@@ -17,13 +17,13 @@
 const PAGES = {
   1: {
     label : '콘웨이의 생명실험',
-    url   : 'https://kjooy0305.github.io/lifegame/',
+    url   : 'pages/1/',
     thumb : null,
     desc  : '셀룰러 오토마타 시뮬레이션',
   },
   2: {
     label : '러시안 룰렛 실패 버전',
-    url   : 'https://kjooy0305.github.io/vibe2026/',
+    url   : 'pages/2/',
     thumb : null,
     desc  : null,
   },

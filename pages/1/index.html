@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conway's Game of Life</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --accent: #238636;
+      --accent-h: #2ea043;
+      --danger: #f85149;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    header h1 { font-size: 15px; font-weight: 600; white-space: nowrap; }
+    .stat { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .stat b { color: #39d353; font-weight: 600; }
+    #loop-badge {
+      font-size: 11px;
+      background: var(--danger);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 4px;
+      display: none;
+      margin-left: auto;
+      font-weight: 600;
+    }
+    #loop-badge.show { display: inline-block; }
+    .main { display: flex; flex: 1; overflow: hidden; }
+    .sidebar {
+      width: 216px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 12px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sec-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+    .row label { font-size: 12px; color: var(--muted); }
+    input[type="number"] {
+      width: 72px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+    }
+    input[type="number"]:focus { border-color: #58a6ff; }
+    .range-wrap { margin-bottom: 8px; }
+    .range-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .range-top span { color: var(--text); }
+    input[type="range"] { width: 100%; accent-color: #39d353; cursor: pointer; }
+    button {
+      display: block;
+      width: 100%;
+      padding: 7px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      margin-bottom: 5px;
+      transition: background .12s;
+      text-align: center;
+    }
+    .btn-primary  { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover  { background: var(--accent-h); }
+    .btn-default  { background: transparent; color: var(--text); }
+    .btn-default:hover  { background: rgba(255,255,255,.06); }
+    .btn-danger   { background: transparent; color: var(--danger); border-color: var(--danger); }
+    .btn-danger:hover   { background: rgba(248,81,73,.1); }
+
+    /* Toggle switch */
+    .tog-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+    .tog-row > span { font-size: 12px; color: var(--muted); line-height: 1.3; }
+    .toggle { position: relative; width: 30px; height: 16px; flex-shrink: 0; cursor: pointer; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .tog-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 8px;
+      transition: background .2s;
+    }
+    .tog-slider::before {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 12px; height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left .2s;
+    }
+    .toggle input:checked + .tog-slider { background: var(--accent); }
+    .toggle input:checked + .tog-slider::before { left: 16px; }
+
+    .tip {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .canvas-area {
+      flex: 1;
+      overflow: auto;
+      background: #0a0e17;
+      cursor: crosshair;
+    }
+    canvas { display: block; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Conway's Game of Life</h1>
+  <div class="stat">세대 <b id="gen">0</b></div>
+  <div class="stat">생존 <b id="alive">0</b></div>
+  <div class="stat">탄생 <b id="born-ct" style="color:#7ee787">0</b> / 소멸 <b id="died-ct" style="color:#f85149">0</b></div>
+  <div id="loop-badge">🔁 루프 감지 · 자동 정지</div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+
+    <div>
+      <div class="sec-title">맵 설정</div>
+      <div class="row"><label>너비 (셀)</label><input type="number" id="mw" value="80" min="10" max="500"></div>
+      <div class="row"><label>높이 (셀)</label><input type="number" id="mh" value="60" min="10" max="400"></div>
+      <div class="range-wrap">
+        <div class="range-top"><span>셀 크기</span><span id="cs-val">10px</span></div>
+        <input type="range" id="cs" min="3" max="24" value="10">
+      </div>
+      <button class="btn-default" id="apply-map">맵 적용</button>
+      <div class="tog-row">
+        <span>경계 순환<br>(벽 통과)</span>
+        <label class="toggle">
+          <input type="checkbox" id="wrap-cb" checked>
+          <span class="tog-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-title">개체 배치</div>
+      <div class="row"><label>랜덤 개수</label><input type="number" id="rc" value="1000" min="1" max="200000"></div>
+      <div class="range-wrap">
+        <div class="range-top"><span>브러시 크기</span><span id="br-val">1×1</span></div>
+        <input type="range" id="br" min="0" max="9" value="0">
+      </div>
+      <div class="range-wrap">
+        <div class="range-top"><span>브러시 밀도</span><span id="bd-val">100%</span></div>
+        <input type="range" id="bd" min="1" max="100" value="100">
+      </div>
+      <button class="btn-primary" id="rnd-btn">랜덤 배치</button>
+      <button class="btn-danger"  id="clr-btn">전체 초기화</button>
+    </div>
+
+    <div>
+      <div class="sec-title">시뮬레이션</div>
+      <button class="btn-primary" id="pp-btn">▶ 재생</button>
+      <button class="btn-default" id="step-btn">⏭ 1세대 진행</button>
+      <div class="range-wrap" style="margin-top:6px">
+        <div class="range-top"><span>속도</span><span id="fps-val">10 FPS</span></div>
+        <input type="range" id="fps-r" min="1" max="60" value="10">
+      </div>
+      <div class="tog-row">
+        <span>루프 감지<br>자동 정지</span>
+        <label class="toggle">
+          <input type="checkbox" id="autostop-cb">
+          <span class="tog-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="tip">
+      시뮬레이션 중에도 클릭·드래그로 셀을 추가·삭제할 수 있습니다.<br><br>
+      <b style="color:var(--text)">색상</b><br>
+      <span style="color:#7ee787">■</span> 신생 &nbsp;
+      <span style="color:#39d353">■</span> 젊음<br>
+      <span style="color:#26a641">■</span> 중년 &nbsp;
+      <span style="color:#1a6b2e">■</span> 장수<br>
+      <span style="color:#2d2013">■</span> 방금 소멸
+    </div>
+
+  </div>
+
+  <div class="canvas-area">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<script>
+// ────── 상태 ──────────────────────────────────────────────────
+let W = 80, H = 60, CS = 10;
+let grid, age, prev;
+let generation = 0;
+let running     = false;
+let fps         = 10;
+let lastTick    = 0;
+let rafId       = null;
+let isDrawing   = false;
+let drawVal     = 1;
+let lastBorn    = 0, lastDied = 0;
+
+// 옵션
+let wrapEdge      = true;
+let brushRadius   = 0;        // 0=1×1, 1=3×3, ..., N=(2N+1)×(2N+1)
+let brushDensity  = 100;      // 1~100% : 브러시 범위 내 셀 칠해질 확률
+let autoStop      = false;
+let hashQueue   = [];
+let loopHashSet = new Set();
+const HASH_WINDOW = 300;      // 최근 300세대 상태 기억
+
+// ────── 그리드 ────────────────────────────────────────────────
+function makeU8()  { return new Uint8Array(W * H); }
+function makeU16() { return new Uint16Array(W * H); }
+function idx(x, y) { return y * W + x; }
+
+function initGrids(w, h) {
+  W = w; H = h;
+  grid = makeU8(); age = makeU16(); prev = makeU8();
+  generation = 0; lastBorn = 0; lastDied = 0;
+  resetHash();
+}
+
+function randomize(n) {
+  const total = W * H;
+  n = Math.min(n, total);
+  grid.fill(0); age.fill(0); prev.fill(0);
+  generation = 0; lastBorn = 0; lastDied = 0;
+  // Fisher-Yates 셔플로 균일 배치
+  const ind = Array.from({length: total}, (_, i) => i);
+  for (let i = total - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    const t = ind[i]; ind[i] = ind[j]; ind[j] = t;
+  }
+  for (let i = 0; i < n; i++) { grid[ind[i]] = 1; age[ind[i]] = 1; }
+  resetHash();
+  hideLoop();
+}
+
+function clearAll() {
+  grid.fill(0); age.fill(0); prev.fill(0);
+  generation = 0; lastBorn = 0; lastDied = 0;
+  resetHash();
+  hideLoop();
+}
+
+// ────── 루프 감지 (FNV-1a 해시) ─────────────────────────────
+function resetHash() { hashQueue = []; loopHashSet.clear(); }
+function showLoop()  { document.getElementById('loop-badge').classList.add('show'); }
+function hideLoop()  { document.getElementById('loop-badge').classList.remove('show'); }
+
+// ────── step() ────────────────────────────────────────────────
+function step() {
+  prev.set(grid);
+  const next = makeU8();
+  let born = 0, died = 0;
+  let hh = 2166136261 | 0;  // FNV-1a 초기값
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let n = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if (wrapEdge) {
+            n += grid[idx((nx + W) % W, (ny + H) % H)];
+          } else {
+            if (nx >= 0 && nx < W && ny >= 0 && ny < H)
+              n += grid[idx(nx, ny)];
+          }
+        }
+      }
+      const alive = grid[idx(x, y)];
+      const survives = alive ? (n === 2 || n === 3) : (n === 3);
+      const ni = idx(x, y);
+      next[ni] = survives ? 1 : 0;
+      age[ni]  = survives ? (alive ? age[ni] + 1 : 1) : 0;
+      if (survives && !alive) born++;
+      if (!survives && alive) died++;
+      // 새 상태를 해시에 반영 (인라인으로 성능 유지)
+      hh ^= next[ni];
+      hh  = Math.imul(hh, 16777619);
+    }
+  }
+
+  grid = next;
+  generation++;
+  lastBorn = born;
+  lastDied = died;
+
+  // 루프 감지
+  if (autoStop) {
+    const key = hh >>> 0;
+    if (loopHashSet.has(key)) {
+      pause();
+      showLoop();
+      return;
+    }
+    hashQueue.push(key);
+    loopHashSet.add(key);
+    if (hashQueue.length > HASH_WINDOW) loopHashSet.delete(hashQueue.shift());
+  }
+}
+
+// ────── 렌더링 ────────────────────────────────────────────────
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+function ageColor(a) {
+  if (a === 1) return '#7ee787';
+  if (a <= 10) return '#39d353';
+  if (a <= 50) return '#26a641';
+  return              '#1a6b2e';
+}
+
+function resizeCanvas() { cv.width = W * CS; cv.height = H * CS; }
+
+function draw() {
+  ctx.fillStyle = '#0a0e17';
+  ctx.fillRect(0, 0, cv.width, cv.height);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = idx(x, y);
+      const cur = grid[i], was = prev[i];
+      if      (cur) ctx.fillStyle = ageColor(age[i]);
+      else if (was) ctx.fillStyle = '#2d2013';
+      else          continue;
+      ctx.fillRect(x * CS + 1, y * CS + 1, CS - 1, CS - 1);
+    }
+  }
+}
+
+function updateStats() {
+  document.getElementById('gen').textContent     = generation.toLocaleString();
+  document.getElementById('born-ct').textContent = lastBorn.toLocaleString();
+  document.getElementById('died-ct').textContent = lastDied.toLocaleString();
+  let n = 0;
+  for (let i = 0; i < grid.length; i++) n += grid[i];
+  document.getElementById('alive').textContent   = n.toLocaleString();
+}
+
+// ────── 애니메이션 루프 ───────────────────────────────────────
+function loop(ts) {
+  if (!running) return;
+  if (ts - lastTick >= 1000 / fps) {
+    step();
+    draw();
+    updateStats();
+    lastTick = ts;
+  }
+  // auto-stop이 step() 내부에서 pause()를 호출하면 running=false가 되므로
+  // running을 확인한 뒤 다음 프레임을 예약
+  if (running) rafId = requestAnimationFrame(loop);
+}
+
+function play() {
+  if (running) return;
+  running = true;
+  hideLoop();
+  resetHash();        // 재생마다 해시 초기화 (수동 편집 후 재생 시 오탐 방지)
+  lastTick = performance.now();
+  rafId = requestAnimationFrame(loop);
+  document.getElementById('pp-btn').textContent = '⏸ 정지';
+}
+
+function pause() {
+  running = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  document.getElementById('pp-btn').textContent = '▶ 재생';
+}
+
+// ────── 캔버스 입력 (브러시 포함) ───────────────────────────
+function cellAt(clientX, clientY) {
+  const r = cv.getBoundingClientRect();
+  return {
+    x: ((clientX - r.left) * (cv.width  / r.width)  / CS) | 0,
+    y: ((clientY - r.top)  * (cv.height / r.height) / CS) | 0
+  };
+}
+
+function paint(cx, cy) {
+  const {x, y} = cellAt(cx, cy);
+  let changed = false;
+  for (let dy = -brushRadius; dy <= brushRadius; dy++) {
+    for (let dx = -brushRadius; dx <= brushRadius; dx++) {
+      // 브러시 범위가 1×1 초과일 때만 밀도 확률 적용
+      if (brushRadius > 0 && Math.random() * 100 >= brushDensity) continue;
+      let bx = x + dx, by = y + dy;
+      if (wrapEdge) {
+        bx = ((bx % W) + W) % W;
+        by = ((by % H) + H) % H;
+      } else {
+        if (bx < 0 || bx >= W || by < 0 || by >= H) continue;
+      }
+      const i = idx(bx, by);
+      if (grid[i] !== drawVal) {
+        grid[i] = drawVal;
+        age[i]  = drawVal ? 1 : 0;
+        changed = true;
+      }
+    }
+  }
+  if (changed) { draw(); updateStats(); }
+}
+
+function startDraw(clientX, clientY) {
+  isDrawing = true;
+  const {x, y} = cellAt(clientX, clientY);
+  const inBounds = x >= 0 && x < W && y >= 0 && y < H;
+  drawVal = (inBounds && grid[idx(x, y)]) ? 0 : 1;
+  paint(clientX, clientY);
+}
+
+cv.addEventListener('mousedown', e => startDraw(e.clientX, e.clientY));
+window.addEventListener('mousemove', e => { if (isDrawing) paint(e.clientX, e.clientY); });
+window.addEventListener('mouseup',   () => { isDrawing = false; });
+
+cv.addEventListener('touchstart', e => {
+  e.preventDefault();
+  startDraw(e.touches[0].clientX, e.touches[0].clientY);
+}, {passive: false});
+cv.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (isDrawing) paint(e.touches[0].clientX, e.touches[0].clientY);
+}, {passive: false});
+cv.addEventListener('touchend', () => { isDrawing = false; });
+
+// ────── 컨트롤 바인딩 ────────────────────────────────────────
+document.getElementById('cs').addEventListener('input', e => {
+  CS = +e.target.value;
+  document.getElementById('cs-val').textContent = CS + 'px';
+  resizeCanvas(); draw();
+});
+
+document.getElementById('apply-map').addEventListener('click', () => {
+  const w = Math.max(10, Math.min(500, +document.getElementById('mw').value || 80));
+  const h = Math.max(10, Math.min(400, +document.getElementById('mh').value || 60));
+  pause(); initGrids(w, h); resizeCanvas(); draw(); updateStats();
+});
+
+document.getElementById('wrap-cb').addEventListener('change', e => {
+  wrapEdge = e.target.checked;
+});
+
+document.getElementById('br').addEventListener('input', e => {
+  brushRadius = +e.target.value;
+  const d = brushRadius * 2 + 1;
+  document.getElementById('br-val').textContent = `${d}×${d}`;
+});
+
+document.getElementById('bd').addEventListener('input', e => {
+  brushDensity = +e.target.value;
+  document.getElementById('bd-val').textContent = brushDensity + '%';
+});
+
+document.getElementById('rnd-btn').addEventListener('click', () => {
+  randomize(Math.max(1, +document.getElementById('rc').value || 1000));
+  draw(); updateStats();
+});
+
+document.getElementById('clr-btn').addEventListener('click', () => {
+  pause(); clearAll(); draw(); updateStats();
+});
+
+document.getElementById('pp-btn').addEventListener('click', () => {
+  running ? pause() : play();
+});
+
+document.getElementById('step-btn').addEventListener('click', () => {
+  pause(); step(); draw(); updateStats();
+});
+
+document.getElementById('fps-r').addEventListener('input', e => {
+  fps = +e.target.value;
+  document.getElementById('fps-val').textContent = fps + ' FPS';
+});
+
+document.getElementById('autostop-cb').addEventListener('change', e => {
+  autoStop = e.target.checked;
+});
+
+// ────── 초기화 ────────────────────────────────────────────────
+initGrids(W, H);
+resizeCanvas();
+randomize(1000);
+draw();
+updateStats();
+</script>
+</body>
+</html>

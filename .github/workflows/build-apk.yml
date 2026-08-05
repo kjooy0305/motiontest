@@ -38,19 +38,24 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon
 
-      - name: Sign APK (debug key for now)
+      - name: Decode keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > release.p12
+
+      - name: Sign APK
+        env:
+          KEY_PASS: ${{ secrets.KEY_PASS }}
         run: |
           BUILD_TOOLS=$(ls $ANDROID_SDK_ROOT/build-tools/ | sort -V | tail -n1)
           $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/zipalign -v -p 4 \
             app/build/outputs/apk/release/app-release-unsigned.apk \
             app/build/outputs/apk/release/stick-fighter-aligned.apk
-          keytool -genkeypair -v -keystore debug.keystore -alias debug \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=StickFighter, OU=Debug, O=Debug, L=Seoul, ST=Seoul, C=KR" \
-            -storepass android -keypass android
           $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/apksigner sign \
-            --ks debug.keystore --ks-key-alias debug \
-            --ks-pass pass:android --key-pass pass:android \
+            --ks release.p12 --ks-type PKCS12 \
+            --ks-key-alias release \
+            --ks-pass pass:$KEY_PASS --key-pass pass:$KEY_PASS \
             --out app/build/outputs/apk/release/stick-fighter.apk \
             app/build/outputs/apk/release/stick-fighter-aligned.apk
 

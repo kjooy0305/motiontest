@@ -140,10 +140,10 @@ class AnimationEditorActivity : AppCompatActivity() {
     }
 
     private fun showFpsDialog() {
-        val view = layoutInflater.inflate(android.R.layout.select_dialog_item, null)
+        val currentFps = animation.fps  // capture before apply{} to avoid View.animation shadowing
         val seek = SeekBar(this)
-        seek.max = 29; seek.progress = animation.fps - 1
-        val label = TextView(this).apply { text = "${animation.fps} fps"; textSize = 14f }
+        seek.max = 29; seek.progress = currentFps - 1
+        val label = TextView(this).apply { text = "$currentFps fps"; textSize = 14f }
         seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar, p: Int, u: Boolean) { label.text = "${p + 1} fps" }
             override fun onStartTrackingTouch(sb: SeekBar) {}
@@ -170,8 +170,9 @@ class AnimationEditorActivity : AppCompatActivity() {
     }
 
     private fun showRenameDialog() {
+        val currentName = animation.name  // capture before apply{} to avoid View.animation shadowing
         val input = EditText(this).apply {
-            setText(animation.name)
+            setText(currentName)
             selectAll()
             val p = (16 * resources.displayMetrics.density).toInt()
             setPadding(p, p / 2, p, p / 2)

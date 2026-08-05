@@ -42,9 +42,9 @@ class FrameAdapter(
             b.tvFrameNum.text = "${adapterPosition + 1}"
             b.imgFrame.setImageBitmap(generateThumb(frame))
             b.root.strokeColor = if (selected)
-                ContextCompat.getColorStateList(b.root.context, R.color.accent)
+                ContextCompat.getColor(b.root.context, R.color.accent)
             else
-                ContextCompat.getColorStateList(b.root.context, R.color.surface)
+                ContextCompat.getColor(b.root.context, R.color.surface)
             b.root.strokeWidth = if (selected) 3f else 0f
             b.root.setOnClickListener { onClick(adapterPosition) }
             b.root.setOnLongClickListener { onLongClick(adapterPosition); true }

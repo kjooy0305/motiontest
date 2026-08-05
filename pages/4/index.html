@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>카카오 지도</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    font-family: -apple-system, 'Malgun Gothic', sans-serif;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── 상단 툴바 ── */
+  #toolbar {
+    position: relative;
+    z-index: 10;
+    background: #1a1a1a;
+    border-bottom: 1px solid #2a2a2a;
+    padding: 10px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #search-input {
+    flex: 1;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #ccc;
+    font-size: 14px;
+    padding: 8px 12px;
+    outline: none;
+    font-family: inherit;
+  }
+  #search-input::placeholder { color: #555; }
+  #search-input:focus { border-color: #555; }
+
+  .tb-btn {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #bbb;
+    font-size: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, color .15s;
+    font-family: inherit;
+  }
+  .tb-btn:hover  { background: #2a2a2a; color: #eee; }
+  .tb-btn:active { background: #333; }
+  .tb-btn.active { background: #1a3a5c; border-color: #2e6da4; color: #7ab8f5; }
+
+  /* ── 지도 ── */
+  #map {
+    flex: 1;
+    width: 100%;
+  }
+
+  /* ── 하단 패널 ── */
+  #info-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: rgba(20,20,20,0.95);
+    border-top: 1px solid #2a2a2a;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #888;
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: transform .25s ease;
+  }
+  #info-panel.hidden { transform: translateY(100%); }
+
+  #info-text { color: #ccc; flex: 1; line-height: 1.4; }
+  #info-close {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  #info-close:hover { color: #999; }
+
+  /* ── 현재 위치 버튼 ── */
+  #loc-btn {
+    position: absolute;
+    right: 14px;
+    bottom: 64px;
+    z-index: 9;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #bbb;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+    transition: background .15s, color .15s;
+  }
+  #loc-btn:hover  { background: #222; color: #eee; }
+  #loc-btn:active { background: #2a2a2a; }
+  #loc-btn.loading { color: #2e6da4; animation: spin .8s linear infinite; }
+
+  /* ── 마커 카운터 ── */
+  #marker-badge {
+    position: absolute;
+    left: 14px;
+    bottom: 64px;
+    z-index: 9;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 20px;
+    color: #888;
+    font-size: 12px;
+    font-family: sans-serif;
+    padding: 6px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+  }
+  #marker-badge span { color: #7ab8f5; font-weight: bold; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 커스텀 인포윈도우 숨기기 (카카오 기본 X버튼 스타일 교체) */
+  .custom-overlay {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #ccc;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,.6);
+    position: relative;
+  }
+  .custom-overlay::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: #333;
+    border-bottom: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- 툴바 -->
+<div id="toolbar">
+  <input id="search-input" type="text" placeholder="장소 검색 (예: 강남역)" autocomplete="off">
+  <button class="tb-btn" id="search-btn" onclick="searchPlace()">검색</button>
+  <button class="tb-btn" id="marker-mode-btn" onclick="toggleMarkerMode()">마커 추가</button>
+</div>
+
+<!-- 지도 -->
+<div id="map"></div>
+
+<!-- 현재 위치 버튼 -->
+<button id="loc-btn" onclick="goToMyLocation()" title="현재 위치">⊙</button>
+
+<!-- 마커 카운터 -->
+<div id="marker-badge">마커 <span id="marker-count">0</span></div>
+
+<!-- 하단 정보 패널 -->
+<div id="info-panel" class="hidden">
+  <div id="info-text"></div>
+  <button id="info-close" onclick="closePanel()">×</button>
+</div>
+
+<script>
+// ── Kakao Maps SDK 로드 ──────────────────────────────
+(function() {
+  const s = document.createElement('script');
+  s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=e3dc17a87b67b4f01cd2c15e77f3b4d4&libraries=services&autoload=false';
+  s.onload = () => kakao.maps.load(initMap);
+  document.head.appendChild(s);
+})();
+
+// ── 전역 상태 ────────────────────────────────────────
+let map, geocoder, ps;
+let markerMode = false;
+let userMarkers = [];
+let searchMarkers = [];
+let myLocationMarker = null;
+let activeOverlay = null;
+
+// ── 지도 초기화 ──────────────────────────────────────
+function initMap() {
+  geocoder = new kakao.maps.services.Geocoder();
+  ps = new kakao.maps.services.Places();
+
+  map = new kakao.maps.Map(document.getElementById('map'), {
+    center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청
+    level: 5,
+  });
+
+  // 지도 컨트롤
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+
+  // 지도 클릭 → 마커 추가 (마커 모드일 때만)
+  kakao.maps.event.addListener(map, 'click', function(e) {
+    if (!markerMode) return;
+    addUserMarker(e.latLng);
+  });
+
+  // 입력창 엔터
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchPlace();
+  });
+}
+
+// ── 마커 모드 토글 ───────────────────────────────────
+function toggleMarkerMode() {
+  markerMode = !markerMode;
+  const btn = document.getElementById('marker-mode-btn');
+  btn.classList.toggle('active', markerMode);
+  btn.textContent = markerMode ? '마커 끄기' : '마커 추가';
+  document.getElementById('map').style.cursor = markerMode ? 'crosshair' : '';
+}
+
+// ── 사용자 마커 추가 ─────────────────────────────────
+function addUserMarker(latlng) {
+  const marker = new kakao.maps.Marker({
+    map,
+    position: latlng,
+    title: `마커 ${userMarkers.length + 1}`,
+  });
+
+  const idx = userMarkers.length + 1;
+
+  // 클릭 → 삭제
+  kakao.maps.event.addListener(marker, 'click', function() {
+    if (activeOverlay) { activeOverlay.setMap(null); activeOverlay = null; }
+
+    const content = document.createElement('div');
+    content.className = 'custom-overlay';
+    content.innerHTML = `마커 ${idx} &nbsp;<button onclick="removeMarker(this)" style="background:none;border:none;color:#c0392b;cursor:pointer;font-size:13px;padding:0 2px">✕</button>`;
+
+    const overlay = new kakao.maps.CustomOverlay({
+      map,
+      position: latlng,
+      content,
+      yAnchor: 2.4,
+    });
+    activeOverlay = overlay;
+
+    content.querySelector('button').addEventListener('click', () => {
+      marker.setMap(null);
+      overlay.setMap(null);
+      userMarkers = userMarkers.filter(m => m !== marker);
+      updateMarkerCount();
+    });
+  });
+
+  // 역지오코딩 → 하단 패널 표시
+  geocoder.coord2Address(latlng.getLng(), latlng.getLat(), function(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+      const addr = result[0].road_address
+        ? result[0].road_address.address_name
+        : result[0].address.address_name;
+      showPanel(`마커 ${idx}: ${addr}`);
+    }
+  });
+
+  userMarkers.push(marker);
+  updateMarkerCount();
+  if (activeOverlay) { activeOverlay.setMap(null); activeOverlay = null; }
+}
+
+function updateMarkerCount() {
+  document.getElementById('marker-count').textContent = userMarkers.length;
+}
+
+// ── 장소 검색 ────────────────────────────────────────
+function searchPlace() {
+  const query = document.getElementById('search-input').value.trim();
+  if (!query) return;
+
+  // 기존 검색 마커 제거
+  searchMarkers.forEach(m => m.setMap(null));
+  searchMarkers = [];
+
+  ps.keywordSearch(query, function(data, status) {
+    if (status !== kakao.maps.services.Status.OK) {
+      showPanel('검색 결과가 없습니다.');
+      return;
+    }
+
+    const bounds = new kakao.maps.LatLngBounds();
+
+    data.slice(0, 5).forEach((place, i) => {
+      const latlng = new kakao.maps.LatLng(place.y, place.x);
+      bounds.extend(latlng);
+
+      const marker = new kakao.maps.Marker({
+        map,
+        position: latlng,
+        title: place.place_name,
+      });
+
+      kakao.maps.event.addListener(marker, 'click', function() {
+        showPanel(`${place.place_name}${place.road_address_name ? '\n' + place.road_address_name : ''}`);
+        map.setCenter(latlng);
+      });
+
+      searchMarkers.push(marker);
+    });
+
+    map.setBounds(bounds);
+    showPanel(`"${query}" 검색 결과 ${data.slice(0,5).length}건`);
+  });
+}
+
+// ── 현재 위치 ────────────────────────────────────────
+function goToMyLocation() {
+  if (!navigator.geolocation) {
+    showPanel('이 브라우저는 위치 정보를 지원하지 않습니다.');
+    return;
+  }
+
+  const btn = document.getElementById('loc-btn');
+  btn.classList.add('loading');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      btn.classList.remove('loading');
+      const latlng = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+
+      if (myLocationMarker) myLocationMarker.setMap(null);
+      myLocationMarker = new kakao.maps.Marker({
+        map,
+        position: latlng,
+        title: '내 위치',
+        image: new kakao.maps.MarkerImage(
+          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+          new kakao.maps.Size(24, 35)
+        ),
+      });
+
+      map.setCenter(latlng);
+      map.setLevel(3);
+      showPanel('현재 위치로 이동했습니다.');
+    },
+    err => {
+      btn.classList.remove('loading');
+      showPanel('위치 정보를 가져올 수 없습니다. 브라우저 권한을 확인하세요.');
+    },
+    { timeout: 10000 }
+  );
+}
+
+// ── 패널 ─────────────────────────────────────────────
+function showPanel(text) {
+  document.getElementById('info-text').textContent = text;
+  document.getElementById('info-panel').classList.remove('hidden');
+}
+
+function closePanel() {
+  document.getElementById('info-panel').classList.add('hidden');
+}
+</script>
+</body>
+</html>

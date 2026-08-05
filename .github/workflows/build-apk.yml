@@ -42,7 +42,7 @@ jobs:
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
         run: |
-          echo "$KEYSTORE_B64" | base64 -d > release.p12
+          python3 -c "import base64,os; open('release.p12','wb').write(base64.b64decode(os.environ['KEYSTORE_B64']))"
 
       - name: Sign APK
         env:

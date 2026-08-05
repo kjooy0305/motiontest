@@ -45,7 +45,7 @@ class FrameAdapter(
                 ContextCompat.getColor(b.root.context, R.color.accent)
             else
                 ContextCompat.getColor(b.root.context, R.color.surface)
-            b.root.strokeWidth = if (selected) 3f else 0f
+            b.root.strokeWidth = if (selected) 3 else 0
             b.root.setOnClickListener { onClick(adapterPosition) }
             b.root.setOnLongClickListener { onLongClick(adapterPosition); true }
         }

@@ -1,0 +1,78 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Bootstrap Gradle wrapper
+        run: |
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "Downloading Gradle wrapper jar..."
+            mkdir -p gradle/wrapper
+            curl -L -o gradle/wrapper/gradle-wrapper.jar \
+              "https://github.com/gradle/gradle/raw/v8.6.0/gradle/wrapper/gradle-wrapper.jar"
+          fi
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Sign APK (debug key for now)
+        run: |
+          BUILD_TOOLS=$(ls $ANDROID_SDK_ROOT/build-tools/ | sort -V | tail -n1)
+          $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/zipalign -v -p 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk \
+            app/build/outputs/apk/release/stick-fighter-aligned.apk
+          keytool -genkeypair -v -keystore debug.keystore -alias debug \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=StickFighter, OU=Debug, O=Debug, L=Seoul, ST=Seoul, C=KR" \
+            -storepass android -keypass android
+          $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/apksigner sign \
+            --ks debug.keystore --ks-key-alias debug \
+            --ks-pass pass:android --key-pass pass:android \
+            --out app/build/outputs/apk/release/stick-fighter.apk \
+            app/build/outputs/apk/release/stick-fighter-aligned.apk
+
+      - name: Get tag name
+        id: tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: "스틱 파이터 ${{ steps.tag.outputs.TAG }}"
+          body: |
+            ## 스틱 파이터 ${{ steps.tag.outputs.TAG }}
+
+            ### 설치 방법
+            1. `stick-fighter.apk` 파일을 다운로드
+            2. 안드로이드 기기에서 **알 수 없는 앱 설치** 허용 (설정 → 보안)
+            3. APK 파일 실행 후 설치
+
+            ### 요구 사항
+            - Android 8.0 (API 26) 이상
+          files: app/build/outputs/apk/release/stick-fighter.apk
+          draft: false
+          prerelease: false

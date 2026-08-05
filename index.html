@@ -201,6 +201,10 @@
         <div class="range-top"><span>브러시 크기</span><span id="br-val">1×1</span></div>
         <input type="range" id="br" min="0" max="9" value="0">
       </div>
+      <div class="range-wrap">
+        <div class="range-top"><span>브러시 밀도</span><span id="bd-val">100%</span></div>
+        <input type="range" id="bd" min="1" max="100" value="100">
+      </div>
       <button class="btn-primary" id="rnd-btn">랜덤 배치</button>
       <button class="btn-danger"  id="clr-btn">전체 초기화</button>
     </div>
@@ -253,9 +257,10 @@ let drawVal     = 1;
 let lastBorn    = 0, lastDied = 0;
 
 // 옵션
-let wrapEdge    = true;
-let brushRadius = 0;          // 0=1×1, 1=3×3, ..., N=(2N+1)×(2N+1)
-let autoStop    = false;
+let wrapEdge      = true;
+let brushRadius   = 0;        // 0=1×1, 1=3×3, ..., N=(2N+1)×(2N+1)
+let brushDensity  = 100;      // 1~100% : 브러시 범위 내 셀 칠해질 확률
+let autoStop      = false;
 let hashQueue   = [];
 let loopHashSet = new Set();
 const HASH_WINDOW = 300;      // 최근 300세대 상태 기억
@@ -435,6 +440,8 @@ function paint(cx, cy) {
   let changed = false;
   for (let dy = -brushRadius; dy <= brushRadius; dy++) {
     for (let dx = -brushRadius; dx <= brushRadius; dx++) {
+      // 브러시 범위가 1×1 초과일 때만 밀도 확률 적용
+      if (brushRadius > 0 && Math.random() * 100 >= brushDensity) continue;
       let bx = x + dx, by = y + dy;
       if (wrapEdge) {
         bx = ((bx % W) + W) % W;
@@ -496,6 +503,11 @@ document.getElementById('br').addEventListener('input', e => {
   brushRadius = +e.target.value;
   const d = brushRadius * 2 + 1;
   document.getElementById('br-val').textContent = `${d}×${d}`;
+});
+
+document.getElementById('bd').addEventListener('input', e => {
+  brushDensity = +e.target.value;
+  document.getElementById('bd-val').textContent = brushDensity + '%';
 });
 
 document.getElementById('rnd-btn').addEventListener('click', () => {

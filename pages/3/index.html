@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>마지막 하루</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --border: #1e1e28;
+    --text: #c8c0b0;
+    --text-dim: #6a6258;
+    --text-bright: #e8dfc8;
+    --red: #8b1a1a;
+    --red-bright: #c0392b;
+    --blue: #1a3a5c;
+    --blue-bright: #2e6da4;
+    --gold: #8b7340;
+    --gold-bright: #c9a84c;
+    --green: #1a4a2e;
+    --green-bright: #27ae60;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Batang', '바탕', serif;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── 상태 바 ── */
+  #status-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .meter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  .meter-label {
+    color: var(--text-dim);
+    min-width: 32px;
+    font-family: sans-serif;
+  }
+
+  .meter-track {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  #infection-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5a0000, #c0392b);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  #resolve-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1a3a5c, #2e6da4);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  .meter-value {
+    font-family: sans-serif;
+    font-size: 10px;
+    min-width: 28px;
+    text-align: right;
+  }
+
+  #infection-value { color: #c0392b; }
+  #resolve-value   { color: #2e6da4; }
+
+  #items-bar {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: sans-serif;
+    min-height: 14px;
+    letter-spacing: 0.3px;
+  }
+  #items-bar span { color: var(--gold-bright); }
+
+  /* ── 메인 게임 영역 ── */
+  #game-wrap {
+    flex: 1;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* 씬 헤더 */
+  #scene-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #chapter-label {
+    font-size: 11px;
+    font-family: sans-serif;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  #scene-title {
+    font-size: 18px;
+    font-weight: normal;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+
+  /* 스토리 텍스트 */
+  #story-text {
+    font-size: 15.5px;
+    line-height: 1.95;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: keep-all;
+    min-height: 120px;
+  }
+
+  #story-text .emphasis { color: var(--text-bright); font-style: italic; }
+  #story-text .danger   { color: #c0392b; }
+  #story-text .hope     { color: #4a8c5c; }
+  #story-text .dim      { color: var(--text-dim); }
+
+  /* 선택지 */
+  #choices-wrap {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Georgia', 'Batang', serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 14px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+    word-break: keep-all;
+  }
+
+  .choice-btn:hover {
+    border-color: #3a3a50;
+    background: #151520;
+    color: var(--text-bright);
+  }
+
+  .choice-btn:active { background: #1a1a2a; }
+
+  .choice-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .choice-btn .choice-note {
+    display: block;
+    font-size: 11px;
+    font-family: sans-serif;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* 엔딩 화면 */
+  #ending-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #ending-overlay.show { display: flex; }
+
+  #ending-box {
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+  }
+
+  #ending-type {
+    font-size: 11px;
+    font-family: sans-serif;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  #ending-title {
+    font-size: 24px;
+    color: var(--text-bright);
+    margin-bottom: 28px;
+    font-weight: normal;
+  }
+
+  #ending-text {
+    font-size: 14.5px;
+    line-height: 2;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: keep-all;
+    text-align: left;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+    margin-bottom: 32px;
+  }
+
+  #ending-stats {
+    font-size: 12px;
+    font-family: sans-serif;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    line-height: 1.8;
+  }
+
+  #restart-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    padding: 12px 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  #restart-btn:hover { border-color: #444; color: var(--text-bright); }
+
+  /* 타이틀 화면 */
+  #title-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    padding: 32px;
+    text-align: center;
+  }
+
+  #title-screen.hidden { display: none; }
+
+  .title-sub {
+    font-size: 11px;
+    font-family: sans-serif;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .title-main {
+    font-size: 36px;
+    color: var(--text-bright);
+    font-weight: normal;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+  }
+
+  .title-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    max-width: 320px;
+    margin-bottom: 48px;
+  }
+
+  #start-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: var(--text);
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    padding: 14px 40px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    letter-spacing: 1px;
+  }
+  #start-btn:hover { border-color: #666; color: var(--text-bright); }
+
+  .title-footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 11px;
+    font-family: sans-serif;
+    color: #2a2a2a;
+  }
+
+  /* 감염 경고 플래시 */
+  @keyframes danger-pulse {
+    0%,100% { box-shadow: inset 0 0 0 0 transparent; }
+    50%      { box-shadow: inset 0 0 40px 10px rgba(139,26,26,.25); }
+  }
+  body.danger-flash { animation: danger-pulse 0.6s ease; }
+
+  /* 페이드 인 */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fade-in 0.5s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- 타이틀 화면 -->
+<div id="title-screen">
+  <div class="title-sub">TEXT DUNGEON</div>
+  <h1 class="title-main">마지막 하루</h1>
+  <p class="title-desc">
+    좀비 아포칼립스 발생 3일차.<br>
+    당신은 감염되었다. 딸이 학교에 있다.<br>
+    남은 시간이 얼마나 될지 모른다.<br><br>
+    진엔딩 / 일반 엔딩 / 배드 엔딩 존재
+  </p>
+  <button id="start-btn" onclick="startGame()">시작하기</button>
+  <div class="title-footer">※ 선택에 따라 결말이 달라집니다</div>
+</div>
+
+<!-- 상태 바 -->
+<div id="status-bar">
+  <div class="meter-row">
+    <span class="meter-label">감염</span>
+    <div class="meter-track"><div id="infection-fill" style="width:20%"></div></div>
+    <span class="meter-value" id="infection-value">20%</span>
+  </div>
+  <div class="meter-row">
+    <span class="meter-label">의지</span>
+    <div class="meter-track"><div id="resolve-fill" style="width:50%"></div></div>
+    <span class="meter-value" id="resolve-value">5/10</span>
+  </div>
+  <div id="items-bar">보유 아이템: <span>없음</span></div>
+</div>
+
+<!-- 게임 본문 -->
+<div id="game-wrap">
+  <div id="scene-header">
+    <span id="chapter-label">Chapter 1</span>
+    <h2 id="scene-title">깨어남</h2>
+  </div>
+  <div id="story-text"></div>
+  <div id="choices-wrap"></div>
+</div>
+
+<!-- 엔딩 오버레이 -->
+<div id="ending-overlay">
+  <div id="ending-box">
+    <div id="ending-type"></div>
+    <div id="ending-title"></div>
+    <div id="ending-text"></div>
+    <div id="ending-stats"></div>
+    <button id="restart-btn" onclick="restartGame()">처음부터 다시</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  게임 상태
+// ═══════════════════════════════════════════════════
+let G = {};
+
+function initState() {
+  G = {
+    infection : 20,   // 0~100, 100 = 배드엔딩 강제
+    resolve   : 5,    // 0~10
+    items     : [],   // 'medicine','food','weapon','note','photo'
+    flags     : {
+      found_medicine : false,
+      helped_npc     : false,
+      note_found     : false,
+      took_rest      : false,
+    },
+    chapter   : 1,
+    scene     : 'start',
+    choices_made : 0,
+  };
+}
+
+// ═══════════════════════════════════════════════════
+//  씬 데이터
+// ═══════════════════════════════════════════════════
+const SCENES = {
+
+/* ── 1. 깨어남 ─────────────────────────────────── */
+start: {
+  title: '깨어남',
+  chapter: 1,
+  getText(s) {
+    return `눈을 뜨자 흰 천장이 보였다.
+
+먼지 쌓인 형광등. 뒤집어진 침대. 부서진 유리창. 병원이었다.
+
+오른팔에서 타는 듯한 통증이 느껴졌다. 갈색으로 굳은 혈흔이 배어난 붕대가 팔꿈치 위를 두 겹으로 감고 있었다. 3일은 된 것 같았다.
+
+기억이 서서히 돌아왔다.
+
+아포칼립스 첫날 아침. 마트 주차장에서의 혼란. 사람들의 비명. 그리고 갑작스러운 통증과 함께—
+
+'<span class="emphasis">수아.</span>'
+
+딸의 이름이 머릿속을 강타했다. 이수아, 아홉 살. 사태가 터진 그날, 수아는 학교에 있었다. 마지막 통화는 72시간 전 아침이었다. "아빠, 무서워요." 그게 마지막이었다.
+
+옆 침대 위에 구겨진 쪽지 하나가 놓여 있었다. 의사의 흘려 쓴 글씨였다.
+
+<span class="dim">───────────────
+환자: 이진우 / 38세 / 응급구조사
+감염 확인: 72시간 전 (하박부 교상)
+현 상태: 바이러스 전환 진행 중
+인지 기능: 현재 유지 중
+예상 전환 시점: <span class="danger">8~12시간 이내</span>
+───────────────</span>
+
+손이 떨렸다.
+
+8시간. 그는 손목시계를 바라봤다. 오전 7시 22분. 학교까지는 걸어서 두 시간 거리다.
+
+아직 움직일 수 있다.`;
+  },
+  choices: [
+    {
+      text: '"방 안을 더 살펴본다."',
+      note: '시간을 조금 쓰지만 무언가 찾을 수 있을지도 모른다',
+      effects: { infection: +3 },
+      items_add: ['medical_kit'],
+      next: 'corridor',
+    },
+    {
+      text: '"지금 당장 나간다."',
+      note: '아무것도 없어도 좋다, 수아가 먼저다',
+      effects: {},
+      next: 'corridor',
+    },
+  ],
+},
+
+/* ── 2. 병원 복도 ───────────────────────────────── */
+corridor: {
+  title: '병원 복도',
+  chapter: 2,
+  getText(s) {
+    const hasKit = s.items.includes('medical_kit');
+    const high = s.infection >= 50;
+    return `복도에는 정적만이 흘렀다.
+
+엎어진 휠체어. 발자국 모양의 피 흔적. 천장에서 끊어진 전선이 간헐적으로 불꽃을 튀겼다.${high ? '\n\n팔의 통증이 심해지고 있었다. 이마에서 식은땀이 흘렀다.' : ''}
+
+복도 끝, 왼쪽에 <span class="emphasis">약국</span> 표지판이 보였다. 불은 꺼져 있었지만 문은 열려 있었다. 오른쪽 비상구 표지판 아래엔 계단이 보였다.
+
+어디선가 낮고 불규칙한 신음소리가 들려왔다. 가깝지는 않았다. 아직.${hasKit ? '\n\n가방 속 의료 키트가 묵직하게 느껴졌다.' : ''}`;
+  },
+  choices: [
+    {
+      text: '"약국을 살펴본다."',
+      note: '시간이 걸리지만 감염 억제제를 찾을 수 있을지도',
+      effects: { infection: +3 },
+      next: 'pharmacy',
+    },
+    {
+      text: '"계단으로 바로 내려간다."',
+      note: '빠르지만 아무것도 없이 나가야 한다',
+      effects: {},
+      next: 'street',
+    },
+  ],
+},
+
+/* ── 3. 약국 ────────────────────────────────────── */
+pharmacy: {
+  title: '병원 약국',
+  chapter: 3,
+  getText(s) {
+    return `약국 안은 어두웠다.
+
+진열대가 대부분 쓰러져 있었고, 바닥에는 쏟아진 약병들이 뒤섞여 있었다. 빛이 거의 없었다. 휴대폰 화면을 켜 비추자 유리 파편이 반짝였다.
+
+카운터 너머, 무언가가 움직이는 소리가 들렸다.
+
+<span class="danger">좀비였다.</span>
+
+등이 돌아선 채 약장을 뒤지고 있는 것처럼 보였다. 아직 이쪽을 발견하지 못한 것 같았다.
+
+처방전 서랍 위에 파란 라벨의 병이 눈에 들어왔다. '<span class="emphasis">바이러스 억제제 — 실험적 처방</span>'. 손만 뻗으면 닿을 거리였다.`;
+  },
+  choices: [
+    {
+      text: '"숨을 죽이고 조용히 집어든다."',
+      note: '성공하면 감염 진행이 늦춰진다',
+      effects: { infection: +2 },
+      items_add: ['medicine'],
+      flags_set: { found_medicine: true },
+      next: 'street',
+    },
+    {
+      text: '"빠르게 서랍을 뒤진다. 더 없을까?"',
+      note: '소리를 낼 위험이 있다, 의지가 필요하다',
+      effects: { infection: +8, resolve: -1 },
+      items_add: ['medicine', 'bandage'],
+      flags_set: { found_medicine: true },
+      next: 'street',
+    },
+    {
+      text: '"너무 위험하다. 그냥 나간다."',
+      effects: {},
+      next: 'street',
+    },
+  ],
+},
+
+/* ── 4. 거리로 ──────────────────────────────────── */
+street: {
+  title: '폐허가 된 거리',
+  chapter: 3,
+  getText(s) {
+    const hasMed = s.flags.found_medicine;
+    const high = s.infection >= 45;
+    return `밖으로 나오자 잿빛 하늘이 펼쳐졌다.
+
+어딘가에서 연기가 피어올랐다. 도로 한가운데에 버려진 차들이 줄지어 서 있었다. 신호등은 꺼져 있었다. 슈퍼마켓의 유리창은 모두 박살 나 있었다.
+
+그리고 — 냄새.
+
+도저히 형용하기 어려운 썩은 냄새가 바람을 타고 흘러왔다. 진우는 구역질을 참았다.
+
+한 블록 앞, 골목 입구 옆에 작은 운동화 한 짝이 떨어져 있었다. 분홍색. 수아가 좋아하는 색이었다.${hasMed ? '\n\n억제제를 삼켰다. 쓴맛이 올라왔지만, 팔의 통증이 조금 가라앉는 것 같았다.' : ''}${high ? '\n\n<span class="danger">머릿속이 간헐적으로 흐릿해졌다. 집중해야 했다.</span>' : ''}
+
+학교까지 두 경로가 있었다.
+
+서쪽 대로는 빠르지만 탁 트여 있어 위험했다. 북쪽 골목은 돌아가지만 건물 사이를 지날 수 있었다. 누군가 살아있다면 건물 안에 있을 가능성이 높았다.`;
+  },
+  choices: [
+    {
+      text: '"서쪽 대로로 간다. 빠른 게 최우선이다."',
+      note: '빠르지만 탁 트여 있어 위험하다',
+      effects: { infection: +5 },
+      next: 'market',
+    },
+    {
+      text: '"북쪽 골목으로 간다. 살아있는 사람이 있을지도."',
+      note: '돌아가지만 더 안전하고, 무언가 얻을 수 있을지도',
+      effects: { infection: +3 },
+      next: 'apartment',
+    },
+  ],
+},
+
+/* ── 5a. 슈퍼마켓 ───────────────────────────────── */
+market: {
+  title: '버려진 슈퍼마켓',
+  chapter: 4,
+  getText(s) {
+    return `유리가 박살 난 슈퍼마켓 입구 앞에 섰다.
+
+안쪽은 어두웠다. 진열대 사이사이로 물건들이 쏟아져 있었고, 바닥에는 발자국과 혈흔이 뒤섞여 있었다.
+
+입구 옆 카트 위에 메모 하나가 테이프로 붙어 있었다.
+
+<span class="dim">'희망초등학교 지하 대피소. 살아있는 사람은 모이세요. —생존자 일동'</span>
+
+<span class="emphasis">희망초등학교.</span> 수아의 학교였다.
+
+손이 떨렸다. 살아있는 사람들이 있다는 말은 — 수아도 있을 수 있다는 말이었다.
+
+안쪽에서 뭔가 쓰러지는 소리가 났다.`;
+  },
+  choices: [
+    {
+      text: '"안으로 들어가 보급품을 챙긴다."',
+      note: '식량과 무기를 얻을 수 있지만 위험하다',
+      effects: { infection: +7, resolve: -1 },
+      items_add: ['food', 'weapon'],
+      flags_set: { note_found: true },
+      next: 'park_road',
+    },
+    {
+      text: '"메모만 챙기고 계속 이동한다."',
+      note: '안전하지만 빈손이다',
+      effects: { infection: +2 },
+      flags_set: { note_found: true },
+      next: 'park_road',
+    },
+  ],
+},
+
+/* ── 5b. 아파트 단지 ────────────────────────────── */
+apartment: {
+  title: '아파트 단지',
+  chapter: 4,
+  getText(s) {
+    return `골목을 지나자 낡은 아파트 단지가 나왔다.
+
+1층 창문 너머로 커튼이 살짝 흔들렸다. 누군가 있었다.
+
+망설이다 창문을 두드렸다. 잠시 침묵이 흘렀다.
+
+"…누구세요?"
+
+노인의 목소리였다. 조심스럽게 커튼이 열렸다. 칠십대쯤 되어 보이는 할머니가 유리 너머에서 진우를 바라봤다. 눈이 빨갛게 부어 있었다.
+
+"혼자세요?" 진우가 물었다.
+
+"손녀하고요." 짧게 답했다. "사흘째 여기 있어요. 식량도 떨어지고… 나가기가 무서워서."
+
+할머니의 손에서 오래된 지도 한 장이 보였다. 무언가를 표시해 뒀다. 진우는 팔의 통증을 느끼며 잠시 그 자리에 섰다.
+
+도와줄 수도 있었다. 하지만 시간이 없었다.`;
+  },
+  choices: [
+    {
+      text: '"일단 안으로 들어가 도와드린다."',
+      note: '시간이 걸리지만 무언가 얻을 수 있을지도',
+      effects: { infection: +5, resolve: +2 },
+      items_add: ['food'],
+      flags_set: { helped_npc: true, note_found: true },
+      next: 'park_road',
+    },
+    {
+      text: '"죄송합니다. 저도 급합니다."',
+      note: '빠르지만 마음에 남는다',
+      effects: { infection: +2, resolve: -1 },
+      next: 'park_road',
+    },
+  ],
+},
+
+/* ── 6. 공원 옆 도로 ────────────────────────────── */
+park_road: {
+  title: '공원 옆 도로',
+  chapter: 5,
+  getText(s) {
+    const high = s.infection >= 60;
+    const hasWeapon = s.items.includes('weapon');
+    return `공원 울타리 옆을 지나는데 — 멈춰야 했다.
+
+철망 안에 아이가 있었다.
+
+다섯 살도 안 됐을 것 같은 아이. 핏빛 눈과 느릿한 움직임. 이미 감염돼 있었다.
+
+<span class="danger">아이였다.</span>
+
+진우는 한참 그 자리에 서 있었다. 발이 떨어지지 않았다. 어딘가 먼 곳에서 신음소리가 들려왔다. 그 소리가, 수아의 목소리와 겹쳐졌다.${high ? '\n\n<span class="danger">팔이 타오르는 것 같았다. 이마에 식은땀이 비 오듯 흘렀다. 벽에 등을 기댔다. 잠깐이었다. 10초만.</span>' : ''}
+
+${hasWeapon ? '손에 쥔 파이프가 묵직하게 느껴졌다.' : '주먹을 꽉 쥐었다.'}`;
+  },
+  choices: [
+    {
+      text: '"조용히 해결한다."',
+      note: hasWeapon => hasWeapon ? '무기가 있다' : '맨손으로, 힘들 것이다',
+      effects: (s) => s.items.includes('weapon')
+        ? { resolve: +1 }
+        : { infection: +5, resolve: -1 },
+      next: 'bridge',
+      effectsFn: true,
+    },
+    {
+      text: '"눈을 돌리고 지나간다."',
+      note: '어쩔 수 없었다고 되뇐다',
+      effects: { resolve: -1 },
+      next: 'bridge',
+    },
+    {
+      text: '"잠깐 벽에 기대 호흡을 가다듬는다."',
+      note: '시간이 조금 흐르지만 정신이 맑아진다',
+      effects: { infection: +5, resolve: +1 },
+      flags_set: { took_rest: true },
+      next: 'bridge',
+    },
+  ],
+},
+
+/* ── 7. 다리 ────────────────────────────────────── */
+bridge: {
+  title: '한강 보조교',
+  chapter: 6,
+  getText(s) {
+    const vhigh = s.infection >= 75;
+    const noteFound = s.flags.note_found;
+    return `다리 앞에서 발이 멈췄다.
+
+200미터짜리 교량. 그리고 그 위에 — 수십 개의 실루엣이 움직이고 있었다.
+
+<span class="danger">좀비 떼였다.</span>
+
+다리 위는 막혀 있었다. 우회로는 멀었다.${noteFound ? '\n\n할머니가 알려준 지도가 떠올랐다. 다리 아래, 수위 관리 통로. 물이 찰 수 있지만 지나갈 수 있다고 했다.' : ''}${vhigh ? '\n\n<span class="danger">시야가 흔들렸다. 메스꺼웠다. 빨리 결정해야 했다.</span>' : ''}`;
+  },
+  choices: [
+    {
+      text: '"조심스럽게 다리를 건넌다."',
+      note: '느리지만 안전하다. 어느 정도는.',
+      effects: { infection: +10, resolve: -1 },
+      next: 'school_area',
+    },
+    {
+      text: '"뛰어서 건넌다. 수아가 기다린다."',
+      note: '빠르지만 주의를 끈다',
+      effects: { infection: +15 },
+      next: 'school_area',
+    },
+    {
+      text: '"다리 아래 수위 통로로 간다."',
+      note: '지도를 봤다면 알 수 있는 경로',
+      available: (s) => s.flags.note_found,
+      effects: { infection: +3 },
+      next: 'school_area',
+    },
+  ],
+},
+
+/* ── 8. 학교 앞 ─────────────────────────────────── */
+school_area: {
+  title: '희망초등학교 앞',
+  chapter: 7,
+  getText(s) {
+    const vhigh = s.infection >= 80;
+    return `<span class="hope">학교가 보였다.</span>
+
+철제 교문은 잠겨 있었다. 정문 기둥에 손으로 쓴 메모가 여러 장 붙어 있었다.
+
+<span class="dim">'지하 대피소로 — 3일째 버티고 있음'
+'가족을 찾는 분은 사무실 게시판 확인'
+'음식은 3층 가정실'</span>
+
+살아있는 사람들이 있었다. 수아도—
+
+${vhigh
+  ? `<span class="danger">갑자기 세상이 기울었다. 무릎을 꿇었다. 교문을 잡았다. 손이 부들부들 떨렸다.\n\n지금이야. 지금 들어가야 해.\n\n이 정도면 충분하다. 조금만 더.</span>`
+  : `진우는 교문의 자물쇠를 살펴봤다. 낡은 자물쇠였다. 옆 담장에 발판이 될 만한 배수관이 있었다.`}`;
+  },
+  choices: [
+    {
+      text: '"담장을 넘어 들어간다."',
+      effects: { infection: +5 },
+      next: 'shelter_door',
+    },
+    {
+      text: '"교문 틈으로 소리를 질러 안에 있는 사람에게 알린다."',
+      note: '소리를 내지만 도움을 받을 수 있다',
+      effects: { infection: +3, resolve: +1 },
+      next: 'shelter_door',
+    },
+  ],
+},
+
+/* ── 9. 대피소 문 앞 ─────────────────────────────── */
+shelter_door: {
+  title: '지하 대피소',
+  chapter: 8,
+  getText(s) {
+    return `계단을 내려가자 두꺼운 철문이 있었다.
+
+문 앞에 섰다. 노크하려고 손을 들었는데—
+
+문이 안에서 열렸다.
+
+"살아있는 사람이에요?" 낯선 목소리였다. 사십대 여성. 눈이 핏발 서 있었지만 살아있었다.
+
+진우는 고개를 끄덕였다.
+
+"이진우예요. 제 딸 이수아, 4학년 2반. 여기 있나요?"
+
+여성이 뒤를 돌아봤다. 잠시 침묵이 흘렀다.
+
+그리고—
+
+"<span class="emphasis">아빠—!</span>"`;
+  },
+  choices: [
+    {
+      text: '계속',
+      effects: {},
+      next: '__ending__',
+    },
+  ],
+},
+
+}; // end SCENES
+
+// ═══════════════════════════════════════════════════
+//  엔딩 데이터
+// ═══════════════════════════════════════════════════
+const ENDINGS = {
+
+true_end: {
+  type: '진 엔딩',
+  title: '마지막 선물',
+  getContent(s) {
+    return `수아가 뛰어왔다. 진우는 그 자리에서 무릎을 꿇었다.
+
+"수아야."
+
+딸이 품 안으로 뛰어들었다. 딸의 온기가 느껴졌다. 아직 그것을 느낄 수 있었다.
+
+"아빠, 팔이 왜 그래요?"
+
+"괜찮아."
+
+거짓말이었다. 하지만 그건 상관없었다.
+
+진우는 수아를 조금 뒤로 물리고, 품에서 접힌 종이 한 장을 꺼냈다. 병원 병실에서, 의식이 가장 맑았던 새벽에 써뒀던 것이었다.
+
+"이거, 나중에 읽어."
+
+수아가 종이를 받아 들었다. 눈이 빨개지기 시작했다.
+
+"아빠?"
+
+"대피소 안으로 들어가." 진우가 조용히 말했다. "지금 바로."
+
+진우는 수아를 밀어 넣고, 자신은 밖에 남았다. 철문을 닫으며 안쪽에서 잠글 수 있는 나사를 돌렸다. 그리고 계단 위에서 들려오는 발소리를 들었다.
+
+많았다.
+
+"아빠!" 철문 너머에서 수아의 목소리가 들렸다.
+
+"괜찮아." 진우가 담담하게 답했다. "다 괜찮아."
+
+팔의 통증이 사라지기 시작했다. 그것이 좋은 신호가 아니라는 것을 그는 알고 있었다. 하지만 기묘하게도, 무섭지 않았다.
+
+계단 위에서 첫 번째 실루엣이 모습을 드러냈다.
+
+이진우는 미소를 지었다.
+
+딸의 이름을, 마지막 순간까지 기억하고 있었다.`;
+  },
+},
+
+normal_end: {
+  type: '일반 엔딩',
+  title: '귀환',
+  getContent(s) {
+    return `수아가 뛰어왔다.
+
+"아빠—!"
+
+진우는 딸을 꼭 안았다. 딸의 온기가 느껴졌다. 그 온기가 채 가시기도 전에 — 그는 자신의 손가락 끝이 더 이상 느껴지지 않는다는 것을 알았다.
+
+시간이 거의 다 됐다.
+
+"수아야." 목소리가 갈라졌다. "아빠가 조금 있다가 이상해질 수 있어."
+
+수아가 그를 올려다봤다.
+
+"알아요." 아이가 조용히 말했다. "그래도 왔잖아요, 아빠."
+
+진우의 눈에서 뭔가가 흘렀다.
+
+"도망가야 해. 저 아주머니랑 같이."
+
+"아빠도—"
+
+"어서."
+
+수아가 마지막으로 그를 꼭 안았다. 그리고 달렸다. 진우는 그 자리에 남아 딸의 뒷모습이 코너를 돌 때까지 바라봤다.
+
+어둠이 내려오기 시작했다.
+
+그러나 그는 해냈다.`;
+  },
+},
+
+bad_end_turned: {
+  type: '배드 엔딩',
+  title: '너무 늦게',
+  getContent(s) {
+    return `학교가 보였다.
+
+저 멀리 — 철제 교문이 보였다. 수아가 있는 곳. 거기까지는 한 블록이었다.
+
+무릎이 꺾였다.
+
+이진우는 인도에 쓰러졌다. 손이 땅에 짚였다. 손바닥에 자갈이 박혔지만 느껴지지 않았다. 머릿속에서 무언가가 끊어지는 소리가 들렸다.
+
+마지막 남은 의식 속에서, 그는 딸의 얼굴을 떠올리려 했다.
+
+잘 기억나지 않았다.
+
+교문 옆 기둥에 손으로 쓴 메모가 붙어 있었다. 한 블록 너머. 그 거리만큼만 더 갔다면—
+
+이진우는 더 이상 이진우가 아니었다.`;
+  },
+},
+
+bad_end_broken: {
+  type: '배드 엔딩',
+  title: '의지의 끝에서',
+  getContent(s) {
+    return `수아가 뛰어왔다.
+
+진우는 그 자리에 서 있었다.
+
+딸이 품에 안겼다. 온기가 느껴졌다. 하지만 — 그 온기에 반응하지 못했다. 뭔가가 이미 부서진 뒤였다.
+
+사흘 동안 너무 많은 것을 봤다. 너무 많은 선택을 했다.
+
+"아빠?" 수아가 고개를 들었다. "괜찮아요?"
+
+이진우는 딸의 얼굴을 바라봤다.
+
+대답하지 못했다.
+
+수아가 아버지의 손을 잡았다. 차가웠다. 아이는 그래도 손을 놓지 않았다.
+
+생존자 중 한 사람이 다가와 진우의 팔을 확인하고는 조용히 다른 사람들에게 신호를 보냈다.
+
+진우는 아무것도 몰랐다. 딸의 손이 잡혀 있다는 것만 알았다.
+
+그것으로 충분했다. 아니, 충분해야만 했다.`;
+  },
+},
+
+}; // end ENDINGS
+
+// ═══════════════════════════════════════════════════
+//  게임 엔진
+// ═══════════════════════════════════════════════════
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function applyEffects(effects, s) {
+  if (!effects) return;
+  if (typeof effects === 'function') effects = effects(s);
+  if (effects.infection !== undefined) s.infection = clamp(s.infection + effects.infection, 0, 100);
+  if (effects.resolve   !== undefined) s.resolve   = clamp(s.resolve   + effects.resolve,   0, 10);
+}
+
+function determineEnding(s) {
+  if (s.infection >= 100) return 'bad_end_turned';
+  if (s.resolve   <= 3)   return 'bad_end_broken';
+  if (s.flags.found_medicine && s.resolve >= 7 && s.infection < 75) return 'true_end';
+  if (s.resolve >= 5 && s.infection < 90) return 'normal_end';
+  if (s.infection >= 90) return 'bad_end_turned';
+  return 'bad_end_broken';
+}
+
+function updateStatusUI() {
+  document.getElementById('infection-fill').style.width = G.infection + '%';
+  document.getElementById('infection-value').textContent = G.infection + '%';
+  document.getElementById('resolve-fill').style.width = (G.resolve / 10 * 100) + '%';
+  document.getElementById('resolve-value').textContent = G.resolve + '/10';
+
+  const ITEM_NAMES = {
+    medical_kit: '의료키트', medicine: '억제제', bandage: '붕대',
+    food: '식량', weapon: '파이프', note: '지도',
+  };
+  const itemSpan = document.getElementById('items-bar').querySelector('span');
+  if (G.items.length === 0) {
+    itemSpan.textContent = '없음';
+  } else {
+    itemSpan.textContent = G.items.map(k => ITEM_NAMES[k] || k).join(' · ');
+  }
+
+  if (G.infection >= 75) {
+    document.getElementById('infection-value').style.color = '#ff4444';
+  }
+}
+
+let typewriterTimer = null;
+
+function typewrite(el, text, speed = 16) {
+  if (typewriterTimer) clearInterval(typewriterTimer);
+  el.innerHTML = '';
+  let i = 0;
+  const click = () => { el.innerHTML = text; clearInterval(typewriterTimer); el.removeEventListener('click', click); };
+  el.addEventListener('click', click);
+  typewriterTimer = setInterval(() => {
+    i++;
+    el.innerHTML = text.substring(0, i);
+    if (i >= text.length) { clearInterval(typewriterTimer); el.removeEventListener('click', click); }
+  }, speed);
+}
+
+function renderScene(sceneId) {
+  if (G.infection >= 100) {
+    showEnding('bad_end_turned');
+    return;
+  }
+
+  const scene = SCENES[sceneId];
+  if (!scene) return;
+
+  G.scene = sceneId;
+
+  document.getElementById('chapter-label').textContent = 'Chapter ' + scene.chapter;
+  document.getElementById('scene-title').textContent = scene.title;
+
+  const storyEl = document.getElementById('story-text');
+  storyEl.className = 'fade-in';
+  typewrite(storyEl, scene.getText(G));
+
+  updateStatusUI();
+
+  const choicesWrap = document.getElementById('choices-wrap');
+  choicesWrap.innerHTML = '';
+  choicesWrap.className = 'fade-in';
+
+  setTimeout(() => {
+    scene.choices.forEach((ch, idx) => {
+      if (ch.available && !ch.available(G)) return;
+
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+
+      const noteText = typeof ch.note === 'function' ? ch.note(G.items.includes('weapon')) : (ch.note || '');
+      btn.innerHTML = ch.text + (noteText ? `<span class="choice-note">${noteText}</span>` : '');
+
+      btn.addEventListener('click', () => {
+        // 효과 적용
+        if (ch.effectsFn) {
+          applyEffects(ch.effects(G), G);
+        } else {
+          applyEffects(ch.effects, G);
+        }
+
+        // 아이템 추가
+        if (ch.items_add) {
+          ch.items_add.forEach(item => {
+            if (!G.items.includes(item)) G.items.push(item);
+          });
+        }
+
+        // 플래그 세팅
+        if (ch.flags_set) Object.assign(G.flags, ch.flags_set);
+
+        G.choices_made++;
+        updateStatusUI();
+
+        // 감염 100% 체크
+        if (G.infection >= 100) {
+          showEnding('bad_end_turned');
+          return;
+        }
+
+        // 위험 효과
+        if (G.infection >= 70) {
+          document.body.classList.add('danger-flash');
+          setTimeout(() => document.body.classList.remove('danger-flash'), 600);
+        }
+
+        if (ch.next === '__ending__') {
+          showEnding(determineEnding(G));
+        } else {
+          renderScene(ch.next);
+        }
+      });
+
+      choicesWrap.appendChild(btn);
+    });
+  }, 200);
+}
+
+function showEnding(endingKey) {
+  const ending = ENDINGS[endingKey];
+  if (!ending) return;
+
+  const overlay = document.getElementById('ending-overlay');
+  document.getElementById('ending-type').textContent = ending.type;
+  document.getElementById('ending-title').textContent = ending.title;
+
+  const textEl = document.getElementById('ending-text');
+  textEl.innerHTML = '';
+  setTimeout(() => {
+    typewrite(textEl, ending.getContent(G), 20);
+  }, 300);
+
+  document.getElementById('ending-stats').innerHTML =
+    `감염 진행: ${G.infection}% &nbsp;|&nbsp; 의지: ${G.resolve}/10 &nbsp;|&nbsp; 선택: ${G.choices_made}회<br>` +
+    `보유 아이템: ${G.items.length > 0 ? G.items.join(', ') : '없음'}`;
+
+  overlay.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════
+//  타이틀 / 재시작
+// ═══════════════════════════════════════════════════
+
+function startGame() {
+  document.getElementById('title-screen').classList.add('hidden');
+  initState();
+  updateStatusUI();
+  renderScene('start');
+}
+
+function restartGame() {
+  document.getElementById('ending-overlay').classList.remove('show');
+  document.getElementById('title-screen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

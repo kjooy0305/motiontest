@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>실시간 버튼</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background: #c0392b;
+      transition: background 0.25s ease;
+      gap: 32px;
+    }
+    body.green   { background: #27ae60; }
+    body.waiting { background: #7f8c8d; }
+
+    #status-text {
+      color: rgba(255,255,255,0.9);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      text-align: center;
+    }
+
+    #btn {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: background 0.1s, transform 0.1s;
+      outline: none;
+    }
+    #btn.pressed {
+      background: rgba(255,255,255,0.35);
+      transform: scale(0.94);
+    }
+
+    #device-info {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+    }
+
+    /* 로그인 화면 */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    #login-screen h1 {
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    #login-screen p {
+      color: rgba(255,255,255,0.8);
+      font-size: 15px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    #kakao-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FEE500;
+      color: #000;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #kakao-btn:hover { background: #f0d800; }
+    #kakao-btn img { width: 22px; height: 22px; }
+
+    #app-screen { display: none; flex-direction: column; align-items: center; gap: 32px; }
+  </style>
+</head>
+<body id="body" class="waiting">
+
+  <div id="login-screen">
+    <h1>🔴 실시간 버튼</h1>
+    <p>같은 카카오 계정으로 PC와 휴대폰에서 로그인한 뒤<br>두 기기 모두 버튼을 누르고 있으면 초록으로 변해요.</p>
+    <button id="kakao-btn" onclick="kakaoLogin()">
+      <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png" alt="K">
+      카카오로 로그인
+    </button>
+  </div>
+
+  <div id="app-screen">
+    <div id="status-text">연결 중...</div>
+    <button id="btn">누르고<br>있어!</button>
+    <div id="device-info"></div>
+  </div>
+
+  <script>
+    const DEVICE_KEY = 'rtbtn_device_id';
+    const SESSION_KEY = 'rtbtn_session';
+
+    // 기기 고유 ID 생성
+    if (!localStorage.getItem(DEVICE_KEY)) {
+      localStorage.setItem(DEVICE_KEY, 'dev_' + crypto.randomUUID());
+    }
+    const deviceId = localStorage.getItem(DEVICE_KEY);
+
+    // OAuth 콜백에서 session 파라미터 처리
+    const params = new URLSearchParams(location.search);
+    if (params.get('session')) {
+      localStorage.setItem(SESSION_KEY, params.get('session'));
+      history.replaceState({}, '', '/');
+    }
+
+    const sessionId = localStorage.getItem(SESSION_KEY);
+
+    function kakaoLogin() {
+      location.href = '/api/auth/kakao';
+    }
+
+    async function init() {
+      if (!sessionId) {
+        showLogin();
+        return;
+      }
+      // 세션 유효성 확인
+      const res = await fetch(`/api/state?session=${sessionId}&device=${deviceId}&pressed=false`);
+      if (res.status === 401) {
+        localStorage.removeItem(SESSION_KEY);
+        showLogin();
+        return;
+      }
+      showApp();
+    }
+
+    function showLogin() {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app-screen').style.display = 'none';
+    }
+
+    function showApp() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'flex';
+      setupButton();
+      startPolling();
+    }
+
+    // ── 버튼 ─────────────────────────────────────────────────
+    let pressed = false;
+
+    function setupButton() {
+      const btn = document.getElementById('btn');
+
+      const onDown = () => {
+        pressed = true;
+        btn.classList.add('pressed');
+        syncState();
+      };
+      const onUp = () => {
+        pressed = false;
+        btn.classList.remove('pressed');
+        syncState();
+      };
+
+      btn.addEventListener('mousedown', onDown);
+      btn.addEventListener('mouseup', onUp);
+      btn.addEventListener('mouseleave', onUp);
+      btn.addEventListener('touchstart', e => { e.preventDefault(); onDown(); }, { passive: false });
+      btn.addEventListener('touchend',   e => { e.preventDefault(); onUp();   }, { passive: false });
+      btn.addEventListener('touchcancel',e => { e.preventDefault(); onUp();   }, { passive: false });
+    }
+
+    async function syncState() {
+      try {
+        await fetch(`/api/state?session=${sessionId}&device=${deviceId}&pressed=${pressed}`);
+      } catch (_) {}
+    }
+
+    // ── 폴링 ─────────────────────────────────────────────────
+    function startPolling() {
+      setInterval(async () => {
+        try {
+          const res = await fetch(`/api/state?session=${sessionId}&device=${deviceId}&pressed=${pressed}`);
+          if (res.status === 401) {
+            localStorage.removeItem(SESSION_KEY);
+            location.reload();
+            return;
+          }
+          const data = await res.json();
+          updateUI(data);
+        } catch (_) {}
+      }, 300);
+    }
+
+    function updateUI({ deviceCount, pressedCount, allPressed }) {
+      const body = document.getElementById('body');
+      const statusText = document.getElementById('status-text');
+      const deviceInfo = document.getElementById('device-info');
+
+      deviceInfo.textContent = `연결된 기기: ${deviceCount}개 / 누름: ${pressedCount}개`;
+
+      if (deviceCount < 2) {
+        body.className = 'waiting';
+        statusText.textContent = '다른 기기 연결을 기다리는 중...';
+      } else if (allPressed) {
+        body.className = 'green';
+        statusText.textContent = '🟢 모두 누르고 있음!';
+      } else {
+        body.className = '';
+        statusText.textContent = '🔴 버튼을 누르고 있어!';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

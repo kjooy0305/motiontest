@@ -1,6 +1,2 @@
-.gradle/
-build/
-*.p12
-*.jks
-*.keystore
-local.properties
+node_modules/
+.wrangler/

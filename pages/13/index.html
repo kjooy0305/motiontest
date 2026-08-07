@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>타자 펑!</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #07070f;
+  overflow: hidden;
+  height: 100vh;
+  font-family: 'Segoe UI', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  cursor: crosshair;
+  user-select: none;
+}
+
+#hint {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: rgba(255,255,255,0.18);
+  font-size: 18px;
+  letter-spacing: 3px;
+  pointer-events: none;
+  transition: opacity 0.8s;
+  line-height: 2.2;
+}
+#hint small {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+
+/* ── 글자 ── */
+.letter {
+  position: fixed;
+  pointer-events: none;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+@keyframes popIn {
+  0%   { transform: translate(-50%, -50%) scale(0)   rotate(-20deg); opacity: 0; }
+  55%  { transform: translate(-50%, -50%) scale(1.25) rotate(6deg);  opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1)   rotate(0deg);  opacity: 1; }
+}
+
+@keyframes explode {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1;   filter: blur(0px); }
+  35%  { transform: translate(-50%, -50%) scale(2.2); opacity: 0.8; filter: blur(1px); }
+  100% { transform: translate(-50%, -50%) scale(5);   opacity: 0;   filter: blur(10px); }
+}
+
+/* ── 펑! 텍스트 ── */
+.boom {
+  position: fixed;
+  pointer-events: none;
+  font-size: 26px;
+  font-weight: 900;
+  transform: translate(-50%, -50%);
+  animation: boomAnim 0.65s ease-out forwards;
+}
+@keyframes boomAnim {
+  0%   { transform: translate(-50%, -130%) scale(0.4); opacity: 1; }
+  40%  { transform: translate(-50%, -180%) scale(1.3); opacity: 1; }
+  100% { transform: translate(-50%, -250%) scale(0.9); opacity: 0; }
+}
+
+/* ── 섬광 ── */
+.flash {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: flashAnim 0.35s ease-out forwards;
+}
+@keyframes flashAnim {
+  0%   { transform: translate(-50%, -50%) scale(0.1); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(4);   opacity: 0; }
+}
+
+/* ── 파티클 ── */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: particleAnim var(--dur) ease-out forwards;
+}
+@keyframes particleAnim {
+  0%   { transform: translate(-50%, -50%) scale(1);
+         opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
+         opacity: 0; }
+}
+
+.particle.square { border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="hint">
+  키보드를 눌러보세요
+  <small>글자가 나타났다가 펑! 하고 사라집니다</small>
+</div>
+
+<script>
+const COLORS = [
+  '#ff6b6b','#ff9f43','#ffd700','#a8e063',
+  '#00d2d3','#54a0ff','#a29bfe','#fd79a8',
+  '#00b894','#fdcb6e','#e17055','#74b9ff',
+];
+
+const hint     = document.getElementById('hint');
+let   hintGone = false;
+
+function hideHint() {
+  if (hintGone) return;
+  hintGone = true;
+  hint.style.opacity = '0';
+  setTimeout(() => hint.remove(), 900);
+}
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function rand(a, b) { return a + Math.random() * (b - a); }
+
+function rndPos() {
+  const px = 90, py = 70;
+  return {
+    x: rand(px, window.innerWidth  - px),
+    y: rand(py, window.innerHeight - py),
+  };
+}
+
+function spawnLetter(char) {
+  hideHint();
+
+  const color    = pick(COLORS);
+  const { x, y } = rndPos();
+  const fontSize = Math.round(rand(56, 110));
+  const liveMs   = Math.round(rand(1400, 2800));
+
+  const el = document.createElement('div');
+  el.className  = 'letter';
+  el.textContent = char;
+  el.style.cssText = `
+    left: ${x}px; top: ${y}px;
+    font-size: ${fontSize}px;
+    color: ${color};
+    text-shadow: 0 0 ${fontSize * 0.5}px ${color}99,
+                 0 0 ${fontSize * 1.2}px ${color}33;
+    animation: popIn 0.4s cubic-bezier(.175,.885,.32,1.275) forwards;
+  `;
+  document.body.appendChild(el);
+
+  setTimeout(() => burst(el, x, y, color), liveMs);
+}
+
+function burst(el, x, y, color) {
+  // 글자 폭발 애니메이션
+  el.style.animation = 'explode 0.45s ease-out forwards';
+  setTimeout(() => el.remove(), 500);
+
+  // 섬광
+  const fl = document.createElement('div');
+  fl.className = 'flash';
+  fl.style.cssText = `
+    left: ${x}px; top: ${y}px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, ${color}cc 0%, ${color}00 70%);
+  `;
+  document.body.appendChild(fl);
+  setTimeout(() => fl.remove(), 400);
+
+  // 펑! 텍스트
+  const boom = document.createElement('div');
+  boom.className  = 'boom';
+  boom.textContent = pick(['펑!','퍽!','뻥!','쾅!','빵!']);
+  boom.style.cssText = `
+    left: ${x}px; top: ${y}px;
+    color: ${color};
+    text-shadow: 0 0 12px ${color};
+  `;
+  document.body.appendChild(boom);
+  setTimeout(() => boom.remove(), 700);
+
+  // 파티클
+  const count = Math.round(rand(12, 20));
+  for (let i = 0; i < count; i++) {
+    const p    = document.createElement('div');
+    const isSquare = Math.random() < 0.35;
+    p.className = 'particle' + (isSquare ? ' square' : '');
+
+    const size  = rand(3, 9);
+    const angle = (Math.PI * 2 * i / count) + rand(-0.4, 0.4);
+    const dist  = rand(60, 130);
+    const dur   = rand(0.35, 0.65);
+    const col   = Math.random() < 0.55 ? color : '#ffffff';
+
+    p.style.cssText = `
+      left: ${x}px; top: ${y}px;
+      width: ${size}px; height: ${size}px;
+      background: ${col};
+      box-shadow: 0 0 ${size * 2}px ${color};
+      --tx: ${Math.cos(angle) * dist}px;
+      --ty: ${Math.sin(angle) * dist}px;
+      --dur: ${dur}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), dur * 1000 + 150);
+  }
+}
+
+// 영문 / 숫자 / 기호
+document.addEventListener('keydown', e => {
+  if (e.isComposing) return;
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.key.length !== 1) return;
+  spawnLetter(e.key);
+});
+
+// 한글 (IME 완성 시)
+document.addEventListener('compositionend', e => {
+  if (e.data && e.data.trim()) spawnLetter(e.data);
+});
+</script>
+</body>
+</html>

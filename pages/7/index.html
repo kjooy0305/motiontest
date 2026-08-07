@@ -16,7 +16,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 28px;
+      gap: 24px;
       padding: 24px;
     }
 
@@ -27,14 +27,13 @@
       text-shadow: 0 0 12px #ffd70080;
     }
 
-    /* 점수 */
+    /* 점수 바 */
     #score-box {
       display: flex;
-      gap: 32px;
-      font-size: 1rem;
+      gap: 28px;
     }
     .score-item { text-align: center; }
-    .score-label { font-size: .7rem; color: #888; letter-spacing: .1em; margin-bottom: 2px; }
+    .score-label { font-size: .65rem; color: #888; letter-spacing: .1em; margin-bottom: 2px; }
     .score-val {
       font-size: 2rem;
       font-weight: 700;
@@ -42,7 +41,8 @@
       text-shadow: 0 0 8px #ffd70060;
       transition: transform .15s;
     }
-    .score-val.bump { transform: scale(1.35); }
+    .score-val.bump { transform: scale(1.4); }
+    #best-val { color: #ff9800; text-shadow: 0 0 8px #ff980060; }
 
     /* 카드 영역 */
     #card-area {
@@ -50,7 +50,6 @@
       align-items: center;
       gap: 20px;
     }
-
     .card {
       width: 90px;
       height: 120px;
@@ -61,26 +60,22 @@
       font-size: 3rem;
       font-weight: 900;
       position: relative;
-      transition: transform .3s, box-shadow .3s;
     }
-
     #card-current {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       border: 2px solid #ffd700;
       box-shadow: 0 0 20px #ffd70040;
       color: #ffd700;
     }
-
     #card-next {
       background: linear-gradient(135deg, #1a1a2e, #16213e);
       border: 2px solid #444;
       color: #555;
       font-size: 2rem;
+      transition: border-color .2s, box-shadow .2s, color .2s;
     }
-    #card-next.revealed { border-color: #aaa; color: #f0f0f0; }
-    #card-next.correct  { border-color: #4caf50; box-shadow: 0 0 20px #4caf5060; color: #4caf50; }
-    #card-next.wrong    { border-color: #f44336; box-shadow: 0 0 20px #f4433660; color: #f44336; }
-
+    #card-next.correct { border-color: #4caf50; box-shadow: 0 0 20px #4caf5060; color: #4caf50; }
+    #card-next.wrong   { border-color: #f44336; box-shadow: 0 0 20px #f4433660; color: #f44336; }
     .card-tag {
       position: absolute;
       bottom: 6px;
@@ -89,7 +84,6 @@
       color: #888;
     }
     #card-current .card-tag { color: #ffd70099; }
-
     .arrow { font-size: 1.6rem; color: #555; }
 
     /* 기준 안내 */
@@ -102,87 +96,121 @@
       padding: 6px 16px;
       opacity: 0;
       transition: opacity .3s;
+      pointer-events: none;
     }
     #ref-notice.show { opacity: 1; }
 
     /* 결과 메시지 */
     #result-msg {
-      height: 1.6rem;
+      height: 1.5rem;
       font-size: 1rem;
       font-weight: 700;
       letter-spacing: .05em;
-      transition: opacity .3s;
       opacity: 0;
+      transition: opacity .2s;
     }
     #result-msg.show { opacity: 1; }
     #result-msg.correct { color: #4caf50; }
     #result-msg.wrong   { color: #f44336; }
 
     /* 베팅 버튼 */
-    #bet-area {
-      display: flex;
-      gap: 14px;
-    }
-
+    #bet-area { display: flex; gap: 14px; }
     .bet-btn {
-      padding: 14px 24px;
+      padding: 14px 22px;
       border: 2px solid transparent;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform .15s, box-shadow .15s, opacity .2s;
-      letter-spacing: .05em;
+      transition: transform .12s, box-shadow .12s, opacity .2s;
+      letter-spacing: .04em;
+      line-height: 1.5;
     }
-    .bet-btn:active { transform: scale(.94); }
-    .bet-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-
+    .bet-btn:active { transform: scale(.93); }
+    .bet-btn:disabled { opacity: .3; cursor: not-allowed; transform: none !important; }
     #btn-low  { background: #1a237e; border-color: #5c6bc0; color: #90caf9; }
-    #btn-low:hover:not(:disabled)  { box-shadow: 0 0 14px #5c6bc060; }
-
+    #btn-low:hover:not(:disabled)  { box-shadow: 0 0 14px #5c6bc060; transform: translateY(-2px); }
     #btn-same { background: #4a148c; border-color: #ab47bc; color: #e040fb; }
-    #btn-same:hover:not(:disabled) { box-shadow: 0 0 14px #ab47bc60; }
-
+    #btn-same:hover:not(:disabled) { box-shadow: 0 0 14px #ab47bc60; transform: translateY(-2px); }
     #btn-high { background: #b71c1c; border-color: #ef5350; color: #ff8a80; }
-    #btn-high:hover:not(:disabled) { box-shadow: 0 0 14px #ef535060; }
-
-    /* 다음 버튼 */
-    #btn-next {
-      display: none;
-      padding: 12px 36px;
-      background: #ffd700;
-      color: #111;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: .08em;
-      transition: transform .15s, box-shadow .15s;
-    }
-    #btn-next:hover { box-shadow: 0 0 16px #ffd70080; transform: scale(1.04); }
+    #btn-high:hover:not(:disabled) { box-shadow: 0 0 14px #ef535060; transform: translateY(-2px); }
 
     /* 히스토리 */
     #history {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 320px;
-      min-height: 28px;
+      max-width: 340px;
+      min-height: 26px;
     }
     .hist-chip {
-      width: 24px;
-      height: 24px;
+      width: 26px; height: 26px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .65rem;
-      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .62rem; font-weight: 700;
     }
     .hist-chip.o { background: #4caf50; color: #fff; }
     .hist-chip.x { background: #f44336; color: #fff; }
+
+    /* 게임오버 오버레이 */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000000cc;
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    #overlay.show { display: flex; }
+    #gameover-box {
+      background: #1a1a1a;
+      border: 2px solid #f44336;
+      border-radius: 16px;
+      padding: 36px 48px;
+      text-align: center;
+      box-shadow: 0 0 40px #f4433660;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    #gameover-box h2 {
+      font-size: 1.8rem;
+      color: #f44336;
+      letter-spacing: .1em;
+    }
+    .go-row { display: flex; gap: 32px; }
+    .go-item { text-align: center; }
+    .go-label { font-size: .7rem; color: #888; letter-spacing: .1em; margin-bottom: 4px; }
+    .go-val { font-size: 2.4rem; font-weight: 900; color: #ffd700; }
+    #go-best-val { color: #ff9800; }
+    #go-new-best {
+      font-size: .9rem;
+      color: #ffd700;
+      background: #2a2000;
+      border: 1px solid #ffd70060;
+      border-radius: 8px;
+      padding: 6px 16px;
+      display: none;
+    }
+    #go-new-best.show { display: block; }
+    #btn-restart {
+      margin-top: 8px;
+      padding: 14px 48px;
+      background: #ffd700;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .08em;
+      transition: transform .12s, box-shadow .12s;
+    }
+    #btn-restart:hover { box-shadow: 0 0 20px #ffd70080; transform: scale(1.05); }
   </style>
 </head>
 <body>
@@ -192,15 +220,15 @@
 <div id="score-box">
   <div class="score-item">
     <div class="score-label">SCORE</div>
-    <div class="score-val" id="score">0</div>
+    <div class="score-val" id="score-val">0</div>
   </div>
   <div class="score-item">
     <div class="score-label">ROUND</div>
-    <div class="score-val" id="round">1</div>
+    <div class="score-val" id="round-val">1</div>
   </div>
   <div class="score-item">
-    <div class="score-label">STREAK</div>
-    <div class="score-val" id="streak">0</div>
+    <div class="score-label">BEST</div>
+    <div class="score-val" id="best-val">0</div>
   </div>
 </div>
 
@@ -216,7 +244,7 @@
   </div>
 </div>
 
-<div id="ref-notice">⚠ 현재 숫자가 1 또는 10 — 기준이 5로 고정</div>
+<div id="ref-notice">⚠ 현재 1 또는 10 — 기준이 5로 고정</div>
 
 <div id="result-msg"></div>
 
@@ -226,39 +254,59 @@
   <button class="bet-btn" id="btn-high" onclick="bet('high')">▲ 높을지<br><small>+1점</small></button>
 </div>
 
-<button id="btn-next" onclick="nextRound()">다음 라운드 ›</button>
-
 <div id="history"></div>
 
+<!-- 게임오버 오버레이 -->
+<div id="overlay">
+  <div id="gameover-box">
+    <h2>💀 GAME OVER</h2>
+    <div class="go-row">
+      <div class="go-item">
+        <div class="go-label">최종 점수</div>
+        <div class="go-val" id="go-score">0</div>
+      </div>
+      <div class="go-item">
+        <div class="go-label">최고 기록</div>
+        <div class="go-val" id="go-best-val">0</div>
+      </div>
+    </div>
+    <div id="go-new-best">🏆 새 최고 기록!</div>
+    <button id="btn-restart" onclick="restart()">다시 도전</button>
+  </div>
+</div>
+
 <script>
+  const LS_KEY = 'numgamble-best';
+
   let current = 5;
   let score   = 0;
   let round   = 1;
-  let streak  = 0;
   let locked  = false;
+  let best    = parseInt(localStorage.getItem(LS_KEY) || '0', 10);
 
-  const elCur    = document.getElementById('cur-num');
-  const elNext   = document.getElementById('next-num');
-  const cardNext = document.getElementById('card-next');
-  const elScore  = document.getElementById('score');
-  const elRound  = document.getElementById('round');
-  const elStreak = document.getElementById('streak');
-  const elResult = document.getElementById('result-msg');
-  const elRef    = document.getElementById('ref-notice');
-  const btnNext  = document.getElementById('btn-next');
-  const btns     = document.querySelectorAll('.bet-btn');
-  const elHist   = document.getElementById('history');
+  const elCur     = document.getElementById('cur-num');
+  const elNext    = document.getElementById('next-num');
+  const cardNext  = document.getElementById('card-next');
+  const elScore   = document.getElementById('score-val');
+  const elRound   = document.getElementById('round-val');
+  const elBest    = document.getElementById('best-val');
+  const elResult  = document.getElementById('result-msg');
+  const elRef     = document.getElementById('ref-notice');
+  const btns      = document.querySelectorAll('.bet-btn');
+  const elHist    = document.getElementById('history');
+  const overlay   = document.getElementById('overlay');
+  const goScore   = document.getElementById('go-score');
+  const goBest    = document.getElementById('go-best-val');
+  const goNewBest = document.getElementById('go-new-best');
+
+  elBest.textContent = best;
 
   function getRef() {
     return (current === 1 || current === 10) ? 5 : current;
   }
 
   function updateRefNotice() {
-    if (current === 1 || current === 10) {
-      elRef.classList.add('show');
-    } else {
-      elRef.classList.remove('show');
-    }
+    elRef.classList.toggle('show', current === 1 || current === 10);
   }
 
   function bet(choice) {
@@ -270,68 +318,85 @@
     const ref    = getRef();
 
     let actual;
-    if (rolled > ref)      actual = 'high';
-    else if (rolled < ref) actual = 'low';
-    else                   actual = 'same';
+    if (rolled === current)    actual = 'same';
+    else if (rolled > ref)     actual = 'high';
+    else                       actual = 'low';
 
-    // same 판정은 rolled === current (현재 숫자와 동일)
-    const isSame = rolled === current;
-    if (isSame) actual = 'same';
-
-    const correct = choice === actual;
+    const correct = (choice === actual);
     const pts = correct ? (choice === 'same' ? 5 : 1) : 0;
 
-    // 카드 공개
     elNext.textContent = rolled;
-    cardNext.classList.add('revealed');
     cardNext.classList.add(correct ? 'correct' : 'wrong');
 
-    // 점수/스트릭
     if (correct) {
-      score  += pts;
-      streak += 1;
-    } else {
-      streak = 0;
-    }
+      score += pts;
+      bump(elScore, score);
 
-    bump(elScore,  score);
-    bump(elStreak, streak);
-
-    // 결과 메시지
-    elResult.className = 'result-msg show ' + (correct ? 'correct' : 'wrong');
-    if (correct) {
+      elResult.className = 'result-msg show correct';
       elResult.textContent = pts === 5
         ? `🎉 정확히 같아! +${pts}점`
         : `✅ 정답! +${pts}점`;
+
+      addChip(true, pts);
+      current = rolled;
+
+      setTimeout(() => {
+        locked = false;
+        btns.forEach(b => b.disabled = false);
+        cardNext.className = 'card';
+        elNext.textContent = '?';
+        elResult.className = 'result-msg';
+        elCur.textContent = current;
+        round++;
+        bump(elRound, round);
+        updateRefNotice();
+      }, 700);
+
     } else {
+      elResult.className = 'result-msg show wrong';
       elResult.textContent = `❌ 틀렸습니다 (나온 숫자: ${rolled})`;
+      addChip(false, 0);
+
+      setTimeout(() => showGameOver(), 900);
     }
-
-    // 히스토리 칩
-    const chip = document.createElement('div');
-    chip.className = 'hist-chip ' + (correct ? 'o' : 'x');
-    chip.textContent = correct ? '+' + pts : '✕';
-    elHist.prepend(chip);
-    if (elHist.children.length > 20) elHist.removeChild(elHist.lastChild);
-
-    current = rolled;
-    btnNext.style.display = 'inline-block';
   }
 
-  function nextRound() {
-    locked = false;
-    btns.forEach(b => b.disabled = false);
-    btnNext.style.display = 'none';
+  function addChip(ok, pts) {
+    const chip = document.createElement('div');
+    chip.className = 'hist-chip ' + (ok ? 'o' : 'x');
+    chip.textContent = ok ? '+' + pts : '✕';
+    elHist.prepend(chip);
+    if (elHist.children.length > 20) elHist.removeChild(elHist.lastChild);
+  }
 
-    cardNext.className = 'card';
+  function showGameOver() {
+    const isNew = score > best;
+    if (isNew) {
+      best = score;
+      localStorage.setItem(LS_KEY, best);
+      elBest.textContent = best;
+    }
+    goScore.textContent = score;
+    goBest.textContent  = best;
+    goNewBest.classList.toggle('show', isNew);
+    overlay.classList.add('show');
+  }
+
+  function restart() {
+    overlay.classList.remove('show');
+    current = 5;
+    score   = 0;
+    round   = 1;
+    locked  = false;
+
+    elCur.textContent  = 5;
     elNext.textContent = '?';
+    cardNext.className = 'card';
+    elScore.textContent = 0;
+    elRound.textContent = 1;
     elResult.className = 'result-msg';
-    elResult.textContent = '';
-
-    elCur.textContent = current;
-    round++;
-    elRound.textContent = round;
-
+    elHist.innerHTML   = '';
+    btns.forEach(b => b.disabled = false);
     updateRefNotice();
   }
 

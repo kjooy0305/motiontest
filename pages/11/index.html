@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>브라이언의 뇌</title>
+<style>
+:root {
+  --bg:#080c10; --surf:#0e1318; --bdr:#1a2028;
+  --text:#c8c0b0; --dim:#556070;
+  --on:#00cfff; --dying:#004a5c; --dead:#080c10;
+  --on-glow:rgba(0,207,255,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;user-select:none;}
+
+/* ── 레이아웃 ── */
+#app{display:flex;flex-direction:column;height:100%;}
+
+/* ── 정보 패널 ── */
+#info-panel{
+  background:var(--surf);border-bottom:1px solid var(--bdr);
+  padding:10px 14px;flex-shrink:0;
+}
+#info-header{
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+#info-title{font-size:14px;letter-spacing:1px;color:var(--on);}
+#info-toggle{font-size:11px;color:var(--dim);}
+#info-body{
+  display:none;margin-top:10px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+}
+#info-body.collapsed{display:none;}
+.state-card{
+  background:var(--bg);border:1px solid var(--bdr);border-radius:8px;
+  padding:10px 12px;
+}
+.state-dot{width:14px;height:14px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:middle;}
+.state-name{font-size:13px;font-weight:bold;}
+.state-desc{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5;}
+.rule-box{
+  grid-column:1/-1;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;
+  padding:10px 14px;font-size:11px;color:var(--dim);line-height:1.9;
+}
+.rule-box b{color:var(--text);}
+
+/* ── 상태 바 ── */
+#stat-bar{
+  display:flex;align-items:center;gap:0;background:var(--surf);
+  border-bottom:1px solid var(--bdr);padding:6px 14px;
+  font-size:11px;font-family:monospace;flex-shrink:0;
+}
+#stat-bar span{flex:1;text-align:center;color:var(--dim);}
+#stat-bar span b{color:var(--text);}
+#stat-bar .on-stat b{color:var(--on);}
+#stat-bar .dying-stat b{color:#3399aa;}
+
+/* ── 캔버스 영역 ── */
+#canvas-area{flex:1;display:flex;align-items:center;justify-content:center;
+  min-height:0;overflow:hidden;cursor:crosshair;}
+#main-canvas{display:block;image-rendering:pixelated;}
+
+/* ── 컨트롤 ── */
+#ctrl{
+  background:var(--surf);border-top:1px solid var(--bdr);
+  padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;
+}
+.ctrl-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+.btn{
+  background:var(--bg);border:1px solid var(--bdr);border-radius:7px;
+  color:var(--dim);font-family:inherit;font-size:12px;padding:8px 14px;
+  cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;
+}
+.btn:hover{color:var(--text);border-color:#334;}
+.btn.active{border-color:var(--on);color:var(--on);background:rgba(0,207,255,0.06);}
+.btn.danger{border-color:#2a1a1a;color:#804040;}
+.btn.danger:hover{border-color:#6a2a2a;color:#c06060;}
+.btn:disabled{opacity:0.2;cursor:not-allowed;}
+
+.sep{width:1px;background:var(--bdr);height:24px;margin:0 2px;flex-shrink:0;}
+
+.label{font-size:11px;color:var(--dim);white-space:nowrap;}
+
+input[type=range]{accent-color:var(--on);width:70px;vertical-align:middle;}
+
+/* 범례 */
+#legend{display:flex;gap:14px;font-size:10px;color:var(--dim);align-items:center;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:4px;}
+.leg-sq{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 설명 패널 -->
+  <div id="info-panel">
+    <div id="info-header" onclick="toggleInfo()">
+      <span id="info-title">🧠 브라이언의 뇌 (Brian's Brain)</span>
+      <span id="info-toggle">▼ 설명 숨기기</span>
+    </div>
+    <div id="info-body">
+      <div class="state-card">
+        <span class="state-dot" style="background:var(--on)"></span>
+        <span class="state-name" style="color:var(--on)">켜짐 (On)</span>
+        <div class="state-desc">신경세포가 <b>발화</b>하는 순간.<br>이웃 8칸 중 켜진 셀이 정확히 2개일 때 꺼진 셀이 이 상태가 됨.</div>
+      </div>
+      <div class="state-card">
+        <span class="state-dot" style="background:#1a8899"></span>
+        <span class="state-name" style="color:#2aaabb">죽어가는 중 (Dying)</span>
+        <div class="state-desc">발화 직후 <b>불응기</b>.<br>켜진 셀은 다음 세대에 자동으로 이 상태가 됨. 다시 켜질 수 없음.</div>
+      </div>
+      <div class="state-card">
+        <span class="state-dot" style="background:#1a2028;border:1px solid #334"></span>
+        <span class="state-name" style="color:var(--dim)">꺼짐 (Off)</span>
+        <div class="state-desc">발화 <b>준비</b> 상태.<br>죽어가는 셀은 다음 세대에 이 상태로 돌아감. 조건이 맞으면 다시 켜질 수 있음.</div>
+      </div>
+      <div class="rule-box">
+        <b>왜 멈추지 않을까?</b> — 켜진 셀은 반드시 죽고, 죽은 셀은 반드시 꺼짐. 새 셀이 켜지려면 항상 새로운 켜진 이웃이 필요함.<br>
+        이 연쇄반응이 마치 신경신호처럼 <b>끊임없이 전파</b>되며 복잡한 패턴을 만들어냄. 콘웨이 생명게임과 달리 거의 항상 움직임이 유지됨.
+      </div>
+    </div>
+  </div>
+
+  <!-- 통계 바 -->
+  <div id="stat-bar">
+    <span>세대 <b id="s-gen">0</b></span>
+    <span class="on-stat">켜짐 <b id="s-on">0</b></span>
+    <span class="dying-stat">불응기 <b id="s-dying">0</b></span>
+    <span>속도 <b id="s-speed">보통</b></span>
+    <span><b id="s-fps">0</b> gen/s</span>
+  </div>
+
+  <!-- 캔버스 -->
+  <div id="canvas-area">
+    <canvas id="main-canvas"></canvas>
+  </div>
+
+  <!-- 컨트롤 -->
+  <div id="ctrl">
+    <div class="ctrl-row">
+      <button class="btn" id="btn-pp" onclick="togglePlay()">▶ 시작</button>
+      <button class="btn" id="btn-step" onclick="step()">1 세대</button>
+      <div class="sep"></div>
+      <span class="label">속도</span>
+      <input type="range" id="speed-range" min="0" max="4" value="2" oninput="updateSpeed()">
+      <span id="speed-label" style="font-size:11px;color:var(--dim);min-width:48px;">보통</span>
+      <div class="sep"></div>
+      <button class="btn danger" onclick="clearGrid()">지우기</button>
+    </div>
+    <div class="ctrl-row">
+      <span class="label">랜덤 채우기</span>
+      <button class="btn" onclick="randomFill(0.15)">희박 15%</button>
+      <button class="btn" onclick="randomFill(0.28)">보통 28%</button>
+      <button class="btn" onclick="randomFill(0.40)">밀집 40%</button>
+      <div class="sep"></div>
+      <span class="label">셀 크기</span>
+      <button class="btn" id="cs-sm" onclick="setCellSize(3)">소</button>
+      <button class="btn active" id="cs-md" onclick="setCellSize(5)">중</button>
+      <button class="btn" id="cs-lg" onclick="setCellSize(8)">대</button>
+      <div class="sep"></div>
+      <div id="legend">
+        <div class="leg"><div class="leg-sq" style="background:var(--on)"></div>켜짐</div>
+        <div class="leg"><div class="leg-sq" style="background:#1a8899"></div>불응기</div>
+        <div class="leg"><div class="leg-sq" style="background:#1a2028;border:1px solid #334"></div>꺼짐</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  설정
+// ══════════════════════════════════════════
+const SPEEDS = [
+  {label:'매우 느림', interval:400, batch:1},
+  {label:'느림',      interval:120, batch:1},
+  {label:'보통',      interval:40,  batch:1},
+  {label:'빠름',      interval:16,  batch:3},
+  {label:'터보',      interval:0,   batch:12},
+];
+
+// 상태값
+const OFF=0, ON=1, DYING=2;
+
+// ON색 팔레트 — 약간의 변화 부여
+const ON_COLOR    = [0,207,255];   // #00cfff
+const DYING_COLOR = [0,60,80];     // #003c50
+const BG_COLOR    = [8,12,16];     // #080c10
+
+let CELL_SIZE = 5;
+let W, H;           // 셀 수
+let grid, nextGrid; // Uint8Array
+
+// ── 캔버스 ──
+const canvas = document.getElementById('main-canvas');
+const ctx    = canvas.getContext('2d');
+let imgData, data32; // ImageData + Uint32Array view
+
+// ── 게임 상태 ──
+let running  = false;
+let genCount = 0;
+let timerId  = null;
+let speedIdx = 2;
+
+// fps 계산
+let lastFpsTime = performance.now(), fpsCount = 0;
+
+// ══════════════════════════════════════════
+//  초기화 & 캔버스 설정
+// ══════════════════════════════════════════
+function setupCanvas() {
+  const area = document.getElementById('canvas-area');
+  const aw = area.clientWidth;
+  const ah = area.clientHeight;
+  W = Math.floor(aw / CELL_SIZE);
+  H = Math.floor(ah / CELL_SIZE);
+  canvas.width  = W * CELL_SIZE;
+  canvas.height = H * CELL_SIZE;
+  grid     = new Uint8Array(W * H);
+  nextGrid = new Uint8Array(W * H);
+  imgData  = ctx.createImageData(W * CELL_SIZE, H * CELL_SIZE);
+  // Uint32Array 뷰 (ABGR 패킹)
+  data32   = new Uint32Array(imgData.data.buffer);
+  genCount = 0;
+  render();
+}
+
+function setCellSize(cs) {
+  CELL_SIZE = cs;
+  document.querySelectorAll('.btn[id^=cs-]').forEach(b=>b.classList.remove('active'));
+  document.getElementById(cs===3?'cs-sm':cs===5?'cs-md':'cs-lg').classList.add('active');
+  setupCanvas();
+}
+
+// ══════════════════════════════════════════
+//  렌더링 (ImageData 직접 쓰기 — 고속)
+// ══════════════════════════════════════════
+function packColor(r,g,b){
+  // canvas ImageData는 RGBA 순서, Uint32는 little-endian → ABGR
+  return (255<<24)|(b<<16)|(g<<8)|r;
+}
+const C_ON    = packColor(...ON_COLOR);
+const C_DYING = packColor(...DYING_COLOR);
+const C_BG    = packColor(...BG_COLOR);
+
+function render() {
+  const cs = CELL_SIZE;
+  const cw = W * cs;
+
+  for (let cy=0; cy<H; cy++) {
+    for (let cx=0; cx<W; cx++) {
+      const state = grid[cy*W + cx];
+      const color = state===ON ? C_ON : state===DYING ? C_DYING : C_BG;
+      // cs×cs 블록 채우기
+      const bx = cx*cs, by = cy*cs;
+      for (let py=by; py<by+cs; py++) {
+        const rowBase = py*cw + bx;
+        for (let px=0; px<cs; px++) data32[rowBase+px] = color;
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // 통계
+  let onCount=0, dyingCount=0;
+  for (let i=0; i<grid.length; i++) {
+    if (grid[i]===ON)    onCount++;
+    else if (grid[i]===DYING) dyingCount++;
+  }
+  document.getElementById('s-gen').textContent   = genCount.toLocaleString();
+  document.getElementById('s-on').textContent    = onCount.toLocaleString();
+  document.getElementById('s-dying').textContent = dyingCount.toLocaleString();
+
+  // fps
+  fpsCount++;
+  const now = performance.now();
+  if (now - lastFpsTime >= 500) {
+    const fps = Math.round(fpsCount / ((now-lastFpsTime)/1000));
+    document.getElementById('s-fps').textContent = fps;
+    fpsCount = 0; lastFpsTime = now;
+  }
+}
+
+// ══════════════════════════════════════════
+//  한 세대 계산 — 브라이언의 뇌 규칙
+// ══════════════════════════════════════════
+function computeNext() {
+  for (let cy=0; cy<H; cy++) {
+    for (let cx=0; cx<W; cx++) {
+      const idx = cy*W + cx;
+      const cur = grid[idx];
+
+      if (cur === ON) {
+        // 켜짐 → 반드시 불응기로
+        nextGrid[idx] = DYING;
+      } else if (cur === DYING) {
+        // 불응기 → 반드시 꺼짐
+        nextGrid[idx] = OFF;
+      } else {
+        // 꺼짐 → 이웃 중 켜진 셀이 정확히 2개면 켜짐
+        let onNeighbors = 0;
+        for (let dy=-1; dy<=1; dy++) {
+          const ny = (cy+dy+H) % H;
+          for (let dx=-1; dx<=1; dx++) {
+            if (dy===0 && dx===0) continue;
+            const nx = (cx+dx+W) % W;
+            if (grid[ny*W+nx] === ON) onNeighbors++;
+          }
+        }
+        nextGrid[idx] = onNeighbors === 2 ? ON : OFF;
+      }
+    }
+  }
+  // 스왑
+  const tmp = grid; grid = nextGrid; nextGrid = tmp;
+  genCount++;
+}
+
+function step() {
+  computeNext();
+  render();
+}
+
+// ══════════════════════════════════════════
+//  애니메이션 루프
+// ══════════════════════════════════════════
+function startLoop() {
+  if (timerId !== null) return;
+  const {interval, batch} = SPEEDS[speedIdx];
+
+  if (interval === 0) {
+    // 터보: requestAnimationFrame
+    function raf() {
+      if (!running) return;
+      for (let i=0; i<batch; i++) computeNext();
+      render();
+      timerId = requestAnimationFrame(raf);
+    }
+    timerId = requestAnimationFrame(raf);
+  } else {
+    timerId = setInterval(() => {
+      if (!running) return;
+      for (let i=0; i<batch; i++) computeNext();
+      render();
+    }, interval);
+  }
+}
+
+function stopLoop() {
+  if (timerId !== null) {
+    if (SPEEDS[speedIdx].interval === 0) cancelAnimationFrame(timerId);
+    else clearInterval(timerId);
+    timerId = null;
+  }
+}
+
+function togglePlay() {
+  running = !running;
+  const btn = document.getElementById('btn-pp');
+  if (running) {
+    btn.textContent = '⏸ 일시정지';
+    btn.classList.add('active');
+    document.getElementById('btn-step').disabled = true;
+    startLoop();
+  } else {
+    btn.textContent = '▶ 시작';
+    btn.classList.remove('active');
+    document.getElementById('btn-step').disabled = false;
+    stopLoop();
+  }
+}
+
+function updateSpeed() {
+  speedIdx = parseInt(document.getElementById('speed-range').value);
+  const sp = SPEEDS[speedIdx];
+  document.getElementById('speed-label').textContent = sp.label;
+  document.getElementById('s-speed').textContent = sp.label;
+  if (running) { stopLoop(); startLoop(); }
+}
+
+// ══════════════════════════════════════════
+//  채우기 / 지우기
+// ══════════════════════════════════════════
+function randomFill(density) {
+  stopLoop();
+  running = false;
+  document.getElementById('btn-pp').textContent = '▶ 시작';
+  document.getElementById('btn-pp').classList.remove('active');
+  document.getElementById('btn-step').disabled = false;
+
+  for (let i=0; i<grid.length; i++) {
+    const r = Math.random();
+    if (r < density)              grid[i] = ON;
+    else if (r < density * 1.5)  grid[i] = DYING;
+    else                          grid[i] = OFF;
+  }
+  genCount = 0;
+  render();
+}
+
+function clearGrid() {
+  stopLoop();
+  running = false;
+  document.getElementById('btn-pp').textContent = '▶ 시작';
+  document.getElementById('btn-pp').classList.remove('active');
+  document.getElementById('btn-step').disabled = false;
+  grid.fill(OFF);
+  genCount = 0;
+  render();
+}
+
+// ══════════════════════════════════════════
+//  마우스 / 터치 그리기
+// ══════════════════════════════════════════
+let isPainting = false, paintState = ON;
+
+function getCell(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scX = canvas.width  / rect.width;
+  const scY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scX;
+  const my = (e.clientY - rect.top)  * scY;
+  const cx = Math.floor(mx / CELL_SIZE);
+  const cy = Math.floor(my / CELL_SIZE);
+  if (cx<0||cx>=W||cy<0||cy>=H) return null;
+  return {cx, cy};
+}
+
+function paintCell(e) {
+  const c = getCell(e);
+  if (!c) return;
+  const idx = c.cy*W + c.cx;
+  grid[idx] = paintState;
+  render();
+}
+
+canvas.addEventListener('mousedown', e => {
+  const c = getCell(e);
+  if (!c) return;
+  const idx = c.cy*W + c.cx;
+  paintState = grid[idx] === OFF ? ON : OFF; // 토글
+  isPainting = true;
+  grid[idx] = paintState;
+  render();
+});
+canvas.addEventListener('mousemove', e => { if (isPainting) paintCell(e); });
+document.addEventListener('mouseup', () => isPainting = false);
+
+// 터치
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const c = getCell(e.touches[0]);
+  if (!c) return;
+  const idx = c.cy*W + c.cx;
+  paintState = grid[idx]===OFF ? ON : OFF;
+  isPainting = true;
+  grid[idx] = paintState;
+  render();
+}, {passive:false});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (isPainting) paintCell(e.touches[0]);
+}, {passive:false});
+document.addEventListener('touchend', () => isPainting=false);
+
+// ══════════════════════════════════════════
+//  설명 패널 토글
+// ══════════════════════════════════════════
+let infoOpen = true;
+function toggleInfo() {
+  infoOpen = !infoOpen;
+  const body = document.getElementById('info-body');
+  const tog  = document.getElementById('info-toggle');
+  if (infoOpen) { body.classList.remove('collapsed'); tog.textContent='▼ 설명 숨기기'; }
+  else          { body.classList.add('collapsed');    tog.textContent='▶ 설명 보기'; }
+  // 캔버스 재조정
+  setTimeout(() => { setupCanvas(); if (running) {} else render(); }, 10);
+}
+
+// ══════════════════════════════════════════
+//  리사이즈 & 초기화
+// ══════════════════════════════════════════
+window.addEventListener('resize', () => { setupCanvas(); render(); });
+
+// 시작 시 기본 패턴으로 초기화
+setupCanvas();
+randomFill(0.28); // 보통 밀도로 첫 화면 채우기
+</script>
+</body>
+</html>

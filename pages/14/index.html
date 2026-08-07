@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>폭죽 불꽃놀이</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#02020c; overflow:hidden; height:100vh; cursor:crosshair; }
+canvas { display:block; }
+#hint {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  color:rgba(255,255,255,0.26); font:15px/1 'Apple SD Gothic Neo',system-ui,sans-serif;
+  letter-spacing:3px; pointer-events:none; transition:opacity 1.2s;
+  white-space:nowrap;
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">화면을 클릭하면 폭죽이 발사됩니다</div>
+
+<script>
+'use strict';
+
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d');
+let W, H;
+
+function resize() {
+  W = cvs.width  = window.innerWidth;
+  H = cvs.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── Util ──────────────────────────────────────────────────────────────────
+const rnd  = (a, b) => a + Math.random()*(b-a);
+const pick = arr   => arr[Math.floor(Math.random()*arr.length)];
+const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0,a).toFixed(3)})`;
+
+// ── Palettes: [core, mid, glitter] (RGB arrays) ────────────────────────────
+const PALS = [
+  [[255,215,50], [255,150,0],   [255,255,180]],  // 금
+  [[255,75,75],  [255,155,120], [255,215,200]],  // 빨강
+  [[70,145,255], [130,195,255], [210,235,255]],  // 파랑
+  [[70,255,155], [100,195,130], [205,255,225]],  // 초록
+  [[195,75,255], [220,140,255], [240,220,255]],  // 보라
+  [[255,90,185], [255,155,215], [255,225,240]],  // 핑크
+  [[70,235,255], [120,215,195], [210,255,255]],  // 청록
+  [[255,255,255],[195,210,255], [175,205,255]],  // 흰색
+];
+
+// ── 별 ──────────────────────────────────────────────────────────────────
+const STARS = Array.from({length:180}, () => ({
+  rx: Math.random(), ry: Math.random() * 0.9,
+  r:  0.3 + Math.random() * 1.5,
+  a:  0.1  + Math.random() * 0.65,
+}));
+
+// ── 폭발 패턴 설정 ─────────────────────────────────────────────────────
+const EXP = [
+  // 국화: 구형 균일 분포
+  {n:155, sLo:2,   sHi:7,   g:0.060, dr:0.984, dLo:0.006,dHi:0.013, tLen:16},
+  // 버드나무: 중력 강해 아래로 흘러내림
+  {n:115, sLo:1.5, sHi:5,   g:0.200, dr:0.979, dLo:0.005,dHi:0.010, tLen:22},
+  // 고리: 좁은 속도 범위 → 선명한 고리
+  {n:130, sLo:3.6, sHi:4.2, g:0.052, dr:0.991, dLo:0.007,dHi:0.011, tLen:13},
+  // 혼합: 빠른 것 + 느린 것 공존
+  {n:175, sLo:0.5, sHi:8.5, g:0.068, dr:0.981, dLo:0.004,dHi:0.013, tLen:17},
+  // 피스틸(암술): 중심 밀집 + 외곽 산개
+  {n:140, sLo:1,   sHi:6,   g:0.075, dr:0.983, dLo:0.005,dHi:0.012, tLen:15},
+];
+
+// ── 데이터 배열 ──────────────────────────────────────────────────────────
+const rockets   = [];
+const particles = [];
+const flashes   = [];
+const smokes    = [];
+
+// ── 로켓 생성 ────────────────────────────────────────────────────────────
+function launchRocket(tx, ty) {
+  const lx  = W * rnd(0.33, 0.67);
+  const ly  = H + 6;
+  const d   = Math.hypot(tx - lx, ty - ly);
+  const spd = d / 68;
+  const ang = Math.atan2(ty - ly, tx - lx);
+
+  // 발사 연기
+  for (let i = 0; i < 14; i++) {
+    smokes.push({
+      x: lx + rnd(-4, 4), y: ly - rnd(0, 8),
+      vx: rnd(-1.8, 1.8), vy: rnd(-3.5, -0.6),
+      r: rnd(5, 14), alpha: rnd(0.15, 0.40),
+      decay: rnd(0.018, 0.038),
+    });
+  }
+
+  rockets.push({
+    x: lx, y: ly, tx, ty,
+    vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd,
+    pal:  pick(PALS),
+    type: Math.floor(Math.random() * EXP.length),
+    trail: [],
+    alive: true,
+  });
+}
+
+// ── 로켓 업데이트 ────────────────────────────────────────────────────────
+function updateRocket(r) {
+  r.trail.push({x: r.x, y: r.y});
+  if (r.trail.length > 30) r.trail.shift();
+  r.x += r.vx;
+  r.y += r.vy;
+  const dist  = Math.hypot(r.x - r.tx, r.y - r.ty);
+  const speed = Math.hypot(r.vx, r.vy);
+  if (dist <= speed * 2.2) {
+    r.x = r.tx; r.y = r.ty;
+    explode(r);
+    r.alive = false;
+  }
+}
+
+function drawRocket(r) {
+  const tl = r.trail;
+  for (let i = 0; i < tl.length; i++) {
+    const t  = (i + 1) / tl.length;
+    const pt = tl[i];
+    // 내부 밝은 심지
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, t * 3, 0, Math.PI * 2);
+    ctx.fillStyle = rgba([255,245,190], t * 0.95);
+    ctx.fill();
+    // 외부 주황 글로우
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, t * 7, 0, Math.PI * 2);
+    ctx.fillStyle = rgba([255,110,20], t * 0.22);
+    ctx.fill();
+  }
+  // 헤드
+  ctx.beginPath(); ctx.arc(r.x, r.y, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(r.x, r.y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = rgba([255,200,100], 0.32); ctx.fill();
+}
+
+// ── 폭발 ────────────────────────────────────────────────────────────────
+function explode(r) {
+  flashes.push({x: r.tx, y: r.ty, pal: r.pal, rad: 0, alpha: 1});
+
+  const cfg = EXP[r.type];
+  for (let i = 0; i < cfg.n; i++) {
+    const ang    = rnd(0, Math.PI * 2);
+    let   spd    = rnd(cfg.sLo, cfg.sHi);
+    // 피스틸 패턴: 30%는 매우 느린 중심 파티클
+    if (r.type === 4 && Math.random() < 0.3) spd = rnd(0.3, 1.2);
+    const glitter = Math.random() < 0.18;
+    const ci  = glitter ? 2 : (Math.random() < 0.65 ? 0 : 1);
+    const dec = rnd(cfg.dLo, cfg.dHi);
+    particles.push({
+      x: r.tx, y: r.ty,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      col: r.pal[ci],
+      g: cfg.g, dr: cfg.dr, dec,
+      trail: [], tLen: cfg.tLen,
+      alpha: 1, rad: rnd(1.0, 2.2),
+      glitter, tick: 0,
+    });
+  }
+}
+
+// ── 파티클 업데이트/렌더 ──────────────────────────────────────────────
+function updateParticle(p) {
+  p.trail.push({x: p.x, y: p.y});
+  if (p.trail.length > p.tLen) p.trail.shift();
+  p.vx *= p.dr;
+  p.vy  = p.vy * p.dr + p.g;
+  p.x  += p.vx; p.y += p.vy;
+  p.alpha -= p.dec; p.tick++;
+  return p.alpha > 0.008;
+}
+
+function drawParticle(p) {
+  const c = p.col;
+  // 꼬리
+  for (let i = 1; i < p.trail.length; i++) {
+    const t = i / p.trail.length;
+    ctx.beginPath();
+    ctx.arc(p.trail[i].x, p.trail[i].y, Math.max(0.2, p.rad * t * 0.75), 0, Math.PI * 2);
+    ctx.fillStyle = rgba(c, t * p.alpha * 0.72);
+    ctx.fill();
+  }
+  // 글리터 깜빡임
+  if (p.glitter && p.tick % 4 < 2) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.rad * 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = rgba(c, p.alpha * 0.18);
+    ctx.fill();
+  }
+  // 파티클 헤드
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
+  ctx.fillStyle = rgba(c, p.alpha);
+  ctx.fill();
+  // 소프트 글로우
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.rad * 2.8, 0, Math.PI * 2);
+  ctx.fillStyle = rgba(c, p.alpha * 0.10);
+  ctx.fill();
+}
+
+// ── 섬광 ────────────────────────────────────────────────────────────────
+function updateFlash(f) {
+  f.rad   += (120 - f.rad) * 0.26;
+  f.alpha -= 0.062;
+  return f.alpha > 0;
+}
+
+function drawFlash(f) {
+  const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.rad);
+  g.addColorStop(0,    rgba([255,255,255], Math.min(f.alpha, 1)));
+  g.addColorStop(0.22, rgba(f.pal[0],     f.alpha * 0.90));
+  g.addColorStop(0.60, rgba(f.pal[1],     f.alpha * 0.45));
+  g.addColorStop(1,    rgba(f.pal[0],     0));
+  ctx.beginPath(); ctx.arc(f.x, f.y, f.rad, 0, Math.PI * 2);
+  ctx.fillStyle = g; ctx.fill();
+}
+
+// ── 연기 렌더 ────────────────────────────────────────────────────────────
+function updateSmoke(s) {
+  s.x += s.vx; s.y += s.vy;
+  s.vy += 0.018;       // 약한 중력
+  s.r  += 0.9;         // 퍼짐
+  s.alpha -= s.decay;
+  return s.alpha > 0;
+}
+
+function drawSmoke(s) {
+  ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(110,110,120,${s.alpha.toFixed(3)})`;
+  ctx.fill();
+}
+
+// ── 메인 루프 ────────────────────────────────────────────────────────────
+function loop() {
+  requestAnimationFrame(loop);
+
+  // 흔적 남기기 (이전 프레임을 어둡게)
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgba(2,2,12,0.21)';
+  ctx.fillRect(0, 0, W, H);
+
+  // 별
+  for (const s of STARS) {
+    ctx.beginPath();
+    ctx.arc(s.rx * W, s.ry * H, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${(s.a * 0.62).toFixed(2)})`;
+    ctx.fill();
+  }
+
+  // 발사 연기 (자연스러운 source-over)
+  ctx.globalCompositeOperation = 'source-over';
+  for (let i = smokes.length - 1; i >= 0; i--) {
+    if (!updateSmoke(smokes[i])) { smokes.splice(i, 1); continue; }
+    drawSmoke(smokes[i]);
+  }
+
+  // 가산 혼합 — 겹칠수록 밝아짐 (자연스러운 글로우)
+  ctx.globalCompositeOperation = 'lighter';
+
+  for (let i = rockets.length - 1; i >= 0; i--) {
+    updateRocket(rockets[i]);
+    if (rockets[i].alive) drawRocket(rockets[i]);
+    else rockets.splice(i, 1);
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    if (!updateParticle(particles[i])) { particles.splice(i, 1); continue; }
+    drawParticle(particles[i]);
+  }
+
+  for (let i = flashes.length - 1; i >= 0; i--) {
+    if (!updateFlash(flashes[i])) { flashes.splice(i, 1); continue; }
+    drawFlash(flashes[i]);
+  }
+
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// ── 이벤트 ───────────────────────────────────────────────────────────────
+const hint = document.getElementById('hint');
+let hintGone = false;
+function hideHint() {
+  if (hintGone) return; hintGone = true;
+  hint.style.opacity = '0'; setTimeout(() => hint.remove(), 1300);
+}
+
+cvs.addEventListener('click', e => {
+  launchRocket(e.clientX, e.clientY);
+  hideHint();
+});
+cvs.addEventListener('touchstart', e => {
+  e.preventDefault();
+  [...e.changedTouches].forEach(t => launchRocket(t.clientX, t.clientY));
+  hideHint();
+}, {passive: false});
+
+// ── 첫 화면 자동 폭죽 (3발) ──────────────────────────────────────────────
+setTimeout(() => launchRocket(W * 0.50, H * 0.24), 500);
+setTimeout(() => launchRocket(W * 0.28, H * 0.30), 1500);
+setTimeout(() => launchRocket(W * 0.72, H * 0.20), 2200);
+
+loop();
+</script>
+</body>
+</html>

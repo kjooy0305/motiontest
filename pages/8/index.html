@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>랜덤 미로</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #161618;
+    --border: #252528;
+    --text: #c8c0b0;
+    --dim: #555;
+    --wall: #5a5a6e;
+    --player: #4a9eff;
+    --exit: #c9a84c;
+    --red: rgba(192,57,43,0.55);
+    --green: rgba(39,174,96,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system,'Malgun Gothic',sans-serif; overflow: hidden; user-select: none; }
+
+  /* ── 타이틀 화면 ── */
+  #title-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; gap: 18px; padding: 24px;
+  }
+  #title-screen h1 { font-size: 32px; letter-spacing: 8px; color: var(--text); font-weight: 300; }
+  .t-sub { font-size: 12px; color: var(--dim); letter-spacing: 2px; }
+  .t-warn { font-size: 13px; color: #c0392b; background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.3); border-radius: 6px; padding: 8px 16px; }
+  .size-label { font-size: 12px; color: var(--dim); letter-spacing: 1px; margin-top: 4px; }
+  .size-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; width: 100%; max-width: 360px; }
+  .size-btn {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 14px 8px;
+    cursor: pointer; transition: background .15s, border-color .15s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .size-btn .s-name { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+  .size-btn .s-diff { font-size: 10px; color: var(--dim); }
+  .size-btn:hover { background: #1e1e22; border-color: #3a3a40; }
+  .custom-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dim); flex-wrap: wrap; justify-content: center; }
+  .custom-row input {
+    width: 52px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 15px; padding: 6px 8px; text-align: center; font-family: monospace;
+  }
+  .custom-row input:focus { outline: none; border-color: #555; }
+  .custom-row button {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 18px; cursor: pointer;
+    transition: background .15s;
+  }
+  .custom-row button:hover { background: #1e1e22; }
+
+  /* ── 게임 화면 ── */
+  #game-screen { display: none; flex-direction: column; height: 100%; }
+  #game-screen.show { display: flex; }
+
+  #stats-bar {
+    display: flex; gap: 0; background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 8px 14px; font-size: 12px; font-family: monospace; color: var(--dim);
+    flex-shrink: 0; align-items: center;
+  }
+  #stats-bar span { flex: 1; text-align: center; }
+  #stats-bar span b { color: var(--text); font-weight: normal; }
+  #stat-resets b { color: #e07060; }
+
+  #canvas-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; min-height: 0;
+  }
+
+  #canvas-wrap { position: relative; }
+  #maze-canvas { display: block; }
+  #flash-layer {
+    position: absolute; inset: 0; pointer-events: none; border-radius: 2px;
+    transition: background 0.35s ease;
+  }
+  #flash-layer.hit  { background: var(--red) !important; transition: none !important; }
+  #flash-layer.win  { background: rgba(201,168,76,0.3) !important; transition: none !important; }
+
+  /* ── D-패드 ── */
+  #dpad {
+    flex-shrink: 0; display: grid; grid-template-areas: ". up ." "left mid right" ". down .";
+    grid-template-columns: 56px 56px 56px; grid-template-rows: 48px 48px 48px;
+    gap: 4px; justify-content: center; padding: 12px 0 8px;
+    background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .dpad-btn {
+    background: #1e1e22; border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .1s; -webkit-tap-highlight-color: transparent;
+  }
+  .dpad-btn:active { background: #2a2a32; }
+  #dpad-up    { grid-area: up; }
+  #dpad-left  { grid-area: left; }
+  #dpad-mid   { grid-area: mid; background: none; border: none; color: var(--dim); font-size: 12px; }
+  #dpad-right { grid-area: right; }
+  #dpad-down  { grid-area: down; }
+
+  #game-btns {
+    flex-shrink: 0; display: flex; gap: 10px; padding: 10px 14px;
+    background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .gbtn {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--dim); font-family: inherit; font-size: 12px; padding: 10px;
+    cursor: pointer; transition: color .15s, border-color .15s; letter-spacing: 1px;
+  }
+  .gbtn:hover { color: var(--text); border-color: #3a3a40; }
+
+  /* ── 승리 오버레이 ── */
+  #win-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+    align-items: center; justify-content: center; z-index: 50; padding: 24px;
+    flex-direction: column; gap: 16px; text-align: center;
+  }
+  #win-overlay.show { display: flex; }
+  #win-icon { font-size: 60px; }
+  #win-title { font-size: 26px; color: var(--exit); letter-spacing: 2px; }
+  #win-stats { font-size: 13px; color: var(--dim); font-family: monospace; line-height: 2; }
+  .wbtn {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    font-family: inherit; font-size: 13px; padding: 12px 28px; border-radius: 8px;
+    cursor: pointer; letter-spacing: 1px; transition: border-color .15s, color .15s;
+  }
+  .wbtn:hover { border-color: #555; color: #eee; }
+
+  /* 흔들기 */
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  #canvas-wrap.shake { animation: shake 0.28s ease; }
+</style>
+</head>
+<body>
+
+<!-- 타이틀 -->
+<div id="title-screen">
+  <h1>MAZE</h1>
+  <div class="t-sub">랜덤 미로 탈출</div>
+  <div class="t-warn">⚠ 벽에 부딪히면 처음으로 돌아갑니다</div>
+
+  <div class="size-label">미로 크기를 선택하세요</div>
+  <div class="size-grid">
+    <button class="size-btn" onclick="startGame(5,5)">
+      <span class="s-name">5 × 5</span><span class="s-diff">입문</span>
+    </button>
+    <button class="size-btn" onclick="startGame(8,8)">
+      <span class="s-name">8 × 8</span><span class="s-diff">쉬움</span>
+    </button>
+    <button class="size-btn" onclick="startGame(10,10)">
+      <span class="s-name">10 × 10</span><span class="s-diff">보통</span>
+    </button>
+    <button class="size-btn" onclick="startGame(15,15)">
+      <span class="s-name">15 × 15</span><span class="s-diff">어려움</span>
+    </button>
+    <button class="size-btn" onclick="startGame(20,20)">
+      <span class="s-name">20 × 20</span><span class="s-diff">매우 어려움</span>
+    </button>
+    <button class="size-btn" onclick="startGame(25,25)">
+      <span class="s-name">25 × 25</span><span class="s-diff">극한</span>
+    </button>
+  </div>
+  <div class="custom-row">
+    <span>직접 입력</span>
+    <input id="cr" type="number" value="12" min="3" max="40">
+    <span>×</span>
+    <input id="cc" type="number" value="12" min="3" max="40">
+    <button onclick="startCustom()">시작</button>
+  </div>
+</div>
+
+<!-- 게임 화면 -->
+<div id="game-screen">
+  <div id="stats-bar">
+    <span>크기 <b id="s-size">?</b></span>
+    <span>이동 <b id="s-steps">0</b></span>
+    <span>리셋 <b id="s-resets">0</b></span>
+    <span><b id="s-time">00:00</b></span>
+  </div>
+  <div id="canvas-area">
+    <div id="canvas-wrap">
+      <canvas id="maze-canvas"></canvas>
+      <div id="flash-layer"></div>
+    </div>
+  </div>
+  <div id="dpad">
+    <button class="dpad-btn" id="dpad-up"    ontouchstart="handleDpad(event,-1,0)" onclick="tryMove(-1,0)">▲</button>
+    <button class="dpad-btn" id="dpad-left"  ontouchstart="handleDpad(event,0,-1)" onclick="tryMove(0,-1)">◀</button>
+    <div class="dpad-btn"    id="dpad-mid">●</div>
+    <button class="dpad-btn" id="dpad-right" ontouchstart="handleDpad(event,0,1)"  onclick="tryMove(0,1)">▶</button>
+    <button class="dpad-btn" id="dpad-down"  ontouchstart="handleDpad(event,1,0)"  onclick="tryMove(1,0)">▼</button>
+  </div>
+  <div id="game-btns">
+    <button class="gbtn" onclick="regenerate()">새 미로 생성</button>
+    <button class="gbtn" onclick="goTitle()">크기 변경</button>
+  </div>
+</div>
+
+<!-- 승리 -->
+<div id="win-overlay">
+  <div id="win-icon">🏆</div>
+  <div id="win-title">탈출 성공!</div>
+  <div id="win-stats"></div>
+  <button class="wbtn" onclick="regenerate()">같은 크기로 다시</button>
+  <button class="wbtn" onclick="goTitle()">크기 변경</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  상수 & 전역 상태
+// ══════════════════════════════════════════
+const DIR = [
+  {dr:-1, dc: 0, wall:'top',    opp:'bottom'},
+  {dr: 0, dc: 1, wall:'right',  opp:'left'},
+  {dr: 1, dc: 0, wall:'bottom', opp:'top'},
+  {dr: 0, dc:-1, wall:'left',   opp:'right'},
+];
+
+let ROWS, COLS, maze;
+let playerR, playerC;
+let steps, resets, timerStart, timerEl, timerInterval;
+let trail = [];  // [{r,c}] 방문 경로
+let gameActive = false;
+let cs = 20;     // cell size px
+
+const canvas = document.getElementById('maze-canvas');
+const ctx    = canvas.getContext('2d');
+const flashEl = document.getElementById('flash-layer');
+const wrapEl  = document.getElementById('canvas-wrap');
+
+// ══════════════════════════════════════════
+//  미로 생성 (반복 DFS — 스택 오버플로 없음)
+// ══════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function generateMaze(rows, cols) {
+  const w = Array.from({length:rows}, () =>
+    Array.from({length:cols}, () => ({top:true,right:true,bottom:true,left:true}))
+  );
+  const vis = Array.from({length:rows}, () => Array(cols).fill(false));
+  const stack = [[0,0]];
+  vis[0][0] = true;
+  let done = 1;
+  const total = rows * cols;
+
+  while (done < total) {
+    const [r,c] = stack[stack.length-1];
+    const dirs = shuffle(DIR);
+    let moved = false;
+    for (const d of dirs) {
+      const nr = r+d.dr, nc = c+d.dc;
+      if (nr>=0 && nr<rows && nc>=0 && nc<cols && !vis[nr][nc]) {
+        w[r][c][d.wall]   = false;
+        w[nr][nc][d.opp]  = false;
+        vis[nr][nc] = true;
+        stack.push([nr,nc]);
+        done++;
+        moved = true;
+        break;
+      }
+    }
+    if (!moved) stack.pop();
+  }
+  return w;
+}
+
+// ══════════════════════════════════════════
+//  캔버스 설정
+// ══════════════════════════════════════════
+function setupCanvas() {
+  const area = document.getElementById('canvas-area');
+  const aw = area.clientWidth  - 16;
+  const ah = area.clientHeight - 16;
+  cs = Math.max(10, Math.min(Math.floor(aw / COLS), Math.floor(ah / ROWS)));
+  canvas.width  = COLS * cs;
+  canvas.height = ROWS * cs;
+}
+
+// ══════════════════════════════════════════
+//  렌더링
+// ══════════════════════════════════════════
+function render() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // 배경
+  ctx.fillStyle = '#0d0d0f';
+  ctx.fillRect(0, 0, W, H);
+
+  // 셀 바닥
+  ctx.fillStyle = '#161618';
+  for (let r=0; r<ROWS; r++)
+    for (let c=0; c<COLS; c++)
+      ctx.fillRect(c*cs+1, r*cs+1, cs-2, cs-2);
+
+  // 경로 흔적
+  for (let i=0; i<trail.length; i++) {
+    const alpha = 0.08 + 0.12 * (i / trail.length);
+    ctx.fillStyle = `rgba(74,158,255,${alpha.toFixed(2)})`;
+    ctx.fillRect(trail[i].c*cs+1, trail[i].r*cs+1, cs-2, cs-2);
+  }
+
+  // 출발 마커
+  ctx.fillStyle = 'rgba(39,174,96,0.25)';
+  ctx.fillRect(1, 1, cs-2, cs-2);
+
+  // 도착 마커
+  ctx.fillStyle = 'rgba(201,168,76,0.3)';
+  ctx.fillRect((COLS-1)*cs+1, (ROWS-1)*cs+1, cs-2, cs-2);
+
+  // 도착 깃발
+  if (cs >= 16) {
+    ctx.fillStyle = 'rgba(201,168,76,0.85)';
+    ctx.font = `${Math.floor(cs*0.55)}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🚩', (COLS-0.5)*cs, (ROWS-0.5)*cs);
+  }
+
+  // 벽 그리기
+  const wt = Math.max(1.5, cs * 0.1);
+  ctx.strokeStyle = '#5a5a6e';
+  ctx.lineWidth   = wt;
+  ctx.lineCap = 'square';
+
+  for (let r=0; r<ROWS; r++) {
+    for (let c=0; c<COLS; c++) {
+      const x = c*cs, y = r*cs;
+      const cell = maze[r][c];
+      ctx.beginPath();
+      if (cell.top)    { ctx.moveTo(x,    y);    ctx.lineTo(x+cs, y); }
+      if (cell.right)  { ctx.moveTo(x+cs, y);    ctx.lineTo(x+cs, y+cs); }
+      if (cell.bottom) { ctx.moveTo(x,    y+cs); ctx.lineTo(x+cs, y+cs); }
+      if (cell.left)   { ctx.moveTo(x,    y);    ctx.lineTo(x,    y+cs); }
+      ctx.stroke();
+    }
+  }
+
+  // 외곽 테두리 강조
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = Math.max(2, wt * 1.5);
+  ctx.strokeRect(0, 0, W, H);
+
+  // 플레이어
+  const px = playerC * cs + cs/2;
+  const py = playerR * cs + cs/2;
+  const pr = cs * 0.3;
+
+  ctx.save();
+  ctx.shadowColor = '#4a9eff';
+  ctx.shadowBlur  = cs * 0.6;
+  ctx.fillStyle   = '#4a9eff';
+  ctx.beginPath();
+  ctx.arc(px, py, pr, 0, Math.PI*2);
+  ctx.fill();
+
+  // 플레이어 하이라이트
+  ctx.shadowBlur = 0;
+  ctx.fillStyle  = 'rgba(255,255,255,0.5)';
+  ctx.beginPath();
+  ctx.arc(px - pr*0.25, py - pr*0.3, pr*0.35, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  // 글씨 레이블 (셀이 충분히 클 때)
+  if (cs >= 22) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `bold ${Math.floor(cs*0.3)}px monospace`;
+    ctx.fillStyle = 'rgba(39,174,96,0.7)';
+    ctx.fillText('S', cs*0.5, cs*0.5);
+  }
+}
+
+// ══════════════════════════════════════════
+//  이동 & 충돌
+// ══════════════════════════════════════════
+let moving = false;
+
+function tryMove(dr, dc) {
+  if (!gameActive || moving) return;
+  const nr = playerR + dr, nc = playerC + dc;
+  if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) return;
+
+  const wallName = dr===-1?'top': dr===1?'bottom': dc===-1?'left':'right';
+  if (maze[playerR][playerC][wallName]) {
+    hitWall(); return;
+  }
+
+  steps++;
+  playerR = nr; playerC = nc;
+  trail.push({r:playerR, c:playerC});
+  updateStats();
+  render();
+
+  if (playerR === ROWS-1 && playerC === COLS-1) win();
+}
+
+function hitWall() {
+  resets++;
+  updateStats();
+  moving = true;
+
+  // 빨간 플래시
+  flashEl.classList.remove('hit','win');
+  void flashEl.offsetWidth;
+  flashEl.classList.add('hit');
+  setTimeout(() => flashEl.classList.remove('hit'), 30);
+  setTimeout(() => { flashEl.style.transition='background 0.3s ease'; flashEl.style.background='transparent'; }, 30);
+
+  // 캔버스 흔들기
+  wrapEl.classList.remove('shake');
+  void wrapEl.offsetWidth;
+  wrapEl.classList.add('shake');
+  setTimeout(() => wrapEl.classList.remove('shake'), 300);
+
+  // 위치 리셋
+  setTimeout(() => {
+    playerR = 0; playerC = 0;
+    trail = [];
+    render();
+    moving = false;
+  }, 200);
+}
+
+function win() {
+  gameActive = false;
+  clearInterval(timerInterval);
+
+  // 황금 플래시
+  flashEl.classList.remove('hit','win');
+  void flashEl.offsetWidth;
+  flashEl.classList.add('win');
+  setTimeout(() => { flashEl.style.transition='background 0.6s ease'; flashEl.style.background='transparent'; }, 80);
+
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  const mm = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const ss = String(elapsed%60).padStart(2,'0');
+
+  document.getElementById('win-stats').innerHTML =
+    `크기 : <b>${ROWS} × ${COLS}</b><br>` +
+    `이동 : <b>${steps}</b>번<br>` +
+    `리셋 : <b>${resets}</b>번<br>` +
+    `시간 : <b>${mm}:${ss}</b>`;
+
+  setTimeout(() => document.getElementById('win-overlay').classList.add('show'), 500);
+}
+
+// ══════════════════════════════════════════
+//  통계 업데이트
+// ══════════════════════════════════════════
+function updateStats() {
+  document.getElementById('s-steps').textContent  = steps;
+  document.getElementById('s-resets').textContent = resets;
+}
+
+function startTimer() {
+  timerStart = Date.now();
+  timerEl = document.getElementById('s-time');
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - timerStart) / 1000);
+    timerEl.textContent = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  }, 500);
+}
+
+// ══════════════════════════════════════════
+//  게임 시작 / 재생성
+// ══════════════════════════════════════════
+function startGame(r, c) {
+  ROWS = Math.max(3, Math.min(40, r));
+  COLS = Math.max(3, Math.min(40, c));
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('game-screen').classList.add('show');
+  document.getElementById('s-size').textContent = `${ROWS}×${COLS}`;
+  init();
+}
+
+function startCustom() {
+  const r = parseInt(document.getElementById('cr').value) || 10;
+  const c = parseInt(document.getElementById('cc').value) || 10;
+  startGame(r, c);
+}
+
+function init() {
+  gameActive = false;
+  maze = generateMaze(ROWS, COLS);
+  playerR = 0; playerC = 0;
+  steps = 0; resets = 0; trail = [];
+  updateStats();
+  setupCanvas();
+  render();
+  startTimer();
+  gameActive = true;
+  document.getElementById('win-overlay').classList.remove('show');
+  flashEl.style.background = 'transparent';
+  flashEl.style.transition = 'none';
+}
+
+function regenerate() {
+  document.getElementById('win-overlay').classList.remove('show');
+  init();
+}
+
+function goTitle() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  document.getElementById('win-overlay').classList.remove('show');
+  document.getElementById('game-screen').classList.remove('show');
+  document.getElementById('title-screen').style.display = 'flex';
+}
+
+// ══════════════════════════════════════════
+//  키보드 컨트롤
+// ══════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (!gameActive) return;
+  switch(e.key) {
+    case 'ArrowUp':    case 'w': case 'W': e.preventDefault(); tryMove(-1,0); break;
+    case 'ArrowDown':  case 's': case 'S': e.preventDefault(); tryMove(1,0);  break;
+    case 'ArrowLeft':  case 'a': case 'A': e.preventDefault(); tryMove(0,-1); break;
+    case 'ArrowRight': case 'd': case 'D': e.preventDefault(); tryMove(0,1);  break;
+  }
+});
+
+// ══════════════════════════════════════════
+//  마우스 클릭 — 캔버스 위 클릭한 방향으로 이동
+// ══════════════════════════════════════════
+canvas.addEventListener('click', e => {
+  if (!gameActive) return;
+  const rect = canvas.getBoundingClientRect();
+  const scX  = canvas.width  / rect.width;
+  const scY  = canvas.height / rect.height;
+  const mx   = (e.clientX - rect.left) * scX;
+  const my   = (e.clientY - rect.top)  * scY;
+  const clickC = Math.floor(mx / cs);
+  const clickR = Math.floor(my / cs);
+  const dr = clickR - playerR, dc = clickC - playerC;
+
+  if (dr === 0 && dc === 0) return;
+  if (Math.abs(dr) >= Math.abs(dc)) tryMove(dr > 0 ? 1 : -1, 0);
+  else                               tryMove(0, dc > 0 ? 1 : -1);
+});
+
+// 마우스 드래그로 이동
+let mouseDown = false, mouseStartX, mouseStartY;
+canvas.addEventListener('mousedown', e => {
+  mouseDown = true;
+  mouseStartX = e.clientX; mouseStartY = e.clientY;
+});
+canvas.addEventListener('mousemove', e => {
+  if (!mouseDown || !gameActive) return;
+  const dx = e.clientX - mouseStartX, dy = e.clientY - mouseStartY;
+  const threshold = cs * 0.6;
+  if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+    mouseStartX = e.clientX; mouseStartY = e.clientY;
+    if (Math.abs(dx) >= Math.abs(dy)) tryMove(0, dx > 0 ? 1 : -1);
+    else                               tryMove(dy > 0 ? 1 : -1, 0);
+  }
+});
+document.addEventListener('mouseup', () => mouseDown = false);
+
+// ══════════════════════════════════════════
+//  터치 스와이프
+// ══════════════════════════════════════════
+let tx0, ty0;
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  tx0 = e.touches[0].clientX;
+  ty0 = e.touches[0].clientY;
+}, {passive:false});
+
+canvas.addEventListener('touchmove', e => {
+  if (!gameActive) return;
+  e.preventDefault();
+  const dx = e.touches[0].clientX - tx0;
+  const dy = e.touches[0].clientY - ty0;
+  const threshold = cs * 0.7;
+  if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+    tx0 = e.touches[0].clientX;
+    ty0 = e.touches[0].clientY;
+    if (Math.abs(dx) >= Math.abs(dy)) tryMove(0, dx > 0 ? 1 : -1);
+    else                               tryMove(dy > 0 ? 1 : -1, 0);
+  }
+}, {passive:false});
+
+// D-패드 터치 (중복 방지)
+function handleDpad(e, dr, dc) {
+  e.preventDefault();
+  tryMove(dr, dc);
+}
+
+// ══════════════════════════════════════════
+//  리사이즈
+// ══════════════════════════════════════════
+window.addEventListener('resize', () => {
+  if (!gameActive) return;
+  setupCanvas();
+  render();
+});
+</script>
+</body>
+</html>

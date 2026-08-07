@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>모의 주식 경매장</title>
+<style>
+:root {
+  --bg:      #080c14;
+  --p1:      #0d1520;
+  --p2:      #111e2e;
+  --bd:      #1a2940;
+  --tx:      #c0d0e0;
+  --tx2:     #5070a0;
+  --up:      #00e676;
+  --dn:      #ff5252;
+  --ac:      #2979ff;
+  --ac2:     #00b0ff;
+  --gold:    #ffc107;
+  --warn:    #ff9800;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);color:var(--tx);
+  font-family:'D2Coding','Consolas',monospace;font-size:12px;
+  height:100vh;overflow:hidden;display:flex;flex-direction:column;
+}
+
+/* ── Start ─────────────────────────────────── */
+#start{
+  position:fixed;inset:0;z-index:100;
+  background:linear-gradient(135deg,#050a14,#0a1828,#050a14);
+  display:flex;align-items:center;justify-content:center;
+}
+.s-box{
+  background:var(--p1);border:1px solid var(--bd);border-radius:12px;
+  padding:36px;width:440px;
+}
+.s-title{font-size:22px;font-weight:bold;color:var(--ac2);letter-spacing:2px;margin-bottom:6px;}
+.s-sub{color:var(--tx2);font-size:12px;margin-bottom:20px;line-height:1.8;}
+.s-info{
+  background:var(--p2);border-radius:8px;padding:14px;
+  margin-bottom:20px;line-height:2.2;font-size:12px;
+}
+.s-info em{color:var(--gold);font-style:normal;}
+.s-label{font-size:11px;color:var(--tx2);letter-spacing:1px;margin-bottom:8px;}
+.time-row{display:flex;gap:10px;margin-bottom:20px;}
+.t-btn{
+  flex:1;padding:10px;background:var(--p2);border:2px solid var(--bd);
+  border-radius:6px;color:var(--tx);cursor:pointer;font-size:14px;font-weight:bold;
+  font-family:inherit;transition:all .2s;
+}
+.t-btn:hover,.t-btn.sel{border-color:var(--ac);background:rgba(41,121,255,.15);color:var(--ac2);}
+.s-go{
+  width:100%;padding:12px;background:var(--ac);border:none;border-radius:6px;
+  color:#fff;font-size:15px;font-weight:bold;font-family:inherit;cursor:pointer;
+  letter-spacing:2px;transition:opacity .2s;
+}
+.s-go:hover{opacity:.85;}
+
+/* ── Header ─────────────────────────────────── */
+#hdr{
+  background:var(--p1);border-bottom:1px solid var(--bd);
+  padding:6px 14px;display:flex;align-items:center;gap:20px;flex-shrink:0;
+}
+.h-logo{color:var(--ac2);font-size:14px;font-weight:bold;letter-spacing:1px;white-space:nowrap;}
+.h-item{display:flex;flex-direction:column;align-items:center;}
+.h-lbl{font-size:9px;color:var(--tx2);letter-spacing:1px;}
+.h-val{font-size:15px;font-weight:bold;}
+#timer{font-size:20px;font-variant-numeric:tabular-nums;letter-spacing:2px;color:var(--ac2);}
+#timer.warn{color:var(--warn);animation:blink 1s infinite;}
+#timer.crit{color:var(--dn);animation:blink .5s infinite;}
+@keyframes blink{50%{opacity:.4;}}
+.h-gap{flex:1;}
+#roi-val{font-size:15px;font-weight:bold;}
+
+/* ── Layout ─────────────────────────────────── */
+#game{display:none;flex:1;flex-direction:column;overflow:hidden;}
+#main{
+  flex:1;overflow:hidden;
+  display:grid;grid-template-columns:210px 1fr 268px;
+}
+
+/* ── Left: stock list ─────────────────────────── */
+#left{
+  background:var(--p1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.p-hdr{
+  padding:6px 10px;font-size:10px;color:var(--tx2);letter-spacing:2px;
+  border-bottom:1px solid var(--bd);background:var(--p2);flex-shrink:0;
+}
+#slist{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent;}
+.sr{
+  padding:7px 8px;cursor:pointer;border-bottom:1px solid rgba(26,41,64,.5);
+  display:grid;grid-template-columns:1fr auto;gap:1px 6px;
+  transition:background .15s;border-left:2px solid transparent;
+}
+.sr:hover{background:rgba(41,121,255,.07);}
+.sr.sel{background:rgba(41,121,255,.14);border-left-color:var(--ac);}
+.sn{font-size:12px;font-weight:bold;}
+.sp{font-size:12px;text-align:right;font-variant-numeric:tabular-nums;}
+.ss{font-size:10px;color:var(--tx2);}
+.sc{font-size:10px;text-align:right;}
+.up{color:var(--up);} .dn{color:var(--dn);} .ne{color:var(--tx2);}
+.ob{
+  grid-column:1/-1;font-size:9px;color:var(--ac2);margin-top:1px;
+}
+
+/* ── Center ─────────────────────────────────── */
+#center{
+  display:flex;flex-direction:column;overflow:hidden;
+  border-right:1px solid var(--bd);background:var(--p1);
+}
+#chart-hdr{
+  padding:7px 12px;border-bottom:1px solid var(--bd);background:var(--p2);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+#stk-name{font-size:14px;font-weight:bold;}
+#stk-meta{font-size:11px;color:var(--tx2);}
+#chart-area{flex:1;padding:6px;min-height:0;position:relative;}
+#chart-canvas{display:block;}
+
+#trade{
+  background:var(--p2);border-top:1px solid var(--bd);
+  padding:10px;flex-shrink:0;
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.ts{background:var(--p1);border:1px solid var(--bd);border-radius:6px;padding:8px;}
+.ts-title{font-size:10px;color:var(--tx2);letter-spacing:1px;margin-bottom:6px;}
+.tr{display:flex;gap:5px;align-items:center;margin-bottom:5px;}
+.tl{font-size:10px;color:var(--tx2);width:44px;flex-shrink:0;}
+input.ni{
+  background:var(--p2);border:1px solid var(--bd);border-radius:3px;
+  color:var(--tx);padding:3px 6px;font-size:12px;font-family:inherit;flex:1;width:0;
+}
+input.ni:focus{outline:none;border-color:var(--ac);}
+.qr{display:flex;gap:3px;margin-top:2px;}
+.qr button{
+  flex:1;padding:2px 0;background:var(--p2);border:1px solid var(--bd);
+  border-radius:2px;color:var(--tx2);cursor:pointer;font-size:9px;font-family:inherit;
+}
+.qr button:hover{color:var(--tx);border-color:var(--ac);}
+.tc{font-size:10px;color:var(--tx2);text-align:right;margin-top:3px;}
+.tc b{color:var(--tx);}
+
+.btn{
+  padding:4px 10px;border:none;border-radius:3px;cursor:pointer;
+  font-size:11px;font-family:inherit;font-weight:bold;transition:opacity .2s;
+}
+.btn:hover{opacity:.8;} .btn:active{opacity:.6;} .btn:disabled{opacity:.35;cursor:default;}
+.b-buy{background:var(--up);color:#000;}
+.b-sell{background:var(--dn);color:#fff;}
+.b-ac{background:var(--ac);color:#fff;}
+.b-gold{background:var(--gold);color:#000;}
+.b-gray{background:#1a2940;color:var(--tx);}
+.b-warn{background:var(--warn);color:#000;}
+.b-full{width:100%;margin-top:4px;padding:5px;}
+
+/* ── Right: tab panel ─────────────────────────── */
+#right{
+  display:flex;flex-direction:column;overflow:hidden;background:var(--p1);
+}
+.tabs{
+  display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--p2);
+}
+.tab{
+  flex:1;padding:6px 0;font-size:10px;color:var(--tx2);cursor:pointer;
+  text-align:center;letter-spacing:.5px;border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+.tab:hover{color:var(--tx);}
+.tab.act{color:var(--ac2);border-bottom-color:var(--ac);}
+#tab-content{flex:1;overflow-y:auto;padding:8px;scrollbar-width:thin;scrollbar-color:var(--bd) transparent;}
+
+/* News */
+.ni-row{
+  padding:5px 6px;border-radius:4px;margin-bottom:4px;
+  background:var(--p2);border-left:2px solid var(--bd);font-size:11px;line-height:1.5;
+}
+.ni-row.pos{border-left-color:var(--up);}
+.ni-row.neg{border-left-color:var(--dn);}
+.ni-row.all{border-left-color:var(--warn);}
+.ni-time{font-size:9px;color:var(--tx2);}
+
+/* Portfolio */
+.pr{
+  padding:6px 8px;background:var(--p2);border-radius:4px;margin-bottom:4px;
+}
+.pr-name{font-size:12px;font-weight:bold;margin-bottom:2px;}
+.pr-d1{display:flex;justify-content:space-between;font-size:10px;color:var(--tx2);}
+.pr-pnl{font-size:11px;font-weight:bold;margin-top:2px;}
+.pr-btns{display:flex;gap:4px;margin-top:4px;}
+
+/* Bank */
+.br{
+  padding:7px 8px;background:var(--p2);border-radius:4px;margin-bottom:4px;
+}
+.br-amt{font-size:13px;font-weight:bold;color:var(--ac2);}
+.br-info{font-size:10px;color:var(--tx2);margin-top:2px;}
+.br-int{color:var(--up);font-weight:bold;}
+.br-lock{color:var(--warn);}
+.b-form{
+  background:var(--p2);border-radius:4px;padding:8px;margin-top:6px;border:1px solid var(--bd);
+}
+.b-form-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.b-form-note{font-size:10px;color:var(--tx2);line-height:1.6;margin-bottom:6px;}
+
+/* Gamble */
+.g-tabs{display:flex;gap:4px;margin-bottom:10px;}
+.g-tab{
+  flex:1;padding:5px;background:var(--p2);border:1px solid var(--bd);
+  border-radius:4px;color:var(--tx2);cursor:pointer;font-size:11px;text-align:center;
+  font-family:inherit;transition:all .15s;
+}
+.g-tab.act{background:rgba(41,121,255,.2);border-color:var(--ac);color:var(--ac2);}
+.g-bet-row{display:flex;gap:5px;align-items:center;margin-bottom:8px;}
+.g-choice{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;}
+.g-num{
+  flex:1;min-width:30px;padding:6px 4px;background:var(--p2);border:1px solid var(--bd);
+  border-radius:4px;color:var(--tx2);cursor:pointer;font-size:13px;font-weight:bold;
+  text-align:center;font-family:inherit;transition:all .15s;
+}
+.g-num:hover{border-color:var(--ac);color:var(--tx);}
+.g-result{
+  text-align:center;font-size:13px;font-weight:bold;padding:6px;
+  border-radius:4px;min-height:32px;background:var(--p2);
+}
+.g-odds{font-size:10px;color:var(--tx2);text-align:center;margin-bottom:6px;}
+
+/* Beg */
+.beg-wrap{text-align:center;padding:8px 0;}
+#beg-msg{
+  font-size:12px;color:var(--tx2);margin:10px 0;min-height:36px;line-height:1.6;
+}
+#beg-cd{font-size:10px;color:var(--tx2);margin-top:4px;}
+.beg-stat{
+  background:var(--p2);border-radius:4px;padding:6px 8px;
+  font-size:11px;margin-top:8px;text-align:left;
+}
+
+/* Flash */
+#flash{
+  position:fixed;top:48px;left:50%;transform:translateX(-50%);
+  background:var(--p1);border:1px solid var(--bd);border-radius:8px;
+  padding:8px 18px;font-size:12px;max-width:480px;width:90%;text-align:center;
+  z-index:50;pointer-events:none;opacity:0;transition:opacity .3s;
+}
+#flash.show{opacity:1;}
+#flash.pos{border-color:var(--up);}
+#flash.neg{border-color:var(--dn);}
+#flash.all{border-color:var(--warn);}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:16px;right:16px;
+  background:var(--p1);border:1px solid var(--bd);border-radius:5px;
+  padding:7px 12px;font-size:11px;z-index:200;pointer-events:none;
+  opacity:0;transform:translateY(8px);transition:all .25s;
+}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* End */
+#end{
+  position:fixed;inset:0;background:rgba(5,10,20,.96);
+  display:none;align-items:center;justify-content:center;z-index:100;
+}
+.e-box{
+  background:var(--p1);border:1px solid var(--bd);border-radius:12px;
+  padding:36px;max-width:480px;width:90%;text-align:center;
+}
+.e-title{font-size:22px;font-weight:bold;color:var(--gold);margin-bottom:8px;}
+.e-rank{font-size:16px;margin-bottom:20px;line-height:1.6;}
+.e-stats{
+  background:var(--p2);border-radius:8px;padding:14px;margin-bottom:20px;text-align:left;
+}
+.e-row{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px;}
+.e-row:last-child{margin-bottom:0;}
+.e-lbl{color:var(--tx2);}
+.e-val{font-weight:bold;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ── Start ─────────────────────────────────────────────────── -->
+<div id="start">
+  <div class="s-box">
+    <div class="s-title">📈 모의 주식 경매장</div>
+    <div class="s-sub">초기 자금으로 주식·도박·은행을 활용해 최대한 많은 돈을 버세요!</div>
+    <div class="s-info">
+      💰 시작 자금 : <em>₩1,000,000</em><br>
+      📊 주식 종목 : <em>20개</em> — 뉴스에 따라 오르내림<br>
+      🎲 도박 : <em>주사위·번호</em> — 고위험 고수익<br>
+      🙏 구걸 : <em>쿨타임 8초</em> — 소소한 용돈<br>
+      🏦 은행 : <em>분당 2% 이자</em>, 최소 3분 예치
+    </div>
+    <div class="s-label">⏱ 게임 시간 선택</div>
+    <div class="time-row">
+      <button class="t-btn" data-min="5">5분</button>
+      <button class="t-btn sel" data-min="10">10분</button>
+      <button class="t-btn" data-min="15">15분</button>
+    </div>
+    <button class="s-go" id="go-btn">게임 시작 ▶</button>
+  </div>
+</div>
+
+<!-- ── Game ─────────────────────────────────────────────────── -->
+<div id="game">
+  <!-- Header -->
+  <div id="hdr">
+    <div class="h-logo">📈 모의 주식 경매장</div>
+    <div class="h-item">
+      <div class="h-lbl">남은 시간</div>
+      <div id="timer">10:00</div>
+    </div>
+    <div class="h-item">
+      <div class="h-lbl">현금</div>
+      <div class="h-val" id="hdr-cash">₩1,000,000</div>
+    </div>
+    <div class="h-item">
+      <div class="h-lbl">총자산</div>
+      <div class="h-val" id="hdr-total">₩1,000,000</div>
+    </div>
+    <div class="h-item">
+      <div class="h-lbl">수익률</div>
+      <div id="roi-val" class="ne">0.00%</div>
+    </div>
+    <div class="h-gap"></div>
+    <div class="h-item">
+      <div class="h-lbl">예치금</div>
+      <div class="h-val" id="hdr-bank">₩0</div>
+    </div>
+  </div>
+
+  <!-- Main area -->
+  <div id="main">
+    <!-- Left: stock list -->
+    <div id="left">
+      <div class="p-hdr">📊 종목 목록</div>
+      <div id="slist"></div>
+    </div>
+
+    <!-- Center: chart + trade -->
+    <div id="center">
+      <div id="chart-hdr">
+        <div id="stk-name" class="ne">종목을 선택하세요</div>
+        <div id="stk-meta"></div>
+      </div>
+      <div id="chart-area"><canvas id="chart-canvas"></canvas></div>
+      <div id="trade">
+        <div class="ts">
+          <div class="ts-title">▲ 매수 BUY</div>
+          <div class="tr">
+            <div class="tl">수량</div>
+            <input class="ni" id="buy-qty" type="number" min="1" value="1" placeholder="주">
+          </div>
+          <div class="qr">
+            <button onclick="setQty('buy',1)">1주</button>
+            <button onclick="setQty('buy',10)">10주</button>
+            <button onclick="setQty('buy',50)">50주</button>
+            <button onclick="setQty('buy',0)">최대</button>
+          </div>
+          <div class="tc" id="buy-total">합계: <b>—</b></div>
+          <button class="btn b-buy b-full" id="buy-btn" onclick="doBuy()">매수</button>
+        </div>
+        <div class="ts">
+          <div class="ts-title">▼ 매도 SELL</div>
+          <div class="tr">
+            <div class="tl">수량</div>
+            <input class="ni" id="sell-qty" type="number" min="1" value="1" placeholder="주">
+          </div>
+          <div class="qr">
+            <button onclick="setQty('sell',1)">1주</button>
+            <button onclick="setQty('sell',10)">10주</button>
+            <button onclick="setQty('sell',0)">전량</button>
+          </div>
+          <div class="tc" id="sell-total">보유: <b>0주</b></div>
+          <button class="btn b-sell b-full" id="sell-btn" onclick="doSell()">매도</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: tab panel -->
+    <div id="right">
+      <div class="tabs">
+        <div class="tab act" data-tab="news">📰뉴스</div>
+        <div class="tab" data-tab="port">💼보유</div>
+        <div class="tab" data-tab="bank">🏦은행</div>
+        <div class="tab" data-tab="gamble">🎲도박</div>
+        <div class="tab" data-tab="beg">🙏구걸</div>
+      </div>
+      <div id="tab-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── End ─────────────────────────────────────────────────── -->
+<div id="end">
+  <div class="e-box">
+    <div class="e-title">⏱ 게임 종료!</div>
+    <div class="e-rank" id="e-rank"></div>
+    <div class="e-stats">
+      <div class="e-row"><span class="e-lbl">시작 자금</span><span class="e-val">₩1,000,000</span></div>
+      <div class="e-row"><span class="e-lbl">최종 총자산</span><span class="e-val" id="e-total"></span></div>
+      <div class="e-row"><span class="e-lbl">순수익</span><span class="e-val" id="e-pnl"></span></div>
+      <div class="e-row"><span class="e-lbl">수익률</span><span class="e-val" id="e-roi"></span></div>
+      <div class="e-row"><span class="e-lbl">뉴스 발생</span><span class="e-val" id="e-news"></span></div>
+      <div class="e-row"><span class="e-lbl">최고 종목</span><span class="e-val" id="e-best"></span></div>
+    </div>
+    <button class="s-go" onclick="location.reload()">다시 플레이</button>
+  </div>
+</div>
+
+<!-- Flash / Toast -->
+<div id="flash"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  STOCKS
+// ═══════════════════════════════════════════════════════════
+const STOCKS = [
+  {id:'SJE', name:'삼진전자',    sector:'전자',   price:45000, vol:.018},
+  {id:'GJS', name:'광주반도체',  sector:'반도체', price:92000, vol:.022},
+  {id:'HKB', name:'한강바이오',  sector:'바이오', price:78000, vol:.032},
+  {id:'CNP', name:'충남제약',    sector:'제약',   price:38000, vol:.028},
+  {id:'WJM', name:'원주의료',    sector:'의료',   price:52000, vol:.026},
+  {id:'KRM', name:'코리아모터스',sector:'자동차', price:28500, vol:.017},
+  {id:'SEE', name:'서울에너지',  sector:'에너지', price:31000, vol:.015},
+  {id:'BSH', name:'부산해운',    sector:'해운',   price:17500, vol:.025},
+  {id:'USC', name:'울산조선',    sector:'조선',   price:9200,  vol:.030},
+  {id:'JJA', name:'제주항공',    sector:'항공',   price:21000, vol:.028},
+  {id:'ICH', name:'인천화학',    sector:'화학',   price:14500, vol:.020},
+  {id:'DJC', name:'대전건설',    sector:'건설',   price:11800, vol:.023},
+  {id:'SJI', name:'세종IT',      sector:'IT',     price:65000, vol:.027},
+  {id:'JBG', name:'전북게임',    sector:'게임',   price:42000, vol:.038},
+  {id:'GGR', name:'경기로봇',    sector:'로봇',   price:81000, vol:.030},
+  {id:'GWT', name:'강원관광',    sector:'관광',   price:5800,  vol:.032},
+  {id:'JJR', name:'제주리조트',  sector:'리조트', price:7100,  vol:.024},
+  {id:'GGS', name:'경기식품',    sector:'식품',   price:9600,  vol:.016},
+  {id:'MKS', name:'목포수산',    sector:'수산',   price:4400,  vol:.027},
+  {id:'PHC', name:'포항철강',    sector:'철강',   price:23500, vol:.018},
+];
+
+// ═══════════════════════════════════════════════════════════
+//  NEWS (100개)
+// ═══════════════════════════════════════════════════════════
+// affects: [{id, d}] 또는 'all' (allD 필드 사용)
+const NEWS = [
+  // ─ 삼진전자 ─
+  {t:'삼진전자, 차세대 AI 반도체 개발 성공 발표',        type:'pos', a:[{id:'SJE',d:.22},{id:'GJS',d:.10}]},
+  {t:'삼진전자 스마트폰, 배터리 폭발 대규모 리콜 사태',   type:'neg', a:[{id:'SJE',d:-.26}]},
+  {t:'삼진전자-애플 부품 공급 계약 10조원 체결',         type:'pos', a:[{id:'SJE',d:.18}]},
+  {t:'삼진전자 회장, 횡령 혐의로 검찰 수사 착수',        type:'neg', a:[{id:'SJE',d:-.14}]},
+  {t:'삼진전자, 갤럭시 신형 사전예약 100만대 돌파',      type:'pos', a:[{id:'SJE',d:.12}]},
+  // ─ 광주반도체 ─
+  {t:'광주반도체, 미국 정부 보조금 5조원 수혜 확정',     type:'pos', a:[{id:'GJS',d:.30}]},
+  {t:'광주반도체, 중국 수출 규제로 매출 직격탄',         type:'neg', a:[{id:'GJS',d:-.20}]},
+  {t:'광주반도체, 정부 반도체 클러스터 주관사 선정',     type:'pos', a:[{id:'GJS',d:.15}]},
+  {t:'광주반도체, 7nm 칩 수율 문제로 양산 차질 심각',    type:'neg', a:[{id:'GJS',d:-.16}]},
+  // ─ 한강바이오 ─
+  {t:'한강바이오, FDA 신약 최종 승인 획득',              type:'pos', a:[{id:'HKB',d:.38}]},
+  {t:'한강바이오, 임상3상 실패 발표 — 연구 중단',        type:'neg', a:[{id:'HKB',d:-.42}]},
+  {t:'한강바이오, 코로나 변이 백신 개발 착수 소식',      type:'pos', a:[{id:'HKB',d:.16}]},
+  {t:'한강바이오 내부 고발 — 연구 데이터 조작 의혹',     type:'neg', a:[{id:'HKB',d:-.24}]},
+  // ─ 충남제약 ─
+  {t:'충남제약, 불법 첨가물 적발 — 영업 정지 처분',      type:'neg', a:[{id:'CNP',d:-.32}]},
+  {t:'충남제약, 국산 1호 항암제 출시 성공',              type:'pos', a:[{id:'CNP',d:.26}]},
+  {t:'충남제약, 미국 제약사와 기술이전 계약 2000억',     type:'pos', a:[{id:'CNP',d:.22}]},
+  {t:'충남제약, 복제약 시장 가격경쟁 심화로 마진 축소',  type:'neg', a:[{id:'CNP',d:-.11}]},
+  // ─ 원주의료 ─
+  {t:'원주의료, 로봇 수술 시스템 전국 병원 납품 계약',   type:'pos', a:[{id:'WJM',d:.24}]},
+  {t:'원주의료, 의료기기 미국 FDA 510k 인증 획득',       type:'pos', a:[{id:'WJM',d:.19}]},
+  {t:'원주의료, 대형 병원 그룹에 지분 매각 협상 돌입',   type:'pos', a:[{id:'WJM',d:.14}]},
+  // ─ 코리아모터스 ─
+  {t:'코리아모터스, 전기차 배터리 화재 15만대 리콜',     type:'neg', a:[{id:'KRM',d:-.23}]},
+  {t:'코리아모터스, 미국 수출량 역대 최고치 경신',       type:'pos', a:[{id:'KRM',d:.18}]},
+  {t:'코리아모터스, 자율주행 레벨4 세계 최초 공개',      type:'pos', a:[{id:'KRM',d:.16}]},
+  {t:'코리아모터스 전 임원, 경쟁사 기밀 유출 혐의',      type:'neg', a:[{id:'KRM',d:-.09}]},
+  {t:'코리아모터스, 인도 시장 합작사 설립 계약 체결',    type:'pos', a:[{id:'KRM',d:.11}]},
+  // ─ 서울에너지 ─
+  {t:'서울에너지, 해상풍력 1조원 수주 성공',             type:'pos', a:[{id:'SEE',d:.21}]},
+  {t:'국제 유가 급락 — 에너지 업계 직격탄',             type:'neg', a:[{id:'SEE',d:-.16}]},
+  {t:'서울에너지, 국내 최대 태양광 발전소 완공',         type:'pos', a:[{id:'SEE',d:.13}]},
+  {t:'서울에너지, 전력요금 규제로 수익성 악화 우려',     type:'neg', a:[{id:'SEE',d:-.12}]},
+  // ─ 부산해운 ─
+  {t:'부산해운, 수에즈운하 재개통으로 물동량 급증',      type:'pos', a:[{id:'BSH',d:.19}]},
+  {t:'부산해운, 대규모 선박 좌초 사고 발생',             type:'neg', a:[{id:'BSH',d:-.29}]},
+  {t:'해운 운임지수 BDI 사상 최고치 경신',               type:'pos', a:[{id:'BSH',d:.22},{id:'USC',d:.10}]},
+  {t:'부산해운, 러시아 제재로 북극 항로 차질',           type:'neg', a:[{id:'BSH',d:-.13}]},
+  // ─ 울산조선 ─
+  {t:'울산조선, LNG선 50척 수주 역대 최대 계약',         type:'pos', a:[{id:'USC',d:.34}]},
+  {t:'울산조선, 파업 장기화로 생산 차질 심각',           type:'neg', a:[{id:'USC',d:-.21}]},
+  {t:'울산조선, 세계 최대 컨테이너선 수주 쾌거',         type:'pos', a:[{id:'USC',d:.28}]},
+  {t:'울산조선, 용접 불량 품질 이슈로 계약 취소 위기',   type:'neg', a:[{id:'USC',d:-.19}]},
+  // ─ 제주항공 ─
+  {t:'제주항공, 기체 결함으로 전 노선 운항 정지',        type:'neg', a:[{id:'JJA',d:-.36}]},
+  {t:'제주항공, 중국 노선 재개 — 여객 수요 폭발',        type:'pos', a:[{id:'JJA',d:.24}]},
+  {t:'제주항공 승무원 파업 — 대규모 결항 예고',          type:'neg', a:[{id:'JJA',d:-.16}]},
+  {t:'제주항공, 베트남 저가항공사 인수 협상 타결',       type:'pos', a:[{id:'JJA',d:.12}]},
+  // ─ 인천화학 ─
+  {t:'인천화학, 공장 화재로 주력 시설 전소',             type:'neg', a:[{id:'ICH',d:-.31}]},
+  {t:'인천화학, 반도체 세정제 세계 1위 점유율 달성',     type:'pos', a:[{id:'ICH',d:.21}]},
+  {t:'인천화학, 발암물질 배출로 환경부 과징금 폭탄',     type:'neg', a:[{id:'ICH',d:-.19}]},
+  {t:'인천화학, 친환경 바이오 플라스틱 신사업 진출',     type:'pos', a:[{id:'ICH',d:.15}]},
+  // ─ 대전건설 ─
+  {t:'정부, 건설 경기 부양 2조원 지원 발표',             type:'pos', a:[{id:'DJC',d:.26}]},
+  {t:'대전건설, 시공 아파트 붕괴 사고 — 대표 구속',      type:'neg', a:[{id:'DJC',d:-.37}]},
+  {t:'대전건설, UAE 스마트시티 프로젝트 수주',           type:'pos', a:[{id:'DJC',d:.30}]},
+  {t:'건설 원자재 급등으로 공사비 감당 불가 위기',       type:'neg', a:[{id:'DJC',d:-.13}]},
+  {t:'대전건설, 베트남 신도시 개발 사업 수주',           type:'pos', a:[{id:'DJC',d:.17}]},
+  // ─ 세종IT ─
+  {t:'세종IT, 글로벌 빅테크와 클라우드 파트너십 체결',   type:'pos', a:[{id:'SJI',d:.19}]},
+  {t:'세종IT, 개인정보 대규모 유출 — 집단소송 위기',     type:'neg', a:[{id:'SJI',d:-.23}]},
+  {t:'세종IT, 카카오와 전략적 제휴 협약 체결',           type:'pos', a:[{id:'SJI',d:.15}]},
+  {t:'세종IT, AI 스타트업 인수 기술 경쟁력 강화',        type:'pos', a:[{id:'SJI',d:.13}]},
+  // ─ 전북게임 ─
+  {t:'전북게임, 신작 MMORPG 글로벌 출시 500만 다운로드', type:'pos', a:[{id:'JBG',d:.32}]},
+  {t:'전북게임, 중국 서비스 허가 취소 — 시장 철수',      type:'neg', a:[{id:'JBG',d:-.29}]},
+  {t:'전북게임, 사행성 논란으로 국회 청문회 소환',       type:'neg', a:[{id:'JBG',d:-.13}]},
+  {t:'전북게임, 스팀 플랫폼 인디 게임 글로벌 흥행',      type:'pos', a:[{id:'JBG',d:.18}]},
+  {t:'전북게임, 넥슨과 합병 협상 진행 소식',             type:'pos', a:[{id:'JBG',d:.22}]},
+  // ─ 경기로봇 ─
+  {t:'경기로봇, 테슬라 공장 자동화 로봇 납품 계약',      type:'pos', a:[{id:'GGR',d:.36}]},
+  {t:'경기로봇, 핵심 특허 분쟁 패소 — 생산 중단 위기',   type:'neg', a:[{id:'GGR',d:-.26}]},
+  {t:'경기로봇, 미국 나스닥 상장 추진 소식',             type:'pos', a:[{id:'GGR',d:.27}]},
+  {t:'경기로봇, 정부 AI 로봇 국책사업 주관사 선정',      type:'pos', a:[{id:'GGR',d:.21}]},
+  // ─ 강원관광 ─
+  {t:'강원관광, 올림픽 특수로 예약 완판 행진',           type:'pos', a:[{id:'GWT',d:.22}]},
+  {t:'강원 산불 확산 — 관광 업계 방문객 급감',           type:'neg', a:[{id:'GWT',d:-.26},{id:'JJR',d:-.11}]},
+  {t:'강원관광, 카지노 면허 추가 획득 소식',             type:'pos', a:[{id:'GWT',d:.24}]},
+  {t:'강원관광, 하이브리드 케이블카 프로젝트 착공',      type:'pos', a:[{id:'GWT',d:.16}]},
+  // ─ 제주리조트 ─
+  {t:'제주리조트, 중국 단체관광 금지령 해제 예약 폭주',  type:'pos', a:[{id:'JJR',d:.27}]},
+  {t:'제주리조트, 외국인 관광객 100만 돌파 기록',        type:'pos', a:[{id:'JJR',d:.19}]},
+  {t:'태풍 내습 — 제주 관광 업계 대규모 취소 사태',      type:'neg', a:[{id:'JJR',d:-.22},{id:'GWT',d:-.10}]},
+  // ─ 경기식품 ─
+  {t:'경기식품, 제품에서 유해물질 검출 — 전량 회수',     type:'neg', a:[{id:'GGS',d:-.31}]},
+  {t:'경기식품, 편의점 독점 공급 계약 체결',             type:'pos', a:[{id:'GGS',d:.23}]},
+  {t:'경기식품, 건강기능식품 확대로 매출 성장',          type:'pos', a:[{id:'GGS',d:.13}]},
+  {t:'경기식품, 식품 위생 기준 강화로 비용 급증',        type:'neg', a:[{id:'GGS',d:-.09}]},
+  // ─ 목포수산 ─
+  {t:'목포수산, 노르웨이 연어 독점 수입 계약 체결',      type:'pos', a:[{id:'MKS',d:.27}]},
+  {t:'적조 현상 심각 — 수산업계 피해 막대',              type:'neg', a:[{id:'MKS',d:-.23}]},
+  {t:'목포수산, 수산물 안전검사서 중금속 검출',          type:'neg', a:[{id:'MKS',d:-.29}]},
+  {t:'목포수산, 원양어업 쿼터 확대 수익 개선 기대',      type:'pos', a:[{id:'MKS',d:.16}]},
+  // ─ 포항철강 ─
+  {t:'포항철강, 글로벌 철강왕과 M&A 협상 진행',          type:'pos', a:[{id:'PHC',d:.21}]},
+  {t:'중국 철강 수입 급증 — 가격 경쟁 심화',             type:'neg', a:[{id:'PHC',d:-.16}]},
+  {t:'포항철강, 조선업 호황으로 납품 수주 급증',         type:'pos', a:[{id:'PHC',d:.18},{id:'USC',d:.08}]},
+  {t:'포항철강, 탄소중립 선언 수소환원제철 투자',        type:'pos', a:[{id:'PHC',d:.11}]},
+  // ─ 시장 전체 ─
+  {t:'미국 연준, 금리 0.5%p 인상 결정',                  type:'neg', a:'all', allD:-.08},
+  {t:'한국 GDP 성장률 예상치 크게 상회 — 경기 호황',     type:'pos', a:'all', allD:.06},
+  {t:'북한, 탄도미사일 발사 — 지정학적 긴장 고조',       type:'neg', a:'all', allD:-.07},
+  {t:'코스피 사상 최고치 3,500 돌파',                     type:'pos', a:'all', allD:.05},
+  {t:'글로벌 경기침체 우려 확산 — IMF 성장률 하향',      type:'neg', a:'all', allD:-.10},
+  {t:'외국인 투자자 사상 최대 순매수 기록',               type:'pos', a:'all', allD:.07},
+  {t:'소비자 물가지수 3.5% 상승 — 인플레이션 우려',      type:'neg', a:'all', allD:-.05},
+  {t:'정부, 증시 부양 위해 연기금 10조원 투입 발표',     type:'pos', a:'all', allD:.08},
+  {t:'미중 무역 전쟁 재점화 — 수출 기업 직격탄',         type:'neg', a:'all', allD:-.09},
+  {t:'한미 FTA 업그레이드 협상 타결 소식',               type:'pos', a:'all', allD:.06},
+  // ─ 섹터 뉴스 ─
+  {t:'바이오 규제 강화 — 임상 절차 엄격화',              type:'neg', a:[{id:'HKB',d:-.08},{id:'CNP',d:-.08},{id:'WJM',d:-.06}]},
+  {t:'정부, 반도체 클러스터 특별법 국회 통과',           type:'pos', a:[{id:'SJE',d:.08},{id:'GJS',d:.12}]},
+  {t:'IT 기업 법인세 감면 혜택 연장 확정',               type:'pos', a:[{id:'SJI',d:.07},{id:'JBG',d:.07}]},
+  {t:'관광 비자 완전 자유화 — 여행업계 대호재',          type:'pos', a:[{id:'GWT',d:.10},{id:'JJR',d:.10},{id:'JJA',d:.08}]},
+  {t:'원자재 가격 급등 — 화학·철강 원가 부담 폭증',      type:'neg', a:[{id:'ICH',d:-.10},{id:'PHC',d:-.08}]},
+  {t:'로봇 자동화 정부 지원금 확대 발표',                type:'pos', a:[{id:'GGR',d:.18}]},
+  {t:'조선업 슈퍼사이클 본격 진입 선언',                 type:'pos', a:[{id:'USC',d:.20},{id:'BSH',d:.12},{id:'PHC',d:.06}]},
+  {t:'게임·IT 업종 세금 혜택 3년 연장',                  type:'pos', a:[{id:'JBG',d:.09},{id:'SJI',d:.08}]},
+];
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let cash, portfolio, bankDeposits, priceData, initPrices, priceHistory, newsLog;
+let selectedId = null, gameDurMs, gameStart;
+let tickTimer, secTimer, newsTimer;
+let lastBeg = 0, begCD = 8000;
+let activeTab = 'news';
+let newsCount = 0;
+let gambling = false;
+let gType = 'dice'; // 'dice' | 'num'
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+const fmt  = n => Math.round(n).toLocaleString('ko-KR');
+const fmtp = n => (n >= 0 ? '+' : '') + (n * 100).toFixed(2) + '%';
+const rnd  = (a, b) => a + Math.random() * (b - a);
+
+function totalPortVal() {
+  return Object.entries(portfolio).reduce((s, [id, {qty}]) => s + qty * priceData[id], 0);
+}
+function totalBankVal() {
+  const now = Date.now();
+  return bankDeposits.reduce((s, d) => {
+    const mins = (now - d.startTime) / 60000;
+    return s + d.amount + d.amount * 0.02 * mins;
+  }, 0);
+}
+function totalAssets() { return cash + totalPortVal() + totalBankVal(); }
+
+function toast(msg, cls = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + cls;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = '', 2000);
+}
+
+function flash(news) {
+  const el = document.getElementById('flash');
+  el.textContent = (news.type === 'pos' ? '📈 ' : news.type === 'neg' ? '📉 ' : '📰 ') + news.t;
+  el.className = 'show ' + (news.a === 'all' ? 'all' : news.type);
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = '', 4000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PRICE ENGINE
+// ═══════════════════════════════════════════════════════════
+function tickPrices() {
+  STOCKS.forEach(s => {
+    const chg = s.vol * (Math.random() - 0.5) * 1.4;
+    priceData[s.id] = Math.max(100, priceData[s.id] * (1 + chg));
+    priceHistory[s.id].push(priceData[s.id]);
+    if (priceHistory[s.id].length > 120) priceHistory[s.id].shift();
+  });
+  renderAll();
+}
+
+function triggerNews() {
+  if (!gameStart) return;
+  const news = NEWS[Math.floor(Math.random() * NEWS.length)];
+  newsCount++;
+
+  if (news.a === 'all') {
+    STOCKS.forEach(s => {
+      priceData[s.id] = Math.max(100, priceData[s.id] * (1 + news.allD));
+    });
+  } else {
+    news.a.forEach(({id, d}) => {
+      priceData[id] = Math.max(100, priceData[id] * (1 + d));
+    });
+  }
+
+  const now = new Date();
+  const timeStr = now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  newsLog.unshift({...news, timeStr});
+  if (newsLog.length > 30) newsLog.pop();
+
+  flash(news);
+  renderAll();
+
+  // randomize next news interval
+  clearTimeout(newsTimer);
+  newsTimer = setTimeout(triggerNews, rnd(18000, 40000));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════
+function renderAll() {
+  renderHeader();
+  renderStockList();
+  renderChart();
+  renderTradePanel();
+  renderTab();
+}
+
+function renderHeader() {
+  const tot = totalAssets();
+  const roi = (tot - 1_000_000) / 1_000_000;
+  document.getElementById('hdr-cash').textContent  = '₩' + fmt(cash);
+  document.getElementById('hdr-total').textContent = '₩' + fmt(tot);
+  document.getElementById('hdr-bank').textContent  = '₩' + fmt(totalBankVal());
+  const rv = document.getElementById('roi-val');
+  rv.textContent = fmtp(roi);
+  rv.className = roi > 0 ? 'up' : roi < 0 ? 'dn' : 'ne';
+}
+
+function renderStockList() {
+  const sl = document.getElementById('slist');
+  let h = '';
+  for (const s of STOCKS) {
+    const p   = priceData[s.id];
+    const ip  = initPrices[s.id];
+    const chg = (p - ip) / ip;
+    const own = portfolio[s.id]?.qty || 0;
+    const cls = chg > 0 ? 'up' : chg < 0 ? 'dn' : 'ne';
+    h += `<div class="sr ${selectedId === s.id ? 'sel' : ''}" onclick="selectStock('${s.id}')">
+      <div class="sn">${s.name}</div>
+      <div class="sp">${fmt(p)}원</div>
+      <div class="ss">${s.sector}</div>
+      <div class="sc ${cls}">${chg >= 0 ? '▲' : '▼'} ${Math.abs(chg * 100).toFixed(1)}%</div>
+      ${own > 0 ? `<div class="ob">● ${own}주 보유 (₩${fmt(own * p)})</div>` : ''}
+    </div>`;
+  }
+  sl.innerHTML = h;
+}
+
+function renderChart() {
+  if (!selectedId) return;
+  const area = document.getElementById('chart-area');
+  const canvas = document.getElementById('chart-canvas');
+  const W = area.clientWidth - 12;
+  const H = area.clientHeight - 12;
+  if (W <= 0 || H <= 0) return;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const hist = priceHistory[selectedId];
+  if (hist.length < 2) return;
+
+  const mn = Math.min(...hist) * 0.995;
+  const mx = Math.max(...hist) * 1.005;
+  const rng = mx - mn;
+  const ip = initPrices[selectedId];
+  const isUp = hist[hist.length - 1] >= ip;
+  const col = isUp ? '#00e676' : '#ff5252';
+
+  // grid
+  ctx.strokeStyle = 'rgba(26,41,64,.5)'; ctx.lineWidth = 1;
+  for (let i = 1; i <= 4; i++) {
+    const y = Math.round(H / 4 * i);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // initial price reference
+  if (rng > 0) {
+    const iy = H - ((ip - mn) / rng) * H;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(80,112,160,.6)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, iy); ctx.lineTo(W, iy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // price line
+  ctx.beginPath();
+  for (let i = 0; i < hist.length; i++) {
+    const x = (i / (hist.length - 1)) * W;
+    const y = rng > 0 ? H - ((hist[i] - mn) / rng) * H : H / 2;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke();
+
+  // fill
+  const lx = W, lastY = rng > 0 ? H - ((hist[hist.length-1] - mn) / rng) * H : H / 2;
+  ctx.lineTo(lx, H); ctx.lineTo(0, H); ctx.closePath();
+  ctx.fillStyle = isUp ? 'rgba(0,230,118,.07)' : 'rgba(255,82,82,.07)';
+  ctx.fill();
+
+  // current price label
+  ctx.fillStyle = col; ctx.font = 'bold 12px monospace';
+  ctx.fillText('₩' + fmt(hist[hist.length - 1]), 6, lastY > 20 ? lastY - 6 : lastY + 16);
+}
+
+function renderTradePanel() {
+  if (!selectedId) return;
+  const s   = STOCKS.find(s => s.id === selectedId);
+  const p   = priceData[selectedId];
+  const own = portfolio[selectedId]?.qty || 0;
+  const chg = (p - initPrices[selectedId]) / initPrices[selectedId];
+  const cls = chg > 0 ? 'up' : chg < 0 ? 'dn' : 'ne';
+
+  document.getElementById('stk-name').textContent = s.name;
+  document.getElementById('stk-name').className = cls;
+  document.getElementById('stk-meta').innerHTML =
+    `<span class="${cls}">${chg >= 0 ? '▲' : '▼'} ${Math.abs(chg * 100).toFixed(2)}%</span>` +
+    ` &nbsp; ${s.sector} &nbsp; 현재가 <b>₩${fmt(p)}</b>`;
+
+  const bq = parseInt(document.getElementById('buy-qty').value) || 0;
+  const sq = parseInt(document.getElementById('sell-qty').value) || 0;
+  document.getElementById('buy-total').innerHTML  = `합계: <b>₩${fmt(bq * p)}</b>`;
+  document.getElementById('sell-total').innerHTML = `보유: <b>${own}주</b>  반환: ₩${fmt(sq * p)}`;
+}
+
+function renderTab() {
+  const el = document.getElementById('tab-content');
+  if (activeTab === 'news') {
+    let h = newsLog.length === 0 ? '<div style="color:var(--tx2);padding:12px;text-align:center;font-size:11px;">뉴스 없음 — 잠시 기다려주세요</div>' : '';
+    for (const n of newsLog) {
+      h += `<div class="ni-row ${n.type === 'pos' ? 'pos' : n.a === 'all' ? 'all' : 'neg'}">
+        <span class="ni-time">${n.timeStr}</span>${n.t}
+      </div>`;
+    }
+    el.innerHTML = h;
+  } else if (activeTab === 'port') {
+    const entries = Object.entries(portfolio).filter(([, v]) => v.qty > 0);
+    if (entries.length === 0) {
+      el.innerHTML = '<div style="color:var(--tx2);padding:12px;text-align:center;font-size:11px;">보유 종목 없음</div>';
+      return;
+    }
+    let h = '';
+    for (const [id, {qty, avgCost}] of entries) {
+      const s = STOCKS.find(s => s.id === id);
+      const p = priceData[id];
+      const pnl = (p - avgCost) * qty;
+      const pnlPct = (p - avgCost) / avgCost;
+      const cls = pnl >= 0 ? 'up' : 'dn';
+      h += `<div class="pr">
+        <div class="pr-name">${s.name} <span style="color:var(--tx2);font-size:10px;">${qty}주</span></div>
+        <div class="pr-d1">
+          <span>평균 ₩${fmt(avgCost)}</span><span>현재 ₩${fmt(p)}</span>
+        </div>
+        <div class="pr-pnl ${cls}">
+          ${pnl >= 0 ? '+' : ''}₩${fmt(pnl)} (${fmtp(pnlPct)})
+        </div>
+        <div class="pr-btns">
+          <button class="btn b-sell" style="font-size:10px;padding:3px 8px;" onclick="quickSell('${id}',1)">1주 매도</button>
+          <button class="btn b-sell" style="font-size:10px;padding:3px 8px;" onclick="quickSell('${id}',0)">전량 매도</button>
+        </div>
+      </div>`;
+    }
+    el.innerHTML = h;
+  } else if (activeTab === 'bank') {
+    let h = '<div class="b-form"><div class="b-form-note">💡 분당 <b>2%</b> 이자 · 최소 <b>3분</b> 예치 후 출금 가능<br>이자는 예치 시점부터 계산됩니다.</div>';
+    h += '<div class="b-form-row"><input class="ni" id="bank-amt" type="number" placeholder="예치할 금액" style="flex:1"><button class="btn b-ac" onclick="doDeposit()">예치</button></div></div>';
+    if (bankDeposits.length > 0) {
+      const now = Date.now();
+      h += '<div style="margin-top:8px;">';
+      bankDeposits.forEach((d, i) => {
+        const elapsed = (now - d.startTime) / 1000;
+        const mins  = elapsed / 60;
+        const interest = d.amount * 0.02 * mins;
+        const canWD = elapsed >= BANK_LOCK_SECS;
+        const remSec = Math.max(0, BANK_LOCK_SECS - elapsed);
+        const remStr = canWD ? '출금 가능' : `${Math.ceil(remSec / 60)}분 ${Math.floor(remSec % 60)}초 후 가능`;
+        h += `<div class="br">
+          <div class="br-amt">₩${fmt(d.amount)}</div>
+          <div class="br-info">이자: <span class="br-int">+₩${fmt(interest)}</span> &nbsp;
+            <span class="${canWD ? 'up' : 'br-lock'}">${remStr}</span></div>
+          ${canWD ? `<button class="btn b-ac" style="margin-top:4px;font-size:10px;padding:3px 8px;" onclick="doWithdraw(${i})">₩${fmt(d.amount + interest)} 출금</button>` : ''}
+        </div>`;
+      });
+      h += '</div>';
+    }
+    el.innerHTML = h;
+  } else if (activeTab === 'gamble') {
+    el.innerHTML = buildGambleHTML();
+  } else if (activeTab === 'beg') {
+    const now = Date.now();
+    const rem = Math.max(0, begCD - (now - lastBeg));
+    const canBeg = rem === 0;
+    el.innerHTML = `<div class="beg-wrap">
+      <div style="font-size:24px;margin-bottom:8px;">🙏</div>
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:12px;">거리에서 돈을 구걸합니다</div>
+      <button class="btn b-gray" id="beg-btn" ${canBeg ? '' : 'disabled'} onclick="doBeg()" style="font-size:13px;padding:8px 24px;">
+        ${canBeg ? '구걸하기' : `${(rem/1000).toFixed(1)}초 후 가능`}
+      </button>
+      <div id="beg-msg"></div>
+      <div class="beg-stat">
+        <div>총 구걸 횟수: <b id="beg-cnt">0</b>회</div>
+        <div>총 수령액: <b id="beg-total">₩0</b></div>
+      </div>
+    </div>`;
+  }
+}
+
+function buildGambleHTML() {
+  return `<div>
+    <div class="g-tabs">
+      <button class="g-tab ${gType==='dice'?'act':''}" onclick="setGType('dice')">🎲 주사위</button>
+      <button class="g-tab ${gType==='num'?'act':''}" onclick="setGType('num')">🔢 번호 맞추기</button>
+    </div>
+    <div class="g-bet-row">
+      <span style="font-size:11px;color:var(--tx2);width:36px;">베팅</span>
+      <input class="ni" id="g-bet" type="number" value="10000" min="1000" style="flex:1">
+      <button class="btn b-gray" style="font-size:10px;" onclick="setBet(.25)">25%</button>
+      <button class="btn b-gray" style="font-size:10px;" onclick="setBet(.5)">50%</button>
+      <button class="btn b-gray" style="font-size:10px;" onclick="setBet(1)">전액</button>
+    </div>
+    ${gType === 'dice' ? `
+      <div class="g-odds">홀/짝 맞추면 <b style="color:var(--up);">1.9배</b> 수익</div>
+      <div class="g-choice">
+        <button class="g-num" onclick="playDice(true)">홀수 🎲</button>
+        <button class="g-num" onclick="playDice(false)">짝수 🎲</button>
+      </div>` : `
+      <div class="g-odds">번호 맞추면 <b style="color:var(--up);">4.5배</b> 수익 (1~5)</div>
+      <div class="g-choice">
+        ${[1,2,3,4,5].map(n=>`<button class="g-num" onclick="playNum(${n})">${n}</button>`).join('')}
+      </div>`}
+    <div class="g-result" id="g-result" style="opacity:0"></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS — Buy/Sell
+// ═══════════════════════════════════════════════════════════
+const BANK_LOCK_SECS = 3 * 60;
+
+function selectStock(id) {
+  selectedId = id;
+  document.getElementById('buy-qty').value = 1;
+  document.getElementById('sell-qty').value = 1;
+  renderAll();
+}
+
+function setQty(type, n) {
+  if (!selectedId) return;
+  const p = priceData[selectedId];
+  const own = portfolio[selectedId]?.qty || 0;
+  let qty;
+  if (type === 'buy') {
+    qty = n === 0 ? Math.max(1, Math.floor(cash / p)) : n;
+    document.getElementById('buy-qty').value = qty;
+  } else {
+    qty = n === 0 ? own : n;
+    document.getElementById('sell-qty').value = qty;
+  }
+  renderTradePanel();
+}
+
+function doBuy() {
+  if (!selectedId) return toast('종목을 먼저 선택하세요');
+  const qty  = parseInt(document.getElementById('buy-qty').value) || 0;
+  const p    = priceData[selectedId];
+  const cost = qty * p;
+  if (qty <= 0) return toast('수량을 입력하세요');
+  if (cost > cash) return toast(`잔금 부족 (₩${fmt(cash)})`, 'dn');
+  cash -= cost;
+  if (!portfolio[selectedId]) portfolio[selectedId] = {qty: 0, avgCost: 0};
+  const prev = portfolio[selectedId];
+  prev.avgCost = (prev.avgCost * prev.qty + cost) / (prev.qty + qty);
+  prev.qty += qty;
+  toast(`${STOCKS.find(s=>s.id===selectedId).name} ${qty}주 매수 — ₩${fmt(cost)} 지출`, 'up');
+  renderAll();
+}
+
+function doSell() {
+  if (!selectedId) return toast('종목을 먼저 선택하세요');
+  const qty  = parseInt(document.getElementById('sell-qty').value) || 0;
+  const own  = portfolio[selectedId]?.qty || 0;
+  if (qty <= 0) return toast('수량을 입력하세요');
+  if (qty > own) return toast(`보유 ${own}주보다 많습니다`, 'dn');
+  const p    = priceData[selectedId];
+  cash += qty * p;
+  portfolio[selectedId].qty -= qty;
+  toast(`${STOCKS.find(s=>s.id===selectedId).name} ${qty}주 매도 — ₩${fmt(qty*p)} 수령`, 'dn');
+  renderAll();
+}
+
+function quickSell(id, qty) {
+  selectedId = id;
+  const own = portfolio[id]?.qty || 0;
+  if (own === 0) return;
+  const q = qty === 0 ? own : Math.min(qty, own);
+  const p = priceData[id];
+  cash += q * p;
+  portfolio[id].qty -= q;
+  toast(`${STOCKS.find(s=>s.id===id).name} ${q}주 매도`, 'dn');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS — Bank
+// ═══════════════════════════════════════════════════════════
+function doDeposit() {
+  const el = document.getElementById('bank-amt');
+  const amt = parseInt(el.value) || 0;
+  if (amt <= 0) return toast('금액을 입력하세요');
+  if (amt > cash) return toast('잔금 부족', 'dn');
+  cash -= amt;
+  bankDeposits.push({amount: amt, startTime: Date.now()});
+  toast(`₩${fmt(amt)} 은행 예치 (3분 후 출금 가능)`, 'ac');
+  el.value = '';
+  renderAll();
+}
+
+function doWithdraw(idx) {
+  const d = bankDeposits[idx];
+  if (!d) return;
+  const mins = (Date.now() - d.startTime) / 60000;
+  const total = d.amount + d.amount * 0.02 * mins;
+  cash += total;
+  bankDeposits.splice(idx, 1);
+  toast(`₩${fmt(total)} 출금 완료 (이자 ₩${fmt(total - d.amount)})`, 'up');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS — Gambling
+// ═══════════════════════════════════════════════════════════
+let begCount = 0, begTotal = 0;
+
+function setGType(t) { gType = t; renderTab(); }
+function setBet(ratio) {
+  const el = document.getElementById('g-bet');
+  if (el) el.value = Math.max(1000, Math.floor(cash * ratio));
+}
+
+function getBet() {
+  const el = document.getElementById('g-bet');
+  const bet = parseInt(el?.value) || 0;
+  if (bet <= 0) { toast('베팅 금액을 입력하세요'); return 0; }
+  if (bet > cash) { toast('잔금 부족', 'dn'); return 0; }
+  return bet;
+}
+
+function playDice(isOdd) {
+  if (gambling) return;
+  const bet = getBet(); if (!bet) return;
+  gambling = true;
+  const res = document.getElementById('g-result');
+  res.style.opacity = 1; res.textContent = '🎲 굴리는 중...'; res.style.background = 'var(--p2)'; res.style.color = 'var(--tx2)';
+  setTimeout(() => {
+    const roll = Math.ceil(Math.random() * 6);
+    const win  = (roll % 2 === 1) === isOdd;
+    if (win) {
+      const gain = Math.floor(bet * 0.9);
+      cash += gain;
+      res.textContent = `🎲 ${roll} (${roll%2?'홀':'짝'}) — +₩${fmt(gain)} 승리!`;
+      res.style.background = 'rgba(0,230,118,.15)'; res.style.color = 'var(--up)';
+    } else {
+      cash -= bet;
+      res.textContent = `🎲 ${roll} (${roll%2?'홀':'짝'}) — -₩${fmt(bet)} 패배...`;
+      res.style.background = 'rgba(255,82,82,.15)'; res.style.color = 'var(--dn)';
+    }
+    gambling = false;
+    renderHeader();
+  }, 700);
+}
+
+function playNum(pick) {
+  if (gambling) return;
+  const bet = getBet(); if (!bet) return;
+  gambling = true;
+  const res = document.getElementById('g-result');
+  res.style.opacity = 1; res.textContent = '🔢 뽑는 중...'; res.style.background = 'var(--p2)'; res.style.color = 'var(--tx2)';
+  setTimeout(() => {
+    const num = Math.ceil(Math.random() * 5);
+    const win = num === pick;
+    if (win) {
+      const gain = Math.floor(bet * 3.5);
+      cash += gain;
+      res.textContent = `🔢 ${num} — 정답! +₩${fmt(gain)} 대박!`;
+      res.style.background = 'rgba(0,230,118,.15)'; res.style.color = 'var(--up)';
+    } else {
+      cash -= bet;
+      res.textContent = `🔢 ${num} (골랐던 번호: ${pick}) — -₩${fmt(bet)} 꽝`;
+      res.style.background = 'rgba(255,82,82,.15)'; res.style.color = 'var(--dn)';
+    }
+    gambling = false;
+    renderHeader();
+  }, 700);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS — Beg
+// ═══════════════════════════════════════════════════════════
+const BEG_MSG = [
+  ['spare any change?... 감사합니다 ₩{amt}을 받았습니다', [200,800]],
+  ['지나가던 시민이 ₩{amt}을 주었습니다', [300,2000]],
+  ['어머니가 지갑을 꺼내 ₩{amt}을 주셨습니다', [500,3000]],
+  ['학생이 ₩{amt} 동전을 던져주었습니다', [100,500]],
+  ['택시기사가 잔돈 ₩{amt}을 건넸습니다', [200,1000]],
+  ['아무도 관심을 주지 않습니다... 오늘은 글렀네요', [0,0]],
+  ['경비원이 쫓아옵니다! 도망가느라 ₩{amt} 잃었습니다', [-500,-100]],
+];
+const BEG_SPECIAL = [
+  {msg:'재벌이 지나가다 ₩50,000을 기부했습니다! 대박!', amt:50000, prob:.012},
+  {msg:'목사님이 ₩10,000을 손에 쥐어주셨습니다 🙏', amt:10000, prob:.04},
+  {msg:'외국인 관광객이 달러를 줬습니다! ₩15,000 수령', amt:15000, prob:.02},
+];
+
+function doBeg() {
+  const now = Date.now();
+  if (now - lastBeg < begCD) return;
+  lastBeg = now;
+
+  const msgEl = document.getElementById('beg-msg');
+  if (!msgEl) return;
+
+  let got = 0, text = '';
+
+  // special events
+  let special = null;
+  for (const s of BEG_SPECIAL) {
+    if (Math.random() < s.prob) { special = s; break; }
+  }
+
+  if (special) {
+    got  = special.amt;
+    text = special.msg;
+  } else {
+    const [tmpl, [lo, hi]] = BEG_MSG[Math.floor(Math.random() * BEG_MSG.length)];
+    if (lo === 0 && hi === 0) {
+      got = 0; text = tmpl;
+    } else {
+      got = Math.round(rnd(lo, hi) / 100) * 100;
+      text = tmpl.replace('{amt}', fmt(Math.abs(got)));
+    }
+  }
+
+  cash = Math.max(0, cash + got);
+  begCount++;
+  begTotal += Math.max(0, got);
+
+  const col = got > 0 ? 'var(--up)' : got < 0 ? 'var(--dn)' : 'var(--tx2)';
+  msgEl.innerHTML = `<span style="color:${col}">${text}</span>`;
+
+  const cntEl = document.getElementById('beg-cnt');
+  const totEl = document.getElementById('beg-total');
+  if (cntEl) cntEl.textContent = begCount;
+  if (totEl) totEl.textContent = '₩' + fmt(begTotal);
+
+  renderHeader();
+
+  // cooldown re-render
+  const btn = document.getElementById('beg-btn');
+  let rem = begCD;
+  const iv = setInterval(() => {
+    rem -= 200;
+    if (rem <= 0) {
+      clearInterval(iv);
+      if (activeTab === 'beg') renderTab();
+    } else {
+      if (btn) btn.textContent = `${(rem/1000).toFixed(1)}초 후 가능`;
+    }
+  }, 200);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════════
+function tickSec() {
+  const elapsed = Date.now() - gameStart;
+  const rem     = Math.max(0, gameDurMs - elapsed);
+  const secs    = Math.ceil(rem / 1000);
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  timerEl.className = secs <= 30 ? 'crit' : secs <= 90 ? 'warn' : '';
+  if (rem <= 0) endGame();
+  if (activeTab === 'bank') renderTab(); // refresh lock countdowns
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME CONTROL
+// ═══════════════════════════════════════════════════════════
+function startGame(minutes) {
+  gameDurMs = minutes * 60 * 1000;
+  gameStart = Date.now();
+
+  cash         = 1_000_000;
+  portfolio    = {};
+  bankDeposits = [];
+  newsLog      = [];
+  newsCount    = 0;
+  begCount     = 0;
+  begTotal     = 0;
+  lastBeg      = 0;
+  gambling     = false;
+  selectedId   = null;
+
+  priceData    = {};
+  initPrices   = {};
+  priceHistory = {};
+  STOCKS.forEach(s => {
+    priceData[s.id]    = s.price;
+    initPrices[s.id]   = s.price;
+    priceHistory[s.id] = [s.price];
+  });
+
+  document.getElementById('start').style.display = 'none';
+  const g = document.getElementById('game');
+  g.style.display = 'flex';
+
+  renderAll();
+  tickTimer = setInterval(tickPrices, 3000);
+  secTimer  = setInterval(tickSec, 500);
+  newsTimer = setTimeout(triggerNews, rnd(12000, 25000));
+  window.addEventListener('resize', () => { renderChart(); });
+}
+
+function endGame() {
+  clearInterval(tickTimer);
+  clearInterval(secTimer);
+  clearTimeout(newsTimer);
+
+  // Liquidate bank deposits (return principal only if still locked)
+  bankDeposits.forEach(d => {
+    const mins = (Date.now() - d.startTime) / 60000;
+    const canWD = (Date.now() - d.startTime) >= BANK_LOCK_SECS * 1000;
+    cash += canWD ? d.amount + d.amount * 0.02 * mins : d.amount;
+  });
+  bankDeposits = [];
+
+  // Liquidate portfolio at current prices
+  Object.entries(portfolio).forEach(([id, {qty}]) => {
+    cash += qty * priceData[id];
+    portfolio[id].qty = 0;
+  });
+
+  const tot  = cash;
+  const pnl  = tot - 1_000_000;
+  const roi  = pnl / 1_000_000;
+
+  const ranks = [
+    [1.50, '🏆 전설의 주식왕 — 당신은 천재입니다!'],
+    [1.00, '💰 워런 버핏의 제자 — 대단한 수익!'],
+    [0.50, '📈 유능한 펀드매니저'],
+    [0.20, '😊 준수한 투자자'],
+    [0.00, '😐 본전치기 — 나쁘지 않네요'],
+    [-0.25,'😓 소폭 손실'],
+    [-0.50,'😰 투자 실패'],
+    [-0.75,'😱 대규모 손실'],
+    [-Infinity,'💀 완전 파산 — 다시 도전!'],
+  ];
+  let rank = ranks[ranks.length - 1][1];
+  for (const [thr, label] of ranks) {
+    if (roi >= thr) { rank = label; break; }
+  }
+
+  // Best performing stock
+  let bestId = null, bestChg = -Infinity;
+  STOCKS.forEach(s => {
+    const chg = (priceData[s.id] - initPrices[s.id]) / initPrices[s.id];
+    if (chg > bestChg) { bestChg = chg; bestId = s.id; }
+  });
+  const bestS = STOCKS.find(s => s.id === bestId);
+
+  document.getElementById('e-rank').innerHTML  = rank;
+  document.getElementById('e-total').innerHTML = `<span class="${pnl>=0?'up':'dn'}">₩${fmt(tot)}</span>`;
+  document.getElementById('e-pnl').innerHTML   = `<span class="${pnl>=0?'up':'dn'}">${pnl>=0?'+':''}₩${fmt(pnl)}</span>`;
+  document.getElementById('e-roi').innerHTML   = `<span class="${roi>=0?'up':'dn'}">${fmtp(roi)}</span>`;
+  document.getElementById('e-news').textContent = `${newsCount}건`;
+  document.getElementById('e-best').textContent = bestS
+    ? `${bestS.name} (${fmtp(bestChg)})`
+    : '—';
+
+  const endEl = document.getElementById('end');
+  endEl.style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+let selectedMin = 10;
+
+document.querySelectorAll('.t-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    selectedMin = parseInt(btn.dataset.min);
+  });
+});
+
+document.getElementById('go-btn').addEventListener('click', () => {
+  startGame(selectedMin);
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('act'));
+    tab.classList.add('act');
+    activeTab = tab.dataset.tab;
+    renderTab();
+  });
+});
+
+document.querySelectorAll('#buy-qty,#sell-qty').forEach(el => {
+  el.addEventListener('input', renderTradePanel);
+});
+</script>
+</body>
+</html>

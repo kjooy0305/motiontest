@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>숫자 도박</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      letter-spacing: .15em;
+      color: #ffd700;
+      text-shadow: 0 0 12px #ffd70080;
+    }
+
+    /* 점수 */
+    #score-box {
+      display: flex;
+      gap: 32px;
+      font-size: 1rem;
+    }
+    .score-item { text-align: center; }
+    .score-label { font-size: .7rem; color: #888; letter-spacing: .1em; margin-bottom: 2px; }
+    .score-val {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffd700;
+      text-shadow: 0 0 8px #ffd70060;
+      transition: transform .15s;
+    }
+    .score-val.bump { transform: scale(1.35); }
+
+    /* 카드 영역 */
+    #card-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .card {
+      width: 90px;
+      height: 120px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 900;
+      position: relative;
+      transition: transform .3s, box-shadow .3s;
+    }
+
+    #card-current {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid #ffd700;
+      box-shadow: 0 0 20px #ffd70040;
+      color: #ffd700;
+    }
+
+    #card-next {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid #444;
+      color: #555;
+      font-size: 2rem;
+    }
+    #card-next.revealed { border-color: #aaa; color: #f0f0f0; }
+    #card-next.correct  { border-color: #4caf50; box-shadow: 0 0 20px #4caf5060; color: #4caf50; }
+    #card-next.wrong    { border-color: #f44336; box-shadow: 0 0 20px #f4433660; color: #f44336; }
+
+    .card-tag {
+      position: absolute;
+      bottom: 6px;
+      font-size: .55rem;
+      letter-spacing: .08em;
+      color: #888;
+    }
+    #card-current .card-tag { color: #ffd70099; }
+
+    .arrow { font-size: 1.6rem; color: #555; }
+
+    /* 기준 안내 */
+    #ref-notice {
+      font-size: .8rem;
+      color: #f9a825;
+      background: #1a1500;
+      border: 1px solid #f9a82560;
+      border-radius: 8px;
+      padding: 6px 16px;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    #ref-notice.show { opacity: 1; }
+
+    /* 결과 메시지 */
+    #result-msg {
+      height: 1.6rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      transition: opacity .3s;
+      opacity: 0;
+    }
+    #result-msg.show { opacity: 1; }
+    #result-msg.correct { color: #4caf50; }
+    #result-msg.wrong   { color: #f44336; }
+
+    /* 베팅 버튼 */
+    #bet-area {
+      display: flex;
+      gap: 14px;
+    }
+
+    .bet-btn {
+      padding: 14px 24px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s, opacity .2s;
+      letter-spacing: .05em;
+    }
+    .bet-btn:active { transform: scale(.94); }
+    .bet-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+    #btn-low  { background: #1a237e; border-color: #5c6bc0; color: #90caf9; }
+    #btn-low:hover:not(:disabled)  { box-shadow: 0 0 14px #5c6bc060; }
+
+    #btn-same { background: #4a148c; border-color: #ab47bc; color: #e040fb; }
+    #btn-same:hover:not(:disabled) { box-shadow: 0 0 14px #ab47bc60; }
+
+    #btn-high { background: #b71c1c; border-color: #ef5350; color: #ff8a80; }
+    #btn-high:hover:not(:disabled) { box-shadow: 0 0 14px #ef535060; }
+
+    /* 다음 버튼 */
+    #btn-next {
+      display: none;
+      padding: 12px 36px;
+      background: #ffd700;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .08em;
+      transition: transform .15s, box-shadow .15s;
+    }
+    #btn-next:hover { box-shadow: 0 0 16px #ffd70080; transform: scale(1.04); }
+
+    /* 히스토리 */
+    #history {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 320px;
+      min-height: 28px;
+    }
+    .hist-chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      font-weight: 700;
+    }
+    .hist-chip.o { background: #4caf50; color: #fff; }
+    .hist-chip.x { background: #f44336; color: #fff; }
+  </style>
+</head>
+<body>
+
+<h1>🎰 숫자 도박</h1>
+
+<div id="score-box">
+  <div class="score-item">
+    <div class="score-label">SCORE</div>
+    <div class="score-val" id="score">0</div>
+  </div>
+  <div class="score-item">
+    <div class="score-label">ROUND</div>
+    <div class="score-val" id="round">1</div>
+  </div>
+  <div class="score-item">
+    <div class="score-label">STREAK</div>
+    <div class="score-val" id="streak">0</div>
+  </div>
+</div>
+
+<div id="card-area">
+  <div class="card" id="card-current">
+    <span id="cur-num">5</span>
+    <span class="card-tag">현재</span>
+  </div>
+  <div class="arrow">▶</div>
+  <div class="card" id="card-next">
+    <span id="next-num">?</span>
+    <span class="card-tag">다음</span>
+  </div>
+</div>
+
+<div id="ref-notice">⚠ 현재 숫자가 1 또는 10 — 기준이 5로 고정</div>
+
+<div id="result-msg"></div>
+
+<div id="bet-area">
+  <button class="bet-btn" id="btn-low"  onclick="bet('low')">▼ 낮을지<br><small>+1점</small></button>
+  <button class="bet-btn" id="btn-same" onclick="bet('same')">■ 같을지<br><small>+5점</small></button>
+  <button class="bet-btn" id="btn-high" onclick="bet('high')">▲ 높을지<br><small>+1점</small></button>
+</div>
+
+<button id="btn-next" onclick="nextRound()">다음 라운드 ›</button>
+
+<div id="history"></div>
+
+<script>
+  let current = 5;
+  let score   = 0;
+  let round   = 1;
+  let streak  = 0;
+  let locked  = false;
+
+  const elCur    = document.getElementById('cur-num');
+  const elNext   = document.getElementById('next-num');
+  const cardNext = document.getElementById('card-next');
+  const elScore  = document.getElementById('score');
+  const elRound  = document.getElementById('round');
+  const elStreak = document.getElementById('streak');
+  const elResult = document.getElementById('result-msg');
+  const elRef    = document.getElementById('ref-notice');
+  const btnNext  = document.getElementById('btn-next');
+  const btns     = document.querySelectorAll('.bet-btn');
+  const elHist   = document.getElementById('history');
+
+  function getRef() {
+    return (current === 1 || current === 10) ? 5 : current;
+  }
+
+  function updateRefNotice() {
+    if (current === 1 || current === 10) {
+      elRef.classList.add('show');
+    } else {
+      elRef.classList.remove('show');
+    }
+  }
+
+  function bet(choice) {
+    if (locked) return;
+    locked = true;
+    btns.forEach(b => b.disabled = true);
+
+    const rolled = Math.floor(Math.random() * 10) + 1;
+    const ref    = getRef();
+
+    let actual;
+    if (rolled > ref)      actual = 'high';
+    else if (rolled < ref) actual = 'low';
+    else                   actual = 'same';
+
+    // same 판정은 rolled === current (현재 숫자와 동일)
+    const isSame = rolled === current;
+    if (isSame) actual = 'same';
+
+    const correct = choice === actual;
+    const pts = correct ? (choice === 'same' ? 5 : 1) : 0;
+
+    // 카드 공개
+    elNext.textContent = rolled;
+    cardNext.classList.add('revealed');
+    cardNext.classList.add(correct ? 'correct' : 'wrong');
+
+    // 점수/스트릭
+    if (correct) {
+      score  += pts;
+      streak += 1;
+    } else {
+      streak = 0;
+    }
+
+    bump(elScore,  score);
+    bump(elStreak, streak);
+
+    // 결과 메시지
+    elResult.className = 'result-msg show ' + (correct ? 'correct' : 'wrong');
+    if (correct) {
+      elResult.textContent = pts === 5
+        ? `🎉 정확히 같아! +${pts}점`
+        : `✅ 정답! +${pts}점`;
+    } else {
+      elResult.textContent = `❌ 틀렸습니다 (나온 숫자: ${rolled})`;
+    }
+
+    // 히스토리 칩
+    const chip = document.createElement('div');
+    chip.className = 'hist-chip ' + (correct ? 'o' : 'x');
+    chip.textContent = correct ? '+' + pts : '✕';
+    elHist.prepend(chip);
+    if (elHist.children.length > 20) elHist.removeChild(elHist.lastChild);
+
+    current = rolled;
+    btnNext.style.display = 'inline-block';
+  }
+
+  function nextRound() {
+    locked = false;
+    btns.forEach(b => b.disabled = false);
+    btnNext.style.display = 'none';
+
+    cardNext.className = 'card';
+    elNext.textContent = '?';
+    elResult.className = 'result-msg';
+    elResult.textContent = '';
+
+    elCur.textContent = current;
+    round++;
+    elRound.textContent = round;
+
+    updateRefNotice();
+  }
+
+  function bump(el, val) {
+    el.textContent = val;
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 200);
+  }
+
+  updateRefNotice();
+</script>
+</body>
+</html>

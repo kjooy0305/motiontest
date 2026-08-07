@@ -176,11 +176,11 @@ input[type=range]{accent-color:var(--on);width:70px;vertical-align:middle;}
 //  설정
 // ══════════════════════════════════════════
 const SPEEDS = [
-  {label:'매우 느림', interval:400, batch:1},
-  {label:'느림',      interval:120, batch:1},
-  {label:'보통',      interval:40,  batch:1},
-  {label:'빠름',      interval:16,  batch:3},
-  {label:'터보',      interval:0,   batch:12},
+  {label:'매우 느림', sps:2},
+  {label:'느림',      sps:8},
+  {label:'보통',      sps:25},
+  {label:'빠름',      sps:120},
+  {label:'터보',      sps:800},
 ];
 
 // 상태값
@@ -201,10 +201,12 @@ const ctx    = canvas.getContext('2d');
 let imgData, data32; // ImageData + Uint32Array view
 
 // ── 게임 상태 ──
-let running  = false;
-let genCount = 0;
-let timerId  = null;
-let speedIdx = 2;
+let running       = false;
+let genCount      = 0;
+let timerId       = null;
+let speedIdx      = 2;
+let lastFrameTime = 0;
+let accumulator   = 0;
 
 // fps 계산
 let lastFpsTime = performance.now(), fpsCount = 0;
@@ -326,34 +328,31 @@ function step() {
 }
 
 // ══════════════════════════════════════════
-//  애니메이션 루프
+//  애니메이션 루프 (단일 RAF + 시간 누산기)
 // ══════════════════════════════════════════
+function loop(timestamp) {
+  if (!running) { timerId = null; return; }
+  if (lastFrameTime === 0) lastFrameTime = timestamp;
+  const dt = Math.min(timestamp - lastFrameTime, 100); // 최대 100ms 점프 방지
+  lastFrameTime = timestamp;
+  accumulator += SPEEDS[speedIdx].sps * dt / 1000;
+  const steps = Math.min(Math.floor(accumulator), 300);
+  accumulator -= steps;
+  for (let i = 0; i < steps; i++) computeNext();
+  if (steps > 0) render();
+  timerId = requestAnimationFrame(loop);
+}
+
 function startLoop() {
   if (timerId !== null) return;
-  const {interval, batch} = SPEEDS[speedIdx];
-
-  if (interval === 0) {
-    // 터보: requestAnimationFrame
-    function raf() {
-      if (!running) return;
-      for (let i=0; i<batch; i++) computeNext();
-      render();
-      timerId = requestAnimationFrame(raf);
-    }
-    timerId = requestAnimationFrame(raf);
-  } else {
-    timerId = setInterval(() => {
-      if (!running) return;
-      for (let i=0; i<batch; i++) computeNext();
-      render();
-    }, interval);
-  }
+  lastFrameTime = 0;
+  accumulator   = 0;
+  timerId = requestAnimationFrame(loop);
 }
 
 function stopLoop() {
   if (timerId !== null) {
-    if (SPEEDS[speedIdx].interval === 0) cancelAnimationFrame(timerId);
-    else clearInterval(timerId);
+    cancelAnimationFrame(timerId);
     timerId = null;
   }
 }
@@ -379,7 +378,7 @@ function updateSpeed() {
   const sp = SPEEDS[speedIdx];
   document.getElementById('speed-label').textContent = sp.label;
   document.getElementById('s-speed').textContent = sp.label;
-  if (running) { stopLoop(); startLoop(); }
+  // 루프가 매 프레임 speedIdx를 읽으므로 재시작 불필요
 }
 
 // ══════════════════════════════════════════

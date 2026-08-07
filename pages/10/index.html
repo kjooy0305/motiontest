@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>출근해야 한다 — 괴담 탈출기</title>
+<style>
+:root{--bg:#08080f;--sur:#10101a;--bor:#222233;--tx:#cccce0;--dim:#666688;--acc:#7c3aed;--red:#ef4444;--gold:#f59e0b;--grn:#22c55e;--blu:#3b82f6;--pnk:#ec4899;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;min-height:100vh;overflow:hidden;}
+.screen{display:none;width:100vw;height:100vh;overflow-y:auto;}
+.screen.active{display:block;}
+
+/* ── CHARACTER ── */
+#sc-char{display:none;flex-direction:column;align-items:center;padding:32px 16px 60px;background:radial-gradient(ellipse at top,#160a2a 0%,var(--bg) 65%);}
+#sc-char.active{display:flex;}
+.ct{font-size:1.8rem;font-weight:900;color:#c084fc;text-shadow:0 0 24px #8b5cf670;text-align:center;margin-bottom:4px;}
+.cs{font-size:.85rem;color:var(--dim);margin-bottom:36px;text-align:center;}
+.sec{width:100%;max-width:580px;margin-bottom:24px;}
+.sl{font-size:.68rem;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+.ob{background:var(--sur);border:2px solid var(--bor);border-radius:8px;padding:10px 8px;color:var(--tx);cursor:pointer;transition:all .12s;text-align:center;font-size:.82rem;}
+.ob:hover{border-color:var(--acc);}
+.ob.sel{border-color:var(--acc);background:#1a0a38;color:#c084fc;}
+.ob .oi{font-size:1.3rem;display:block;margin-bottom:3px;}
+.ob .on{font-weight:700;display:block;}
+.ob .od{font-size:.68rem;color:var(--dim);display:block;margin-top:2px;}
+.ob.sel .od{color:#a78bfa;}
+.ni{width:100%;max-width:580px;background:var(--sur);border:2px solid var(--bor);border-radius:8px;padding:11px 14px;color:var(--tx);font-size:.95rem;outline:none;transition:border-color .12s;}
+.ni:focus{border-color:var(--acc);}
+.sp{width:100%;max-width:580px;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px;}
+.spi{text-align:center;}
+.spi .sn{font-size:.6rem;color:var(--dim);}
+.spi .sv{font-size:1rem;font-weight:700;color:var(--acc);}
+.sbtn{margin-top:20px;padding:14px 56px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.06em;transition:transform .12s,box-shadow .12s;}
+.sbtn:hover{transform:scale(1.04);box-shadow:0 0 28px #8b5cf650;}
+.sbtn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+/* ── GAME ── */
+#sc-game{display:none;height:100vh;overflow:hidden;flex-direction:column;}
+#sc-game.active{display:flex;}
+#sbar{background:#0a0a12;border-bottom:1px solid var(--bor);padding:6px 14px;display:flex;gap:12px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.sg{display:flex;align-items:center;gap:5px;}
+.sg .sgl{font-size:.6rem;color:var(--dim);letter-spacing:.08em;}
+.sbw{width:70px;height:7px;background:#151520;border-radius:4px;overflow:hidden;}
+.sb{height:100%;border-radius:4px;transition:width .3s;}
+.bhp{background:linear-gradient(90deg,#b91c1c,#f97316);}
+.bsn{background:linear-gradient(90deg,#1d4ed8,#7c3aed);}
+.bcr{background:linear-gradient(90deg,#6d28d9,#db2777);}
+.sg .sgv{font-size:.72rem;font-weight:700;min-width:24px;}
+#td{margin-left:auto;font-size:.82rem;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;}
+#gm{display:flex;flex:1;overflow:hidden;}
+#sp{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+#sh{padding:18px 22px 14px;border-bottom:1px solid var(--bor);}
+.sct{font-size:.65rem;color:var(--dim);letter-spacing:.1em;}
+.stit{font-size:1.3rem;font-weight:900;color:#c084fc;margin:3px 0 6px;}
+.satm{font-size:.75rem;color:var(--dim);font-style:italic;}
+#stx{padding:18px 22px;font-size:.92rem;line-height:1.95;color:var(--tx);}
+#stx p{margin-bottom:10px;}
+.hl{color:var(--gold);}
+.hr{color:var(--red);}
+.ul{color:var(--grn);}
+.pk{color:var(--pnk);}
+#rtx{padding:0 22px 6px;font-size:.82rem;font-style:italic;color:var(--dim);min-height:1.4rem;}
+#ca{padding:10px 22px 22px;display:flex;flex-direction:column;gap:9px;}
+.cb{background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:12px 16px;color:var(--tx);cursor:pointer;transition:all .12s;text-align:left;font-size:.88rem;line-height:1.5;position:relative;}
+.cb:hover:not(:disabled){border-color:var(--acc);background:#16163a;transform:translateX(3px);}
+.cb:disabled{opacity:.3;cursor:not-allowed;}
+.cb .ch{font-size:.68rem;color:var(--dim);display:block;margin-top:3px;}
+.cb .cc{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.68rem;color:var(--dim);text-align:right;}
+.cb.dn{border-color:#1c0a0a;}
+.cb.dn:hover:not(:disabled){border-color:var(--red);}
+.cb.sp2{border-color:#1a1a3a;}
+.cb.sp2:hover:not(:disabled){border-color:#818cf8;}
+.cb.uc{border-color:#0a1c0a;}
+.cb.uc:hover:not(:disabled){border-color:var(--grn);}
+#cp{width:200px;border-left:1px solid var(--bor);overflow-y:auto;background:#09090f;flex-shrink:0;}
+#cp h3{font-size:.62rem;color:var(--dim);letter-spacing:.1em;padding:12px 10px 7px;border-bottom:1px solid var(--bor);text-transform:uppercase;}
+.cl{padding:6px;}
+.ct2{display:flex;align-items:flex-start;gap:5px;padding:5px 6px;border-radius:5px;margin-bottom:3px;font-size:.68rem;border:1px solid transparent;cursor:default;}
+.ct2.physical{border-color:#2a1a3a;background:#100820;}
+.ct2.mental{border-color:#1a2240;background:#08101e;}
+.ct2.special{border-color:#2a2010;background:#0e0c06;}
+.ct2.corruption{border-color:#30100a;background:#110505;}
+.ct2.unlock{border-color:#0a2010;color:#4ade80;}
+.ci{font-size:.85rem;flex-shrink:0;margin-top:1px;}
+.cn{font-weight:700;color:var(--tx);display:block;}
+.cd{color:var(--dim);font-size:.64rem;}
+#nc{padding:12px 10px;font-size:.75rem;color:var(--dim);font-style:italic;}
+
+/* ── MINIGAME ── */
+#mgo{display:none;position:fixed;inset:0;background:#000000ee;z-index:100;align-items:center;justify-content:center;}
+#mgo.active{display:flex;}
+#mgb{background:var(--sur);border:2px solid var(--acc);border-radius:14px;padding:28px;max-width:460px;width:92%;text-align:center;}
+#mgt{font-size:1.2rem;font-weight:900;color:var(--acc);margin-bottom:6px;}
+#mgd{font-size:.82rem;color:var(--dim);margin-bottom:20px;line-height:1.6;}
+#mgtbw{width:100%;height:5px;background:#15152a;border-radius:3px;margin-bottom:16px;}
+#mgtb{height:100%;border-radius:3px;background:var(--acc);transition:width .08s linear;}
+#mgc{margin-bottom:20px;}
+.mgq{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.mgqb{padding:11px 22px;border:2px solid var(--bor);border-radius:7px;background:var(--sur);color:var(--tx);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .1s;}
+.mgqb:hover{border-color:var(--acc);background:#1a1040;}
+.mgs{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap;}
+.mgc2{width:56px;height:56px;border:2px solid var(--bor);border-radius:7px;background:var(--sur);cursor:pointer;transition:all .12s;font-size:1.3rem;display:flex;align-items:center;justify-content:center;}
+.mgc2.lit{border-color:var(--acc);background:#2a1060;}
+.mgc2.ok{border-color:var(--grn);background:#062010;}
+.mgc2.no{border-color:var(--red);background:#200606;}
+.mgrz{width:100%;height:70px;border:2px solid var(--bor);border-radius:7px;position:relative;overflow:hidden;background:#06060f;margin-bottom:10px;}
+.mgrl{position:absolute;top:0;bottom:0;width:3px;background:#ef4444;left:78%;}
+.mgbt{position:absolute;top:8px;width:36px;height:54px;background:#7c3aed;border-radius:5px;}
+.mgtpb{width:100%;padding:14px;background:var(--acc);border:none;border-radius:7px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;}
+#mgr{font-size:1rem;font-weight:700;min-height:1.5rem;}
+#mgr.ok{color:var(--grn);}
+#mgr.no{color:var(--red);}
+
+/* ── ENDING ── */
+#sc-end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;background:radial-gradient(ellipse at center,#0c0c1e,#000);}
+#sc-end.active{display:flex;}
+.eb{font-size:3.5rem;margin-bottom:14px;}
+.et{font-size:1.8rem;font-weight:900;margin-bottom:6px;text-align:center;}
+.esu{font-size:.9rem;color:var(--dim);margin-bottom:28px;text-align:center;}
+.etx{max-width:560px;line-height:1.9;text-align:center;font-size:.92rem;margin-bottom:28px;}
+.ests{display:flex;gap:20px;margin-bottom:28px;flex-wrap:wrap;justify-content:center;}
+.esi{text-align:center;}
+.esl{font-size:.65rem;color:var(--dim);letter-spacing:.1em;}
+.esv{font-size:1.6rem;font-weight:900;}
+.ebtn{padding:13px 44px;background:var(--acc);border:none;border-radius:9px;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .12s;}
+.ebtn:hover{transform:scale(1.04);}
+
+/* ── MISC ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--bor);border-radius:3px;}
+@keyframes flick{0%,88%,100%{opacity:1;}89%,91%,93%{opacity:.35;}90%,92%{opacity:.75;}}
+.flick{animation:flick 5s infinite;}
+@keyframes hpulse{0%,100%{box-shadow:0 0 0 0 #ef444428;}50%{box-shadow:0 0 18px 4px #ef444428;}}
+.hpulse{animation:hpulse 2.5s infinite;}
+@media(max-width:600px){#cp{display:none;}#sbar{gap:8px;}.sbw{width:48px;}}
+</style>
+</head>
+<body>
+
+<!-- ── 캐릭터 생성 ── -->
+<div id="sc-char" class="screen">
+  <div class="ct">출근해야 한다</div>
+  <div class="cs">괴담에 떨어져도 출근을 해야 하는구나 — 당신은 누구입니까?</div>
+  <div class="sec"><div class="sl">이름</div>
+    <input class="ni" id="inp-name" type="text" placeholder="이름을 입력하세요" maxlength="8" oninput="updChar()">
+  </div>
+  <div class="sec"><div class="sl">성별</div><div class="og" id="g-gender"></div></div>
+  <div class="sec"><div class="sl">직업</div><div class="og" id="g-job"></div></div>
+  <div class="sec"><div class="sl">외모 특징</div><div class="og" id="g-look"></div></div>
+  <div class="sec"><div class="sl">기본 스탯 미리보기</div><div class="sp" id="stat-prev"></div></div>
+  <button class="sbtn" id="sbtn" onclick="startGame()" disabled>▶ 심연으로 들어간다</button>
+</div>
+
+<!-- ── 메인 게임 ── -->
+<div id="sc-game" class="screen">
+  <div id="sbar">
+    <div class="sg"><span class="sgl">HP</span><div class="sbw"><div class="sb bhp" id="b-hp" style="width:100%"></div></div><span class="sgv" id="v-hp">100</span></div>
+    <div class="sg"><span class="sgl">이성</span><div class="sbw"><div class="sb bsn" id="b-sn" style="width:100%"></div></div><span class="sgv" id="v-sn">100</span></div>
+    <div class="sg"><span class="sgl">타락</span><div class="sbw"><div class="sb bcr" id="b-cr" style="width:0%"></div></div><span class="sgv" id="v-cr">0</span></div>
+    <div id="td">오전 2:07</div>
+  </div>
+  <div id="gm">
+    <div id="sp">
+      <div id="sh">
+        <div class="sct" id="s-time"></div>
+        <div class="stit" id="s-title"></div>
+        <div class="satm" id="s-atm"></div>
+      </div>
+      <div id="stx"></div>
+      <div id="rtx"></div>
+      <div id="ca"></div>
+    </div>
+    <div id="cp"><h3>오염 현황</h3><div class="cl" id="c-list"><div id="nc">오염 없음</div></div></div>
+  </div>
+</div>
+
+<!-- ── 미니게임 오버레이 ── -->
+<div id="mgo">
+  <div id="mgb">
+    <div id="mgt"></div>
+    <div id="mgd"></div>
+    <div id="mgtbw"><div id="mgtb" style="width:100%"></div></div>
+    <div id="mgc"></div>
+    <div id="mgr"></div>
+  </div>
+</div>
+
+<!-- ── 엔딩 ── -->
+<div id="sc-end" class="screen">
+  <div class="eb" id="e-badge"></div>
+  <div class="et" id="e-title"></div>
+  <div class="esu" id="e-sub"></div>
+  <div class="etx" id="e-text"></div>
+  <div class="ests" id="e-stats"></div>
+  <button class="ebtn" onclick="resetGame()">다시 시작</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CHARACTER OPTIONS
+// ═══════════════════════════════════════════════
+const GENDERS = [
+  { id:'m', icon:'🧍', name:'남성', desc:'체력+10 이성-5', stats:{hp:10,san:-5} },
+  { id:'f', icon:'🧍‍♀️', name:'여성', desc:'이성+10 운+5', stats:{san:10,lk:5} },
+  { id:'x', icon:'🧑', name:'기타', desc:'운+10 적응+10', stats:{lk:10,ada:10} },
+];
+const JOBS = [
+  { id:'office', icon:'💼', name:'회사원', desc:'적응+15 · 스트레스 저항', stats:{ada:15}, special:'적응 본능으로 무시한다' },
+  { id:'police', icon:'👮', name:'경찰', desc:'체력+20 이성+5', stats:{hp:20,san:5}, special:'공권력을 행사한다' },
+  { id:'nurse', icon:'🧑‍⚕️', name:'간호사', desc:'HP회복+20 이성+10', stats:{hp:15,san:10,ada:5}, special:'의료 지식을 활용한다' },
+  { id:'reporter', icon:'📷', name:'기자', desc:'운+15 이성+10', stats:{lk:15,san:10}, special:'취재 본능으로 관찰한다' },
+  { id:'student', icon:'🎒', name:'학생', desc:'운+20 체력-10', stats:{lk:20,hp:-10}, special:'도시전설을 알고 있다' },
+  { id:'shaman', icon:'🔮', name:'무당', desc:'적응+25 · 오염 경로 해금', stats:{san:5,ada:25}, special:'주문을 외운다' },
+];
+const LOOKS = [
+  { id:'plain', icon:'😐', name:'평범한 외모', desc:'운+5', stats:{lk:5} },
+  { id:'striking', icon:'✨', name:'눈에 띄는 외모', desc:'매력+10 위험+5%', stats:{lk:-3,ada:5} },
+  { id:'dark', icon:'😶‍🌫️', name:'어두운 인상', desc:'위협+10 친화-5', stats:{hp:5,san:-5} },
+  { id:'scar', icon:'🤕', name:'흉터 있음', desc:'체력+5 이성+5', stats:{hp:5,san:5} },
+];
+
+// ═══════════════════════════════════════════════
+//  CONTAMINATION DEFINITIONS (100+)
+// ═══════════════════════════════════════════════
+const CD = {
+  // 신체 Physical
+  eye_1:{n:'눈 오염 I',d:'눈이 충혈되고 시야 가장자리에 그림자가 어른거린다.',t:'physical',i:'👁️'},
+  eye_2:{n:'눈 오염 II',d:'실체 없는 형상들이 보인다. 무엇이 진짜인지 알기 어렵다.',t:'physical',i:'👁️'},
+  eye_3:{n:'괴담의 눈',d:'숨겨진 것들이 보인다. 새로운 길이 열린다.',t:'unlock',i:'🟢'},
+  ear_1:{n:'귀 오염 I',d:'이명이 끊이지 않는다. 집중하기 어렵다.',t:'physical',i:'👂'},
+  ear_2:{n:'귀 오염 II',d:'먼 곳에서 목소리들이 들린다. 무슨 말인지 모르겠다.',t:'physical',i:'👂'},
+  ear_3:{n:'괴담의 귀',d:'죽은 자의 말이 들린다. 괴담과 소통이 가능하다.',t:'unlock',i:'🟢'},
+  hand_1:{n:'손 오염 I',d:'손이 차갑고 가끔 혼자 움직이려 한다.',t:'physical',i:'🤚'},
+  hand_2:{n:'손 오염 II',d:'손이 스스로 움직인다. 막을 수가 없을 때가 있다.',t:'physical',i:'🤚'},
+  hand_3:{n:'괴담의 손',d:'벽이나 물체를 통과할 수 있다.',t:'unlock',i:'🟢'},
+  foot_1:{n:'발 오염 I',d:'발이 끌린다. 특정 방향으로 가려는 충동이 있다.',t:'physical',i:'🦶'},
+  foot_2:{n:'발 오염 II',d:'발자국이 사라진다. 존재감이 옅어지는 느낌이다.',t:'physical',i:'🦶'},
+  foot_3:{n:'괴담의 발',d:'공간 사이를 걸을 수 있다. 지름길이 보인다.',t:'unlock',i:'🟢'},
+  mouth_1:{n:'입 오염 I',d:'목소리가 제대로 나오지 않는다. 가끔 이상한 소리가 난다.',t:'physical',i:'👄'},
+  mouth_2:{n:'입 오염 II',d:'의도하지 않은 말이 나온다. 무언가가 말하게 한다.',t:'physical',i:'👄'},
+  mouth_3:{n:'괴담의 입',d:'괴담의 언어를 구사할 수 있다. 주문이 가능하다.',t:'unlock',i:'🟢'},
+  skin_1:{n:'피부 오염 I',d:'피부가 차갑고 건조하다. 촉각이 무뎌진다.',t:'physical',i:'🫲'},
+  skin_2:{n:'피부 오염 II',d:'피부에 알 수 없는 문양이 새겨진다.',t:'physical',i:'🫲'},
+  skin_3:{n:'괴담의 피부',d:'반투명해졌다. 일부 존재들이 인식하지 못한다.',t:'unlock',i:'🟢'},
+  hair_1:{n:'모발 오염 I',d:'머리카락이 하얗게 변한다.',t:'physical',i:'💇'},
+  hair_2:{n:'모발 오염 II',d:'머리카락이 스스로 움직인다.',t:'physical',i:'💇'},
+  hair_3:{n:'괴담의 모발',d:'머리카락이 촉수처럼 행동한다.',t:'unlock',i:'🟢'},
+  heart_1:{n:'심장 오염 I',d:'심장이 불규칙하게 뛴다.',t:'physical',i:'❤️'},
+  heart_2:{n:'심장 오염 II',d:'두 번째 심장박동이 들린다. 내 것이 아닌.',t:'physical',i:'❤️'},
+  heart_3:{n:'괴담의 심장',d:'심장이 두 개가 됐다. HP+20 but 타락에 취약.',t:'unlock',i:'🟢'},
+  bone_1:{n:'골격 오염 I',d:'뼈가 시리다. 관절이 삐걱거린다.',t:'physical',i:'🦴'},
+  bone_2:{n:'골격 오염 II',d:'뼈가 스스로 재배치되는 것 같은 느낌이다.',t:'physical',i:'🦴'},
+  bone_3:{n:'괴담의 골격',d:'몸이 괴이하게 구부러진다. 좁은 공간을 통과할 수 있다.',t:'unlock',i:'🟢'},
+  blood_1:{n:'혈액 오염 I',d:'피가 차갑다. 보통 사람보다 체온이 낮다.',t:'physical',i:'🩸'},
+  blood_2:{n:'혈액 오염 II',d:'피의 색이 변해가고 있다.',t:'physical',i:'🩸'},
+  blood_3:{n:'괴담의 혈액',d:'검은 피가 흐른다. 독성이 있어 괴담에게 해롭다.',t:'unlock',i:'🟢'},
+  neck_1:{n:'목 오염 I',d:'목이 뻣뻣하고 이상하게 구부러지려 한다.',t:'physical',i:'🦒'},
+  neck_2:{n:'목 오염 II',d:'목이 늘어나는 감각이 든다.',t:'physical',i:'🦒'},
+  spine_1:{n:'척추 오염 I',d:'척추가 시리다. 등 뒤가 항상 노출된 것 같다.',t:'physical',i:'⬆️'},
+  spine_2:{n:'척추 오염 II',d:'척추가 이상하게 구부러지려 한다.',t:'physical',i:'⬆️'},
+  tongue_1:{n:'혀 오염 I',d:'혀에서 이상한 맛이 난다. 쇠맛, 흙맛.',t:'physical',i:'👅'},
+  tongue_2:{n:'혀 오염 II',d:'혀가 이상한 말을 만들어낸다.',t:'physical',i:'👅'},
+  // 정신 Mental
+  mind_1:{n:'정신 오염 I',d:'집중하기 어렵다. 생각이 흐릿해진다.',t:'mental',i:'🧠'},
+  mind_2:{n:'정신 오염 II',d:'환각을 본다. 무엇이 진짜인지 알 수 없다.',t:'mental',i:'🧠'},
+  mind_3:{n:'괴담의 정신',d:'현실과 괴담의 경계가 사라졌다. 모든 것이 보인다.',t:'unlock',i:'🟢'},
+  memory_1:{n:'기억 오염 I',d:'일부 기억을 잃어버렸다.',t:'mental',i:'💭'},
+  memory_2:{n:'기억 오염 II',d:'다른 사람의 기억이 내 것과 섞인다.',t:'mental',i:'💭'},
+  memory_3:{n:'괴담의 기억',d:'전생의 기억이 남아있다. 괴담에 대한 지식이 생긴다.',t:'unlock',i:'🟢'},
+  dream_1:{n:'꿈 오염 I',d:'악몽을 꾼다. 쉬어도 피로가 쌓인다.',t:'mental',i:'😴'},
+  dream_2:{n:'꿈 오염 II',d:'깨어있어도 꿈이 보인다.',t:'mental',i:'😴'},
+  dream_3:{n:'괴담의 꿈',d:'꿈과 현실이 반전됐다.',t:'unlock',i:'🟢'},
+  self_1:{n:'자아 오염 I',d:'내가 누구인지 혼란스럽다.',t:'mental',i:'🪞'},
+  self_2:{n:'자아 오염 II',d:'자아가 흔들린다. 다른 존재가 내 안에 있는 것 같다.',t:'mental',i:'🪞'},
+  self_3:{n:'두 번째 자아',d:'두 번째 자아가 생겼다. 선택에 다른 관점이 생긴다.',t:'unlock',i:'🟢'},
+  fear_1:{n:'공포 오염 I',d:'특정 것에 과도한 공포를 느낀다.',t:'mental',i:'😨'},
+  fear_2:{n:'공포 오염 II',d:'공포가 신체를 마비시킨다.',t:'mental',i:'😨'},
+  fear_3:{n:'역전된 공포',d:'공포가 역전됐다. 이제 괴담들이 두려워한다.',t:'unlock',i:'🟢'},
+  will_1:{n:'의지 오염 I',d:'의지가 약해졌다. 저항하기 어렵다.',t:'mental',i:'💪'},
+  will_2:{n:'의지 오염 II',d:'타인의 의지에 쉽게 영향받는다.',t:'mental',i:'💪'},
+  will_3:{n:'강철 의지',d:'오히려 의지가 단단해졌다. 부정적 효과에 저항한다.',t:'unlock',i:'🟢'},
+  sense_1:{n:'감각 오염 I',d:'감각이 예민해진다. 작은 소리도 크게 들린다.',t:'mental',i:'✨'},
+  sense_2:{n:'감각 오염 II',d:'과각성 상태. 끊임없이 위험을 감지한다.',t:'mental',i:'✨'},
+  sense_3:{n:'초감각',d:'인간을 넘는 감각. 위험을 미리 감지한다.',t:'unlock',i:'🟢'},
+  empathy_1:{n:'감정 오염 I',d:'타인의 감정이 침범한다.',t:'mental',i:'💔'},
+  empathy_2:{n:'감정 오염 II',d:'타인의 고통이 느껴진다.',t:'mental',i:'💔'},
+  empathy_3:{n:'괴담의 감정',d:'괴담의 감정이 느껴진다. 의도를 읽을 수 있다.',t:'unlock',i:'🟢'},
+  desire_1:{n:'욕망 오염 I',d:'이상한 욕망이 든다.',t:'mental',i:'🌀'},
+  desire_2:{n:'욕망 오염 II',d:'욕망을 통제할 수 없다.',t:'mental',i:'🌀'},
+  desire_3:{n:'욕망의 힘',d:'욕망이 원동력이 됐다. 절박할수록 강해진다.',t:'unlock',i:'🟢'},
+  identity_1:{n:'정체성 오염 I',d:'정체성이 흔들린다.',t:'mental',i:'🫥'},
+  identity_2:{n:'정체성 오염 II',d:'타 존재와 동화되는 느낌이다.',t:'mental',i:'🫥'},
+  // 특수 Special
+  redmask_obs:{n:'빨간 마스크의 집착',d:'"예쁘냐"는 목소리가 머릿속에서 사라지지 않는다.',t:'special',i:'😷'},
+  redmask_wound:{n:'입 찢김 흔적',d:'입가에 작은 상처가 생겼다. 웃음을 참을 수 없다.',t:'special',i:'😷'},
+  elev_pull:{n:'잘못된 층의 부름',d:'엘리베이터가 잘못된 층에 멈출 때 내리고 싶어진다.',t:'special',i:'🛗'},
+  elev_pass:{n:'엘리베이터 승객',d:'엘리베이터 안의 존재를 봤다. 그것도 나를 봤다.',t:'special',i:'🛗'},
+  mirror_crack:{n:'거울 균열 감지',d:'모든 거울에서 균열이 보인다.',t:'special',i:'🪞'},
+  mirror_other:{n:'거울 속 타자',d:'거울 속 내가 따로 행동한다.',t:'special',i:'🪞'},
+  phone_wait:{n:'전화 대기',d:'전화가 울릴 것 같은 느낌이 지워지지 않는다.',t:'special',i:'📞'},
+  phone_voice:{n:'전화 목소리 기억',d:'그 목소리를 기억한다. 살아있는 자의 것이 아니었다.',t:'special',i:'📞'},
+  subway_last:{n:'마지막 칸의 부름',d:'지하철을 탈 때마다 마지막 칸으로 가고 싶어진다.',t:'special',i:'🚇'},
+  subway_wrong:{n:'잘못된 역 충동',d:'잘못된 역에서 내리고 싶은 충동이 든다.',t:'special',i:'🚇'},
+  desk_pull:{n:'책상 아래의 기억',d:'책상 아래에서 무언가가 잡아당기던 감각이 남아있다.',t:'special',i:'🪑'},
+  rooftop_e:{n:'옥상 끝의 유혹',d:'높은 곳 끝에서 아래를 내려다보고 싶어진다.',t:'special',i:'🏢'},
+  payphone_s:{n:'공중전화 강박',d:'공중전화 앞에서 발이 멈춘다.',t:'special',i:'☎️'},
+  fox_charm:{n:'구미호의 매혹',d:'그 눈빛이 잊히지 않는다. 다시 보고 싶다.',t:'special',i:'🦊'},
+  fox_bead:{n:'여우구슬 갈망',d:'구미호의 구슬을 원한다. 먹으면 어떻게 될까.',t:'special',i:'🦊'},
+  corpse_smell:{n:'시체 냄새',d:'달리는 시체의 냄새가 배어있다. 괴담을 끌어당긴다.',t:'special',i:'💀'},
+  shadow_lost:{n:'그림자 분리',d:'자신의 그림자가 따로 움직인다.',t:'special',i:'🌑'},
+  shadow_extra:{n:'여분의 그림자',d:'그림자가 두 개다. 하나는 내 것이 아니다.',t:'special',i:'🌑'},
+  count_comp:{n:'숫자 강박',d:'주변의 모든 것을 세고 싶은 충동이 든다.',t:'special',i:'🔢'},
+  wall_warm:{n:'벽의 온기',d:'벽이 따뜻하다고 느껴진다. 손을 넣으면 어떨까.',t:'special',i:'🧱'},
+  name_called:{n:'이름이 불림',d:'아무도 없는데 내 이름이 들린다. 대답하면 안 된다.',t:'special',i:'📢'},
+  name_answer:{n:'이름에 대답함',d:'목소리에 대답했다. 존재들이 내 이름을 알았다.',t:'special',i:'📢'},
+  umbrella_n:{n:'우산 강박',d:'맑은 날에도 우산을 펴고 싶어진다.',t:'special',i:'☂️'},
+  halfbody_s:{n:'반쪽 존재의 시선',d:'반쪽만 있는 것에 눈이 간다. 그것도 나를 본다.',t:'special',i:'👻'},
+  neck_stretch:{n:'목 늘어나는 감각',d:'가끔 목이 늘어나는 것 같다.',t:'special',i:'🦒'},
+  joint_rev:{n:'관절 역전 감각',d:'관절이 반대로 구부러지는 감각이 든다.',t:'special',i:'🦴'},
+  delivery_m:{n:'밤 배달부의 표식',d:'배달부가 남긴 영수증이 사라지지 않는다.',t:'special',i:'📦'},
+  vending_c:{n:'자판기 동전',d:'동전이 없어도 자판기에서 물건이 나왔다.',t:'special',i:'🥤'},
+  patient_n:{n:'환자 번호',d:'어느 순간부터 환자 번호가 붙어있다.',t:'special',i:'🏥'},
+  three_c:{n:'셋을 기다림',d:'"하나, 둘..."이 들리면 몸이 굳는다.',t:'special',i:'3️⃣'},
+  water_pull:{n:'물의 유혹',d:'물 근처에서 들어가고 싶어진다.',t:'special',i:'💧'},
+  bridge_edge:{n:'다리 끝의 부름',d:'다리 난간 너머에서 무언가 부른다.',t:'special',i:'🌉'},
+  fox_merge:{n:'여우와 동화',d:'여우의 것이 섞이고 있다.',t:'special',i:'🦊'},
+  mirror_merge:{n:'거울 자아 동화',d:'거울 속 자아가 점점 내 것과 비슷해진다.',t:'special',i:'🪞'},
+  elev_floor:{n:'존재하지 않는 층',d:'B13, 0층, ∞층... 번호가 기억에 남는다.',t:'special',i:'🛗'},
+  // 타락 Corruption
+  cor_taste:{n:'피의 맛',d:'피의 맛이 좋다. 이상한 일이다.',t:'corruption',i:'🩸'},
+  cor_hunt:{n:'사냥 본능',d:'뭔가를 쫓고 싶다는 본능이 든다.',t:'corruption',i:'🐺'},
+  cor_void:{n:'허무',d:'이 모든 것이 의미없다는 생각이 든다.',t:'corruption',i:'🌑'},
+  cor_merge:{n:'융합 욕구',d:'괴담과 하나가 되고 싶다는 욕구가 든다.',t:'corruption',i:'🌀'},
+  cor_become:{n:'괴담화 진행',d:'서서히 인간의 것이 아닌 존재가 되어가고 있다.',t:'corruption',i:'💀'},
+};
+
+// ═══════════════════════════════════════════════
+//  SCENES  (id → scene object)
+// ═══════════════════════════════════════════════
+// choice fields: text, icon, show(s), req(s), cost{hp,san,cor}, contam[], flag{}, next, time, betray, btText, btCost{}, btContam[], btNext
+const SCENES = {
+
+/* ── ACT 1: 빌딩 ── */
+office_wake:{
+  title:'사무실 각성',
+  time:'오전 2:07',
+  atm:'눈을 뜬다. 여기는... 사무실이다. 하지만 뭔가 이상하다.',
+  text:`<p>형광등이 <span class="hr">깜빡인다</span>. 리듬이 없다. 심장박동처럼도, 모스부호처럼도 보인다.</p>
+<p>책상 위 시계가 <span class="hr">2:07</span>에 멈춰 있다. 초침이 움직이지 않는다. 하지만 당신은 그것이 고장났다고 생각하지 않는다.</p>
+<p>오늘 오전 9시에 <span class="hl">중요한 회의</span>가 있다. 지각하면 안 된다. 괴담에 떨어져도 출근을 해야 하는구나.</p>`,
+  choices:[
+    {text:'💡 핸드폰 손전등을 켠다',icon:'',show:s=>true,cost:{},contam:[],next:'office_corridor',time:5,
+     betray:.1,btText:'핸드폰 화면에서 잠깐 — 자신의 반영이 아닌 다른 무언가가 보였다. 눈을 깜빡이자 사라졌다.',btCost:{san:-5},btContam:['mirror_crack']},
+    {text:'🚪 어두운 채로 복도로 나간다',icon:'',show:s=>true,cost:{san:-5},contam:['sense_1'],next:'office_corridor',time:3},
+    {text:`🔮 주문을 외워 이 상황을 파악한다`,icon:'',show:s=>s.char.job==='shaman',cost:{},contam:[],next:'office_corridor',time:4,
+     flag:{shaman_sense:true}},
+  ]
+},
+
+office_corridor:{
+  title:'7층 복도',
+  time:'오전 2:10',
+  atm:'빛이 없다. 복도 끝이 보이지 않는다.',
+  text:`<p>복도는 끝이 없는 것처럼 보인다. 사무실 건물 7층 복도가 이렇게 길었던가. <span class="hr">발소리가 메아리친다</span>. 한 박자 늦게.</p>
+<p>어딘가에서 — 아마도 끝 쪽에서 — <span class="hr">당신의 이름</span>을 부르는 소리가 들린다. 낮고 부드럽고, 완전히 틀린 방향에서 오는 목소리.</p>
+<p>비상구 표시등이 빨간빛을 내고 있다. 계단 방향. 그리고 복도 끝에는 <span class="hl">원래 없던 문</span>이 하나 생겨있다.</p>`,
+  onEnter:s=>{if(!s.contam.has('name_called'))s.contam.add('name_called');},
+  choices:[
+    {text:'🚶 목소리를 무시하고 계단으로 향한다',show:s=>true,cost:{san:-5},contam:[],next:'office_stairs',time:8,
+     betray:.2,btText:'무시하는 순간 뭔가가 발목을 잡는다. 끌리는 감각. 억지로 뿌리쳤다.',btCost:{hp:-8,san:-5},btContam:['fear_1']},
+    {text:'📣 "누구야!" 하고 대답한다',show:s=>true,cost:{san:-10},contam:['name_answer'],next:'office_corridor2',time:5},
+    {text:'🚪 복도 끝의 새 문을 확인한다',show:s=>true,cost:{},contam:[],next:'office_end_door',time:10},
+    {text:'🚽 화장실에 들어간다',show:s=>true,cost:{},contam:[],next:'office_bathroom',time:8},
+    {text:'👮 빠르게 비상구로 뛴다',show:s=>s.char.job==='police',cost:{hp:-5},contam:[],next:'office_stairs',time:4},
+  ]
+},
+
+office_corridor2:{
+  title:'7층 복도 — 대답한 후',
+  time:'오전 2:14',
+  atm:'목소리에 대답했다. 무언가가 바뀌었다.',
+  text:`<p>대답한 순간, 복도 전체가 조용해진다. 그 다음에 오는 것은 정적이 아니라 <span class="hr">수많은 속삭임</span>이다.</p>
+<p>이름을 안다. 당신의 이름을 안다. 이제 그것들이 이름으로 부를 수 있다.</p>
+<p>하지만 동시에 — 뭔가 보인다. 복도 끝 그 문 앞에 <span class="hr">형체</span>가 서있다. 한쪽 방향으로만 빛이 반사되는, 그런 형체.</p>`,
+  choices:[
+    {text:'🚪 형체를 무시하고 계단으로',show:s=>true,cost:{san:-5},contam:[],next:'office_stairs',time:6},
+    {text:'👁️ 형체를 자세히 본다',show:s=>true,cost:{san:-10},contam:['eye_1','fear_1'],next:'office_end_door',time:5},
+    {text:'🔮 괴담의 언어로 말을 건다',show:s=>s.contam.has('mouth_3')||s.char.job==='shaman',cost:{san:-5},contam:['ear_1'],next:'office_end_door',time:5,flag:{talked_entity:true}},
+  ]
+},
+
+office_end_door:{
+  title:'복도 끝의 문',
+  time:'오전 2:18',
+  atm:'원래 없던 문. 열면 어디로 갈까.',
+  text:`<p>가까이 다가가자 문에서 <span class="hr">열기</span>가 느껴진다. 반대쪽에 뭔가 있다. 불빛도, 소리도, 냄새도 없다. 그냥 <span class="hr">무게</span>가 느껴진다.</p>
+<p>문 손잡이는 사무실 내 다른 어느 문과도 다른 디자인이다. 황동 재질, 손바닥 모양 조각. <span class="hr">따뜻하다</span>.</p>`,
+  choices:[
+    {text:'🚪 문을 연다',show:s=>true,cost:{san:-15,cor:5},contam:['eye_1','mind_1'],next:'office_stairs',time:3,
+     betray:.3,btText:'문 너머는 그냥 벽장이었다. 하지만 그 안에서 무언가가 이미 나와있었다.',btCost:{hp:-15,san:-10},btContam:['fear_2','eye_2']},
+    {text:'🚫 문을 열지 않고 돌아선다',show:s=>true,cost:{san:-5},contam:[],next:'office_bathroom',time:5},
+    {text:'👁️ 문에 귀를 댄다',show:s=>s.contam.has('ear_1')||s.contam.has('ear_2'),cost:{san:-10},contam:['ear_2'],next:'office_bathroom',time:5,flag:{heard_door:true}},
+    {text:'🤚 손으로 문을 통과시킨다',show:s=>s.contam.has('hand_3'),cost:{san:-5},contam:['hand_3'],next:'office_stairs',time:2,flag:{phased_door:true}},
+  ]
+},
+
+office_bathroom:{
+  title:'화장실 — 거울 앞',
+  time:'오전 2:20',
+  atm:'첫 번째 핵심 괴담: 거울 속의 나. 처음엔 작은 이상함이다.',
+  text:`<p>화장실 조명은 정상이다. 형광등이 안정적으로 빛을 낸다. 세면대 앞에 섰을 때, 처음엔 아무것도 이상하지 않았다.</p>
+<p>그러다 <span class="hr">0.3초</span>. 당신이 오른손을 들었을 때, 거울 속 반영은 <span class="hr">왼손을 먼저 들었다</span>.</p>
+<p>착각인가? 다시 보면 완전히 정상이다. 거울 속 당신은 정상적으로 움직인다. 하지만 — 당신은 분명히 봤다.</p>`,
+  choices:[
+    {text:'🪞 거울을 깨트린다',show:s=>true,cost:{hp:-10,san:-5},contam:['mirror_crack','hand_1'],next:'office_lobby',time:5,
+     betray:.25,btText:'거울 파편이 손을 긁었다. 그런데 핏자국이 거울 안쪽에도 생겼다.',btCost:{hp:-5},btContam:['blood_1']},
+    {text:'👁️ 거울을 빤히 쳐다본다',show:s=>true,cost:{san:-15},contam:['mirror_other','eye_1'],next:'office_lobby',time:8,flag:{mirror_watched:true}},
+    {text:'🚿 세수를 하고 나간다',show:s=>true,cost:{san:5},contam:[],next:'office_lobby',time:5},
+    {text:'🔮 거울에게 말을 건다',show:s=>s.char.job==='shaman'||s.contam.has('mouth_3'),cost:{san:-10},contam:['mirror_other','ear_1'],next:'office_lobby',time:6,flag:{mirror_talked:true}},
+  ]
+},
+
+office_lobby:{
+  title:'1층 로비',
+  time:'오전 2:30',
+  atm:'경비 데스크에 아무도 없다. 그런데 로비는 생각보다 따뜻하다.',
+  text:`<p>로비에 내려오자 경비 아저씨가 없다. 데스크 의자가 <span class="hr">흔들리고 있다</span>. 방금까지 누가 있었던 것처럼.</p>
+<p>엘리베이터 문이 열려있다. <span class="hr">B13</span>층 표시등이 켜져 있다. 이 건물에 B13층은 없다.</p>
+<p>데스크 아래에서 <span class="hr">무언가가 당기는 소리</span>가 들린다. 천천히, 규칙적으로.</p>`,
+  choices:[
+    {text:'🚪 정문으로 나간다',show:s=>true,cost:{},contam:[],next:'office_parking',time:5},
+    {text:'🪑 데스크 아래를 본다',show:s=>true,cost:{san:-15},contam:['desk_pull','fear_1'],next:'office_desk',time:8},
+    {text:'🛗 엘리베이터를 타본다',show:s=>true,cost:{san:-10},contam:['elev_pull'],next:'office_elev_preview',time:6},
+    {text:'📷 모든 것을 사진으로 찍는다',show:s=>s.char.job==='reporter',cost:{},contam:[],next:'office_parking',time:5,flag:{lobby_photo:true}},
+  ]
+},
+
+office_desk:{
+  title:'데스크 아래',
+  time:'오전 2:35',
+  atm:'보지 말았어야 했을 수도 있다.',
+  text:`<p>데스크 아래를 봤을 때, 처음엔 아무것도 없는 줄 알았다. 그러다 <span class="hr">손</span>이 보였다. 데스크 나무판을 뚫고 나온 손. 손목까지만.</p>
+<p>손은 움직이지 않았다. 단지 <span class="hr">거기 있었다</span>. 마치 원래부터 그랬던 것처럼.</p>`,
+  choices:[
+    {text:'🏃 그냥 뛰어나간다',show:s=>true,cost:{hp:-5,san:-10},contam:[],next:'office_parking',time:3},
+    {text:'🤚 손을 잡아본다',show:s=>true,cost:{san:-20,cor:10},contam:['hand_1','fear_2'],next:'office_parking',time:5,
+     betray:.4,btText:'잡는 순간 손이 당신의 손목을 잡았다. 겨우 빠져나왔다.',btCost:{hp:-20},btContam:['hand_2']},
+    {text:'🩺 맥박을 짚어본다',show:s=>s.char.job==='nurse',cost:{san:-15},contam:['empathy_1'],next:'office_parking',time:5,flag:{desk_examined:true}},
+  ]
+},
+
+office_elev_preview:{
+  title:'엘리베이터 — 예고',
+  time:'오전 2:36',
+  atm:'심연의 엘리베이터. 첫 만남.',
+  text:`<p>엘리베이터 안으로 들어섰다. 문이 닫혔다. 버튼 패널에는 1층부터 7층까지... 그리고 <span class="hr">B13</span>과 <span class="hr">∞</span>이 있다.</p>
+<p>당신은 아무것도 누르지 않았다. 그런데 엘리베이터가 움직이기 시작했다. <span class="hr">내려가고 있다</span>.</p>
+<p>패널에 B1, B2, B3... 숫자가 올라간다. 아니, 내려간다. B6, B7... 층수 표시가 계속 바뀐다.</p>`,
+  choices:[
+    {text:'🔴 비상정지 버튼을 누른다',show:s=>true,cost:{san:-10},contam:['elev_floor'],next:'office_parking',time:5},
+    {text:'🚪 문이 열릴 때 뛰어내린다',show:s=>true,cost:{hp:-10,san:-5},contam:['elev_pass'],next:'office_parking',time:3},
+    {text:'⏳ 기다린다',show:s=>true,cost:{san:-20,cor:10},contam:['elev_pull','elev_pass'],next:'office_parking',time:12,
+     betray:.35,btText:'잠깐 문이 열렸다. 그 너머에 있는 것이 당신을 봤다.',btCost:{hp:-15,san:-10}},
+  ]
+},
+
+office_parking:{
+  title:'지하주차장',
+  time:'오전 2:45',
+  atm:'어둡고 넓다. 기둥마다 그림자가 다르다.',
+  text:`<p>지하주차장은 차가 한 대도 없다. 조명은 절반만 켜져있고, 켜진 것들도 <span class="hr">깜빡인다</span>.</p>
+<p>당신의 그림자가 발 아래 있다. 그런데 기둥 쪽 그림자 하나가 — <span class="hr">당신을 향해 천천히 짧아지고 있다</span>. 그것은 그림자가 없는 사람이다.</p>`,
+  onEnter:s=>{if(Math.random()<.3)s.contam.add('shadow_extra');},
+  choices:[
+    {text:'🏃 출구로 뛴다',show:s=>true,cost:{hp:-8},contam:[],next:'street_exit',time:3,
+     betray:.2,btText:'뛰는 중 그림자 없는 사람의 손이 어깨를 스쳤다. 그 손은 차가웠다.',btCost:{hp:-10,san:-8},btContam:['shadow_lost']},
+    {text:'🌑 그림자 없는 사람에게 다가간다',show:s=>true,cost:{san:-15,cor:5},contam:['shadow_extra'],next:'street_exit',time:8,flag:{shadow_met:true}},
+    {text:'🙈 눈을 감고 출구까지 걷는다',show:s=>true,cost:{san:-5},contam:[],next:'street_exit',time:6},
+    {text:'📋 그림자 없는 사람의 면상을 직접 본다',show:s=>s.char.job==='police'||s.char.job==='reporter',cost:{san:-20},contam:['eye_2','fear_2'],next:'street_exit',time:5,flag:{saw_shadowless:true}},
+  ]
+},
+
+/* ── ACT 2: 도시의 밤 ── */
+street_exit:{
+  title:'건물 밖',
+  time:'오전 3:00',
+  atm:'밖으로 나왔다. 하지만 밖도 안전하지 않다.',
+  text:`<p>건물 밖. 도시는 <span class="hr">조용하다</span>. 지나치게. 자정 넘은 도시가 이렇게 조용한 건 이상하다.</p>
+<p>신호등은 모두 빨간색이다. 아무것도 지나가지 않는데도.</p>
+<p>그때 — 오토바이 소리. 형광 노란 조끼를 입은 배달부가 지나가다 <span class="hr">멈춘다</span>. 당신을 본다. 아니, 본다기보다 — 인식한다. 그리고 무언가를 내밀었다. 영수증.</p>`,
+  choices:[
+    {text:'📄 영수증을 받는다',show:s=>true,cost:{},contam:['delivery_m'],next:'convenience',time:5,flag:{has_receipt:true}},
+    {text:'🤚 영수증을 거부한다',show:s=>true,cost:{san:-5},contam:[],next:'convenience',time:3},
+    {text:'🏃 배달부를 무시하고 걷는다',show:s=>true,cost:{},contam:[],next:'alley_entrance',time:5,
+     betray:.15,btText:'걷다가 뒤를 돌아보니 배달부가 사라져있었다. 영수증 한 장이 바닥에 떨어져 있었다.',btCost:{},btContam:['delivery_m']},
+  ]
+},
+
+convenience:{
+  title:'24시 편의점',
+  time:'오전 3:08',
+  atm:'불빛이 있다. 하지만 안에 있는 것들이 문제다.',
+  text:`<p>편의점 자동문이 열린다. <span class="hl">불빛</span>이 있다. 음식도 있다. 평범하다 — 아니, 평범한 척한다.</p>
+<p>계산대 뒤에 알바생이 있는데, 고개를 들지 않는다. 계속 바코드를 찍고 있다. 물건도 없이. <span class="hr">삑, 삑, 삑</span>.</p>
+<p>자판기 앞에 아무도 없는데 <span class="hr">캔 하나가 나와서 굴러다닌다</span>.</p>`,
+  choices:[
+    {text:'🥤 자판기 캔을 줍는다',show:s=>true,cost:{hp:10},contam:['vending_c'],next:'convenience2',time:3,flag:{has_drink:true}},
+    {text:'🧃 편의점에서 음식을 산다',show:s=>true,cost:{},contam:[],next:'convenience2',time:8,flag:{has_food:true}},
+    {text:'🗣️ 알바생에게 말을 건다',show:s=>true,cost:{san:-10},contam:[],next:'convenience_clerk',time:5},
+    {text:'🚪 그냥 나간다',show:s=>true,cost:{},contam:[],next:'alley_entrance',time:2},
+  ]
+},
+
+convenience_clerk:{
+  title:'편의점 알바생',
+  time:'오전 3:12',
+  atm:'이것은 인간인가?',
+  text:`<p>알바생이 고개를 든다. 얼굴은 <span class="hr">평범하다</span>. 지나치게 평범하다. 눈썹, 코, 입 모두 완벽하게 평균적이다. 어딘가에서 평균 얼굴을 모아 만든 것 같은.</p>
+<p>"어서 오세요." 목소리도 평범하다. "무엇을 드릴까요."</p>
+<p>문장 끝에 물음표가 없다. 억양이 없다. 기계가 읽는 것처럼.</p>`,
+  choices:[
+    {text:'"여기서 나가려면 어떻게 해야 해요?"',show:s=>true,cost:{san:-5},contam:['empathy_1'],next:'convenience2',time:5,flag:{clerk_info:true}},
+    {text:'"괜찮으세요?"',show:s=>true,cost:{san:-10},contam:[],next:'convenience2',time:3},
+    {text:'취재하듯 질문 공세를 퍼붓는다',show:s=>s.char.job==='reporter',cost:{san:-5},contam:['ear_1'],next:'convenience2',time:8,flag:{clerk_report:true}},
+  ]
+},
+
+convenience2:{
+  title:'편의점 밖',
+  time:'오전 3:15',
+  atm:'여기서 나간다. 골목이냐, 우회로냐.',
+  text:`<p>편의점에서 나왔다. 오른쪽은 골목이다 — 더 빠르지만 어둡다. 왼쪽은 큰길이다 — 더 멀지만 불빛이 있다.</p>
+<p>큰길 저편에서 버스 정류장이 보인다. 공중전화가 있다. 그 전화기가 <span class="hr">울리고 있다</span>.</p>`,
+  choices:[
+    {text:'🌑 골목 지름길로 간다',show:s=>true,cost:{},contam:[],next:'alley_entrance',time:5},
+    {text:'🛤️ 큰길로 우회한다',show:s=>true,cost:{},contam:[],next:'bus_stop',time:12},
+    {text:'☎️ 먼저 공중전화부터 확인한다',show:s=>true,cost:{san:-5},contam:['payphone_s'],next:'bus_stop',time:8},
+  ]
+},
+
+alley_entrance:{
+  title:'골목 입구',
+  time:'오전 3:18',
+  atm:'골목 안이 이상하게 따뜻하다.',
+  text:`<p>골목 입구에 들어서자 공기가 바뀐다. <span class="hr">따뜻하다</span>. 겨울 밤에 이렇게 따뜻한 골목은 이상하다.</p>
+<p>벽에 누군가가 낙서를 해뒀다. <span class="hr">예쁘냐</span>는 글자가. 글씨체가 번져있다.</p>`,
+  choices:[
+    {text:'➡️ 골목으로 들어간다',show:s=>true,cost:{},contam:[],next:'alley_redmask',time:5},
+    {text:'↩️ 돌아서서 큰길로',show:s=>true,cost:{},contam:[],next:'bus_stop',time:10},
+  ]
+},
+
+alley_redmask:{
+  title:'골목 — 빨간 마스크',
+  time:'오전 3:22',
+  atm:'핵심이 아닌 괴담 1번. 빨간 마스크 여자.',
+  text:`<p>골목 중간쯤에서 그녀가 서있다. 붉은 마스크, 긴 가위, 코트. <span class="hr">클래식한</span> 괴담이다.</p>
+<p>"<span class="hr">예쁘냐</span>?" 그녀가 묻는다.</p>
+<p>시간이 없다. 판단해야 한다.</p>`,
+  minigame:'redmask',
+  choices:[]
+},
+
+alley_end:{
+  title:'골목 끝',
+  time:'오전 3:30',
+  atm:'빠져나왔다. 버스 정류장이 보인다.',
+  text:`<p>골목을 빠져나왔다. 뒤를 돌아보지 않았다. 그것이 옳은 판단인지는 모르겠지만.</p>
+<p>버스 정류장이 보인다. 그리고 공중전화가 <span class="hr">다시 울리고 있다</span>.</p>`,
+  choices:[
+    {text:'☎️ 공중전화를 받는다',show:s=>true,cost:{san:-10},contam:['phone_wait'],next:'bus_stop',time:3},
+    {text:'🚌 버스 정류장에서 기다린다',show:s=>true,cost:{},contam:[],next:'bus_stop',time:5},
+  ]
+},
+
+bus_stop:{
+  title:'버스 정류장',
+  time:'오전 3:35',
+  atm:'핵심 괴담 3번: 새벽의 전화. 시작.',
+  text:`<p>버스 정류장 의자에는 노인 한 분이 앉아있다. 시선이 고정되어 있고, 눈을 깜빡이지 않는다.</p>
+<p>공중전화가 울린다. 세 번. 멈춘다. 그리고 다시 세 번. <span class="hr">세 번 울리면 받아야 한다</span>고 어떤 괴담에서 읽었던 것 같다. 아니면 받으면 안 된다고 했던가.</p>
+<p>당신의 핸드폰이 울린다. <span class="hr">저장된 번호인데 죽은 사람의 것</span>이다.</p>`,
+  choices:[
+    {text:'📱 핸드폰을 받는다',show:s=>true,cost:{san:-15},contam:['phone_wait','phone_voice'],next:'bus_stop2',time:5,flag:{phone_answered:true}},
+    {text:'📱 핸드폰을 거절한다',show:s=>true,cost:{san:-5},contam:['phone_wait'],next:'bus_stop2',time:2},
+    {text:'☎️ 공중전화를 받는다',show:s=>true,cost:{san:-20},contam:['payphone_s','phone_voice'],next:'bus_stop2',time:8,flag:{payphone_answered:true}},
+    {text:'🚶 그냥 걸어간다',show:s=>true,cost:{},contam:[],next:'apartment_outside',time:8},
+  ]
+},
+
+bus_stop2:{
+  title:'버스 정류장 — 통화 후',
+  time:'오전 3:42',
+  atm:'전화 너머에서 무슨 말을 들었는가.',
+  text:`${''/* 동적으로 설정 */}`,
+  onEnter:s=>{
+    const el = document.getElementById('stx');
+    let txt = '';
+    if(s.flags.phone_answered){
+      txt = `<p>전화를 받았다. "<span class="hr">거기 있어</span>." 목소리가 말했다. 그 목소리를 알고 있다. 죽은 사람의 목소리다. 하지만 내용은 분명했다 — 경고인지, 명령인지.</p><p>전화가 끊겼다. 신호음 없이. 그냥 침묵이 됐다.</p>`;
+    } else if(s.flags.payphone_answered){
+      txt = `<p>공중전화를 받았다. 숨소리만 들렸다. 그리고 <span class="hr">이름</span>을 불렀다. 당신의 이름을. 수화기 너머 아득히 먼 곳에서.</p>`;
+    } else {
+      txt = `<p>전화를 받지 않았다. 진동이 멈췄다. 뭔가를 놓쳤을 수도 있고, 올바른 선택이었을 수도 있다.</p>`;
+    }
+    el.innerHTML = txt + `<p>이제 여기서 어디로 갈 것인가. 회사는 아직 멀다. <span class="hl">오전 9시</span>까지 가야 한다.</p>`;
+  },
+  choices:[
+    {text:'🏢 아파트 단지로 간다 (지름길)',show:s=>true,cost:{},contam:[],next:'apartment_outside',time:10},
+    {text:'🌲 공원을 가로질러 간다',show:s=>true,cost:{},contam:[],next:'park_entrance',time:12},
+    {text:'🚇 지하철역으로 간다',show:s=>true,cost:{},contam:[],next:'subway_entrance',time:8},
+  ]
+},
+
+apartment_outside:{
+  title:'아파트 단지',
+  time:'오전 3:55',
+  atm:'단지 안. 위를 보면 안 된다.',
+  text:`<p>아파트 단지는 평소와 다르지 않아 보인다. 주차된 차들, 가로등, 조용한 건물들. 하지만 <span class="hr">15층</span>을 보면 안 된다는 것을 직감했다.</p>
+<p>그래서 봤다. 15층 난간에 아이가 서있다. 몸 절반이 난간 밖으로 나와있다. <span class="hr">흔들리지 않는다</span>. 그것이 더 이상하다.</p>
+<p>1동 입구 벽에서 <span class="hr">손</span>이 나와있다. 벽돌 사이로 손가락이 보인다. 움직이지 않는다. 그냥 거기 있다.</p>`,
+  choices:[
+    {text:'📣 아이에게 소리친다',show:s=>true,cost:{san:-10},contam:['rooftop_e'],next:'apartment_elev',time:5,
+     betray:.2,btText:'소리치자 아이가 고개를 돌렸다. 얼굴이 없었다. 그리고 웃었다.',btCost:{san:-15},btContam:['fear_2']},
+    {text:'🧱 벽의 손을 건드린다',show:s=>true,cost:{san:-15,cor:5},contam:['wall_warm'],next:'apartment_elev',time:5,
+     betray:.3,btText:'손이 당신의 손을 잡았다. 따뜻했다. 무섭도록 따뜻했다.',btCost:{hp:-10,san:-10},btContam:['hand_1']},
+    {text:'🏃 시선 피하고 빠르게 통과한다',show:s=>true,cost:{},contam:[],next:'apartment_elev',time:3},
+    {text:'📷 사진을 찍어둔다',show:s=>s.char.job==='reporter',cost:{},contam:[],next:'apartment_elev',time:5,flag:{apt_photo:true}},
+  ]
+},
+
+apartment_elev:{
+  title:'아파트 엘리베이터',
+  time:'오전 4:05',
+  atm:'핵심 괴담 2번: 심연의 엘리베이터. 본 조우.',
+  text:`<p>엘리베이터를 타야 한다. 이 건물을 통과해서 반대편으로 나가야 빠르다.</p>
+<p>버튼을 누른다. 문이 열린다. 안에 — <span class="hr">아무도 없다</span>. 좋다. 탔다. 문이 닫혔다.</p>
+<p>버튼 패널. B1부터 25층까지. 그리고 존재하지 않는 층들 — <span class="hr">B13, 0, ∞</span>. 반대편 통로로 나가려면 1층을 눌러야 하는데.</p>
+<p>엘리베이터가 움직이기 시작했다. <span class="hr">내려간다</span>. 버튼을 누르지 않았는데.</p>`,
+  minigame:'elevator',
+  choices:[]
+},
+
+apartment_elev2:{
+  title:'엘리베이터에서 나온 후',
+  time:'오전 4:20',
+  atm:'어떻게 탈출했는가에 따라 다르다.',
+  text:`<p>엘리베이터 밖으로 나왔다. 손이 떨린다. 발도 떨린다. <span class="hl">살아있다</span>.</p>
+<p>어느 층인지 모르겠지만 — 계단을 찾아 내려가면 나갈 수 있을 것이다. 비상계단 표시가 보인다.</p>`,
+  choices:[
+    {text:'🚪 비상계단으로 나간다',show:s=>true,cost:{},contam:[],next:'park_entrance',time:8},
+    {text:'🌲 공원으로 직행한다',show:s=>true,cost:{},contam:[],next:'park_entrance',time:5},
+    {text:'🚇 지하철로 간다',show:s=>true,cost:{},contam:[],next:'subway_entrance',time:10},
+  ]
+},
+
+park_entrance:{
+  title:'공원 입구',
+  time:'오전 4:10',
+  atm:'공원에 아이들이 있다. 새벽 4시에.',
+  text:`<p>공원 입구. 새벽 4시의 공원이 빈 것은 당연하다 — 하지만 공원 가운데 모래사장에 <span class="hr">아이들이 놀고 있다</span>. 서너 명. 조용히.</p>
+<p>자세히 보면 아이들이 <span class="hr">숫자를 세고 있다</span>. 손바닥으로 모래를 두드리며. "하나... 둘... 셋..."</p>
+<p>공원 오른쪽 길로 가면 여우 동상이 있다. 동상인데 — 동상이 눈을 깜빡였다.</p>`,
+  choices:[
+    {text:'🏃 공원을 빠르게 통과한다',show:s=>true,cost:{hp:-5},contam:[],next:'park_exit',time:5,
+     betray:.25,btText:'빠르게 걷는 도중 아이들 중 하나가 고개를 들어 당신을 봤다. "셋." 그리고 멈췄다.',btCost:{san:-15},btContam:['three_c']},
+    {text:'🔢 아이들에게 다가간다',show:s=>true,cost:{san:-10},contam:[],next:'park_count',time:8},
+    {text:'🦊 여우 동상을 확인한다',show:s=>true,cost:{},contam:[],next:'park_fox',time:8},
+    {text:'📚 도시전설 지식을 활용한다',show:s=>s.char.job==='student',cost:{},contam:[],next:'park_count',time:5,flag:{student_know:true}},
+  ]
+},
+
+park_count:{
+  title:'숫자 세는 아이',
+  time:'오전 4:15',
+  atm:'아이들과 리듬을 맞춰야 한다.',
+  text:`<p>아이들 앞에 섰다. 아이들은 당신을 보지 않는다. 계속 센다. 하나... 둘... 셋...</p>
+<p>느낌이 왔다. 이 리듬에 맞춰야 한다. 어긋나면 —</p>`,
+  minigame:'counting',
+  choices:[]
+},
+
+park_fox:{
+  title:'공원 — 구미호',
+  time:'오전 4:18',
+  atm:'인간의 모습을 하고 있지만 인간이 아니다.',
+  text:`<p>여우 동상 앞에 여자가 서있다. 동상이 아니다 — <span class="hr">살아있다</span>. 빨간 한복, 흰 얼굴, 황금빛 눈.</p>
+<p>"어디 가?" 그녀가 묻는다. 목소리가 음악처럼 울린다. "<span class="hr">나랑 있으면 안전해</span>."</p>
+<p>그 말이 맞을 수도 있다. 하지만 구미호의 안전은 대가가 있다.</p>`,
+  choices:[
+    {text:'❤️ 제안을 받아들인다',show:s=>true,cost:{san:10,cor:20},contam:['fox_charm'],next:'park_exit',time:10,flag:{fox_pact:true},
+     betray:.2,btText:'따라가다 보니 어느새 시간이 2시간이나 지나있었다. 구미호는 웃고 있었다.',btCost:{hp:-10},btContam:['fox_bead']},
+    {text:'🚫 거절하고 돌아선다',show:s=>true,cost:{san:-5},contam:[],next:'park_exit',time:3},
+    {text:'🔮 맞불로 주문을 외운다',show:s=>s.char.job==='shaman',cost:{san:-10},contam:['fox_merge'],next:'park_exit',time:5,flag:{fox_bound:true}},
+    {text:'📷 사진을 찍고 인터뷰를 시도한다',show:s=>s.char.job==='reporter',cost:{san:-10,cor:10},contam:['fox_charm'],next:'park_exit',time:8,flag:{fox_story:true}},
+  ]
+},
+
+park_exit:{
+  title:'공원 출구',
+  time:'오전 4:30',
+  atm:'공원을 빠져나왔다.',
+  text:`<p>공원을 통과했다. 뒤를 돌아보면 공원은 조용하다. 아이들도 없다. 여우도 없다.</p>
+<p>지하철역이 보인다. 아니면 다리 방향으로 갈 수도 있다. 회사는 강 건너에 있다.</p>`,
+  choices:[
+    {text:'🚇 지하철을 탄다',show:s=>true,cost:{},contam:[],next:'subway_entrance',time:5},
+    {text:'🌉 다리를 걸어서 건넌다',show:s=>true,cost:{hp:-5},contam:[],next:'bridge',time:20},
+    {text:'🏥 병원 옆길로 돌아간다',show:s=>true,cost:{},contam:[],next:'hospital_pass',time:15},
+  ]
+},
+
+subway_entrance:{
+  title:'지하철역 입구',
+  time:'오전 4:15',
+  atm:'반만 있는 사람이 있다.',
+  text:`<p>지하철역 계단 앞. 내려가려는데 계단 중간에 — <span class="hr">사람이 서있다</span>. 상반신만. 허리 아래가 없다. 서있는 게 아니라 떠있다. 하반신이 없는데도 서있다.</p>
+<p>그것이 고개를 든다. <span class="hr">눈이 맞았다</span>.</p>`,
+  choices:[
+    {text:'🚶 그것을 피해서 지나간다',show:s=>true,cost:{san:-10},contam:['halfbody_s'],next:'subway_platform',time:5},
+    {text:'🏃 뛰어서 지나간다',show:s=>true,cost:{hp:-5,san:-5},contam:[],next:'subway_platform',time:2,
+     betray:.15,btText:'뛰는 과정에서 그것의 손이 어깨를 스쳤다. 차갑고 습한 감촉이었다.',btCost:{san:-10},btContam:['halfbody_s','fear_1']},
+    {text:'👁️ 눈을 마주친 채로 천천히 지나간다',show:s=>true,cost:{san:-20},contam:['halfbody_s','empathy_1'],next:'subway_platform',time:8,flag:{halfbody_stare:true}},
+  ]
+},
+
+subway_platform:{
+  title:'지하철 플랫폼',
+  time:'오전 4:22',
+  atm:'열차가 온다. 올바른 방향인가?',
+  text:`<p>플랫폼에 사람이 없다. 도착 표시판이 <span class="hr">오류</span>라고만 표시된다. 방향도 없다. 그냥 오류.</p>
+<p>바람이 온다. 열차가 온다. 열차 문이 열린다. 안에 — 사람들이 타있다. 많다. 하지만 모두 같은 방향을 보고 있다. <span class="hr">당신 반대편</span>.</p>`,
+  choices:[
+    {text:'🚇 탄다',show:s=>true,cost:{},contam:[],next:'subway_train',time:3},
+    {text:'🔍 마지막 칸을 확인한다',show:s=>true,cost:{san:-5},contam:['subway_last'],next:'subway_last_car',time:5},
+    {text:'❌ 타지 않는다',show:s=>true,cost:{},contam:[],next:'park_exit',time:10},
+  ]
+},
+
+subway_train:{
+  title:'지하철 안',
+  time:'오전 4:28',
+  atm:'다들 같은 방향을 보고 있다.',
+  text:`<p>열차 안에 탔다. 문이 닫혔다. 사람들은 여전히 한 방향만 본다. 당신이 탄 것도 모르는 것 같다.</p>
+<p>창문에 당신의 반영이 보인다. 그런데 창문 속 당신은 — <span class="hr">열차 안 사람들을 보고 있다</span>. 당신은 지금 정면을 보고 있는데.</p>
+<p>핵심 괴담 1번이 여기서 본격화된다.</p>`,
+  minigame:'mirror',
+  choices:[]
+},
+
+subway_last_car:{
+  title:'지하철 마지막 칸',
+  time:'오전 4:30',
+  atm:'마지막 칸에는 탑승금지 이유가 있다.',
+  text:`<p>마지막 칸. 비어있다. 아니 — <span class="hr">비어있어 보인다</span>. 앉았다. 조용하다.</p>
+<p>그러다 서서히 느껴진다. 당신 말고 누군가가 있다. 눈에 보이지 않지만 — 온도가 다르다. 냄새가 다르다. 그리고 <span class="hr">숨소리</span>가 들린다.</p>`,
+  choices:[
+    {text:'🚇 다른 칸으로 이동한다',show:s=>true,cost:{san:-5},contam:[],next:'subway_train',time:3},
+    {text:'🗣️ "있어요?" 하고 말한다',show:s=>true,cost:{san:-15,cor:5},contam:['subway_last','ear_1'],next:'subway_mirror',time:5,flag:{last_car_talked:true}},
+    {text:'😶 못 본 척 가만히 있는다',show:s=>true,cost:{san:-10},contam:['subway_last'],next:'subway_mirror',time:8},
+  ]
+},
+
+subway_mirror:{
+  title:'창문 속의 나',
+  time:'오전 4:38',
+  atm:'핵심 괴담 1번: 거울 속의 나. 본 조우.',
+  text:`<p>창문 속 반영이 — 움직인다. 당신과 다르게. 당신이 왼쪽을 볼 때 그것은 오른쪽을 본다. 당신이 손을 들 때 그것은 내린다.</p>
+<p>거울 속의 당신이 <span class="hr">당신을 보며 웃는다</span>.</p>
+<p>제압해야 한다. 그렇지 않으면 — 바뀐다. 무엇이 진짜 당신인지.</p>`,
+  minigame:'mirror_game',
+  choices:[]
+},
+
+subway_exit:{
+  title:'지하철 하차',
+  time:'오전 5:00',
+  atm:'강 건너편 역에 내렸다.',
+  text:`<p>열차에서 내렸다. 강 건너편이다. 여기서 회사까지는 <span class="hl">걸어서 40분</span>.</p>
+<p>아직 오전 5시. 시간은 있다. 하지만 오염이 쌓이고, 몸이 무겁고, 동이 트기 전 마지막으로 이상한 것들이 몰려온다.</p>`,
+  choices:[
+    {text:'🌉 다리를 걷는다',show:s=>true,cost:{},contam:[],next:'bridge',time:15},
+    {text:'🏥 병원 옆길로 간다',show:s=>true,cost:{},contam:[],next:'hospital_pass',time:12},
+    {text:'🚕 택시를 잡으려 한다',show:s=>true,cost:{hp:-5},contam:[],next:'dawn_streets',time:5,
+     betray:.4,btText:'택시가 멈췄다. 운전사가 고개를 돌렸을 때 — 얼굴이 없었다. 뛰었다.',btCost:{hp:-10,san:-15}},
+  ]
+},
+
+hospital_pass:{
+  title:'병원 옆길',
+  time:'오전 4:50',
+  atm:'우산 귀신이 있다.',
+  text:`<p>병원 옆길을 걷는다. 비는 오지 않는다. 그런데 우산을 들고 있는 사람들이 걸어온다. 여럿이. 한밤중에 우산을 펼치고.</p>
+<p>가까이 지나치면서 보니 — 우산 아래에 <span class="hr">아무도 없다</span>. 우산이 혼자 걷는다. 아니면 우산 아래에 있는 것이 투명한 것인가.</p>
+<p>하나가 당신 쪽으로 방향을 튼다. 멈춘다. 우산이 당신 위에서 펼쳐진다.</p>`,
+  choices:[
+    {text:'🏃 피해서 달린다',show:s=>true,cost:{hp:-5},contam:[],next:'dawn_streets',time:5},
+    {text:'🤝 우산 아래 있는 것에게 인사한다',show:s=>true,cost:{san:-15,cor:10},contam:['umbrella_n'],next:'dawn_streets',time:5,flag:{umbrella_met:true}},
+    {text:'🩺 의료인으로서 상황을 판단한다',show:s=>s.char.job==='nurse',cost:{san:-5},contam:['empathy_1'],next:'dawn_streets',time:5,flag:{hosp_nurse:true}},
+    {text:'🏥 병원에 들어간다',show:s=>s.contam.has('eye_3')||s.contam.has('patient_n'),cost:{hp:20},contam:[],next:'dawn_streets',time:20,flag:{hospital_healed:true}},
+  ]
+},
+
+bridge:{
+  title:'한강 다리',
+  time:'오전 5:00',
+  atm:'다리 위. 긴 목의 여자. 새벽의 전화 본 조우.',
+  text:`<p>다리 위. 강바람이 강하다. 가로등 불빛에 강물이 검게 빛난다.</p>
+<p>다리 중간에 <span class="hr">긴 목의 여자</span>가 서있다. 난간에 기대어. 목이 — 지나치게 길다. 고개를 돌리면 목이 먼저 돌아온다. 그녀가 당신을 봤다.</p>
+<p>그때 핸드폰이 울린다. 죽은 사람의 번호. <span class="hr">세 번째 전화</span>다.</p>`,
+  choices:[
+    {text:'📱 전화를 받는다',show:s=>true,cost:{san:-15},contam:['phone_voice'],next:'bridge2',time:5,flag:{bridge_call:true}},
+    {text:'📱 전화를 끊는다',show:s=>true,cost:{san:-5},contam:[],next:'bridge2',time:2},
+    {text:'🦒 긴 목의 여자에게 말을 건다',show:s=>true,cost:{san:-20,cor:10},contam:['neck_1'],next:'bridge2',time:8,flag:{neck_met:true}},
+    {text:'🌊 강 아래를 보지 않고 빠르게 건넌다',show:s=>true,cost:{hp:-8},contam:[],next:'dawn_streets',time:10},
+  ]
+},
+
+bridge2:{
+  title:'다리 건넌 후',
+  time:'오전 5:15',
+  atm:'',
+  onEnter:s=>{
+    const el=document.getElementById('stx');
+    let txt='';
+    if(s.flags.bridge_call){
+      txt=`<p>전화를 받았다. "<span class="hr">이제 알아야 할 때야</span>." 그 목소리가 말했다. 그리고 뭔가를 말했다 — 이 모든 것이 왜 일어나는지. 당신이 이곳에 왜 있는지. 하지만 말이 끝나기 전에 전화가 끊겼다.</p><p>반만 들었다. 나머지 반을 알려면 마지막 전화를 기다려야 한다.</p>`;
+      s.flags.half_truth=true;
+    } else {
+      txt=`<p>다리를 건넜다. 돌아보지 않았다. 긴 목의 여자가 아직 거기 있는지 모른다.</p>`;
+    }
+    el.innerHTML=txt+`<p>동이 트기 시작한다. 하늘이 <span class="hl">짙은 남색</span>으로 변한다. 새벽 5시 15분. 회사까지 이제 <span class="hl">30분</span>이면 된다.</p>`;
+  },
+  choices:[
+    {text:'🌅 새벽 거리로 나간다',show:s=>true,cost:{},contam:[],next:'dawn_streets',time:3},
+  ]
+},
+
+/* ── ACT 3: 새벽 ── */
+dawn_streets:{
+  title:'새벽 거리',
+  time:'오전 5:20',
+  atm:'동이 튼다. 하지만 완전히 안전해진 건 아니다.',
+  text:`<p>하늘이 밝아오기 시작한다. 도시가 조금씩 <span class="hl">정상화</span>된다. 신호등이 다시 제대로 작동한다. 차가 한두 대 지나간다.</p>
+<p>하지만 당신은 알고 있다 — 완전히 안전해진 건 아니다. 오염이 남아있다. 타락이 남아있다. 그것들은 동이 트는 것과 상관없이 당신 안에 있다.</p>
+<p>회사 건물이 <span class="hl">보인다</span>. 저기다.</p>`,
+  onEnter:s=>{
+    // Apply time pressure — if heavily contaminated, extra encounter
+    if([...s.contam].filter(c=>c.startsWith('cor_')).length>=2){
+      s.pendingEvent='corruption_surge';
+    }
+  },
+  choices:[
+    {text:'🏢 회사로 직행한다',show:s=>true,cost:{},contam:[],next:'approach_work',time:15},
+    {text:'☕ 근처 카페에서 잠깐 쉰다',show:s=>true,cost:{hp:10,san:5},contam:[],next:'approach_work',time:20,
+     betray:.15,btText:'카페 창문 속 반영이 당신과 다른 표정을 짓고 있었다.',btCost:{san:-10},btContam:['mirror_other']},
+    {text:'📞 119에 신고한다',show:s=>s.char.job==='police',cost:{},contam:[],next:'approach_work',time:10,flag:{called_police:true}},
+  ]
+},
+
+approach_work:{
+  title:'회사 건물 앞',
+  time:'오전 6:00',
+  atm:'핵심 괴담 3번: 새벽의 전화. 마지막.',
+  text:`<p>회사 건물 앞에 섰다. 아직 이른 시간이라 사람이 없다. 자동문이 <span class="hl">열린다</span>. 정상이다.</p>
+<p>그때 핸드폰이 울린다. <span class="hr">네 번째 전화</span>. 죽은 사람의 번호. 이것이 마지막 전화다. 받으면 — 무언가가 끝나거나, 시작된다.</p>`,
+  choices:[
+    {text:'📱 마지막 전화를 받는다',show:s=>true,cost:{san:-20},contam:[],next:'approach_work2',time:5,flag:{last_call:true}},
+    {text:'📵 전화를 끊고 회사에 들어간다',show:s=>true,cost:{san:-5},contam:[],next:'work_entrance',time:3},
+    {text:'📱 스피커폰으로 받는다',show:s=>s.flags.half_truth,cost:{san:-10},contam:[],next:'approach_work2',time:5,flag:{last_call:true,truth_known:true}},
+  ]
+},
+
+approach_work2:{
+  title:'마지막 전화',
+  time:'오전 6:05',
+  atm:'진실을 알 수도 있다.',
+  onEnter:s=>{
+    const el=document.getElementById('stx');
+    let txt='';
+    if(s.flags.truth_known){
+      txt=`<p>"<span class="hr">기억해</span>." 목소리가 말한다. "이것은 반복된다. 매일 밤. 당신이 기억하지 못할 뿐이야. 오늘 밤만 특별한 게 아니야."</p><p>"하지만 오늘은 — 당신이 <span class="hl">선택할 수 있어</span>. 오염을 들고 들어가거나. 끊어내거나. 아니면 — 완전히 다른 무언가가 되거나."</p><p>전화가 끊겼다. <span class="ul">진실을 알았다.</span></p>`;
+      s.flags.truth_full=true;
+    } else if(s.flags.phone_answered||s.flags.bridge_call){
+      txt=`<p>"<span class="hr">거의 다 왔어</span>." 목소리가 말한다. 이제 그 목소리가 누구인지 알 것 같다. 내가 알던 사람이다. 그런데 왜 이 번호에서? "조심해. 엘리베이터."</p><p>전화가 끊겼다. 경고를 들었다.</p>`;
+      s.flags.elev_warned=true;
+    } else {
+      txt=`<p>"<span class="hr">...</span>" 아무 말도 없다. 숨소리만. 그리고 천천히 뭔가가 전해진다. 공포가 아닌 — <span class="hl">슬픔</span>이.</p><p>전화가 끊겼다. 무슨 의미인지 모르겠다.</p>`;
+    }
+    el.innerHTML=txt;
+  },
+  choices:[
+    {text:'🏢 회사에 들어간다',show:s=>true,cost:{},contam:[],next:'work_entrance',time:3},
+  ]
+},
+
+work_entrance:{
+  title:'회사 입구',
+  time:'오전 6:10',
+  atm:'안에 들어왔다.',
+  text:`<p>회사 로비에 들어섰다. 경비원이 있다. 멀쩡하게. 고개를 들고 당신을 보며 "안녕하세요"라고 한다.</p>
+<p>정상이다. 아니, 너무 정상이다. 조명도, 공기도, 온도도 모두 정상이다. 하지만 당신 안에 남아있는 것들 — 오염, 타락, 기억 — 그것들은 정상이 아니다.</p>
+<p>엘리베이터가 보인다. 올라가야 한다.</p>`,
+  choices:[
+    {text:'🛗 엘리베이터를 탄다',show:s=>true,cost:{},contam:[],next:'work_elevator',time:3},
+    {text:'🚶 계단으로 올라간다',show:s=>true,cost:{hp:-5},contam:[],next:'work_floor',time:10},
+    {text:'🔮 오염을 정화하는 주문을 시도한다',show:s=>s.char.job==='shaman'&&s.contam.size>0,cost:{san:-20},contam:[],next:'work_elevator',time:10,flag:{shaman_purge:true}},
+  ]
+},
+
+work_elevator:{
+  title:'회사 엘리베이터',
+  time:'오전 6:15',
+  atm:'핵심 괴담 1&2 최종. 거울과 엘리베이터.',
+  text:`<p>엘리베이터를 탔다. 문이 닫혔다. 층수 버튼을 눌렀다.</p>
+<p>엘리베이터 거울 패널에 당신의 반영이 보인다. 거울 속 당신이 — <span class="hr">먼저 버튼을 눌렀다</span>. 당신보다 0.3초 먼저.</p>
+<p>엘리베이터가 멈춘다. 당신이 선택한 층이 아니다. <span class="hr">B13</span>.</p>`,
+  choices:[
+    {text:'🚪 문이 열려도 나가지 않는다',show:s=>true,cost:{san:-20},contam:[],next:'work_floor',time:8,
+     betray:.3,btText:'문이 열렸다. 거울 속 당신이 문 쪽으로 걸어나갔다. 당신은 남았다. 그리고 문이 닫혔다.',btCost:{san:-15},btContam:['self_2','mirror_merge']},
+    {text:'🪞 거울 속 자아와 대화한다',show:s=>s.flags.mirror_watched||s.flags.mirror_talked||s.contam.has('mirror_other'),cost:{san:-20,cor:10},contam:['self_2'],next:'work_floor',time:10,flag:{mirror_talked_final:true}},
+    {text:'💪 눈을 감고 자신을 붙잡는다',show:s=>s.contam.has('will_3')||s.stats.san>60,cost:{san:-10},contam:[],next:'work_floor',time:5},
+    {text:'🔮 주문으로 거울 자아를 봉인한다',show:s=>s.char.job==='shaman'||s.contam.has('mouth_3'),cost:{san:-20},contam:[],next:'work_floor',time:8,flag:{mirror_sealed:true}},
+  ]
+},
+
+work_floor:{
+  title:'사무실',
+  time:'오전 7:00',
+  atm:'도착했다. 이제 어떻게 끝낼 것인가.',
+  text:`<p>사무실에 도착했다. 조용하다. 아직 동료들이 없다. 당신 자리가 있다. 컴퓨터가 있다.</p>
+<p>창문 밖으로 도시가 보인다. 아침 햇살이 들어온다. <span class="hl">아름답다</span>고 생각했다가 — 이 생각이 진짜 내 생각인지 의심한다.</p>
+<p>동료들이 하나둘 들어오기 시작한다. "일찍 왔네요." 말을 건다. 정상적인 사람들처럼. 하지만 당신은 이제 알고 있다 — 이것이 진짜 현실인가, 아니면 또 다른 층인가.</p>`,
+  choices:[
+    {text:'💼 자리에 앉아 일을 시작한다',show:s=>true,cost:{},contam:[],next:'ending_dispatch',time:5},
+    {text:'🚪 도망친다. 회사를 나간다',show:s=>true,cost:{},contam:[],next:'ending_dispatch2',time:2},
+    {text:'📢 모든 것을 동료들에게 말한다',show:s=>true,cost:{san:-10},contam:[],next:'ending_dispatch',time:10,flag:{told_all:true}},
+  ]
+},
+
+ending_dispatch:{
+  title:'',time:'',atm:'',text:'',
+  onEnter:s=>{ setTimeout(()=>determineEnding(s),100); },
+  choices:[]
+},
+
+ending_dispatch2:{
+  title:'',time:'',atm:'',text:'',
+  onEnter:s=>{ s.flags.fled=true; setTimeout(()=>determineEnding(s),100); },
+  choices:[]
+},
+
+};
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+let G = {
+  char:{ name:'', gender:'', job:'', look:'' },
+  stats:{ hp:100, san:100, cor:0, lk:50, ada:50 },
+  contam: new Set(),
+  flags:{},
+  scene:'',
+  time:127,
+  round:0,
+};
+
+// ═══════════════════════════════════════════════
+//  ENGINE
+// ═══════════════════════════════════════════════
+function goScene(id){
+  const sc = SCENES[id];
+  if(!sc){ console.warn('Scene not found:',id); return; }
+  G.scene = id;
+  G.round++;
+  document.getElementById('rtx').textContent='';
+  renderStatus();
+  renderContam();
+  document.getElementById('s-time').textContent = sc.time || formatTime(G.time);
+  document.getElementById('s-title').textContent = sc.title;
+  document.getElementById('s-atm').textContent = sc.atm || '';
+  if(sc.text) document.getElementById('stx').innerHTML = sc.text;
+  if(sc.onEnter) sc.onEnter(G);
+  if(G.stats.hp <= 0){ triggerEnding('dead'); return; }
+  if(G.stats.san <= 0){ triggerEnding('insane'); return; }
+  if(G.stats.cor >= 100){ triggerEnding('legend'); return; }
+  if(sc.minigame){ runMinigame(sc.minigame); return; }
+  renderChoices(sc.choices);
+  document.getElementById('sp').scrollTop=0;
+}
+
+function renderChoices(choices){
+  const ca = document.getElementById('ca');
+  ca.innerHTML='';
+  (choices||[]).forEach(c=>{
+    if(c.show && !c.show(G)) return;
+    const btn = document.createElement('button');
+    btn.className = 'cb' + (c.cls?' '+c.cls:'');
+    const isDisabled = c.req && !c.req(G);
+    btn.disabled = isDisabled;
+    let costStr='';
+    if(c.cost){
+      const parts=[];
+      if(c.cost.hp) parts.push((c.cost.hp>0?'HP+':'HP')+c.cost.hp);
+      if(c.cost.san) parts.push((c.cost.san>0?'이성+':'이성')+c.cost.san);
+      if(c.cost.cor) parts.push('타락+'+(c.cost.cor||0));
+      costStr=parts.join(' ');
+    }
+    btn.innerHTML=`<span>${c.icon||''}${c.text}</span>`
+      +(c.hint?`<span class="ch">${c.hint}</span>`:'')
+      +(costStr?`<span class="cc">${costStr}</span>`:'');
+    btn.onclick=()=>applyChoice(c);
+    ca.appendChild(btn);
+  });
+}
+
+function applyChoice(c){
+  document.querySelectorAll('#ca .cb').forEach(b=>b.disabled=true);
+  let betrayed = false;
+  if(c.betray){
+    const finalChance = c.betray * (1 - G.stats.lk/200);
+    if(Math.random() < finalChance) betrayed = true;
+  }
+  if(c.cost){
+    if(c.cost.hp) G.stats.hp = clamp(G.stats.hp + c.cost.hp, 0, 130);
+    if(c.cost.san) G.stats.san = clamp(G.stats.san + c.cost.san, 0, 130);
+    if(c.cost.cor) G.stats.cor = clamp(G.stats.cor + c.cost.cor, 0, 100);
+  }
+  if(betrayed){
+    if(c.btCost){
+      if(c.btCost.hp) G.stats.hp = clamp(G.stats.hp + c.btCost.hp, 0, 130);
+      if(c.btCost.san) G.stats.san = clamp(G.stats.san + c.btCost.san, 0, 130);
+      if(c.btCost.cor) G.stats.cor = clamp((G.stats.cor||0)+(c.btCost.cor||0), 0, 100);
+    }
+    if(c.btContam) c.btContam.forEach(ct=>G.contam.add(ct));
+  }
+  if(c.contam) c.contam.forEach(ct=>G.contam.add(ct));
+  if(G.contam.has('heart_3')&&!G.flags.heart3_applied){ G.stats.hp=clamp(G.stats.hp+20,0,130); G.flags.heart3_applied=true; }
+  if(c.flag) Object.assign(G.flags, c.flag);
+  if(c.time) G.time += c.time;
+  renderStatus(); renderContam();
+  if(betrayed && c.btText){
+    document.getElementById('rtx').innerHTML=`<span style="color:var(--red)">...예상과 달리,</span> ${c.btText}`;
+  }
+  if(G.stats.hp<=0){ setTimeout(()=>triggerEnding('dead'),800); return; }
+  if(G.stats.san<=0){ setTimeout(()=>triggerEnding('insane'),800); return; }
+  if(G.stats.cor>=100){ setTimeout(()=>triggerEnding('legend'),800); return; }
+  const nextId = betrayed && c.btNext ? c.btNext : (typeof c.next==='function'?c.next(G):c.next);
+  setTimeout(()=>goScene(nextId), betrayed?1200:400);
+}
+
+function clamp(v,mn,mx){ return Math.max(mn,Math.min(mx,v)); }
+function formatTime(m){
+  const h=Math.floor(m/60)%24, mn=m%60;
+  const ampm=h<12?'오전':'오후';
+  const hh=h===0?12:h>12?h-12:h;
+  return `${ampm} ${hh}:${mn.toString().padStart(2,'0')}`;
+}
+
+function renderStatus(){
+  const hp=Math.min(100,G.stats.hp), san=Math.min(100,G.stats.san);
+  document.getElementById('b-hp').style.width=hp+'%';
+  document.getElementById('v-hp').textContent=Math.round(hp);
+  document.getElementById('b-sn').style.width=san+'%';
+  document.getElementById('v-sn').textContent=Math.round(san);
+  document.getElementById('b-cr').style.width=G.stats.cor+'%';
+  document.getElementById('v-cr').textContent=Math.round(G.stats.cor);
+  document.getElementById('td').textContent=formatTime(G.time);
+}
+
+function renderContam(){
+  const cl=document.getElementById('c-list');
+  const nc=document.getElementById('nc');
+  const items=[...G.contam].filter(id=>CD[id]);
+  if(items.length===0){nc.style.display='block';cl.querySelectorAll('.ct2').forEach(e=>e.remove());return;}
+  nc.style.display='none';
+  cl.querySelectorAll('.ct2').forEach(e=>e.remove());
+  items.slice(-30).forEach(id=>{
+    const d=CD[id];
+    const div=document.createElement('div');
+    div.className=`ct2 ${d.t}`;
+    div.title=d.d;
+    div.innerHTML=`<span class="ci">${d.i}</span><div><span class="cn">${d.n}</span><span class="cd">${d.d.slice(0,28)}...</span></div>`;
+    cl.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  MINI-GAMES
+// ═══════════════════════════════════════════════
+let mgTimer=null;
+function showMG(title,desc){
+  document.getElementById('mgt').textContent=title;
+  document.getElementById('mgd').textContent=desc;
+  document.getElementById('mgr').textContent='';
+  document.getElementById('mgr').className='';
+  document.getElementById('mgc').innerHTML='';
+  document.getElementById('mgtb').style.width='100%';
+  document.getElementById('mgo').classList.add('active');
+}
+function hideMG(){ document.getElementById('mgo').classList.remove('active'); }
+function setMGResult(ok,msg){ const el=document.getElementById('mgr'); el.textContent=msg; el.className=ok?'ok':'no'; }
+function startMGTimer(sec,onEnd){
+  let rem=sec;
+  const bar=document.getElementById('mgtb');
+  bar.style.width='100%';
+  mgTimer=setInterval(()=>{ rem-=0.1; bar.style.width=Math.max(0,rem/sec*100)+'%'; if(rem<=0){clearInterval(mgTimer);onEnd();} },100);
+}
+function stopMGTimer(){ clearInterval(mgTimer); }
+function runMinigame(type){
+  if(type==='redmask') mgRedmask();
+  else if(type==='elevator') mgElevator();
+  else if(type==='counting') mgCounting();
+  else if(type==='mirror'||type==='mirror_game') mgMirror();
+}
+
+// 빨간 마스크
+let redmaskAnswers=[];
+function mgRedmask(){
+  showMG('빨간 마스크','그녀가 묻는다. 2초 안에 대답하세요.');
+  redmaskAnswers=[];
+  redmaskRound(0);
+}
+function redmaskRound(n){
+  if(n>=3){ mgRedmaskEnd(); return; }
+  document.getElementById('mgd').textContent=`질문 ${n+1}/3 — "예쁘냐?"`;
+  const cc=document.getElementById('mgc');
+  cc.innerHTML='';
+  const choices=[{t:'예쁘다',v:'yes'},{t:'안 예쁘다',v:'no'}];
+  if(G.char.job==='shaman'||G.contam.has('redmask_wound')) choices.push({t:'나도 예뻐',v:'same'});
+  stopMGTimer();
+  const div=document.createElement('div'); div.className='mgq';
+  choices.forEach(ch=>{
+    const b=document.createElement('button'); b.className='mgqb'; b.textContent=ch.t;
+    b.onclick=()=>{ stopMGTimer(); redmaskAnswers.push(ch.v); setMGResult(true,'...'); setTimeout(()=>redmaskRound(n+1),600); };
+    div.appendChild(b);
+  });
+  cc.appendChild(div);
+  startMGTimer(2,()=>{ redmaskAnswers.push('timeout'); setMGResult(false,'너무 늦었다.'); setTimeout(()=>redmaskRound(n+1),700); });
+}
+function mgRedmaskEnd(){
+  hideMG();
+  const ans=redmaskAnswers;
+  if(ans[0]===ans[1]&&ans[1]===ans[2]){ G.stats.san-=20; G.stats.hp-=10; G.contam.add('redmask_wound'); }
+  else if(ans.includes('same')){ G.stats.cor+=15; G.contam.add('redmask_obs'); }
+  else if(ans.includes('timeout')){ G.stats.hp-=15; G.contam.add('redmask_wound'); }
+  else { G.stats.san-=10; G.contam.add('redmask_obs'); }
+  G.stats.hp=clamp(G.stats.hp,0,130); G.stats.san=clamp(G.stats.san,0,130);
+  renderStatus(); renderContam();
+  goScene('alley_end');
+}
+
+// 엘리베이터
+let elevSeq=[], elevInput=[];
+function mgElevator(){
+  showMG('심연의 엘리베이터','버튼이 깜빡이는 순서를 기억하고 그대로 누르세요.');
+  const floors=['B13','0','∞','B7','13','?'];
+  elevSeq=[]; elevInput=[];
+  const len=G.stats.ada>60?3:4;
+  while(elevSeq.length<len) elevSeq.push(floors[Math.floor(Math.random()*floors.length)]);
+  const cc=document.getElementById('mgc'); cc.innerHTML='';
+  const grid=document.createElement('div'); grid.className='mgs';
+  floors.forEach(f=>{
+    const btn=document.createElement('button'); btn.className='mgc2'; btn.textContent=f; btn.dataset.f=f;
+    btn.onclick=()=>elevPress(btn,f);
+    grid.appendChild(btn);
+  });
+  cc.appendChild(grid);
+  const info=document.createElement('div');
+  info.id='elev-info'; info.style.cssText='margin:10px 0;font-size:.85rem;color:var(--dim);';
+  info.textContent='순서를 보여드립니다...';
+  cc.appendChild(info);
+  setTimeout(()=>elevShowSeq(0,grid,info),800);
+}
+function elevShowSeq(i,grid,info){
+  if(i>=elevSeq.length){ info.textContent='같은 순서로 누르세요.'; return; }
+  const btns=[...grid.querySelectorAll('.mgc2')];
+  const btn=btns.find(b=>b.dataset.f===elevSeq[i]);
+  if(btn){ btn.classList.add('lit'); setTimeout(()=>{ btn.classList.remove('lit'); setTimeout(()=>elevShowSeq(i+1,grid,info),300); },500); }
+  else setTimeout(()=>elevShowSeq(i+1,grid,info),400);
+}
+function elevPress(btn,f){
+  elevInput.push(f);
+  const ok=f===elevSeq[elevInput.length-1];
+  btn.classList.add(ok?'ok':'no');
+  setTimeout(()=>btn.classList.remove('ok','no'),400);
+  if(!ok||elevInput.length>=elevSeq.length) setTimeout(mgElevatorEnd,600);
+}
+function mgElevatorEnd(){
+  hideMG();
+  const correct=elevInput.length===elevSeq.length&&elevInput.every((v,i)=>v===elevSeq[i]);
+  if(correct){ G.stats.san-=5; G.contam.add('elev_floor'); }
+  else { G.stats.hp-=20; G.stats.san-=15; G.contam.add('elev_pull'); G.contam.add('elev_pass'); }
+  G.stats.hp=clamp(G.stats.hp,0,130); G.stats.san=clamp(G.stats.san,0,130);
+  renderStatus(); renderContam();
+  goScene('apartment_elev2');
+}
+
+// 숫자 세는 아이
+let countHits=0, countMiss2=0, countBeatTimer2=null;
+function mgCounting(){
+  showMG('숫자 세는 아이','"하나... 둘... 셋..." 아이의 박자에 맞춰 탭하세요.');
+  countHits=0; countMiss2=0;
+  const cc=document.getElementById('mgc');
+  cc.innerHTML=`<div id="cnt-num" style="font-size:3.5rem;font-weight:900;color:var(--acc);min-height:80px;line-height:80px;text-align:center;"></div>
+<button class="mgtpb" id="cnt-btn" style="margin-top:8px;">탭!</button>`;
+  document.getElementById('cnt-btn').onclick=()=>{
+    const bt=window._cbt||0, now=Date.now(), diff=Math.abs(now-bt);
+    if(diff<400){ countHits++; setMGResult(true,'✓ 맞췄다'); }
+    else { countMiss2++; setMGResult(false,'박자가 맞지 않는다...'); }
+  };
+  countBeat2(0);
+}
+const beatNames=['하나','둘','셋','넷','다섯'];
+function countBeat2(i){
+  if(i>=5){ setTimeout(mgCountEnd,500); return; }
+  const el=document.getElementById('cnt-num');
+  if(el) el.textContent=beatNames[i];
+  window._cbt=Date.now();
+  countBeatTimer2=setTimeout(()=>countBeat2(i+1), 1800-i*80);
+}
+function mgCountEnd(){
+  clearTimeout(countBeatTimer2); hideMG();
+  if(countHits>=3){ G.stats.san+=5; G.contam.add('count_comp'); }
+  else { G.stats.san-=20; G.stats.hp-=10; G.contam.add('count_comp'); G.contam.add('three_c'); }
+  G.stats.hp=clamp(G.stats.hp,0,130); G.stats.san=clamp(G.stats.san,0,130);
+  renderStatus(); renderContam();
+  goScene('park_fox');
+}
+
+// 거울 게임
+const mDirs=['↑','↓','←','→'], mOpp={'↑':'↓','↓':'↑','←':'→','→':'←'};
+let mBad=0;
+function mgMirror(){
+  showMG('거울 속의 나','거울 속 자아가 방향을 보인다. 반대 방향을 누르세요!');
+  mBad=0; mirrorRound(0);
+}
+function mirrorRound(n){
+  if(n>=5){ mgMirrorEnd(); return; }
+  const dir=mDirs[Math.floor(Math.random()*4)], opp=mOpp[dir];
+  document.getElementById('mgd').textContent=`라운드 ${n+1}/5 — 거울 속 자아: ${dir}`;
+  const cc=document.getElementById('mgc'); cc.innerHTML='';
+  const q=document.createElement('div'); q.className='mgq';
+  mDirs.forEach(d=>{
+    const b=document.createElement('button'); b.className='mgqb'; b.textContent=d;
+    b.onclick=()=>{
+      stopMGTimer();
+      const ok=d===opp;
+      setMGResult(ok,ok?'정확해!':'틀렸다...');
+      if(!ok){ mBad++; G.stats.san-=8; G.contam.add('mirror_other'); }
+      setTimeout(()=>mirrorRound(n+1),600);
+    };
+    q.appendChild(b);
+  });
+  cc.appendChild(q);
+  startMGTimer(Math.max(1.5,3-n*0.3),()=>{ mBad++; G.stats.san-=12; G.contam.add('mirror_merge'); setMGResult(false,'시간 초과...'); setTimeout(()=>mirrorRound(n+1),700); });
+}
+function mgMirrorEnd(){
+  hideMG();
+  if(mBad===0){ G.flags.mirror_won=true; G.contam.add('self_3'); }
+  else if(mBad>=3){ G.flags.mirror_lost=true; G.contam.add('self_2'); G.contam.add('mirror_merge'); }
+  G.stats.san=clamp(G.stats.san,0,130);
+  renderStatus(); renderContam();
+  goScene('subway_exit');
+}
+
+// ═══════════════════════════════════════════════
+//  ENDINGS
+// ═══════════════════════════════════════════════
+function determineEnding(s){
+  const cor=s.stats.cor, san=s.stats.san;
+  const contamCount=[...s.contam].length;
+  const unlocks=[...s.contam].filter(c=>CD[c]&&CD[c].t==='unlock').length;
+  let endId;
+  if(s.flags.fled) endId='disappeared';
+  else if(cor>=80) endId='corrupted';
+  else if(s.flags.truth_full&&san>=40&&cor<30) endId='liberated';
+  else if(unlocks>=5&&san>=30) endId='returned';
+  else if(contamCount>=15||san<20) endId='contaminated';
+  else endId='normal';
+  triggerEnding(endId);
+}
+const ENDINGS={
+  normal:{badge:'💼',title:'출근 완료',sub:'괴담에 떨어져도 출근을 해야 하는구나.',color:'#22c55e',
+    text:'오전 9시 정각, 자리에 앉았다. 회의가 시작됐다. 상사가 자료를 설명하고 있다. 아무도 어젯밤의 당신을 모른다. 아마 내일도 이런 날이 올 것이다. 어쩌면 매일 밤.'},
+  contaminated:{badge:'🫀',title:'오염된 출근',sub:'도착했다. 하지만 이미 달라졌다.',color:'#7c3aed',
+    text:'자리에 앉았다. 컴퓨터 화면에 자신의 반영이 보인다. 눈을 찡그린다. 화면 속 반영은 찡그리지 않는다. 동료들이 자꾸 흘끔 본다. 무엇이 달라졌는지 그들도 모르는 것 같다. 당신도 모른다.'},
+  corrupted:{badge:'🌑',title:'타락한 출근',sub:'이미 그 쪽 존재가 되었다.',color:'#db2777',
+    text:'회사에 앉아있다. 하지만 당신이 보는 세계는 다른 사람들의 것과 다르다. 동료들이 웃고 있는데 — 그들의 그림자가 울고 있다. 당신은 양쪽 모두 보인다. 어느 쪽이 진짜인지 더 이상 신경 쓰지 않는다.'},
+  disappeared:{badge:'👻',title:'실종',sub:'출근하지 못했다.',color:'#ef4444',
+    text:'회사에서 당신을 기다렸다. 아무도 오지 않았다. 사무실 복도 끝에서 가끔 발소리가 들린다고 한다. 이름을 부르면 대답한다고 한다. 하지만 거기엔 아무것도 없다. 당신은 새로운 도시전설이 됐다.'},
+  liberated:{badge:'✨',title:'해방',sub:'진실을 알고 사이클을 끊었다.',color:'#f59e0b',
+    text:'자리에 앉았다. 알고 있다 — 이것이 반복되는 하루라는 것을. 하지만 오늘 처음으로 당신은 기억한다. 다음번엔 더 잘 헤쳐나갈 수 있다. 진짜 탈출은 내일 밤에 일어날 것이다. 아니면 그 다음 밤에.'},
+  legend:{badge:'💀',title:'새로운 괴담',sub:'당신이 도시전설이 됐다.',color:'#dc2626',
+    text:'회사에 도착했지만 — 더 이상 인간으로서 도착한 게 아니다. 동료들이 이상하게 본다. 당신의 그림자가 움직이지 않는다. 당신의 발소리가 없다. 오늘 밤부터 새로운 이야기가 시작된다.'},
+  returned:{badge:'🌅',title:'귀환',sub:'자신을 지키며 돌아왔다. 최고 엔딩.',color:'#60a5fa',
+    text:'도착했다. 오염이 있고, 기억이 있고, 타락도 조금 있다. 하지만 — 당신이다. 완전히 당신이다. 창문 밖 하늘이 밝다. 괴담들이 알고 있다 — 이 사람은 꺾이지 않는다고. 오늘 밤은 좀 더 조용할 것이다.'},
+  dead:{badge:'💀',title:'사망',sub:'회사에 도착하지 못했다.',color:'#ef4444',
+    text:'도시 어딘가에서 아침이 밝았다. 당신의 자리는 비어있다. 상사가 전화를 한다. 받는 사람이 없다. 당신이 마지막으로 있었던 곳에서 — 무언가가 당신의 이름을 기억하고 있다.'},
+  insane:{badge:'🌀',title:'발광',sub:'이성을 잃었다.',color:'#7c3aed',
+    text:'병원에서 눈을 떴다. 의사들이 말한다 — 길바닥에서 발견됐다고. 아무 말도 안 했다고. 당신은 기억한다. 모든 것을. 하지만 말할 수가 없다. 혀가 움직이지 않는다. 그것이 막고 있다.'},
+};
+function triggerEnding(id){
+  const e=ENDINGS[id]||ENDINGS.normal;
+  document.getElementById('sc-game').classList.remove('active');
+  const se=document.getElementById('sc-end');
+  se.classList.add('active');
+  document.getElementById('e-badge').textContent=e.badge;
+  const et=document.getElementById('e-title');
+  et.textContent=e.title; et.style.color=e.color||'var(--acc)';
+  document.getElementById('e-sub').textContent=e.sub;
+  document.getElementById('e-text').textContent=e.text;
+  document.getElementById('e-stats').innerHTML=`
+    <div class="esi"><div class="esl">최종 HP</div><div class="esv" style="color:#f97316">${Math.round(Math.min(100,G.stats.hp))}</div></div>
+    <div class="esi"><div class="esl">최종 이성</div><div class="esv" style="color:#818cf8">${Math.round(Math.min(100,G.stats.san))}</div></div>
+    <div class="esi"><div class="esl">타락도</div><div class="esv" style="color:#db2777">${Math.round(G.stats.cor)}</div></div>
+    <div class="esi"><div class="esl">오염 수</div><div class="esv" style="color:#f59e0b">${G.contam.size}</div></div>
+    <div class="esi"><div class="esl">라운드</div><div class="esv" style="color:#22c55e">${G.round}</div></div>`;
+  const score=Math.round((Math.min(100,G.stats.hp)+Math.min(100,G.stats.san))*(100-G.stats.cor)/100*G.round);
+  const best=parseInt(localStorage.getItem('haunt_best')||'0',10);
+  if(score>best) localStorage.setItem('haunt_best',score);
+}
+
+// ═══════════════════════════════════════════════
+//  CHARACTER CREATION
+// ═══════════════════════════════════════════════
+let sel={gender:null,job:null,look:null};
+function buildGrid(cid,items,key){
+  const g=document.getElementById(cid); g.innerHTML='';
+  items.forEach(item=>{
+    const btn=document.createElement('button'); btn.className='ob';
+    btn.innerHTML=`<span class="oi">${item.icon}</span><span class="on">${item.name}</span><span class="od">${item.desc}</span>`;
+    btn.onclick=()=>{ g.querySelectorAll('.ob').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); sel[key]=item.id; updChar(); };
+    g.appendChild(btn);
+  });
+}
+function updChar(){
+  const name=document.getElementById('inp-name').value.trim();
+  document.getElementById('sbtn').disabled=!(name&&sel.gender&&sel.job&&sel.look);
+  const base={hp:100,san:100,cor:0,lk:50,ada:50};
+  [GENDERS.find(g=>g.id===sel.gender),JOBS.find(j=>j.id===sel.job),LOOKS.find(l=>l.id===sel.look)].filter(Boolean).forEach(x=>{
+    if(x.stats) Object.entries(x.stats).forEach(([k,v])=>base[k]=(base[k]||0)+v);
+  });
+  document.getElementById('stat-prev').innerHTML=`
+    <div class="spi"><div class="sn">HP</div><div class="sv">${clamp(base.hp,0,130)}</div></div>
+    <div class="spi"><div class="sn">이성</div><div class="sv">${clamp(base.san,0,130)}</div></div>
+    <div class="spi"><div class="sn">운</div><div class="sv">${clamp(base.lk,0,130)}</div></div>
+    <div class="spi"><div class="sn">적응</div><div class="sv">${clamp(base.ada,0,130)}</div></div>
+    <div class="spi"><div class="sn">타락</div><div class="sv">0</div></div>`;
+}
+function startGame(){
+  const name=document.getElementById('inp-name').value.trim();
+  if(!name||!sel.gender||!sel.job||!sel.look) return;
+  G.char={name,gender:sel.gender,job:sel.job,look:sel.look};
+  G.stats={hp:100,san:100,cor:0,lk:50,ada:50};
+  [GENDERS.find(g=>g.id===sel.gender),JOBS.find(j=>j.id===sel.job),LOOKS.find(l=>l.id===sel.look)].filter(Boolean).forEach(x=>{
+    if(x.stats) Object.entries(x.stats).forEach(([k,v])=>{G.stats[k]=(G.stats[k]||0)+v;});
+  });
+  Object.keys(G.stats).forEach(k=>G.stats[k]=clamp(G.stats[k]||0,0,130));
+  G.contam=new Set(); G.flags={}; G.time=127; G.round=0;
+  document.getElementById('sc-char').classList.remove('active');
+  document.getElementById('sc-game').classList.add('active');
+  goScene('office_wake');
+}
+function resetGame(){
+  sel={gender:null,job:null,look:null};
+  document.getElementById('sc-end').classList.remove('active');
+  document.getElementById('sc-game').classList.remove('active');
+  document.getElementById('sc-char').classList.add('active');
+  document.getElementById('inp-name').value='';
+  document.querySelectorAll('.ob').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('sbtn').disabled=true;
+  document.getElementById('stat-prev').innerHTML='';
+}
+
+// INIT
+buildGrid('g-gender',GENDERS,'gender');
+buildGrid('g-job',JOBS,'job');
+buildGrid('g-look',LOOKS,'look');
+document.getElementById('sc-char').classList.add('active');
+</script>
+</body>
+</html>

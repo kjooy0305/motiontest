@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>반응속도 테스트</title>
+<style>
+:root{
+  --bg:#080c10;--surf:#0e1318;--surf2:#131920;--bdr:#1a2028;
+  --text:#c8c0b0;--dim:#556070;
+  --green:#34d399;--yellow:#fbbf24;--red:#f87171;--purple:#a78bfa;--blue:#60a5fa;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;user-select:none;}
+
+/* ── 공통 ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.screen.hide{display:none;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+
+/* ═══════ 홈 ═══════ */
+#home{background:var(--bg);padding:16px;overflow-y:auto;}
+.home-inner{width:100%;max-width:460px;display:flex;flex-direction:column;gap:20px;}
+
+.home-title{text-align:center;}
+.home-title h1{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;}
+.home-title p{font-size:12px;color:var(--dim);margin-top:4px;}
+
+/* 미리보기 */
+.preview-box{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:var(--surf);border:1px solid var(--bdr);border-radius:14px;
+  padding:18px 14px;
+}
+.preview-label{font-size:10px;color:var(--dim);letter-spacing:.5px;}
+#preview-ring-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+#preview-ring-wrap svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg);}
+#preview-body{border-radius:50%;background:hsl(120,70%,45%);transition:width .15s,height .15s,background .15s;}
+.preview-time-bar{width:100%;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;}
+#preview-bar{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+
+/* 설정 카드 */
+.settings{display:flex;flex-direction:column;gap:12px;}
+.setting-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;}
+.setting-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.setting-header span{font-size:13px;color:var(--text);}
+.setting-header .val{font-size:13px;font-family:monospace;color:var(--purple);font-weight:600;}
+.slider-row{display:flex;align-items:center;gap:8px;}
+.sl-hint{font-size:10px;color:var(--dim);white-space:nowrap;}
+input[type=range]{
+  flex:1;height:6px;accent-color:var(--purple);
+  -webkit-appearance:none;appearance:none;
+  background:var(--bdr);border-radius:3px;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--purple);cursor:pointer;
+}
+.round-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.rbtn{
+  padding:6px 14px;border-radius:20px;font-size:12px;
+  border:1px solid var(--bdr);background:transparent;color:var(--dim);transition:.15s;
+}
+.rbtn.on{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1);}
+.rbtn:hover{color:var(--text);}
+
+.start-btn{
+  width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;
+  background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;
+  transition:transform .1s,box-shadow .1s;
+  box-shadow:0 4px 20px rgba(167,139,250,.3);
+}
+.start-btn:active{transform:scale(.97);}
+
+/* ═══════ 게임 ═══════ */
+#game{background:var(--bg);}
+
+#stats-bar{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-around;
+  background:var(--surf);border-bottom:1px solid var(--bdr);
+  padding:8px 12px;z-index:10;flex-shrink:0;
+}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat span{font-size:14px;font-weight:700;font-family:monospace;color:var(--text);}
+.stat label{font-size:9px;color:var(--dim);letter-spacing:.3px;}
+.stat.hit span{color:var(--green);}
+.stat.miss span{color:var(--red);}
+.stat.last span{color:var(--blue);}
+
+#game-area{
+  position:absolute;inset:0;top:49px;overflow:hidden;touch-action:none;
+}
+
+/* 카운트다운 오버레이 */
+#cd-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(8,12,16,.7);z-index:20;backdrop-filter:blur(2px);
+}
+#cd-overlay.hide{display:none;}
+#cd-text{
+  font-size:80px;font-weight:900;color:#fff;
+  animation:cdPop .5s ease-out;text-shadow:0 0 40px rgba(167,139,250,.8);
+}
+@keyframes cdPop{from{transform:scale(1.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* 게임 원 */
+.gc{
+  position:absolute;transform:translate(-50%,-50%);
+  cursor:pointer;touch-action:none;
+}
+.gc svg{position:absolute;inset:0;transform:rotate(-90deg);pointer-events:none;}
+.gc-body{
+  position:absolute;inset:6px;border-radius:50%;
+  background:hsl(120,70%,45%);
+  box-shadow:0 0 20px rgba(52,211,153,.4);
+  transition:background .1s;
+  display:flex;align-items:center;justify-content:center;
+}
+.gc-body.urgent{box-shadow:0 0 25px rgba(248,113,113,.5);}
+.gc.pop-in{animation:popIn .18s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:translate(-50%,-50%) scale(0);}to{transform:translate(-50%,-50%) scale(1);}}
+
+/* 히트 파티클 */
+.hit-burst{
+  position:absolute;transform:translate(-50%,-50%);
+  pointer-events:none;z-index:5;
+}
+.hit-burst circle{animation:burstOut .45s ease-out forwards;}
+@keyframes burstOut{to{r:40;opacity:0;}}
+
+/* 미스 깜빡 */
+.gc.miss-flash{animation:missFlash .35s ease-out;}
+@keyframes missFlash{0%,100%{opacity:1;}25%,75%{opacity:0;filter:brightness(3);}}
+
+/* ═══════ 결과 ═══════ */
+#result{background:var(--bg);padding:20px;overflow-y:auto;}
+.result-inner{width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;align-items:center;}
+
+.grade-badge{
+  width:90px;height:90px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:3px solid var(--purple);background:rgba(167,139,250,.1);
+  box-shadow:0 0 30px rgba(167,139,250,.2);
+}
+.grade-badge .grade-emoji{font-size:32px;}
+.grade-badge .grade-lbl{font-size:9px;color:var(--purple);margin-top:2px;letter-spacing:.5px;}
+.result-title{font-size:18px;font-weight:700;color:var(--text);text-align:center;}
+.result-sub{font-size:12px;color:var(--dim);text-align:center;margin-top:-8px;}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.rs{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:12px;
+  padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.rs .rv{font-size:20px;font-weight:700;font-family:monospace;color:var(--text);}
+.rs .rl{font-size:10px;color:var(--dim);}
+.rs.good .rv{color:var(--green);}
+.rs.warn .rv{color:var(--yellow);}
+.rs.bad .rv{color:var(--red);}
+
+.chart-card{
+  width:100%;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px;
+}
+.chart-card h4{font-size:11px;color:var(--dim);margin-bottom:10px;text-align:center;}
+#result-chart{width:100%;display:block;}
+
+.result-btns{display:flex;gap:10px;width:100%;}
+.result-btns button{
+  flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:600;
+  border:1px solid var(--bdr);background:var(--surf2);color:var(--text);transition:.15s;
+}
+.result-btns button:hover{border-color:var(--purple);color:var(--purple);}
+.result-btns button.primary{
+  background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border-color:transparent;
+}
+
+/* 참고 선 */
+.ref-line{font-size:11px;color:var(--dim);text-align:center;}
+.ref-line b{color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- ════ 홈 화면 ════ -->
+<div id="home" class="screen">
+<div class="home-inner">
+
+  <div class="home-title">
+    <h1>⚡ 반응속도 테스트</h1>
+    <p>원이 사라지기 전에 눌러요</p>
+  </div>
+
+  <!-- 미리보기 -->
+  <div class="preview-box">
+    <span class="preview-label">미리보기</span>
+    <div id="preview-ring-wrap">
+      <div id="preview-body"></div>
+      <svg id="preview-svg" viewBox="0 0 100 100"></svg>
+    </div>
+    <div class="preview-time-bar"><div id="preview-bar" style="width:100%"></div></div>
+    <span class="preview-label" id="preview-hint">원 크기 60px · 사라지는 시간 1.5초</span>
+  </div>
+
+  <!-- 설정 -->
+  <div class="settings">
+
+    <div class="setting-card">
+      <div class="setting-header">
+        <span>원 크기</span>
+        <span class="val" id="v-size">60 px</span>
+      </div>
+      <div class="slider-row">
+        <span class="sl-hint">작게</span>
+        <input type="range" id="sl-size" min="30" max="110" value="60" step="5" oninput="onSettings()">
+        <span class="sl-hint">크게</span>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-header">
+        <span>사라지는 시간</span>
+        <span class="val" id="v-time">1.5 초</span>
+      </div>
+      <div class="slider-row">
+        <span class="sl-hint">0.5초</span>
+        <input type="range" id="sl-time" min="5" max="40" value="15" oninput="onSettings()">
+        <span class="sl-hint">4.0초</span>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-header">
+        <span>라운드 수</span>
+        <span class="val" id="v-rounds">15 회</span>
+      </div>
+      <div class="round-btns" id="round-btns">
+        <button class="rbtn" onclick="setRounds(10)">10회</button>
+        <button class="rbtn on" onclick="setRounds(15)">15회</button>
+        <button class="rbtn" onclick="setRounds(20)">20회</button>
+        <button class="rbtn" onclick="setRounds(30)">30회</button>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="start-btn" onclick="startGame()">시작하기</button>
+</div>
+</div>
+
+<!-- ════ 게임 화면 ════ -->
+<div id="game" class="screen hide">
+  <div id="stats-bar">
+    <div class="stat"><span id="st-round">1/15</span><label>라운드</label></div>
+    <div class="stat hit"><span id="st-hit">0</span><label>성공</label></div>
+    <div class="stat miss"><span id="st-miss">0</span><label>실패</label></div>
+    <div class="stat last"><span id="st-last">—</span><label>최근(ms)</label></div>
+    <div class="stat"><span id="st-avg">—</span><label>평균(ms)</label></div>
+  </div>
+  <div id="game-area">
+    <div id="cd-overlay">
+      <span id="cd-text">3</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════ 결과 화면 ════ -->
+<div id="result" class="screen hide">
+<div class="result-inner">
+  <div class="grade-badge">
+    <span class="grade-emoji" id="r-emoji">⚡</span>
+    <span class="grade-lbl" id="r-lbl">빠름</span>
+  </div>
+  <div class="result-title" id="r-title">평균 반응속도</div>
+  <div class="result-sub" id="r-sub">사람의 평균 반응속도는 약 250ms입니다</div>
+
+  <div class="result-grid">
+    <div class="rs good">
+      <span class="rv" id="r-avg">—</span>
+      <span class="rl">평균 반응속도</span>
+    </div>
+    <div class="rs">
+      <span class="rv" id="r-best">—</span>
+      <span class="rl">최고 기록</span>
+    </div>
+    <div class="rs">
+      <span class="rv" id="r-rate">—</span>
+      <span class="rl">성공률</span>
+    </div>
+    <div class="rs warn">
+      <span class="rv" id="r-worst">—</span>
+      <span class="rl">최저 기록</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h4>반응속도 분포 (ms)</h4>
+    <canvas id="result-chart" height="80"></canvas>
+  </div>
+
+  <div class="ref-line">사람 평균 <b>250ms</b> · 프로게이머 <b>150ms</b></div>
+
+  <div class="result-btns">
+    <button onclick="goHome()">설정 변경</button>
+    <button class="primary" onclick="restartGame()">다시 시작</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════
+//  설정 & 상태
+// ══════════════════════════════
+const cfg = { size: 60, time: 1500, rounds: 15 };
+
+const gs = {
+  round: 0,      // 완료 라운드 수
+  hits: 0,
+  misses: 0,
+  times: [],     // ms, 히트만
+  active: false,
+  circleEl: null,
+  circleStart: 0,
+  rafId: null,
+  nextTimer: null,
+  cd: 3,
+  cdTimer: null,
+};
+
+// ══════════════════════════════
+//  홈 화면
+// ══════════════════════════════
+let previewAnimTimer = null;
+
+function onSettings() {
+  cfg.size  = +document.getElementById('sl-size').value;
+  cfg.time  = +document.getElementById('sl-time').value * 100; // step=0.1s units
+
+  document.getElementById('v-size').textContent  = `${cfg.size} px`;
+  document.getElementById('v-time').textContent  = (cfg.time / 1000).toFixed(1) + ' 초';
+
+  updatePreview();
+}
+
+function setRounds(n) {
+  cfg.rounds = n;
+  document.getElementById('v-rounds').textContent = `${n} 회`;
+  document.querySelectorAll('.rbtn').forEach(b => {
+    b.classList.toggle('on', +b.textContent === n);
+  });
+}
+
+function updatePreview() {
+  const sz = cfg.size;
+  const body = document.getElementById('preview-body');
+  const wrap = document.getElementById('preview-ring-wrap');
+  const svgEl = document.getElementById('preview-svg');
+  const bar   = document.getElementById('preview-bar');
+  const hint  = document.getElementById('preview-hint');
+
+  wrap.style.width  = (sz + 12) + 'px';
+  wrap.style.height = (sz + 12) + 'px';
+  body.style.width  = sz + 'px';
+  body.style.height = sz + 'px';
+  body.style.background = 'hsl(120,70%,45%)';
+
+  // Ring
+  const r = 46;
+  const circ = +(2 * Math.PI * r).toFixed(2);
+  svgEl.innerHTML = `
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="#1a2028" stroke-width="6"/>
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="#34d399" stroke-width="6"
+      stroke-dasharray="${circ}" stroke-dashoffset="0" id="pvring" stroke-linecap="round"/>
+  `;
+
+  hint.textContent = `원 크기 ${sz}px · 사라지는 시간 ${(cfg.time/1000).toFixed(1)}초`;
+
+  // 애니메이션
+  clearTimeout(previewAnimTimer);
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.style.background = '#34d399';
+  setTimeout(() => {
+    bar.style.transition = `width ${cfg.time}ms linear`;
+    bar.style.width = '0%';
+  }, 30);
+
+  // ring 애니메이션
+  const pvring = document.getElementById('pvring');
+  if (pvring) {
+    pvring.style.transition = 'none';
+    pvring.style.strokeDashoffset = 0;
+    setTimeout(() => {
+      pvring.style.transition = `stroke-dashoffset ${cfg.time}ms linear, stroke ${cfg.time}ms linear`;
+      pvring.style.strokeDashoffset = circ;
+      pvring.style.stroke = '#f87171';
+    }, 30);
+  }
+
+  previewAnimTimer = setTimeout(updatePreview, cfg.time + 200);
+}
+
+function startGame() {
+  show('game');
+  gs.round = 0; gs.hits = 0; gs.misses = 0; gs.times = []; gs.active = false;
+  updateStatsBar();
+  runCountdown();
+}
+
+function goHome() { cleanupGame(); show('home'); }
+function restartGame() { cleanupGame(); startGame(); }
+
+// ══════════════════════════════
+//  카운트다운
+// ══════════════════════════════
+function runCountdown() {
+  const ov = document.getElementById('cd-overlay');
+  const tx = document.getElementById('cd-text');
+  ov.classList.remove('hide');
+  let n = 3;
+  tx.textContent = n;
+
+  gs.cdTimer = setInterval(() => {
+    n--;
+    if (n > 0) {
+      tx.textContent = n;
+      tx.style.animation = 'none';
+      tx.offsetWidth; // reflow
+      tx.style.animation = 'cdPop .5s ease-out';
+    } else if (n === 0) {
+      tx.textContent = 'GO!';
+      tx.style.color = '#34d399';
+      tx.style.animation = 'none';
+      tx.offsetWidth;
+      tx.style.animation = 'cdPop .4s ease-out';
+    } else {
+      clearInterval(gs.cdTimer);
+      ov.classList.add('hide');
+      tx.style.color = '#fff';
+      gs.active = true;
+      scheduleNext(400);
+    }
+  }, 700);
+}
+
+// ══════════════════════════════
+//  게임 루프
+// ══════════════════════════════
+function scheduleNext(delay) {
+  gs.nextTimer = setTimeout(() => {
+    if (!gs.active) return;
+    spawnCircle();
+  }, delay + Math.random() * 400);
+}
+
+const CIRC = +(2 * Math.PI * 46).toFixed(2);
+
+function spawnCircle() {
+  if (gs.round >= cfg.rounds) { endGame(); return; }
+  clearOldCircle();
+
+  const area  = document.getElementById('game-area');
+  const aW = area.clientWidth, aH = area.clientHeight;
+  const pad = cfg.size / 2 + 16;
+  const cx = pad + Math.random() * Math.max(1, aW - pad * 2);
+  const cy = pad + Math.random() * Math.max(1, aH - pad * 2);
+
+  const el = document.createElement('div');
+  el.className = 'gc pop-in';
+  el.style.cssText = `left:${cx}px;top:${cy}px;width:${cfg.size+12}px;height:${cfg.size+12}px;`;
+  el.innerHTML = `
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#1a2028" stroke-width="7"/>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#34d399" stroke-width="7"
+        stroke-dasharray="${CIRC}" stroke-dashoffset="0" stroke-linecap="round" id="gc-ring"/>
+    </svg>
+    <div class="gc-body" id="gc-body"></div>
+  `;
+  el.addEventListener('pointerdown', onHit, {once: true});
+  area.appendChild(el);
+  gs.circleEl    = el;
+  gs.circleStart = performance.now();
+
+  cancelAnimationFrame(gs.rafId);
+  gs.rafId = requestAnimationFrame(tickCircle);
+}
+
+function tickCircle(now) {
+  if (!gs.circleEl) return;
+  const elapsed  = now - gs.circleStart;
+  const progress = Math.min(1, elapsed / cfg.time);
+  const ring     = document.getElementById('gc-ring');
+  const body     = document.getElementById('gc-body');
+
+  if (ring) {
+    ring.style.strokeDashoffset = CIRC * progress;
+    const hue = 120 * (1 - progress);          // green → red
+    ring.style.stroke = `hsl(${hue},80%,58%)`;
+  }
+  if (body) {
+    const hue = 120 * (1 - progress);
+    body.style.background = `hsl(${hue},70%,42%)`;
+    body.style.boxShadow  = progress > 0.7
+      ? `0 0 24px hsla(${hue},80%,55%,.6)` : `0 0 18px hsla(${hue},70%,50%,.4)`;
+    if (progress > 0.7) body.classList.add('urgent');
+    else body.classList.remove('urgent');
+  }
+
+  if (progress >= 1) {
+    onMiss();
+  } else {
+    gs.rafId = requestAnimationFrame(tickCircle);
+  }
+}
+
+function onHit(e) {
+  e.stopPropagation();
+  if (!gs.active || !gs.circleEl) return;
+  cancelAnimationFrame(gs.rafId);
+
+  const ms = Math.round(performance.now() - gs.circleStart);
+  gs.hits++;
+  gs.times.push(ms);
+  gs.round++;
+
+  // 히트 파티클
+  spawnBurst(e.clientX, e.clientY, ms);
+
+  clearOldCircle();
+  updateStatsBar();
+  scheduleNext(300);
+}
+
+function onMiss() {
+  if (!gs.active || !gs.circleEl) return;
+  cancelAnimationFrame(gs.rafId);
+  gs.misses++;
+  gs.round++;
+
+  if (gs.circleEl) gs.circleEl.classList.add('miss-flash');
+  setTimeout(() => {
+    clearOldCircle();
+    updateStatsBar();
+    if (gs.round < cfg.rounds) scheduleNext(300);
+    else setTimeout(endGame, 100);
+  }, 380);
+}
+
+function clearOldCircle() {
+  if (gs.circleEl) { gs.circleEl.remove(); gs.circleEl = null; }
+}
+
+function cleanupGame() {
+  cancelAnimationFrame(gs.rafId);
+  clearTimeout(gs.nextTimer);
+  clearInterval(gs.cdTimer);
+  gs.active = false;
+  clearOldCircle();
+  // clean bursts
+  document.querySelectorAll('.hit-burst').forEach(e => e.remove());
+}
+
+// ══════════════════════════════
+//  히트 파티클
+// ══════════════════════════════
+function spawnBurst(cx, cy, ms) {
+  const area = document.getElementById('game-area');
+  const rect = area.getBoundingClientRect();
+  const x = cx - rect.left, y = cy - rect.top;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.classList.add('hit-burst');
+  svg.style.cssText = `left:${x}px;top:${y}px;width:90px;height:90px;overflow:visible;`;
+
+  const N = 8;
+  for (let i = 0; i < N; i++) {
+    const angle = (i / N) * Math.PI * 2;
+    const dist  = 28 + Math.random() * 16;
+    const tx = Math.cos(angle) * dist, ty = Math.sin(angle) * dist;
+    const hue = 120 - Math.random() * 30;
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', tx);
+    c.setAttribute('cy', ty);
+    c.setAttribute('r', 4 + Math.random() * 3);
+    c.setAttribute('fill', `hsl(${hue},75%,60%)`);
+    c.setAttribute('opacity','1');
+    c.style.animation = `burstOut ${300 + Math.random() * 200}ms ease-out forwards`;
+    svg.appendChild(c);
+  }
+
+  // ms 표시
+  const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x','0'); txt.setAttribute('y','-20');
+  txt.setAttribute('fill','#c8c0b0'); txt.setAttribute('font-size','12');
+  txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-family','monospace');
+  txt.textContent = `${ms}ms`;
+  txt.style.animation = 'burstOut .6s ease-out forwards';
+  svg.appendChild(txt);
+
+  area.appendChild(svg);
+  setTimeout(() => svg.remove(), 700);
+}
+
+// ══════════════════════════════
+//  통계 바
+// ══════════════════════════════
+function updateStatsBar() {
+  const disp = gs.round + 1 <= cfg.rounds ? gs.round + 1 : cfg.rounds;
+  document.getElementById('st-round').textContent = `${Math.min(disp, cfg.rounds)}/${cfg.rounds}`;
+  document.getElementById('st-hit').textContent   = gs.hits;
+  document.getElementById('st-miss').textContent  = gs.misses;
+  const last = gs.times.length ? gs.times[gs.times.length - 1] : null;
+  document.getElementById('st-last').textContent  = last ? `${last}` : '—';
+  const avg = gs.times.length ? Math.round(gs.times.reduce((a,b)=>a+b,0)/gs.times.length) : null;
+  document.getElementById('st-avg').textContent   = avg ? `${avg}` : '—';
+}
+
+// ══════════════════════════════
+//  게임 종료 & 결과
+// ══════════════════════════════
+function endGame() {
+  cleanupGame();
+  buildResult();
+  show('result');
+}
+
+const GRADES = [
+  {max:150,  emoji:'🏆', lbl:'프로게이머', title:'역대급 반응속도!'},
+  {max:200,  emoji:'⚡', lbl:'매우 빠름',  title:'굉장히 빠른 반응속도!'},
+  {max:250,  emoji:'✨', lbl:'빠름',       title:'평균 이상의 반응속도!'},
+  {max:300,  emoji:'✅', lbl:'보통 이상',  title:'좋은 반응속도입니다.'},
+  {max:400,  emoji:'👍', lbl:'평균',       title:'평균적인 반응속도입니다.'},
+  {max:600,  emoji:'🐌', lbl:'느린 편',    title:'조금 느린 편이에요.'},
+  {max:Infinity,emoji:'💤',lbl:'매우 느림',title:'더 연습해 봐요!'},
+];
+
+function buildResult() {
+  const times = gs.times;
+  const avg   = times.length ? Math.round(times.reduce((a,b)=>a+b,0)/times.length) : null;
+  const best  = times.length ? Math.min(...times) : null;
+  const worst = times.length ? Math.max(...times) : null;
+  const rate  = Math.round(gs.hits / cfg.rounds * 100);
+
+  const grade = GRADES.find(g => (avg||999) < g.max) || GRADES[GRADES.length-1];
+  document.getElementById('r-emoji').textContent = grade.emoji;
+  document.getElementById('r-lbl').textContent   = grade.lbl;
+  document.getElementById('r-title').textContent = grade.title;
+  document.getElementById('r-sub').textContent   = `총 ${cfg.rounds}라운드 · 성공 ${gs.hits}회 · 실패 ${gs.misses}회`;
+
+  document.getElementById('r-avg').textContent   = avg  ? `${avg}ms`  : '—';
+  document.getElementById('r-best').textContent  = best ? `${best}ms` : '—';
+  document.getElementById('r-worst').textContent = worst? `${worst}ms`: '—';
+  document.getElementById('r-rate').textContent  = `${rate}%`;
+
+  // avg 색상
+  const avgEl = document.getElementById('r-avg').parentElement;
+  avgEl.className = 'rs ' + ((avg||999) < 250 ? 'good' : (avg||999) < 400 ? 'warn' : 'bad');
+
+  drawChart(times);
+}
+
+function drawChart(times) {
+  const cv = document.getElementById('result-chart');
+  const W  = cv.offsetWidth || 300;
+  cv.width = W;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,W,80);
+
+  if (!times.length) { ctx.fillStyle='#556070'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText('데이터 없음',W/2,44); return; }
+
+  // 버킷: 100ms 단위, 0~800ms
+  const BINS = 8, BIN_W = 100;
+  const counts = Array(BINS).fill(0);
+  times.forEach(t => {
+    const b = Math.min(BINS-1, Math.floor(t / BIN_W));
+    counts[b]++;
+  });
+  const maxC = Math.max(1, ...counts);
+  const bw = W / BINS;
+
+  counts.forEach((c, i) => {
+    const h = Math.round((c / maxC) * 56);
+    const hue = Math.max(0, 120 - i * 16);
+    ctx.fillStyle = `hsl(${hue},70%,45%)`;
+    ctx.fillRect(i * bw + 2, 66 - h, bw - 4, h);
+    // x label
+    ctx.fillStyle = '#556070';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${i * BIN_W}`, i * bw + bw / 2, 78);
+  });
+
+  // avg 선
+  if (times.length) {
+    const avg = times.reduce((a,b)=>a+b,0)/times.length;
+    const ax = Math.min(W-1, avg / (BINS * BIN_W) * W);
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(ax,0); ctx.lineTo(ax,66); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#a78bfa'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('avg', ax, 9);
+  }
+}
+
+// ══════════════════════════════
+//  화면 전환
+// ══════════════════════════════
+function show(id) {
+  ['home','game','result'].forEach(s => {
+    document.getElementById(s).classList.toggle('hide', s !== id);
+  });
+}
+
+// ══════════════════════════════
+//  초기화
+// ══════════════════════════════
+window.addEventListener('load', () => {
+  onSettings();    // 기본값으로 미리보기 시작
+});
+
+// 게임 화면 빈 곳 클릭 방지 (원 클릭만 유효)
+document.getElementById('game-area')?.addEventListener('pointerdown', e => {
+  if (!e.target.closest('.gc')) e.stopPropagation();
+});
+</script>
+</body>
+</html>

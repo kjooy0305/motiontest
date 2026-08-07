@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>러시안 룰렛</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #161618;
+    --border: #252528;
+    --text: #c8c0b0;
+    --text-dim: #555;
+    --gold: #c9a84c;
+    --red: #c0392b;
+    --red-glow: rgba(192,57,43,0.4);
+    --green: #27ae60;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Malgun Gothic', sans-serif;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── 배경 그레인 ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #game-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 20px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* ── 타이틀 ── */
+  h1 {
+    font-size: 13px;
+    letter-spacing: 5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  /* ── 라운드 & 생존 정보 ── */
+  #info-bar {
+    display: flex;
+    gap: 32px;
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--text-dim);
+  }
+  #info-bar span { color: var(--text); }
+
+  /* ── 리볼버 SVG 영역 ── */
+  #revolver-wrap {
+    position: relative;
+    width: 320px;
+    height: 220px;
+  }
+
+  #revolver-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 8px 32px rgba(0,0,0,0.8));
+  }
+
+  /* 총구 불꽃 */
+  #muzzle-flash {
+    position: absolute;
+    left: 0px;
+    top: 72px;
+    width: 48px;
+    height: 48px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ── 실린더 (6발) ── */
+  #cylinder-wrap {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+
+  #cylinder-svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 0s;
+  }
+  #cylinder-svg.spinning {
+    transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  /* ── 버튼 영역 ── */
+  #btn-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .game-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 16px 8px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s, transform .1s;
+    letter-spacing: 1px;
+  }
+  .game-btn:hover:not(:disabled)  { background: #1e1e22; border-color: #3a3a40; color: #eee; }
+  .game-btn:active:not(:disabled) { transform: scale(0.97); }
+  .game-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  #btn-spin  { border-color: #2a2a3a; }
+  #btn-fire  {
+    border-color: #3a1a1a;
+    color: #e07060;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+  #btn-fire:hover:not(:disabled) { background: #1e1010; border-color: #6a2a2a; color: #ff8070; }
+
+  /* ── 결과 오버레이 ── */
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px;
+  }
+  #overlay.show { display: flex; }
+
+  #overlay.alive  { background: rgba(0,20,0,0.92); }
+  #overlay.dead   { background: rgba(30,0,0,0.95); }
+
+  #overlay-icon {
+    font-size: 72px;
+    line-height: 1;
+  }
+
+  #overlay-title {
+    font-size: 28px;
+    letter-spacing: 2px;
+    text-align: center;
+  }
+  .alive  #overlay-title { color: var(--green); }
+  .dead   #overlay-title { color: var(--red); }
+
+  #overlay-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  #overlay-stats {
+    font-size: 13px;
+    font-family: monospace;
+    color: #555;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  #btn-next {
+    background: transparent;
+    border: 1px solid #333;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 14px 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: border-color .15s, color .15s;
+    margin-top: 8px;
+  }
+  #btn-next:hover { border-color: #666; color: #eee; }
+
+  /* ── 화면 효과 ── */
+  @keyframes dead-shake {
+    0%,100% { transform: translateX(0); }
+    10%,50%,90% { transform: translateX(-8px); }
+    30%,70% { transform: translateX(8px); }
+  }
+  @keyframes flash-red {
+    0%   { background: rgba(180,20,20,0.7); }
+    100% { background: transparent; }
+  }
+  @keyframes flash-white {
+    0%   { background: rgba(255,255,255,0.6); }
+    100% { background: transparent; }
+  }
+  @keyframes muzzle-anim {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(2); }
+  }
+  @keyframes spin-anim {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(var(--spin-deg, 720deg)); }
+  }
+
+  #flash-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  body.shake { animation: dead-shake 0.4s ease; }
+  #flash-layer.red   { animation: flash-red   0.4s ease forwards; }
+  #flash-layer.white { animation: flash-white 0.25s ease forwards; }
+
+  /* ── 총 상태 표시 ── */
+  #gun-status {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    min-height: 18px;
+    text-align: center;
+  }
+  #gun-status.ready { color: var(--gold); }
+  #gun-status.spun  { color: #7ab8f5; }
+</style>
+</head>
+<body>
+
+<div id="flash-layer"></div>
+
+<div id="game-wrap">
+  <h1>Russian Roulette</h1>
+
+  <div id="info-bar">
+    라운드 <span id="round-num">1</span> &nbsp;|&nbsp;
+    생존 <span id="survive-count">0</span>회 &nbsp;|&nbsp;
+    확률 <span id="prob-text">1/6</span>
+  </div>
+
+  <!-- 리볼버 그래픽 -->
+  <div id="revolver-wrap">
+    <svg id="revolver-svg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="metalGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a4a50"/>
+          <stop offset="40%" stop-color="#2a2a30"/>
+          <stop offset="100%" stop-color="#1a1a1e"/>
+        </linearGradient>
+        <linearGradient id="barrelGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3a3a40"/>
+          <stop offset="50%" stop-color="#252528"/>
+          <stop offset="100%" stop-color="#1a1a1e"/>
+        </linearGradient>
+        <linearGradient id="gripGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3d2410"/>
+          <stop offset="100%" stop-color="#1e1008"/>
+        </linearGradient>
+        <filter id="glow-red">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+
+      <!-- 총열 (barrel) -->
+      <rect x="10" y="82" width="200" height="20" rx="4" fill="url(#barrelGrad)" stroke="#333" stroke-width="0.5"/>
+      <rect x="10" y="84" width="200" height="4" rx="2" fill="#444" opacity="0.4"/>
+      <!-- 총열 끝 마감 -->
+      <rect x="10" y="80" width="12" height="24" rx="2" fill="#222" stroke="#333" stroke-width="0.5"/>
+
+      <!-- 총 프레임 (frame) -->
+      <path d="M210 72 Q230 72 240 82 L240 104 Q230 114 210 114 L200 114 L200 72 Z"
+            fill="url(#metalGrad)" stroke="#333" stroke-width="0.5"/>
+
+      <!-- 실린더 위치 표시 (프레임의 원형 홈) -->
+      <circle cx="220" cy="93" r="36" fill="url(#metalGrad)" stroke="#2a2a30" stroke-width="1.5"/>
+      <circle cx="220" cy="93" r="30" fill="#111" stroke="#222" stroke-width="1"/>
+
+      <!-- 트리거 가드 + 손잡이 연결부 -->
+      <path d="M240 104 L260 104 L260 130 Q255 145 240 152 L230 155 L225 140 L235 135 L240 120 Z"
+            fill="url(#metalGrad)" stroke="#333" stroke-width="0.5"/>
+
+      <!-- 트리거 -->
+      <path d="M255 112 Q258 120 255 128 Q252 120 255 112 Z"
+            fill="#1a1a1e" stroke="#555" stroke-width="1"/>
+
+      <!-- 해머 (hammer) -->
+      <path d="M238 68 L248 60 L252 66 L248 76 L240 76 Z"
+            fill="url(#metalGrad)" stroke="#333" stroke-width="0.5"/>
+
+      <!-- 손잡이 (grip) -->
+      <path d="M240 130 Q238 160 230 180 Q225 195 215 200 L205 198 Q210 185 212 170 L218 155 L225 140 L235 135 Z"
+            fill="url(#gripGrad)" stroke="#2a1508" stroke-width="1"/>
+      <!-- 그립 나무결 -->
+      <path d="M218 145 Q228 148 232 155" stroke="#2a1008" stroke-width="0.7" fill="none" opacity="0.5"/>
+      <path d="M216 155 Q226 158 230 165" stroke="#2a1008" stroke-width="0.7" fill="none" opacity="0.5"/>
+      <path d="M215 165 Q223 168 227 175" stroke="#2a1008" stroke-width="0.7" fill="none" opacity="0.5"/>
+      <path d="M214 175 Q220 178 223 184" stroke="#2a1008" stroke-width="0.7" fill="none" opacity="0.5"/>
+
+      <!-- 총열 가늠자 -->
+      <rect x="100" y="78" width="4" height="6" rx="1" fill="#555"/>
+      <rect x="20" y="78" width="6" height="5" rx="1" fill="#555"/>
+    </svg>
+
+    <!-- 총구 불꽃 SVG -->
+    <svg id="muzzle-flash" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <polygon points="30,5 35,25 55,20 38,30 55,42 35,36 30,55 25,36 5,42 22,30 5,20 25,25"
+                 fill="#ffdd44" opacity="0.9"/>
+        <polygon points="30,12 33,24 45,20 35,28 45,38 33,33 30,46 27,33 15,38 25,28 15,20 27,24"
+                 fill="white" opacity="0.8"/>
+        <circle cx="30" cy="30" r="8" fill="white" opacity="0.9"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- 실린더 (6개 약실) -->
+  <div id="cylinder-wrap">
+    <svg id="cylinder-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="cylGrad" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#3a3a42"/>
+          <stop offset="100%" stop-color="#1a1a1e"/>
+        </radialGradient>
+        <radialGradient id="chamberEmpty" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#2a2a2e"/>
+          <stop offset="100%" stop-color="#111"/>
+        </radialGradient>
+        <radialGradient id="chamberLoaded" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#c9a84c"/>
+          <stop offset="60%" stop-color="#8b6020"/>
+          <stop offset="100%" stop-color="#3a2808"/>
+        </radialGradient>
+        <filter id="inner-shadow">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="1" dy="2"/>
+          <feComposite in2="SourceGraphic" operator="arithmetic" k2="-1" k3="1"/>
+        </filter>
+      </defs>
+
+      <!-- 실린더 본체 -->
+      <circle cx="80" cy="80" r="72" fill="url(#cylGrad)" stroke="#2a2a30" stroke-width="2"/>
+      <circle cx="80" cy="80" r="68" fill="none" stroke="#333" stroke-width="0.5"/>
+
+      <!-- 6개 약실 (60도 간격) -->
+      <!-- 약실들은 JS로 동적 렌더링 -->
+      <g id="chambers-group"></g>
+
+      <!-- 발사 위치 표시 (왼쪽 9시 방향) -->
+      <path d="M6 74 L18 74 L18 86 L6 86 Z" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.6"/>
+      <text x="2" y="93" font-size="7" fill="#c9a84c" opacity="0.5" font-family="monospace">FIRE</text>
+
+      <!-- 중앙 핀 -->
+      <circle cx="80" cy="80" r="8" fill="#111" stroke="#333" stroke-width="1"/>
+      <circle cx="80" cy="80" r="4" fill="#222" stroke="#444" stroke-width="0.5"/>
+      <circle cx="80" cy="80" r="1.5" fill="#555"/>
+    </svg>
+  </div>
+
+  <div id="gun-status">장전 후 돌려서 방아쇠를 당기세요</div>
+
+  <div id="btn-row">
+    <button class="game-btn" id="btn-load"  onclick="loadGun()">장전</button>
+    <button class="game-btn" id="btn-spin"  onclick="spinCylinder()" disabled>돌리기</button>
+    <button class="game-btn" id="btn-fire"  onclick="fire()" disabled>🔫 방아쇠</button>
+  </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div id="overlay">
+  <div id="overlay-icon"></div>
+  <div id="overlay-title"></div>
+  <div id="overlay-sub"></div>
+  <div id="overlay-stats"></div>
+  <button id="btn-next" onclick="nextRound()">다음 라운드</button>
+</div>
+
+<script>
+// ── 게임 상태 ──────────────────────────────────────────
+const CHAMBERS = 6;
+let state = {
+  loaded      : false,
+  spun        : false,
+  bulletPos   : -1,   // 장전된 약실 인덱스 (0~5)
+  currentPos  : 0,    // 현재 발사 위치의 약실
+  rotation    : 0,    // 실린더 현재 각도
+  round       : 1,
+  survived    : 0,
+  totalFired  : 0,
+};
+
+// 발사 위치 각도: 9시 방향 = 270도 오프셋
+// 약실 i의 각도: i * 60도 (0번이 12시 방향)
+// 발사 위치(9시)에 오는 약실 = (rotation / 60) % 6
+
+// ── 실린더 렌더링 ──────────────────────────────────────
+function getChamberAngle(i) {
+  return (i * 60) - 90; // 0번=12시 방향 기준
+}
+
+function renderChambers() {
+  const g = document.getElementById('chambers-group');
+  g.innerHTML = '';
+  const cx = 80, cy = 80, r = 48;
+
+  for (let i = 0; i < CHAMBERS; i++) {
+    const angleDeg = getChamberAngle(i);
+    const rad = angleDeg * Math.PI / 180;
+    const x = cx + r * Math.cos(rad);
+    const y = cy + r * Math.sin(rad);
+
+    const isLoaded = state.loaded && i === state.bulletPos;
+    const gradId   = isLoaded ? 'chamberLoaded' : 'chamberEmpty';
+
+    // 약실 원
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x);
+    circle.setAttribute('cy', y);
+    circle.setAttribute('r', '16');
+    circle.setAttribute('fill', `url(#${gradId})`);
+    circle.setAttribute('stroke', isLoaded ? '#8b6020' : '#222');
+    circle.setAttribute('stroke-width', '1.5');
+    g.appendChild(circle);
+
+    // 약실 내부 링
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring.setAttribute('cx', x);
+    ring.setAttribute('cy', y);
+    ring.setAttribute('r', '10');
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', isLoaded ? '#c9a84c' : '#1a1a1e');
+    ring.setAttribute('stroke-width', '1');
+    g.appendChild(ring);
+
+    if (isLoaded) {
+      // 총알 표시 (금색 탄두)
+      const bullet = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      bullet.setAttribute('cx', x);
+      bullet.setAttribute('cy', y);
+      bullet.setAttribute('r', '6');
+      bullet.setAttribute('fill', '#c9a84c');
+      g.appendChild(bullet);
+
+      const shine = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      shine.setAttribute('cx', x - 2);
+      shine.setAttribute('cy', y - 2);
+      shine.setAttribute('r', '2');
+      shine.setAttribute('fill', 'rgba(255,255,200,0.5)');
+      g.appendChild(shine);
+    } else {
+      // 빈 약실 – 어두운 구멍
+      const hole = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      hole.setAttribute('cx', x);
+      hole.setAttribute('cy', y);
+      hole.setAttribute('r', '7');
+      hole.setAttribute('fill', '#080808');
+      g.appendChild(hole);
+    }
+
+    // 약실 번호
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x);
+    txt.setAttribute('y', y + 4);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('font-size', '7');
+    txt.setAttribute('fill', '#444');
+    txt.setAttribute('font-family', 'monospace');
+    txt.textContent = i + 1;
+    g.appendChild(txt);
+  }
+}
+
+// ── 현재 발사 위치 약실 계산 ───────────────────────────
+// 실린더가 rotation만큼 돌아있을 때,
+// 9시(발사) 위치에 오는 약실 인덱스
+function getFiringChamber() {
+  // 각 약실의 실제 각도 = getChamberAngle(i) + rotation
+  // 9시 = 180도 (left 방향)
+  const target = 180;
+  let best = 0;
+  let bestDiff = 999;
+  for (let i = 0; i < CHAMBERS; i++) {
+    const actual = ((getChamberAngle(i) + state.rotation) % 360 + 360) % 360;
+    const diff = Math.abs(actual - target);
+    const diff2 = 360 - diff;
+    if (Math.min(diff, diff2) < bestDiff) {
+      bestDiff = Math.min(diff, diff2);
+      best = i;
+    }
+  }
+  return best;
+}
+
+// ── 실린더 SVG 회전 적용 ──────────────────────────────
+function applyCylinderRotation(animate = false) {
+  const svg = document.getElementById('cylinder-svg');
+  if (animate) svg.classList.add('spinning');
+  else svg.classList.remove('spinning');
+  svg.style.transform = `rotate(${state.rotation}deg)`;
+  // 번호 텍스트는 회전 반대로 (항상 읽기 쉽게)
+}
+
+// ── 장전 ──────────────────────────────────────────────
+function loadGun() {
+  state.bulletPos = Math.floor(Math.random() * CHAMBERS);
+  state.loaded    = true;
+  state.spun      = false;
+  state.rotation  = 0;
+
+  applyCylinderRotation(false);
+  renderChambers();
+
+  setStatus('장전 완료 — 이제 실린더를 돌리세요', 'ready');
+  document.getElementById('btn-load').disabled = true;
+  document.getElementById('btn-spin').disabled = false;
+  document.getElementById('btn-fire').disabled = true;
+}
+
+// ── 돌리기 ────────────────────────────────────────────
+function spinCylinder() {
+  const extraSpins = 3 + Math.floor(Math.random() * 5); // 3~7바퀴
+  const extraDeg   = Math.floor(Math.random() * 360 / 60) * 60; // 60도 단위 스냅
+  const totalDeg   = extraSpins * 360 + extraDeg;
+
+  state.rotation = (state.rotation + totalDeg) % 360;
+  state.spun = true;
+
+  const svg = document.getElementById('cylinder-svg');
+  svg.style.transition = `transform ${0.6 + extraSpins * 0.12}s cubic-bezier(0.25,0.1,0.25,1)`;
+  svg.style.transform  = `rotate(${state.rotation + (extraSpins * 360)}deg)`;
+
+  setTimeout(() => {
+    svg.style.transition = 'none';
+    svg.style.transform  = `rotate(${state.rotation}deg)`;
+    state.currentPos = getFiringChamber();
+    setStatus('돌리기 완료 — 방아쇠를 당기세요', 'spun');
+    document.getElementById('btn-spin').disabled = false;
+    document.getElementById('btn-fire').disabled = false;
+  }, (0.6 + extraSpins * 0.12) * 1000 + 50);
+
+  document.getElementById('btn-spin').disabled = true;
+  document.getElementById('btn-fire').disabled = true;
+  setStatus('실린더 회전 중...', '');
+}
+
+// ── 방아쇠 ────────────────────────────────────────────
+function fire() {
+  if (!state.spun) return;
+
+  state.currentPos = getFiringChamber();
+  state.totalFired++;
+
+  document.getElementById('btn-load').disabled = true;
+  document.getElementById('btn-spin').disabled = true;
+  document.getElementById('btn-fire').disabled = true;
+
+  const hit = state.currentPos === state.bulletPos;
+
+  if (hit) {
+    // 발사 — 사망
+    setTimeout(() => showFlash('red'), 80);
+    setTimeout(() => shakePage(), 100);
+    setTimeout(() => triggerMuzzleFlash(), 80);
+    setTimeout(() => showEnding(false), 700);
+  } else {
+    // 공포 — 생존
+    state.survived++;
+    triggerMuzzleFlash();
+    showFlash('white');
+    setTimeout(() => showEnding(true), 600);
+  }
+}
+
+// ── 총구 불꽃 ─────────────────────────────────────────
+function triggerMuzzleFlash() {
+  const f = document.getElementById('muzzle-flash');
+  f.style.animation = 'none';
+  f.offsetHeight; // reflow
+  f.style.animation = 'muzzle-anim 0.25s ease forwards';
+}
+
+// ── 화면 효과 ─────────────────────────────────────────
+function showFlash(type) {
+  const l = document.getElementById('flash-layer');
+  l.className = '';
+  l.offsetHeight;
+  l.className = type;
+  setTimeout(() => l.className = '', 400);
+}
+
+function shakePage() {
+  document.body.classList.remove('shake');
+  document.body.offsetHeight;
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 400);
+}
+
+// ── 엔딩 오버레이 ────────────────────────────────────
+const ALIVE_MSGS = [
+  '오늘은 운이 좋았다.',
+  '아직 살아있다.',
+  '심장이 터질 것 같다.',
+  '총알은 다른 약실에 있었다.',
+  '신이 있다면, 방금 봤다.',
+];
+const DEAD_MSGS = [
+  '운이 다했다.',
+  '마지막 순간이었다.',
+  '총알은 거짓말하지 않는다.',
+];
+
+function showEnding(alive) {
+  const ol = document.getElementById('overlay');
+  ol.className = 'show ' + (alive ? 'alive' : 'dead');
+
+  document.getElementById('overlay-icon').textContent  = alive ? '💨' : '💀';
+  document.getElementById('overlay-title').textContent = alive ? '생존' : '사망';
+  document.getElementById('overlay-sub').textContent   = alive
+    ? ALIVE_MSGS[Math.floor(Math.random() * ALIVE_MSGS.length)]
+    : DEAD_MSGS[Math.floor(Math.random() * DEAD_MSGS.length)];
+
+  const prob = ((1 / CHAMBERS) * 100).toFixed(1);
+  document.getElementById('overlay-stats').innerHTML =
+    `라운드 ${state.round} &nbsp;|&nbsp; 생존 ${state.survived}/${state.totalFired}회<br>` +
+    `발사 위치: ${state.currentPos + 1}번 약실 &nbsp;|&nbsp; 장전 위치: ${alive ? '???': state.bulletPos + 1}번 약실`;
+
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = alive ? '다음 라운드' : '다시 시작';
+}
+
+function nextRound() {
+  const ol = document.getElementById('overlay');
+  const isDead = ol.classList.contains('dead');
+
+  ol.className = '';
+
+  if (isDead) {
+    // 완전 초기화
+    state.round    = 1;
+    state.survived = 0;
+    state.totalFired = 0;
+  } else {
+    state.round++;
+  }
+
+  // 상태 초기화
+  state.loaded   = false;
+  state.spun     = false;
+  state.bulletPos = -1;
+  state.rotation  = 0;
+
+  applyCylinderRotation(false);
+  renderChambers();
+  updateInfoBar();
+  setStatus('장전 후 돌려서 방아쇠를 당기세요', '');
+
+  document.getElementById('btn-load').disabled = false;
+  document.getElementById('btn-spin').disabled = true;
+  document.getElementById('btn-fire').disabled = true;
+}
+
+// ── UI 헬퍼 ───────────────────────────────────────────
+function setStatus(msg, cls) {
+  const el = document.getElementById('gun-status');
+  el.textContent = msg;
+  el.className   = cls || '';
+}
+
+function updateInfoBar() {
+  document.getElementById('round-num').textContent    = state.round;
+  document.getElementById('survive-count').textContent = state.survived;
+  document.getElementById('prob-text').textContent    = `1/${CHAMBERS}`;
+}
+
+// ── 초기화 ────────────────────────────────────────────
+renderChambers();
+updateInfoBar();
+</script>
+</body>
+</html>

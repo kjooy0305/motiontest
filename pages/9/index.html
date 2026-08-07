@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI 미로 탈출</title>
+<style>
+:root {
+  --bg:#0d0d0f; --surf:#161618; --bdr:#252528; --text:#c8c0b0; --dim:#555;
+  --visited:rgba(74,120,255,0.22); --frontier:rgba(255,140,30,0.45);
+  --cur:#ffe44a; --path:rgba(255,90,90,0.28); --sol:rgba(39,200,96,0.55);
+  --sol-line:#27c860; --wall:#5a5a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;user-select:none;}
+
+/* ── 타이틀 ── */
+#title{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:16px;padding:20px;}
+#title h1{font-size:28px;letter-spacing:6px;font-weight:300;}
+.t-sub{font-size:11px;color:var(--dim);letter-spacing:2px;}
+.section-label{font-size:11px;color:var(--dim);letter-spacing:1px;align-self:flex-start;
+  max-width:480px;width:100%;}
+
+/* 크기 선택 */
+.size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:480px;}
+.sz-btn{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;color:var(--text);
+  font-family:inherit;padding:12px 6px;cursor:pointer;transition:background .15s,border-color .15s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;}
+.sz-btn .sn{font-size:14px;font-weight:bold;letter-spacing:1px;}
+.sz-btn .sd{font-size:10px;color:var(--dim);}
+.sz-btn:hover{background:#1e1e22;border-color:#3a3a40;}
+.custom-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);}
+.custom-row input{width:50px;background:var(--surf);border:1px solid var(--bdr);border-radius:6px;
+  color:var(--text);font-size:14px;padding:6px 8px;text-align:center;font-family:monospace;}
+.custom-row input:focus{outline:none;border-color:#555;}
+.custom-row button{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;
+  color:var(--text);font-family:inherit;font-size:13px;padding:8px 16px;cursor:pointer;}
+.custom-row button:hover{background:#1e1e22;}
+
+/* 알고리즘 선택 */
+.algo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:480px;}
+.algo-btn{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;color:var(--text);
+  font-family:inherit;padding:12px 14px;cursor:pointer;transition:background .15s,border-color .15s;
+  text-align:left;position:relative;}
+.algo-btn.active{border-color:#4a9eff;background:#0e1a2a;}
+.algo-btn .an{font-size:14px;font-weight:bold;margin-bottom:4px;}
+.algo-btn .ad{font-size:11px;color:var(--dim);line-height:1.4;}
+.algo-btn .badge{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;
+  border-radius:10px;font-family:monospace;}
+.badge-opt{background:#1a3a1a;color:#4a9a4a;border:1px solid #2a5a2a;}
+.badge-short{background:#1a2a3a;color:#4a7aaa;border:1px solid #2a4a6a;}
+.badge-fun{background:#3a2a1a;color:#aa7a4a;border:1px solid #5a4a2a;}
+
+#start-btn{background:transparent;border:1px solid #333;color:var(--text);font-family:inherit;
+  font-size:14px;padding:13px 40px;border-radius:8px;cursor:pointer;letter-spacing:1px;
+  transition:border-color .15s,color .15s;max-width:480px;width:100%;}
+#start-btn:hover{border-color:#888;color:#eee;}
+#start-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* ── 게임 화면 ── */
+#game{display:none;flex-direction:column;height:100%;}
+#game.show{display:flex;}
+
+/* 상단 바 */
+#top-bar{display:flex;align-items:center;gap:0;background:var(--surf);
+  border-bottom:1px solid var(--bdr);padding:6px 12px;flex-shrink:0;flex-wrap:wrap;}
+#algo-badge{font-size:12px;color:#4a9eff;font-weight:bold;letter-spacing:1px;flex:none;min-width:80px;}
+.stat-group{display:flex;gap:16px;font-size:11px;font-family:monospace;color:var(--dim);
+  flex:1;justify-content:center;}
+.stat-group span b{color:var(--text);}
+#algo-desc{font-size:10px;color:var(--dim);width:100%;margin-top:2px;padding-top:4px;
+  border-top:1px solid var(--bdr);}
+
+/* 캔버스 영역 */
+#canvas-area{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;position:relative;min-height:0;gap:8px;padding:8px;}
+#maze-canvas{display:block;}
+
+/* 범례 */
+#legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:10px;
+  font-family:sans-serif;color:var(--dim);}
+.leg{display:flex;align-items:center;gap:4px;}
+.leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+
+/* 컨트롤 바 */
+#ctrl-bar{display:flex;align-items:center;gap:8px;background:var(--surf);
+  border-top:1px solid var(--bdr);padding:10px 12px;flex-shrink:0;flex-wrap:wrap;}
+.cbtn{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;color:var(--dim);
+  font-family:inherit;font-size:13px;padding:9px 14px;cursor:pointer;
+  transition:color .15s,border-color .15s;white-space:nowrap;}
+.cbtn:hover{color:var(--text);border-color:#444;}
+.cbtn:disabled{opacity:0.25;cursor:not-allowed;}
+.cbtn.primary{color:#c8c0b0;border-color:#3a3a3a;}
+.cbtn.primary:hover{color:#eee;border-color:#666;}
+#speed-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim);flex:1;
+  justify-content:center;}
+#speed-wrap input{width:80px;accent-color:#4a9eff;}
+
+/* 완료 배너 */
+#solved-banner{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(10,20,12,0.95);border:1px solid #2a5a2a;border-radius:12px;
+  padding:20px 28px;text-align:center;z-index:20;min-width:220px;}
+#solved-banner.show{display:block;}
+#solved-banner h3{color:var(--sol-line);font-size:18px;margin-bottom:10px;letter-spacing:1px;}
+#solved-banner .sv-stats{font-size:12px;font-family:monospace;color:var(--dim);line-height:2;}
+</style>
+</head>
+<body>
+
+<!-- 타이틀 화면 -->
+<div id="title">
+  <h1>AI MAZE</h1>
+  <div class="t-sub">AI가 미로를 탈출하는 과정을 관찰하세요</div>
+
+  <div class="section-label">① 미로 크기</div>
+  <div class="size-grid">
+    <button class="sz-btn" onclick="setSize(6,6)"><span class="sn">6×6</span><span class="sd">입문</span></button>
+    <button class="sz-btn" onclick="setSize(10,10)"><span class="sn">10×10</span><span class="sd">보통</span></button>
+    <button class="sz-btn" onclick="setSize(15,15)"><span class="sn">15×15</span><span class="sd">어려움</span></button>
+    <button class="sz-btn" onclick="setSize(20,20)"><span class="sn">20×20</span><span class="sd">매우 어려움</span></button>
+    <button class="sz-btn" onclick="setSize(25,25)"><span class="sn">25×25</span><span class="sd">극한</span></button>
+    <button class="sz-btn" onclick="startCustom()"><span class="sn">직접</span><span class="sd">입력</span></button>
+  </div>
+  <div class="custom-row">
+    <input id="cr" type="number" value="12" min="4" max="40">
+    <span>×</span>
+    <input id="cc" type="number" value="12" min="4" max="40">
+    행·열
+  </div>
+
+  <div class="section-label">② 탈출 알고리즘</div>
+  <div class="algo-grid">
+    <button class="algo-btn" id="ab-bfs" onclick="selectAlgo('bfs')">
+      <span class="badge badge-short">최단경로</span>
+      <div class="an">BFS</div>
+      <div class="ad">너비 우선 탐색<br>모든 방향 동시 탐색<br>반드시 최단 경로를 찾음</div>
+    </button>
+    <button class="algo-btn" id="ab-dfs" onclick="selectAlgo('dfs')">
+      <span class="badge badge-fun">백트래킹</span>
+      <div class="an">DFS</div>
+      <div class="ad">깊이 우선 탐색<br>한 길로 끝까지 돌진<br>막히면 되돌아옴</div>
+    </button>
+    <button class="algo-btn" id="ab-astar" onclick="selectAlgo('astar')">
+      <span class="badge badge-opt">최적화</span>
+      <div class="an">A*</div>
+      <div class="ad">에이스타 알고리즘<br>목표 방향 예측 탐색<br>효율적 최단 경로</div>
+    </button>
+    <button class="algo-btn" id="ab-wall" onclick="selectAlgo('wall')">
+      <span class="badge badge-fun">고전방식</span>
+      <div class="an">벽 따라가기</div>
+      <div class="ad">오른손 법칙<br>오른쪽 벽에 손을 대고<br>끝까지 따라감</div>
+    </button>
+    <button class="algo-btn" id="ab-random" onclick="selectAlgo('random')">
+      <span class="badge badge-fun">무작위</span>
+      <div class="an">랜덤 탐색</div>
+      <div class="ad">무작위로 이동<br>언젠가는 도착함<br>가장 오래 걸림</div>
+    </button>
+  </div>
+
+  <button id="start-btn" onclick="startGame()" disabled>알고리즘을 선택하세요</button>
+</div>
+
+<!-- 게임 화면 -->
+<div id="game">
+  <div id="top-bar">
+    <span id="algo-badge">BFS</span>
+    <div class="stat-group">
+      <span>탐색 <b id="s-explored">0</b></span>
+      <span>이동 <b id="s-steps">0</b></span>
+      <span>경로 <b id="s-pathlen">—</b></span>
+      <span><b id="s-time">0.0s</b></span>
+    </div>
+    <div id="algo-desc">설명</div>
+  </div>
+
+  <div id="canvas-area">
+    <canvas id="maze-canvas"></canvas>
+    <div id="legend">
+      <div class="leg"><div class="leg-dot" style="background:rgba(74,120,255,0.5)"></div>탐색 완료</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,140,30,0.7)"></div>탐색 중</div>
+      <div class="leg"><div class="leg-dot" style="background:#ffe44a"></div>현재 위치</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,90,90,0.5)"></div>이동 경로</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(39,200,96,0.7)"></div>최종 경로</div>
+    </div>
+    <div id="solved-banner">
+      <h3>🏁 탈출 성공!</h3>
+      <div class="sv-stats" id="sv-stats"></div>
+    </div>
+  </div>
+
+  <div id="ctrl-bar">
+    <button class="cbtn primary" id="btn-pp" onclick="togglePause()">▶ 시작</button>
+    <button class="cbtn" id="btn-step" onclick="stepOnce()" disabled>1칸</button>
+    <div id="speed-wrap">
+      속도 <input type="range" id="speed-range" min="0" max="4" value="2" oninput="updateSpeed()"> <span id="speed-label">보통</span>
+    </div>
+    <button class="cbtn" onclick="rerunAlgo()">다시 실행</button>
+    <button class="cbtn" onclick="goTitle()">← 돌아가기</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  방향 상수
+// ══════════════════════════════════════════
+const DIR = [
+  {dr:-1,dc:0,wall:'top',   opp:'bottom'},
+  {dr:0, dc:1,wall:'right', opp:'left'},
+  {dr:1, dc:0,wall:'bottom',opp:'top'},
+  {dr:0, dc:-1,wall:'left', opp:'right'},
+];
+const D_NAMES=['top','right','bottom','left'];
+
+function shuffle(a){
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+
+// ══════════════════════════════════════════
+//  미로 생성 (반복 DFS)
+// ══════════════════════════════════════════
+function generateMaze(rows,cols){
+  const w=Array.from({length:rows},()=>
+    Array.from({length:cols},()=>({top:true,right:true,bottom:true,left:true})));
+  const vis=Array.from({length:rows},()=>Array(cols).fill(false));
+  const stk=[[0,0]]; vis[0][0]=true; let done=1;
+  while(done<rows*cols){
+    const[r,c]=stk[stk.length-1];
+    const ds=shuffle(DIR); let mv=false;
+    for(const d of ds){
+      const nr=r+d.dr,nc=c+d.dc;
+      if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&!vis[nr][nc]){
+        w[r][c][d.wall]=false; w[nr][nc][d.opp]=false;
+        vis[nr][nc]=true; stk.push([nr,nc]); done++; mv=true; break;
+      }
+    }
+    if(!mv)stk.pop();
+  }
+  return w;
+}
+
+// ══════════════════════════════════════════
+//  전역 상태
+// ══════════════════════════════════════════
+let ROWS=10,COLS=10,maze=null;
+let selectedAlgo='';
+let cs=20;
+
+const canvas=document.getElementById('maze-canvas');
+const ctx=canvas.getContext('2d');
+
+// 시각화 상태
+const viz={
+  visited  :new Set(),  // "r,c"
+  frontier :new Set(),  // "r,c"
+  pathCells:new Set(),  // "r,c"  현재 탐색 경로 (DFS/wall)
+  current  :null,       // {r,c}
+  solution :null,       // [{r,c}]
+  facing   :1,          // 벽타기용 방향
+  steps    :0,
+  explored :0,
+  solved   :false,
+};
+
+function resetViz(){
+  viz.visited.clear(); viz.frontier.clear(); viz.pathCells.clear();
+  viz.current=null; viz.solution=null; viz.facing=1;
+  viz.steps=0; viz.explored=0; viz.solved=false;
+}
+
+// ══════════════════════════════════════════
+//  솔버 제너레이터
+// ══════════════════════════════════════════
+
+// ── BFS ──────────────────────────────────
+function* bfsSolver(){
+  const queue=[[0,0]];
+  const par={'0,0':null};
+  viz.visited.add('0,0'); viz.frontier.add('0,0');
+  while(queue.length>0){
+    const[r,c]=queue.shift();
+    const key=`${r},${c}`;
+    viz.frontier.delete(key);
+    viz.current={r,c}; viz.steps++;
+    yield;
+    if(r===ROWS-1&&c===COLS-1){
+      const path=[]; let k=key;
+      while(k){const[pr,pc]=k.split(',').map(Number);path.unshift({r:pr,c:pc});k=par[k];}
+      viz.solution=path; viz.solved=true; yield; return;
+    }
+    for(const d of DIR){
+      const nr=r+d.dr,nc=c+d.dc,nk=`${nr},${nc}`;
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!viz.visited.has(nk)&&!maze[r][c][d.wall]){
+        viz.visited.add(nk); viz.frontier.add(nk); par[nk]=key;
+        viz.explored++; queue.push([nr,nc]);
+      }
+    }
+  }
+}
+
+// ── DFS ──────────────────────────────────
+function* dfsSolver(){
+  const visited=new Set(['0,0']);
+  const path=[{r:0,c:0}];
+  viz.visited.add('0,0'); viz.pathCells.add('0,0');
+  while(path.length>0){
+    const{r,c}=path[path.length-1];
+    viz.current={r,c}; viz.steps++;
+    yield;
+    if(r===ROWS-1&&c===COLS-1){
+      viz.solution=[...path]; viz.solved=true; yield; return;
+    }
+    let moved=false;
+    for(const d of DIR){
+      const nr=r+d.dr,nc=c+d.dc,nk=`${nr},${nc}`;
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!visited.has(nk)&&!maze[r][c][d.wall]){
+        visited.add(nk); viz.visited.add(nk);
+        viz.explored++; path.push({r:nr,c:nc});
+        viz.pathCells.add(nk); moved=true; break;
+      }
+    }
+    if(!moved){
+      viz.pathCells.delete(`${r},${c}`);
+      path.pop();
+    }
+  }
+}
+
+// ── A* ───────────────────────────────────
+function* astarSolver(){
+  const h=(r,c)=>Math.abs(r-(ROWS-1))+Math.abs(c-(COLS-1));
+  const open=new Map([['0,0',{r:0,c:0,g:0,f:h(0,0)}]]);
+  const closed=new Set();
+  const par={'0,0':null};
+  viz.frontier.add('0,0');
+  while(open.size>0){
+    // 가장 낮은 f 노드 선택
+    let bestKey=null,bestF=Infinity;
+    for(const[k,n]of open)if(n.f<bestF){bestF=n.f;bestKey=k;}
+    const{r,c,g}=open.get(bestKey);
+    open.delete(bestKey); viz.frontier.delete(bestKey);
+    closed.add(bestKey); viz.visited.add(bestKey);
+    viz.current={r,c}; viz.steps++;
+    yield;
+    if(r===ROWS-1&&c===COLS-1){
+      const path=[];let k=bestKey;
+      while(k){const[pr,pc]=k.split(',').map(Number);path.unshift({r:pr,c:pc});k=par[k];}
+      viz.solution=path; viz.solved=true; yield; return;
+    }
+    for(const d of DIR){
+      const nr=r+d.dr,nc=c+d.dc,nk=`${nr},${nc}`;
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!closed.has(nk)&&!maze[r][c][d.wall]){
+        const ng=g+1,nf=ng+h(nr,nc);
+        if(!open.has(nk)||open.get(nk).g>ng){
+          open.set(nk,{r:nr,c:nc,g:ng,f:nf});
+          viz.frontier.add(nk); par[nk]=bestKey;
+          if(!viz.visited.has(nk)) viz.explored++;
+        }
+      }
+    }
+  }
+}
+
+// ── 벽 따라가기 (오른손 법칙) ────────────
+function* wallFollower(){
+  let r=0,c=0,facing=1; // 오른쪽 방향으로 시작
+  const pathArr=[{r,c}];
+  viz.visited.add('0,0'); viz.pathCells.add('0,0');
+  const MAX=ROWS*COLS*20;
+  for(let step=0;step<MAX;step++){
+    viz.current={r,c}; viz.facing=facing; viz.steps++;
+    yield;
+    if(r===ROWS-1&&c===COLS-1){
+      viz.solution=[...pathArr]; viz.solved=true; yield; return;
+    }
+    // 오른쪽 → 직진 → 왼쪽 → 뒤로
+    const tries=[(facing+1)%4, facing, (facing+3)%4, (facing+2)%4];
+    for(const d of tries){
+      const wall=D_NAMES[d],dr=[-1,0,1,0][d],dc=[0,1,0,-1][d];
+      const nr=r+dr,nc=c+dc;
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!maze[r][c][wall]){
+        r=nr;c=nc;facing=d; pathArr.push({r,c});
+        viz.visited.add(`${r},${c}`); viz.pathCells.add(`${r},${c}`);
+        viz.explored=viz.visited.size; break;
+      }
+    }
+  }
+}
+
+// ── 랜덤 탐색 ────────────────────────────
+function* randomWalk(){
+  let r=0,c=0;
+  const trailArr=[{r,c}];
+  viz.visited.add('0,0'); viz.pathCells.add('0,0');
+  const MAX=ROWS*COLS*500;
+  for(let step=0;step<MAX;step++){
+    viz.current={r,c}; viz.steps++;
+    yield;
+    if(r===ROWS-1&&c===COLS-1){
+      viz.solution=[...trailArr]; viz.solved=true; yield; return;
+    }
+    const avail=DIR.filter(d=>{
+      const nr=r+d.dr,nc=c+d.dc;
+      return nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!maze[r][c][d.wall];
+    });
+    if(!avail.length)break;
+    const d=avail[Math.floor(Math.random()*avail.length)];
+    r+=d.dr; c+=d.dc;
+    trailArr.push({r,c});
+    viz.visited.add(`${r},${c}`); viz.pathCells.add(`${r},${c}`);
+    viz.explored=viz.visited.size;
+  }
+}
+
+// ══════════════════════════════════════════
+//  캔버스 렌더링
+// ══════════════════════════════════════════
+function setupCanvas(){
+  const area=document.getElementById('canvas-area');
+  const aw=area.clientWidth-16, ah=area.clientHeight-80;
+  cs=Math.max(8,Math.min(Math.floor(aw/COLS),Math.floor(ah/ROWS)));
+  canvas.width=COLS*cs; canvas.height=ROWS*cs;
+}
+
+function render(){
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // 배경
+  ctx.fillStyle='#0d0d0f'; ctx.fillRect(0,0,W,H);
+
+  // 셀 바닥
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    ctx.fillStyle='#161618'; ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+  }
+
+  // 탐색 완료 (visited / closed)
+  ctx.fillStyle='rgba(74,120,255,0.22)';
+  for(const k of viz.visited){
+    const[r,c]=k.split(',').map(Number);
+    ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+  }
+
+  // 현재 탐색 경로 (DFS/wall/random)
+  if(viz.pathCells.size>0&&selectedAlgo!=='bfs'&&selectedAlgo!=='astar'){
+    ctx.fillStyle='rgba(255,90,90,0.28)';
+    for(const k of viz.pathCells){
+      const[r,c]=k.split(',').map(Number);
+      ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+    }
+  }
+
+  // 탐색 중 (frontier / open set)
+  ctx.fillStyle='rgba(255,140,30,0.5)';
+  for(const k of viz.frontier){
+    const[r,c]=k.split(',').map(Number);
+    ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+  }
+
+  // 최종 경로
+  if(viz.solution){
+    ctx.fillStyle='rgba(39,200,96,0.45)';
+    for(const{r,c}of viz.solution)ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+    // 경로 선
+    ctx.strokeStyle='#27c860'; ctx.lineWidth=Math.max(2,cs*0.18);
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    viz.solution.forEach(({r,c},i)=>{
+      const x=c*cs+cs/2,y=r*cs+cs/2;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+
+  // 벽 그리기
+  const wt=Math.max(1.5,cs*0.1);
+  ctx.strokeStyle='#5a5a6e'; ctx.lineWidth=wt; ctx.lineCap='square';
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const x=c*cs,y=r*cs,cell=maze[r][c];
+    ctx.beginPath();
+    if(cell.top)   {ctx.moveTo(x,y);   ctx.lineTo(x+cs,y);}
+    if(cell.right) {ctx.moveTo(x+cs,y);ctx.lineTo(x+cs,y+cs);}
+    if(cell.bottom){ctx.moveTo(x,y+cs);ctx.lineTo(x+cs,y+cs);}
+    if(cell.left)  {ctx.moveTo(x,y);   ctx.lineTo(x,y+cs);}
+    ctx.stroke();
+  }
+  // 외곽 테두리
+  ctx.strokeStyle='#888'; ctx.lineWidth=Math.max(2,wt*1.5);
+  ctx.strokeRect(0,0,W,H);
+
+  // 출발/도착 표시
+  if(cs>=14){
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font=`${Math.floor(cs*0.5)}px serif`;
+    ctx.fillText('🏁',(COLS-0.5)*cs,(ROWS-0.5)*cs);
+  }
+
+  // 현재 위치 (플레이어)
+  if(viz.current&&!viz.solved){
+    const{r,c}=viz.current;
+    const px=c*cs+cs/2,py=r*cs+cs/2,pr=cs*0.3;
+    ctx.save();
+    ctx.shadowColor='#ffe44a'; ctx.shadowBlur=cs*0.7;
+    ctx.fillStyle='#ffe44a';
+    ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fill();
+    // 벽타기 방향 화살표
+    if(selectedAlgo==='wall'&&cs>=16){
+      const arrowDirs=[[0,-cs*0.4],[cs*0.4,0],[0,cs*0.4],[-cs*0.4,0]];
+      const[adx,ady]=arrowDirs[viz.facing]||[0,0];
+      ctx.strokeStyle='#ffe44a'; ctx.lineWidth=2; ctx.shadowBlur=4;
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+adx,py+ady); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // 시작점 (S)
+  if(cs>=16){
+    ctx.fillStyle='rgba(39,174,96,0.5)';
+    ctx.fillRect(1,1,cs-2,cs-2);
+    ctx.fillStyle='rgba(39,174,96,0.85)';
+    ctx.font=`bold ${Math.floor(cs*0.35)}px monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('S',cs/2,cs/2);
+  }
+}
+
+// ══════════════════════════════════════════
+//  애니메이션 루프
+// ══════════════════════════════════════════
+const SPEED_CONFIG=[
+  {label:'매우 느림', skip:15, sps:1},
+  {label:'느림',      skip:5,  sps:1},
+  {label:'보통',      skip:2,  sps:1},
+  {label:'빠름',      skip:1,  sps:8},
+  {label:'매우 빠름', skip:1,  sps:60},
+];
+
+let solver=null, paused=true, frameCount=0;
+let speedIdx=2;
+let solveStart=0;
+
+function updateSpeed(){
+  speedIdx=parseInt(document.getElementById('speed-range').value);
+  document.getElementById('speed-label').textContent=SPEED_CONFIG[speedIdx].label;
+}
+
+function animLoop(){
+  if(paused||viz.solved) return;
+  const{skip,sps}=SPEED_CONFIG[speedIdx];
+  frameCount++;
+  if(frameCount>=skip){
+    frameCount=0;
+    for(let i=0;i<sps;i++){
+      if(viz.solved)break;
+      const res=solver.next();
+      if(res.done)break;
+    }
+    render();
+    updateStatBar();
+  }
+  if(!viz.solved) requestAnimationFrame(animLoop);
+  else onSolved();
+}
+
+function togglePause(){
+  if(viz.solved)return;
+  if(!solver){
+    // 첫 시작
+    resetViz(); solver=makeSolver();
+    solveStart=Date.now(); paused=false;
+    document.getElementById('btn-pp').textContent='⏸ 일시정지';
+    document.getElementById('btn-step').disabled=true;
+    frameCount=0;
+    requestAnimationFrame(animLoop);
+    return;
+  }
+  paused=!paused;
+  document.getElementById('btn-pp').textContent=paused?'▶ 계속':'⏸ 일시정지';
+  document.getElementById('btn-step').disabled=!paused;
+  if(!paused){frameCount=0;requestAnimationFrame(animLoop);}
+}
+
+function stepOnce(){
+  if(!solver||viz.solved)return;
+  if(!paused)return;
+  solver.next();
+  render(); updateStatBar();
+  if(viz.solved)onSolved();
+}
+
+function onSolved(){
+  paused=true;
+  render(); updateStatBar();
+  const elapsed=((Date.now()-solveStart)/1000).toFixed(2);
+  document.getElementById('sv-stats').innerHTML=
+    `탐색 셀: <b>${viz.explored}</b><br>`+
+    `이동 횟수: <b>${viz.steps}</b><br>`+
+    `경로 길이: <b>${viz.solution?viz.solution.length-1:'?'}</b>칸<br>`+
+    `소요 시간: <b>${elapsed}초</b>`;
+  document.getElementById('solved-banner').classList.add('show');
+  document.getElementById('btn-pp').textContent='완료';
+  document.getElementById('btn-pp').disabled=true;
+}
+
+function updateStatBar(){
+  document.getElementById('s-explored').textContent=viz.explored;
+  document.getElementById('s-steps').textContent=viz.steps;
+  document.getElementById('s-pathlen').textContent=viz.solution?(viz.solution.length-1)+'칸':'—';
+  const s=viz.solved?((Date.now()-solveStart)/1000):((Date.now()-solveStart)/1000);
+  document.getElementById('s-time').textContent=s.toFixed(1)+'s';
+}
+
+// ══════════════════════════════════════════
+//  솔버 팩토리
+// ══════════════════════════════════════════
+function makeSolver(){
+  switch(selectedAlgo){
+    case 'bfs':    return bfsSolver();
+    case 'dfs':    return dfsSolver();
+    case 'astar':  return astarSolver();
+    case 'wall':   return wallFollower();
+    case 'random': return randomWalk();
+  }
+}
+
+// ══════════════════════════════════════════
+//  UI 핸들러
+// ══════════════════════════════════════════
+const ALGO_INFO={
+  bfs   :{name:'BFS',  desc:'너비 우선 탐색 — 큐를 이용해 가까운 셀부터 순서대로 탐색. 항상 최단 경로를 찾습니다.'},
+  dfs   :{name:'DFS',  desc:'깊이 우선 탐색 — 스택을 이용해 한 방향으로 끝까지 탐색 후 막히면 되돌아옵니다.'},
+  astar :{name:'A*',   desc:'에이스타 — 현재 비용 + 목표까지 예상 거리(맨해튼)로 우선순위를 정해 탐색합니다.'},
+  wall  :{name:'벽 따라가기', desc:'오른손 법칙 — 오른쪽 벽에 손을 대고 끝까지 따라갑니다. 단순하지만 효과적.'},
+  random:{name:'랜덤 탐색',  desc:'랜덤 워크 — 매 순간 무작위 방향을 선택. 언젠가는 도착하지만 가장 오래 걸립니다.'},
+};
+
+function selectAlgo(algo){
+  selectedAlgo=algo;
+  document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`ab-${algo}`).classList.add('active');
+  document.getElementById('start-btn').disabled=false;
+  document.getElementById('start-btn').textContent=
+    `${ALGO_INFO[algo].name}으로 탈출 시작 →`;
+}
+
+let pendingRows=10,pendingCols=10;
+function setSize(r,c){
+  pendingRows=r; pendingCols=c;
+  document.querySelectorAll('.sz-btn').forEach(b=>b.style.borderColor='');
+  event.currentTarget.style.borderColor='#4a9eff';
+}
+function startCustom(){
+  pendingRows=parseInt(document.getElementById('cr').value)||10;
+  pendingCols=parseInt(document.getElementById('cc').value)||10;
+}
+
+function startGame(){
+  if(!selectedAlgo)return;
+  ROWS=Math.max(4,Math.min(40,pendingRows));
+  COLS=Math.max(4,Math.min(40,pendingCols));
+  maze=generateMaze(ROWS,COLS);
+
+  document.getElementById('title').style.display='none';
+  document.getElementById('game').classList.add('show');
+  document.getElementById('algo-badge').textContent=ALGO_INFO[selectedAlgo].name;
+  document.getElementById('algo-desc').textContent=ALGO_INFO[selectedAlgo].desc;
+
+  solver=null; paused=true;
+  resetViz();
+  document.getElementById('btn-pp').textContent='▶ 시작';
+  document.getElementById('btn-pp').disabled=false;
+  document.getElementById('btn-step').disabled=false;
+  document.getElementById('solved-banner').classList.remove('show');
+  updateSpeed();
+  setupCanvas(); render();
+}
+
+function rerunAlgo(){
+  maze=generateMaze(ROWS,COLS);
+  solver=null; paused=true;
+  resetViz();
+  document.getElementById('btn-pp').textContent='▶ 시작';
+  document.getElementById('btn-pp').disabled=false;
+  document.getElementById('btn-step').disabled=false;
+  document.getElementById('solved-banner').classList.remove('show');
+  setupCanvas(); render();
+}
+
+function goTitle(){
+  paused=true; solver=null;
+  document.getElementById('game').classList.remove('show');
+  document.getElementById('title').style.display='flex';
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('game').classList.contains('show')){
+    setupCanvas(); render();
+  }
+});
+
+// 초기 크기 기본값
+pendingRows=10; pendingCols=10;
+</script>
+</body>
+</html>

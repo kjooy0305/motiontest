@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>색 물결</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+canvas{display:block;cursor:crosshair;touch-action:none;}
+#hint{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,0.45);font-size:13px;
+  font-family:-apple-system,'Malgun Gothic',sans-serif;
+  pointer-events:none;transition:opacity 1.2s;white-space:nowrap;
+  letter-spacing:.5px;text-shadow:0 1px 8px rgba(0,0,0,0.5);
+}
+#hint.hidden{opacity:0;}
+#next-preview{
+  position:fixed;top:16px;right:16px;
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.3);
+  pointer-events:none;transition:background .4s;
+  box-shadow:0 0 8px rgba(255,255,255,0.15);
+}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="hint">화면을 클릭하면 새로운 색이 퍼집니다</div>
+<div id="next-preview" title="다음 색 미리보기"></div>
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const hint = document.getElementById('hint');
+const preview = document.getElementById('next-preview');
+
+// ── 크기 ──────────────────────────────────────
+function resize() {
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => {
+  resize();
+  // 현재 배경색 즉시 채움
+  ctx.fillStyle = currentBg;
+  ctx.fillRect(0, 0, cv.width, cv.height);
+});
+
+// ── 색상 ──────────────────────────────────────
+let hue = Math.random() * 360;
+let currentBg = hslStr(hue, 58, 28);
+
+function hslStr(h, s, l) { return `hsl(${h|0},${s}%,${l}%)`; }
+
+function nextHue() {
+  hue = (hue + 137.508) % 360; // 황금각 회전 — 인접 색끼리 겹치지 않음
+  return hue;
+}
+
+function makeColor(h) {
+  const s = 55 + Math.random() * 18;
+  const l = 22 + Math.random() * 22;
+  return {
+    fill  : hslStr(h, s, l),
+    ring  : hslStr(h, s, Math.min(l + 28, 85)),   // 테두리: 밝은 버전
+    echo  : hslStr(h, s - 10, Math.min(l + 40, 90)), // 잔물결: 더 밝게
+  };
+}
+
+// 다음 색 미리보기
+let pendingH = nextHue();
+let pendingColor = makeColor(pendingH);
+preview.style.background = pendingColor.fill;
+
+// ── 리플 목록 ─────────────────────────────────
+// { x, y, color, maxR, start, dur, done }
+const ripples = [];
+
+// ── 클릭 / 터치 ───────────────────────────────
+let firstClick = false;
+
+function spawnRipple(x, y) {
+  if (!firstClick) { firstClick = true; hint.classList.add('hidden'); }
+
+  const color = pendingColor;
+  const W = cv.width, H = cv.height;
+  // 클릭 지점에서 네 모서리 중 가장 먼 거리
+  const maxR = Math.ceil(Math.sqrt(
+    Math.max(x * x, (W - x) * (W - x)) +
+    Math.max(y * y, (H - y) * (H - y))
+  ));
+
+  ripples.push({ x, y, color, maxR, start: performance.now(), dur: 900, done: false });
+
+  // 다음 색 준비
+  pendingH = nextHue();
+  pendingColor = makeColor(pendingH);
+  preview.style.background = pendingColor.fill;
+}
+
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  spawnRipple(e.clientX, e.clientY);
+});
+
+// ── 이징 ──────────────────────────────────────
+function easeOutQuart(t) { return 1 - (1 - t) ** 4; }
+function easeOutCubic(t) { return 1 - (1 - t) ** 3; }
+
+// ── 렌더 루프 ─────────────────────────────────
+function draw(now) {
+  requestAnimationFrame(draw);
+
+  // 배경 (완료된 리플이 없으면 currentBg 유지)
+  ctx.fillStyle = currentBg;
+  ctx.fillRect(0, 0, cv.width, cv.height);
+
+  // 리플 렌더 (오래된 것부터 → 새 것이 위에 그려짐)
+  for (let i = 0; i < ripples.length; i++) {
+    const rip = ripples[i];
+    const t = Math.min(1, (now - rip.start) / rip.dur);
+    const r = rip.maxR * easeOutQuart(t);
+
+    // ── 본체 원 ──
+    ctx.beginPath();
+    ctx.arc(rip.x, rip.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = rip.color.fill;
+    ctx.fill();
+
+    // ── 테두리 링 (앞 70% 동안 점점 사라짐) ──
+    const ringAlpha = Math.max(0, 1 - t / 0.7);
+    if (ringAlpha > 0) {
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = rip.color.ring.replace('hsl', 'hsla').replace(')', `,${ringAlpha * 0.75})`).replace('hsla(', 'hsla(');
+      ctx.lineWidth = 5 + (1 - t) * 8;
+      ctx.stroke();
+    }
+
+    // ── 잔물결 에코 링 (살짝 앞서 달리는 희미한 원) ──
+    const echoT = Math.min(1, t + 0.12);
+    const echoR = rip.maxR * easeOutCubic(echoT);
+    const echoAlpha = Math.max(0, (1 - t * 2) * 0.35);
+    if (echoAlpha > 0 && echoR > r) {
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, echoR, 0, Math.PI * 2);
+      ctx.strokeStyle = rip.color.echo.replace('hsl(', `hsla(`).replace(')', `,${echoAlpha})`);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // 완료된 리플 → 배경색 업데이트
+    if (t >= 1 && !rip.done) {
+      rip.done = true;
+      currentBg = rip.color.fill;
+    }
+  }
+
+  // 완료된 리플 제거 (최근 1개는 남겨 currentBg 역할)
+  if (ripples.length > 8) ripples.splice(0, ripples.length - 8);
+}
+
+// ── 초기 배경 채우기 ──────────────────────────
+ctx.fillStyle = currentBg;
+ctx.fillRect(0, 0, cv.width, cv.height);
+
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

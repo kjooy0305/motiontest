@@ -178,18 +178,6 @@ function burst(el, x, y, color) {
   document.body.appendChild(fl);
   setTimeout(() => fl.remove(), 400);
 
-  // 펑! 텍스트
-  const boom = document.createElement('div');
-  boom.className  = 'boom';
-  boom.textContent = pick(['펑!','퍽!','뻥!','쾅!','빵!']);
-  boom.style.cssText = `
-    left: ${x}px; top: ${y}px;
-    color: ${color};
-    text-shadow: 0 0 12px ${color};
-  `;
-  document.body.appendChild(boom);
-  setTimeout(() => boom.remove(), 700);
-
   // 파티클
   const count = Math.round(rand(12, 20));
   for (let i = 0; i < count; i++) {

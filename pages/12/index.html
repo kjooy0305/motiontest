@@ -5,792 +5,642 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>딥러닝의 원리</title>
 <style>
-:root {
-  --bg:#080c10; --surf:#0e1318; --bdr:#1a2028;
-  --text:#c8c0b0; --dim:#556070;
-  --accent:#a78bfa; --accent2:#34d399; --accent3:#f472b6;
-  --warn:#fbbf24; --err:#f87171;
+:root{
+  --bg:#080c10;--surf:#0e1318;--surf2:#131920;--bdr:#1a2028;
+  --text:#c8c0b0;--dim:#556070;
+  --purple:#a78bfa;--green:#34d399;--pink:#f472b6;--yellow:#fbbf24;--red:#f87171;--blue:#60a5fa;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;user-select:none;}
-
 #app{display:flex;flex-direction:column;height:100%;}
 
+/* 학년 바 */
+#grade-bar{display:flex;align-items:center;background:var(--surf);
+  border-bottom:1px solid var(--bdr);padding:5px 10px;gap:6px;flex-shrink:0;}
+.gbtn{padding:4px 12px;border:1px solid var(--bdr);border-radius:20px;background:transparent;
+  color:var(--dim);font-size:11px;cursor:pointer;transition:.15s;font-family:inherit;}
+.gbtn:hover{color:var(--text);}
+.gbtn.on{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1);}
+#grade-hint{margin-left:auto;font-size:10px;color:var(--dim);}
+
 /* 탭 */
-#tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;}
-.tab{padding:10px 18px;font-size:12px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:.15s;}
+#tab-bar{display:flex;background:var(--surf);border-bottom:2px solid var(--bdr);flex-shrink:0;}
+.tab{flex:1;padding:8px 4px;font-size:11px;cursor:pointer;color:var(--dim);
+  border-bottom:2px solid transparent;text-align:center;transition:.15s;margin-bottom:-2px;}
 .tab:hover{color:var(--text);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab.on{color:var(--purple);border-bottom-color:var(--purple);}
 
-/* 메인 영역 */
-#main{flex:1;min-height:0;position:relative;}
-.panel{display:none;width:100%;height:100%;flex-direction:column;}
-.panel.active{display:flex;}
+/* 본문 */
+#content{flex:1;min-height:0;display:flex;overflow:hidden;}
+#sim-area{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;}
+#sim-area canvas{display:block;}
 
-/* 공통 캔버스 래퍼 */
-.cv-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-canvas{display:block;}
+/* 단어 탭 */
+#word-wrap{display:none;flex-direction:column;width:100%;height:100%;padding:14px;gap:10px;overflow:hidden;}
+#word-wrap.on{display:flex;}
+#wrow{display:flex;gap:8px;flex-shrink:0;}
+#wq{flex:1;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;
+  color:var(--text);font-size:13px;padding:7px 11px;font-family:inherit;outline:none;}
+#wq:focus{border-color:var(--purple);}
+#wbtn{padding:7px 14px;background:rgba(167,139,250,.1);border:1px solid var(--purple);
+  border-radius:8px;color:var(--purple);font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+#wbtn:hover{background:rgba(167,139,250,.2);}
+#wtext{flex:1;line-height:2.4;font-size:14px;overflow-y:auto;}
+.tok{display:inline;padding:2px 4px;border-radius:4px;margin:1px;
+  transition:background .25s,opacity .25s,outline .1s;}
+.tok.scan{outline:2px solid var(--purple);}
+.tok.hi{background:rgba(167,139,250,.55);color:#fff;}
+.tok.mid{background:rgba(167,139,250,.22);}
+.tok.lo{opacity:.4;}
 
-/* 하단 컨트롤 */
-#ctrl{background:var(--surf);border-top:1px solid var(--bdr);padding:8px 12px;
-  display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
+/* 설명 패널 */
+#exp{width:210px;flex-shrink:0;background:var(--surf);border-left:1px solid var(--bdr);
+  display:flex;flex-direction:column;overflow:hidden;}
+#exp-hd{padding:9px 12px;font-size:11px;color:var(--purple);
+  border-bottom:1px solid var(--bdr);flex-shrink:0;letter-spacing:.5px;}
+#exp-step{padding:10px 12px;font-size:11px;line-height:1.7;
+  border-bottom:1px solid var(--bdr);flex-shrink:0;}
+#exp-step .sn{color:var(--purple);font-family:monospace;font-size:10px;display:block;margin-bottom:3px;}
+#exp-step b{color:var(--text);}
+#exp-why{padding:10px 12px;font-size:11px;line-height:1.7;overflow-y:auto;flex:1;}
+#exp-why h4{font-size:10px;color:var(--yellow);margin-bottom:5px;}
+#exp-why p{color:var(--dim);}
+#exp-why b{color:var(--text);}
+#exp-why .f{color:var(--green);font-family:monospace;font-size:10px;display:block;margin-top:4px;}
+#exp-tags{padding:7px 12px;flex-shrink:0;display:flex;flex-wrap:wrap;gap:4px;border-top:1px solid var(--bdr);}
+.tag{padding:2px 8px;border-radius:12px;font-size:10px;border:1px solid;}
+.t-blue{border-color:var(--blue);color:var(--blue);}
+.t-green{border-color:var(--green);color:var(--green);}
+.t-purple{border-color:var(--purple);color:var(--purple);}
+.t-yellow{border-color:var(--yellow);color:var(--yellow);}
+
+@media(max-width:600px){
+  #content{flex-direction:column;}
+  #exp{width:100%;height:155px;border-left:none;border-top:1px solid var(--bdr);}
+}
+
+/* 컨트롤 */
+#ctrl{background:var(--surf);border-top:1px solid var(--bdr);
+  padding:7px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
 .btn{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;
-  color:var(--dim);font-family:inherit;font-size:12px;padding:7px 14px;
+  color:var(--dim);font-family:inherit;font-size:12px;padding:6px 12px;
   cursor:pointer;transition:.15s;white-space:nowrap;}
 .btn:hover{color:var(--text);border-color:#334;}
-.btn.active{border-color:var(--accent);color:var(--accent);background:rgba(167,139,250,.07);}
-.btn.go{border-color:#2a3a2a;color:var(--accent2);}
-.btn.go:hover{border-color:var(--accent2);background:rgba(52,211,153,.07);}
-.sep{width:1px;background:var(--bdr);height:22px;flex-shrink:0;}
-.lbl{font-size:11px;color:var(--dim);white-space:nowrap;}
-input[type=range]{accent-color:var(--accent);width:72px;vertical-align:middle;}
-
-/* 정보 오버레이 */
-#info-overlay{
-  position:absolute;top:8px;right:8px;width:220px;
-  background:rgba(14,19,24,.92);border:1px solid var(--bdr);border-radius:10px;
-  padding:12px 14px;font-size:11px;line-height:1.7;z-index:10;
-}
-#info-overlay h3{font-size:12px;color:var(--accent);margin-bottom:8px;}
-#info-overlay p{color:var(--dim);}
-#info-overlay b{color:var(--text);}
-#info-overlay .val{color:var(--accent2);font-family:monospace;}
-
-/* 로그 스트립 */
-#log{position:absolute;bottom:0;left:0;right:0;height:28px;
-  background:rgba(8,12,16,.85);border-top:1px solid var(--bdr);
-  font-size:10px;font-family:monospace;color:var(--dim);
-  display:flex;align-items:center;padding:0 12px;pointer-events:none;z-index:5;}
+.btn.on{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.07);}
+.btn.go{border-color:#1a3a2a;color:var(--green);}
+.btn.go:hover{border-color:var(--green);}
+.sep{width:1px;background:var(--bdr);height:20px;flex-shrink:0;}
+.lbl{font-size:10px;color:var(--dim);}
+input[type=range]{accent-color:var(--purple);width:68px;}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <div id="tabs">
-    <div class="tab active" onclick="switchTab('fwd')">① 순전파</div>
-    <div class="tab" onclick="switchTab('bp')">② 역전파</div>
-    <div class="tab" onclick="switchTab('act')">③ 활성화 함수</div>
-    <div class="tab" onclick="switchTab('train')">④ 학습 과정</div>
-  </div>
-
-  <div id="main">
-
-    <!-- ① 순전파 -->
-    <div class="panel active" id="panel-fwd">
-      <div class="cv-wrap"><canvas id="cv-fwd"></canvas></div>
-    </div>
-
-    <!-- ② 역전파 -->
-    <div class="panel" id="panel-bp">
-      <div class="cv-wrap"><canvas id="cv-bp"></canvas></div>
-    </div>
-
-    <!-- ③ 활성화 함수 -->
-    <div class="panel" id="panel-act">
-      <div class="cv-wrap"><canvas id="cv-act"></canvas></div>
-    </div>
-
-    <!-- ④ 학습 과정 -->
-    <div class="panel" id="panel-train">
-      <div class="cv-wrap"><canvas id="cv-train"></canvas></div>
-    </div>
-
-    <div id="info-overlay">
-      <h3 id="info-title">순전파 (Forward Pass)</h3>
-      <div id="info-body"></div>
-    </div>
-
-    <div id="log"><span id="log-text">신호가 입력층 → 은닉층 → 출력층 방향으로 흐릅니다.</span></div>
-  </div>
-
-  <div id="ctrl" id="ctrl-bar">
-    <button class="btn go" id="btn-main" onclick="mainAction()">▶ 시작</button>
-    <button class="btn" id="btn-step" onclick="stepAction()">한 단계</button>
-    <div class="sep"></div>
-    <span class="lbl">속도</span>
-    <input type="range" id="rng-speed" min="1" max="5" value="3" oninput="onSpeedChange()">
-    <div class="sep"></div>
-    <span class="lbl" id="extra-lbl"></span>
-    <button class="btn" id="btn-extra" style="display:none" onclick="extraAction()"></button>
-    <div class="sep" id="sep-extra" style="display:none"></div>
-    <button class="btn" onclick="resetCurrent()">리셋</button>
-  </div>
-
+<div id="grade-bar">
+  <button class="gbtn on" onclick="setGrade(0)">🟡 초등학생</button>
+  <button class="gbtn"    onclick="setGrade(1)">🔵 중학생</button>
+  <button class="gbtn"    onclick="setGrade(2)">🔴 고등학생</button>
+  <span id="grade-hint">쉽고 재미있게 AI를 배워요!</span>
 </div>
 
+<div id="tab-bar">
+  <div class="tab on"  onclick="switchTab('maze')">🌀 미로 탈출</div>
+  <div class="tab"     onclick="switchTab('mine')">💣 지뢰찾기</div>
+  <div class="tab"     onclick="switchTab('word')">🔍 단어 찾기</div>
+</div>
+
+<div id="content">
+  <div id="sim-area">
+    <canvas id="cv-maze"></canvas>
+    <canvas id="cv-mine" style="display:none"></canvas>
+    <div id="word-wrap">
+      <div id="wrow">
+        <input id="wq" type="text" placeholder="찾을 단어를 입력하세요..." maxlength="15">
+        <button id="wbtn" onclick="wordMod.search()">AI 검색</button>
+      </div>
+      <div id="wtext"></div>
+    </div>
+  </div>
+
+  <div id="exp">
+    <div id="exp-hd">💭 AI의 생각</div>
+    <div id="exp-step">
+      <span class="sn" id="esn">준비</span>
+      <span id="est">▶ 시작 버튼을 눌러 AI 사고 과정을 확인하세요.</span>
+    </div>
+    <div id="exp-why">
+      <h4>🔍 이 판단의 이유</h4>
+      <p id="ewhy">—</p>
+    </div>
+    <div id="exp-tags" id="etags"></div>
+  </div>
+</div>
+
+<div id="ctrl">
+  <button class="btn go" id="bmain" onclick="mainAct()">▶ 시작</button>
+  <button class="btn"    id="bstep" onclick="stepAct()">한 단계</button>
+  <div class="sep"></div>
+  <span class="lbl">속도</span>
+  <input type="range" id="rspeed" min="1" max="5" value="3" oninput="onSpeed()">
+  <div class="sep"></div>
+  <button class="btn" onclick="resetAct()">리셋</button>
+  <button class="btn" id="bnew"  onclick="newAct()">새 문제</button>
+</div>
+
+</div>
 <script>
-// ═══════════════════════════════════════════════
-//  공통 유틸
-// ═══════════════════════════════════════════════
-const $ = id => document.getElementById(id);
+// ═══════════════ 전역 ════════════════
+let grade=0, curTab='maze', spd=200, timer=null, running=false;
+const SPEED_MS=[700,400,200,90,30];
+const GHINTS=['쉽고 재미있게 AI를 배워요!','조금 더 자세히 AI 원리를 이해해요.','수식과 알고리즘으로 깊이 파고들어요.'];
 
-function lerp(a,b,t){return a+(b-a)*t;}
-function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
-function sigmoid(x){return 1/(1+Math.exp(-x));}
-function relu(x){return Math.max(0,x);}
-function tanh(x){return Math.tanh(x);}
-function leakyRelu(x){return x>=0?x:0.1*x;}
+// 마지막 세 학년 설명 (등급 전환 시 재렌더)
+let lastExps=null, lastSN='';
 
-const SPEED_MAP = [600,350,180,80,25]; // ms per step
-let speed = 180;
-
-function onSpeedChange(){
-  speed = SPEED_MAP[parseInt($('rng-speed').value)-1];
+function xp(sn, arr){
+  lastSN=sn; lastExps=arr;
+  _renderXp(sn,arr[grade]);
+}
+function _renderXp(sn,e){
+  document.getElementById('esn').textContent=sn;
+  document.getElementById('est').innerHTML=e.s;
+  document.getElementById('ewhy').innerHTML=e.w;
+  document.getElementById('exp-tags').innerHTML=(e.tags||[]).map(t=>`<span class="tag t-${t.c}">${t.l}</span>`).join('');
 }
 
-// ═══════════════════════════════════════════════
-//  탭 전환
-// ═══════════════════════════════════════════════
-let currentTab = 'fwd';
-const TAB_INFO = {
-  fwd:{
-    title:'순전파 (Forward Pass)',
-    body:'입력값이 <b>가중치(w)</b>와 곱해져 각 뉴런으로 전달됩니다.<br><br>뉴런은 입력 합계에 <b>활성화 함수</b>를 적용해 출력을 만들어 냅니다.<br><br><span class="val">출력 = σ(Σ wᵢxᵢ + b)</span>',
-    log:'신호가 입력층 → 은닉층 → 출력층 방향으로 흐릅니다.'
-  },
-  bp:{
-    title:'역전파 (Backpropagation)',
-    body:'출력의 <b>오차(Loss)</b>를 계산한 뒤, 체인 룰(chain rule)로 각 가중치의 기울기를 역방향으로 전파합니다.<br><br><span class="val">∂L/∂w = ∂L/∂y · ∂y/∂w</span><br><br>붉은 신호 = 기울기(gradient) 흐름.',
-    log:'오차가 출력층 → 은닉층 → 입력층 방향으로 역전파됩니다.'
-  },
-  act:{
-    title:'활성화 함수',
-    body:'뉴런에 <b>비선형성</b>을 부여합니다.<br><br><b>Sigmoid</b> — 이진 분류<br><b>ReLU</b> — 은닉층 표준<br><b>Tanh</b> — 중심이 0<br><b>Leaky ReLU</b> — 죽은 뉴런 방지',
-    log:'함수를 클릭하면 그래프와 미분값을 확인할 수 있습니다.'
-  },
-  train:{
-    title:'학습 과정 (Training)',
-    body:'순전파 → 손실 계산 → 역전파 → 가중치 업데이트를 반복합니다.<br><br><span class="val">w ← w − η · ∂L/∂w</span><br><br>η = 학습률 (learning rate)<br>손실 곡선이 내려갈수록 모델이 개선됩니다.',
-    log:'에포크(epoch)마다 손실이 감소하면 학습이 잘 되고 있습니다.'
-  }
-};
-
-function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active', ['fwd','bp','act','train'][i]===tab);
-  });
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  $('panel-'+tab).classList.add('active');
-  currentTab = tab;
-  const info = TAB_INFO[tab];
-  $('info-title').textContent = info.title;
-  $('info-body').innerHTML = info.body;
-  $('log-text').textContent = info.log;
-
-  resetCurrent();
+function setGrade(g){
+  grade=g;
+  document.querySelectorAll('.gbtn').forEach((b,i)=>b.classList.toggle('on',i===g));
+  document.getElementById('grade-hint').textContent=GHINTS[g];
+  if(lastExps) _renderXp(lastSN,lastExps[grade]);
+  if(curTab==='maze'){stopRun();mazeMod.init();}
 }
 
-function mainAction(){
-  if(currentTab==='fwd') fwd.toggle();
-  else if(currentTab==='bp') bp.toggle();
-  else if(currentTab==='act') act.toggle();
-  else if(currentTab==='train') train.toggle();
-}
-function stepAction(){
-  if(currentTab==='fwd') fwd.step();
-  else if(currentTab==='bp') bp.step();
-  else if(currentTab==='train') train.step();
-}
-function extraAction(){
-  if(currentTab==='train') train.toggleOverfit();
-}
-function resetCurrent(){
-  if(currentTab==='fwd') fwd.reset();
-  else if(currentTab==='bp') bp.reset();
-  else if(currentTab==='act') act.reset();
-  else if(currentTab==='train') train.reset();
+function onSpeed(){spd=SPEED_MS[+document.getElementById('rspeed').value-1];if(running)restartTimer();}
+function restartTimer(){clearInterval(timer);timer=setInterval(autoStep,spd);}
+
+function switchTab(t){
+  stopRun();curTab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',['maze','mine','word'][i]===t));
+  document.getElementById('cv-maze').style.display=t==='maze'?'block':'none';
+  document.getElementById('cv-mine').style.display=t==='mine'?'block':'none';
+  document.getElementById('word-wrap').classList.toggle('on',t==='word');
+  document.getElementById('bstep').style.display=t==='word'?'none':'';
+  document.getElementById('bnew').style.display=t==='word'?'none':'';
+  if(t==='maze') mazeMod.init();
+  else if(t==='mine') mineMod.init();
+  else wordMod.init();
 }
 
-// ═══════════════════════════════════════════════
-//  공통 신경망 레이아웃 계산
-// ═══════════════════════════════════════════════
-function buildNet(cv, layers){
-  const W=cv.width, H=cv.height;
-  const marginX=60, marginY=40;
-  const netW=W-marginX*2, netH=H-marginY*2;
-  const cols=layers.length;
-  const nodes=[];
-  layers.forEach((count,li)=>{
-    const x=marginX+netW*(li/(cols-1));
-    const col=[];
-    for(let ni=0;ni<count;ni++){
-      const y=marginY+netH*((ni+0.5)/count);
-      col.push({x,y,val:0,li,ni});
-    }
-    nodes.push(col);
-  });
-  return nodes;
+function mainAct(){if(curTab==='word'){wordMod.search();return;}running?stopRun():startRun();}
+function stepAct(){if(running)stopRun();doStep();}
+function resetAct(){stopRun();if(curTab==='maze')mazeMod.reset();else if(curTab==='mine')mineMod.reset();else wordMod.reset();}
+function newAct(){stopRun();if(curTab==='maze')mazeMod.init();else if(curTab==='mine')mineMod.init();}
+
+function startRun(){
+  running=true;
+  const bm=document.getElementById('bmain');
+  bm.textContent='⏸ 일시정지';bm.classList.add('on');
+  timer=setInterval(autoStep,spd);
+}
+function stopRun(){
+  running=false;clearInterval(timer);timer=null;
+  const bm=document.getElementById('bmain');
+  bm.textContent='▶ 시작';bm.classList.remove('on');
+}
+function autoStep(){if(doStep())stopRun();}
+function doStep(){
+  if(curTab==='maze') return mazeMod.step();
+  if(curTab==='mine') return mineMod.step();
+  return true;
 }
 
-function drawNet(ctx, nodes, weights, options={}){
-  const {
-    activeEdge=null, edgeColor='rgba(167,139,250,0.15)',
-    activeEdgeColor='#a78bfa', nodeColor='#1a2028',
-    activeNode=null, nodeRadius=14
-  } = options;
-
-  // 엣지
-  for(let li=0;li<nodes.length-1;li++){
-    nodes[li].forEach(src=>{
-      nodes[li+1].forEach(dst=>{
-        const key=`${li}-${src.ni}-${dst.ni}`;
-        const isActive = activeEdge && activeEdge.has(key);
-        ctx.beginPath();
-        ctx.moveTo(src.x,src.y);
-        ctx.lineTo(dst.x,dst.y);
-        ctx.strokeStyle = isActive ? activeEdgeColor : edgeColor;
-        ctx.lineWidth = isActive ? 2 : 1;
-        ctx.stroke();
-        // 가중치 표시 (활성 시)
-        if(isActive && weights && weights[key]!==undefined){
-          const mx=(src.x+dst.x)/2, my=(src.y+dst.y)/2;
-          ctx.fillStyle='#a78bfa';
-          ctx.font='10px monospace';
-          ctx.textAlign='center';
-          ctx.fillText(weights[key].toFixed(2),mx,my-4);
-        }
-      });
-    });
-  }
-
-  // 노드
-  nodes.forEach(col=>{
-    col.forEach(n=>{
-      const isActive = activeNode && activeNode.has(`${n.li}-${n.ni}`);
-      const v = clamp(n.val,0,1);
-      ctx.beginPath();
-      ctx.arc(n.x,n.y,nodeRadius,0,Math.PI*2);
-      ctx.fillStyle = isActive
-        ? `rgba(167,139,250,${0.2+v*0.8})`
-        : `rgba(26,32,40,${0.5+v*0.5})`;
-      ctx.fill();
-      ctx.strokeStyle = isActive ? '#a78bfa' : '#2a3545';
-      ctx.lineWidth = isActive ? 2 : 1;
-      ctx.stroke();
-      ctx.fillStyle = isActive ? '#fff' : '#778899';
-      ctx.font='10px monospace';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText(v>0?v.toFixed(1):'', n.x, n.y);
-    });
-  });
-
-  // 레이어 레이블
-  const labels=['입력층','은닉층1','은닉층2','출력층'];
-  nodes.forEach((col,li)=>{
-    ctx.fillStyle='#556070';
-    ctx.font='11px sans-serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='top';
-    ctx.fillText(labels[li]||`층${li}`, col[0].x, 6);
-  });
-}
-
-// ═══════════════════════════════════════════════
-//  ① 순전파
-// ═══════════════════════════════════════════════
-const fwd = (() => {
-  let cv, ctx, nodes, weights={};
-  let timer=null, running=false, phase=0;
-  const LAYERS=[3,4,4,2];
-  const ACTIVE_EDGES=new Set(), ACTIVE_NODES=new Set();
+// ═══════════════ 미로 모듈 ════════════════
+const mazeMod=(()=>{
+  let cv,ctx,W,H,cs;
+  let walls,vis,queue,parent,pathSet,qSet,vSet;
+  let stepN=0,cur=null,done=false;
+  const SIZES=[9,13,17];
 
   function init(){
-    cv=$('cv-fwd');
+    cv=document.getElementById('cv-maze');
     ctx=cv.getContext('2d');
-    resize();
+    _resize();
+    _generate();
+    _resetBFS();
   }
 
-  function resize(){
-    const wrap=cv.parentElement;
-    cv.width=wrap.clientWidth;
-    cv.height=wrap.clientHeight;
-    nodes=buildNet(cv,LAYERS);
-    // 랜덤 가중치
-    weights={};
-    for(let li=0;li<nodes.length-1;li++){
-      nodes[li].forEach(s=>{
-        nodes[li+1].forEach(d=>{
-          weights[`${li}-${s.ni}-${d.ni}`]=(Math.random()*2-1).toFixed(2)*1;
-        });
-      });
+  function _resize(){
+    const a=cv.parentElement;
+    cv.width=a.clientWidth; cv.height=a.clientHeight;
+    const sz=SIZES[grade];
+    cs=Math.floor(Math.min(cv.width/sz,cv.height/sz)*0.88);
+    W=SIZES[grade]; H=W;
+  }
+
+  function _generate(){
+    W=H=SIZES[grade];
+    walls=Array(H).fill(0).map(()=>Array(W).fill(0).map(()=>({N:1,S:1,E:1,W:1})));
+    const v=Array(H).fill(0).map(()=>Array(W).fill(false));
+    const stk=[[0,0]]; v[0][0]=true;
+    while(stk.length){
+      const [r,c]=stk[stk.length-1];
+      const nb=[];
+      if(r>0&&!v[r-1][c]) nb.push([r-1,c,'N','S']);
+      if(r<H-1&&!v[r+1][c]) nb.push([r+1,c,'S','N']);
+      if(c>0&&!v[r][c-1]) nb.push([r,c-1,'W','E']);
+      if(c<W-1&&!v[r][c+1]) nb.push([r,c+1,'E','W']);
+      if(nb.length){
+        const [nr,nc,d1,d2]=nb[Math.floor(Math.random()*nb.length)];
+        walls[r][c][d1]=0; walls[nr][nc][d2]=0;
+        v[nr][nc]=true; stk.push([nr,nc]);
+      } else stk.pop();
     }
-    // 입력 초기화
-    nodes[0].forEach(n=>{ n.val=parseFloat((Math.random()).toFixed(2)); });
+  }
+
+  function _resetBFS(){
+    queue=[{r:0,c:0,d:0}];
+    vis=Array(H).fill(0).map(()=>Array(W).fill(false));
+    vis[0][0]=true;
+    parent={'0,0':null}; pathSet=new Set(); qSet=new Set(['0,0']); vSet=new Set(['0,0']);
+    stepN=0; cur=null; done=false;
     draw();
+    xp('준비',[
+      {s:'▶ 시작을 눌러 AI가 미로를 탐색하는 과정을 봐요!',w:'AI는 마치 물이 퍼지듯이 가까운 곳부터 차례차례 살펴봐요.',tags:[{l:'BFS',c:'purple'},{l:'미로탐색',c:'blue'}]},
+      {s:'BFS(너비 우선 탐색)로 최단 경로를 찾습니다.',w:'큐(Queue)에 넣은 순서대로 꺼내어 탐색하기 때문에 가장 가까운 셀부터 처리돼요.',tags:[{l:'BFS',c:'purple'},{l:'Queue',c:'blue'}]},
+      {s:'BFS 알고리즘으로 최단 경로를 탐색합니다.',w:'시간복잡도 O(V+E). 큐 기반 탐색으로 최적성을 보장.',tags:[{l:'O(V+E)',c:'blue'},{l:'최적성보장',c:'green'}]},
+    ]);
   }
 
   function draw(){
+    if(!ctx) return;
+    const px=Math.floor((cv.width-W*cs)/2), py=Math.floor((cv.height-H*cs)/2);
     ctx.clearRect(0,0,cv.width,cv.height);
-    drawNet(ctx,nodes,weights,{activeEdge:ACTIVE_EDGES,activeNode:ACTIVE_NODES,nodeRadius:16});
-  }
+    ctx.fillStyle='#080c10'; ctx.fillRect(0,0,cv.width,cv.height);
 
-  function computeLayer(li){
-    nodes[li+1].forEach(dst=>{
-      let sum=0;
-      nodes[li].forEach(src=>{
-        sum+=src.val*weights[`${li}-${src.ni}-${dst.ni}`];
-      });
-      dst.val=parseFloat(sigmoid(sum).toFixed(2));
-    });
-  }
+    for(let r=0;r<H;r++) for(let c=0;c<W;c++){
+      const x=px+c*cs,y=py+r*cs,k=`${r},${c}`;
+      let fill='#0d1117';
+      if(pathSet.has(k)) fill='rgba(167,139,250,0.7)';
+      else if(cur&&cur.r===r&&cur.c===c) fill='#ffffff';
+      else if(qSet.has(k)) fill='rgba(167,139,250,0.2)';
+      else if(vSet.has(k)) fill='rgba(52,211,153,0.08)';
+      ctx.fillStyle=fill; ctx.fillRect(x+1,y+1,cs-1,cs-1);
 
-  function step(){
-    if(phase>=LAYERS.length-1){ reset(); return; }
-    ACTIVE_EDGES.clear(); ACTIVE_NODES.clear();
-    nodes[phase].forEach(s=>{
-      ACTIVE_NODES.add(`${phase}-${s.ni}`);
-      nodes[phase+1].forEach(d=>{
-        ACTIVE_EDGES.add(`${phase}-${s.ni}-${d.ni}`);
-      });
-    });
-    computeLayer(phase);
-    nodes[phase+1].forEach(d=>ACTIVE_NODES.add(`${phase+1}-${d.ni}`));
-    phase++;
-    $('log-text').textContent=`층 ${phase} → ${phase+1} 순전파 완료. σ(Σwx+b) 적용.`;
-    draw();
-  }
-
-  function toggle(){
-    if(running){ clearInterval(timer); timer=null; running=false; $('btn-main').textContent='▶ 시작'; }
-    else{ running=true; $('btn-main').textContent='⏸ 일시정지'; timer=setInterval(step,speed); }
-  }
-
-  function reset(){
-    clearInterval(timer); timer=null; running=false;
-    $('btn-main').textContent='▶ 시작';
-    phase=0; ACTIVE_EDGES.clear(); ACTIVE_NODES.clear();
-    nodes[0].forEach(n=>{ n.val=parseFloat((Math.random()).toFixed(2)); });
-    for(let li=1;li<nodes.length;li++) nodes[li].forEach(n=>n.val=0);
-    $('log-text').textContent='신호가 입력층 → 은닉층 → 출력층 방향으로 흐릅니다.';
-    draw();
-  }
-
-  return {init,resize,step,toggle,reset};
-})();
-
-// ═══════════════════════════════════════════════
-//  ② 역전파
-// ═══════════════════════════════════════════════
-const bp = (() => {
-  let cv, ctx, nodes, grads={};
-  let timer=null, running=false, phase=0;
-  const LAYERS=[3,4,4,2];
-  const ACTIVE_EDGES=new Set(), ACTIVE_NODES=new Set();
-
-  function init(){
-    cv=$('cv-bp');
-    ctx=cv.getContext('2d');
-    resize();
-  }
-
-  function resize(){
-    const wrap=cv.parentElement;
-    cv.width=wrap.clientWidth;
-    cv.height=wrap.clientHeight;
-    nodes=buildNet(cv,LAYERS);
-    grads={};
-    nodes.forEach(col=>col.forEach(n=>{ n.val=parseFloat((Math.random()*0.6+0.2).toFixed(2)); }));
-    for(let li=0;li<nodes.length-1;li++){
-      nodes[li].forEach(s=>nodes[li+1].forEach(d=>{
-        grads[`${li}-${s.ni}-${d.ni}`]=parseFloat((Math.random()*0.8+0.1).toFixed(2));
-      }));
+      if(r===0&&c===0){ctx.fillStyle='#34d399';ctx.font=`bold ${Math.max(9,cs-8)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('S',x+cs/2,y+cs/2);}
+      if(r===H-1&&c===W-1){ctx.fillStyle='#f472b6';ctx.font=`bold ${Math.max(9,cs-8)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('G',x+cs/2,y+cs/2);}
     }
-    draw();
-  }
 
-  function draw(){
-    ctx.clearRect(0,0,cv.width,cv.height);
-    // 기울기 엣지 색상 (붉은 계열)
-    const AE=ACTIVE_EDGES, AN=ACTIVE_NODES;
-    for(let li=0;li<nodes.length-1;li++){
-      nodes[li].forEach(src=>{
-        nodes[li+1].forEach(dst=>{
-          const key=`${li}-${src.ni}-${dst.ni}`;
-          const isA=AE.has(key);
-          ctx.beginPath();
-          ctx.moveTo(src.x,src.y);
-          ctx.lineTo(dst.x,dst.y);
-          ctx.strokeStyle=isA?'#f87171':'rgba(248,113,113,0.1)';
-          ctx.lineWidth=isA?2:1;
-          ctx.stroke();
-          if(isA&&grads[key]!==undefined){
-            const mx=(src.x+dst.x)/2,my=(src.y+dst.y)/2;
-            ctx.fillStyle='#f87171';
-            ctx.font='10px monospace';
-            ctx.textAlign='center';
-            ctx.fillText('∂'+grads[key].toFixed(2),mx,my-4);
-          }
-        });
-      });
-    }
-    nodes.forEach(col=>col.forEach(n=>{
-      const isA=AN.has(`${n.li}-${n.ni}`);
+    ctx.strokeStyle='#2a3545'; ctx.lineWidth=1.5;
+    for(let r=0;r<H;r++) for(let c=0;c<W;c++){
+      const x=px+c*cs,y=py+r*cs,w=walls[r][c];
       ctx.beginPath();
-      ctx.arc(n.x,n.y,16,0,Math.PI*2);
-      ctx.fillStyle=isA?'rgba(248,113,113,0.25)':'rgba(26,32,40,0.8)';
-      ctx.fill();
-      ctx.strokeStyle=isA?'#f87171':'#2a3545';
-      ctx.lineWidth=isA?2:1;
+      if(w.N){ctx.moveTo(x,y);ctx.lineTo(x+cs,y);}
+      if(w.S){ctx.moveTo(x,y+cs);ctx.lineTo(x+cs,y+cs);}
+      if(w.W){ctx.moveTo(x,y);ctx.lineTo(x,y+cs);}
+      if(w.E){ctx.moveTo(x+cs,y);ctx.lineTo(x+cs,y+cs);}
       ctx.stroke();
-      ctx.fillStyle=isA?'#fca5a5':'#778899';
-      ctx.font='10px monospace';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText(n.val.toFixed(1),n.x,n.y);
-    }));
-    const labels=['입력층','은닉층1','은닉층2','출력층'];
-    nodes.forEach((col,li)=>{
-      ctx.fillStyle='#556070';ctx.font='11px sans-serif';
-      ctx.textAlign='center';ctx.textBaseline='top';
-      ctx.fillText(labels[li]||`층${li}`,col[0].x,6);
+    }
+
+    // 범례
+    const legend=[['#ffffff','현재'],['rgba(167,139,250,0.5)','탐색 대기'],['rgba(52,211,153,0.3)','방문 완료'],['rgba(167,139,250,0.7)','최단 경로']];
+    legend.forEach(([col,lbl],i)=>{
+      const lx=px+i*Math.floor((W*cs)/4),ly=py+H*cs+8;
+      if(ly+16>cv.height) return;
+      ctx.fillStyle=col; ctx.fillRect(lx,ly,10,10);
+      ctx.fillStyle='#556070'; ctx.font='9px sans-serif'; ctx.textAlign='left';
+      ctx.fillText(lbl,lx+13,ly+9);
     });
-    // 오차 표시
-    if(phase>0){
-      const outCol=nodes[nodes.length-1];
-      const lossY=outCol[outCol.length-1].y+30;
-      ctx.fillStyle='#f87171';ctx.font='bold 13px monospace';
-      ctx.textAlign='center';
-      ctx.fillText(`Loss = ${(0.35*(1-phase/(LAYERS.length))).toFixed(3)}`,outCol[0].x,lossY);
+
+    if(stepN>0){
+      ctx.fillStyle='#556070'; ctx.font='10px monospace'; ctx.textAlign='right';
+      ctx.fillText(`대기:${queue.length} 방문:${vSet.size}`,cv.width-6,cv.height-4);
     }
   }
 
   function step(){
-    const layerIdx=LAYERS.length-1-phase;
-    if(layerIdx<0){ reset(); return; }
-    ACTIVE_EDGES.clear(); ACTIVE_NODES.clear();
-    if(layerIdx>0){
-      nodes[layerIdx-1].forEach(s=>{
-        ACTIVE_NODES.add(`${layerIdx-1}-${s.ni}`);
-        nodes[layerIdx].forEach(d=>{
-          ACTIVE_EDGES.add(`${layerIdx-1}-${s.ni}-${d.ni}`);
-        });
-      });
+    if(done) return true;
+    if(!queue.length){done=true;return true;}
+    const cell=queue.shift(); const {r,c,d}=cell;
+    const k=`${r},${c}`; qSet.delete(k); cur=cell; stepN++;
+
+    if(r===H-1&&c===W-1){
+      let p=k; while(p!==null){pathSet.add(p);p=parent[p];}
+      done=true;
+      const pl=pathSet.size;
+      xp(`단계 ${stepN}`,[
+        {s:`🎉 목표 도달! AI가 <b>${pl}칸</b>을 거쳐 출구를 찾았어요!`,w:`BFS는 물이 퍼지듯 가까운 곳부터 탐색해요.<br>그래서 찾은 첫 번째 경로가 <b>항상 가장 짧아요</b>!<br>보라색 경로가 최단 길이에요.`,tags:[{l:'최단경로',c:'purple'},{l:'BFS완료',c:'green'}]},
+        {s:`목표 도달. 최단 경로 <b>${pl}칸</b>.`,w:`BFS는 같은 거리의 노드를 먼저 처리하므로 첫 번째로 찾은 경로가 최단 경로예요.<br>탐색 노드: <b>${vSet.size}개</b>`,tags:[{l:'BFS',c:'blue'},{l:'최적성',c:'green'}]},
+        {s:`Goal(${r},${c}) 도달. 경로 길이: <b>${pl}</b>`,w:`BFS 최적성 증명: 같은 depth의 노드를 동시에 처리 → 처음 도달한 경로가 최단.<br><span class="f">경로=${pl}, 탐색=${vSet.size}, 큐처리=${stepN}</span>`,tags:[{l:'O(V+E)',c:'blue'},{l:'최적성',c:'green'}]},
+      ]);
+      draw(); return true;
     }
-    nodes[layerIdx].forEach(n=>ACTIVE_NODES.add(`${layerIdx}-${n.ni}`));
-    phase++;
-    const layerName=['출력층','은닉층2','은닉층1','입력층'][phase-1]||`층${phase-1}`;
-    $('log-text').textContent=`${layerName}의 기울기(gradient) 계산 완료. 가중치 업데이트 예정.`;
-    draw();
+
+    const DIRS=[{dr:-1,dc:0,w:'N',nm:'위'},{dr:1,dc:0,w:'S',nm:'아래'},{dr:0,dc:1,w:'E',nm:'오른쪽'},{dr:0,dc:-1,w:'W',nm:'왼쪽'}];
+    const blocked=[],added=[];
+    DIRS.forEach(({dr,dc,w,nm})=>{
+      const nr=r+dr,nc=c+dc,nk=`${nr},${nc}`;
+      if(nr<0||nr>=H||nc<0||nc>=W||walls[r][c][w]){blocked.push(nm+'(벽)');return;}
+      if(vis[nr][nc]){blocked.push(nm+'(방문)');return;}
+      vis[nr][nc]=true; vSet.add(nk); parent[nk]=k;
+      queue.push({r:nr,c:nc,d:d+1}); qSet.add(nk); added.push(nm);
+    });
+
+    const bStr=blocked.join(', ')||'없음', aStr=added.join(', ')||'없음';
+    xp(`단계 ${stepN}`,[
+      {s:`AI가 <b>(${r+1}행 ${c+1}열)</b> 칸을 살펴봤어요!`,
+       w:`${blocked.length?`<b>${bStr}</b> 방향은 벽이 막혔거나 이미 가봤어요.<br>`:''}${added.length?`<b>${aStr}</b> 방향으로 갈 수 있어서 탐색 목록에 추가했어요! 🟣`:'더 갈 곳이 없어요.'}`,
+       tags:[{l:'BFS',c:'purple'},{l:`깊이${d}`,c:'blue'}]},
+      {s:`노드(${r},${c}) 처리. 깊이:<b>${d}</b>. 큐:<b>${queue.length}</b>`,
+       w:`막힌 방향: <b>${bStr}</b><br>새로 추가: <b>${aStr}</b><br><br>BFS는 먼저 넣은 것을 먼저 꺼내는 큐 구조 덕분에 항상 가까운 노드부터 처리해요.`,
+       tags:[{l:'Queue',c:'blue'},{l:`depth=${d}`,c:'green'}]},
+      {s:`Dequeue(${r},${c}), depth=${d}. 잔여큐:${queue.length}`,
+       w:`인접 4방향 검사:<br>차단(벽/기방문): <b>${bStr}</b><br>Enqueue: <b>${aStr}</b><br><span class="f">|V|=${vSet.size}, |Queue|=${queue.length}</span>`,
+       tags:[{l:'BFS',c:'blue'},{l:`d=${d}`,c:'purple'}]},
+    ]);
+    draw(); return false;
   }
 
-  function toggle(){
-    if(running){ clearInterval(timer);timer=null;running=false;$('btn-main').textContent='▶ 시작'; }
-    else{ running=true;$('btn-main').textContent='⏸ 일시정지';timer=setInterval(step,speed); }
-  }
-
-  function reset(){
-    clearInterval(timer);timer=null;running=false;$('btn-main').textContent='▶ 시작';
-    phase=0;ACTIVE_EDGES.clear();ACTIVE_NODES.clear();
-    $('log-text').textContent='오차가 출력층 → 은닉층 → 입력층 방향으로 역전파됩니다.';
-    draw();
-  }
-
-  return {init,resize,step,toggle,reset};
+  function reset(){_resetBFS();}
+  function resize(){_resize();draw();}
+  return {init,reset,step,resize};
 })();
 
-// ═══════════════════════════════════════════════
-//  ③ 활성화 함수
-// ═══════════════════════════════════════════════
-const act = (() => {
-  let cv, ctx;
-  let selected=0;
-  const FUNCS=[
-    {name:'Sigmoid', fn:sigmoid, dfn:x=>{const s=sigmoid(x);return s*(1-s);}, color:'#a78bfa', desc:'출력: 0~1. 이진 분류 출력층에 사용. 기울기 소실 문제 있음.'},
-    {name:'ReLU', fn:relu, dfn:x=>x>=0?1:0, color:'#34d399', desc:'음수=0, 양수=그대로. 은닉층 표준. 빠르고 간단. 죽은 뉴런 위험.'},
-    {name:'Tanh', fn:tanh, dfn:x=>1-Math.tanh(x)**2, color:'#f472b6', desc:'출력: -1~1. 중심이 0이라 학습 안정. 기울기 소실은 여전히 있음.'},
-    {name:'Leaky ReLU', fn:leakyRelu, dfn:x=>x>=0?1:0.1, color:'#fbbf24', desc:'음수 구간 기울기 0.1. 죽은 뉴런 문제 완화. ReLU 개선판.'},
-  ];
+// ═══════════════ 지뢰찾기 모듈 ════════════════
+const mineMod=(()=>{
+  const R=8,C=8,M=10;
+  let cv,ctx,board,rev,flag,cs,stepN,done,safeQ,mineQ,curCell,curSrc,curAct;
+
+  function _size(){
+    const a=document.getElementById('cv-mine').parentElement;
+    cv.width=a.clientWidth; cv.height=a.clientHeight;
+    cs=Math.floor(Math.min(cv.width/(C+1),cv.height/(R+2)));
+  }
 
   function init(){
-    cv=$('cv-act');
+    cv=document.getElementById('cv-mine');
     ctx=cv.getContext('2d');
-    // 버튼 바꾸기
-    $('btn-main').textContent='← 이전 함수';
-    $('btn-step').textContent='다음 함수 →';
-    $('extra-lbl').textContent='';
-    resize();
-  }
-
-  function resize(){
-    const wrap=cv.parentElement;
-    cv.width=wrap.clientWidth;
-    cv.height=wrap.clientHeight;
+    _size(); _create(); _rebuild();
+    stepN=0;done=false;curCell=null;curSrc=null;curAct='';
     draw();
+    xp('준비',[
+      {s:'▶ 시작을 눌러 AI가 지뢰찾기를 푸는 과정을 봐요!',w:'AI는 숫자 힌트를 분석해서 <b>확실히 안전한 칸</b>과 <b>확실히 지뢰인 칸</b>만 골라요.',tags:[{l:'논리추론',c:'purple'},{l:'지뢰찾기',c:'blue'}]},
+      {s:'제약 조건 분석으로 지뢰 위치를 추론합니다.',w:'각 숫자 셀 주변의 미공개 칸 수와 필요 지뢰 수를 비교해 결정론적 추론을 수행해요.',tags:[{l:'제약전파',c:'blue'},{l:'결정론적',c:'green'}]},
+      {s:'Constraint Propagation 알고리즘 실행.',w:'각 셀의 제약: Σ(인접 미공개 셀의 지뢰 여부) = 셀 값 - 기표시 지뢰 수.<br><span class="f">P(mine)=0 또는 1인 경우만 처리</span>',tags:[{l:'CP',c:'blue'},{l:'확률론',c:'purple'}]},
+    ]);
   }
 
-  function draw(){
-    const W=cv.width, H=cv.height;
-    ctx.clearRect(0,0,W,H);
-
-    const pad=60, gW=W-pad*2, gH=H-pad*2-60;
-    const cx=pad, cy=pad;
-    const xRange=[-4,4], yRange=[-1.5,1.5];
-
-    function toX(v){ return cx+gW*(v-xRange[0])/(xRange[1]-xRange[0]); }
-    function toY(v){ return cy+gH*(1-(v-yRange[0])/(yRange[1]-yRange[0])); }
-
-    // 배경 그리드
-    ctx.strokeStyle='#1a2028'; ctx.lineWidth=1;
-    for(let v=-1;v<=1;v+=0.5){
-      ctx.beginPath(); ctx.moveTo(toX(xRange[0]),toY(v)); ctx.lineTo(toX(xRange[1]),toY(v)); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(toX(v*4),toY(yRange[0])); ctx.lineTo(toX(v*4),toY(yRange[1])); ctx.stroke();
-    }
-
-    // 축
-    ctx.strokeStyle='#334'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(toX(xRange[0]),toY(0)); ctx.lineTo(toX(xRange[1]),toY(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(toX(0),toY(yRange[0])); ctx.lineTo(toX(0),toY(yRange[1])); ctx.stroke();
-
-    // 축 레이블
-    ctx.fillStyle='#556070'; ctx.font='10px monospace'; ctx.textAlign='center';
-    for(let v=-4;v<=4;v+=2){
-      ctx.fillText(v,toX(v),toY(0)+14);
-    }
-    ctx.textAlign='right';
-    for(let v=-1;v<=1;v+=0.5){
-      if(Math.abs(v)<0.01) continue;
-      ctx.fillText(v.toFixed(1),toX(0)-6,toY(v)+4);
-    }
-
-    // 모든 함수 (흐리게)
-    FUNCS.forEach((f,i)=>{
-      if(i===selected) return;
-      ctx.beginPath(); ctx.strokeStyle=f.color+'33'; ctx.lineWidth=1.5;
-      for(let px=0;px<=gW;px++){
-        const xv=xRange[0]+px/gW*(xRange[1]-xRange[0]);
-        const yv=f.fn(xv);
-        if(px===0) ctx.moveTo(toX(xv),toY(yv)); else ctx.lineTo(toX(xv),toY(yv));
+  function _create(){
+    board=Array(R).fill(0).map(()=>Array(C).fill(0));
+    const pos=[]; for(let r=0;r<R;r++) for(let c=0;c<C;c++) pos.push([r,c]);
+    for(let i=pos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pos[i],pos[j]]=[pos[j],pos[i]];}
+    for(let i=0;i<M;i++) board[pos[i][0]][pos[i][1]]=-1;
+    for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+      if(board[r][c]===-1) continue;
+      let cnt=0;
+      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+        const nr=r+dr,nc=c+dc;
+        if(nr>=0&&nr<R&&nc>=0&&nc<C&&board[nr][nc]===-1) cnt++;
       }
-      ctx.stroke();
-    });
-
-    const f=FUNCS[selected];
-
-    // 선택 함수
-    ctx.beginPath(); ctx.strokeStyle=f.color; ctx.lineWidth=2.5;
-    for(let px=0;px<=gW;px++){
-      const xv=xRange[0]+px/gW*(xRange[1]-xRange[0]);
-      const yv=f.fn(xv);
-      if(px===0) ctx.moveTo(toX(xv),toY(yv)); else ctx.lineTo(toX(xv),toY(yv));
+      board[r][c]=cnt;
     }
-    ctx.stroke();
-
-    // 미분 곡선
-    ctx.beginPath(); ctx.strokeStyle=f.color+'88'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
-    for(let px=0;px<=gW;px++){
-      const xv=xRange[0]+px/gW*(xRange[1]-xRange[0]);
-      const dv=f.dfn(xv);
-      if(px===0) ctx.moveTo(toX(xv),toY(dv)); else ctx.lineTo(toX(xv),toY(dv));
-    }
-    ctx.stroke(); ctx.setLineDash([]);
-
-    // 범례
-    const legY=H-36;
-    FUNCS.forEach((ff,i)=>{
-      const lx=pad+i*(gW/4)+gW/8;
-      ctx.beginPath(); ctx.arc(lx-24,legY,5,0,Math.PI*2);
-      ctx.fillStyle=i===selected?ff.color:ff.color+'55'; ctx.fill();
-      ctx.fillStyle=i===selected?ff.color:'#556070';
-      ctx.font=i===selected?'bold 12px sans-serif':'11px sans-serif';
-      ctx.textAlign='left'; ctx.fillText(ff.name,lx-16,legY+4);
-    });
-
-    // 설명
-    ctx.fillStyle=f.color; ctx.font='bold 13px sans-serif'; ctx.textAlign='left';
-    ctx.fillText(f.name, pad, gH+pad+28);
-    ctx.fillStyle='#778899'; ctx.font='11px sans-serif';
-    ctx.fillText(f.desc, pad, gH+pad+44);
-
-    // 점선 범례
-    ctx.fillStyle='#556070'; ctx.font='10px sans-serif'; ctx.textAlign='right';
-    ctx.fillText('실선=함수  점선=미분', W-pad, gH+pad+28);
-
-    $('log-text').textContent=`${f.name}: ${f.desc}`;
+    rev=Array(R).fill(0).map(()=>Array(C).fill(false));
+    flag=Array(R).fill(0).map(()=>Array(C).fill(false));
+    // 0셀 시작
+    let sr=-1,sc=-1;
+    for(let r=0;r<R&&sr===-1;r++) for(let c=0;c<C&&sr===-1;c++) if(board[r][c]===0){sr=r;sc=c;}
+    if(sr===-1){sr=0;sc=0;}
+    _flood(sr,sc);
   }
 
-  function toggle(){
-    selected=(selected+3)%FUNCS.length; draw();
+  function _flood(r,c){
+    if(r<0||r>=R||c<0||c>=C||rev[r][c]||board[r][c]===-1) return;
+    rev[r][c]=true;
+    if(board[r][c]===0){
+      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){if(dr||dc)_flood(r+dr,c+dc);}
+    }
+  }
+
+  function _rebuild(){
+    safeQ=[]; mineQ=[];
+    for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+      if(!rev[r][c]||board[r][c]<=0) continue;
+      const n=board[r][c]; const unk=[]; let fc=0;
+      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+        if(!dr&&!dc) continue;
+        const nr=r+dr,nc=c+dc;
+        if(nr<0||nr>=R||nc<0||nc>=C) continue;
+        if(flag[nr][nc]) fc++;
+        else if(!rev[nr][nc]) unk.push([nr,nc]);
+      }
+      const rem=n-fc;
+      if(rem===0&&unk.length>0) unk.forEach(([ur,uc])=>{if(!safeQ.some(x=>x.r===ur&&x.c===uc)&&!rev[ur][uc]) safeQ.push({r:ur,c:uc,sr:r,sc:c,n,rem,ul:unk.length});});
+      if(rem>0&&rem===unk.length) unk.forEach(([ur,uc])=>{if(!mineQ.some(x=>x.r===ur&&x.c===uc)&&!flag[ur][uc]) mineQ.push({r:ur,c:uc,sr:r,sc:c,n,rem,ul:unk.length});});
+    }
+  }
+
+  const NC=['','#60a5fa','#34d399','#f87171','#a78bfa','#fbbf24','#f472b6','#c8c0b0','#778899'];
+
+  function draw(){
+    if(!ctx) return;
+    const px=Math.floor((cv.width-C*cs)/2),py=Math.floor((cv.height-R*cs)/2);
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='#080c10'; ctx.fillRect(0,0,cv.width,cv.height);
+    for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+      const x=px+c*cs,y=py+r*cs;
+      const isSrc=curSrc&&curSrc.r===r&&curSrc.c===c;
+      const isAct=curCell&&curCell.r===r&&curCell.c===c;
+      if(rev[r][c]){
+        ctx.fillStyle=isSrc?'rgba(167,139,250,0.15)':'#0e1318'; ctx.fillRect(x+1,y+1,cs-2,cs-2);
+        if(board[r][c]>0){ctx.fillStyle=NC[board[r][c]];ctx.font=`bold ${Math.max(9,cs-8)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(board[r][c],x+cs/2,y+cs/2);}
+      } else if(flag[r][c]){
+        ctx.fillStyle='#1a1208'; ctx.fillRect(x+1,y+1,cs-2,cs-2);
+        ctx.font=`${Math.max(9,cs-8)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🚩',x+cs/2,y+cs/2);
+      } else {
+        let fill='#131920';
+        if(isAct) fill=curAct==='safe'?'rgba(52,211,153,0.35)':'rgba(248,113,113,0.35)';
+        ctx.fillStyle=fill; ctx.fillRect(x+1,y+1,cs-2,cs-2);
+        if(isSrc){ctx.strokeStyle='rgba(167,139,250,0.7)';ctx.lineWidth=2;ctx.strokeRect(x+2,y+2,cs-3,cs-3);}
+      }
+      ctx.strokeStyle='#1a2028';ctx.lineWidth=1;ctx.strokeRect(x,y,cs,cs);
+    }
+    const tf=flag.flat().filter(Boolean).length,tr=rev.flat().filter(Boolean).length;
+    ctx.fillStyle='#556070';ctx.font='10px monospace';ctx.textAlign='right';
+    ctx.fillText(`🚩${tf}/${M}  ✅${tr}/${R*C-M}`,cv.width-6,cv.height-4);
   }
 
   function step(){
-    selected=(selected+1)%FUNCS.length; draw();
+    if(done) return true;
+    stepN++;
+    if(mineQ.length){
+      const {r,c,sr,sc,n,rem,ul}=mineQ.shift();
+      if(!flag[r][c]&&!rev[r][c]){
+        flag[r][c]=true; curCell={r,c}; curSrc={r:sr,c:sc}; curAct='mine';
+        xp(`단계 ${stepN}`,[
+          {s:`💣 <b>${r+1}행 ${c+1}열</b>에 지뢰를 표시했어요!`,
+           w:`숫자 <b>'${n}'</b> 칸 근처에 확인 안 된 칸이 딱 <b>${ul}개</b>.<br>그 중 지뢰가 <b>${rem}개</b> 있어야 해요.<br>확인 안 된 칸 수 = 지뢰 수 → <b>전부 지뢰!</b>`,
+           tags:[{l:'지뢰확정',c:'yellow'},{l:'논리추론',c:'purple'}]},
+          {s:`지뢰 표시: (${r},${c}). 분석 셀: (${sr},${sc})`,
+           w:`셀(${sr},${sc})값=<b>${n}</b><br>미공개=${ul}개, 기표시=${n-rem}개<br>잔여지뢰수(${rem}) = 미공개수(${ul})<br>→ 미공개 전부 <b>지뢰 확정</b>`,
+           tags:[{l:'제약충족',c:'yellow'},{l:'결정론적',c:'blue'}]},
+          {s:`Flag(${r},${c}). Source(${sr},${sc}), val=${n}`,
+           w:`제약: unknown(${ul}) = remaining(${rem})<br>∴ 해당 셀 전부 지뢰<br><span class="f">P(mine|(${r},${c})) = 1.0</span>`,
+           tags:[{l:'P=1.0',c:'yellow'},{l:'CP',c:'blue'}]},
+        ]);
+        _rebuild(); draw(); return false;
+      }
+    }
+    if(safeQ.length){
+      const {r,c,sr,sc,n,rem,ul}=safeQ.shift();
+      if(!rev[r][c]&&!flag[r][c]){
+        _flood(r,c); curCell={r,c}; curSrc={r:sr,c:sc}; curAct='safe';
+        xp(`단계 ${stepN}`,[
+          {s:`✅ <b>${r+1}행 ${c+1}열</b>을 안전하게 열었어요!`,
+           w:`숫자 <b>'${n}'</b> 칸 주변 지뢰 ${n}개를 이미 <b>다 찾았어요!</b><br>그러니까 나머지 확인 안 된 칸은<br><b>전부 안전해요!</b> 🟢`,
+           tags:[{l:'안전확정',c:'green'},{l:'논리추론',c:'purple'}]},
+          {s:`안전 공개: (${r},${c}). 분석 셀: (${sr},${sc})`,
+           w:`셀(${sr},${sc})값=<b>${n}</b><br>이미 표시된 지뢰=<b>${n}</b>개 (완료)<br>잔여지뢰(${rem})=0, 미공개=${ul}개<br>→ 미공개 전부 <b>안전 확정</b>`,
+           tags:[{l:'제약충족',c:'green'},{l:'결정론적',c:'blue'}]},
+          {s:`Reveal(${r},${c}). Source(${sr},${sc}), val=${n}`,
+           w:`제약: remaining(${rem}) = 0 & unknown(${ul}) > 0<br>∴ 해당 셀 전부 안전<br><span class="f">P(mine|(${r},${c})) = 0.0</span>`,
+           tags:[{l:'P=0.0',c:'green'},{l:'CP',c:'blue'}]},
+        ]);
+        _rebuild(); draw(); return false;
+      }
+    }
+    done=true;
+    const tf=flag.flat().filter(Boolean).length,tr=rev.flat().filter(Boolean).length;
+    xp(`단계 ${stepN}`,[
+      {s:`AI가 확실한 칸을 모두 처리했어요!<br>✅ 안전 공개: <b>${tr}/${R*C-M}칸</b>  🚩 지뢰: <b>${tf}/${M}개</b>`,
+       w:`AI는 확실한 것만 골라서 움직여요.<br>애매한 칸은 추측이 필요해서 더 어려워요!`,
+       tags:[{l:'추론완료',c:'green'},{l:'불확실성',c:'blue'}]},
+      {s:`결정론적 추론 완료. 공개 ${tr}/${R*C-M}, 표시 ${tf}/${M}`,
+       w:`더 이상 단순 제약 조건으로 확정 가능한 셀이 없어요.<br>남은 셀은 확률 계산이나 추측이 필요해요.`,
+       tags:[{l:'CP완료',c:'green'},{l:'확률필요',c:'yellow'}]},
+      {s:`CP 완료. Revealed:${tr}/${R*C-M}, Flagged:${tf}/${M}`,
+       w:`결정론적 제약 전파 소진. 잔여 셀은 확률론적 분석(베이즈 추론) 필요.<br><span class="f">P(mine|constraints) 계산 필요</span>`,
+       tags:[{l:'CP종료',c:'green'},{l:'Bayesian',c:'blue'}]},
+    ]);
+    draw(); return true;
   }
 
-  function reset(){
-    selected=0;
-    $('btn-main').textContent='← 이전 함수';
-    $('btn-step').textContent='다음 함수 →';
-    draw();
-  }
-
-  return {init,resize,step,toggle,reset};
+  function reset(){_create();_rebuild();stepN=0;done=false;curCell=null;curSrc=null;draw();xp('준비',[{s:'리셋 완료. ▶ 시작을 눌러 다시 시작하세요.',w:'—',tags:[]},{s:'리셋 완료.',w:'—',tags:[]},{s:'Reset.',w:'—',tags:[]}]);}
+  function resize(){_size();draw();}
+  return {init,reset,step,resize};
 })();
 
-// ═══════════════════════════════════════════════
-//  ④ 학습 과정
-// ═══════════════════════════════════════════════
-const train = (() => {
-  let cv, ctx;
-  let timer=null, running=false;
-  let epoch=0, loss=[], valLoss=[], overfitMode=false;
-  const MAX_EPOCH=60;
+// ═══════════════ 단어 찾기 모듈 ════════════════
+const wordMod=(()=>{
+  const TEXTS=[
+    '강아지가 공원에서 신나게 뛰어 놀고 있습니다. 주인이 공을 던지자 강아지는 빠르게 달려가 물어왔습니다.',
+    '딥러닝은 인공신경망을 여러 층으로 쌓아 복잡한 패턴을 학습하는 기계학습 방법입니다.',
+    '봄이 되면 벚꽃이 피고 따뜻한 바람이 불어옵니다. 많은 사람들이 공원으로 소풍을 나옵니다.',
+    '컴퓨터는 0과 1로 이루어진 이진수로 모든 데이터를 처리합니다. 빠르고 정확하게 계산을 수행합니다.',
+  ];
+  let tokens=[],scores=[],idx=0,scanning=false,wt=null,query='';
 
-  function lossAt(e, overfit){
-    const base=0.9*Math.exp(-e*0.08)+0.05+(Math.random()-0.5)*0.015;
-    const val=overfit
-      ? (e<20 ? base*1.05 : base*1.05+0.004*(e-20))
-      : base*1.08+(Math.random()-0.5)*0.02;
-    return {train:Math.max(0.02,base), val:Math.max(0.02,val)};
+  function _tok(txt){return txt.split(/(\s+)/).filter(t=>t.trim());}
+  function _sim(q,t){
+    const qa=q.replace(/[^가-힣a-zA-Z0-9]/g,'');
+    const ta=t.replace(/[^가-힣a-zA-Z0-9]/g,'');
+    if(!qa||!ta) return 0;
+    if(ta.includes(qa)||qa.includes(ta)) return 1;
+    let ov=0; for(const ch of qa) if(ta.includes(ch)) ov++;
+    return Math.min(1,ov/Math.max(qa.length,ta.length)*1.5);
   }
 
   function init(){
-    cv=$('cv-train');
-    ctx=cv.getContext('2d');
-    $('btn-extra').style.display='';
-    $('sep-extra').style.display='';
-    $('btn-extra').textContent='과적합 모드';
-    resize();
+    query=''; document.getElementById('wq').value='';
+    tokens=_tok(TEXTS[Math.floor(Math.random()*TEXTS.length)]);
+    scores=tokens.map(()=>0); idx=0; scanning=false;
+    clearInterval(wt); wt=null;
+    _render(false);
+    document.getElementById('bmain').textContent='AI 검색';
+    document.getElementById('bmain').classList.remove('on');
+    document.getElementById('bstep').style.display='none';
+    document.getElementById('bnew').style.display='none';
+    xp('준비',[
+      {s:'찾을 단어를 입력하고 <b>AI 검색</b>을 누르세요!',w:'AI가 문장의 각 단어를 하나씩 비교해서 찾아줘요.',tags:[{l:'단어탐색',c:'purple'},{l:'어텐션',c:'blue'}]},
+      {s:'검색어를 입력하고 AI 검색을 시작하세요.',w:'토큰화된 각 단어와 쿼리의 유사도를 순서대로 계산해요.',tags:[{l:'토큰화',c:'blue'},{l:'유사도',c:'purple'}]},
+      {s:'Query 입력 후 Attention 스캔을 시작하세요.',w:'Q·K 내적으로 attention score를 계산해 관련 토큰을 탐색합니다.',tags:[{l:'Attention',c:'purple'},{l:'Transformer',c:'blue'}]},
+    ]);
   }
 
-  function resize(){
-    const wrap=cv.parentElement;
-    cv.width=wrap.clientWidth;
-    cv.height=wrap.clientHeight;
-    draw();
-  }
-
-  function draw(){
-    const W=cv.width, H=cv.height;
-    ctx.clearRect(0,0,W,H);
-
-    const pad={l:60,r:30,t:40,b:60};
-    const gW=W-pad.l-pad.r, gH=H-pad.t-pad.b;
-
-    // 배경
-    ctx.fillStyle='#0a0f14';
-    ctx.fillRect(pad.l,pad.t,gW,gH);
-
-    // 과적합 구간 하이라이트
-    if(overfitMode && epoch>20){
-      ctx.fillStyle='rgba(248,113,113,0.05)';
-      const ex=pad.l+gW*(20/MAX_EPOCH);
-      ctx.fillRect(ex,pad.t,pad.l+gW-ex,gH);
-      ctx.fillStyle='#f8717133';ctx.font='11px sans-serif';ctx.textAlign='center';
-      ctx.fillText('과적합 구간',pad.l+gW*(40/MAX_EPOCH),pad.t+18);
-    }
-
-    // 그리드
-    ctx.strokeStyle='#1a2028';ctx.lineWidth=1;
-    for(let i=0;i<=5;i++){
-      const y=pad.t+gH*(i/5);
-      ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+gW,y);ctx.stroke();
-    }
-
-    function toX(e){return pad.l+gW*(e/MAX_EPOCH);}
-    function toY(v){return pad.t+gH*(1-clamp(v,0,1));}
-
-    // 곡선
-    function drawCurve(arr,color,dash=[]){
-      if(arr.length<2) return;
-      ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash(dash);
-      arr.forEach((v,i)=>{ i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)); });
-      ctx.stroke();ctx.setLineDash([]);
-    }
-    drawCurve(loss,'#a78bfa');
-    drawCurve(valLoss,'#f472b6',[6,4]);
-
-    // 현재 에포크 수직선
-    if(epoch>0){
-      ctx.strokeStyle='#33404f';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.beginPath();ctx.moveTo(toX(epoch),pad.t);ctx.lineTo(toX(epoch),pad.t+gH);ctx.stroke();ctx.setLineDash([]);
-    }
-
-    // 축
-    ctx.strokeStyle='#2a3545';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+gH);ctx.lineTo(pad.l+gW,pad.t+gH);ctx.stroke();
-
-    ctx.fillStyle='#556070';ctx.font='10px monospace';
-    ctx.textAlign='right';
-    [0,0.2,0.4,0.6,0.8,1.0].forEach(v=>{
-      ctx.fillText(v.toFixed(1),pad.l-6,toY(v)+4);
+  function _render(showS){
+    const area=document.getElementById('wtext'); area.innerHTML='';
+    tokens.forEach((t,i)=>{
+      const sp=document.createElement('span');
+      sp.className='tok'; sp.id=`t${i}`; sp.textContent=t;
+      if(showS){const s=scores[i];sp.classList.add(s>=0.8?'hi':s>=0.3?'mid':'lo');}
+      area.appendChild(sp);
     });
-    ctx.textAlign='center';
-    [0,20,40,60].forEach(e=>{
-      ctx.fillText(e,toX(e),pad.t+gH+14);
-    });
-
-    // 축 제목
-    ctx.fillStyle='#778899';ctx.font='11px sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('에포크 (Epoch)',pad.l+gW/2,pad.t+gH+32);
-    ctx.save();ctx.translate(14,pad.t+gH/2);ctx.rotate(-Math.PI/2);
-    ctx.fillText('손실 (Loss)',0,0);ctx.restore();
-
-    // 범례
-    [['■ 훈련 손실','#a78bfa'],['■ 검증 손실','#f472b6']].forEach(([l,c],i)=>{
-      ctx.fillStyle=c;ctx.font='11px sans-serif';ctx.textAlign='left';
-      ctx.fillText(l,pad.l+i*130,pad.t-10);
-    });
-
-    // 현재 값 표시
-    if(loss.length>0){
-      const lt=loss[loss.length-1], lv=valLoss[valLoss.length-1];
-      ctx.fillStyle='#a78bfa';ctx.font='bold 12px monospace';ctx.textAlign='left';
-      ctx.fillText(`훈련: ${lt.toFixed(3)}`,pad.l+4,pad.t+16);
-      ctx.fillStyle='#f472b6';
-      ctx.fillText(`검증: ${lv.toFixed(3)}`,pad.l+4,pad.t+32);
-      ctx.fillStyle='#556070';ctx.font='11px monospace';
-      ctx.fillText(`에포크 ${epoch}/${MAX_EPOCH}`,pad.l+4,pad.t+48);
-    }
   }
 
-  function step(){
-    if(epoch>=MAX_EPOCH){ return; }
-    const {train:t,val:v}=lossAt(epoch,overfitMode);
-    loss.push(t); valLoss.push(v);
-    epoch++;
-    const lt=loss[loss.length-1],lv=valLoss[valLoss.length-1];
-    const gap=lv-lt;
-    if(gap>0.05) $('log-text').textContent=`에포크 ${epoch}: 훈련=${lt.toFixed(3)} 검증=${lv.toFixed(3)} — 검증 손실 증가, 과적합 의심!`;
-    else $('log-text').textContent=`에포크 ${epoch}: 훈련=${lt.toFixed(3)} 검증=${lv.toFixed(3)} — 정상 학습 중.`;
-    draw();
+  function search(){
+    const q=document.getElementById('wq').value.trim();
+    if(!q){xp('오류',[{s:'찾을 단어를 먼저 입력해주세요!',w:'검색어 없이는 비교할 수 없어요.',tags:[]},{s:'검색어를 입력하세요.',w:'—',tags:[]},{s:'Query is empty.',w:'—',tags:[]}]);return;}
+    if(scanning){clearInterval(wt);scanning=false;document.getElementById('wbtn').textContent='AI 검색';return;}
+    query=q; scores=tokens.map(()=>0); idx=0; scanning=true;
+    document.getElementById('wbtn').textContent='⏹ 중지';
+    _render(false);
+    wt=setInterval(_scan,spd*1.5);
   }
 
-  function toggle(){
-    if(epoch>=MAX_EPOCH) reset();
-    if(running){ clearInterval(timer);timer=null;running=false;$('btn-main').textContent='▶ 시작'; }
-    else{ running=true;$('btn-main').textContent='⏸ 일시정지';timer=setInterval(step,speed); }
+  function _scan(){
+    if(idx>=tokens.length){clearInterval(wt);scanning=false;document.getElementById('wbtn').textContent='AI 검색';_done();return;}
+    const tok=tokens[idx],s=_sim(query,tok); scores[idx]=s;
+    document.querySelectorAll('.tok').forEach(e=>e.classList.remove('scan'));
+    const el=document.getElementById(`t${idx}`); if(el) el.classList.add('scan');
+    for(let i=0;i<idx;i++){const t=document.getElementById(`t${i}`);if(!t) continue;t.classList.remove('scan','hi','mid','lo');const sc=scores[i];t.classList.add(sc>=0.8?'hi':sc>=0.3?'mid':'lo');}
+    const clean=tok.replace(/\s/g,'');
+    const mtype=s>=0.8?'완전 일치':s>=0.3?'부분 일치':'불일치';
+    const mpct=(s*100).toFixed(0);
+    xp(`${idx+1}/${tokens.length}번째`,[
+      {s:`<b>"${query}"</b>와 <b>"${clean}"</b> 비교 중...<br>${s>=0.8?'🔴':'s'>=0.3?'🟡':'⚪'} <b>${mtype}</b>! 관련도: <b>${mpct}%</b>`,
+       w:s>=0.8?`"${clean}"에 "${query}"가 들어있어요! 🎉 AI가 이 단어를 발견했어요.`:s>=0.3?`일부 글자가 비슷해요. "${query}"의 일부가 이 단어에 있어요.`:`"${clean}"은 "${query}"와 달라서 AI가 그냥 지나쳐요.`,
+       tags:[{l:mtype,c:s>=0.8?'green':s>=0.3?'purple':'blue'},{l:`${mpct}%`,c:'blue'}]},
+      {s:`토큰[${idx}]: "<b>${clean}</b>"<br>유사도: <b>${mpct}%</b> (${mtype})`,
+       w:s>=0.8?`검색어와 이 토큰이 일치 → 어텐션 가중치 최대`:s>=0.3?`부분 문자열 겹침. 일부 어텐션 부여.`:`문자 유사도 낮음 → 어텐션 최소화.`,
+       tags:[{l:'어텐션',c:'purple'},{l:`w=${s.toFixed(2)}`,c:'blue'}]},
+      {s:`Token[${idx}]: "${clean}", score=${s.toFixed(3)}`,
+       w:`<span class="f">sim = char_overlap/max(|q|,|t|)×1.5</span>${s>=0.8?'<br>완전 포함 관계, score=1.0':s>=0.3?`<br>부분 겹침 (${mpct}%)`:'<br>유사도 낮음'}<br>Attention Weight: <b>${s.toFixed(3)}</b>`,
+       tags:[{l:'Similarity',c:'purple'},{l:'Attention',c:'blue'}]},
+    ]);
+    idx++;
   }
 
-  function reset(){
-    clearInterval(timer);timer=null;running=false;$('btn-main').textContent='▶ 시작';
-    epoch=0;loss=[];valLoss=[];
-    $('log-text').textContent='에포크(epoch)마다 손실이 감소하면 학습이 잘 되고 있습니다.';
-    draw();
+  function _done(){
+    _render(true);
+    const mx=Math.max(...scores), bi=scores.indexOf(mx), bt=tokens[bi]?.trim()||'';
+    const mc=scores.filter(s=>s>=0.8).length;
+    xp('검색 완료',[
+      {s:`"<b>${query}</b>" 검색 완료! 총 <b>${mc}번</b> 찾았어요!<br>가장 비슷한 단어: <b>"${bt}"</b>`,
+       w:`보라색으로 빛나는 단어가 "${query}"와 가장 비슷한 단어예요!<br>AI는 이 방법으로 문장에서 중요한 단어를 찾아요.`,
+       tags:[{l:'검색완료',c:'green'},{l:'어텐션',c:'purple'}]},
+      {s:`검색 완료. 일치 <b>${mc}건</b>. 최고유사도: "${bt}" (${(mx*100).toFixed(0)}%)`,
+       w:`어텐션 메커니즘: 쿼리와 각 키를 비교해 가중치 부여.<br>높은 가중치의 토큰이 최종 답변에 더 많이 반영돼요.`,
+       tags:[{l:'Attention',c:'purple'},{l:'Token Match',c:'green'}]},
+      {s:`Attention 완료. matches=${mc}, max=${mx.toFixed(3)}<br>Best: "${bt}"`,
+       w:`<span class="f">Attention(Q,K) ≈ softmax(Q·K/√d)</span><br>높은 attention score = 해당 토큰 집중<br>이것이 Transformer Self-Attention의 핵심 원리.`,
+       tags:[{l:'Softmax',c:'blue'},{l:'Transformer',c:'purple'}]},
+    ]);
   }
 
-  function toggleOverfit(){
-    overfitMode=!overfitMode;
-    $('btn-extra').classList.toggle('active',overfitMode);
-    $('btn-extra').textContent=overfitMode?'일반 모드':'과적합 모드';
-    reset();
-  }
-
-  return {init,resize,step,toggle,reset,toggleOverfit};
+  function reset(){clearInterval(wt);scanning=false;document.getElementById('wbtn').textContent='AI 검색';init();}
+  return {init,reset,search};
 })();
 
-// ═══════════════════════════════════════════════
-//  초기화
-// ═══════════════════════════════════════════════
+// ═══════════════ 초기화 ════════════════
 window.addEventListener('load',()=>{
-  fwd.init(); bp.init(); act.init(); train.init();
-  switchTab('fwd');
+  mazeMod.init();
+  document.getElementById('wq').addEventListener('keydown',e=>{if(e.key==='Enter')wordMod.search();});
 });
-
 window.addEventListener('resize',()=>{
-  fwd.resize(); bp.resize(); act.resize(); train.resize();
+  if(curTab==='maze') mazeMod.resize();
+  else if(curTab==='mine') mineMod.resize();
 });
 </script>
 </body>

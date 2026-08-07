@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아이콘 목록</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      padding: 24px 16px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+      cursor: default;
+    }
+
+    .card:hover {
+      border-color: #5eead4;
+      background: #f0fdfa;
+    }
+
+    .card svg {
+      width: 28px;
+      height: 28px;
+      stroke: #0d9488;
+      stroke-width: 1.75;
+      flex-shrink: 0;
+    }
+
+    .icon-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1e293b;
+      word-break: break-all;
+      line-height: 1.3;
+    }
+
+    .icon-usage {
+      font-size: 10px;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+
+<h1>아이콘 목록</h1>
+<p class="subtitle">그냥드림 플랫폼에서 사용 중인 Lucide 아이콘 27종</p>
+
+<div class="grid" id="grid"></div>
+
+<script>
+  const ICONS = [
+    { name: 'LayoutDashboard', key: 'layout-dashboard', usage: '통합 대시보드' },
+    { name: 'MapPinned',       key: 'map-pinned',       usage: '지역별 현황' },
+    { name: 'ClipboardList',   key: 'clipboard-list',   usage: '이용·지원 내역' },
+    { name: 'PackageSearch',   key: 'package-search',   usage: '물품·유통기한' },
+    { name: 'UploadCloud',     key: 'upload-cloud',     usage: '데이터 업로드' },
+    { name: 'FileUp',          key: 'file-up',          usage: '파일 선택 (스텝)' },
+    { name: 'Loader2',         key: 'loader-2',         usage: '업로드 중 (스텝)' },
+    { name: 'Columns3',        key: 'columns-3',        usage: '열 인식 결과 (스텝)' },
+    { name: 'ShieldCheck',     key: 'shield-check',     usage: '누락·중복 확인 (스텝)' },
+    { name: 'CheckCircle2',    key: 'check-circle-2',   usage: '통합 반영 완료 (스텝)' },
+    { name: 'FolderOpen',      key: 'folder-open',      usage: '파일 선택 드롭존' },
+    { name: 'Upload',          key: 'upload',           usage: '드래그 업로드 힌트' },
+    { name: 'FileSpreadsheet', key: 'file-spreadsheet', usage: '엑셀 파일 표시' },
+    { name: 'Folder',          key: 'folder',           usage: '헤더 파일 선택' },
+    { name: 'AlertCircle',     key: 'alert-circle',     usage: '오류 알림' },
+    { name: 'ArrowLeft',       key: 'arrow-left',       usage: '이전 단계' },
+    { name: 'ArrowRight',      key: 'arrow-right',      usage: '다음 단계' },
+    { name: 'RotateCcw',       key: 'rotate-ccw',       usage: '새 파일 선택 (초기화)' },
+    { name: 'Trash2',          key: 'trash-2',          usage: '파일 삭제' },
+    { name: 'ClipboardCheck',  key: 'clipboard-check',  usage: '지원 건수 통계' },
+    { name: 'MapPin',          key: 'map-pin',          usage: '지역 마커' },
+    { name: 'Users',           key: 'users',            usage: '이용자 수' },
+    { name: 'Search',          key: 'search',           usage: '검색' },
+    { name: 'Inbox',           key: 'inbox',            usage: '빈 상태 표시' },
+    { name: 'Boxes',           key: 'boxes',            usage: '물품 현황' },
+    { name: 'CalendarClock',   key: 'calendar-clock',   usage: '유통기한' },
+    { name: 'PackageOpen',     key: 'package-open',     usage: '품목 상세' },
+  ];
+
+  const grid = document.getElementById('grid');
+
+  ICONS.forEach(({ name, key, usage }) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <i data-lucide="${key}"></i>
+      <span class="icon-name">${name}</span>
+      <span class="icon-usage">${usage}</span>
+    `;
+    grid.appendChild(card);
+  });
+
+  lucide.createIcons();
+</script>
+</body>
+</html>

@@ -166,10 +166,10 @@ const PAGES = {
   },
 
   23: {
-    label : 'Doom — 레이캐스팅 FPS',
+    label : '코드의 세계',
     url   : 'pages/23/',
     thumb : null,
-    desc  : 'DDA 레이캐스팅 · 텍스처 맵핑 · 적 AI · 사격 · 아이템 · 출구 탈출',
+    desc  : 'HTML·CSS·JS·TS·React·Vue·Python·Go·Java·Rust 등 30종 · 기초·주요기능·실전 코드',
   },
 
   // 24 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성

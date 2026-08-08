@@ -2,1124 +2,1339 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DOOM — 테스트 23</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>코드의 세계</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;background:#000;overflow:hidden;}
-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
-#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;font-family:'Courier New',Consolas,monospace;color:#fff;}
-
-/* ── MENU ── */
-#menu{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.92);border:2px solid #cc0000;
-  padding:36px 50px;text-align:center;pointer-events:all;min-width:300px;
+:root{
+  --bg:#0d0d1a;--sb:#111122;--bdr:#252540;
+  --acc:#6c8eff;--tx:#cccce8;--mu:#5a5a88;--cbg:#080814;
+  --st:#ce9178;--cm:#4e7550;--kw:#c586c0;--bi:#9cdcfe;--nu:#b5cea8;--de:#dcdcaa;
 }
-#menu h1{font-size:52px;font-weight:900;letter-spacing:8px;color:#cc0000;
-  text-shadow:0 0 25px #ff0000,0 0 50px #880000;margin-bottom:4px;}
-#menu .sub{font-size:11px;color:#666;letter-spacing:3px;margin-bottom:28px;}
-.mbtn{display:block;width:100%;padding:11px;margin:7px 0;background:#150000;
-  border:1px solid #880000;color:#ff6666;font-size:14px;font-family:'Courier New',monospace;
-  font-weight:700;letter-spacing:2px;cursor:pointer;transition:.12s;text-transform:uppercase;}
-.mbtn:hover{background:#2a0000;color:#fff;border-color:#cc0000;}
-.ctrls{font-size:10px;color:#444;margin-top:18px;line-height:1.9;text-align:left;}
-.ctrls b{color:#666;}
+body{background:var(--bg);color:var(--tx);font:14px/1.6 'Segoe UI',system-ui,sans-serif;display:flex;height:100vh;overflow:hidden;}
 
-/* ── DEAD / WIN ── */
-#dead,#win{display:none;position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);text-align:center;pointer-events:all;}
-#dead h2{font-size:58px;color:#cc0000;text-shadow:0 0 30px #ff0000;font-weight:900;
-  letter-spacing:5px;margin-bottom:16px;animation:pulse 1.5s infinite;}
-#win{background:rgba(0,0,0,0.88);border:2px solid #ffd700;padding:36px 50px;}
-#win h2{font-size:40px;color:#ffd700;text-shadow:0 0 20px #ffaa00;font-weight:900;
-  letter-spacing:4px;margin-bottom:12px;}
-.scoreInfo{font-size:14px;color:#888;margin-bottom:24px;line-height:2;}
-.scoreInfo b{color:#aaa;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+/* ── Sidebar ── */
+#sidebar{width:256px;min-width:256px;background:var(--sb);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;}
+#sw{padding:10px 12px;border-bottom:1px solid var(--bdr);}
+#search{width:100%;padding:7px 12px;background:#181830;border:1px solid var(--bdr);border-radius:8px;color:var(--tx);font-size:13px;outline:none;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--mu);}
+#nav{flex:1;overflow-y:auto;padding:6px 0;}
+#nav::-webkit-scrollbar{width:4px;}
+#nav::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+.ch{padding:7px 12px 3px;font-size:10px;font-weight:700;letter-spacing:1.8px;color:var(--mu);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+.ch:hover{color:var(--tx);}
+.ch .ar{transition:transform .18s;font-size:9px;}
+.ch.col .ar{transform:rotate(-90deg);}
+.ci.hid{display:none;}
+.ni{padding:5px 12px 5px 20px;cursor:pointer;font-size:12.5px;border-left:2px solid transparent;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9898c0;display:flex;align-items:center;gap:6px;}
+.ni:hover{background:#1c1c36;color:var(--tx);}
+.ni.on{border-left-color:var(--acc);color:var(--acc);background:#181830;}
 
-/* ── OVERLAY MESSAGES ── */
-#dmgFlash{position:absolute;top:0;left:0;width:100%;height:100%;
-  background:rgba(200,0,0,0);pointer-events:none;transition:background .1s;}
-#killMsg{position:absolute;top:18%;left:50%;transform:translateX(-50%);
-  font-size:13px;color:#ff4444;font-weight:700;letter-spacing:2px;
-  opacity:0;transition:opacity .3s;text-shadow:0 0 10px #ff0000;pointer-events:none;}
-#pickupMsg{position:absolute;top:14%;left:50%;transform:translateX(-50%);
-  font-size:12px;color:#44ff44;font-weight:700;letter-spacing:1px;
-  opacity:0;transition:opacity .3s;text-shadow:0 0 8px #00ff00;pointer-events:none;}
-#lockHint{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
-  font-size:11px;color:#333;pointer-events:none;letter-spacing:1px;text-align:center;}
-#pauseTxt{display:none;position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);font-size:30px;color:#fff;
-  letter-spacing:5px;text-shadow:0 0 20px #fff;pointer-events:all;}
+/* ── Main ── */
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 
-/* ── CROSSHAIR ── */
-#xhair{display:none;position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);width:18px;height:18px;pointer-events:none;}
-#xhair::before,#xhair::after{content:'';position:absolute;background:rgba(255,255,255,0.75);}
-#xhair::before{width:2px;height:100%;left:50%;transform:translateX(-50%);}
-#xhair::after{height:2px;width:100%;top:50%;transform:translateY(-50%);}
+/* Landing */
+#landing{flex:1;overflow-y:auto;padding:28px 32px;}
+#landing::-webkit-scrollbar{width:5px;}
+#landing::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+#landing h1{font-size:26px;font-weight:700;color:#e8e8ff;margin-bottom:6px;}
+#landing p{color:var(--mu);margin-bottom:24px;font-size:13.5px;}
+.grid-section{margin-bottom:28px;}
+.grid-section h2{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mu);margin-bottom:12px;}
+.cards{display:flex;flex-wrap:wrap;gap:10px;}
+.card{padding:12px 16px;border-radius:10px;border:1px solid var(--bdr);cursor:pointer;transition:all .15s;min-width:120px;background:#111122;}
+.card:hover{transform:translateY(-2px);background:#181830;}
+.card .icon{font-size:22px;margin-bottom:4px;}
+.card .cname{font-size:13px;font-weight:600;color:#dde;}
+.card .ctag{font-size:11px;color:var(--mu);margin-top:2px;}
+
+/* Detail */
+#det{flex:1;overflow-y:auto;padding:28px 36px;display:none;}
+#det::-webkit-scrollbar{width:5px;}
+#det::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+#det.show{display:block;}
+#dback{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:4px;}
+#dback:hover{color:var(--tx);}
+#dtop{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+#dicon{font-size:36px;}
+.dmeta{flex:1;}
+#dname{font-size:22px;font-weight:700;color:#e8e8ff;}
+#dtype{font-size:12px;color:var(--mu);margin-top:2px;}
+.dlevel{display:flex;gap:4px;margin-top:6px;}
+.dlevel span{width:10px;height:4px;border-radius:2px;background:var(--bdr);}
+.dlevel span.on{background:var(--acc);}
+#ddesc{color:#9898c0;margin-bottom:20px;line-height:1.75;max-width:680px;font-size:13.5px;}
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tb{padding:5px 18px;border:1px solid var(--bdr);border-radius:20px;background:transparent;color:var(--mu);cursor:pointer;font-size:13px;transition:all .14s;}
+.tb:hover{border-color:var(--acc);color:var(--acc);}
+.tb.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600;}
+.cw{position:relative;max-width:800px;}
+#copybtn{position:absolute;top:10px;right:10px;padding:4px 11px;background:#1e1e38;border:1px solid var(--bdr);border-radius:6px;color:var(--mu);cursor:pointer;font-size:12px;transition:all .14s;z-index:2;}
+#copybtn:hover{background:#2a2a48;color:var(--tx);}
+pre{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:20px 18px;overflow-x:auto;font:13px/1.9 'Fira Code','Consolas','Courier New',monospace;tab-size:2;min-height:80px;}
+pre::-webkit-scrollbar{height:4px;}
+pre::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+.kw{color:var(--kw);}.bi{color:var(--bi);}.st{color:var(--st);}
+.cm{color:var(--cm);font-style:italic;}.nu{color:var(--nu);}.de{color:var(--de);}
 </style>
 </head>
 <body>
-<canvas id="cv"></canvas>
-<div id="ui">
-  <!-- Menu -->
-  <div id="menu">
-    <h1>DOOM</h1>
-    <div class="sub">테스트 23 · RAYCASTING FPS</div>
-    <button class="mbtn" onclick="startGame()">▶ 게임 시작</button>
-    <div class="ctrls">
-      <b>이동</b> W A S D / 방향키<br>
-      <b>회전</b> ← → / 마우스 (클릭 후 잠금)<br>
-      <b>사격</b> 마우스 클릭 / Space / Ctrl<br>
-      <b>달리기</b> Shift 누르고 이동<br>
-      <b>일시정지</b> Escape
+<aside id="sidebar">
+  <div id="sw"><input id="search" placeholder="🔍  검색..."></div>
+  <nav id="nav"></nav>
+</aside>
+<div id="main">
+  <div id="landing">
+    <h1>코드의 세계</h1>
+    <p>웹·앱·시스템 개발에 쓰이는 언어와 기술 30종 — 카드를 클릭하면 상세 정보를 볼 수 있습니다.</p>
+    <div id="grid-root"></div>
+  </div>
+  <div id="det">
+    <button id="dback">← 목록으로</button>
+    <div id="dtop">
+      <div id="dicon"></div>
+      <div class="dmeta">
+        <div id="dname"></div>
+        <div id="dtype"></div>
+        <div class="dlevel" id="dlevel"></div>
+      </div>
+    </div>
+    <div id="ddesc"></div>
+    <div class="tabs">
+      <button class="tb on" data-i="0">기초 문법</button>
+      <button class="tb" data-i="1">주요 기능</button>
+      <button class="tb" data-i="2">실전 활용</button>
+    </div>
+    <div class="cw">
+      <button id="copybtn">복사</button>
+      <pre id="codeblock"></pre>
     </div>
   </div>
-  <!-- Dead -->
-  <div id="dead">
-    <h2>YOU DIED</h2>
-    <div class="scoreInfo" id="deadInfo"></div>
-    <button class="mbtn" style="width:220px;margin:0 auto;" onclick="startGame()">다시 시작</button><br>
-    <button class="mbtn" style="width:220px;margin:6px auto;" onclick="showMenu()">메인 메뉴</button>
-  </div>
-  <!-- Win -->
-  <div id="win">
-    <h2>LEVEL CLEAR!</h2>
-    <div class="scoreInfo" id="winInfo"></div>
-    <button class="mbtn" style="width:220px;margin:0 auto;" onclick="startGame()">다시 플레이</button><br>
-    <button class="mbtn" style="width:220px;margin:6px auto;" onclick="showMenu()">메인 메뉴</button>
-  </div>
-  <!-- Pause -->
-  <div id="pauseTxt">PAUSED<br><span style="font-size:14px;color:#888;">ESC to resume</span></div>
-  <!-- Damage flash -->
-  <div id="dmgFlash"></div>
-  <!-- Messages -->
-  <div id="killMsg"></div>
-  <div id="pickupMsg"></div>
-  <!-- Crosshair -->
-  <div id="xhair"></div>
-  <div id="lockHint">클릭하여 마우스 잠금 (시점 조절)</div>
 </div>
 <script>
-'use strict';
-// ══════════════════════════════════════════════════════════
-//  CANVAS
-// ══════════════════════════════════════════════════════════
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-ctx.imageSmoothingEnabled = false;
+const DATA = [
+  /* ===== 프론트엔드 ===== */
+  {cat:'프론트엔드',name:'HTML',icon:'🌐',color:'#e34c26',type:'마크업 언어',level:1,
+   desc:'웹 페이지의 구조를 정의하는 표준 마크업 언어입니다. 태그(tag)로 텍스트·이미지·링크·폼 등 요소를 배치하며, CSS·JS와 함께 웹의 3대 핵심 기술입니다.',ex:[
+`<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>내 페이지</title>
+</head>
+<body>
+  <h1>안녕하세요</h1>
+  <p>HTML은 웹 페이지의 <strong>뼈대</strong>입니다.</p>
+  <a href="https://example.com">링크</a>
+</body>
+</html>`,
+`<!-- 시맨틱 태그 -->
+<header><nav><a href="/">홈</a></nav></header>
+<main>
+  <article>
+    <h2>제목</h2>
+    <figure>
+      <img src="img.jpg" alt="설명">
+      <figcaption>캡션</figcaption>
+    </figure>
+  </article>
+  <aside>사이드바</aside>
+</main>
+<footer>© 2024</footer>`,
+`<!-- 입력 폼 -->
+<form action="/submit" method="POST">
+  <label for="email">이메일</label>
+  <input type="email" id="email" name="email" required>
+  <label for="msg">메시지</label>
+  <textarea id="msg" rows="4"></textarea>
+  <button type="submit">전송</button>
+</form>`
+  ]},
 
-let W, H, CW, CH;
-function setSize() {
-  W = window.innerWidth; H = window.innerHeight;
-  CW = Math.max(320, (W * 0.5)|0);
-  CH = Math.max(180, (H * 0.5)|0);
-  cv.width = CW; cv.height = CH;
-  cv.style.width = W+'px'; cv.style.height = H+'px';
-  ctx.imageSmoothingEnabled = false;
-  zbuf = new Float32Array(CW);
+  {cat:'프론트엔드',name:'CSS',icon:'🎨',color:'#264de4',type:'스타일 언어',level:2,
+   desc:'HTML 요소의 시각적 표현을 정의합니다. 색상·폰트·레이아웃·애니메이션을 제어하며, Flexbox·Grid로 반응형 레이아웃을 구현합니다.',ex:[
+`/* 기본 선택자 & 박스 모델 */
+body { font-family: system-ui; background: #f5f5f5; }
+.card {
+  width: 300px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}`,
+`/* Flexbox & Grid */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
-setSize();
-window.addEventListener('resize', setSize);
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 16px;
+}`,
+`/* 반응형 + 애니메이션 */
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.card { animation: fadeIn .4s ease forwards; }`
+  ]},
 
-// ══════════════════════════════════════════════════════════
-//  MAP   (0=air, 1=stone, 2=brick, 3=metal, 4=wood, 9=exit)
-// ══════════════════════════════════════════════════════════
-const MAP_W = 24, MAP_H = 20;
-const MAP = [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,2,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,0,1],
-  [1,0,2,2,0,0,0,0,0,0,0,3,0,0,0,3,0,3,3,3,0,0,0,1],
-  [1,0,2,0,0,0,0,0,0,0,0,3,3,0,3,3,0,3,0,3,0,0,0,1],
-  [1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,3,0,0,0,1],
-  [1,0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0,3,3,3,0,0,0,1],
-  [1,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,4,4,0,1],
-  [1,0,0,0,0,0,4,4,0,4,4,4,0,0,0,0,0,0,0,0,4,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,4,0,0,1],
-  [1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,2,0,2,0,0,4,4,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,9,2,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  {cat:'프론트엔드',name:'JavaScript',icon:'⚡',color:'#f7df1e',type:'스크립트 언어',level:2,
+   desc:'웹 브라우저에서 동작하는 프로그래밍 언어입니다. DOM 조작·이벤트 처리·비동기 통신을 담당하며, Node.js로 서버에서도 실행됩니다.',ex:[
+`// 변수, 함수, DOM 조작
+const btn = document.querySelector('#myBtn');
+let count = 0;
+btn.addEventListener('click', () => {
+  count++;
+  document.querySelector('#out').textContent = count;
+});
+const doubled = [1,2,3,4,5].map(n => n * 2);
+const evens   = [1,2,3,4,5].filter(n => n % 2 === 0);`,
+`// async/await + fetch
+async function loadUser(id) {
+  try {
+    const res = await fetch('/api/users/' + id);
+    if (!res.ok) throw new Error('Not found');
+    return await res.json();
+  } catch (err) {
+    console.error('오류:', err.message);
+  }
+}`,
+`// 클래스 + 로컬스토리지
+class TodoApp {
+  constructor() {
+    this.todos = JSON.parse(localStorage.getItem('todos') || '[]');
+  }
+  add(text) {
+    this.todos.push({ id: Date.now(), text, done: false });
+    localStorage.setItem('todos', JSON.stringify(this.todos));
+  }
+  toggle(id) {
+    const t = this.todos.find(t => t.id === id);
+    if (t) t.done = !t.done;
+  }
+}`
+  ]},
+
+  {cat:'프론트엔드',name:'TypeScript',icon:'🔷',color:'#3178c6',type:'정적 타입 언어',level:2,
+   desc:'JavaScript의 상위 집합으로 정적 타입을 추가했습니다. 컴파일 타임에 오류를 잡아 대규모 프로젝트의 유지보수성을 크게 향상시킵니다.',ex:[
+`// 타입 정의
+type User = {
+  id:    number;
+  name:  string;
+  email: string;
+  role:  'admin' | 'user';
+};
+function greet(user: User): string {
+  return '안녕하세요, ' + user.name + '님!';
+}`,
+`// 제네릭
+function first<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+interface ApiResponse<T> {
+  data:    T;
+  status:  number;
+  message: string;
+}
+async function fetchUser(id: number): Promise<ApiResponse<User>> {
+  return fetch('/api/users/' + id).then(r => r.json());
+}`,
+`// 유틸리티 타입
+type PartialUser   = Partial<User>;
+type ReadonlyUser  = Readonly<User>;
+type UserKeys      = keyof User;   // 'id'|'name'|'email'|'role'
+
+class UserService {
+  private users = new Map<number, User>();
+  getById(id: number): User | undefined {
+    return this.users.get(id);
+  }
+  upsert(user: User) { this.users.set(user.id, user); }
+}`
+  ]},
+
+  {cat:'프론트엔드',name:'React',icon:'⚛️',color:'#61dafb',type:'UI 라이브러리',level:3,
+   desc:'Meta가 만든 컴포넌트 기반 UI 라이브러리입니다. 가상 DOM과 단방향 데이터 흐름으로 복잡한 인터페이스를 효율적으로 구축합니다.',ex:[
+`// useState 기본
+import { useState } from 'react';
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>카운트: {count}</p>
+      <button onClick={() => setCount(c => c + 1)}>증가</button>
+    </div>
+  );
+}`,
+`// useEffect + 데이터 페칭
+import { useState, useEffect } from 'react';
+function UserList() {
+  const [users, setUsers]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch('/api/users')
+      .then(r => r.json())
+      .then(data => { setUsers(data); setLoading(false); });
+  }, []);
+  if (loading) return <p>로딩 중...</p>;
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}`,
+`// Context + 커스텀 훅
+const AuthContext = createContext(null);
+function useAuth() {
+  const [user, setUser] = useState(null);
+  const login = async (email, pw) => {
+    const data = await authApi.login(email, pw);
+    setUser(data.user);
+  };
+  return { user, login, logout: () => setUser(null) };
+}
+export function AuthProvider({ children }) {
+  return <AuthContext.Provider value={useAuth()}>{children}</AuthContext.Provider>;
+}`
+  ]},
+
+  {cat:'프론트엔드',name:'Vue.js',icon:'💚',color:'#42b883',type:'프론트엔드 프레임워크',level:2,
+   desc:'점진적 도입이 가능한 프론트엔드 프레임워크입니다. Composition API와 직관적인 템플릿 문법으로 학습 곡선이 완만하며, 소~중규모 프로젝트에 적합합니다.',ex:[
+`<!-- Single File Component -->
+<template>
+  <div>
+    <p>{{ count }}번 클릭됨</p>
+    <button @click="increment">증가</button>
+  </div>
+</template>
+<script setup>
+import { ref } from 'vue';
+const count     = ref(0);
+const increment = () => count.value++;
+</script>`,
+`<!-- v-for, v-if, v-model, computed -->
+<template>
+  <input v-model="search" placeholder="검색...">
+  <li v-for="item in filtered" :key="item.id">{{ item.name }}</li>
+</template>
+<script setup>
+import { ref, computed } from 'vue';
+const search = ref('');
+const items  = ref([{ id:1, name:'Apple' }, { id:2, name:'Banana' }]);
+const filtered = computed(() =>
+  items.value.filter(i => i.name.includes(search.value)));
+</script>`,
+`// Pinia 상태관리
+import { defineStore } from 'pinia';
+export const useCartStore = defineStore('cart', {
+  state: () => ({ items: [], total: 0 }),
+  getters: {
+    count: s => s.items.length,
+  },
+  actions: {
+    addItem(product) {
+      this.items.push(product);
+      this.total += product.price;
+    },
+  },
+});`
+  ]},
+
+  /* ===== 백엔드 ===== */
+  {cat:'백엔드',name:'Python',icon:'🐍',color:'#3776ab',type:'범용 언어',level:1,
+   desc:'읽기 쉬운 문법과 방대한 라이브러리 생태계로 인기 있는 언어입니다. 웹(FastAPI·Django), 데이터과학, AI/ML, 자동화 등 폭넓게 활용됩니다.',ex:[
+`# 기본 문법
+def greet(name: str, times: int = 1) -> str:
+    return ('안녕, ' + name + '\n') * times
+
+numbers = [1, 2, 3, 4, 5]
+squares = [x**2 for x in numbers if x % 2 == 0]
+print(squares)  # [4, 16]`,
+`# FastAPI 서버
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name:  str
+    price: float
+
+@app.get('/items/{item_id}')
+async def get_item(item_id: int):
+    return {'id': item_id}
+
+@app.post('/items/')
+async def create_item(item: Item):
+    return item`,
+`# pandas 데이터 분석
+import pandas as pd
+df = pd.read_csv('sales.csv')
+monthly = (df.groupby('month')['revenue']
+             .sum()
+             .sort_values(ascending=False))
+print(monthly.head(3))
+df[df['revenue'] > 1000].to_csv('top.csv', index=False)`
+  ]},
+
+  {cat:'백엔드',name:'Node.js',icon:'🟢',color:'#339933',type:'JS 런타임',level:2,
+   desc:'Chrome V8 엔진 기반의 JavaScript 서버 런타임입니다. 비동기 I/O와 이벤트 루프로 고성능 서버를 구축하며, npm 생태계와 함께 강력합니다.',ex:[
+`// Express 기본 서버
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+app.get('/users/:id', async (req, res) => {
+  const user = await db.findUser(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Not found' });
+  res.json(user);
+});
+app.listen(3000, () => console.log('서버 시작'));`,
+`// 미들웨어 + 에러 핸들러
+const auth = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  req.user = verifyToken(token);
+  next();
+};
+app.use('/api', auth);
+app.use((err, req, res, next) => {
+  res.status(500).json({ error: err.message });
+});`,
+`// Socket.io 실시간
+const { Server } = require('socket.io');
+const io = new Server(server);
+
+io.on('connection', socket => {
+  socket.on('join', room => socket.join(room));
+  socket.on('message', ({ room, msg }) => {
+    io.to(room).emit('message', { user: socket.id, msg });
+  });
+  socket.on('disconnect', () => console.log('연결 종료'));
+});`
+  ]},
+
+  {cat:'백엔드',name:'Go',icon:'🔵',color:'#00add8',type:'컴파일 언어',level:3,
+   desc:'Google이 개발한 컴파일 언어로 빠른 컴파일 속도와 간결한 문법이 특징입니다. 고루틴으로 동시성을 쉽게 구현하며, 클라우드·마이크로서비스에 강점을 가집니다.',ex:[
+`package main
+import "fmt"
+
+type User struct { Name, Email string }
+func (u User) String() string {
+    return fmt.Sprintf("%s <%s>", u.Name, u.Email)
+}
+func main() {
+    u := User{"Alice", "alice@example.com"}
+    fmt.Println(u)
+}`,
+`// 고루틴 + 채널
+func worker(jobs <-chan int, results chan<- int) {
+    for j := range jobs { results <- j * j }
+}
+func main() {
+    jobs, results := make(chan int, 9), make(chan int, 9)
+    for w := 0; w < 3; w++ { go worker(jobs, results) }
+    for i := 1; i <= 9; i++ { jobs <- i }
+    close(jobs)
+    for i := 0; i < 9; i++ { fmt.Println(<-results) }
+}`,
+`// HTTP 서버
+package main
+import ("encoding/json"; "net/http")
+type Resp struct { Message string \`json:"message"\` }
+func handler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type","application/json")
+    json.NewEncoder(w).Encode(Resp{"Hello, Go!"})
+}
+func main() {
+    http.HandleFunc("/", handler)
+    http.ListenAndServe(":8080", nil)
+}`
+  ]},
+
+  {cat:'백엔드',name:'Java',icon:'☕',color:'#f89820',type:'객체지향 언어',level:3,
+   desc:'강력한 타입 시스템과 JVM 기반의 플랫폼 독립성을 가진 언어입니다. Spring 프레임워크와 함께 대규모 엔터프라이즈 시스템에 널리 사용됩니다.',ex:[
+`// 클래스와 인터페이스
+public interface Printable { void print(); }
+
+public class Document implements Printable {
+    private String content;
+    public Document(String content) { this.content = content; }
+    @Override
+    public void print() { System.out.println(content); }
+}`,
+`// Stream API
+import java.util.*;
+import java.util.stream.*;
+List<String> names = List.of("Alice","Bob","Carol","Dave");
+List<String> result = names.stream()
+    .filter(n -> n.length() > 3)
+    .map(String::toUpperCase)
+    .sorted()
+    .collect(Collectors.toList());
+// [ALICE, CAROL, DAVE]`,
+`// Spring Boot REST
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    @Autowired private UserService svc;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> get(@PathVariable Long id) {
+        return svc.findById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+}`
+  ]},
+
+  {cat:'백엔드',name:'Rust',icon:'🦀',color:'#ce422b',type:'시스템 언어',level:4,
+   desc:'메모리 안전성을 컴파일 타임에 보장하는 시스템 언어입니다. GC 없이 C/C++ 수준의 성능을 내며, WebAssembly·CLI·서버 등에 활용됩니다.',ex:[
+`// 소유권 시스템
+fn main() {
+    let s1 = String::from("hello");
+    let s2 = s1;           // s1 소유권 이동
+    // println!("{}", s1); // 컴파일 오류!
+    println!("{}", s2);
+
+    let n = 42;  // 스택 타입 → Copy
+    let m = n;   // 복사됨
+    println!("{} {}", n, m);
+}`,
+`// 열거형 + 패턴 매칭
+enum Shape { Circle(f64), Rectangle(f64, f64) }
+fn area(s: &Shape) -> f64 {
+    match s {
+        Shape::Circle(r)      => std::f64::consts::PI * r * r,
+        Shape::Rectangle(w,h) => w * h,
+    }
+}`,
+`// Axum 웹 서버
+use axum::{routing::get, Router, Json};
+use serde::Serialize;
+#[derive(Serialize)]
+struct Health { status: &'static str }
+async fn health() -> Json<Health> {
+    Json(Health { status: "ok" })
+}
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/health", get(health));
+    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+        .serve(app.into_make_service()).await.unwrap();
+}`
+  ]},
+
+  {cat:'백엔드',name:'PHP',icon:'🐘',color:'#777bb3',type:'서버 사이드 언어',level:2,
+   desc:'웹 개발에 특화된 서버 사이드 스크립트 언어입니다. WordPress·Laravel 등 거대한 생태계를 보유하며, 전 세계 웹사이트의 약 77%에서 사용됩니다.',ex:[
+`<?php
+$name = "Alice";
+$scores = [90, 85, 92, 78];
+$avg = array_sum($scores) / count($scores);
+echo "안녕, {$name}님! 평균: {$avg}점";
+
+$upper = array_map('strtoupper', ['a','b','c']);
+$evens = array_filter([1,2,3,4,5], fn($n) => $n % 2 === 0);`,
+`<?php
+// Laravel 컨트롤러
+class UserController extends Controller {
+    public function show(int $id): JsonResponse {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+    public function store(Request $request): JsonResponse {
+        $data = $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+        ]);
+        return response()->json(User::create($data), 201);
+    }
+}`,
+`<?php
+// Eloquent ORM
+class Post extends Model {
+    protected $fillable = ['title','content','user_id'];
+    public function user()     { return $this->belongsTo(User::class); }
+    public function comments() { return $this->hasMany(Comment::class); }
+}
+$posts = Post::with('user','comments')
+             ->where('published', true)
+             ->orderBy('created_at','desc')
+             ->paginate(10);`
+  ]},
+
+  {cat:'백엔드',name:'C#',icon:'💜',color:'#9b4993',type:'다중 패러다임 언어',level:3,
+   desc:'Microsoft가 개발한 .NET 플랫폼의 주력 언어입니다. LINQ·async/await·레코드 타입을 지원하며, 게임(Unity)·웹(ASP.NET)·데스크톱 개발에 폭넓게 쓰입니다.',ex:[
+`// LINQ
+var numbers = new List<int> { 1,2,3,4,5 };
+var squares = numbers.Where(n => n % 2 == 0)
+                     .Select(n => n * n)
+                     .ToList();  // [4, 16]
+
+record Person(string Name, int Age);
+var people  = new[] { new Person("Alice",30), new Person("Bob",25) };
+var youngest = people.MinBy(p => p.Age);`,
+`// async/await
+public class WeatherService {
+    private readonly HttpClient _client;
+    public async Task<WeatherData> GetAsync(string city) {
+        var response = await _client.GetAsync("/api/weather/" + city);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<WeatherData>();
+    }
+}`,
+`// ASP.NET Core 최소 API
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+var app = builder.Build();
+
+app.MapGet("/users/{id:int}", async (int id, IUserRepo repo) => {
+    var user = await repo.FindAsync(id);
+    return user is null ? Results.NotFound() : Results.Ok(user);
+});
+app.Run();`
+  ]},
+
+  /* ===== 모바일 ===== */
+  {cat:'모바일',name:'Swift',icon:'🍎',color:'#fa7343',type:'컴파일 언어',level:3,
+   desc:'Apple이 개발한 iOS·macOS 앱 개발 언어입니다. Optional로 null 안전성을 보장하며, SwiftUI로 선언형 UI를 간결하게 작성할 수 있습니다.',ex:[
+`// 기본 + Optional
+var name: String? = "Alice"
+if let n = name { print("안녕하세요, \\(n)!") }
+
+struct Point {
+    var x, y: Double
+    func distance(to o: Point) -> Double {
+        sqrt(pow(x-o.x,2) + pow(y-o.y,2))
+    }
+}`,
+`// 열거형 + async/await
+enum NetworkError: Error {
+    case noConnection, timeout, serverError(Int)
+}
+func fetchData() async throws -> Data {
+    guard isConnected else { throw NetworkError.noConnection }
+    let (data, _) = try await URLSession.shared.data(from: url)
+    return data
+}`,
+`// SwiftUI View
+struct ContentView: View {
+    @State private var count = 0
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("카운트: \\(count)").font(.largeTitle)
+            Button("증가") { count += 1 }
+                .buttonStyle(.borderedProminent)
+        }
+        .padding()
+    }
+}`
+  ]},
+
+  {cat:'모바일',name:'Kotlin',icon:'🤖',color:'#7f52ff',type:'다중 패러다임 언어',level:3,
+   desc:'JetBrains가 개발한 JVM 기반 언어로 Android 공식 개발 언어입니다. Java보다 간결하며, Null 안전성·확장 함수·코루틴이 강점입니다.',ex:[
+`// data class + 확장 함수
+data class User(val name: String, val age: Int)
+fun User.isAdult() = age >= 18
+
+fun main() {
+    val users  = listOf(User("Alice",30), User("Bob",16))
+    val adults = users.filter { it.isAdult() }
+    println(adults.map { it.name })  // [Alice]
+}`,
+`// 코루틴
+import kotlinx.coroutines.*
+suspend fun fetchUser(id: Int): User {
+    delay(100)
+    return User("Alice", 30)
+}
+fun main() = runBlocking {
+    val users = (1..5).map { id -> async { fetchUser(id) } }.awaitAll()
+    println(users.size)
+}`,
+`// Jetpack Compose
+@Composable
+fun CounterScreen() {
+    var count by remember { mutableStateOf(0) }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("카운트: $count", style = MaterialTheme.typography.headlineLarge)
+        Button(onClick = { count++ }) { Text("증가") }
+    }
+}`
+  ]},
+
+  {cat:'모바일',name:'Flutter',icon:'🦋',color:'#02569b',type:'크로스플랫폼 프레임워크',level:2,
+   desc:'Google의 크로스플랫폼 UI 프레임워크입니다. Dart 언어로 iOS·Android·Web·Desktop을 단일 코드로 개발하며, 60fps 부드러운 렌더링이 특징입니다.',ex:[
+`// 기본 위젯
+import 'package:flutter/material.dart';
+void main() => runApp(const MyApp());
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Flutter')),
+      body: const Center(child: Text('안녕하세요!')),
+    ),
+  );
+}`,
+`// StatefulWidget
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+  @override State<Counter> createState() => _State();
+}
+class _State extends State<Counter> {
+  int _n = 0;
+  @override Widget build(BuildContext ctx) => Column(children: [
+    Text('$_n', style: const TextStyle(fontSize: 48)),
+    ElevatedButton(onPressed: ()=>setState(()=>_n++), child: const Text('증가')),
+  ]);
+}`,
+`// Riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+final counterProvider = StateProvider<int>((ref) => 0);
+class CounterWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final n = ref.watch(counterProvider);
+    return Column(children: [
+      Text('$n'),
+      ElevatedButton(
+        onPressed: () => ref.read(counterProvider.notifier).state++,
+        child: const Text('증가'),
+      ),
+    ]);
+  }
+}`
+  ]},
+
+  {cat:'모바일',name:'React Native',icon:'📱',color:'#61dafb',type:'크로스플랫폼 프레임워크',level:3,
+   desc:'JavaScript(React)로 iOS·Android 네이티브 앱을 개발하는 프레임워크입니다. 웹 개발자가 모바일로 진입하기 쉽고, Expo로 빠르게 시작할 수 있습니다.',ex:[
+`import { View, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+      <Text style={{ fontSize:48 }}>{count}</Text>
+      <TouchableOpacity onPress={() => setCount(c => c+1)}>
+        <Text style={{ fontSize:20 }}>증가</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}`,
+`// React Navigation
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home"   component={HomeScreen} />
+        <Stack.Screen name="Detail" component={DetailScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}`,
+`// AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage';
+async function save(key, data) {
+  await AsyncStorage.setItem(key, JSON.stringify(data));
+}
+async function load(key) {
+  const raw = await AsyncStorage.getItem(key);
+  return raw ? JSON.parse(raw) : null;
+}`
+  ]},
+
+  /* ===== 데이터베이스 ===== */
+  {cat:'데이터베이스',name:'MySQL',icon:'🐬',color:'#00758f',type:'관계형 DB',level:2,
+   desc:'세계에서 가장 널리 사용되는 오픈소스 관계형 데이터베이스입니다. ACID 트랜잭션·인덱스·조인을 지원하며 웹 서비스의 표준 DB로 자리잡고 있습니다.',ex:[
+`-- 기본 CRUD
+CREATE TABLE users (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(150) UNIQUE NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com');
+SELECT * FROM users WHERE id = 1;
+UPDATE users SET name = 'Bob'  WHERE id = 1;
+DELETE FROM users WHERE id = 1;`,
+`-- JOIN + GROUP BY + HAVING
+SELECT u.name,
+       COUNT(o.id)   AS order_count,
+       SUM(o.amount) AS total
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.created_at >= '2024-01-01'
+GROUP BY u.id, u.name
+HAVING total > 100000
+ORDER BY total DESC LIMIT 10;`,
+`-- 인덱스 + 트랜잭션
+CREATE INDEX idx_email    ON users(email);
+CREATE INDEX idx_orders   ON orders(user_id, created_at);
+
+START TRANSACTION;
+  UPDATE accounts SET balance = balance - 10000 WHERE id = 1;
+  UPDATE accounts SET balance = balance + 10000 WHERE id = 2;
+COMMIT;
+-- 오류 시: ROLLBACK;`
+  ]},
+
+  {cat:'데이터베이스',name:'PostgreSQL',icon:'🐘',color:'#336791',type:'관계형 DB',level:3,
+   desc:'고급 기능과 표준 SQL 준수로 유명한 오픈소스 DB입니다. JSON·배열·전문검색·지리정보(PostGIS)를 지원하며, 복잡한 쿼리와 대용량 데이터에 강합니다.',ex:[
+`-- JSON 컬럼
+CREATE TABLE products (
+  id    SERIAL PRIMARY KEY,
+  name  TEXT   NOT NULL,
+  attrs JSONB
+);
+INSERT INTO products (name, attrs)
+VALUES ('노트북', '{"brand":"Samsung","ram":16}');
+
+SELECT name, attrs->>'brand' AS brand,
+       (attrs->>'ram')::int  AS ram
+FROM products WHERE attrs->>'brand' = 'Samsung';`,
+`-- CTE + Window 함수
+WITH monthly AS (
+  SELECT DATE_TRUNC('month', created_at) AS month,
+         SUM(amount) AS revenue
+  FROM orders GROUP BY 1
+)
+SELECT month, revenue,
+       LAG(revenue) OVER (ORDER BY month) AS prev,
+       revenue - LAG(revenue) OVER (ORDER BY month) AS diff
+FROM monthly ORDER BY month;`,
+`-- 전문 검색 + 배열
+ALTER TABLE articles
+  ADD COLUMN tsv tsvector
+  GENERATED ALWAYS AS (to_tsvector('english', title||' '||body)) STORED;
+CREATE INDEX ON articles USING GIN(tsv);
+
+SELECT title FROM articles
+WHERE tsv @@ plainto_tsquery('english', 'python tutorial');
+SELECT * FROM posts WHERE 'python' = ANY(tags);`
+  ]},
+
+  {cat:'데이터베이스',name:'MongoDB',icon:'🌿',color:'#47a248',type:'문서형 NoSQL',level:2,
+   desc:'JSON 형식의 BSON 문서를 저장하는 NoSQL 데이터베이스입니다. 스키마가 유연하고 수평 확장이 쉬워 빠르게 변화하는 데이터 구조에 적합합니다.',ex:[
+`// Mongoose ODM
+const userSchema = new Schema({
+  name:  String,
+  email: { type: String, unique: true },
+  tags:  [String],
+  meta:  { logins: Number, lastSeen: Date },
+});
+const User = model('User', userSchema);
+
+const user  = await User.create({ name:'Alice', email:'a@b.com' });
+const found = await User.findOne({ email: 'a@b.com' });`,
+`// 쿼리 + 집계
+await User.find({ tags: 'admin', 'meta.logins': { $gt: 5 } });
+
+await Order.aggregate([
+  { $match:  { status: 'paid' } },
+  { $group:  { _id: '$userId', total: { $sum: '$amount' } } },
+  { $sort:   { total: -1 } },
+  { $limit:  10 },
+]);`,
+`// 인덱스
+db.orders.createIndex({ userId:1, createdAt:-1 });
+// TTL 자동 만료
+db.sessions.createIndex({ expireAt:1 }, { expireAfterSeconds:0 });
+// 텍스트 검색
+db.articles.createIndex({ title:'text', body:'text' });
+db.articles.find({ $text: { $search: 'python tutorial' } });`
+  ]},
+
+  {cat:'데이터베이스',name:'Redis',icon:'🔴',color:'#dc382d',type:'인메모리 DB',level:2,
+   desc:'초고속 인메모리 키-값 저장소입니다. 캐싱·세션·메시지 큐·리더보드에 활용되며, String·Hash·List·Set·Sorted Set 등 다양한 자료구조를 지원합니다.',ex:[
+`# 기본 명령어
+SET  user:1:name "Alice"
+SET  session:abc "user:1" EX 3600  # 1시간 만료
+GET  user:1:name
+INCR page:views           # 원자적 증가
+
+# Hash
+HSET  user:1 name Alice age 30
+HGET  user:1 name
+HGETALL user:1`,
+`# List + Sorted Set
+RPUSH queue:tasks "task1" "task2"
+LPOP  queue:tasks            # FIFO
+
+ZADD  leaderboard 1500 "Alice"
+ZADD  leaderboard 2300 "Bob"
+ZREVRANGE leaderboard 0 2 WITHSCORES  # 상위 3명`,
+`// Node.js 캐싱 패턴
+const redis = require('ioredis');
+const client = new redis();
+
+async function getUser(id) {
+  const cached = await client.get('user:' + id);
+  if (cached) return JSON.parse(cached);
+  const user = await db.findUser(id);
+  await client.setex('user:' + id, 3600, JSON.stringify(user));
+  return user;
+}`
+  ]},
+
+  {cat:'데이터베이스',name:'SQLite',icon:'🗃️',color:'#003b57',type:'경량 RDBMS',level:1,
+   desc:'파일 하나로 동작하는 경량 관계형 DB입니다. 별도 서버 없이 임베드되어 모바일 앱·로컬 저장소·프로토타이핑에 이상적이며, Python에 기본 내장됩니다.',ex:[
+`import sqlite3
+conn = sqlite3.connect('app.db')
+cur  = conn.cursor()
+cur.execute("""CREATE TABLE IF NOT EXISTS users (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name  TEXT    NOT NULL,
+    email TEXT    UNIQUE
+)""")
+cur.execute("INSERT INTO users (name,email) VALUES (?,?)", ("Alice","a@b.com"))
+conn.commit()`,
+`import sqlite3
+conn = sqlite3.connect('app.db')
+conn.row_factory = sqlite3.Row  # dict처럼 접근
+
+rows = conn.execute(
+    "SELECT * FROM users WHERE name LIKE ?", ("%A%",)
+).fetchall()
+for row in rows:
+    print(dict(row))`,
+`# SQLAlchemy ORM
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import DeclarativeBase, Session
+class Base(DeclarativeBase): pass
+class User(Base):
+    __tablename__ = 'users'
+    id    = Column(Integer, primary_key=True)
+    name  = Column(String(100))
+    email = Column(String(150), unique=True)
+engine = create_engine('sqlite:///app.db')
+Base.metadata.create_all(engine)`
+  ]},
+
+  /* ===== DevOps ===== */
+  {cat:'DevOps',name:'Docker',icon:'🐳',color:'#2496ed',type:'컨테이너 플랫폼',level:2,
+   desc:'애플리케이션을 컨테이너로 패키징해 어디서든 동일하게 실행하는 플랫폼입니다. "내 컴퓨터에서는 돼요" 문제를 해결하며, 현대 배포의 표준입니다.',ex:[
+`# Dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]
+
+# docker build -t myapp .
+# docker run -p 8000:8000 myapp`,
+`# docker-compose.yml
+version: '3.9'
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql://user:pass@db/mydb
+    depends_on: [db]
+  db:
+    image: postgres:16
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    environment: { POSTGRES_PASSWORD: pass }
+volumes:
+  pgdata:`,
+`# 자주 쓰는 명령어
+docker ps                         # 실행 중 컨테이너
+docker logs -f myapp              # 실시간 로그
+docker exec -it myapp /bin/bash   # 컨테이너 접속
+docker system prune -af           # 미사용 리소스 정리
+
+# 멀티 스테이지 빌드
+FROM node:20 AS builder
+RUN npm ci && npm run build
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html`
+  ]},
+
+  {cat:'DevOps',name:'Git',icon:'🔀',color:'#f05032',type:'버전 관리 시스템',level:2,
+   desc:'분산형 버전 관리 시스템으로 소스 코드의 변경 이력을 추적합니다. 브랜치 전략으로 팀 협업을 구조화하고, GitHub·GitLab과 함께 현대 개발의 필수 도구입니다.',ex:[
+`# 기본 워크플로
+git init
+git clone <url>
+git add -p                        # 선택적 스테이지
+git commit -m "feat: 로그인 추가"
+git push origin main
+
+# 브랜치
+git checkout -b feat/login
+git merge  feat/login
+git branch -d feat/login`,
+`# 협업 패턴
+git fetch origin
+git rebase origin/main            # 최신 기반으로 재배치
+git stash                         # 작업 임시 저장
+git stash pop
+
+# 히스토리
+git rebase -i HEAD~3              # 최근 3개 커밋 정리
+git cherry-pick <sha>             # 특정 커밋만 적용`,
+`# 유용한 별칭
+git config --global alias.lg \
+  "log --oneline --graph --decorate --all"
+git config --global alias.undo "reset HEAD~1 --mixed"
+
+# .gitignore
+node_modules/
+*.env
+.DS_Store
+dist/
+__pycache__/`
+  ]},
+
+  {cat:'DevOps',name:'Linux / Bash',icon:'🐧',color:'#f0c000',type:'OS / 셸',level:2,
+   desc:'서버 환경의 90% 이상을 차지하는 운영체제와 그 셸 언어입니다. 파이프라인·cron·프로세스 관리로 자동화 스크립트를 작성합니다.',ex:[
+`#!/bin/bash
+NAME="World"
+echo "Hello, $NAME!"
+
+for file in *.log; do
+  gzip "$file"
+done
+
+if [ -f "config.json" ]; then
+  echo "설정 파일 있음"
+else
+  cp config.example.json config.json
+fi`,
+`# 파이프라인 & 유용한 명령어
+grep -E "ERROR|CRITICAL" app.log | tail -50
+ps aux --sort=-%cpu | head -10
+find /var/log -name "*.log" -mtime +7 -delete
+ss -tlnp | grep :8000`,
+`#!/bin/bash
+# 배포 스크립트
+set -euo pipefail
+APP="/opt/myapp"
+
+echo "백업 중..."
+tar -czf "/opt/backups/app-$(date +%Y%m%d).tar.gz" "$APP"
+
+echo "업데이트 중..."
+cd "$APP" && git pull origin main
+pip install -r requirements.txt -q
+
+systemctl restart myapp
+echo "배포 완료"`
+  ]},
+
+  {cat:'DevOps',name:'GitHub Actions',icon:'⚙️',color:'#2088ff',type:'CI/CD 플랫폼',level:2,
+   desc:'GitHub에 내장된 자동화 플랫폼입니다. 코드 푸시·PR·스케줄 이벤트에 반응해 테스트·빌드·배포를 자동화하며, 수천 개의 재사용 가능한 액션이 있습니다.',ex:[
+`# .github/workflows/ci.yml
+name: CI
+on:
+  push:         { branches: [main] }
+  pull_request: { branches: [main] }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: pytest --cov`,
+`# 멀티 매트릭스
+jobs:
+  test:
+    strategy:
+      matrix:
+        python: ['3.10','3.11','3.12']
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: ${{ matrix.python }} }
+      - run: pip install pytest && pytest`,
+`# Docker 빌드 & 배포
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - run: |
+          docker build -t myapp:${{ github.sha }} .
+          docker push myapp:${{ github.sha }}`
+  ]},
+
+  /* ===== 시스템 ===== */
+  {cat:'시스템',name:'C',icon:'⚙️',color:'#a8b9cc',type:'시스템 언어',level:4,
+   desc:'가장 오래되고 영향력 있는 시스템 프로그래밍 언어입니다. 운영체제·임베디드·드라이버에 사용되며, 거의 모든 현대 언어가 C의 영향을 받았습니다.',ex:[
+`#include <stdio.h>
+void swap(int *a, int *b) {
+    int t = *a; *a = *b; *b = t;
+}
+int main() {
+    int arr[] = {5,2,8,1,9};
+    swap(&arr[0], &arr[4]);
+    for (int i=0; i<5; i++)
+        printf("%d ", arr[i]);  // 9 2 8 1 5
+    return 0;
+}`,
+`#include <stdlib.h>
+#include <string.h>
+typedef struct { char name[50]; int age; } Person;
+
+Person* create(const char* name, int age) {
+    Person* p = malloc(sizeof(Person));
+    if (!p) return NULL;
+    strncpy(p->name, name, 49);
+    p->age = age;
+    return p;
+}
+// 사용 후 반드시: free(p);`,
+`#include <stdio.h>
+int main() {
+    FILE *fp = fopen("data.txt","r");
+    if (!fp) { perror("오류"); return 1; }
+    char line[256];
+    while (fgets(line, sizeof(line), fp))
+        printf("%s", line);
+    fclose(fp);
+    return 0;
+}`
+  ]},
+
+  {cat:'시스템',name:'C++',icon:'⚡',color:'#00599c',type:'다중 패러다임 언어',level:4,
+   desc:'C를 기반으로 OOP·제네릭·함수형 프로그래밍을 추가한 언어입니다. 게임 엔진·그래픽스·고성능 시스템에서 성능이 중요할 때 사용됩니다.',ex:[
+`#include <iostream>
+#include <vector>
+using namespace std;
+class Stack {
+    vector<int> data;
+public:
+    void push(int v) { data.push_back(v); }
+    int  pop()  { int v=data.back(); data.pop_back(); return v; }
+    bool empty() const { return data.empty(); }
+};
+int main() {
+    Stack s; s.push(1); s.push(2);
+    cout << s.pop() << endl;  // 2
+}`,
+`// 템플릿 + 스마트 포인터
+#include <memory>
+template<typename T>
+class Box {
+    unique_ptr<T> val;
+public:
+    Box(T v): val(make_unique<T>(v)) {}
+    T get() const { return *val; }
+};
+// RAII
+class Resource {
+public:
+     Resource() { cout<<"열기\\n"; }
+    ~Resource() { cout<<"닫기\\n"; }
+};`,
+`// Modern C++20
+#include <ranges>
+#include <format>
+auto nums = vector{1,2,3,4,5};
+auto even_sq = nums
+    | views::filter([](int n){ return n%2==0; })
+    | views::transform([](int n){ return n*n; });
+
+auto [mn,mx] = minmax_element(nums.begin(),nums.end());
+string msg = format("범위: {}~{}", *mn, *mx);`
+  ]},
+
+  {cat:'시스템',name:'WebAssembly',icon:'🔧',color:'#654ff0',type:'저수준 실행 형식',level:4,
+   desc:'브라우저에서 실행되는 바이너리 코드 형식입니다. C/C++/Rust로 작성된 코드를 웹에서 네이티브에 가까운 속도로 실행하며, 게임·영상편집·과학 계산에 활용됩니다.',ex:[
+`// Rust → WebAssembly
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+pub fn fibonacci(n: u32) -> u64 {
+    if n < 2 { return n as u64; }
+    let (mut a, mut b) = (0u64, 1u64);
+    for _ in 2..=n { (a, b) = (b, a+b); }
+    b
+}
+// wasm-pack build --target web`,
+`// JS에서 wasm 호출
+import init, { fibonacci } from './pkg/mylib.js';
+
+async function main() {
+  await init();
+  console.log(fibonacci(50));  // 12586269025
+}
+main();`,
+`// C로 wasm 컴파일 (emscripten)
+#include <emscripten.h>
+EMSCRIPTEN_KEEPALIVE
+int add(int a, int b) { return a + b; }
+
+// 빌드:
+// emcc main.c -O3 -o main.wasm \
+//   -s EXPORTED_FUNCTIONS="['_add']"
+// JS: const result = Module._add(3,4);`
+  ]},
 ];
 
-const ENEMY_SPAWNS = [
-  {x:5.5,y:5.5,t:0},{x:10.5,y:2.5,t:1},{x:18.5,y:4.5,t:0},
-  {x:8.5,y:10.5,t:2},{x:8.5,y:12.5,t:0},{x:19.5,y:14.5,t:1},
-  {x:4.5,y:16.5,t:2},{x:14.5,y:16.5,t:0},{x:20.5,y:13.5,t:1},
-  {x:20.5,y:15.5,t:2},
-];
-const ITEM_SPAWNS = [
-  {x:3.5,y:3.5,t:'h'},{x:12.5,y:10.5,t:'a'},{x:14.5,y:6.5,t:'h'},
-  {x:20.5,y:18.5,t:'a'},{x:6.5,y:18.5,t:'h'},{x:9.5,y:8.5,t:'a'},
-];
-
-// ══════════════════════════════════════════════════════════
-//  TEXTURE GENERATION  (64x64 offscreen canvases)
-// ══════════════════════════════════════════════════════════
-const TEX = 64;
-const textures = {};
-
-function mkTex(fn) {
-  const c = document.createElement('canvas');
-  c.width = c.height = TEX;
-  const x = c.getContext('2d');
-  // precompute random noise per pixel for determinism
-  const rnd = new Float32Array(TEX*TEX);
-  for (let i = 0; i < rnd.length; i++) rnd[i] = Math.random();
-  fn(x, TEX, rnd);
-  return c;
+// ── 하이라이터 ────────────────────────────────────────────────────────────────
+const KWS = new Set([
+  'const','let','var','function','return','if','else','for','while','do','class','new',
+  'import','export','default','from','async','await','try','catch','finally','throw',
+  'typeof','instanceof','in','of','this','super','extends','static','null','undefined','true','false',
+  'def','elif','pass','lambda','yield','with','as','not','and','or','is','del','global','nonlocal','None','True','False',
+  'fn','let','mut','pub','use','struct','enum','impl','trait','match','where','mod','crate','self','Self','ref','move',
+  'func','var','type','package','interface','map','chan','go','defer','select','range','make','append',
+  'public','private','protected','void','int','string','bool','float','double','char',
+  'abstract','final','override','virtual','sealed','namespace','using','throws',
+  'include','define','typedef','sizeof','malloc','free','auto',
+  'switch','case','break','continue','delete',
+]);
+const BIS = new Set([
+  'print','len','range','list','dict','set','tuple','str','int','float','bool',
+  'sum','min','max','sorted','map','filter','zip','enumerate','isinstance','type',
+  'console','document','Math','JSON','Object','Array','Promise','fetch','require',
+  'printf','scanf','cout','cin','endl','make_unique','vector',
+  'fmt','log','http','os','io','sync','errors',
+]);
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function highlight(code){
+  const slots=[]; const st=h=>{slots.push(h);return`\x00${slots.length-1}\x00`;};
+  let h=esc(code);
+  h=h.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''/g,m=>st(`<span class="st">${m}</span>`));
+  h=h.replace(/`[^`]*`/g,m=>st(`<span class="st">${m}</span>`));
+  h=h.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g,m=>st(`<span class="st">${m}</span>`));
+  h=h.replace(/\/\/[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
+  h=h.replace(/#(?!include)[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
+  h=h.replace(/\/\*[\s\S]*?\*\//g,m=>st(`<span class="cm">${m}</span>`));
+  h=h.replace(/--[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
+  h=h.replace(/@[\w.]+/g,m=>st(`<span class="de">${m}</span>`));
+  h=h.replace(/\b([A-Za-z_]\w*)\b/g,(m,w)=>{
+    if(KWS.has(w)) return st(`<span class="kw">${w}</span>`);
+    if(BIS.has(w)) return st(`<span class="bi">${w}</span>`);
+    return m;
+  });
+  h=h.replace(/\b(\d[\d_]*\.?\d*([eE][+-]?\d+)?)\b/g,m=>st(`<span class="nu">${m}</span>`));
+  return h.replace(/\x00(\d+)\x00/g,(_,i)=>slots[+i]);
 }
 
-// 1: Stone
-textures[1] = mkTex((ctx, S, r) => {
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const row = (y/12)|0, off = (row%2)*20;
-      const isMortar = y%12===0 || (x+off)%40===0;
-      const n = (r[y*S+x]*30-15)|0;
-      ctx.fillStyle = isMortar
-        ? `rgb(${55+n},${55+n},${58+n})`
-        : `rgb(${105+n},${105+n},${115+n})`;
-      ctx.fillRect(x,y,1,1);
-    }
-  }
-});
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let activeIdx=-1, tabIdx=0;
 
-// 2: Brick
-textures[2] = mkTex((ctx, S, r) => {
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const row = (y/8)|0, off = (row%2)*16;
-      const isMortar = y%8===0 || (x+off)%32===0;
-      const n = (r[y*S+x]*22-11)|0;
-      ctx.fillStyle = isMortar
-        ? `rgb(${72+n},${65+n},${58+n})`
-        : `rgb(${162+n},${72+n},${52+n})`;
-      ctx.fillRect(x,y,1,1);
-    }
-  }
-});
+const CAT_COLORS = {
+  '프론트엔드':'#6c8eff','백엔드':'#a78bfa','모바일':'#f472b6',
+  '데이터베이스':'#34d399','DevOps':'#fbbf24','시스템':'#fb923c',
+};
 
-// 3: Metal
-textures[3] = mkTex((ctx, S, r) => {
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const px = (x/16)|0, py = (y/16)|0;
-      const isRivet = (x%16===2&&y%16===2)||(x%16===13&&y%16===13);
-      const isSeam  = x%16===0||y%16===0;
-      const n = (r[y*S+x]*14-7)|0;
-      const base = 75 + (px+py)%3*12;
-      ctx.fillStyle = isRivet ? `rgb(200,200,185)` :
-        isSeam ? `rgb(${40+n},${40+n},${45+n})` :
-        `rgb(${base+n},${base+n},${base+10+n})`;
-      ctx.fillRect(x,y,1,1);
-    }
-  }
-});
-
-// 4: Wood
-textures[4] = mkTex((ctx, S, r) => {
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const grain = Math.sin(x*0.28+y*0.06)*18 + Math.sin(x*0.1)*8;
-      const n = (r[y*S+x]*10-5)|0;
-      ctx.fillStyle = `rgb(${(118+grain+n)|0},${(78+grain*0.5+n)|0},${(38+n)|0})`;
-      ctx.fillRect(x,y,1,1);
-    }
-  }
-});
-
-// 9: Exit
-textures[9] = mkTex((ctx, S) => {
-  ctx.fillStyle='#003300'; ctx.fillRect(0,0,S,S);
-  // Checkerboard border
-  for (let i=0;i<S/8;i++) {
-    ctx.fillStyle = i%2===0?'#004400':'#005500';
-    ctx.fillRect(i*8,0,8,8);ctx.fillRect(i*8,S-8,8,8);
-    ctx.fillRect(0,i*8,8,8);ctx.fillRect(S-8,i*8,8,8);
-  }
-  ctx.fillStyle='#00ff44';
-  ctx.font=`bold ${S/4}px monospace`;
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('EXIT',S/2,S/2);
-});
-
-// ══════════════════════════════════════════════════════════
-//  SPRITE IMAGES
-// ══════════════════════════════════════════════════════════
-const SPR = 128;
-
-function mkSpr(fn) {
-  const c = document.createElement('canvas');
-  c.width = c.height = SPR;
-  fn(c.getContext('2d'), SPR);
-  return c;
-}
-
-// Enemy types: 0=demon(red), 1=imp(green), 2=specter(purple)
-const ENEMY_COLORS = [
-  ['#880000','#cc2222','#ff0000'],
-  ['#005500','#117711','#22ff44'],
-  ['#330055','#7733aa','#cc44ff'],
-];
-
-function drawEnemy(ctx, S, colors) {
-  const [dark,mid,hi] = colors;
-  // Shadow
-  ctx.fillStyle='rgba(0,0,0,0.4)';
-  ctx.beginPath(); ctx.ellipse(S/2,S*0.93,S*0.2,S*0.05,0,0,Math.PI*2); ctx.fill();
-  // Legs
-  ctx.fillStyle=dark;
-  ctx.fillRect(S*0.35,S*0.72,S*0.11,S*0.18);
-  ctx.fillRect(S*0.54,S*0.72,S*0.11,S*0.18);
-  // Feet
-  ctx.fillStyle='#111';
-  ctx.fillRect(S*0.32,S*0.88,S*0.15,S*0.06);
-  ctx.fillRect(S*0.51,S*0.88,S*0.15,S*0.06);
-  // Body
-  ctx.fillStyle=mid;
-  ctx.beginPath(); ctx.ellipse(S/2,S*0.58,S*0.2,S*0.18,0,0,Math.PI*2); ctx.fill();
-  // Arms
-  ctx.fillStyle=dark;
-  ctx.fillRect(S*0.12,S*0.46,S*0.18,S*0.08); // left
-  ctx.fillRect(S*0.7,S*0.46,S*0.18,S*0.08);  // right
-  // Claws
-  ctx.fillStyle='#222';
-  for(let i=0;i<3;i++){
-    ctx.fillRect(S*0.08+i*S*0.04,S*0.54,S*0.03,S*0.08);
-    ctx.fillRect(S*0.70+i*S*0.04,S*0.54,S*0.03,S*0.08);
-  }
-  // Head
-  ctx.fillStyle=mid;
-  ctx.beginPath(); ctx.arc(S/2,S*0.3,S*0.2,0,Math.PI*2); ctx.fill();
-  // Horns
-  ctx.fillStyle=dark;
-  ctx.beginPath();
-  ctx.moveTo(S*0.36,S*0.14);ctx.lineTo(S*0.3,S*0.02);ctx.lineTo(S*0.42,S*0.14);ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(S*0.64,S*0.14);ctx.lineTo(S*0.7,S*0.02);ctx.lineTo(S*0.58,S*0.14);ctx.fill();
-  // Eyes
-  ctx.fillStyle='#ffee00';
-  ctx.beginPath();ctx.arc(S*0.41,S*0.28,S*0.05,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(S*0.59,S*0.28,S*0.05,0,Math.PI*2);ctx.fill();
-  // Pupils
-  ctx.fillStyle='#000';
-  ctx.beginPath();ctx.arc(S*0.42,S*0.285,S*0.025,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(S*0.60,S*0.285,S*0.025,0,Math.PI*2);ctx.fill();
-  // Mouth
-  ctx.strokeStyle=hi; ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(S/2,S*0.34,S*0.08,0.2,Math.PI-0.2);ctx.stroke();
-  // Teeth
-  ctx.fillStyle='#ddd';
-  for(let i=0;i<4;i++) ctx.fillRect(S*0.38+i*S*0.06,S*0.34,S*0.04,S*0.04);
-}
-
-const enemySprites = ENEMY_COLORS.map(c => mkSpr((ctx,S) => drawEnemy(ctx,S,c)));
-const enemyHurtSprites = ENEMY_COLORS.map(c => mkSpr((ctx,S) => {
-  ctx.globalAlpha=0.6; drawEnemy(ctx,S,c); ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(255,50,50,0.5)'; ctx.fillRect(0,0,S,S);
-}));
-
-const deadSprite = mkSpr((ctx,S) => {
-  // Blood pool
-  ctx.fillStyle='#3a0000';
-  ctx.beginPath(); ctx.ellipse(S/2,S*0.75,S*0.38,S*0.14,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#660000';
-  ctx.beginPath(); ctx.ellipse(S*0.45,S*0.72,S*0.25,S*0.1,-0.3,0,Math.PI*2); ctx.fill();
-  // Flattened body
-  ctx.fillStyle='#550000';
-  ctx.fillRect(S*0.08,S*0.62,S*0.84,S*0.16);
-  ctx.fillStyle='#330000';
-  ctx.fillRect(S*0.08,S*0.62,S*0.84,S*0.04);
-});
-
-// Health and ammo item sprites
-const healthSprite = mkSpr((ctx,S) => {
-  // Medkit cross
-  ctx.fillStyle='#006600';
-  ctx.beginPath(); ctx.roundRect(S*0.15,S*0.15,S*0.7,S*0.7,8); ctx.fill();
-  ctx.fillStyle='#00dd00';
-  ctx.fillRect(S*0.4,S*0.25,S*0.2,S*0.5);
-  ctx.fillRect(S*0.25,S*0.4,S*0.5,S*0.2);
-  ctx.fillStyle='rgba(255,255,255,0.15)';
-  ctx.fillRect(S*0.15,S*0.15,S*0.7,S*0.08);
-});
-
-const ammoSprite = mkSpr((ctx,S) => {
-  ctx.fillStyle='#444';
-  ctx.fillRect(S*0.2,S*0.3,S*0.6,S*0.5);
-  ctx.fillStyle='#ffd700';
-  for(let i=0;i<5;i++){
-    ctx.fillRect(S*0.24+i*S*0.11,S*0.22,S*0.07,S*0.15);
-  }
-  ctx.fillStyle='#888';
-  ctx.fillRect(S*0.15,S*0.58,S*0.7,S*0.08);
-});
-
-// ══════════════════════════════════════════════════════════
-//  WEAPON DRAWING
-// ══════════════════════════════════════════════════════════
-function drawWeapon(anim, bob, flash) {
-  const wh = CH * 0.55;
-  const wx = CW / 2;
-  const wy = CH + bob * 6;
-  const recoil = flash * 18;
-
-  ctx.save();
-  ctx.translate(wx, wy - recoil);
-
-  // Barrel
-  ctx.fillStyle='#2a2a2a';
-  ctx.fillRect(-wh*0.06, -wh*0.62, wh*0.12, wh*0.45);
-  ctx.fillStyle='#1a1a1a';
-  ctx.fillRect(-wh*0.04, -wh*0.64, wh*0.08, wh*0.48);
-
-  // Slide
-  ctx.fillStyle='#333';
-  ctx.fillRect(-wh*0.16, -wh*0.48, wh*0.32, wh*0.3);
-  ctx.fillStyle='#3a3a3a';
-  ctx.fillRect(-wh*0.14, -wh*0.46, wh*0.28, wh*0.06);
-
-  // Trigger guard
-  ctx.strokeStyle='#333'; ctx.lineWidth=wh*0.03;
-  ctx.beginPath();
-  ctx.moveTo(-wh*0.06,-wh*0.2); ctx.lineTo(-wh*0.1,-wh*0.06);
-  ctx.lineTo(wh*0.1,-wh*0.06); ctx.lineTo(wh*0.06,-wh*0.2);
-  ctx.stroke();
-
-  // Handle
-  ctx.fillStyle='#4a3820';
-  ctx.fillRect(-wh*0.1, -wh*0.22, wh*0.2, wh*0.28);
-  // Handle grip lines
-  ctx.strokeStyle='#3a2810'; ctx.lineWidth=1;
-  for(let i=0;i<5;i++){
-    ctx.beginPath();
-    ctx.moveTo(-wh*0.1, -wh*0.18+i*wh*0.04);
-    ctx.lineTo(wh*0.1,  -wh*0.18+i*wh*0.04);
-    ctx.stroke();
-  }
-
-  // Muzzle flash
-  if (flash > 0.01) {
-    const fa = flash;
-    ctx.globalAlpha = fa * 0.9;
-    ctx.fillStyle = `hsl(50,100%,70%)`;
-    ctx.beginPath();
-    for(let a=0;a<8;a++){
-      const ang = a*Math.PI/4 + flash;
-      const r = wh*(0.06+Math.random()*0.06);
-      ctx[a===0?'moveTo':'lineTo'](Math.cos(ang)*r, -wh*0.64+Math.sin(ang)*r*0.5);
-    }
-    ctx.closePath(); ctx.fill();
-    ctx.globalAlpha = fa * 0.6;
-    ctx.fillStyle='#fff';
-    ctx.beginPath(); ctx.arc(0,-wh*0.64,wh*0.05,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
-  ctx.restore();
-}
-
-// ══════════════════════════════════════════════════════════
-//  HUD
-// ══════════════════════════════════════════════════════════
-function drawHUD(player, kills, total) {
-  const hh = CH * 0.14;
-  const y0 = CH - hh;
-
-  // Background
-  ctx.fillStyle='rgba(0,0,0,0.72)';
-  ctx.fillRect(0, y0, CW, hh);
-  ctx.strokeStyle='#440000'; ctx.lineWidth=1;
-  ctx.strokeRect(0, y0, CW, hh);
-
-  const fs = hh * 0.38;
-  ctx.font = `bold ${fs}px "Courier New"`;
-
-  // HP bar
-  const barW = CW * 0.22;
-  const barH = hh * 0.32;
-  const bx = CW * 0.02;
-  const by = y0 + hh * 0.15;
-  ctx.fillStyle='#1a0000'; ctx.fillRect(bx, by, barW, barH);
-  const hpPct = Math.max(0, player.hp/100);
-  const hpCol = hpPct>0.5?'#00cc00':hpPct>0.25?'#ff8800':'#cc0000';
-  ctx.fillStyle=hpCol; ctx.fillRect(bx,by,barW*hpPct,barH);
-  ctx.strokeStyle='#333'; ctx.lineWidth=1; ctx.strokeRect(bx,by,barW,barH);
-
-  // HP text
-  ctx.fillStyle='#fff';
-  ctx.textAlign='left';
-  ctx.fillText(`♥ ${player.hp}`, bx, y0+hh*0.72);
-
-  // Ammo
-  ctx.fillStyle='#ffd700';
-  ctx.textAlign='right';
-  ctx.fillText(`⬡ ${player.ammo}`, CW*0.97, y0+hh*0.72);
-
-  // Score
-  ctx.fillStyle='#ffffff';
-  ctx.textAlign='center';
-  ctx.fillText(`${player.score}`, CW*0.5, y0+hh*0.72);
-
-  // Kill count
-  ctx.font=`${hh*0.25}px "Courier New"`;
-  ctx.fillStyle='#ff4444';
-  ctx.textAlign='left';
-  ctx.fillText(`KILLS ${kills}/${total}`, bx, y0+hh*0.95);
-
-  // Ammo pips
-  const pipX = CW*0.78;
-  const pipY = y0+hh*0.25;
-  for(let i=0;i<Math.min(player.ammo,20);i++){
-    ctx.fillStyle = i < 10 ? '#ffd700':'#ff8800';
-    ctx.fillRect(pipX + (i%10)*(CW*0.019), pipY + ((i/10)|0)*(hh*0.2), CW*0.015, hh*0.15);
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  MINIMAP
-// ══════════════════════════════════════════════════════════
-function drawMinimap(player, enemies) {
-  const MS = Math.min(CW, CH) * 0.016;
-  const mx = CW - MAP_W*MS - 4;
-  const my = 4;
-
-  ctx.fillStyle='rgba(0,0,0,0.6)';
-  ctx.fillRect(mx-2,my-2,MAP_W*MS+4,MAP_H*MS+4);
-
-  for(let y=0;y<MAP_H;y++){
-    for(let x=0;x<MAP_W;x++){
-      const v = MAP[y][x];
-      if(!v) continue;
-      ctx.fillStyle = v===9?'#00ff44': v===1?'#666':v===2?'#843':v===3?'#468':'#862';
-      ctx.fillRect(mx+x*MS, my+y*MS, MS-0.5, MS-0.5);
-    }
-  }
-
-  // Player
-  ctx.fillStyle='#fff';
-  ctx.fillRect(mx+player.x*MS-1.5, my+player.y*MS-1.5, 3, 3);
-  ctx.strokeStyle='#fff'; ctx.lineWidth=1;
-  ctx.beginPath();
-  ctx.moveTo(mx+player.x*MS, my+player.y*MS);
-  ctx.lineTo(mx+(player.x+Math.cos(player.angle)*2)*MS,
-             my+(player.y+Math.sin(player.angle)*2)*MS);
-  ctx.stroke();
-
-  // Enemies
-  for(const e of enemies){
-    if(e.dead) continue;
-    ctx.fillStyle='#f00';
-    ctx.fillRect(mx+e.x*MS-1, my+e.y*MS-1, 2, 2);
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  AUDIO (Web Audio API)
-// ══════════════════════════════════════════════════════════
-let AC = null;
-function getAC(){
-  if(!AC) AC = new AudioContext();
-  if(AC.state==='suspended') AC.resume();
-  return AC;
-}
-
-function playShoot(){
-  const ac = getAC();
-  const buf = ac.createBuffer(1, ac.sampleRate*0.12, ac.sampleRate);
-  const d = buf.getChannelData(0);
-  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ac.sampleRate*0.03));
-  const src=ac.createBufferSource(); src.buffer=buf;
-  const g=ac.createGain(); g.gain.value=0.35;
-  // Low pass for that boom
-  const filt=ac.createBiquadFilter();
-  filt.type='lowpass'; filt.frequency.value=2000;
-  src.connect(filt); filt.connect(g); g.connect(ac.destination);
-  src.start();
-}
-
-function playEmpty(){
-  const ac=getAC();
-  const osc=ac.createOscillator(); osc.type='square'; osc.frequency.value=150;
-  const g=ac.createGain(); g.gain.setValueAtTime(0.06,ac.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.05);
-  osc.connect(g); g.connect(ac.destination);
-  osc.start(); osc.stop(ac.currentTime+0.05);
-}
-
-function playHurt(){
-  const ac=getAC();
-  const osc=ac.createOscillator(); osc.type='sawtooth';
-  osc.frequency.setValueAtTime(280,ac.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(80,ac.currentTime+0.25);
-  const g=ac.createGain(); g.gain.setValueAtTime(0.18,ac.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.25);
-  osc.connect(g); g.connect(ac.destination);
-  osc.start(); osc.stop(ac.currentTime+0.25);
-}
-
-function playEnemyDeath(){
-  const ac=getAC();
-  const buf=ac.createBuffer(1,ac.sampleRate*0.4,ac.sampleRate);
-  const d=buf.getChannelData(0);
-  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ac.sampleRate*0.1))*0.6;
-  const src=ac.createBufferSource(); src.buffer=buf;
-  const g=ac.createGain(); g.gain.value=0.3;
-  const filt=ac.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=800;
-  src.connect(filt); filt.connect(g); g.connect(ac.destination);
-  src.start();
-}
-
-function playPickup(isHealth){
-  const ac=getAC();
-  const osc=ac.createOscillator();
-  osc.frequency.setValueAtTime(isHealth?440:660,ac.currentTime);
-  osc.frequency.setValueAtTime(isHealth?550:880,ac.currentTime+0.08);
-  const g=ac.createGain(); g.gain.setValueAtTime(0.1,ac.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.18);
-  osc.connect(g); g.connect(ac.destination);
-  osc.start(); osc.stop(ac.currentTime+0.18);
-}
-
-function playWin(){
-  const ac=getAC();
-  [523,659,784,1047].forEach((f,i)=>{
-    const osc=ac.createOscillator(); const g=ac.createGain();
-    osc.frequency.value=f;
-    g.gain.setValueAtTime(0.12,ac.currentTime+i*0.12);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+i*0.12+0.25);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(ac.currentTime+i*0.12); osc.stop(ac.currentTime+i*0.12+0.3);
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function buildNav(q=''){
+  const nav=document.getElementById('nav');
+  const cats=[...new Set(DATA.map(d=>d.cat))];
+  nav.innerHTML='';
+  cats.forEach(cat=>{
+    const items=DATA.filter((d,i)=>{
+      if(q&&!d.name.toLowerCase().includes(q)&&!d.cat.toLowerCase().includes(q)) return false;
+      return d.cat===cat;
+    });
+    if(!items.length) return;
+    const ch=document.createElement('div'); ch.className='ch';
+    ch.innerHTML=`<span>${cat}</span><span class="ar">▾</span>`;
+    const ci=document.createElement('div'); ci.className='ci';
+    items.forEach(d=>{
+      const i=DATA.indexOf(d);
+      const ni=document.createElement('div'); ni.className='ni'+(i===activeIdx?' on':'');
+      ni.innerHTML=`<span>${d.icon}</span><span style="flex:1">${d.name}</span>`;
+      ni.dataset.idx=i; ni.onclick=()=>select(i);
+      ci.appendChild(ni);
+    });
+    ch.onclick=()=>{ch.classList.toggle('col');ci.classList.toggle('hid');};
+    nav.appendChild(ch); nav.appendChild(ci);
   });
 }
 
-function playGrowl(type){
-  const ac=getAC();
-  const osc=ac.createOscillator(); osc.type='sawtooth';
-  osc.frequency.value=[80,120,60][type]||80;
-  const g=ac.createGain(); g.gain.setValueAtTime(0.05,ac.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.35);
-  const filt=ac.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=400;
-  osc.connect(filt); filt.connect(g); g.connect(ac.destination);
-  osc.start(); osc.stop(ac.currentTime+0.35);
-}
-
-// ══════════════════════════════════════════════════════════
-//  INPUT
-// ══════════════════════════════════════════════════════════
-const keys = {};
-let mouseDX = 0;
-let mouseLocked = false;
-
-document.addEventListener('keydown', e => {
-  keys[e.code] = true;
-  if(gameState==='PLAY'){
-    if(e.code==='Escape') togglePause();
-    if((e.code==='Space'||e.code==='ControlLeft'||e.code==='ControlRight') && !paused) shoot();
-  }
-  if(e.code==='KeyF') tryFullscreen();
-});
-document.addEventListener('keyup', e => { keys[e.code]=false; });
-
-document.addEventListener('mousemove', e => {
-  if(mouseLocked) mouseDX += e.movementX;
-});
-
-document.addEventListener('mousedown', e => {
-  if(gameState!=='PLAY') return;
-  if(!mouseLocked){
-    cv.requestPointerLock();
-    return;
-  }
-  if(!paused) shoot();
-});
-
-document.addEventListener('pointerlockchange', () => {
-  mouseLocked = document.pointerLockElement === cv;
-  document.getElementById('lockHint').style.opacity = mouseLocked?'0':'1';
-});
-
-// Touch shoot
-cv.addEventListener('touchstart', e => {
-  e.preventDefault();
-  if(gameState==='PLAY' && !paused) shoot();
-},{passive:false});
-
-function tryFullscreen(){
-  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
-}
-
-// ══════════════════════════════════════════════════════════
-//  GAME STATE
-// ══════════════════════════════════════════════════════════
-let gameState = 'MENU';
-let paused = false;
-
-let player, enemies, items;
-let zbuf;
-let weaponFlash = 0, weaponBob = 0, walkPhase = 0;
-let killMsgTimer = 0, pickupMsgTimer = 0;
-let totalEnemies = ENEMY_SPAWNS.length;
-
-// Camera vectors derived from player.angle
-let dirX=1, dirY=0, planeX=0, planeY=0.66;
-
-function updateCamera(){
-  dirX = Math.cos(player.angle);
-  dirY = Math.sin(player.angle);
-  planeX = -Math.sin(player.angle)*0.66;
-  planeY =  Math.cos(player.angle)*0.66;
-}
-
-function initGame(){
-  player = {
-    x:1.5, y:1.5, angle:0,
-    hp:100, ammo:30, score:0, kills:0,
-    dead:false,
-  };
-  updateCamera();
-
-  enemies = ENEMY_SPAWNS.map((s,i) => ({
-    id:i, x:s.x, y:s.y, type:s.t,
-    hp:100, dead:false,
-    state:'IDLE', // IDLE/CHASE/ATTACK/HURT/DEAD
-    stateTimer:0,
-    growlTimer:4+Math.random()*4,
-    alertRange:8, attackRange:1.2,
-  }));
-
-  items = ITEM_SPAWNS.map((s,i) => ({
-    id:i, x:s.x, y:s.y, type:s.t, // 'h'=health, 'a'=ammo
-    taken:false,
-  }));
-
-  weaponFlash=0; weaponBob=0; walkPhase=0;
-  killMsgTimer=0; pickupMsgTimer=0;
-  zbuf = new Float32Array(CW);
-}
-
-// ══════════════════════════════════════════════════════════
-//  LINE OF SIGHT (simple raycast)
-// ══════════════════════════════════════════════════════════
-function hasLOS(x0,y0,x1,y1){
-  const dx=x1-x0, dy=y1-y0;
-  const dist=Math.sqrt(dx*dx+dy*dy);
-  const steps=dist*5|0;
-  for(let i=1;i<steps;i++){
-    const t=i/steps;
-    if(MAP[y0+dy*t|0][x0+dx*t|0]>0 && MAP[y0+dy*t|0][x0+dx*t|0]!==9) return false;
-  }
-  return true;
-}
-
-// ══════════════════════════════════════════════════════════
-//  SHOOTING
-// ══════════════════════════════════════════════════════════
-function shoot(){
-  if(player.dead) return;
-  if(player.ammo<=0){ playEmpty(); return; }
-  player.ammo--;
-  playShoot();
-  weaponFlash=1.0;
-
-  let hitDist=Infinity;
-  let hitEnemy=null;
-
-  for(const e of enemies){
-    if(e.dead) continue;
-    const dx=e.x-player.x, dy=e.y-player.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist>18) continue;
-    const ang=Math.atan2(dy,dx);
-    let diff=ang-player.angle;
-    while(diff>Math.PI) diff-=2*Math.PI;
-    while(diff<-Math.PI) diff+=2*Math.PI;
-    const hitW=0.08+0.18/dist;
-    if(Math.abs(diff)<hitW && hasLOS(player.x,player.y,e.x,e.y)){
-      if(dist<hitDist){ hitDist=dist; hitEnemy=e; }
-    }
-  }
-
-  if(hitEnemy){
-    const dmg=(25+Math.random()*25)|0;
-    hitEnemy.hp-=dmg;
-    hitEnemy.state='HURT'; hitEnemy.stateTimer=0.18;
-    if(hitEnemy.hp<=0){
-      hitEnemy.dead=true; hitEnemy.state='DEAD';
-      player.score+=100; player.kills++;
-      playEnemyDeath();
-      showKillMsg();
-    }
-  }
-}
-
-function showKillMsg(){
-  const msgs=['NICE!','DESTROYED!','DIE MONSTER!','GET REKT!','ONE DOWN!'];
-  const el=document.getElementById('killMsg');
-  el.textContent=msgs[(Math.random()*msgs.length)|0];
-  el.style.opacity='1';
-  killMsgTimer=1.8;
-}
-
-// ══════════════════════════════════════════════════════════
-//  UPDATE
-// ══════════════════════════════════════════════════════════
-function update(dt){
-  if(paused||player.dead) return;
-
-  // ── Player movement ────────────────────────────────────
-  const spd=(keys['ShiftLeft']||keys['ShiftRight'])?4.0:2.8;
-  const rotSpd=2.2;
-  const col=0.25;
-
-  // Mouse look
-  if(mouseLocked && mouseDX!==0){
-    player.angle += mouseDX * 0.002;
-    mouseDX=0;
-    updateCamera();
-  }
-
-  // Rotate
-  if(keys['ArrowLeft']||keys['KeyA'] && !keys['ArrowLeft']){ /* handled below */ }
-  if(keys['ArrowLeft']){ player.angle-=rotSpd*dt; updateCamera(); }
-  if(keys['ArrowRight']){ player.angle+=rotSpd*dt; updateCamera(); }
-
-  let moved=false;
-  let mx=0, my=0;
-
-  if(keys['KeyW']||keys['ArrowUp']){   mx+=dirX; my+=dirY; }
-  if(keys['KeyS']||keys['ArrowDown']){ mx-=dirX; my-=dirY; }
-  if(keys['KeyA'] && !keys['ArrowLeft']){ mx-=planeX/0.66; my-=planeY/0.66; }
-  if(keys['KeyD'] && !keys['ArrowRight']){ mx+=planeX/0.66; my+=planeY/0.66; }
-
-  if(mx||my){
-    moved=true;
-    const len=Math.sqrt(mx*mx+my*my);
-    mx/=len; my/=len;
-    const nx=player.x+mx*spd*dt;
-    const ny=player.y+my*spd*dt;
-    if(MAP[player.y|0][nx+col*Math.sign(mx)|0]===0 || MAP[player.y|0][nx+col*Math.sign(mx)|0]===9)
-      player.x=nx;
-    if(MAP[ny+col*Math.sign(my)|0][player.x|0]===0 || MAP[ny+col*Math.sign(my)|0][player.x|0]===9)
-      player.y=ny;
-    walkPhase+=dt*spd*3;
-  }
-
-  // Weapon bob
-  if(moved) weaponBob=Math.sin(walkPhase)*0.8;
-  else weaponBob*=0.85;
-  if(weaponFlash>0) weaponFlash=Math.max(0,weaponFlash-dt*5);
-
-  // Kill timer messages
-  if(killMsgTimer>0){
-    killMsgTimer-=dt;
-    if(killMsgTimer<=0) document.getElementById('killMsg').style.opacity='0';
-  }
-  if(pickupMsgTimer>0){
-    pickupMsgTimer-=dt;
-    if(pickupMsgTimer<=0) document.getElementById('pickupMsg').style.opacity='0';
-  }
-
-  // ── Check exit ─────────────────────────────────────────
-  if(MAP[player.y|0][player.x|0]===9){
-    if(player.kills>=totalEnemies) triggerWin();
-    else{
-      const el=document.getElementById('pickupMsg');
-      el.textContent=`적을 모두 처치해야 탈출 가능! (${player.kills}/${totalEnemies})`;
-      el.style.opacity='1'; pickupMsgTimer=2.5;
-    }
-  }
-
-  // ── Item pickup ────────────────────────────────────────
-  for(const item of items){
-    if(item.taken) continue;
-    const dx=item.x-player.x, dy=item.y-player.y;
-    if(dx*dx+dy*dy<0.5){
-      item.taken=true;
-      if(item.type==='h'){
-        player.hp=Math.min(100,player.hp+25);
-        const el=document.getElementById('pickupMsg');
-        el.textContent='+25 HP'; el.style.opacity='1'; pickupMsgTimer=1.5;
-        playPickup(true);
-      } else {
-        player.ammo=Math.min(99,player.ammo+10);
-        const el=document.getElementById('pickupMsg');
-        el.textContent='+10 탄약'; el.style.opacity='1'; pickupMsgTimer=1.5;
-        playPickup(false);
-      }
-    }
-  }
-
-  // ── Enemy AI ───────────────────────────────────────────
-  for(const e of enemies){
-    if(e.dead) continue;
-
-    const dx=player.x-e.x, dy=player.y-e.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-
-    // Growl
-    e.growlTimer-=dt;
-    if(e.growlTimer<=0 && dist<12){
-      playGrowl(e.type);
-      e.growlTimer=3+Math.random()*4;
-    }
-
-    if(e.stateTimer>0) e.stateTimer-=dt;
-
-    switch(e.state){
-      case 'IDLE':
-        if(dist<e.alertRange && hasLOS(e.x,e.y,player.x,player.y)){
-          e.state='CHASE';
-        }
-        break;
-
-      case 'HURT':
-        if(e.stateTimer<=0) e.state='CHASE';
-        break;
-
-      case 'CHASE': {
-        if(dist<e.attackRange){ e.state='ATTACK'; e.stateTimer=0.6; break; }
-        const espd=[1.4,1.8,1.0][e.type]*dt;
-        const elen=Math.sqrt(dx*dx+dy*dy)||1;
-        const ex=e.x+dx/elen*espd;
-        const ey=e.y+dy/elen*espd;
-        if(MAP[e.y|0][ex+0.2*Math.sign(dx)|0]===0) e.x=ex;
-        if(MAP[ey+0.2*Math.sign(dy)|0][e.x|0]===0) e.y=ey;
-        break;
-      }
-
-      case 'ATTACK':
-        if(e.stateTimer<=0){
-          // Deal damage
-          const dx2=player.x-e.x,dy2=player.y-e.y;
-          const d2=Math.sqrt(dx2*dx2+dy2*dy2);
-          if(d2<e.attackRange*1.4){
-            const dmg=(10+Math.random()*15+[0,5,-5][e.type])|0;
-            player.hp=Math.max(0,player.hp-dmg);
-            playHurt();
-            flashDmg();
-            if(player.hp<=0){ triggerDead(); return; }
-          }
-          e.state='CHASE'; e.stateTimer=0.8;
-        }
-        break;
-    }
-  }
-}
-
-function flashDmg(){
-  const el=document.getElementById('dmgFlash');
-  el.style.background='rgba(200,0,0,0.35)';
-  setTimeout(()=>{ el.style.background='rgba(200,0,0,0)'; },150);
-}
-
-// ══════════════════════════════════════════════════════════
-//  RAYCASTER
-// ══════════════════════════════════════════════════════════
-function renderScene(){
-  const HALF = CH>>1;
-
-  // Ceiling
-  ctx.fillStyle='#111'; ctx.fillRect(0,0,CW,HALF);
-  // Floor
-  ctx.fillStyle='#1a1208'; ctx.fillRect(0,HALF,CW,HALF);
-
-  for(let col=0; col<CW; col++){
-    const camX = 2*col/CW - 1;
-    const rdx = dirX + planeX*camX;
-    const rdy = dirY + planeY*camX;
-
-    let mx=(player.x)|0, my=(player.y)|0;
-    const ddx=Math.abs(1/rdx)||1e30;
-    const ddy=Math.abs(1/rdy)||1e30;
-    let sdx, sdy, stepX, stepY;
-
-    if(rdx<0){ stepX=-1; sdx=(player.x-mx)*ddx; }
-    else      { stepX= 1; sdx=(mx+1-player.x)*ddx; }
-    if(rdy<0){ stepY=-1; sdy=(player.y-my)*ddy; }
-    else      { stepY= 1; sdy=(my+1-player.y)*ddy; }
-
-    let side=0, hit=false;
-    for(let d=0;d<30;d++){
-      if(sdx<sdy){ sdx+=ddx; mx+=stepX; side=0; }
-      else        { sdy+=ddy; my+=stepY; side=1; }
-      const v=MAP[my]?.[mx];
-      if(v==null||v>0){ hit=true; break; }
-    }
-
-    const wallType = MAP[my]?.[mx] ?? 1;
-    const pwd = side===0 ? sdx-ddx : sdy-ddy;
-    zbuf[col]=pwd;
-
-    const lh=Math.min(CH*4, (CH/pwd)|0);
-    const ds=Math.max(0, HALF-(lh>>1));
-    const de=Math.min(CH, HALF+(lh>>1));
-
-    // Texture x
-    let wallX = side===0 ? player.y+pwd*rdy : player.x+pwd*rdx;
-    wallX-=Math.floor(wallX);
-    const tx=(wallX*TEX)|0;
-
-    // Draw wall strip
-    const tex = textures[wallType] || textures[1];
-    ctx.drawImage(tex, tx,0,1,TEX, col,ds,1,de-ds);
-
-    // Distance + side shading
-    const shade = Math.min(0.92, pwd/14 + (side?0.18:0));
-    ctx.fillStyle=`rgba(0,0,0,${shade})`;
-    ctx.fillRect(col, ds, 1, de-ds);
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  SPRITE RENDERER
-// ══════════════════════════════════════════════════════════
-function renderSprites(){
-  // Gather all sprites (enemies + items)
-  const toRender=[];
-  for(const e of enemies){
-    const dx=e.x-player.x, dy=e.y-player.y;
-    toRender.push({
-      x:e.x, y:e.y,
-      dist:dx*dx+dy*dy,
-      img: e.dead ? deadSprite :
-           e.state==='HURT'? enemyHurtSprites[e.type] : enemySprites[e.type],
-      scale:1.0, vOff:0,
+// ── LANDING GRID ──────────────────────────────────────────────────────────────
+function buildGrid(){
+  const root=document.getElementById('grid-root');
+  const cats=[...new Set(DATA.map(d=>d.cat))];
+  root.innerHTML='';
+  cats.forEach(cat=>{
+    const sec=document.createElement('div'); sec.className='grid-section';
+    const col=CAT_COLORS[cat]||'#6c8eff';
+    sec.innerHTML=`<h2>${cat}</h2><div class="cards"></div>`;
+    root.appendChild(sec);
+    const wrap=sec.querySelector('.cards');
+    DATA.forEach((d,i)=>{
+      if(d.cat!==cat) return;
+      const card=document.createElement('div'); card.className='card';
+      card.style.cssText=`border-color:${col}33;`;
+      card.innerHTML=`<div class="icon">${d.icon}</div><div class="cname">${d.name}</div><div class="ctag">${d.type}</div>`;
+      card.onclick=()=>select(i);
+      wrap.appendChild(card);
     });
+  });
+}
+
+// ── DETAIL ───────────────────────────────────────────────────────────────────
+function select(i){
+  activeIdx=i; tabIdx=0;
+  document.querySelectorAll('.ni').forEach(el=>el.classList.toggle('on',+el.dataset.idx===i));
+  const d=DATA[i];
+  document.getElementById('landing').style.display='none';
+  const det=document.getElementById('det');
+  det.classList.add('show');
+  document.getElementById('dicon').textContent=d.icon;
+  document.getElementById('dname').textContent=d.name;
+  document.getElementById('dtype').textContent=d.type+' · '+d.cat;
+  const lv=document.getElementById('dlevel'); lv.innerHTML='';
+  for(let j=1;j<=4;j++){
+    const s=document.createElement('span'); if(j<=d.level) s.className='on'; lv.appendChild(s);
   }
-  for(const item of items){
-    if(item.taken) continue;
-    const dx=item.x-player.x, dy=item.y-player.y;
-    toRender.push({
-      x:item.x, y:item.y,
-      dist:dx*dx+dy*dy,
-      img:item.type==='h'?healthSprite:ammoSprite,
-      scale:0.65, vOff:0.25,
-    });
-  }
-
-  // Sort far→near
-  toRender.sort((a,b)=>b.dist-a.dist);
-
-  const invDet=1/(planeX*dirY-dirX*planeY);
-
-  for(const s of toRender){
-    const sdx=s.x-player.x, sdy=s.y-player.y;
-    const tx=invDet*(dirY*sdx-dirX*sdy);
-    const ty=invDet*(-planeY*sdx+planeX*sdy);
-    if(ty<=0.05) continue;
-
-    const scrX=((CW/2)*(1+tx/ty))|0;
-    const sh=(Math.abs(CH/ty)*s.scale)|0;
-    const sw=sh;
-    const sx0=Math.max(0,(scrX-sw/2)|0);
-    const sx1=Math.min(CW-1,(scrX+sw/2)|0);
-    const sy=((CH/2-(sh/2))|0) + (sh*s.vOff)|0;
-
-    for(let sx=sx0; sx<=sx1; sx++){
-      if(ty>=zbuf[sx]) continue;
-      const texX=((sx-(scrX-sw/2))/sw*SPR)|0;
-      ctx.drawImage(s.img, texX,0,1,SPR, sx,sy,1,sh);
-    }
-  }
+  document.getElementById('ddesc').textContent=d.desc;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',+b.dataset.i===0));
+  renderCode();
+}
+function renderCode(){
+  const d=DATA[activeIdx]; if(!d) return;
+  document.getElementById('codeblock').innerHTML=highlight(d.ex[tabIdx]);
 }
 
-// ══════════════════════════════════════════════════════════
-//  RENDER LOOP
-// ══════════════════════════════════════════════════════════
-let lastTime=0;
-function frame(ts){
-  requestAnimationFrame(frame);
-  if(gameState!=='PLAY') return;
-
-  const dt=Math.min((ts-lastTime)/1000, 0.05);
-  lastTime=ts;
-
-  update(dt);
-  renderScene();
-  renderSprites();
-  drawWeapon(weaponFlash, weaponBob, weaponFlash);
-  drawHUD(player, player.kills, totalEnemies);
-  drawMinimap(player, enemies);
-
-  // Pause overlay
-  if(paused){
-    ctx.fillStyle='rgba(0,0,0,0.55)';
-    ctx.fillRect(0,0,CW,CH);
-  }
-}
-requestAnimationFrame(frame);
-
-// ══════════════════════════════════════════════════════════
-//  STATE MANAGEMENT
-// ══════════════════════════════════════════════════════════
-function showMenu(){
-  gameState='MENU';
-  document.getElementById('menu').style.display='';
-  document.getElementById('dead').style.display='none';
-  document.getElementById('win').style.display='none';
-  document.getElementById('xhair').style.display='none';
-  document.getElementById('lockHint').style.opacity='1';
-  if(document.pointerLockElement) document.exitPointerLock();
-}
-
-function startGame(){
-  initGame();
-  gameState='PLAY';
-  paused=false;
-  document.getElementById('menu').style.display='none';
-  document.getElementById('dead').style.display='none';
-  document.getElementById('win').style.display='none';
-  document.getElementById('pauseTxt').style.display='none';
-  document.getElementById('xhair').style.display='';
-  document.getElementById('lockHint').style.opacity='1';
-  lastTime=performance.now();
-  getAC();
-}
-
-function togglePause(){
-  paused=!paused;
-  document.getElementById('pauseTxt').style.display=paused?'':'none';
-  if(paused && mouseLocked) document.exitPointerLock();
-}
-
-function triggerDead(){
-  player.dead=true;
-  if(mouseLocked) document.exitPointerLock();
-  setTimeout(()=>{
-    gameState='DEAD';
-    document.getElementById('dead').style.display='';
-    document.getElementById('xhair').style.display='none';
-    document.getElementById('deadInfo').innerHTML=
-      `<b>점수</b> ${player.score}<br><b>처치</b> ${player.kills}/${totalEnemies}`;
-  },1800);
-}
-
-function triggerWin(){
-  if(gameState!=='PLAY') return;
-  playWin();
-  if(mouseLocked) document.exitPointerLock();
-  setTimeout(()=>{
-    gameState='WIN';
-    document.getElementById('win').style.display='';
-    document.getElementById('xhair').style.display='none';
-    document.getElementById('winInfo').innerHTML=
-      `<b>최종 점수</b> ${player.score}<br><b>처치</b> ${player.kills}/${totalEnemies}<br><b>남은 HP</b> ${player.hp}`;
-  },800);
-}
-
-// Preload
-showMenu();
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildNav(); buildGrid();
+document.getElementById('search').addEventListener('input',e=>buildNav(e.target.value.toLowerCase()));
+document.querySelectorAll('.tb').forEach(b=>b.addEventListener('click',()=>{
+  tabIdx=+b.dataset.i;
+  document.querySelectorAll('.tb').forEach(x=>x.classList.toggle('on',+x.dataset.i===tabIdx));
+  renderCode();
+}));
+document.getElementById('dback').addEventListener('click',()=>{
+  document.getElementById('landing').style.display='';
+  document.getElementById('det').classList.remove('show');
+  activeIdx=-1;
+  document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));
+});
+document.getElementById('copybtn').addEventListener('click',()=>{
+  const text=DATA[activeIdx]?.ex[tabIdx]||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copybtn');
+    btn.textContent='✓ 복사됨'; btn.style.color='#89d185';
+    setTimeout(()=>{btn.textContent='복사';btn.style.color='';},1500);
+  });
+});
 </script>
 </body>
 </html>

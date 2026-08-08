@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마인크래프트 데이터팩 — 테스트 29</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b22;--bg3:#1a2030;--bg4:#1e2636;
+  --border:#2d3748;--border2:#4a5568;
+  --txt:#e2e8f0;--txt2:#a0aec0;--txt3:#718096;
+  --green:#4ade80;--green2:#16a34a;--green3:#052e16;
+  --yellow:#fbbf24;--yellow2:#d97706;
+  --blue:#60a5fa;--blue2:#1d4ed8;--blue3:#1e3a5f;
+  --red:#f87171;--orange:#fb923c;
+  --purple:#c084fc;--teal:#2dd4bf;
+  --dirt:#8B6914;--grass:#5D8B3C;--stone:#8a8a8a;
+  --wood:#C4A265;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--grass);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--txt);white-space:nowrap;}
+.mc-badge{background:linear-gradient(135deg,#5D8B3C,#2d5a1b);color:#fff;font-size:13px;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:1px;border:1px solid #4ade80;image-rendering:pixelated;}
+.search-wrap{flex:1;min-width:160px;max-width:360px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(74,222,128,.15);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 12px;border-radius:4px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:var(--green3);color:var(--green);border:1px solid var(--green2);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(74,222,128,.08);color:var(--green);border-left-color:var(--green);}
+.main{flex:1;padding:20px 24px;max-width:1000px;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--green);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.hl{color:var(--yellow);}
+
+.r-table{width:100%;border-collapse:collapse;}
+.r-table tr{border-bottom:1px solid var(--border);}
+.r-table tr:last-child{border-bottom:none;}
+.r-table tr:hover td{background:rgba(255,255,255,.02);}
+.r-table td{padding:0;vertical-align:top;}
+.cmd-cell{padding:10px 12px 10px 16px;width:44%;font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;}
+.desc-cell{padding:10px 16px 10px 0;}
+
+.mc{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--green);background:rgba(74,222,128,.07);padding:3px 7px;border-radius:3px;border:1px solid rgba(74,222,128,.15);display:inline-block;word-break:break-all;line-height:1.5;}
+.mc .kw{color:var(--yellow);}
+.mc .str{color:var(--teal);}
+.mc .num{color:var(--orange);}
+.mc .sel{color:var(--purple);}
+.mc .cmt{color:var(--txt3);font-style:italic;}
+.mc .arg{color:var(--blue);}
+
+.codeblock{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;margin:8px 0;color:var(--txt2);overflow-x:auto;line-height:1.9;white-space:pre;}
+.codeblock .kw{color:var(--yellow);}
+.codeblock .str{color:var(--teal);}
+.codeblock .num{color:var(--orange);}
+.codeblock .sel{color:var(--purple);}
+.codeblock .cmt{color:var(--txt3);font-style:italic;}
+.codeblock .fn{color:var(--green);}
+.codeblock .key{color:var(--blue);}
+.codeblock .va{color:var(--txt);}
+
+.dm{color:var(--txt);font-size:13px;margin-bottom:3px;font-weight:500;}
+.ds{color:var(--txt2);font-size:12px;line-height:1.55;}
+.tag{display:inline-block;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--green);margin:3px 2px 0;}
+.tag-b{display:inline-block;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--blue);margin:3px 2px 0;}
+.tag-y{display:inline-block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--yellow);margin:3px 2px 0;}
+
+.tip{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:5px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--green);}
+.warn{font-size:11px;color:var(--yellow);margin-top:5px;padding:4px 8px;background:rgba(251,191,36,.06);border-radius:3px;border-left:2px solid var(--yellow);}
+.note{font-size:11px;color:var(--blue);margin-top:5px;padding:4px 8px;background:rgba(96,165,250,.06);border-radius:3px;border-left:2px solid var(--blue);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+@media(max-width:800px){.two-col,.three-col{grid-template-columns:1fr;}}
+
+.mini-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;}
+.mini-title{font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+
+.version-badge{display:inline-block;background:rgba(251,191,36,.12);border:1px solid var(--yellow2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--yellow);font-family:monospace;margin-left:6px;}
+
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="mc-badge">⛏ MC</span> 마인크래프트 데이터팩</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="검색... (예: execute, scoreboard, particle, recipe)">
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('basic',this)">📦 기초</button>
+    <button class="tab" onclick="switchTab('cmd',this)">⚡ 명령어</button>
+    <button class="tab" onclick="switchTab('sel',this)">🎯 선택자</button>
+    <button class="tab" onclick="switchTab('block',this)">🧱 블럭·아이템</button>
+    <button class="tab" onclick="switchTab('fx',this)">🎆 파티클·소리</button>
+    <button class="tab" onclick="switchTab('tag',this)">📋 태그·레시피</button>
+    <button class="tab" onclick="switchTab('ex',this)">💡 실전 예제</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="mainArea">
+
+<!-- ══════════════════════════════════════════
+     기초
+═══════════════════════════════════════════ -->
+<div class="panel active" id="panel-basic">
+  <div class="sec-title">📦 데이터팩 기초</div>
+  <div class="sec-sub">폴더 구조 · pack.mcmeta · 네임스페이스 · 활성화 · tick/load 함수</div>
+
+  <div class="card" id="b-struct">
+    <div class="card-header"><span class="hl">01</span> 데이터팩 폴더 구조</div>
+    <div style="padding:14px 16px;">
+      <div class="tip"><b>데이터팩</b>은 세계(World) 폴더 안 <b>datapacks/</b>에 넣으면 자동으로 인식됩니다. 바닐라 마인크래프트에 모드 없이 커스텀 기능을 추가하는 공식 방법.</div>
+      <div class="codeblock"><span class="cmt"># 기본 폴더 구조</span>
+<span class="fn">my_datapack/</span>
+├── <span class="kw">pack.mcmeta</span>          <span class="cmt"># 필수 - 팩 정보</span>
+├── pack.png              <span class="cmt"># 선택 - 아이콘 이미지</span>
+└── <span class="fn">data/</span>
+    ├── <span class="sel">minecraft/</span>         <span class="cmt"># 바닐라 오버라이드</span>
+    │   └── tags/
+    │       └── functions/
+    │           ├── load.json   <span class="cmt"># 세계 로드시 실행</span>
+    │           └── tick.json   <span class="cmt"># 매 틱(1/20초) 실행</span>
+    └── <span class="str">mypack/</span>            <span class="cmt"># 내 네임스페이스</span>
+        ├── functions/
+        │   ├── main.mcfunction
+        │   └── utils/
+        │       └── helper.mcfunction
+        ├── advancements/
+        ├── loot_tables/
+        ├── predicates/
+        ├── recipes/
+        └── tags/
+            ├── blocks/
+            ├── items/
+            └── functions/</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-meta">
+    <div class="card-header"><span class="hl">02</span> pack.mcmeta</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">pack.mcmeta 형식</div>
+          <div class="codeblock">{
+  <span class="key">"pack"</span>: {
+    <span class="key">"pack_format"</span>: <span class="num">26</span>,
+    <span class="key">"description"</span>: <span class="str">"내 데이터팩 설명"</span>
+  }
+}</div>
+          <div class="warn">pack_format 버전표 ↓</div>
+          <table class="r-table" style="margin-top:8px;">
+            <tr><td class="cmd-cell" style="width:50%;"><span class="mc"><span class="num">48</span></span></td><td><div class="desc-cell"><div class="ds">1.21.4 (최신)</div></div></td></tr>
+            <tr><td class="cmd-cell"><span class="mc"><span class="num">41</span></span></td><td><div class="desc-cell"><div class="ds">1.21.0 ~ 1.21.1</div></div></td></tr>
+            <tr><td class="cmd-cell"><span class="mc"><span class="num">26</span></span></td><td><div class="desc-cell"><div class="ds">1.20.4 ~ 1.20.6</div></div></td></tr>
+            <tr><td class="cmd-cell"><span class="mc"><span class="num">18</span></span></td><td><div class="desc-cell"><div class="ds">1.20.0 ~ 1.20.1</div></div></td></tr>
+            <tr><td class="cmd-cell"><span class="mc"><span class="num">10</span></span></td><td><div class="desc-cell"><div class="ds">1.19.4</div></div></td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="mini-title">세계에서 활성화</div>
+          <div class="codeblock"><span class="cmt"># 기존 세계에 추가</span>
+<span class="num">1.</span> 세계 폴더/datapacks/ 에 넣기
+<span class="num">2.</span> 게임 내에서:
+   <span class="fn">/datapack list</span>       <span class="cmt"># 목록 확인</span>
+   <span class="fn">/datapack enable</span> <span class="str">"file/my_datapack"</span>
+   <span class="fn">/datapack disable</span> <span class="str">"file/my_datapack"</span>
+
+<span class="cmt"># 새 세계 생성 시</span>
+새 세계 → 추가 설정 → 데이터팩
+→ 폴더/zip 파일 끌어다 놓기
+
+<span class="cmt"># 팩 리로드 (코드 수정 후)</span>
+<span class="fn">/reload</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="b-func">
+    <div class="card-header"><span class="hl">03</span> .mcfunction 파일 — 명령어 묶음</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">data/mypack/functions/main.mcfunction</div>
+          <div class="codeblock"><span class="cmt"># # 으로 주석 작성</span>
+<span class="cmt"># 명령어를 한 줄씩 작성</span>
+
+<span class="fn">say</span> 안녕하세요!
+<span class="fn">give</span> <span class="sel">@a</span> minecraft:diamond <span class="num">1</span>
+<span class="fn">tp</span> <span class="sel">@a</span> <span class="num">0 64 0</span>
+
+<span class="cmt"># 다른 함수 호출</span>
+<span class="fn">function</span> <span class="str">mypack:utils/helper</span>
+
+<span class="cmt"># 슬래시(/) 없이 명령어 작성!</span></div>
+        </div>
+        <div>
+          <div class="mini-title">tick.json / load.json (함수 태그)</div>
+          <div class="codeblock"><span class="cmt"># data/minecraft/tags/functions/tick.json</span>
+{
+  <span class="key">"values"</span>: [
+    <span class="str">"mypack:tick"</span>
+  ]
+}
+
+<span class="cmt"># data/minecraft/tags/functions/load.json</span>
+{
+  <span class="key">"values"</span>: [
+    <span class="str">"mypack:load"</span>
+  ]
+}
+
+<span class="cmt"># tick → 매 틱(초당 20회) 실행</span>
+<span class="cmt"># load → /reload 할 때마다 1회 실행</span></div>
+        </div>
+      </div>
+      <div class="warn">tick 함수는 초당 20번 실행 → 무거운 연산은 scoreboard 타이머로 주기 조절 필요</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-ns">
+    <div class="card-header"><span class="hl">04</span> 네임스페이스 규칙</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="str">mypack:main</span></span></td>
+        <td><div class="desc-cell"><div class="dm">함수 참조 방식: 네임스페이스:경로</div><div class="ds">소문자, 숫자, <code>_</code>, <code>-</code>, <code>/</code> 만 사용 가능. 대문자·공백 불가.</div><div class="note">예: mypack:utils/damage_player → functions/utils/damage_player.mcfunction</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="str">minecraft:</span></span></td>
+        <td><div class="desc-cell"><div class="dm">minecraft 네임스페이스 = 바닐라 오버라이드</div><div class="ds">minecraft:tags/functions/tick.json 처럼 바닐라 기능을 덮어쓰거나 추가.</div></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     명령어
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-cmd">
+  <div class="sec-title">⚡ 주요 명령어</div>
+  <div class="sec-sub">execute · scoreboard · data · give/summon · fill · title · schedule 등</div>
+
+  <div class="card" id="c-execute">
+    <div class="card-header"><span class="hl">01</span> /execute — 데이터팩의 핵심 명령어</div>
+    <div class="tip"><b>/execute</b>는 명령어 실행 <b>문맥(context)</b>을 바꾸는 명령어. 하위명령을 체인처럼 연결해 복잡한 조건과 동작을 구현.</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">as</span> <span class="sel">@a</span></span></td>
+        <td><div class="desc-cell"><div class="dm">실행자(executor)를 대상으로 변경</div><div class="ds">@s 가 선택된 플레이어 각각을 가리키게 됨.</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">run</span> <span class="fn">say</span> 안녕
+<span class="cmt"># 모든 플레이어가 각자 "안녕" 말함</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">at</span> <span class="sel">@s</span></span></td>
+        <td><div class="desc-cell"><div class="dm">실행 위치를 대상 위치로 이동</div><div class="ds">as와 함께 쓰면 각 플레이어 위치에서 명령어 실행.</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">at</span> <span class="sel">@s</span> <span class="kw">run</span> <span class="fn">summon</span> minecraft:lightning_bolt ~ ~ ~
+<span class="cmt"># 모든 플레이어 위치에 번개 소환</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">if block</span> ~ ~-1 ~ <span class="str">stone</span></span></td>
+        <td><div class="desc-cell"><div class="dm">특정 좌표의 블럭 조건 확인</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">at</span> <span class="sel">@s</span>
+  <span class="kw">if block</span> ~ ~-1 ~ minecraft:stone
+  <span class="kw">run</span> <span class="fn">say</span> 돌 위에 서 있음
+<span class="cmt"># 플레이어 발 아래 블럭이 돌인 경우만</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">if entity</span> <span class="sel">@s</span><span class="arg">[tag=vip]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 존재/조건 확인</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">if entity</span> <span class="sel">@a</span><span class="arg">[tag=vip]</span> <span class="kw">run</span>
+  <span class="fn">say</span> VIP 플레이어 있음</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">if score</span> <span class="sel">@s</span> kills <span class="kw">matches</span> <span class="num">10..</span></span></td>
+        <td><div class="desc-cell"><div class="dm">스코어보드 값 조건 확인</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> kills <span class="kw">matches</span> <span class="num">10..</span>
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:reward</span>
+<span class="cmt"># 킬 10 이상인 플레이어에게 보상</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">unless</span></span></td>
+        <td><div class="desc-cell"><div class="dm">if 의 반대 조건</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">unless entity</span> <span class="sel">@a</span><span class="arg">[gamemode=creative]</span>
+  <span class="kw">run</span> <span class="fn">say</span> 서바이벌 플레이어만 있음</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">positioned</span> <span class="num">0 64 0</span></span></td>
+        <td><div class="desc-cell"><div class="dm">실행 위치를 절대 좌표로 이동</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">positioned</span> <span class="num">100 64 200</span>
+  <span class="kw">if block</span> ~ ~ ~ minecraft:chest
+  <span class="kw">run</span> <span class="fn">say</span> 해당 좌표에 상자 있음</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">store result score</span> <span class="sel">@s</span> obj</span></td>
+        <td><div class="desc-cell"><div class="dm">명령어 결과를 스코어보드에 저장</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">store result score</span> <span class="sel">@s</span> health
+  <span class="kw">run</span> <span class="fn">data</span> <span class="kw">get</span> entity <span class="sel">@s</span> Health <span class="num">1</span>
+<span class="cmt"># 플레이어 체력값을 health 오브젝트에 저장</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">in</span> minecraft:the_nether</span></td>
+        <td><div class="desc-cell"><div class="dm">특정 차원으로 실행 위치 이동</div><div class="ds">overworld · the_nether · the_end 선택 가능.</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="kw">rotated as</span> <span class="sel">@s</span></span></td>
+        <td><div class="desc-cell"><div class="dm">실행 회전을 대상의 바라보는 방향으로 설정</div><div class="codeblock"><span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">at</span> <span class="sel">@s</span> <span class="kw">rotated as</span> <span class="sel">@s</span>
+  <span class="kw">run</span> <span class="fn">summon</span> minecraft:arrow ^ ^ ^3
+<span class="cmt"># 플레이어가 바라보는 방향 앞 3블럭에 화살 소환</span></div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="c-score">
+    <div class="card-header"><span class="hl">02</span> /scoreboard — 변수 시스템</div>
+    <div class="tip"><b>Scoreboard</b>는 데이터팩에서 <b>변수</b> 역할. 플레이어·엔티티별 정수값을 저장·연산.</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">scoreboard objectives add</span> <span class="str">kills</span> <span class="arg">playerKillCount</span></span></td>
+        <td><div class="desc-cell"><div class="dm">오브젝트(변수군) 생성</div><div class="ds">criterion: dummy(수동) · playerKillCount · deathCount · health · xp · level · food · air</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">scoreboard players set</span> <span class="sel">@s</span> kills <span class="num">0</span></span></td>
+        <td><div class="desc-cell"><div class="dm">값 설정 (절대값)</div><div class="codeblock"><span class="fn">scoreboard players set</span> <span class="sel">@s</span> kills <span class="num">0</span>
+<span class="fn">scoreboard players add</span> <span class="sel">@s</span> kills <span class="num">1</span>    <span class="cmt"># +1</span>
+<span class="fn">scoreboard players remove</span> <span class="sel">@s</span> kills <span class="num">1</span> <span class="cmt"># -1</span>
+<span class="fn">scoreboard players reset</span> <span class="sel">@s</span> kills    <span class="cmt"># 초기화</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">scoreboard players operation</span></span></td>
+        <td><div class="desc-cell"><div class="dm">스코어 간 연산</div><div class="codeblock"><span class="cmt"># target obj 연산자 source obj</span>
+<span class="fn">scoreboard players operation</span> <span class="sel">@s</span> total <span class="kw">+=</span> <span class="sel">@s</span> bonus
+<span class="cmt"># 연산자: += -= *= /= %= = < > &lt;&gt;</span>
+<span class="cmt"># < 는 최솟값, > 는 최댓값, &lt;&gt; 는 swap</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">scoreboard objectives setdisplay</span> <span class="arg">sidebar</span></span></td>
+        <td><div class="desc-cell"><div class="dm">사이드바/탭/벨로우네임 표시</div><div class="ds">sidebar · list · belowName 위치 선택.</div><div class="codeblock"><span class="fn">scoreboard objectives setdisplay</span> sidebar kills</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="c-data">
+    <div class="card-header"><span class="hl">03</span> /data — NBT 직접 조작</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">data get entity</span> <span class="sel">@s</span> Health</span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 NBT 값 읽기</div><div class="codeblock"><span class="fn">data get entity</span> <span class="sel">@s</span> Health
+<span class="fn">data get entity</span> <span class="sel">@s</span> Inventory
+<span class="fn">data get block</span> <span class="num">0 64 0</span> Items</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">data merge entity</span> <span class="sel">@s</span> <span class="arg">{NBT}</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 NBT 병합 (값 덮어쓰기)</div><div class="codeblock"><span class="cmt"># 플레이어 체력을 20으로 설정</span>
+<span class="fn">data merge entity</span> <span class="sel">@s</span> <span class="arg">{Health:20.0f}</span>
+
+<span class="cmt"># 엔티티 이름 변경</span>
+<span class="fn">data merge entity</span> <span class="sel">@e</span><span class="arg">[type=zombie,limit=1]</span>
+  <span class="arg">{CustomName:'{"text":"보스 좀비"}'}</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">data modify entity</span> <span class="sel">@s</span> <span class="arg">path set value</span></span></td>
+        <td><div class="desc-cell"><div class="dm">특정 NBT 경로 값 수정</div><div class="codeblock"><span class="fn">data modify entity</span> <span class="sel">@s</span> NoAI <span class="kw">set value</span> <span class="num">1b</span>
+<span class="cmt"># 엔티티 AI 비활성화</span>
+
+<span class="fn">data modify entity</span> <span class="sel">@s</span> Motion
+  <span class="kw">set value</span> <span class="arg">[0.0d,1.5d,0.0d]</span>
+<span class="cmt"># 엔티티를 위로 튀어오르게</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">data remove entity</span> <span class="sel">@s</span> <span class="arg">path</span></span></td>
+        <td><div class="desc-cell"><div class="dm">특정 NBT 경로 제거</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="c-misc">
+    <div class="card-header"><span class="hl">04</span> 자주 쓰는 명령어 모음</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">give</span> <span class="sel">@s</span> <span class="str">diamond_sword</span><span class="arg">{}</span> <span class="num">1</span></span></td>
+        <td><div class="desc-cell"><div class="dm">아이템 지급</div><div class="codeblock"><span class="fn">give</span> <span class="sel">@a</span> minecraft:diamond_sword<span class="arg">{
+  display:{Name:'{"text":"신의 검","color":"gold"}'},
+  Enchantments:[{id:"sharpness",lvl:5}]
+}</span> <span class="num">1</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">summon</span> <span class="str">zombie</span> ~ ~ ~ <span class="arg">{}</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 소환</div><div class="codeblock"><span class="fn">summon</span> minecraft:zombie ~ ~1 ~
+  <span class="arg">{CustomName:'{"text":"특수 좀비"}',
+   CustomNameVisible:1,Health:100.0f,
+   IsBaby:0b,NoAI:0b}</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">tp</span> <span class="sel">@s</span> <span class="num">0 64 0</span></span></td>
+        <td><div class="desc-cell"><div class="dm">텔레포트</div><div class="codeblock"><span class="fn">tp</span> <span class="sel">@s</span> <span class="num">0 64 0</span>          <span class="cmt"># 절대 좌표</span>
+<span class="fn">tp</span> <span class="sel">@s</span> <span class="num">~1 ~ ~</span>         <span class="cmt"># 상대 좌표</span>
+<span class="fn">tp</span> <span class="sel">@s</span> <span class="num">^1 ^ ^</span>         <span class="cmt"># 바라보는 방향 기준</span>
+<span class="fn">tp</span> <span class="sel">@e[type=zombie]</span> <span class="sel">@a[limit=1]</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">fill</span> x1 y1 z1 x2 y2 z2 <span class="str">block</span></span></td>
+        <td><div class="desc-cell"><div class="dm">영역을 블럭으로 채우기</div><div class="codeblock"><span class="fn">fill</span> <span class="num">~-5 ~ ~-5 ~5 ~5 ~5</span> minecraft:air
+<span class="cmt"># 반경 5블럭 공기로 채움 (영역 청소)</span>
+<span class="fn">fill</span> <span class="num">~-5 ~ ~-5 ~5 ~5 ~5</span> minecraft:glass
+  replace minecraft:stone
+<span class="cmt"># stone → glass 로만 교체 (replace 모드)</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">setblock</span> ~ ~-1 ~ <span class="str">stone</span></span></td>
+        <td><div class="desc-cell"><div class="dm">단일 블럭 설치</div><div class="ds">destroy · keep · replace 모드 선택 가능.</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">effect give</span> <span class="sel">@s</span> <span class="str">speed</span> <span class="num">30 2</span></span></td>
+        <td><div class="desc-cell"><div class="dm">포션 효과 부여</div><div class="ds">give/clear. 형식: 대상 효과 지속시간(초) 레벨(0=Ⅰ).</div><div class="codeblock"><span class="fn">effect give</span> <span class="sel">@a</span> minecraft:speed <span class="num">30 1</span> true
+<span class="cmt"># true = 파티클 숨김</span>
+<span class="fn">effect clear</span> <span class="sel">@a</span> minecraft:speed</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">enchant</span> <span class="sel">@s</span> <span class="str">sharpness</span> <span class="num">5</span></span></td>
+        <td><div class="desc-cell"><div class="dm">들고 있는 아이템에 인첸트 적용</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">kill</span> <span class="sel">@e[type=zombie]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 즉시 제거</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">title</span> <span class="sel">@a</span> <span class="kw">title</span> <span class="arg">{"text":"..."}</span></span></td>
+        <td><div class="desc-cell"><div class="dm">화면 중앙 타이틀 표시</div><div class="codeblock"><span class="fn">title</span> <span class="sel">@a</span> times <span class="num">10 40 10</span>    <span class="cmt"># 페이드 설정</span>
+<span class="fn">title</span> <span class="sel">@a</span> title <span class="arg">{"text":"게임 시작!","color":"gold","bold":true}</span>
+<span class="fn">title</span> <span class="sel">@a</span> subtitle <span class="arg">{"text":"행운을 빕니다","color":"white"}</span>
+<span class="fn">title</span> <span class="sel">@a</span> actionbar <span class="arg">{"text":"❤ 체력: 20"}</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">{JSON}</span></span></td>
+        <td><div class="desc-cell"><div class="dm">채팅창에 형식화된 텍스트 전송</div><div class="codeblock"><span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">{"text":"클릭!","clickEvent":
+  {"action":"run_command","value":"/say 클릭됨"},
+  "color":"aqua","underlined":true}</span>
+<span class="cmt"># clickEvent action: run_command, suggest_command,</span>
+<span class="cmt">#   open_url, copy_to_clipboard</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">schedule function</span> <span class="str">mypack:fn</span> <span class="num">100</span>t</span></td>
+        <td><div class="desc-cell"><div class="dm">N틱 후 함수 실행 예약</div><div class="ds">단위: t(틱) · s(초) · d(일). <span class="mc">append</span> / <span class="mc">replace</span> 모드.</div><div class="codeblock"><span class="fn">schedule function</span> mypack:delayed <span class="num">5</span>s
+<span class="cmt"># 5초 후 실행</span>
+<span class="fn">schedule clear</span> mypack:delayed <span class="cmt"># 취소</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">tag</span> <span class="sel">@s</span> <span class="kw">add</span> <span class="str">vip</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티에 태그 추가/제거</div><div class="ds">태그로 특정 엔티티를 선택할 수 있어 매우 유용.</div><div class="codeblock"><span class="fn">tag</span> <span class="sel">@s</span> add vip
+<span class="fn">tag</span> <span class="sel">@s</span> remove vip
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a[tag=vip]</span> <span class="kw">run</span> ...</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">gamemode</span> <span class="arg">creative</span> <span class="sel">@s</span></span></td>
+        <td><div class="desc-cell"><div class="dm">게임 모드 변경</div><div class="ds">survival · creative · adventure · spectator</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">gamerule</span> <span class="arg">keepInventory</span> <span class="kw">true</span></span></td>
+        <td><div class="desc-cell"><div class="dm">게임 규칙 설정</div><div class="ds">doFireTick · mobGriefing · doDaylightCycle · doMobSpawning · naturalRegeneration 등</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="fn">loot give</span> <span class="sel">@s</span> <span class="kw">loot</span> <span class="str">mypack:table</span></span></td>
+        <td><div class="desc-cell"><div class="dm">전리품 테이블로 아이템 지급</div><div class="codeblock"><span class="fn">loot give</span> <span class="sel">@s</span> loot mypack:boss_reward
+<span class="fn">loot spawn</span> ~ ~ ~ loot minecraft:chests/village_blacksmith
+<span class="fn">loot replace entity</span> <span class="sel">@s</span> weapon.mainhand loot mypack:weapon</div></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     선택자
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-sel">
+  <div class="sec-title">🎯 선택자 & 조건</div>
+  <div class="sec-sub">@a · @p · @e · @r · @s · 선택자 인수 · Predicate JSON</div>
+
+  <div class="card" id="s-base">
+    <div class="card-header"><span class="hl">01</span> 기본 선택자</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc"><span class="sel">@a</span></span></td><td><div class="desc-cell"><div class="dm">모든 플레이어</div><div class="ds">All players — 온라인 플레이어 전체.</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="sel">@p</span></span></td><td><div class="desc-cell"><div class="dm">가장 가까운 플레이어</div><div class="ds">Nearest Player — 실행 위치 기준 최근접 1명.</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="sel">@e</span></span></td><td><div class="desc-cell"><div class="dm">모든 엔티티 (플레이어 포함)</div><div class="ds">All Entities — type 인수로 좁히는 게 일반적.</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="sel">@r</span></span></td><td><div class="desc-cell"><div class="dm">랜덤 플레이어 1명</div><div class="ds">Random player. limit 인수로 n명 선택 가능.</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="sel">@s</span></span></td><td><div class="desc-cell"><div class="dm">명령어 실행자 자신</div><div class="ds">execute as 로 바뀐 실행자 = @s.</div></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-args">
+    <div class="card-header"><span class="hl">02</span> 선택자 인수 [...]</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[type=zombie]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">엔티티 타입 필터</div><div class="codeblock"><span class="sel">@e</span><span class="arg">[type=minecraft:zombie]</span>
+<span class="sel">@e</span><span class="arg">[type=!minecraft:player]</span>  <span class="cmt"># 플레이어 제외</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[distance=..10]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">거리 필터</div><div class="ds">..10 = 10 이하 · 5.. = 5 이상 · 3..8 = 3~8블럭</div><div class="codeblock"><span class="sel">@a</span><span class="arg">[distance=..5]</span>   <span class="cmt"># 반경 5 내 플레이어</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[limit=1,sort=nearest]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">수 제한 · 정렬</div><div class="ds">sort: nearest · furthest · random · arbitrary</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[tag=vip]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">태그 필터</div><div class="ds">tag=!vip 로 태그 없는 엔티티 선택.</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[scores={kills=5..}]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">스코어 기반 필터</div><div class="codeblock"><span class="sel">@a</span><span class="arg">[scores={kills=10..,deaths=..3}]</span>
+<span class="cmt"># 킬 10 이상이고 사망 3 이하인 플레이어</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[gamemode=survival]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">게임모드 필터</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[name="플레이어명"]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">이름 필터</div><div class="ds">name=!"이름" 으로 특정 이름 제외.</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[nbt={OnGround:1b}]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">NBT 조건 필터</div><div class="codeblock"><span class="sel">@e</span><span class="arg">[type=zombie,nbt={IsBaby:1b}]</span>
+<span class="cmt"># 아기 좀비만 선택</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[predicate=mypack:cond]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">Predicate JSON 조건 적용</div><div class="ds">복잡한 조건을 JSON 파일로 분리. 아래 참고.</div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc"><span class="arg">[x=0,y=64,z=0,dx=10,dy=5,dz=10]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">특정 박스 영역 내 필터</div><div class="ds">x/y/z 시작점, dx/dy/dz 크기(+방향으로만).</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-pred">
+    <div class="card-header"><span class="hl">03</span> Predicate — 복합 조건 JSON</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">Predicate는 <b>data/mypack/predicates/</b> 폴더에 JSON으로 작성. 복잡한 조건을 재사용 가능한 파일로 분리.</div>
+      <div class="two-col">
+        <div>
+          <div class="mini-title">data/mypack/predicates/is_raining.json</div>
+          <div class="codeblock">{
+  <span class="key">"condition"</span>: <span class="str">"minecraft:weather_check"</span>,
+  <span class="key">"raining"</span>: <span class="kw">true</span>
+}
+
+<span class="cmt"># 사용: execute if predicate mypack:is_raining</span></div>
+        </div>
+        <div>
+          <div class="mini-title">data/mypack/predicates/full_hp.json</div>
+          <div class="codeblock">{
+  <span class="key">"condition"</span>: <span class="str">"minecraft:entity_properties"</span>,
+  <span class="key">"entity"</span>: <span class="str">"this"</span>,
+  <span class="key">"predicate"</span>: {
+    <span class="key">"type"</span>: <span class="str">"minecraft:player"</span>,
+    <span class="key">"nbt"</span>: <span class="str">"{Health:20.0f}"</span>
+  }
+}</div>
+        </div>
+      </div>
+      <div class="mini-title" style="margin-top:10px;">자주 쓰는 condition 종류</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell" style="width:50%;"><span class="mc">entity_properties</span></td><td><div class="desc-cell"><div class="ds">엔티티 속성 검사 (type, nbt, location 등)</div></div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">entity_scores</span></td><td><div class="desc-cell"><div class="ds">스코어보드 값 범위 확인</div></div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">location_check</span></td><td><div class="desc-cell"><div class="ds">위치·바이옴·구조물·빛 레벨 확인</div></div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">random_chance</span></td><td><div class="desc-cell"><div class="ds">확률 기반 조건 (0.0~1.0)</div></div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">all_of / any_of / inverted</span></td><td><div class="desc-cell"><div class="ds">AND / OR / NOT 논리 결합</div></div></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     블럭·아이템
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-block">
+  <div class="sec-title">🧱 블럭 & 아이템</div>
+  <div class="sec-sub">블럭 상태 · 아이템 NBT · 전리품 테이블 · 어드밴스먼트</div>
+
+  <div class="card" id="bl-state">
+    <div class="card-header"><span class="hl">01</span> 블럭 상태 (Block States)</div>
+    <table class="r-table">
+      <tr>
+        <td class="cmd-cell"><span class="mc">stone_stairs<span class="arg">[facing=east]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">방향 있는 블럭</div><div class="codeblock"><span class="fn">setblock</span> ~ ~ ~ minecraft:stone_stairs<span class="arg">[
+  facing=east,half=top,shape=straight
+]</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc">oak_door<span class="arg">[open=true]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">열린 문</div><div class="codeblock"><span class="fn">setblock</span> ~ ~ ~ minecraft:oak_door<span class="arg">[
+  facing=north,half=lower,hinge=left,open=true
+]</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="cmd-cell"><span class="mc">redstone_wire<span class="arg">[power=15]</span></span></td>
+        <td><div class="desc-cell"><div class="dm">레드스톤 신호값</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="bl-nbt">
+    <div class="card-header"><span class="hl">02</span> 아이템 NBT — 커스텀 아이템</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">이름·설명·인첸트</div>
+          <div class="codeblock"><span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_sword<span class="arg">{
+  display: {
+    Name: '{"text":"전설의 검","color":"gold","bold":true}',
+    Lore: ['{"text":"고대의 힘이 깃들어 있다","color":"gray","italic":false}',
+           '{"text":"공격력 +999","color":"red"}']
+  },
+  Enchantments: [
+    {id:"minecraft:sharpness",lvl:10},
+    {id:"minecraft:unbreaking",lvl:3}
+  ],
+  Unbreakable: 1b,
+  HideFlags: 255
+}</span></div>
+        </div>
+        <div>
+          <div class="mini-title">속성 수정자 (AttribModifiers)</div>
+          <div class="codeblock"><span class="fn">give</span> <span class="sel">@s</span> minecraft:iron_chestplate<span class="arg">{
+  AttributeModifiers: [{
+    AttributeName: "generic.max_health",
+    Name: "extra_hp",
+    Amount: 10.0d,
+    Operation: 0,
+    UUID: [I;1,2,3,4],
+    Slot: "chest"
+  },{
+    AttributeName: "generic.armor",
+    Name: "armor_bonus",
+    Amount: 5.0d,
+    Operation: 0,
+    UUID: [I;5,6,7,8],
+    Slot: "chest"
+  }]
+}</span></div>
+          <div class="note">Operation: 0=덧셈 · 1=배율덧셈 · 2=배율곱셈</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="bl-loot">
+    <div class="card-header"><span class="hl">03</span> 전리품 테이블 (Loot Table)</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">전리품 테이블은 <b>data/mypack/loot_tables/</b> 에 JSON으로 저장. 몬스터 드롭·상자 내용물·낚시 결과 등 정의.</div>
+      <div class="codeblock"><span class="cmt">// data/mypack/loot_tables/boss_drop.json</span>
+{
+  <span class="key">"type"</span>: <span class="str">"minecraft:entity"</span>,
+  <span class="key">"pools"</span>: [{
+    <span class="key">"rolls"</span>: <span class="num">1</span>,
+    <span class="key">"entries"</span>: [
+      {
+        <span class="key">"type"</span>: <span class="str">"minecraft:item"</span>,
+        <span class="key">"name"</span>: <span class="str">"minecraft:diamond"</span>,
+        <span class="key">"weight"</span>: <span class="num">70</span>,
+        <span class="key">"functions"</span>: [{
+          <span class="key">"function"</span>: <span class="str">"minecraft:set_count"</span>,
+          <span class="key">"count"</span>: {<span class="key">"min"</span>: <span class="num">1</span>, <span class="key">"max"</span>: <span class="num">3</span>}
+        }]
+      },
+      {
+        <span class="key">"type"</span>: <span class="str">"minecraft:item"</span>,
+        <span class="key">"name"</span>: <span class="str">"minecraft:netherite_ingot"</span>,
+        <span class="key">"weight"</span>: <span class="num">30</span>
+      }
+    ]
+  }]
+}</div>
+    </div>
+  </div>
+
+  <div class="card" id="bl-adv">
+    <div class="card-header"><span class="hl">04</span> 어드밴스먼트 (Advancement)</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">// data/mypack/advancements/first_kill.json</span>
+{
+  <span class="key">"display"</span>: {
+    <span class="key">"icon"</span>: {<span class="key">"item"</span>: <span class="str">"minecraft:diamond_sword"</span>},
+    <span class="key">"title"</span>: {<span class="key">"text"</span>: <span class="str">"첫 번째 처치"</span>},
+    <span class="key">"description"</span>: {<span class="key">"text"</span>: <span class="str">"적을 처음으로 처치했습니다."</span>},
+    <span class="key">"frame"</span>: <span class="str">"goal"</span>,     <span class="cmt">// task / goal / challenge</span>
+    <span class="key">"announce_to_chat"</span>: <span class="kw">true</span>,
+    <span class="key">"show_toast"</span>: <span class="kw">true</span>
+  },
+  <span class="key">"parent"</span>: <span class="str">"minecraft:story/root"</span>,
+  <span class="key">"criteria"</span>: {
+    <span class="key">"killed"</span>: {
+      <span class="key">"trigger"</span>: <span class="str">"minecraft:player_killed_entity"</span>,
+      <span class="key">"conditions"</span>: {
+        <span class="key">"entity"</span>: {<span class="key">"type"</span>: <span class="str">"minecraft:zombie"</span>}
+      }
+    }
+  },
+  <span class="key">"rewards"</span>: {
+    <span class="key">"function"</span>: <span class="str">"mypack:rewards/first_kill"</span>
+  }
+}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     파티클·소리
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-fx">
+  <div class="sec-title">🎆 파티클 & 소리</div>
+  <div class="sec-sub">/particle · /playsound — 주요 목록과 문법</div>
+
+  <div class="card" id="fx-particle">
+    <div class="card-header"><span class="hl">01</span> /particle — 파티클 생성</div>
+    <div style="padding:14px 16px;">
+      <div class="mini-title">문법</div>
+      <div class="codeblock"><span class="fn">particle</span> <span class="str">&lt;이름&gt;</span> <span class="num">&lt;x&gt; &lt;y&gt; &lt;z&gt;</span>  <span class="cmt"># 위치</span>
+         <span class="num">&lt;dx&gt; &lt;dy&gt; &lt;dz&gt;</span>  <span class="cmt"># 분산 범위</span>
+         <span class="num">&lt;speed&gt; &lt;count&gt;</span>  <span class="cmt"># 속도 · 개수</span>
+         <span class="arg">[force|normal]</span>   <span class="cmt"># force = 멀리서도 보임</span>
+         <span class="arg">[플레이어]</span>       <span class="cmt"># 특정 플레이어에게만</span>
+
+<span class="cmt"># 예시</span>
+<span class="fn">particle</span> minecraft:flame ~ ~1 ~ <span class="num">0.5 0.5 0.5 0.1 30</span>
+<span class="fn">particle</span> minecraft:heart ~ ~2 ~ <span class="num">0 0 0 0 5</span> force <span class="sel">@a</span></div>
+    </div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">flame</span></td><td><div class="desc-cell"><div class="dm">불꽃 파티클</div><span class="tag">🔥 화염 효과</span><span class="tag">소환 연기</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">explosion</span></td><td><div class="desc-cell"><div class="dm">폭발 파티클</div><span class="tag">💥 폭발 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">heart</span></td><td><div class="desc-cell"><div class="dm">하트 파티클</div><span class="tag">❤ 회복 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">angry_villager</span></td><td><div class="desc-cell"><div class="dm">화난 주민 파티클 (짜증 표시)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">happy_villager</span></td><td><div class="desc-cell"><div class="dm">행복한 주민 파티클 (초록 별)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">end_rod</span></td><td><div class="desc-cell"><div class="dm">엔드 막대 파티클 (흰색 반짝)</div><span class="tag">✨ 마법 효과</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dragon_breath</span></td><td><div class="desc-cell"><div class="dm">드래곤 숨결 (보라색)</div><span class="tag">🐉 보스 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">enchant</span></td><td><div class="desc-cell"><div class="dm">인첸트 룬 파티클 (파란 글리프)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">crit</span></td><td><div class="desc-cell"><div class="dm">크리티컬 히트 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">soul</span></td><td><div class="desc-cell"><div class="dm">소울 파티클 (소울 모래 불꽃)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">witch</span></td><td><div class="desc-cell"><div class="dm">마녀 파티클 (보라 방울)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">smoke</span></td><td><div class="desc-cell"><div class="dm">연기 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">large_smoke</span></td><td><div class="desc-cell"><div class="dm">큰 연기 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">cloud</span></td><td><div class="desc-cell"><div class="dm">흰 연기 구름 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">portal</span></td><td><div class="desc-cell"><div class="dm">포탈 파티클 (보라 소용돌이)</div><span class="tag">🌀 포탈 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">totem_of_undying</span></td><td><div class="desc-cell"><div class="dm">토템 부활 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dust 1.0 0.0 0.0 2</span></td><td><div class="desc-cell"><div class="dm">색상 있는 먼지 파티클</div><div class="ds">R G B (0~1) 크기. 임의 색상 파티클.</div><div class="codeblock"><span class="fn">particle</span> minecraft:dust <span class="num">1.0 0.0 0.0 2</span> ~ ~1 ~ <span class="num">0 0 0 0 10</span>
+<span class="cmt"># 빨간색 먼지 파티클</span></div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block stone</span></td><td><div class="desc-cell"><div class="dm">특정 블럭 파편 파티클</div><div class="codeblock"><span class="fn">particle</span> minecraft:block minecraft:diamond_block
+  ~ ~1 ~ <span class="num">0.5 0.5 0.5 0.1 20</span></div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item diamond</span></td><td><div class="desc-cell"><div class="dm">아이템 파편 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">falling_dust sand</span></td><td><div class="desc-cell"><div class="dm">블럭이 떨어지는 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">note</span></td><td><div class="desc-cell"><div class="dm">음표 파티클</div><span class="tag">🎵 음악 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">glow</span></td><td><div class="desc-cell"><div class="dm">빛나는 사각 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">electric_spark</span></td><td><div class="desc-cell"><div class="dm">전기 스파크 파티클</div><span class="tag">⚡ 번개 연출</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">cherry_leaves</span></td><td><div class="desc-cell"><div class="dm">벚꽃 잎 파티클</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">wax_on / wax_off</span></td><td><div class="desc-cell"><div class="dm">왁스 파티클</div></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="fx-sound">
+    <div class="card-header"><span class="hl">02</span> /playsound — 소리 재생</div>
+    <div style="padding:14px 16px;">
+      <div class="mini-title">문법</div>
+      <div class="codeblock"><span class="fn">playsound</span> <span class="str">&lt;소리&gt;</span> <span class="arg">&lt;채널&gt;</span> <span class="sel">&lt;플레이어&gt;</span>
+         <span class="num">[x y z]</span>           <span class="cmt"># 재생 위치 (생략시 실행 위치)</span>
+         <span class="num">[볼륨]</span>            <span class="cmt"># 기본 1.0</span>
+         <span class="num">[피치]</span>            <span class="cmt"># 기본 1.0 (0.5~2.0)</span>
+         <span class="num">[최소볼륨]</span>        <span class="cmt"># 거리와 무관한 최소 볼륨</span>
+
+<span class="cmt"># 채널: master · music · record · weather</span>
+<span class="cmt">#       block · hostile · neutral · player · ambient · voice</span>
+
+<span class="fn">playsound</span> minecraft:entity.player.levelup master <span class="sel">@a</span> ~ ~ ~ <span class="num">1 1</span>
+<span class="fn">playsound</span> minecraft:block.note_block.bell player <span class="sel">@s</span> ~ ~ ~ <span class="num">1 2</span>
+<span class="cmt"># 피치 2.0 = 1옥타브 높음</span></div>
+    </div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">entity.player.levelup</span></td><td><div class="desc-cell"><div class="dm">레벨업 소리</div><span class="tag-y">🎮 보상</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.experience_orb.pickup</span></td><td><div class="desc-cell"><div class="dm">경험치 획득 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.player.hurt</span></td><td><div class="desc-cell"><div class="dm">플레이어 피격 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.player.death</span></td><td><div class="desc-cell"><div class="dm">플레이어 사망 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.lightning_bolt.thunder</span></td><td><div class="desc-cell"><div class="dm">번개 소리</div><span class="tag-b">⚡ 이벤트</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.ender_dragon.growl</span></td><td><div class="desc-cell"><div class="dm">엔더 드래곤 포효 소리</div><span class="tag-b">🐉 보스</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.wither.spawn</span></td><td><div class="desc-cell"><div class="dm">위더 소환 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.note_block.bell</span></td><td><div class="desc-cell"><div class="dm">노트블럭 종 소리</div><span class="tag-y">🔔 알림</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.note_block.harp</span></td><td><div class="desc-cell"><div class="dm">노트블럭 하프 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.chest.open / close</span></td><td><div class="desc-cell"><div class="dm">상자 열기/닫기 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.totem.use</span></td><td><div class="desc-cell"><div class="dm">토템 사용 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ui.button.click</span></td><td><div class="desc-cell"><div class="dm">UI 버튼 클릭 소리</div><span class="tag-y">✅ UI 피드백</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.portal.travel</span></td><td><div class="desc-cell"><div class="dm">포탈 이동 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.generic.explode</span></td><td><div class="desc-cell"><div class="dm">폭발 소리</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music.game</span></td><td><div class="desc-cell"><div class="dm">오버월드 배경음악</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music.nether.nether_wastes</span></td><td><div class="desc-cell"><div class="dm">네더 황무지 배경음악</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music_disc.pigstep</span></td><td><div class="desc-cell"><div class="dm">Pigstep 음반 음악</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.amethyst_cluster.break</span></td><td><div class="desc-cell"><div class="dm">자수정 클러스터 파괴 소리 (맑은 소리)</div></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.villager.trade</span></td><td><div class="desc-cell"><div class="dm">거래 성공 소리</div><span class="tag-y">🛒 상점</span></div></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     태그·레시피
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-tag">
+  <div class="sec-title">📋 태그 & 레시피</div>
+  <div class="sec-sub">함수 태그 · 블럭/아이템 태그 · 커스텀 제작법 (Crafting Recipe)</div>
+
+  <div class="card" id="t-ftag">
+    <div class="card-header"><span class="hl">01</span> 함수 태그</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">커스텀 함수 태그</div>
+          <div class="codeblock"><span class="cmt">// data/mypack/tags/functions/boss_phase.json</span>
+{
+  <span class="key">"values"</span>: [
+    <span class="str">"mypack:boss/phase1"</span>,
+    <span class="str">"mypack:boss/phase2"</span>,
+    {
+      <span class="key">"id"</span>: <span class="str">"mypack:boss/optional"</span>,
+      <span class="key">"required"</span>: <span class="kw">false</span>
+    }
+  ]
+}
+
+<span class="cmt"># 사용:</span>
+<span class="fn">function</span> <span class="str">#mypack:boss_phase</span>
+<span class="cmt"># # 을 붙이면 태그의 모든 함수 실행</span></div>
+        </div>
+        <div>
+          <div class="mini-title">태그로 여러 함수 한 번에 실행</div>
+          <div class="codeblock"><span class="cmt">// data/minecraft/tags/functions/tick.json</span>
+{
+  <span class="key">"values"</span>: [
+    <span class="str">"mypack:tick_main"</span>,
+    <span class="str">"mypack:tick_combat"</span>,
+    <span class="str">"mypack:tick_shop"</span>
+  ]
+}
+
+<span class="cmt">// data/minecraft/tags/functions/load.json</span>
+{
+  <span class="key">"replace"</span>: <span class="kw">false</span>,  <span class="cmt">// 다른 팩과 병합</span>
+  <span class="key">"values"</span>: [<span class="str">"mypack:setup"</span>]
+}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="t-btag">
+    <div class="card-header"><span class="hl">02</span> 블럭 · 아이템 태그</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">커스텀 블럭 태그</div>
+          <div class="codeblock"><span class="cmt">// data/mypack/tags/blocks/my_ores.json</span>
+{
+  <span class="key">"values"</span>: [
+    <span class="str">"minecraft:diamond_ore"</span>,
+    <span class="str">"minecraft:deepslate_diamond_ore"</span>,
+    <span class="str">"minecraft:emerald_ore"</span>
+  ]
+}
+
+<span class="cmt"># 사용:</span>
+<span class="fn">execute</span> <span class="kw">if block</span> ~ ~ ~ <span class="str">#mypack:my_ores</span>
+  <span class="kw">run</span> <span class="fn">say</span> 광석 위에 있음</div>
+        </div>
+        <div>
+          <div class="mini-title">바닐라 태그 오버라이드</div>
+          <div class="codeblock"><span class="cmt">// data/minecraft/tags/blocks/mineable/pickaxe.json</span>
+<span class="cmt">// 곡괭이로 캘 수 있는 블럭에 추가</span>
+{
+  <span class="key">"replace"</span>: <span class="kw">false</span>,
+  <span class="key">"values"</span>: [
+    <span class="str">"mypack:custom_ore"</span>
+  ]
+}
+
+<span class="cmt"># 유용한 바닐라 태그들</span>
+<span class="cmt"># minecraft:blocks/logs — 모든 원목</span>
+<span class="cmt"># minecraft:items/axes — 도끼류</span>
+<span class="cmt"># minecraft:blocks/wools — 양털류</span>
+<span class="cmt"># minecraft:blocks/fire — 불 블럭</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="t-recipe">
+    <div class="card-header"><span class="hl">03</span> 커스텀 레시피 (Crafting Recipe)</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="mini-title">모양 있는 제작법 (shaped)</div>
+          <div class="codeblock"><span class="cmt">// data/mypack/recipes/super_sword.json</span>
+{
+  <span class="key">"type"</span>: <span class="str">"minecraft:crafting_shaped"</span>,
+  <span class="key">"pattern"</span>: [
+    <span class="str">"DDD"</span>,
+    <span class="str">" S "</span>,
+    <span class="str">" S "</span>
+  ],
+  <span class="key">"key"</span>: {
+    <span class="key">"D"</span>: {<span class="key">"item"</span>: <span class="str">"minecraft:diamond"</span>},
+    <span class="key">"S"</span>: {<span class="key">"item"</span>: <span class="str">"minecraft:stick"</span>}
+  },
+  <span class="key">"result"</span>: {
+    <span class="key">"item"</span>: <span class="str">"minecraft:diamond_sword"</span>,
+    <span class="key">"count"</span>: <span class="num">1</span>
+  }
+}</div>
+        </div>
+        <div>
+          <div class="mini-title">모양 없는 제작법 (shapeless)</div>
+          <div class="codeblock"><span class="cmt">// data/mypack/recipes/coal_to_diamond.json</span>
+{
+  <span class="key">"type"</span>: <span class="str">"minecraft:crafting_shapeless"</span>,
+  <span class="key">"ingredients"</span>: [
+    {<span class="key">"item"</span>: <span class="str">"minecraft:coal_block"</span>},
+    {<span class="key">"item"</span>: <span class="str">"minecraft:coal_block"</span>},
+    {<span class="key">"item"</span>: <span class="str">"minecraft:coal_block"</span>}
+  ],
+  <span class="key">"result"</span>: {
+    <span class="key">"item"</span>: <span class="str">"minecraft:diamond"</span>,
+    <span class="key">"count"</span>: <span class="num">1</span>
+  }
+}</div>
+          <div class="mini-title" style="margin-top:10px;">제련 레시피 (smelting)</div>
+          <div class="codeblock">{
+  <span class="key">"type"</span>: <span class="str">"minecraft:smelting"</span>,
+  <span class="key">"ingredient"</span>: {<span class="key">"item"</span>: <span class="str">"minecraft:stone"</span>},
+  <span class="key">"result"</span>: <span class="str">"minecraft:smooth_stone"</span>,
+  <span class="key">"experience"</span>: <span class="num">0.1</span>,
+  <span class="key">"cookingtime"</span>: <span class="num">200</span>
+}
+<span class="cmt"># type: smelting · blasting · smoking · campfire_cooking</span></div>
+        </div>
+      </div>
+      <div class="note">레시피 삭제: data/minecraft/recipes/ 에 같은 이름의 빈 파일 또는 <code>{"type":"minecraft:crafting_special_*"}</code> 으로 오버라이드</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     실전 예제
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-ex">
+  <div class="sec-title">💡 실전 예제</div>
+  <div class="sec-sub">킬 카운터 · 커스텀 킷 · 타이머 · 랜덤 이벤트 · 미니게임 시스템</div>
+
+  <div class="card" id="e-kill">
+    <div class="card-header"><span class="hl">01</span> 킬 카운터 + 사이드바 표시</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># data/mypack/functions/setup.mcfunction (load 시 실행)</span>
+<span class="fn">scoreboard objectives add</span> kills playerKillCount
+<span class="fn">scoreboard objectives add</span> deaths deathCount
+<span class="fn">scoreboard objectives setdisplay</span> sidebar kills
+<span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">{"text":"[킬 카운터] 시스템 로드됨","color":"green"}</span>
+
+<span class="cmt"># data/mypack/functions/tick.mcfunction (매 틱 실행)</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> kills <span class="kw">matches</span> <span class="num">10</span> <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:reward_10kills</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> kills <span class="kw">matches</span> <span class="num">50</span> <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:reward_50kills</span>
+
+<span class="cmt"># data/mypack/functions/reward_10kills.mcfunction</span>
+<span class="fn">title</span> <span class="sel">@s</span> title <span class="arg">{"text":"10킬 달성!","color":"gold","bold":true}</span>
+<span class="fn">playsound</span> minecraft:entity.player.levelup master <span class="sel">@s</span> ~ ~ ~ <span class="num">1 1</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond <span class="num">5</span>
+<span class="fn">particle</span> minecraft:totem_of_undying ~ ~1 ~ <span class="num">0.5 1 0.5 0.1 50</span> force <span class="sel">@s</span>
+<span class="fn">scoreboard players set</span> <span class="sel">@s</span> kills <span class="num">11</span>  <span class="cmt"># 중복 방지 (10→11로 올려서 다시 안걸림)</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-kit">
+    <div class="card-header"><span class="hl">02</span> 커스텀 킷 시스템</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># data/mypack/functions/kit/warrior.mcfunction</span>
+<span class="fn">clear</span> <span class="sel">@s</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_sword<span class="arg">{
+  display:{Name:'{"text":"전사의 검","color":"aqua","bold":true}'},
+  Enchantments:[{id:"sharpness",lvl:3},{id:"unbreaking",lvl:3}],
+  Unbreakable:1b,HideFlags:127
+}</span> <span class="num">1</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_chestplate<span class="arg">{
+  Enchantments:[{id:"protection",lvl:4}],Unbreakable:1b
+}</span> <span class="num">1</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:golden_apple <span class="num">5</span>
+<span class="fn">effect give</span> <span class="sel">@s</span> minecraft:strength <span class="num">30 0</span>
+<span class="fn">title</span> <span class="sel">@s</span> title <span class="arg">{"text":"⚔ 전사 킷 지급","color":"aqua"}</span>
+<span class="fn">playsound</span> minecraft:item.armor.equip_diamond master <span class="sel">@s</span>
+
+<span class="cmt"># 호출 방법</span>
+<span class="fn">function</span> <span class="str">mypack:kit/warrior</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-timer">
+    <div class="card-header"><span class="hl">03</span> 게임 타이머</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># setup.mcfunction 에서</span>
+<span class="fn">scoreboard objectives add</span> timer dummy
+<span class="fn">scoreboard players set</span> global timer <span class="num">2400</span>  <span class="cmt"># 2400틱 = 2분</span>
+
+<span class="cmt"># tick.mcfunction</span>
+<span class="fn">scoreboard players remove</span> global timer <span class="num">1</span>
+
+<span class="cmt"># 타이머 표시 (actionbar)</span>
+<span class="fn">execute</span> <span class="kw">store result storage</span> mypack:temp time <span class="arg">int 0.05</span>
+  <span class="kw">run</span> <span class="fn">scoreboard players get</span> global timer
+<span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">{"score":{"name":"global","objective":"timer"},"text":"틱 남음"}</span>
+
+<span class="cmt"># 타이머 종료 감지</span>
+<span class="fn">execute</span> <span class="kw">if score</span> global timer <span class="kw">matches</span> <span class="num">..0</span> <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:game_over</span>
+
+<span class="cmt"># game_over.mcfunction</span>
+<span class="fn">title</span> <span class="sel">@a</span> title <span class="arg">{"text":"⏰ 시간 종료!","color":"red","bold":true}</span>
+<span class="fn">playsound</span> minecraft:block.note_block.bell master <span class="sel">@a</span> ~ ~ ~ <span class="num">1 0.5</span>
+<span class="fn">scoreboard players set</span> global timer <span class="num">-1</span>  <span class="cmt"># -1로 중복 실행 방지</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-random">
+    <div class="card-header"><span class="hl">04</span> 랜덤 이벤트 시스템</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># 랜덤 이벤트: /random 명령어는 1.20+에서 지원</span>
+<span class="fn">scoreboard objectives add</span> rng dummy
+
+<span class="cmt"># random.mcfunction — 0~99 랜덤 값 생성</span>
+<span class="fn">execute</span> <span class="kw">store result score</span> <span class="sel">@s</span> rng
+  <span class="kw">run</span> <span class="fn">random value</span> <span class="num">0..99</span>  <span class="cmt"># 1.20+ 전용</span>
+
+<span class="cmt"># 구버전 방식: loot table random</span>
+<span class="fn">execute</span> <span class="kw">store result score</span> <span class="sel">@s</span> rng
+  <span class="kw">run</span> <span class="fn">loot spawn</span> ~ ~-10 ~ <span class="kw">loot</span> <span class="str">mypack:random_number</span>
+
+<span class="cmt"># 조건 분기</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> rng <span class="kw">matches</span> <span class="num">0..24</span> <span class="kw">run</span>
+  <span class="fn">function</span> <span class="str">mypack:event/lightning</span>   <span class="cmt"># 25% 확률 번개</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> rng <span class="kw">matches</span> <span class="num">25..49</span> <span class="kw">run</span>
+  <span class="fn">function</span> <span class="str">mypack:event/heal</span>        <span class="cmt"># 25% 확률 회복</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if score</span> <span class="sel">@s</span> rng <span class="kw">matches</span> <span class="num">50..74</span> <span class="kw">run</span>
+  <span class="fn">function</span> <span class="str">mypack:event/zombie_swarm</span> <span class="cmt"># 25% 확률 좀비 떼</span>
+<span class="cmt"># 75..99: 아무 일도 없음 (25%)</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-store">
+    <div class="card-header"><span class="hl">05</span> Storage — 전역 데이터 저장</div>
+    <div style="padding:14px 16px;">
+      <div class="tip"><b>Storage</b> (1.15+)는 플레이어/엔티티와 무관하게 임의 NBT 데이터를 저장하는 전역 공간.</div>
+      <div class="codeblock"><span class="cmt"># storage에 값 저장</span>
+<span class="fn">data modify storage</span> mypack:global GamePhase <span class="kw">set value</span> <span class="str">"active"</span>
+<span class="fn">data modify storage</span> mypack:global BossHP <span class="kw">set value</span> <span class="num">500</span>
+
+<span class="cmt"># storage에서 값 읽기</span>
+<span class="fn">data get storage</span> mypack:global GamePhase
+<span class="fn">data get storage</span> mypack:global BossHP
+
+<span class="cmt"># storage → scoreboard 로 복사</span>
+<span class="fn">execute</span> <span class="kw">store result score</span> global boss_hp
+  <span class="kw">run</span> <span class="fn">data get storage</span> mypack:global BossHP
+
+<span class="cmt"># 조건 분기에 활용</span>
+<span class="fn">execute</span> <span class="kw">if data storage</span> mypack:global <span class="arg">{GamePhase:"active"}</span>
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:game_loop</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-fake">
+    <div class="card-header"><span class="hl">06</span> 가짜 플레이어 — 상수·전역 변수</div>
+    <div style="padding:14px 16px;">
+      <div class="tip"><b>가짜 플레이어</b>(fake player)는 스코어보드에서 실제 플레이어가 아닌 이름을 사용해 상수/전역 변수 역할.</div>
+      <div class="codeblock"><span class="cmt"># setup.mcfunction 에서 상수 설정</span>
+<span class="fn">scoreboard objectives add</span> const dummy
+<span class="fn">scoreboard players set</span> #2     const <span class="num">2</span>
+<span class="fn">scoreboard players set</span> #100   const <span class="num">100</span>
+<span class="fn">scoreboard players set</span> #1000  const <span class="num">1000</span>
+
+<span class="cmt"># 활용: 점수를 100으로 나누기 (백분율)</span>
+<span class="fn">scoreboard players operation</span> <span class="sel">@s</span> percent <span class="kw">=</span> <span class="sel">@s</span> score
+<span class="fn">scoreboard players operation</span> <span class="sel">@s</span> percent <span class="kw">*=</span> #100 const
+<span class="fn">scoreboard players operation</span> <span class="sel">@s</span> percent <span class="kw">/=</span> global max_score
+
+<span class="cmt"># 전역 카운터 (# 접두사 = 가짜플레이어 관례)</span>
+<span class="fn">scoreboard players add</span> #total kills_total <span class="num">1</span>
+<span class="fn">scoreboard players get</span> #total kills_total</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-debug">
+    <div class="card-header"><span class="hl">07</span> 디버그 · 자주 쓰는 패턴</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># 특정 조건에서만 디버그 메시지 출력</span>
+<span class="fn">execute</span> <span class="kw">if score</span> #debug const <span class="kw">matches</span> <span class="num">1</span>
+  <span class="kw">run</span> <span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">["[DEBUG] 현재 phase: ",
+    {"score":{"name":"global","objective":"phase"}}]</span>
+
+<span class="cmt"># 엔티티가 존재하는지 확인</span>
+<span class="fn">execute</span> <span class="kw">unless entity</span> <span class="sel">@e[tag=boss,limit=1]</span>
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:spawn_boss</span>
+
+<span class="cmt"># 재귀로 루프 구현 (주의: 최대 65536번)</span>
+<span class="cmt"># loop.mcfunction</span>
+<span class="fn">scoreboard players remove</span> #i temp <span class="num">1</span>
+<span class="fn">function</span> <span class="str">mypack:do_work</span>
+<span class="fn">execute</span> <span class="kw">if score</span> #i temp <span class="kw">matches</span> <span class="num">1..</span>
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:loop</span>  <span class="cmt"># 재귀</span>
+
+<span class="cmt"># 사용: #i 에 횟수 설정 후 호출</span>
+<span class="fn">scoreboard players set</span> #i temp <span class="num">10</span>
+<span class="fn">function</span> <span class="str">mypack:loop</span></div>
+    </div>
+  </div>
+</div>
+
+  </main>
+</div>
+
+<script>
+const SIDEBAR = {
+  basic: [
+    {id:'b-struct',label:'폴더 구조'},
+    {id:'b-meta',label:'pack.mcmeta'},
+    {id:'b-func',label:'.mcfunction 파일'},
+    {id:'b-ns',label:'네임스페이스'},
+  ],
+  cmd: [
+    {id:'c-execute',label:'/execute'},
+    {id:'c-score',label:'/scoreboard'},
+    {id:'c-data',label:'/data (NBT)'},
+    {id:'c-misc',label:'기타 명령어 모음'},
+  ],
+  sel: [
+    {id:'s-base',label:'기본 선택자 @a @p @e'},
+    {id:'s-args',label:'선택자 인수 [...]'},
+    {id:'s-pred',label:'Predicate JSON'},
+  ],
+  block: [
+    {id:'bl-state',label:'블럭 상태'},
+    {id:'bl-nbt',label:'아이템 NBT'},
+    {id:'bl-loot',label:'전리품 테이블'},
+    {id:'bl-adv',label:'어드밴스먼트'},
+  ],
+  fx: [
+    {id:'fx-particle',label:'파티클 목록'},
+    {id:'fx-sound',label:'소리 목록'},
+  ],
+  tag: [
+    {id:'t-ftag',label:'함수 태그'},
+    {id:'t-btag',label:'블럭·아이템 태그'},
+    {id:'t-recipe',label:'커스텀 레시피'},
+  ],
+  ex: [
+    {id:'e-kill',label:'킬 카운터'},
+    {id:'e-kit',label:'커스텀 킷 시스템'},
+    {id:'e-timer',label:'게임 타이머'},
+    {id:'e-random',label:'랜덤 이벤트'},
+    {id:'e-store',label:'Storage 전역 저장'},
+    {id:'e-fake',label:'가짜 플레이어 상수'},
+    {id:'e-debug',label:'디버그 패턴'},
+  ],
+};
+
+let curTab = 'basic';
+
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  curTab = id;
+  buildSidebar(id);
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  const items = SIDEBAR[id] || [];
+  sb.innerHTML = '<div class="sb-label">목차</div>' +
+    items.map(it => `<button class="sb-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('');
+}
+
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.sb-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(id));
+  });
+}
+
+buildSidebar('basic');
+
+// 검색
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.panel').forEach(p => p.style.display = '');
+    document.getElementById('panel-' + curTab).classList.add('active');
+    document.querySelectorAll('.card').forEach(c => c.style.display = '');
+    document.querySelectorAll('.r-table tr').forEach(r => r.style.display = '');
+    return;
+  }
+  // 모든 패널 표시 (검색 시)
+  document.querySelectorAll('.panel').forEach(p => { p.style.display = 'block'; p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.r-table').forEach(tbl => {
+    let vis = 0;
+    tbl.querySelectorAll('tr').forEach(r => {
+      const show = r.textContent.toLowerCase().includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    const card = tbl.closest('.card');
+    if (card) card.style.display = vis > 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.querySelector('.r-table')) {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    }
+  });
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); }
+});
+</script>
+</body>
+</html>

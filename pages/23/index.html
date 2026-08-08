@@ -7,14 +7,14 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#0d0d1a;--sb:#111122;--bdr:#252540;
+  --bg:#0d0d1a;--sb:#111122;--bdr:#252540;--card:#131326;
   --acc:#6c8eff;--tx:#cccce8;--mu:#5a5a88;--cbg:#080814;
-  --st:#ce9178;--cm:#4e7550;--kw:#c586c0;--bi:#9cdcfe;--nu:#b5cea8;--de:#dcdcaa;
+  --kw:#c586c0;--st:#ce9178;--cm:#4e7550;--nu:#b5cea8;--bi:#9cdcfe;
 }
 body{background:var(--bg);color:var(--tx);font:14px/1.6 'Segoe UI',system-ui,sans-serif;display:flex;height:100vh;overflow:hidden;}
 
-/* ── Sidebar ── */
-#sidebar{width:256px;min-width:256px;background:var(--sb);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;}
+/* ── 사이드바 ── */
+#sidebar{width:246px;min-width:246px;background:var(--sb);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;}
 #sw{padding:10px 12px;border-bottom:1px solid var(--bdr);}
 #search{width:100%;padding:7px 12px;background:#181830;border:1px solid var(--bdr);border-radius:8px;color:var(--tx);font-size:13px;outline:none;}
 #search:focus{border-color:var(--acc);}
@@ -31,52 +31,90 @@ body{background:var(--bg);color:var(--tx);font:14px/1.6 'Segoe UI',system-ui,san
 .ni:hover{background:#1c1c36;color:var(--tx);}
 .ni.on{border-left-color:var(--acc);color:var(--acc);background:#181830;}
 
-/* ── Main ── */
+/* ── 메인 ── */
 #main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 
-/* Landing */
+/* 랜딩 그리드 */
 #landing{flex:1;overflow-y:auto;padding:28px 32px;}
 #landing::-webkit-scrollbar{width:5px;}
 #landing::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
 #landing h1{font-size:26px;font-weight:700;color:#e8e8ff;margin-bottom:6px;}
-#landing p{color:var(--mu);margin-bottom:24px;font-size:13.5px;}
-.grid-section{margin-bottom:28px;}
-.grid-section h2{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mu);margin-bottom:12px;}
+#landing p{color:var(--mu);margin-bottom:26px;font-size:13.5px;}
+.gsec{margin-bottom:28px;}
+.gsec h2{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.gsec h2::after{content:'';flex:1;height:1px;background:var(--bdr);}
 .cards{display:flex;flex-wrap:wrap;gap:10px;}
-.card{padding:12px 16px;border-radius:10px;border:1px solid var(--bdr);cursor:pointer;transition:all .15s;min-width:120px;background:#111122;}
+.card{padding:14px 16px;border-radius:10px;border:1px solid var(--bdr);cursor:pointer;transition:all .16s;min-width:130px;background:var(--card);display:flex;flex-direction:column;gap:4px;}
 .card:hover{transform:translateY(-2px);background:#181830;}
-.card .icon{font-size:22px;margin-bottom:4px;}
-.card .cname{font-size:13px;font-weight:600;color:#dde;}
-.card .ctag{font-size:11px;color:var(--mu);margin-top:2px;}
+.card .ci{font-size:24px;}
+.card .cn{font-size:13px;font-weight:600;color:#dde;}
+.card .ct{font-size:11px;color:var(--mu);}
+.card .cl{display:flex;gap:3px;margin-top:4px;}
+.card .cl span{width:8px;height:3px;border-radius:2px;background:var(--bdr);}
+.card .cl span.on{background:var(--acc);}
 
-/* Detail */
-#det{flex:1;overflow-y:auto;padding:28px 36px;display:none;}
+/* 상세 패널 */
+#det{flex:1;overflow-y:auto;padding:0;display:none;}
 #det::-webkit-scrollbar{width:5px;}
 #det::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
 #det.show{display:block;}
-#dback{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:4px;}
+
+/* 상단 헤더 */
+#dhead{padding:24px 32px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:16px;background:#0f0f20;}
+#dback{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;padding:0;display:flex;align-items:center;gap:4px;position:absolute;top:16px;left:16px;}
 #dback:hover{color:var(--tx);}
-#dtop{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
-#dicon{font-size:36px;}
-.dmeta{flex:1;}
-#dname{font-size:22px;font-weight:700;color:#e8e8ff;}
-#dtype{font-size:12px;color:var(--mu);margin-top:2px;}
-.dlevel{display:flex;gap:4px;margin-top:6px;}
-.dlevel span{width:10px;height:4px;border-radius:2px;background:var(--bdr);}
-.dlevel span.on{background:var(--acc);}
-#ddesc{color:#9898c0;margin-bottom:20px;line-height:1.75;max-width:680px;font-size:13.5px;}
-.tabs{display:flex;gap:6px;margin-bottom:16px;}
-.tb{padding:5px 18px;border:1px solid var(--bdr);border-radius:20px;background:transparent;color:var(--mu);cursor:pointer;font-size:13px;transition:all .14s;}
-.tb:hover{border-color:var(--acc);color:var(--acc);}
-.tb.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600;}
-.cw{position:relative;max-width:800px;}
+#dicon-big{font-size:44px;line-height:1;}
+.dhead-info{flex:1;}
+#dname{font-size:24px;font-weight:700;color:#e8e8ff;margin-bottom:3px;}
+#dtype{font-size:12px;color:var(--mu);margin-bottom:6px;}
+.dlv{display:flex;gap:4px;}
+.dlv span{width:12px;height:4px;border-radius:2px;background:var(--bdr);}
+.dlv span.on{background:var(--acc);}
+
+/* 본문 */
+#dbody{padding:24px 32px;display:flex;flex-direction:column;gap:22px;max-width:860px;}
+
+#ddesc{color:#b0b0d0;line-height:1.8;font-size:13.5px;}
+
+/* 기본 정보 */
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.fact{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:10px 14px;}
+.fact .fl{font-size:10px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.fact .fv{font-size:13px;font-weight:600;color:#dde;}
+
+/* 섹션 공통 */
+.sec-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);margin-bottom:10px;}
+
+/* 활용처 태그 */
+.use-tags{display:flex;flex-wrap:wrap;gap:7px;}
+.utag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid;background:transparent;}
+
+/* 장단점 */
+.proscons{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pro-box,.con-box{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:14px;}
+.pro-box{border-top:2px solid #22c55e;}
+.con-box{border-top:2px solid #ef4444;}
+.pc-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.pro-box .pc-title{color:#22c55e;}
+.con-box .pc-title{color:#ef4444;}
+.pc-item{font-size:12.5px;color:#b0b0d0;padding:3px 0;display:flex;gap:6px;align-items:flex-start;}
+.pc-item::before{flex-shrink:0;margin-top:2px;}
+.pro-box .pc-item::before{content:'✓';color:#22c55e;}
+.con-box .pc-item::before{content:'✗';color:#ef4444;}
+
+/* 생태계 */
+.eco-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.echip{padding:4px 12px;background:#1a1a35;border:1px solid var(--bdr);border-radius:6px;font-size:12px;color:#b0b0d0;}
+
+/* 예제 코드 */
+.code-wrap{position:relative;}
 #copybtn{position:absolute;top:10px;right:10px;padding:4px 11px;background:#1e1e38;border:1px solid var(--bdr);border-radius:6px;color:var(--mu);cursor:pointer;font-size:12px;transition:all .14s;z-index:2;}
 #copybtn:hover{background:#2a2a48;color:var(--tx);}
-pre{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:20px 18px;overflow-x:auto;font:13px/1.9 'Fira Code','Consolas','Courier New',monospace;tab-size:2;min-height:80px;}
+pre{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:18px 18px;overflow-x:auto;font:13px/1.9 'Fira Code','Consolas','Courier New',monospace;tab-size:2;}
 pre::-webkit-scrollbar{height:4px;}
 pre::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
 .kw{color:var(--kw);}.bi{color:var(--bi);}.st{color:var(--st);}
-.cm{color:var(--cm);font-style:italic;}.nu{color:var(--nu);}.de{color:var(--de);}
+.cm{color:var(--cm);font-style:italic;}.nu{color:var(--nu);}
 </style>
 </head>
 <body>
@@ -87,1161 +125,349 @@ pre::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
 <div id="main">
   <div id="landing">
     <h1>코드의 세계</h1>
-    <p>웹·앱·시스템 개발에 쓰이는 언어와 기술 30종 — 카드를 클릭하면 상세 정보를 볼 수 있습니다.</p>
+    <p>웹·앱·시스템 개발에 쓰이는 언어와 기술 30종 — 카드를 눌러 상세 정보를 확인하세요.</p>
     <div id="grid-root"></div>
   </div>
   <div id="det">
     <button id="dback">← 목록으로</button>
-    <div id="dtop">
-      <div id="dicon"></div>
-      <div class="dmeta">
+    <div id="dhead">
+      <div id="dicon-big"></div>
+      <div class="dhead-info">
         <div id="dname"></div>
         <div id="dtype"></div>
-        <div class="dlevel" id="dlevel"></div>
+        <div class="dlv" id="dlv"></div>
       </div>
     </div>
-    <div id="ddesc"></div>
-    <div class="tabs">
-      <button class="tb on" data-i="0">기초 문법</button>
-      <button class="tb" data-i="1">주요 기능</button>
-      <button class="tb" data-i="2">실전 활용</button>
-    </div>
-    <div class="cw">
-      <button id="copybtn">복사</button>
-      <pre id="codeblock"></pre>
+    <div id="dbody">
+      <p id="ddesc"></p>
+
+      <div>
+        <div class="sec-label">기본 정보</div>
+        <div class="facts" id="dfacts"></div>
+      </div>
+
+      <div>
+        <div class="sec-label">주요 활용처</div>
+        <div class="use-tags" id="duses"></div>
+      </div>
+
+      <div class="proscons" id="dproscons"></div>
+
+      <div>
+        <div class="sec-label">대표 프레임워크 · 라이브러리</div>
+        <div class="eco-chips" id="deco"></div>
+      </div>
+
+      <div>
+        <div class="sec-label">간단한 예제</div>
+        <div class="code-wrap">
+          <button id="copybtn">복사</button>
+          <pre id="codeblock"></pre>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <script>
 const DATA = [
-  /* ===== 프론트엔드 ===== */
-  {cat:'프론트엔드',name:'HTML',icon:'🌐',color:'#e34c26',type:'마크업 언어',level:1,
-   desc:'웹 페이지의 구조를 정의하는 표준 마크업 언어입니다. 태그(tag)로 텍스트·이미지·링크·폼 등 요소를 배치하며, CSS·JS와 함께 웹의 3대 핵심 기술입니다.',ex:[
-`<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>내 페이지</title>
-</head>
-<body>
-  <h1>안녕하세요</h1>
-  <p>HTML은 웹 페이지의 <strong>뼈대</strong>입니다.</p>
-  <a href="https://example.com">링크</a>
-</body>
-</html>`,
-`<!-- 시맨틱 태그 -->
-<header><nav><a href="/">홈</a></nav></header>
-<main>
-  <article>
-    <h2>제목</h2>
-    <figure>
-      <img src="img.jpg" alt="설명">
-      <figcaption>캡션</figcaption>
-    </figure>
-  </article>
-  <aside>사이드바</aside>
-</main>
-<footer>© 2024</footer>`,
-`<!-- 입력 폼 -->
-<form action="/submit" method="POST">
-  <label for="email">이메일</label>
-  <input type="email" id="email" name="email" required>
-  <label for="msg">메시지</label>
-  <textarea id="msg" rows="4"></textarea>
-  <button type="submit">전송</button>
-</form>`
-  ]},
-
-  {cat:'프론트엔드',name:'CSS',icon:'🎨',color:'#264de4',type:'스타일 언어',level:2,
-   desc:'HTML 요소의 시각적 표현을 정의합니다. 색상·폰트·레이아웃·애니메이션을 제어하며, Flexbox·Grid로 반응형 레이아웃을 구현합니다.',ex:[
-`/* 기본 선택자 & 박스 모델 */
-body { font-family: system-ui; background: #f5f5f5; }
-.card {
-  width: 300px;
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.1);
-}`,
-`/* Flexbox & Grid */
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-  gap: 16px;
-}`,
-`/* 반응형 + 애니메이션 */
-@media (max-width: 768px) {
-  .grid { grid-template-columns: 1fr; }
-}
-@keyframes fadeIn {
-  from { opacity:0; transform:translateY(10px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.card { animation: fadeIn .4s ease forwards; }`
-  ]},
-
-  {cat:'프론트엔드',name:'JavaScript',icon:'⚡',color:'#f7df1e',type:'스크립트 언어',level:2,
-   desc:'웹 브라우저에서 동작하는 프로그래밍 언어입니다. DOM 조작·이벤트 처리·비동기 통신을 담당하며, Node.js로 서버에서도 실행됩니다.',ex:[
-`// 변수, 함수, DOM 조작
-const btn = document.querySelector('#myBtn');
-let count = 0;
-btn.addEventListener('click', () => {
-  count++;
-  document.querySelector('#out').textContent = count;
-});
-const doubled = [1,2,3,4,5].map(n => n * 2);
-const evens   = [1,2,3,4,5].filter(n => n % 2 === 0);`,
-`// async/await + fetch
-async function loadUser(id) {
-  try {
-    const res = await fetch('/api/users/' + id);
-    if (!res.ok) throw new Error('Not found');
-    return await res.json();
-  } catch (err) {
-    console.error('오류:', err.message);
-  }
-}`,
-`// 클래스 + 로컬스토리지
-class TodoApp {
-  constructor() {
-    this.todos = JSON.parse(localStorage.getItem('todos') || '[]');
-  }
-  add(text) {
-    this.todos.push({ id: Date.now(), text, done: false });
-    localStorage.setItem('todos', JSON.stringify(this.todos));
-  }
-  toggle(id) {
-    const t = this.todos.find(t => t.id === id);
-    if (t) t.done = !t.done;
-  }
-}`
-  ]},
-
-  {cat:'프론트엔드',name:'TypeScript',icon:'🔷',color:'#3178c6',type:'정적 타입 언어',level:2,
-   desc:'JavaScript의 상위 집합으로 정적 타입을 추가했습니다. 컴파일 타임에 오류를 잡아 대규모 프로젝트의 유지보수성을 크게 향상시킵니다.',ex:[
-`// 타입 정의
-type User = {
-  id:    number;
-  name:  string;
-  email: string;
-  role:  'admin' | 'user';
-};
-function greet(user: User): string {
-  return '안녕하세요, ' + user.name + '님!';
-}`,
-`// 제네릭
-function first<T>(arr: T[]): T | undefined {
-  return arr[0];
-}
-interface ApiResponse<T> {
-  data:    T;
-  status:  number;
-  message: string;
-}
-async function fetchUser(id: number): Promise<ApiResponse<User>> {
-  return fetch('/api/users/' + id).then(r => r.json());
-}`,
-`// 유틸리티 타입
-type PartialUser   = Partial<User>;
-type ReadonlyUser  = Readonly<User>;
-type UserKeys      = keyof User;   // 'id'|'name'|'email'|'role'
-
-class UserService {
-  private users = new Map<number, User>();
-  getById(id: number): User | undefined {
-    return this.users.get(id);
-  }
-  upsert(user: User) { this.users.set(user.id, user); }
-}`
-  ]},
-
-  {cat:'프론트엔드',name:'React',icon:'⚛️',color:'#61dafb',type:'UI 라이브러리',level:3,
-   desc:'Meta가 만든 컴포넌트 기반 UI 라이브러리입니다. 가상 DOM과 단방향 데이터 흐름으로 복잡한 인터페이스를 효율적으로 구축합니다.',ex:[
-`// useState 기본
-import { useState } from 'react';
-function Counter() {
-  const [count, setCount] = useState(0);
-  return (
-    <div>
-      <p>카운트: {count}</p>
-      <button onClick={() => setCount(c => c + 1)}>증가</button>
-    </div>
-  );
-}`,
-`// useEffect + 데이터 페칭
-import { useState, useEffect } from 'react';
-function UserList() {
-  const [users, setUsers]     = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    fetch('/api/users')
-      .then(r => r.json())
-      .then(data => { setUsers(data); setLoading(false); });
-  }, []);
-  if (loading) return <p>로딩 중...</p>;
-  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
-}`,
-`// Context + 커스텀 훅
-const AuthContext = createContext(null);
-function useAuth() {
-  const [user, setUser] = useState(null);
-  const login = async (email, pw) => {
-    const data = await authApi.login(email, pw);
-    setUser(data.user);
-  };
-  return { user, login, logout: () => setUser(null) };
-}
-export function AuthProvider({ children }) {
-  return <AuthContext.Provider value={useAuth()}>{children}</AuthContext.Provider>;
-}`
-  ]},
-
-  {cat:'프론트엔드',name:'Vue.js',icon:'💚',color:'#42b883',type:'프론트엔드 프레임워크',level:2,
-   desc:'점진적 도입이 가능한 프론트엔드 프레임워크입니다. Composition API와 직관적인 템플릿 문법으로 학습 곡선이 완만하며, 소~중규모 프로젝트에 적합합니다.',ex:[
-`<!-- Single File Component -->
-<template>
-  <div>
-    <p>{{ count }}번 클릭됨</p>
-    <button @click="increment">증가</button>
-  </div>
-</template>
-<script setup>
-import { ref } from 'vue';
-const count     = ref(0);
-const increment = () => count.value++;
-</script>`,
-`<!-- v-for, v-if, v-model, computed -->
-<template>
-  <input v-model="search" placeholder="검색...">
-  <li v-for="item in filtered" :key="item.id">{{ item.name }}</li>
-</template>
-<script setup>
-import { ref, computed } from 'vue';
-const search = ref('');
-const items  = ref([{ id:1, name:'Apple' }, { id:2, name:'Banana' }]);
-const filtered = computed(() =>
-  items.value.filter(i => i.name.includes(search.value)));
-</script>`,
-`// Pinia 상태관리
-import { defineStore } from 'pinia';
-export const useCartStore = defineStore('cart', {
-  state: () => ({ items: [], total: 0 }),
-  getters: {
-    count: s => s.items.length,
-  },
-  actions: {
-    addItem(product) {
-      this.items.push(product);
-      this.total += product.price;
-    },
-  },
-});`
-  ]},
-
-  /* ===== 백엔드 ===== */
-  {cat:'백엔드',name:'Python',icon:'🐍',color:'#3776ab',type:'범용 언어',level:1,
-   desc:'읽기 쉬운 문법과 방대한 라이브러리 생태계로 인기 있는 언어입니다. 웹(FastAPI·Django), 데이터과학, AI/ML, 자동화 등 폭넓게 활용됩니다.',ex:[
-`# 기본 문법
-def greet(name: str, times: int = 1) -> str:
-    return ('안녕, ' + name + '\n') * times
-
-numbers = [1, 2, 3, 4, 5]
-squares = [x**2 for x in numbers if x % 2 == 0]
-print(squares)  # [4, 16]`,
-`# FastAPI 서버
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class Item(BaseModel):
-    name:  str
-    price: float
-
-@app.get('/items/{item_id}')
-async def get_item(item_id: int):
-    return {'id': item_id}
-
-@app.post('/items/')
-async def create_item(item: Item):
-    return item`,
-`# pandas 데이터 분석
-import pandas as pd
-df = pd.read_csv('sales.csv')
-monthly = (df.groupby('month')['revenue']
-             .sum()
-             .sort_values(ascending=False))
-print(monthly.head(3))
-df[df['revenue'] > 1000].to_csv('top.csv', index=False)`
-  ]},
-
-  {cat:'백엔드',name:'Node.js',icon:'🟢',color:'#339933',type:'JS 런타임',level:2,
-   desc:'Chrome V8 엔진 기반의 JavaScript 서버 런타임입니다. 비동기 I/O와 이벤트 루프로 고성능 서버를 구축하며, npm 생태계와 함께 강력합니다.',ex:[
-`// Express 기본 서버
-const express = require('express');
-const app = express();
-app.use(express.json());
-
-app.get('/users/:id', async (req, res) => {
-  const user = await db.findUser(req.params.id);
-  if (!user) return res.status(404).json({ error: 'Not found' });
-  res.json(user);
-});
-app.listen(3000, () => console.log('서버 시작'));`,
-`// 미들웨어 + 에러 핸들러
-const auth = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
-  req.user = verifyToken(token);
-  next();
-};
-app.use('/api', auth);
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: err.message });
-});`,
-`// Socket.io 실시간
-const { Server } = require('socket.io');
-const io = new Server(server);
-
-io.on('connection', socket => {
-  socket.on('join', room => socket.join(room));
-  socket.on('message', ({ room, msg }) => {
-    io.to(room).emit('message', { user: socket.id, msg });
-  });
-  socket.on('disconnect', () => console.log('연결 종료'));
-});`
-  ]},
-
-  {cat:'백엔드',name:'Go',icon:'🔵',color:'#00add8',type:'컴파일 언어',level:3,
-   desc:'Google이 개발한 컴파일 언어로 빠른 컴파일 속도와 간결한 문법이 특징입니다. 고루틴으로 동시성을 쉽게 구현하며, 클라우드·마이크로서비스에 강점을 가집니다.',ex:[
-`package main
-import "fmt"
-
-type User struct { Name, Email string }
-func (u User) String() string {
-    return fmt.Sprintf("%s <%s>", u.Name, u.Email)
-}
-func main() {
-    u := User{"Alice", "alice@example.com"}
-    fmt.Println(u)
-}`,
-`// 고루틴 + 채널
-func worker(jobs <-chan int, results chan<- int) {
-    for j := range jobs { results <- j * j }
-}
-func main() {
-    jobs, results := make(chan int, 9), make(chan int, 9)
-    for w := 0; w < 3; w++ { go worker(jobs, results) }
-    for i := 1; i <= 9; i++ { jobs <- i }
-    close(jobs)
-    for i := 0; i < 9; i++ { fmt.Println(<-results) }
-}`,
-`// HTTP 서버
-package main
-import ("encoding/json"; "net/http")
-type Resp struct { Message string \`json:"message"\` }
-func handler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type","application/json")
-    json.NewEncoder(w).Encode(Resp{"Hello, Go!"})
-}
-func main() {
-    http.HandleFunc("/", handler)
-    http.ListenAndServe(":8080", nil)
-}`
-  ]},
-
-  {cat:'백엔드',name:'Java',icon:'☕',color:'#f89820',type:'객체지향 언어',level:3,
-   desc:'강력한 타입 시스템과 JVM 기반의 플랫폼 독립성을 가진 언어입니다. Spring 프레임워크와 함께 대규모 엔터프라이즈 시스템에 널리 사용됩니다.',ex:[
-`// 클래스와 인터페이스
-public interface Printable { void print(); }
-
-public class Document implements Printable {
-    private String content;
-    public Document(String content) { this.content = content; }
-    @Override
-    public void print() { System.out.println(content); }
-}`,
-`// Stream API
-import java.util.*;
-import java.util.stream.*;
-List<String> names = List.of("Alice","Bob","Carol","Dave");
-List<String> result = names.stream()
-    .filter(n -> n.length() > 3)
-    .map(String::toUpperCase)
-    .sorted()
-    .collect(Collectors.toList());
-// [ALICE, CAROL, DAVE]`,
-`// Spring Boot REST
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
-    @Autowired private UserService svc;
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> get(@PathVariable Long id) {
-        return svc.findById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
-}`
-  ]},
-
-  {cat:'백엔드',name:'Rust',icon:'🦀',color:'#ce422b',type:'시스템 언어',level:4,
-   desc:'메모리 안전성을 컴파일 타임에 보장하는 시스템 언어입니다. GC 없이 C/C++ 수준의 성능을 내며, WebAssembly·CLI·서버 등에 활용됩니다.',ex:[
-`// 소유권 시스템
-fn main() {
-    let s1 = String::from("hello");
-    let s2 = s1;           // s1 소유권 이동
-    // println!("{}", s1); // 컴파일 오류!
-    println!("{}", s2);
-
-    let n = 42;  // 스택 타입 → Copy
-    let m = n;   // 복사됨
-    println!("{} {}", n, m);
-}`,
-`// 열거형 + 패턴 매칭
-enum Shape { Circle(f64), Rectangle(f64, f64) }
-fn area(s: &Shape) -> f64 {
-    match s {
-        Shape::Circle(r)      => std::f64::consts::PI * r * r,
-        Shape::Rectangle(w,h) => w * h,
-    }
-}`,
-`// Axum 웹 서버
-use axum::{routing::get, Router, Json};
-use serde::Serialize;
-#[derive(Serialize)]
-struct Health { status: &'static str }
-async fn health() -> Json<Health> {
-    Json(Health { status: "ok" })
-}
-#[tokio::main]
-async fn main() {
-    let app = Router::new().route("/health", get(health));
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
-        .serve(app.into_make_service()).await.unwrap();
-}`
-  ]},
-
-  {cat:'백엔드',name:'PHP',icon:'🐘',color:'#777bb3',type:'서버 사이드 언어',level:2,
-   desc:'웹 개발에 특화된 서버 사이드 스크립트 언어입니다. WordPress·Laravel 등 거대한 생태계를 보유하며, 전 세계 웹사이트의 약 77%에서 사용됩니다.',ex:[
-`<?php
-$name = "Alice";
-$scores = [90, 85, 92, 78];
-$avg = array_sum($scores) / count($scores);
-echo "안녕, {$name}님! 평균: {$avg}점";
-
-$upper = array_map('strtoupper', ['a','b','c']);
-$evens = array_filter([1,2,3,4,5], fn($n) => $n % 2 === 0);`,
-`<?php
-// Laravel 컨트롤러
-class UserController extends Controller {
-    public function show(int $id): JsonResponse {
-        $user = User::findOrFail($id);
-        return response()->json($user);
-    }
-    public function store(Request $request): JsonResponse {
-        $data = $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-        ]);
-        return response()->json(User::create($data), 201);
-    }
-}`,
-`<?php
-// Eloquent ORM
-class Post extends Model {
-    protected $fillable = ['title','content','user_id'];
-    public function user()     { return $this->belongsTo(User::class); }
-    public function comments() { return $this->hasMany(Comment::class); }
-}
-$posts = Post::with('user','comments')
-             ->where('published', true)
-             ->orderBy('created_at','desc')
-             ->paginate(10);`
-  ]},
-
-  {cat:'백엔드',name:'C#',icon:'💜',color:'#9b4993',type:'다중 패러다임 언어',level:3,
-   desc:'Microsoft가 개발한 .NET 플랫폼의 주력 언어입니다. LINQ·async/await·레코드 타입을 지원하며, 게임(Unity)·웹(ASP.NET)·데스크톱 개발에 폭넓게 쓰입니다.',ex:[
-`// LINQ
-var numbers = new List<int> { 1,2,3,4,5 };
-var squares = numbers.Where(n => n % 2 == 0)
-                     .Select(n => n * n)
-                     .ToList();  // [4, 16]
-
-record Person(string Name, int Age);
-var people  = new[] { new Person("Alice",30), new Person("Bob",25) };
-var youngest = people.MinBy(p => p.Age);`,
-`// async/await
-public class WeatherService {
-    private readonly HttpClient _client;
-    public async Task<WeatherData> GetAsync(string city) {
-        var response = await _client.GetAsync("/api/weather/" + city);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<WeatherData>();
-    }
-}`,
-`// ASP.NET Core 최소 API
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<IUserRepo, UserRepo>();
-var app = builder.Build();
-
-app.MapGet("/users/{id:int}", async (int id, IUserRepo repo) => {
-    var user = await repo.FindAsync(id);
-    return user is null ? Results.NotFound() : Results.Ok(user);
-});
-app.Run();`
-  ]},
-
-  /* ===== 모바일 ===== */
-  {cat:'모바일',name:'Swift',icon:'🍎',color:'#fa7343',type:'컴파일 언어',level:3,
-   desc:'Apple이 개발한 iOS·macOS 앱 개발 언어입니다. Optional로 null 안전성을 보장하며, SwiftUI로 선언형 UI를 간결하게 작성할 수 있습니다.',ex:[
-`// 기본 + Optional
-var name: String? = "Alice"
-if let n = name { print("안녕하세요, \\(n)!") }
-
-struct Point {
-    var x, y: Double
-    func distance(to o: Point) -> Double {
-        sqrt(pow(x-o.x,2) + pow(y-o.y,2))
-    }
-}`,
-`// 열거형 + async/await
-enum NetworkError: Error {
-    case noConnection, timeout, serverError(Int)
-}
-func fetchData() async throws -> Data {
-    guard isConnected else { throw NetworkError.noConnection }
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return data
-}`,
-`// SwiftUI View
-struct ContentView: View {
-    @State private var count = 0
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("카운트: \\(count)").font(.largeTitle)
-            Button("증가") { count += 1 }
-                .buttonStyle(.borderedProminent)
-        }
-        .padding()
-    }
-}`
-  ]},
-
-  {cat:'모바일',name:'Kotlin',icon:'🤖',color:'#7f52ff',type:'다중 패러다임 언어',level:3,
-   desc:'JetBrains가 개발한 JVM 기반 언어로 Android 공식 개발 언어입니다. Java보다 간결하며, Null 안전성·확장 함수·코루틴이 강점입니다.',ex:[
-`// data class + 확장 함수
-data class User(val name: String, val age: Int)
-fun User.isAdult() = age >= 18
-
-fun main() {
-    val users  = listOf(User("Alice",30), User("Bob",16))
-    val adults = users.filter { it.isAdult() }
-    println(adults.map { it.name })  // [Alice]
-}`,
-`// 코루틴
-import kotlinx.coroutines.*
-suspend fun fetchUser(id: Int): User {
-    delay(100)
-    return User("Alice", 30)
-}
-fun main() = runBlocking {
-    val users = (1..5).map { id -> async { fetchUser(id) } }.awaitAll()
-    println(users.size)
-}`,
-`// Jetpack Compose
-@Composable
-fun CounterScreen() {
-    var count by remember { mutableStateOf(0) }
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("카운트: $count", style = MaterialTheme.typography.headlineLarge)
-        Button(onClick = { count++ }) { Text("증가") }
-    }
-}`
-  ]},
-
-  {cat:'모바일',name:'Flutter',icon:'🦋',color:'#02569b',type:'크로스플랫폼 프레임워크',level:2,
-   desc:'Google의 크로스플랫폼 UI 프레임워크입니다. Dart 언어로 iOS·Android·Web·Desktop을 단일 코드로 개발하며, 60fps 부드러운 렌더링이 특징입니다.',ex:[
-`// 기본 위젯
-import 'package:flutter/material.dart';
-void main() => runApp(const MyApp());
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-    home: Scaffold(
-      appBar: AppBar(title: const Text('Flutter')),
-      body: const Center(child: Text('안녕하세요!')),
-    ),
-  );
-}`,
-`// StatefulWidget
-class Counter extends StatefulWidget {
-  const Counter({super.key});
-  @override State<Counter> createState() => _State();
-}
-class _State extends State<Counter> {
-  int _n = 0;
-  @override Widget build(BuildContext ctx) => Column(children: [
-    Text('$_n', style: const TextStyle(fontSize: 48)),
-    ElevatedButton(onPressed: ()=>setState(()=>_n++), child: const Text('증가')),
-  ]);
-}`,
-`// Riverpod
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-final counterProvider = StateProvider<int>((ref) => 0);
-class CounterWidget extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final n = ref.watch(counterProvider);
-    return Column(children: [
-      Text('$n'),
-      ElevatedButton(
-        onPressed: () => ref.read(counterProvider.notifier).state++,
-        child: const Text('증가'),
-      ),
-    ]);
-  }
-}`
-  ]},
-
-  {cat:'모바일',name:'React Native',icon:'📱',color:'#61dafb',type:'크로스플랫폼 프레임워크',level:3,
-   desc:'JavaScript(React)로 iOS·Android 네이티브 앱을 개발하는 프레임워크입니다. 웹 개발자가 모바일로 진입하기 쉽고, Expo로 빠르게 시작할 수 있습니다.',ex:[
-`import { View, Text, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
-export default function Counter() {
-  const [count, setCount] = useState(0);
-  return (
-    <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
-      <Text style={{ fontSize:48 }}>{count}</Text>
-      <TouchableOpacity onPress={() => setCount(c => c+1)}>
-        <Text style={{ fontSize:20 }}>증가</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}`,
-`// React Navigation
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-const Stack = createNativeStackNavigator();
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home"   component={HomeScreen} />
-        <Stack.Screen name="Detail" component={DetailScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}`,
-`// AsyncStorage
-import AsyncStorage from '@react-native-async-storage/async-storage';
-async function save(key, data) {
-  await AsyncStorage.setItem(key, JSON.stringify(data));
-}
-async function load(key) {
-  const raw = await AsyncStorage.getItem(key);
-  return raw ? JSON.parse(raw) : null;
-}`
-  ]},
-
-  /* ===== 데이터베이스 ===== */
-  {cat:'데이터베이스',name:'MySQL',icon:'🐬',color:'#00758f',type:'관계형 DB',level:2,
-   desc:'세계에서 가장 널리 사용되는 오픈소스 관계형 데이터베이스입니다. ACID 트랜잭션·인덱스·조인을 지원하며 웹 서비스의 표준 DB로 자리잡고 있습니다.',ex:[
-`-- 기본 CRUD
-CREATE TABLE users (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(100) NOT NULL,
-  email      VARCHAR(150) UNIQUE NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com');
-SELECT * FROM users WHERE id = 1;
-UPDATE users SET name = 'Bob'  WHERE id = 1;
-DELETE FROM users WHERE id = 1;`,
-`-- JOIN + GROUP BY + HAVING
-SELECT u.name,
-       COUNT(o.id)   AS order_count,
-       SUM(o.amount) AS total
-FROM users u
-LEFT JOIN orders o ON o.user_id = u.id
-WHERE o.created_at >= '2024-01-01'
-GROUP BY u.id, u.name
-HAVING total > 100000
-ORDER BY total DESC LIMIT 10;`,
-`-- 인덱스 + 트랜잭션
-CREATE INDEX idx_email    ON users(email);
-CREATE INDEX idx_orders   ON orders(user_id, created_at);
-
-START TRANSACTION;
-  UPDATE accounts SET balance = balance - 10000 WHERE id = 1;
-  UPDATE accounts SET balance = balance + 10000 WHERE id = 2;
-COMMIT;
--- 오류 시: ROLLBACK;`
-  ]},
-
-  {cat:'데이터베이스',name:'PostgreSQL',icon:'🐘',color:'#336791',type:'관계형 DB',level:3,
-   desc:'고급 기능과 표준 SQL 준수로 유명한 오픈소스 DB입니다. JSON·배열·전문검색·지리정보(PostGIS)를 지원하며, 복잡한 쿼리와 대용량 데이터에 강합니다.',ex:[
-`-- JSON 컬럼
-CREATE TABLE products (
-  id    SERIAL PRIMARY KEY,
-  name  TEXT   NOT NULL,
-  attrs JSONB
-);
-INSERT INTO products (name, attrs)
-VALUES ('노트북', '{"brand":"Samsung","ram":16}');
-
-SELECT name, attrs->>'brand' AS brand,
-       (attrs->>'ram')::int  AS ram
-FROM products WHERE attrs->>'brand' = 'Samsung';`,
-`-- CTE + Window 함수
-WITH monthly AS (
-  SELECT DATE_TRUNC('month', created_at) AS month,
-         SUM(amount) AS revenue
-  FROM orders GROUP BY 1
-)
-SELECT month, revenue,
-       LAG(revenue) OVER (ORDER BY month) AS prev,
-       revenue - LAG(revenue) OVER (ORDER BY month) AS diff
-FROM monthly ORDER BY month;`,
-`-- 전문 검색 + 배열
-ALTER TABLE articles
-  ADD COLUMN tsv tsvector
-  GENERATED ALWAYS AS (to_tsvector('english', title||' '||body)) STORED;
-CREATE INDEX ON articles USING GIN(tsv);
-
-SELECT title FROM articles
-WHERE tsv @@ plainto_tsquery('english', 'python tutorial');
-SELECT * FROM posts WHERE 'python' = ANY(tags);`
-  ]},
-
-  {cat:'데이터베이스',name:'MongoDB',icon:'🌿',color:'#47a248',type:'문서형 NoSQL',level:2,
-   desc:'JSON 형식의 BSON 문서를 저장하는 NoSQL 데이터베이스입니다. 스키마가 유연하고 수평 확장이 쉬워 빠르게 변화하는 데이터 구조에 적합합니다.',ex:[
-`// Mongoose ODM
-const userSchema = new Schema({
-  name:  String,
-  email: { type: String, unique: true },
-  tags:  [String],
-  meta:  { logins: Number, lastSeen: Date },
-});
-const User = model('User', userSchema);
-
-const user  = await User.create({ name:'Alice', email:'a@b.com' });
-const found = await User.findOne({ email: 'a@b.com' });`,
-`// 쿼리 + 집계
-await User.find({ tags: 'admin', 'meta.logins': { $gt: 5 } });
-
-await Order.aggregate([
-  { $match:  { status: 'paid' } },
-  { $group:  { _id: '$userId', total: { $sum: '$amount' } } },
-  { $sort:   { total: -1 } },
-  { $limit:  10 },
-]);`,
-`// 인덱스
-db.orders.createIndex({ userId:1, createdAt:-1 });
-// TTL 자동 만료
-db.sessions.createIndex({ expireAt:1 }, { expireAfterSeconds:0 });
-// 텍스트 검색
-db.articles.createIndex({ title:'text', body:'text' });
-db.articles.find({ $text: { $search: 'python tutorial' } });`
-  ]},
-
-  {cat:'데이터베이스',name:'Redis',icon:'🔴',color:'#dc382d',type:'인메모리 DB',level:2,
-   desc:'초고속 인메모리 키-값 저장소입니다. 캐싱·세션·메시지 큐·리더보드에 활용되며, String·Hash·List·Set·Sorted Set 등 다양한 자료구조를 지원합니다.',ex:[
-`# 기본 명령어
-SET  user:1:name "Alice"
-SET  session:abc "user:1" EX 3600  # 1시간 만료
-GET  user:1:name
-INCR page:views           # 원자적 증가
-
-# Hash
-HSET  user:1 name Alice age 30
-HGET  user:1 name
-HGETALL user:1`,
-`# List + Sorted Set
-RPUSH queue:tasks "task1" "task2"
-LPOP  queue:tasks            # FIFO
-
-ZADD  leaderboard 1500 "Alice"
-ZADD  leaderboard 2300 "Bob"
-ZREVRANGE leaderboard 0 2 WITHSCORES  # 상위 3명`,
-`// Node.js 캐싱 패턴
-const redis = require('ioredis');
-const client = new redis();
-
-async function getUser(id) {
-  const cached = await client.get('user:' + id);
-  if (cached) return JSON.parse(cached);
-  const user = await db.findUser(id);
-  await client.setex('user:' + id, 3600, JSON.stringify(user));
-  return user;
-}`
-  ]},
-
-  {cat:'데이터베이스',name:'SQLite',icon:'🗃️',color:'#003b57',type:'경량 RDBMS',level:1,
-   desc:'파일 하나로 동작하는 경량 관계형 DB입니다. 별도 서버 없이 임베드되어 모바일 앱·로컬 저장소·프로토타이핑에 이상적이며, Python에 기본 내장됩니다.',ex:[
-`import sqlite3
-conn = sqlite3.connect('app.db')
-cur  = conn.cursor()
-cur.execute("""CREATE TABLE IF NOT EXISTS users (
-    id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    name  TEXT    NOT NULL,
-    email TEXT    UNIQUE
-)""")
-cur.execute("INSERT INTO users (name,email) VALUES (?,?)", ("Alice","a@b.com"))
-conn.commit()`,
-`import sqlite3
-conn = sqlite3.connect('app.db')
-conn.row_factory = sqlite3.Row  # dict처럼 접근
-
-rows = conn.execute(
-    "SELECT * FROM users WHERE name LIKE ?", ("%A%",)
-).fetchall()
-for row in rows:
-    print(dict(row))`,
-`# SQLAlchemy ORM
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Session
-class Base(DeclarativeBase): pass
-class User(Base):
-    __tablename__ = 'users'
-    id    = Column(Integer, primary_key=True)
-    name  = Column(String(100))
-    email = Column(String(150), unique=True)
-engine = create_engine('sqlite:///app.db')
-Base.metadata.create_all(engine)`
-  ]},
-
-  /* ===== DevOps ===== */
-  {cat:'DevOps',name:'Docker',icon:'🐳',color:'#2496ed',type:'컨테이너 플랫폼',level:2,
-   desc:'애플리케이션을 컨테이너로 패키징해 어디서든 동일하게 실행하는 플랫폼입니다. "내 컴퓨터에서는 돼요" 문제를 해결하며, 현대 배포의 표준입니다.',ex:[
-`# Dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]
-
-# docker build -t myapp .
-# docker run -p 8000:8000 myapp`,
-`# docker-compose.yml
-version: '3.9'
-services:
-  app:
-    build: .
-    ports: ["8000:8000"]
-    environment:
-      DATABASE_URL: postgresql://user:pass@db/mydb
-    depends_on: [db]
-  db:
-    image: postgres:16
-    volumes: ["pgdata:/var/lib/postgresql/data"]
-    environment: { POSTGRES_PASSWORD: pass }
-volumes:
-  pgdata:`,
-`# 자주 쓰는 명령어
-docker ps                         # 실행 중 컨테이너
-docker logs -f myapp              # 실시간 로그
-docker exec -it myapp /bin/bash   # 컨테이너 접속
-docker system prune -af           # 미사용 리소스 정리
-
-# 멀티 스테이지 빌드
-FROM node:20 AS builder
-RUN npm ci && npm run build
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html`
-  ]},
-
-  {cat:'DevOps',name:'Git',icon:'🔀',color:'#f05032',type:'버전 관리 시스템',level:2,
-   desc:'분산형 버전 관리 시스템으로 소스 코드의 변경 이력을 추적합니다. 브랜치 전략으로 팀 협업을 구조화하고, GitHub·GitLab과 함께 현대 개발의 필수 도구입니다.',ex:[
-`# 기본 워크플로
-git init
-git clone <url>
-git add -p                        # 선택적 스테이지
-git commit -m "feat: 로그인 추가"
-git push origin main
-
-# 브랜치
-git checkout -b feat/login
-git merge  feat/login
-git branch -d feat/login`,
-`# 협업 패턴
-git fetch origin
-git rebase origin/main            # 최신 기반으로 재배치
-git stash                         # 작업 임시 저장
-git stash pop
-
-# 히스토리
-git rebase -i HEAD~3              # 최근 3개 커밋 정리
-git cherry-pick <sha>             # 특정 커밋만 적용`,
-`# 유용한 별칭
-git config --global alias.lg \
-  "log --oneline --graph --decorate --all"
-git config --global alias.undo "reset HEAD~1 --mixed"
-
-# .gitignore
-node_modules/
-*.env
-.DS_Store
-dist/
-__pycache__/`
-  ]},
-
-  {cat:'DevOps',name:'Linux / Bash',icon:'🐧',color:'#f0c000',type:'OS / 셸',level:2,
-   desc:'서버 환경의 90% 이상을 차지하는 운영체제와 그 셸 언어입니다. 파이프라인·cron·프로세스 관리로 자동화 스크립트를 작성합니다.',ex:[
-`#!/bin/bash
-NAME="World"
-echo "Hello, $NAME!"
-
-for file in *.log; do
-  gzip "$file"
-done
-
-if [ -f "config.json" ]; then
-  echo "설정 파일 있음"
-else
-  cp config.example.json config.json
-fi`,
-`# 파이프라인 & 유용한 명령어
-grep -E "ERROR|CRITICAL" app.log | tail -50
-ps aux --sort=-%cpu | head -10
-find /var/log -name "*.log" -mtime +7 -delete
-ss -tlnp | grep :8000`,
-`#!/bin/bash
-# 배포 스크립트
-set -euo pipefail
-APP="/opt/myapp"
-
-echo "백업 중..."
-tar -czf "/opt/backups/app-$(date +%Y%m%d).tar.gz" "$APP"
-
-echo "업데이트 중..."
-cd "$APP" && git pull origin main
-pip install -r requirements.txt -q
-
-systemctl restart myapp
-echo "배포 완료"`
-  ]},
-
-  {cat:'DevOps',name:'GitHub Actions',icon:'⚙️',color:'#2088ff',type:'CI/CD 플랫폼',level:2,
-   desc:'GitHub에 내장된 자동화 플랫폼입니다. 코드 푸시·PR·스케줄 이벤트에 반응해 테스트·빌드·배포를 자동화하며, 수천 개의 재사용 가능한 액션이 있습니다.',ex:[
-`# .github/workflows/ci.yml
-name: CI
-on:
-  push:         { branches: [main] }
-  pull_request: { branches: [main] }
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - run: pip install -r requirements.txt
-      - run: pytest --cov`,
-`# 멀티 매트릭스
-jobs:
-  test:
-    strategy:
-      matrix:
-        python: ['3.10','3.11','3.12']
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: ${{ matrix.python }} }
-      - run: pip install pytest && pytest`,
-`# Docker 빌드 & 배포
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-      - run: |
-          docker build -t myapp:${{ github.sha }} .
-          docker push myapp:${{ github.sha }}`
-  ]},
-
-  /* ===== 시스템 ===== */
-  {cat:'시스템',name:'C',icon:'⚙️',color:'#a8b9cc',type:'시스템 언어',level:4,
-   desc:'가장 오래되고 영향력 있는 시스템 프로그래밍 언어입니다. 운영체제·임베디드·드라이버에 사용되며, 거의 모든 현대 언어가 C의 영향을 받았습니다.',ex:[
-`#include <stdio.h>
-void swap(int *a, int *b) {
-    int t = *a; *a = *b; *b = t;
-}
-int main() {
-    int arr[] = {5,2,8,1,9};
-    swap(&arr[0], &arr[4]);
-    for (int i=0; i<5; i++)
-        printf("%d ", arr[i]);  // 9 2 8 1 5
-    return 0;
-}`,
-`#include <stdlib.h>
-#include <string.h>
-typedef struct { char name[50]; int age; } Person;
-
-Person* create(const char* name, int age) {
-    Person* p = malloc(sizeof(Person));
-    if (!p) return NULL;
-    strncpy(p->name, name, 49);
-    p->age = age;
-    return p;
-}
-// 사용 후 반드시: free(p);`,
-`#include <stdio.h>
-int main() {
-    FILE *fp = fopen("data.txt","r");
-    if (!fp) { perror("오류"); return 1; }
-    char line[256];
-    while (fgets(line, sizeof(line), fp))
-        printf("%s", line);
-    fclose(fp);
-    return 0;
-}`
-  ]},
-
-  {cat:'시스템',name:'C++',icon:'⚡',color:'#00599c',type:'다중 패러다임 언어',level:4,
-   desc:'C를 기반으로 OOP·제네릭·함수형 프로그래밍을 추가한 언어입니다. 게임 엔진·그래픽스·고성능 시스템에서 성능이 중요할 때 사용됩니다.',ex:[
-`#include <iostream>
-#include <vector>
-using namespace std;
-class Stack {
-    vector<int> data;
-public:
-    void push(int v) { data.push_back(v); }
-    int  pop()  { int v=data.back(); data.pop_back(); return v; }
-    bool empty() const { return data.empty(); }
-};
-int main() {
-    Stack s; s.push(1); s.push(2);
-    cout << s.pop() << endl;  // 2
-}`,
-`// 템플릿 + 스마트 포인터
-#include <memory>
-template<typename T>
-class Box {
-    unique_ptr<T> val;
-public:
-    Box(T v): val(make_unique<T>(v)) {}
-    T get() const { return *val; }
-};
-// RAII
-class Resource {
-public:
-     Resource() { cout<<"열기\\n"; }
-    ~Resource() { cout<<"닫기\\n"; }
-};`,
-`// Modern C++20
-#include <ranges>
-#include <format>
-auto nums = vector{1,2,3,4,5};
-auto even_sq = nums
-    | views::filter([](int n){ return n%2==0; })
-    | views::transform([](int n){ return n*n; });
-
-auto [mn,mx] = minmax_element(nums.begin(),nums.end());
-string msg = format("범위: {}~{}", *mn, *mx);`
-  ]},
-
-  {cat:'시스템',name:'WebAssembly',icon:'🔧',color:'#654ff0',type:'저수준 실행 형식',level:4,
-   desc:'브라우저에서 실행되는 바이너리 코드 형식입니다. C/C++/Rust로 작성된 코드를 웹에서 네이티브에 가까운 속도로 실행하며, 게임·영상편집·과학 계산에 활용됩니다.',ex:[
-`// Rust → WebAssembly
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-pub fn fibonacci(n: u32) -> u64 {
-    if n < 2 { return n as u64; }
-    let (mut a, mut b) = (0u64, 1u64);
-    for _ in 2..=n { (a, b) = (b, a+b); }
-    b
-}
-// wasm-pack build --target web`,
-`// JS에서 wasm 호출
-import init, { fibonacci } from './pkg/mylib.js';
-
-async function main() {
-  await init();
-  console.log(fibonacci(50));  // 12586269025
-}
-main();`,
-`// C로 wasm 컴파일 (emscripten)
-#include <emscripten.h>
-EMSCRIPTEN_KEEPALIVE
-int add(int a, int b) { return a + b; }
-
-// 빌드:
-// emcc main.c -O3 -o main.wasm \
-//   -s EXPORTED_FUNCTIONS="['_add']"
-// JS: const result = Module._add(3,4);`
-  ]},
+/* ===== 프론트엔드 ===== */
+{cat:'프론트엔드',name:'HTML',icon:'🌐',color:'#e34c26',type:'마크업 언어',level:1,
+ by:'Tim Berners-Lee',year:1993,paradigm:'선언형',typing:'해당 없음',
+ desc:'웹 페이지의 구조와 의미를 정의하는 표준 마크업 언어입니다. 브라우저가 콘텐츠를 렌더링하는 뼈대 역할을 하며, CSS·JavaScript와 함께 웹의 3대 핵심 기술입니다.',
+ uses:['웹 페이지 구조','이메일 템플릿','웹 앱 UI 뼈대','문서 포맷'],
+ pros:['배우기 매우 쉬움','모든 브라우저 지원','SEO 친화적'],
+ cons:['로직 표현 불가','단독으로 동적 기능 없음'],
+ eco:['Bootstrap','Tailwind CSS','Pug','EJS','MDX'],
+ code:'<!DOCTYPE html>\n<html lang="ko">\n<head>\n  <meta charset="UTF-8">\n  <title>안녕하세요</title>\n</head>\n<body>\n  <h1>코드의 세계에 오신 것을 환영합니다!</h1>\n  <p>HTML은 웹의 <strong>뼈대</strong>입니다.</p>\n</body>\n</html>'},
+
+{cat:'프론트엔드',name:'CSS',icon:'🎨',color:'#264de4',type:'스타일 언어',level:2,
+ by:'Håkon Wium Lie',year:1996,paradigm:'선언형',typing:'해당 없음',
+ desc:'HTML 요소의 시각적 표현을 정의합니다. 색상·레이아웃·애니메이션을 담당하며, Flexbox와 Grid로 복잡한 반응형 레이아웃을 간결하게 구현합니다.',
+ uses:['웹 페이지 스타일링','반응형 디자인','애니메이션·트랜지션','다크모드 테마'],
+ pros:['CSS 변수로 테마 관리','Grid/Flex 강력한 레이아웃','애니메이션 GPU 가속'],
+ cons:['복잡한 레이아웃 학습 곡선','브라우저 호환성 이슈'],
+ eco:['Tailwind CSS','Sass/SCSS','CSS Modules','PostCSS','styled-components'],
+ code:'.card {\n  display: flex;\n  gap: 16px;\n  padding: 20px;\n  border-radius: 12px;\n  background: #fff;\n  box-shadow: 0 4px 16px rgba(0,0,0,.08);\n  transition: transform .2s;\n}\n.card:hover { transform: translateY(-4px); }'},
+
+{cat:'프론트엔드',name:'JavaScript',icon:'⚡',color:'#f7df1e',type:'스크립트 언어',level:2,
+ by:'Brendan Eich (Netscape)',year:1995,paradigm:'다중 패러다임',typing:'동적 타이핑',
+ desc:'웹의 유일한 네이티브 프로그래밍 언어입니다. DOM 조작·이벤트·비동기 처리를 담당하며, Node.js로 서버에서도 실행됩니다. 전 세계 웹사이트의 98%가 사용합니다.',
+ uses:['웹 인터랙션·DOM 조작','API 통신 (fetch)','Node.js 서버 개발','브라우저 게임'],
+ pros:['브라우저 네이티브','거대한 npm 생태계','풀스택 개발 가능'],
+ cons:['동적 타입으로 런타임 오류','실행 속도 한계','레거시 코드 혼재'],
+ eco:['React','Vue','Angular','Node.js','Next.js','Vite'],
+ code:'// 비동기 API 호출\nasync function loadUser(id) {\n  const res  = await fetch(`/api/users/${id}`);\n  const user = await res.json();\n  document.querySelector("#name").textContent = user.name;\n}\nloadUser(42);'},
+
+{cat:'프론트엔드',name:'TypeScript',icon:'🔷',color:'#3178c6',type:'정적 타입 언어',level:2,
+ by:'Microsoft',year:2012,paradigm:'다중 패러다임',typing:'정적 타이핑',
+ desc:'JavaScript에 정적 타입을 추가한 언어입니다. 컴파일 시 타입 오류를 미리 잡아 대규모 팀 프로젝트에서 유지보수성을 크게 향상시킵니다.',
+ uses:['대규모 웹 애플리케이션','팀 협업 프로젝트','API 타입 정의','라이브러리 개발'],
+ pros:['컴파일 타임 오류 검출','IDE 자동완성 강화','JS 완벽 호환'],
+ cons:['컴파일 단계 추가','초기 설정 복잡','학습 곡선 존재'],
+ eco:['React+TS','NestJS','Prisma','tRPC','Zod'],
+ code:'// 타입 안전한 함수\ntype User = { id: number; name: string; email: string };\n\nasync function getUser(id: number): Promise<User | null> {\n  const res = await fetch(`/api/users/${id}`);\n  return res.ok ? res.json() : null;\n}'},
+
+{cat:'프론트엔드',name:'React',icon:'⚛️',color:'#61dafb',type:'UI 라이브러리',level:3,
+ by:'Meta (Facebook)',year:2013,paradigm:'함수형·선언형',typing:'선택적 (TS)',
+ desc:'컴포넌트 기반 UI 라이브러리입니다. 가상 DOM과 단방향 데이터 흐름으로 복잡한 상태를 관리하며, 현재 가장 많이 사용되는 프론트엔드 라이브러리입니다.',
+ uses:['SPA 웹 앱','복잡한 UI 상태 관리','Next.js SSR/SSG','모바일 앱 (React Native)'],
+ pros:['컴포넌트 재사용성','거대한 커뮤니티','React Native 공유'],
+ cons:['상태관리 복잡성','잦은 변화','학습 곡선 존재'],
+ eco:['Next.js','React Query','Zustand','Redux','Shadcn/ui'],
+ code:'import { useState } from "react";\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <div>\n      <p>카운트: {count}</p>\n      <button onClick={() => setCount(c => c + 1)}>증가</button>\n    </div>\n  );\n}'},
+
+{cat:'프론트엔드',name:'Vue.js',icon:'💚',color:'#42b883',type:'프론트엔드 프레임워크',level:2,
+ by:'Evan You',year:2014,paradigm:'선언형·컴포넌트',typing:'선택적 (TS)',
+ desc:'점진적으로 도입 가능한 프론트엔드 프레임워크입니다. 직관적인 템플릿 문법과 Composition API로 React보다 완만한 학습 곡선을 제공합니다.',
+ uses:['SPA 웹 앱','기존 사이트에 부분 적용','중소규모 프로젝트','프로토타이핑'],
+ pros:['완만한 학습 곡선','공식 문서 우수','Composition API 강력'],
+ cons:['React보다 작은 커뮤니티','일부 기업 채용 적음'],
+ eco:['Nuxt.js','Pinia','Vite','VueRouter','Vuetify'],
+ code:'<template>\n  <input v-model="search" placeholder="검색...">\n  <ul>\n    <li v-for="item in filtered" :key="item.id">{{ item.name }}</li>\n  </ul>\n</template>\n<script setup>\nconst search  = ref("");\nconst items   = ref([{id:1,name:"Apple"},{id:2,name:"Banana"}]);\nconst filtered = computed(() =>\n  items.value.filter(i => i.name.includes(search.value)));\n</script>'},
+
+/* ===== 백엔드 ===== */
+{cat:'백엔드',name:'Python',icon:'🐍',color:'#3776ab',type:'범용 언어',level:1,
+ by:'Guido van Rossum',year:1991,paradigm:'다중 패러다임',typing:'동적 타이핑',
+ desc:'읽기 쉬운 문법과 방대한 라이브러리 생태계를 자랑하는 언어입니다. 웹 개발뿐 아니라 AI/ML·데이터 분석·자동화 스크립트까지 폭넓게 쓰이는 만능 언어입니다.',
+ uses:['웹 백엔드 API','AI/ML 모델 개발','데이터 분석·시각화','자동화·크롤링','과학 연산'],
+ pros:['배우기 가장 쉬운 언어','방대한 라이브러리','AI/ML 업계 표준'],
+ cons:['실행 속도 느림','GIL로 멀티스레딩 제한','모바일 앱 불가'],
+ eco:['Django','FastAPI','Flask','NumPy','Pandas','PyTorch','TensorFlow'],
+ code:'# FastAPI 서버 예제\nfrom fastapi import FastAPI\napp = FastAPI()\n\n@app.get("/users/{user_id}")\nasync def get_user(user_id: int):\n    return {"id": user_id, "name": "Alice"}\n\n# uvicorn main:app --reload'},
+
+{cat:'백엔드',name:'Node.js',icon:'🟢',color:'#339933',type:'JS 런타임',level:2,
+ by:'Ryan Dahl',year:2009,paradigm:'이벤트 기반·비동기',typing:'동적(JS)/정적(TS)',
+ desc:'Chrome V8 엔진 기반의 JavaScript 서버 런타임입니다. 비동기 I/O로 동시 접속이 많은 실시간 서비스에 강하며, 프론트엔드 개발자가 백엔드도 담당할 수 있게 합니다.',
+ uses:['REST API 서버','실시간 서비스(채팅·알림)','마이크로서비스','CLI 도구 개발'],
+ pros:['JS로 풀스택 개발','비동기 I/O 성능 우수','npm 생태계 최대'],
+ cons:['CPU 집약 작업 약함','콜백 지옥 가능성','단일 스레드'],
+ eco:['Express','NestJS','Fastify','Socket.io','Prisma'],
+ code:'const express = require("express");\nconst app = express();\napp.use(express.json());\n\napp.get("/users/:id", async (req, res) => {\n  const user = await db.findUser(req.params.id);\n  user ? res.json(user) : res.status(404).json({error:"Not found"});\n});\napp.listen(3000);'},
+
+{cat:'백엔드',name:'Go',icon:'🔵',color:'#00add8',type:'컴파일 언어',level:3,
+ by:'Google',year:2009,paradigm:'절차지향·동시성',typing:'정적 타이핑',
+ desc:'Google이 만든 컴파일 언어입니다. 빠른 컴파일·단순한 문법·고루틴(goroutine)으로 쉽게 동시성 프로그래밍을 구현할 수 있습니다. 클라우드·마이크로서비스의 표준 언어 중 하나입니다.',
+ uses:['고성능 API 서버','마이크로서비스','CLI 도구','클라우드 인프라 (Docker·K8s)'],
+ pros:['C급 실행 속도','고루틴으로 쉬운 동시성','단일 바이너리 배포'],
+ cons:['제네릭 늦게 도입','에러 처리 장황','OOP 기능 제한적'],
+ eco:['Gin','Fiber','Echo','gRPC','GORM'],
+ code:'package main\nimport "fmt"\n\nfunc sum(nums []int) int {\n  total := 0\n  for _, n := range nums { total += n }\n  return total\n}\nfunc main() {\n  fmt.Println(sum([]int{1, 2, 3, 4, 5})) // 15\n}'},
+
+{cat:'백엔드',name:'Java',icon:'☕',color:'#f89820',type:'객체지향 언어',level:3,
+ by:'Sun Microsystems',year:1995,paradigm:'객체지향',typing:'정적 타이핑',
+ desc:'JVM 위에서 동작해 "Write Once, Run Anywhere"를 실현합니다. 강력한 타입 시스템과 방대한 생태계로 대규모 엔터프라이즈 시스템의 표준 언어입니다.',
+ uses:['엔터프라이즈 백엔드','Android 앱 개발','금융·은행 시스템','빅데이터 (Hadoop·Spark)'],
+ pros:['강력한 타입 안전성','거대한 기업 생태계','성능 최적화 성숙'],
+ cons:['장황한 문법','JVM 메모리 사용 높음','느린 개발 생산성'],
+ eco:['Spring Boot','Spring Cloud','Maven','Hibernate','Kafka'],
+ code:'// Spring Boot REST\n@RestController\n@RequestMapping("/api/users")\npublic class UserController {\n  @Autowired private UserService svc;\n\n  @GetMapping("/{id}")\n  public ResponseEntity<User> get(@PathVariable Long id) {\n    return svc.findById(id).map(ResponseEntity::ok)\n             .orElse(ResponseEntity.notFound().build());\n  }\n}'},
+
+{cat:'백엔드',name:'Rust',icon:'🦀',color:'#ce422b',type:'시스템 언어',level:4,
+ by:'Mozilla Research',year:2015,paradigm:'다중 패러다임',typing:'정적 타이핑',
+ desc:'가비지 컬렉터 없이 메모리 안전성을 보장하는 언어입니다. 소유권(ownership) 시스템으로 C/C++ 수준의 성능을 내면서도 메모리 버그를 컴파일 타임에 차단합니다.',
+ uses:['시스템 소프트웨어','WebAssembly','고성능 서버','게임 엔진','CLI 도구'],
+ pros:['최고 수준의 실행 성능','메모리 안전 보장','WebAssembly 최적'],
+ cons:['매우 가파른 학습 곡선','컴파일 시간 느림','생태계 아직 성장 중'],
+ eco:['Tokio','Axum','Actix-web','Serde','wasm-bindgen'],
+ code:'// 소유권 예제\nfn main() {\n  let s1 = String::from("Hello");\n  let s2 = s1;          // s1 소유권 이동\n  // println!("{}", s1); // 컴파일 오류!\n  println!("{}", s2);   // 정상\n}'},
+
+{cat:'백엔드',name:'PHP',icon:'🐘',color:'#777bb3',type:'서버 사이드 언어',level:2,
+ by:'Rasmus Lerdorf',year:1994,paradigm:'다중 패러다임',typing:'동적 타이핑',
+ desc:'웹 개발에 특화된 서버 사이드 스크립트 언어입니다. WordPress·Laravel 등 방대한 생태계를 보유하며, 전 세계 웹사이트의 약 77%가 PHP로 동작합니다.',
+ uses:['웹 사이트·CMS 개발','WordPress 플러그인','API 서버','이커머스'],
+ pros:['웹 서버와 쉬운 통합','배포 간단','WordPress 최대 점유율'],
+ cons:['타입 안전성 부족','오래된 레거시 코드','성능 한계'],
+ eco:['Laravel','Symfony','WordPress','Composer','PHPUnit'],
+ code:'<?php\n// Laravel 라우팅\nRoute::get("/users/{id}", function (int $id) {\n  $user = User::findOrFail($id);\n  return response()->json($user);\n});\n\n// Eloquent ORM\n$posts = Post::where("published", true)\n             ->orderBy("created_at", "desc")\n             ->paginate(10);'},
+
+{cat:'백엔드',name:'C#',icon:'💜',color:'#9b4993',type:'다중 패러다임 언어',level:3,
+ by:'Microsoft',year:2000,paradigm:'객체지향·함수형',typing:'정적 타이핑',
+ desc:'Microsoft .NET 플랫폼의 주력 언어입니다. LINQ·async/await·레코드 타입 등 현대적 기능을 갖추며 게임(Unity)·웹(ASP.NET)·데스크톱 개발에 폭넓게 쓰입니다.',
+ uses:['ASP.NET 웹 API','Unity 게임 개발','Windows 데스크톱','마이크로서비스'],
+ pros:['강력한 언어 기능 (LINQ·패턴매칭)','Unity 게임 개발 표준','성능 우수'],
+ cons:['주로 Windows/MS 환경','Java와 유사해 포지션 겹침'],
+ eco:['ASP.NET Core','Unity','Entity Framework','Blazor','MAUI'],
+ code:'// LINQ + 레코드\nrecord Product(string Name, decimal Price, string Category);\n\nvar products = new[] {\n  new Product("노트북", 1200000, "전자"),\n  new Product("마우스", 35000, "전자"),\n};\nvar cheap = products.Where(p => p.Price < 100000)\n                    .OrderBy(p => p.Price).ToList();'},
+
+/* ===== 모바일 ===== */
+{cat:'모바일',name:'Swift',icon:'🍎',color:'#fa7343',type:'컴파일 언어',level:3,
+ by:'Apple',year:2014,paradigm:'다중 패러다임',typing:'정적 타이핑',
+ desc:'Apple이 Objective-C를 대체하기 위해 개발한 언어입니다. Optional으로 null 안전성을 보장하고, SwiftUI로 선언형 UI를 간결하게 작성합니다. iOS/macOS 앱 개발의 표준입니다.',
+ uses:['iOS·iPadOS 앱','macOS 앱','watchOS·tvOS 앱','Apple 생태계 전반'],
+ pros:['Optional로 null 안전','SwiftUI 생산성','Objective-C 상호운용'],
+ cons:['Apple 생태계에 한정','Windows 개발 환경 없음','비교적 짧은 역사'],
+ eco:['SwiftUI','UIKit','Combine','Vapor (서버)','Swift Package Manager'],
+ code:'// SwiftUI View\nstruct ContentView: View {\n  @State private var count = 0\n  var body: some View {\n    VStack(spacing: 20) {\n      Text("카운트: \\(count)").font(.largeTitle)\n      Button("증가") { count += 1 }\n        .buttonStyle(.borderedProminent)\n    }.padding()\n  }\n}'},
+
+{cat:'모바일',name:'Kotlin',icon:'🤖',color:'#7f52ff',type:'다중 패러다임 언어',level:3,
+ by:'JetBrains',year:2016,paradigm:'다중 패러다임',typing:'정적 타이핑',
+ desc:'JVM 기반 언어로 Google이 Android 공식 언어로 채택했습니다. Java보다 간결하며, Null 안전성·확장 함수·코루틴으로 현대적인 개발 경험을 제공합니다.',
+ uses:['Android 앱 개발','서버 사이드 (Spring)','Kotlin Multiplatform','데스크톱'],
+ pros:['Java보다 간결','Null 안전성 내장','Java 완전 호환'],
+ cons:['컴파일 속도 느린 편','Kotlin MP 아직 성숙 중'],
+ eco:['Jetpack Compose','Spring Boot','Ktor','Room','Hilt'],
+ code:'// Jetpack Compose\n@Composable\nfun CounterScreen() {\n  var count by remember { mutableStateOf(0) }\n  Column(horizontalAlignment = Alignment.CenterHorizontally) {\n    Text("$count", style = MaterialTheme.typography.headlineLarge)\n    Button(onClick = { count++ }) { Text("증가") }\n  }\n}'},
+
+{cat:'모바일',name:'Flutter',icon:'🦋',color:'#02569b',type:'크로스플랫폼',level:2,
+ by:'Google',year:2018,paradigm:'선언형 UI',typing:'정적 타이핑 (Dart)',
+ desc:'Dart 언어를 사용하는 Google의 크로스플랫폼 UI 프레임워크입니다. 단일 코드로 iOS·Android·Web·Desktop 앱을 개발하며, 60fps의 부드러운 렌더링이 특징입니다.',
+ uses:['iOS + Android 동시 개발','Web·Desktop도 하나로','스타트업 빠른 개발','프로토타이핑'],
+ pros:['단일 코드베이스 4개 플랫폼','고성능 렌더링','Hot Reload 빠른 개발'],
+ cons:['Dart 언어 별도 학습','네이티브보다 APK 크기 큼','네이티브 기능 접근 복잡'],
+ eco:['Riverpod','GetX','Drift(DB)','Dio(HTTP)','Firebase'],
+ code:'class Counter extends StatefulWidget {\n  @override State<Counter> createState() => _State();\n}\nclass _State extends State<Counter> {\n  int n = 0;\n  @override\n  Widget build(BuildContext ctx) => Column(children: [\n    Text("$n", style: TextStyle(fontSize: 48)),\n    ElevatedButton(onPressed: ()=>setState(()=>n++), child: Text("증가")),\n  ]);\n}'},
+
+{cat:'모바일',name:'React Native',icon:'📱',color:'#61dafb',type:'크로스플랫폼',level:3,
+ by:'Meta (Facebook)',year:2015,paradigm:'컴포넌트 기반',typing:'동적(JS)/정적(TS)',
+ desc:'React 문법으로 iOS·Android 네이티브 앱을 개발하는 프레임워크입니다. 웹 개발자가 모바일로 쉽게 진입할 수 있으며, Expo를 통해 빠르게 시작할 수 있습니다.',
+ uses:['iOS + Android 크로스플랫폼','웹 개발자의 모바일 진입','빠른 MVP 개발'],
+ pros:['React 지식 재활용','JS/TS 사용 가능','Expo로 빠른 시작'],
+ cons:['Flutter보다 성능 낮을 수 있음','네이티브 브릿지 복잡','디버깅 어려울 수 있음'],
+ eco:['Expo','React Navigation','Zustand','MMKV','React Query'],
+ code:'import { View, Text, TouchableOpacity } from "react-native";\nimport { useState } from "react";\n\nexport default function App() {\n  const [count, setCount] = useState(0);\n  return (\n    <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>\n      <Text style={{fontSize:48}}>{count}</Text>\n      <TouchableOpacity onPress={() => setCount(c => c+1)}>\n        <Text>증가</Text>\n      </TouchableOpacity>\n    </View>\n  );\n}'},
+
+/* ===== 데이터베이스 ===== */
+{cat:'데이터베이스',name:'MySQL',icon:'🐬',color:'#00758f',type:'관계형 DB',level:2,
+ by:'MySQL AB',year:1995,paradigm:'관계형 모델',typing:'스키마 기반',
+ desc:'세계에서 가장 널리 사용되는 오픈소스 관계형 데이터베이스입니다. ACID 트랜잭션·인덱스·복잡한 JOIN을 지원하며 웹 서비스의 사실상 표준 DB입니다.',
+ uses:['웹 서비스 주 DB','이커머스 데이터','사용자·주문 관리','WordPress 백엔드'],
+ pros:['광범위한 레퍼런스','성숙한 도구 생태계','호스팅 어디서나 지원'],
+ cons:['JSON 지원 PostgreSQL보다 약함','고급 쿼리 기능 제한'],
+ eco:['phpMyAdmin','MySQL Workbench','Sequelize','Prisma','TypeORM'],
+ code:'-- JOIN + 집계\nSELECT u.name, COUNT(o.id) AS orders, SUM(o.amount) AS total\nFROM users u\nLEFT JOIN orders o ON o.user_id = u.id\nWHERE o.created_at >= "2024-01-01"\nGROUP BY u.id\nHAVING total > 100000\nORDER BY total DESC LIMIT 10;'},
+
+{cat:'데이터베이스',name:'PostgreSQL',icon:'🐘',color:'#336791',type:'관계형 DB',level:3,
+ by:'UC Berkeley',year:1996,paradigm:'관계형·객체지향',typing:'스키마 기반',
+ desc:'고급 기능과 표준 SQL 준수로 유명한 오픈소스 DB입니다. JSON/JSONB·배열·전문검색·지리정보(PostGIS) 등을 지원하며, 복잡한 분석 쿼리에 최적화되어 있습니다.',
+ uses:['복잡한 데이터 분석','JSON 문서 저장','GIS 지리정보 서비스','엔터프라이즈 DB'],
+ pros:['JSON·배열 등 풍부한 타입','윈도우 함수·CTE 강력','확장 가능 (PostGIS 등)'],
+ cons:['설정·운영 복잡도 높음','MySQL보다 메모리 사용 많음'],
+ eco:['pgAdmin','Supabase','Prisma','PostGIS','TimescaleDB'],
+ code:'-- JSONB + Window 함수\nSELECT name, attrs->>"brand" AS brand,\n       revenue,\n       LAG(revenue) OVER (ORDER BY month) AS prev_revenue\nFROM products\nWHERE attrs->>"category" = "전자"\nORDER BY revenue DESC;'},
+
+{cat:'데이터베이스',name:'MongoDB',icon:'🌿',color:'#47a248',type:'문서형 NoSQL',level:2,
+ by:'MongoDB Inc.',year:2009,paradigm:'문서 지향',typing:'스키마리스',
+ desc:'JSON 형식의 BSON 문서를 저장하는 대표적인 NoSQL 데이터베이스입니다. 스키마가 유연하고 수평 확장이 쉬워 빠르게 변화하는 스타트업 서비스에 적합합니다.',
+ uses:['유연한 데이터 구조','콘텐츠 관리 시스템','실시간 분석','카탈로그·로그 저장'],
+ pros:['스키마 자유로움','수평 확장 용이','JSON과 자연스러운 통합'],
+ cons:['JOIN 쿼리 불편','트랜잭션 제한','데이터 중복 가능'],
+ eco:['Mongoose','MongoDB Atlas','Compass','Realm','Prisma'],
+ code:'// 집계 파이프라인\nawait Order.aggregate([\n  { $match:  { status: "paid" } },\n  { $group:  { _id: "$userId", total: { $sum: "$amount" } } },\n  { $sort:   { total: -1 } },\n  { $limit:  10 },\n]);'},
+
+{cat:'데이터베이스',name:'Redis',icon:'🔴',color:'#dc382d',type:'인메모리 DB',level:2,
+ by:'Salvatore Sanfilippo',year:2009,paradigm:'키-값 저장소',typing:'스키마리스',
+ desc:'메모리에 데이터를 저장해 초고속 읽기/쓰기를 제공하는 DB입니다. 캐싱·세션·메시지 큐·실시간 리더보드 등에 활용되며, 마이크로초 단위 응답 속도가 특징입니다.',
+ uses:['API 응답 캐싱','세션·토큰 저장','실시간 리더보드','Pub/Sub 메시지 큐'],
+ pros:['마이크로초 응답 속도','다양한 자료구조','Pub/Sub 내장'],
+ cons:['데이터 영속성 제한','메모리 용량 제한','분산 설정 복잡'],
+ eco:['ioredis','redis-py','RedisInsight','Upstash','KeyDB'],
+ code:'# 캐싱 패턴\nSET  user:42:profile "{\\"name\\":\\"Alice\\"}" EX 3600\nGET  user:42:profile\n\n# 리더보드\nZADD  scores 1500 "Alice"\nZADD  scores 2300 "Bob"\nZREVRANGE scores 0 2 WITHSCORES'},
+
+{cat:'데이터베이스',name:'SQLite',icon:'🗃️',color:'#003b57',type:'경량 RDBMS',level:1,
+ by:'D. Richard Hipp',year:2000,paradigm:'관계형 모델',typing:'동적 타이핑',
+ desc:'별도 서버 없이 파일 하나로 동작하는 경량 DB입니다. 설치·설정이 필요 없어 모바일 앱 내장 DB·데스크톱 앱·프로토타이핑에 이상적이며, Python에 기본 내장됩니다.',
+ uses:['모바일 앱 내장 DB','데스크톱 앱 로컬 저장','프로토타이핑·개발 환경','브라우저 저장 (WASM)'],
+ pros:['서버 불필요','파일 하나로 DB 전체','모든 플랫폼 지원'],
+ cons:['동시 쓰기 성능 약함','대용량 서비스 부적합'],
+ eco:['SQLAlchemy','Drizzle','better-sqlite3','Turso','SQLite WASM'],
+ code:'import sqlite3\nconn = sqlite3.connect("app.db")\ncur  = conn.cursor()\ncur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)")\ncur.execute("INSERT INTO users (name) VALUES (?)", ("Alice",))\nconn.commit()\nrows = conn.execute("SELECT * FROM users").fetchall()\nprint(rows)'},
+
+/* ===== DevOps ===== */
+{cat:'DevOps',name:'Docker',icon:'🐳',color:'#2496ed',type:'컨테이너 플랫폼',level:2,
+ by:'Docker Inc.',year:2013,paradigm:'컨테이너화',typing:'해당 없음',
+ desc:'애플리케이션을 격리된 컨테이너로 패키징해 어디서든 동일하게 실행하는 플랫폼입니다. "내 컴퓨터에서는 됩니다" 문제를 해결하며 현대 배포의 사실상 표준입니다.',
+ uses:['개발 환경 통일','CI/CD 파이프라인','마이크로서비스 배포','의존성 격리'],
+ pros:['환경 완전 격리','경량·빠른 시작','이미지 레이어 캐싱'],
+ cons:['보안 설정 주의 필요','Windows 컨테이너 제한','학습 곡선 존재'],
+ eco:['Docker Compose','Kubernetes','Docker Hub','Podman','BuildKit'],
+ code:'# Dockerfile\nFROM python:3.12-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 8000\nCMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]'},
+
+{cat:'DevOps',name:'Git',icon:'🔀',color:'#f05032',type:'버전 관리 시스템',level:2,
+ by:'Linus Torvalds',year:2005,paradigm:'분산 VCS',typing:'해당 없음',
+ desc:'소스 코드 변경 이력을 추적하는 분산형 버전 관리 시스템입니다. 브랜치 전략으로 팀 협업을 구조화하고, GitHub·GitLab과 함께 현대 소프트웨어 개발의 필수 도구입니다.',
+ uses:['소스 코드 버전 관리','팀 협업·코드 리뷰','CI/CD 트리거','오픈소스 기여'],
+ pros:['분산형으로 오프라인 작업','빠른 브랜치·병합','업계 표준'],
+ cons:['복잡한 rebase·conflict','초보자 어려운 명령어'],
+ eco:['GitHub','GitLab','Bitbucket','GitHub Actions','Conventional Commits'],
+ code:'# 기본 워크플로\ngit checkout -b feat/login    # 브랜치 생성\ngit add -p                    # 변경사항 선택\ngit commit -m "feat: 로그인 추가"\ngit push origin feat/login\n# PR 생성 → 리뷰 → Merge → 배포'},
+
+{cat:'DevOps',name:'Linux / Bash',icon:'🐧',color:'#f0c000',type:'OS / 셸 스크립트',level:2,
+ by:'Linus Torvalds / Brian Fox',year:1991,paradigm:'명령형·파이프라인',typing:'동적',
+ desc:'서버 환경의 90% 이상을 차지하는 운영체제와 셸 언어입니다. 파이프라인·cron·프로세스 관리로 강력한 자동화 스크립트를 작성하며, 모든 DevOps의 기반입니다.',
+ uses:['서버 관리·모니터링','배포 자동화 스크립트','로그 분석·파이프라인','cron 작업 스케줄링'],
+ pros:['모든 서버 환경 공통','강력한 파이프라인','도구 조합으로 무한 확장'],
+ cons:['문법 복잡·불일관','오류 처리 까다로움','크로스플랫폼 제한'],
+ eco:['Bash','Zsh','Fish','tmux','systemd','Ansible'],
+ code:'#!/bin/bash\nset -euo pipefail    # 오류 시 즉시 종료\n\necho "서버 업데이트 중..."\ngit pull origin main\npip install -r requirements.txt -q\n\nsystemctl restart myapp\necho "배포 완료: $(date)"'},
+
+{cat:'DevOps',name:'GitHub Actions',icon:'⚙️',color:'#2088ff',type:'CI/CD 플랫폼',level:2,
+ by:'GitHub (Microsoft)',year:2018,paradigm:'이벤트 기반 자동화',typing:'YAML',
+ desc:'GitHub에 내장된 자동화 플랫폼입니다. Push·PR·스케줄 등의 이벤트에 반응해 테스트·빌드·배포를 자동화하며, 수천 개의 재사용 가능한 공개 액션이 있습니다.',
+ uses:['자동화 테스트 (CI)','자동 빌드·배포 (CD)','코드 품질 검사','릴리즈 자동화'],
+ pros:['GitHub 네이티브 통합','무료 오픈소스 지원','풍부한 Marketplace'],
+ cons:['복잡한 YAML 설정','긴 실행 시간 과금','로컬 테스트 어려움'],
+ eco:['act (로컬 실행)','nektos/act','GitHub Marketplace','Dependabot'],
+ code:'# .github/workflows/ci.yml\nname: CI\non:\n  push:         { branches: [main] }\n  pull_request: { branches: [main] }\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: pip install pytest && pytest'},
+
+/* ===== 시스템 ===== */
+{cat:'시스템',name:'C',icon:'⚙️',color:'#a8b9cc',type:'시스템 언어',level:4,
+ by:'Dennis Ritchie (Bell Labs)',year:1972,paradigm:'절차지향',typing:'정적 타이핑',
+ desc:'운영체제·임베디드·하드웨어 드라이버의 언어입니다. Linux 커널·Python 인터프리터·많은 DB가 C로 작성되었으며, 사실상 모든 현대 언어가 C의 영향을 받았습니다.',
+ uses:['운영체제 커널 개발','임베디드·마이크로컨트롤러','드라이버 개발','고성능 라이브러리'],
+ pros:['최고 수준의 실행 성능','하드웨어 직접 제어','어디서나 실행 가능'],
+ cons:['수동 메모리 관리','메모리 버그 위험','현대 추상화 부족'],
+ eco:['GCC','Clang','Make','CMake','Valgrind'],
+ code:'#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n  int *arr = malloc(5 * sizeof(int));\n  for (int i = 0; i < 5; i++) arr[i] = i * i;\n  for (int i = 0; i < 5; i++) printf("%d ", arr[i]);\n  free(arr);  // 반드시 해제!\n  return 0;\n}'},
+
+{cat:'시스템',name:'C++',icon:'⚡',color:'#00599c',type:'다중 패러다임 언어',level:4,
+ by:'Bjarne Stroustrup',year:1985,paradigm:'다중 패러다임',typing:'정적 타이핑',
+ desc:'C에 OOP·제네릭·STL을 추가한 언어입니다. 게임 엔진(Unreal)·그래픽스·금융 시스템·고성능 DB 등 성능이 절대적으로 중요한 분야에서 사용됩니다.',
+ uses:['게임 엔진 (Unreal Engine)','실시간 그래픽스','고성능 금융 시스템','임베디드 시스템'],
+ pros:['C급 성능 + OOP·제네릭','STL 강력한 표준 라이브러리','저수준 제어 가능'],
+ cons:['가장 복잡한 언어 중 하나','수동 메모리 관리','컴파일 시간 느림'],
+ eco:['Unreal Engine','OpenCV','LLVM','Qt','Boost'],
+ code:'#include <vector>\n#include <ranges>\n#include <format>\nusing namespace std;\n\nauto nums = vector{1,2,3,4,5};\n// C++20 Ranges\nauto even_squares = nums\n  | views::filter([](int n){ return n%2==0; })\n  | views::transform([](int n){ return n*n; });\n// 결과: 4, 16'},
+
+{cat:'시스템',name:'WebAssembly',icon:'🔧',color:'#654ff0',type:'저수준 실행 형식',level:4,
+ by:'W3C',year:2019,paradigm:'스택 기반 VM',typing:'정적 타이핑',
+ desc:'브라우저에서 실행되는 바이너리 코드 형식입니다. C/C++/Rust로 작성된 코드를 웹에서 네이티브에 가까운 속도로 실행합니다. Figma·AutoCAD·게임 등에 활용됩니다.',
+ uses:['브라우저 고성능 연산','게임·CAD 웹 포팅','비디오·오디오 처리','Python/Ruby 브라우저 실행'],
+ pros:['네이티브에 가까운 웹 성능','다양한 언어로 컴파일 가능','샌드박스 보안'],
+ cons:['DOM 직접 접근 불가','디버깅 어려움','아직 발전 중인 표준'],
+ eco:['Emscripten','wasm-pack','Wasmer','WABT','AssemblyScript'],
+ code:'// Rust → WebAssembly\nuse wasm_bindgen::prelude::*;\n\n#[wasm_bindgen]\npub fn add(a: i32, b: i32) -> i32 { a + b }\n\n// JS에서:\n// import init, { add } from "./pkg/mylib.js";\n// await init();\n// console.log(add(3, 4));  // 7'},
 ];
 
 // ── 하이라이터 ────────────────────────────────────────────────────────────────
-const KWS = new Set([
-  'const','let','var','function','return','if','else','for','while','do','class','new',
-  'import','export','default','from','async','await','try','catch','finally','throw',
-  'typeof','instanceof','in','of','this','super','extends','static','null','undefined','true','false',
-  'def','elif','pass','lambda','yield','with','as','not','and','or','is','del','global','nonlocal','None','True','False',
-  'fn','let','mut','pub','use','struct','enum','impl','trait','match','where','mod','crate','self','Self','ref','move',
-  'func','var','type','package','interface','map','chan','go','defer','select','range','make','append',
-  'public','private','protected','void','int','string','bool','float','double','char',
-  'abstract','final','override','virtual','sealed','namespace','using','throws',
-  'include','define','typedef','sizeof','malloc','free','auto',
-  'switch','case','break','continue','delete',
-]);
-const BIS = new Set([
-  'print','len','range','list','dict','set','tuple','str','int','float','bool',
-  'sum','min','max','sorted','map','filter','zip','enumerate','isinstance','type',
-  'console','document','Math','JSON','Object','Array','Promise','fetch','require',
-  'printf','scanf','cout','cin','endl','make_unique','vector',
-  'fmt','log','http','os','io','sync','errors',
-]);
+const KWS = new Set('const let var function return if else for while do class new import export default from async await try catch finally throw typeof instanceof in of this super extends static null undefined true false def elif pass lambda yield with as not and or is del global nonlocal None True False fn mut pub use struct enum impl trait match where mod go defer select range make append public private protected void int string bool float double char abstract final override static package include typedef sizeof auto switch case break continue'.split(' '));
+const BIS = new Set('print len range list dict set tuple str sum min max sorted map filter zip enumerate isinstance type console document Math JSON Object Array Promise fetch require printf cout cin fmt log http'.split(' '));
+
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function highlight(code){
-  const slots=[]; const st=h=>{slots.push(h);return`\x00${slots.length-1}\x00`;};
+function hl(code){
+  const sl=[]; const st=h=>{sl.push(h);return '\x00'+(sl.length-1)+'\x00';};
   let h=esc(code);
-  h=h.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''/g,m=>st(`<span class="st">${m}</span>`));
-  h=h.replace(/`[^`]*`/g,m=>st(`<span class="st">${m}</span>`));
-  h=h.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g,m=>st(`<span class="st">${m}</span>`));
-  h=h.replace(/\/\/[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
-  h=h.replace(/#(?!include)[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
-  h=h.replace(/\/\*[\s\S]*?\*\//g,m=>st(`<span class="cm">${m}</span>`));
-  h=h.replace(/--[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
-  h=h.replace(/@[\w.]+/g,m=>st(`<span class="de">${m}</span>`));
+  h=h.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''/g,m=>st('<span class="st">'+m+'</span>'));
+  h=h.replace(/`[^`\n]*`/g,m=>st('<span class="st">'+m+'</span>'));
+  h=h.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g,m=>st('<span class="st">'+m+'</span>'));
+  h=h.replace(/\/\/[^\n]*/g,m=>st('<span class="cm">'+m+'</span>'));
+  h=h.replace(/#(?!include)[^\n]*/g,m=>st('<span class="cm">'+m+'</span>'));
+  h=h.replace(/--[^\n]*/g,m=>st('<span class="cm">'+m+'</span>'));
+  h=h.replace(/\/\*[\s\S]*?\*\//g,m=>st('<span class="cm">'+m+'</span>'));
+  h=h.replace(/@[\w.]+/g,m=>st('<span class="de">'+m+'</span>'));
   h=h.replace(/\b([A-Za-z_]\w*)\b/g,(m,w)=>{
-    if(KWS.has(w)) return st(`<span class="kw">${w}</span>`);
-    if(BIS.has(w)) return st(`<span class="bi">${w}</span>`);
+    if(KWS.has(w)) return st('<span class="kw">'+w+'</span>');
+    if(BIS.has(w)) return st('<span class="bi">'+w+'</span>');
     return m;
   });
-  h=h.replace(/\b(\d[\d_]*\.?\d*([eE][+-]?\d+)?)\b/g,m=>st(`<span class="nu">${m}</span>`));
-  return h.replace(/\x00(\d+)\x00/g,(_,i)=>slots[+i]);
+  h=h.replace(/\b(\d[\d_]*\.?\d*)\b/g,m=>st('<span class="nu">'+m+'</span>'));
+  return h.replace(/\x00(\d+)\x00/g,(_,i)=>sl[+i]);
 }
 
-// ── STATE ──────────────────────────────────────────────────────────────────────
-let activeIdx=-1, tabIdx=0;
+// ── 카테고리 색 ───────────────────────────────────────────────────────────────
+const CC={'프론트엔드':'#6c8eff','백엔드':'#a78bfa','모바일':'#f472b6','데이터베이스':'#34d399','DevOps':'#fbbf24','시스템':'#fb923c'};
 
-const CAT_COLORS = {
-  '프론트엔드':'#6c8eff','백엔드':'#a78bfa','모바일':'#f472b6',
-  '데이터베이스':'#34d399','DevOps':'#fbbf24','시스템':'#fb923c',
-};
-
-// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+// ── 사이드바 ──────────────────────────────────────────────────────────────────
+let activeIdx=-1;
 function buildNav(q=''){
   const nav=document.getElementById('nav');
   const cats=[...new Set(DATA.map(d=>d.cat))];
@@ -1253,12 +479,12 @@ function buildNav(q=''){
     });
     if(!items.length) return;
     const ch=document.createElement('div'); ch.className='ch';
-    ch.innerHTML=`<span>${cat}</span><span class="ar">▾</span>`;
+    ch.innerHTML='<span>'+cat+'</span><span class="ar">▾</span>';
     const ci=document.createElement('div'); ci.className='ci';
     items.forEach(d=>{
       const i=DATA.indexOf(d);
       const ni=document.createElement('div'); ni.className='ni'+(i===activeIdx?' on':'');
-      ni.innerHTML=`<span>${d.icon}</span><span style="flex:1">${d.name}</span>`;
+      ni.innerHTML='<span>'+d.icon+'</span><span style="flex:1">'+d.name+'</span>';
       ni.dataset.idx=i; ni.onclick=()=>select(i);
       ci.appendChild(ni);
     });
@@ -1267,60 +493,88 @@ function buildNav(q=''){
   });
 }
 
-// ── LANDING GRID ──────────────────────────────────────────────────────────────
+// ── 랜딩 그리드 ──────────────────────────────────────────────────────────────
 function buildGrid(){
   const root=document.getElementById('grid-root');
   const cats=[...new Set(DATA.map(d=>d.cat))];
   root.innerHTML='';
   cats.forEach(cat=>{
-    const sec=document.createElement('div'); sec.className='grid-section';
-    const col=CAT_COLORS[cat]||'#6c8eff';
-    sec.innerHTML=`<h2>${cat}</h2><div class="cards"></div>`;
+    const col=CC[cat]||'#6c8eff';
+    const sec=document.createElement('div'); sec.className='gsec';
+    sec.innerHTML='<h2>'+cat+'</h2><div class="cards"></div>';
     root.appendChild(sec);
     const wrap=sec.querySelector('.cards');
     DATA.forEach((d,i)=>{
       if(d.cat!==cat) return;
       const card=document.createElement('div'); card.className='card';
-      card.style.cssText=`border-color:${col}33;`;
-      card.innerHTML=`<div class="icon">${d.icon}</div><div class="cname">${d.name}</div><div class="ctag">${d.type}</div>`;
+      card.style.borderColor=col+'44';
+      // 난이도 점
+      const dots=Array.from({length:4},(_,j)=>'<span class="'+(j<d.level?'on':'')+'"></span>').join('');
+      card.innerHTML='<div class="ci">'+d.icon+'</div><div class="cn">'+d.name+'</div><div class="ct">'+d.type+'</div><div class="cl">'+dots+'</div>';
       card.onclick=()=>select(i);
       wrap.appendChild(card);
     });
   });
 }
 
-// ── DETAIL ───────────────────────────────────────────────────────────────────
+// ── 상세 패널 ────────────────────────────────────────────────────────────────
 function select(i){
-  activeIdx=i; tabIdx=0;
+  activeIdx=i;
   document.querySelectorAll('.ni').forEach(el=>el.classList.toggle('on',+el.dataset.idx===i));
   const d=DATA[i];
+  const col=CC[d.cat]||'#6c8eff';
+
   document.getElementById('landing').style.display='none';
-  const det=document.getElementById('det');
-  det.classList.add('show');
-  document.getElementById('dicon').textContent=d.icon;
+  document.getElementById('det').classList.add('show');
+
+  document.getElementById('dicon-big').textContent=d.icon;
   document.getElementById('dname').textContent=d.name;
   document.getElementById('dtype').textContent=d.type+' · '+d.cat;
-  const lv=document.getElementById('dlevel'); lv.innerHTML='';
+
+  const lv=document.getElementById('dlv'); lv.innerHTML='';
   for(let j=1;j<=4;j++){
     const s=document.createElement('span'); if(j<=d.level) s.className='on'; lv.appendChild(s);
   }
+
   document.getElementById('ddesc').textContent=d.desc;
-  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',+b.dataset.i===0));
-  renderCode();
-}
-function renderCode(){
-  const d=DATA[activeIdx]; if(!d) return;
-  document.getElementById('codeblock').innerHTML=highlight(d.ex[tabIdx]);
+
+  // 기본 정보
+  document.getElementById('dfacts').innerHTML=
+    '<div class="fact"><div class="fl">만든 곳</div><div class="fv">'+d.by+'</div></div>'+
+    '<div class="fact"><div class="fl">출시 연도</div><div class="fv">'+d.year+'년</div></div>'+
+    '<div class="fact"><div class="fl">패러다임</div><div class="fv">'+d.paradigm+'</div></div>'+
+    '<div class="fact"><div class="fl">타입 시스템</div><div class="fv">'+d.typing+'</div></div>';
+
+  // 활용처
+  const useEl=document.getElementById('duses'); useEl.innerHTML='';
+  d.uses.forEach(u=>{
+    const t=document.createElement('span'); t.className='utag';
+    t.style.cssText='color:'+col+';border-color:'+col+'55;';
+    t.textContent=u; useEl.appendChild(t);
+  });
+
+  // 장단점
+  const pcEl=document.getElementById('dproscons');
+  const pHtml=d.pros.map(p=>'<div class="pc-item">'+esc(p)+'</div>').join('');
+  const cHtml=d.cons.map(c=>'<div class="pc-item">'+esc(c)+'</div>').join('');
+  pcEl.innerHTML=
+    '<div class="pro-box"><div class="pc-title">장점</div>'+pHtml+'</div>'+
+    '<div class="con-box"><div class="pc-title">단점</div>'+cHtml+'</div>';
+
+  // 생태계
+  const ecoEl=document.getElementById('deco'); ecoEl.innerHTML='';
+  d.eco.forEach(e=>{
+    const c=document.createElement('span'); c.className='echip'; c.textContent=e; ecoEl.appendChild(c);
+  });
+
+  // 예제 코드
+  document.getElementById('codeblock').innerHTML=hl(d.code);
+  document.getElementById('det').scrollTop=0;
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── 초기화 ───────────────────────────────────────────────────────────────────
 buildNav(); buildGrid();
 document.getElementById('search').addEventListener('input',e=>buildNav(e.target.value.toLowerCase()));
-document.querySelectorAll('.tb').forEach(b=>b.addEventListener('click',()=>{
-  tabIdx=+b.dataset.i;
-  document.querySelectorAll('.tb').forEach(x=>x.classList.toggle('on',+x.dataset.i===tabIdx));
-  renderCode();
-}));
 document.getElementById('dback').addEventListener('click',()=>{
   document.getElementById('landing').style.display='';
   document.getElementById('det').classList.remove('show');
@@ -1328,10 +582,10 @@ document.getElementById('dback').addEventListener('click',()=>{
   document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));
 });
 document.getElementById('copybtn').addEventListener('click',()=>{
-  const text=DATA[activeIdx]?.ex[tabIdx]||'';
-  navigator.clipboard.writeText(text).then(()=>{
+  const code=DATA[activeIdx]?.code||'';
+  navigator.clipboard.writeText(code).then(()=>{
     const btn=document.getElementById('copybtn');
-    btn.textContent='✓ 복사됨'; btn.style.color='#89d185';
+    btn.textContent='✓ 복사됨'; btn.style.color='#22c55e';
     setTimeout(()=>{btn.textContent='복사';btn.style.color='';},1500);
   });
 });

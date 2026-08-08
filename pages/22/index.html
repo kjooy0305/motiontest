@@ -264,7 +264,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <div class="section-title">🚀 GitHub 주요 기능</div>
       <div class="section-sub">GitHub에서 제공하는 기능들 개요</div>
 
-      <div class="feat-grid">
+      <div class="feat-grid" id="feat-grid">
         <div class="feat-card">
           <div class="feat-icon">📁</div>
           <div class="feat-name">Repository</div>
@@ -347,7 +347,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="feat-search">
         <div class="card-header">🔍 GitHub 검색 문법</div>
         <div class="card-body">
           <table class="sc-table">
@@ -366,7 +366,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="feat-md">
         <div class="card-header">🏷️ 이슈/PR 마크다운 특수 문법</div>
         <div class="card-body">
           <table class="sc-table">
@@ -489,7 +489,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <div class="section-title">🔄 GitHub 워크플로우</div>
       <div class="section-sub">팀 협업과 배포에서 자주 쓰이는 흐름 정리</div>
 
-      <div class="card">
+      <div class="card" id="wf-flow">
         <div class="card-header">📌 GitHub Flow (기본 브랜치 전략)</div>
         <div class="card-body">
           <div class="flow">
@@ -516,7 +516,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="wf-merge">
         <div class="card-header">🔀 병합 전략 비교</div>
         <div class="card-body">
           <table class="sc-table">
@@ -536,7 +536,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="wf-actions">
         <div class="card-header">⚙️ Actions 워크플로우 기본 구조</div>
         <div class="card-body" style="padding:16px;">
           <pre style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;font-size:12px;color:var(--txt2);overflow-x:auto;line-height:1.7;"><span style="color:var(--txt3)"># .github/workflows/ci.yml</span>
@@ -562,7 +562,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="wf-commit">
         <div class="card-header">🏷️ 커밋 메시지 컨벤션 (Conventional Commits)</div>
         <div class="card-body">
           <div class="tags">
@@ -585,7 +585,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="wf-url">
         <div class="card-header">🔗 유용한 URL 패턴</div>
         <div class="card-body">
           <table class="cli-table">
@@ -631,9 +631,9 @@ const sidebarData={
     {id:'sc-notification',label:'알림'},
   ],
   features:[
-    {id:'',label:'주요 기능 카드'},
-    {id:'',label:'검색 문법'},
-    {id:'',label:'마크다운 특수 문법'},
+    {id:'feat-grid',label:'주요 기능 카드'},
+    {id:'feat-search',label:'검색 문법'},
+    {id:'feat-md',label:'마크다운 특수 문법'},
   ],
   cli:[
     {id:'cli-auth',label:'인증'},
@@ -644,21 +644,21 @@ const sidebarData={
     {id:'cli-release',label:'릴리스 / 기타'},
   ],
   workflow:[
-    {id:'',label:'GitHub Flow'},
-    {id:'',label:'병합 전략'},
-    {id:'',label:'Actions 구조'},
-    {id:'',label:'커밋 컨벤션'},
-    {id:'',label:'URL 패턴'},
+    {id:'wf-flow',label:'GitHub Flow'},
+    {id:'wf-merge',label:'병합 전략'},
+    {id:'wf-actions',label:'Actions 구조'},
+    {id:'wf-commit',label:'커밋 컨벤션'},
+    {id:'wf-url',label:'URL 패턴'},
   ],
 };
 function buildSidebar(id){
   const sb=document.getElementById('sidebar');
   const items=sidebarData[id]||[];
   sb.innerHTML='<div class="sidebar-section"><div class="sidebar-label">목차</div>'+
-    items.map(it=>`<button class="sidebar-item" onclick="${it.id?`scrollTo('${it.id}')`:''}">${it.label}</button>`).join('')+
+    items.map(it=>`<button class="sidebar-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('')+
   '</div>';
 }
-function scrollTo(id){
+function scrollToSec(id){
   const el=document.getElementById(id);
   if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }

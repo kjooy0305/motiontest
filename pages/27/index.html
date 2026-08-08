@@ -102,6 +102,7 @@ body{background:var(--bg);color:var(--txt);font-family:'SFMono-Regular',Consolas
     <button class="tab" onclick="switchTab('perm')">🔒 권한/프로세스</button>
     <button class="tab" onclick="switchTab('net')">🌐 네트워크</button>
     <button class="tab" onclick="switchTab('git')">🔀 Git</button>
+    <button class="tab" onclick="switchTab('pkg')">📦 패키지/도구</button>
     <button class="tab" onclick="switchTab('tips')">💡 팁</button>
   </div>
 </div>
@@ -644,6 +645,236 @@ body{background:var(--bg);color:var(--txt);font-family:'SFMono-Regular',Consolas
       </div>
     </div>
 
+    <!-- ════════════════════ 패키지/도구 ════════════════════ -->
+    <div class="panel" id="panel-pkg">
+      <div class="sec-title">📦 패키지 매니저 & 개발 도구</div>
+      <div class="sec-sub">npm · yarn · pnpm · pip · docker · 기타 자주 쓰는 개발 CLI</div>
+
+      <div class="card" id="pk-npm">
+        <div class="card-header"><span class="hl">01</span> npm (Node Package Manager)</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm init</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">새 Node.js 프로젝트 초기화 (package.json 생성)</div><div class="desc-sub"><span class="opt">-y</span> 모든 질문에 기본값으로 자동 응답.</div><div class="desc-ex">$ npm init -y</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm install</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">package.json의 모든 의존성 설치</div><div class="desc-sub">node_modules 폴더가 없을 때 전체 설치. CI 환경에서는 <span class="arg">npm ci</span> 권장 (lock 파일 기준으로 정확히 설치).</div><div class="desc-ex">$ npm install &nbsp;|&nbsp; $ npm ci</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm install <span class="arg">패키지명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">특정 패키지 설치 (dependencies에 추가)</div><div class="desc-sub"><span class="opt">--save-dev / -D</span> devDependencies에 추가 · <span class="opt">-g</span> 전역 설치 · <span class="opt">@버전</span> 특정 버전 지정.</div><div class="desc-ex">$ npm install react<br>$ npm install -D typescript eslint<br>$ npm install -g nodemon</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm uninstall <span class="arg">패키지명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패키지 제거</div><div class="desc-sub">node_modules에서 삭제 + package.json에서도 제거.</div><div class="desc-ex">$ npm uninstall lodash</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm run <span class="arg">스크립트명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">package.json의 scripts 항목 실행</div><div class="desc-sub">가장 많이 쓰는 명령. start·dev·build·test·lint 등은 관례적 이름.</div><div class="desc-ex">$ npm run dev &nbsp;|&nbsp; $ npm run build &nbsp;|&nbsp; $ npm run lint</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm start</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">scripts.start 실행 (run 없이 가능)</div><div class="desc-sub">start·test·stop은 run 생략 가능. 그 외는 npm run 필요.</div><div class="desc-ex">$ npm start &nbsp;|&nbsp; $ npm test</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm update <span class="arg">[패키지]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패키지를 허용 버전 범위 내 최신으로 업데이트</div><div class="desc-sub">인수 없으면 전체 업데이트. 메이저 업데이트는 <span class="arg">npm install 패키지@latest</span>.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm outdated</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">업데이트 가능한 패키지 목록 확인</div><div class="desc-sub">Current / Wanted / Latest 비교 표시.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm list <span class="opt">--depth=0</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">설치된 패키지 목록 (1단계만)</div><div class="desc-sub"><span class="opt">-g</span> 전역 설치 목록.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npm cache clean <span class="opt">--force</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">npm 캐시 삭제</div><div class="desc-sub">설치 오류가 날 때 캐시 지우고 재설치하면 해결되는 경우 많음.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">npx <span class="arg">패키지명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">설치 없이 패키지 즉시 실행</div><div class="desc-sub">전역 설치 없이 일회성으로 실행. 최신 버전 자동 사용.</div><div class="desc-ex">$ npx create-react-app my-app<br>$ npx create-next-app@latest<br>$ npx prettier --write .</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="pk-yarn">
+        <div class="card-header"><span class="hl">02</span> yarn / pnpm</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">yarn / yarn install</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">전체 의존성 설치</div><div class="desc-sub">npm install과 동일. yarn.lock 기반.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">yarn add <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패키지 설치</div><div class="desc-sub"><span class="opt">--dev / -D</span> devDependencies · <span class="opt">global</span> 전역.</div><div class="desc-ex">$ yarn add axios &nbsp;|&nbsp; $ yarn add -D jest</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">yarn remove <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패키지 제거</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">yarn <span class="arg">스크립트명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">스크립트 실행 (run 생략 가능)</div><div class="desc-sub">npm run dev → <span class="arg">yarn dev</span></div><div class="desc-ex">$ yarn dev &nbsp;|&nbsp; $ yarn build &nbsp;|&nbsp; $ yarn test</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pnpm install</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">pnpm으로 의존성 설치 (디스크 효율 최대)</div><div class="desc-sub">npm/yarn보다 빠르고 디스크 절약. 심볼릭 링크 기반 저장.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pnpm add / run / dlx</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">npm add/run/npx 와 동일 역할</div><div class="desc-sub"><span class="arg">pnpm dlx</span>는 npx에 해당.</div><div class="desc-ex">$ pnpm add vite &nbsp;|&nbsp; $ pnpm run dev &nbsp;|&nbsp; $ pnpm dlx create-next-app</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="pk-node">
+        <div class="card-header"><span class="hl">03</span> Node.js 관련</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">node <span class="arg">파일.js</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">JavaScript 파일 실행</div><div class="desc-sub">서버 시작, 스크립트 실행 등.</div><div class="desc-ex">$ node server.js &nbsp;|&nbsp; $ node -e "console.log(1+1)"</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">node <span class="opt">-v</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Node.js 버전 확인</div><div class="desc-sub"><span class="arg">npm -v</span> npm 버전 · <span class="arg">node -e "process.versions"</span> 상세 버전.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">nvm use <span class="arg">버전</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Node.js 버전 전환 (nvm 설치 시)</div><div class="desc-sub"><span class="arg">nvm ls</span> 설치된 버전 목록 · <span class="arg">nvm install 20</span> 설치 · <span class="arg">nvm use --lts</span> 최신 LTS.</div><div class="desc-ex">$ nvm install 20 &nbsp;|&nbsp; $ nvm use 18</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">nodemon <span class="arg">파일.js</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 변경 감지 시 자동 재시작</div><div class="desc-sub">개발 중 서버 자동 재시작. <span class="arg">npm install -g nodemon</span> 후 사용.</div><div class="desc-ex">$ nodemon server.js</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="pk-pip">
+        <div class="card-header"><span class="hl">04</span> pip (Python)</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pip install <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Python 패키지 설치</div><div class="desc-sub"><span class="opt">--upgrade / -U</span> 최신 버전으로 업그레이드 · <span class="opt">==버전</span> 특정 버전.</div><div class="desc-ex">$ pip install requests<br>$ pip install django==4.2</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pip install <span class="opt">-r</span> requirements.txt</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">requirements.txt 기반 일괄 설치</div><div class="desc-sub">프로젝트 공유 시 의존성 목록 파일로 관리.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pip freeze <span class="opt">&gt;</span> requirements.txt</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 설치된 패키지 목록 저장</div><div class="desc-sub">가상 환경 활성화 후 실행해야 프로젝트 의존성만 저장됨.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pip list</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">설치된 패키지 목록 확인</div><div class="desc-sub"><span class="opt">--outdated</span> 업데이트 가능한 패키지만.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pip uninstall <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패키지 제거</div><div class="desc-sub"><span class="opt">-y</span> 확인 없이 바로 제거.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">python -m venv <span class="arg">venv</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Python 가상 환경(venv) 생성</div><div class="desc-sub">프로젝트별 독립된 패키지 환경 구성. 전역 환경 오염 방지.</div><div class="desc-ex">$ python -m venv venv<br>$ source venv/bin/activate &nbsp;&nbsp;# Linux/Mac<br>$ venv\Scripts\activate &nbsp;&nbsp;&nbsp;&nbsp;# Windows</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">deactivate</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">가상 환경 비활성화</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="pk-docker">
+        <div class="card-header"><span class="hl">05</span> Docker</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker pull <span class="arg">이미지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Docker Hub에서 이미지 다운로드</div><div class="desc-sub"><span class="arg">:태그</span>로 버전 지정. 기본은 latest.</div><div class="desc-ex">$ docker pull node:20 &nbsp;|&nbsp; $ docker pull postgres:16</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker run <span class="arg">이미지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">컨테이너 실행</div><div class="desc-sub"><span class="opt">-d</span> 백그라운드 · <span class="opt">-p 호스트:컨테이너</span> 포트 연결 · <span class="opt">-e KEY=VAL</span> 환경변수 · <span class="opt">-v 경로:경로</span> 볼륨 마운트 · <span class="opt">--name</span> 이름 지정 · <span class="opt">--rm</span> 종료 후 자동 삭제.</div><div class="desc-ex">$ docker run -d -p 3000:3000 --name myapp node:20<br>$ docker run --rm -it ubuntu bash</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker ps</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실행 중인 컨테이너 목록</div><div class="desc-sub"><span class="opt">-a</span> 중지된 컨테이너 포함 전체.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker stop <span class="arg">컨테이너</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">컨테이너 중지</div><div class="desc-sub"><span class="arg">docker start</span> 재시작 · <span class="arg">docker restart</span> 재시작.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker rm <span class="arg">컨테이너</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">컨테이너 삭제</div><div class="desc-sub"><span class="opt">-f</span> 실행 중도 강제 삭제. <span class="arg">docker rmi 이미지</span> 이미지 삭제.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker exec <span class="opt">-it</span> <span class="arg">컨테이너</span> bash</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실행 중인 컨테이너 안으로 진입</div><div class="desc-sub">컨테이너 내부를 직접 탐색·디버깅할 때 필수.</div><div class="desc-ex">$ docker exec -it myapp bash</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker logs <span class="arg">컨테이너</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">컨테이너 로그 출력</div><div class="desc-sub"><span class="opt">-f</span> 실시간 추적 · <span class="opt">--tail 100</span> 마지막 100줄.</div><div class="desc-ex">$ docker logs -f myapp</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker build <span class="opt">-t</span> <span class="arg">이름:태그</span> .</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Dockerfile로 이미지 빌드</div><div class="desc-sub"><span class="opt">-t</span> 이미지명:태그 지정. 마지막 <span class="arg">.</span>은 빌드 컨텍스트(현재 폴더).</div><div class="desc-ex">$ docker build -t myapp:1.0 .</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker images</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">로컬에 저장된 이미지 목록</div><div class="desc-sub"><span class="arg">docker image prune</span> 미사용 이미지 일괄 삭제.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker compose up</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">docker-compose.yml 기반 멀티 컨테이너 실행</div><div class="desc-sub"><span class="opt">-d</span> 백그라운드 · <span class="opt">--build</span> 이미지 새로 빌드 후 실행.</div><div class="desc-ex">$ docker compose up -d --build</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">docker compose down</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">컨테이너·네트워크 중지 및 제거</div><div class="desc-sub"><span class="opt">-v</span> 볼륨까지 삭제.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="pk-misc">
+        <div class="card-header"><span class="hl">06</span> 기타 자주 쓰는 개발 CLI</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">make <span class="arg">[타겟]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Makefile의 타겟 실행</div><div class="desc-sub">빌드 자동화. <span class="arg">make</span>만 치면 첫 번째 타겟 실행. C/C++ 프로젝트, 그 외 커스텀 자동화에도 활용.</div><div class="desc-ex">$ make build &nbsp;|&nbsp; $ make test &nbsp;|&nbsp; $ make clean</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">curl <span class="opt">-fsSL</span> <span class="arg">URL</span> | bash</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">원격 설치 스크립트 실행 (공식 설치 방식)</div><div class="desc-sub">nvm·homebrew·rustup 등 공식 설치 명령 패턴. 신뢰할 수 있는 출처에서만 사용.</div><div class="desc-ex">$ curl -fsSL https://get.docker.com | bash</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">brew install <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Homebrew로 패키지 설치 (macOS / Linux)</div><div class="desc-sub"><span class="arg">brew update</span> 목록 갱신 · <span class="arg">brew upgrade</span> 전체 업데이트 · <span class="arg">brew list</span> 설치 목록.</div><div class="desc-ex">$ brew install git node wget</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">apt install <span class="arg">패키지</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">APT 패키지 설치 (Ubuntu / Debian)</div><div class="desc-sub"><span class="arg">sudo apt update</span> 목록 갱신 먼저 필요. <span class="arg">apt remove</span> 제거 · <span class="arg">apt upgrade</span> 시스템 업데이트.</div><div class="desc-ex">$ sudo apt update && sudo apt install -y curl git</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">cargo <span class="arg">명령</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Rust 패키지 매니저 & 빌드 도구</div><div class="desc-sub"><span class="arg">cargo new</span> 프로젝트 생성 · <span class="arg">cargo build</span> 빌드 · <span class="arg">cargo run</span> 실행 · <span class="arg">cargo test</span> 테스트 · <span class="arg">cargo add 패키지</span> 의존성 추가.</div><div class="desc-ex">$ cargo new my-app &nbsp;|&nbsp; $ cargo run</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">go <span class="arg">명령</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">Go 빌드 도구</div><div class="desc-sub"><span class="arg">go run 파일.go</span> 실행 · <span class="arg">go build</span> 빌드 · <span class="arg">go test ./...</span> 전체 테스트 · <span class="arg">go get 패키지</span> 패키지 추가 · <span class="arg">go mod tidy</span> 의존성 정리.</div><div class="desc-ex">$ go run main.go &nbsp;|&nbsp; $ go test ./...</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">code <span class="arg">.</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 폴더를 VS Code로 열기</div><div class="desc-sub">VS Code의 code 명령어. <span class="arg">code 파일명</span>으로 특정 파일 바로 열기.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">open <span class="arg">.</span> / xdg-open <span class="arg">.</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 폴더를 파일 탐색기로 열기</div><div class="desc-sub">macOS는 <span class="arg">open</span> · Linux는 <span class="arg">xdg-open</span> · <span class="arg">open index.html</span>로 브라우저 열기도 가능.</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
     <!-- ════════════════════ 팁 ════════════════════ -->
     <div class="panel" id="panel-tips">
       <div class="sec-title">💡 터미널 팁 & 단축키</div>
@@ -761,7 +992,7 @@ body{background:var(--bg);color:var(--txt);font-family:'SFMono-Regular',Consolas
 
 <script>
 // ── 탭 전환 ──
-const TAB_LABELS={basic:'기본',text:'텍스트',perm:'권한',net:'네트워크',git:'Git',tips:'팁'};
+const TAB_LABELS={basic:'기본',text:'텍스트',perm:'권한',net:'네트워크',git:'Git',pkg:'패키지',tips:'팁'};
 function switchTab(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -801,6 +1032,14 @@ const SIDEBAR={
     {id:'g-basic',label:'기본 워크플로우'},
     {id:'g-branch',label:'브랜치 관리'},
     {id:'g-history',label:'히스토리 & 되돌리기'},
+  ],
+  pkg:[
+    {id:'pk-npm',label:'npm'},
+    {id:'pk-yarn',label:'yarn / pnpm'},
+    {id:'pk-node',label:'Node.js 관련'},
+    {id:'pk-pip',label:'pip (Python)'},
+    {id:'pk-docker',label:'Docker'},
+    {id:'pk-misc',label:'기타 개발 CLI'},
   ],
   tips:[
     {id:'tp-shortcut',label:'쉘 단축키'},

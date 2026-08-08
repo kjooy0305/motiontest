@@ -152,10 +152,10 @@ const PAGES = {
   },
 
   22: {
-    label : '코드의 세계',
+    label : 'DOOM (1993)',
     url   : 'pages/22/',
     thumb : null,
-    desc  : 'JS·TS·Python·Go 등 웹·앱 개발에 쓰이는 기술 종류별 정리',
+    desc  : 'id Software 클래식 FPS · 에피소드 1 셰어웨어 · 브라우저 실행',
   },
 
   // 23 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성

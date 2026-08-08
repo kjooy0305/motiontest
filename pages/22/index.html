@@ -1,375 +1,263 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>코드의 세계</title>
-<style>
-:root {
-  --bg: #080c10; --surf: #0e1318; --surf2: #131920; --bdr: #1a2028;
-  --text: #c8c0b0; --dim: #556070; --bright: #e8e0d0;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--bg); color: var(--text);
-  font-family: -apple-system, 'Malgun Gothic', sans-serif; }
-#app { display: flex; flex-direction: column; height: 100%; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOOM (1993)</title>
+  <link rel="stylesheet" href="https://js-dos.com/v7/build/js-dos.css">
+  <script src="https://js-dos.com/v7/build/js-dos.js"></script>
+  <style>
+    :root {
+      --red:   #c0392b;
+      --red2:  #e74c3c;
+      --dark:  #0a0a0a;
+      --dark2: #111;
+      --dark3: #1a1a1a;
+      --dim:   #888;
+      --txt:   #ccc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── 상단 고정 ── */
-#top { flex-shrink: 0; background: var(--surf); border-bottom: 1px solid var(--bdr); }
-#search-row {
-  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
-  border-bottom: 1px solid var(--bdr);
-}
-#search-wrap {
-  flex: 1; display: flex; align-items: center; gap: 7px;
-  background: var(--surf2); border: 1px solid var(--bdr);
-  border-radius: 9px; padding: 7px 12px;
-}
-#search-wrap svg { opacity: .4; flex-shrink: 0; }
-#sq {
-  flex: 1; background: transparent; border: none; outline: none;
-  color: var(--text); font-size: 13px; font-family: inherit;
-}
-#sq::placeholder { color: var(--dim); }
-#count { font-size: 11px; color: var(--dim); white-space: nowrap; font-family: monospace; }
+    body {
+      background: var(--dark);
+      color: var(--txt);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-/* ── 카테고리 필터 ── */
-#cat-bar {
-  display: flex; gap: 6px; padding: 8px 14px;
-  overflow-x: auto; scrollbar-width: none;
-}
-#cat-bar::-webkit-scrollbar { display: none; }
-.cchip {
-  flex-shrink: 0; padding: 4px 12px; border-radius: 20px; font-size: 11px;
-  border: 1px solid var(--bdr); background: transparent; color: var(--dim);
-  cursor: pointer; transition: .15s; font-family: inherit;
-}
-.cchip:hover { color: var(--text); }
-.cchip.on { color: #fff; }
+    /* ── 헤더 ── */
+    #header {
+      background: #0d0000;
+      border-bottom: 2px solid var(--red);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    #logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--red2);
+      letter-spacing: .2em;
+      text-shadow: 0 0 18px #c0392b99, 0 0 40px #c0392b44;
+      text-transform: uppercase;
+    }
+    #logo span { color: #fff; font-size: .85rem; letter-spacing: .08em; display: block; margin-top: -4px; }
+    #hbtns { display: flex; gap: 8px; }
+    .hbtn {
+      padding: 6px 16px; border-radius: 4px; font-size: .8rem; font-weight: 700;
+      cursor: pointer; border: 1px solid; font-family: inherit; letter-spacing: .05em;
+      transition: all .15s;
+    }
+    #btn-fs  { background: #1a0000; border-color: var(--red); color: var(--red2); }
+    #btn-fs:hover  { background: var(--red); color: #fff; box-shadow: 0 0 14px #c0392b80; }
 
-/* ── 스크롤 본문 ── */
-#content { flex: 1; overflow-y: auto; padding: 16px 14px 30px; }
+    /* ── 게임 컨테이너 ── */
+    #game-wrap {
+      position: relative;
+      background: #000;
+      width: 100%;
+    }
+    #jsdos {
+      width: 100%;
+      height: 70vh;
+      min-height: 420px;
+      display: block;
+    }
 
-/* ── 카테고리 섹션 ── */
-.sec { margin-bottom: 24px; }
-.sec.hide { display: none; }
-.sec-head {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 10px; padding-bottom: 8px;
-  border-bottom: 1px solid var(--bdr);
-}
-.sec-icon { font-size: 18px; }
-.sec-label { font-size: 14px; font-weight: 700; }
-.sec-cnt { font-size: 11px; color: var(--dim); margin-left: auto; }
+    /* ── 로딩 화면 ── */
+    #loading-overlay {
+      position: absolute; inset: 0;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 10; gap: 16px;
+      pointer-events: none;
+      transition: opacity .5s;
+    }
+    #loading-overlay.hide { opacity: 0; pointer-events: none; }
+    .skull { font-size: 3rem; animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:.7} }
+    .load-title { font-size: 1.4rem; font-weight: 900; color: var(--red2); letter-spacing: .2em; text-shadow: 0 0 20px #c0392b; }
+    .load-bar-wrap { width: 280px; height: 12px; background: #1a0000; border: 1px solid var(--red); border-radius: 2px; overflow: hidden; }
+    .load-bar { height: 100%; width: 0; background: linear-gradient(90deg,#8b0000,var(--red2)); transition: width .4s; }
+    .load-msg { font-size: .78rem; color: var(--dim); }
 
-/* ── 카드 그리드 ── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 8px;
-}
-.card {
-  background: var(--surf); border: 1px solid var(--bdr);
-  border-radius: 10px; padding: 12px 14px;
-  border-left: 3px solid var(--accent, #556070);
-  transition: transform .15s, box-shadow .15s;
-  cursor: default;
-}
-.card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
-.card.hide { display: none; }
+    /* ── 하단 패널 ── */
+    #bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid #2a0000;
+      flex: 1;
+    }
+    .panel {
+      padding: 18px 22px;
+      border-right: 1px solid #1a0000;
+    }
+    .panel:last-child { border-right: none; }
+    .panel-title {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      color: var(--red2); text-transform: uppercase; margin-bottom: 12px;
+      padding-bottom: 6px; border-bottom: 1px solid #2a0000;
+    }
 
-.card-top { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
-.card-badge {
-  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
-  color: #000; background: var(--accent, #556070); white-space: nowrap;
-  letter-spacing: .3px;
-}
-.card-name { font-size: 14px; font-weight: 700; color: var(--bright); }
-.card-desc { font-size: 11px; color: var(--dim); line-height: 1.5; margin-bottom: 6px; }
-.card-use {
-  display: inline-block; font-size: 10px; color: var(--accent, #556070);
-  background: color-mix(in srgb, var(--accent, #556070) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent, #556070) 30%, transparent);
-  border-radius: 4px; padding: 2px 7px;
-}
+    /* 조작법 그리드 */
+    .ctrl-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
+    .ctrl-key {
+      font-size: .78rem; color: #fff;
+      background: #1a0000; border: 1px solid #3a0000;
+      border-bottom: 2px solid #5a0000;
+      border-radius: 4px; padding: 2px 8px; white-space: nowrap;
+      text-align: center; font-family: inherit;
+    }
+    .ctrl-desc { font-size: .78rem; color: var(--dim); display: flex; align-items: center; }
 
-/* ── 빈 결과 ── */
-#empty { display: none; text-align: center; padding: 60px 20px; color: var(--dim); }
-#empty .e-icon { font-size: 40px; display: block; margin-bottom: 12px; }
-</style>
+    /* 정보 목록 */
+    .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .info-list li {
+      font-size: .78rem; color: var(--dim); padding: 7px 10px;
+      background: #0d0000; border-left: 2px solid var(--red);
+      border-radius: 0 4px 4px 0;
+      line-height: 1.5;
+    }
+    .info-list li strong { color: var(--txt); }
+
+    /* 팁 */
+    .tip-box {
+      background: #0d0000; border: 1px solid #2a0000;
+      border-radius: 6px; padding: 10px 12px;
+      font-size: .76rem; color: var(--dim); margin-top: 10px; line-height: 1.6;
+    }
+    .tip-box strong { color: var(--red2); }
+
+    @media (max-width: 580px) {
+      #bottom { grid-template-columns: 1fr; }
+      .panel { border-right: none; border-bottom: 1px solid #1a0000; }
+      #jsdos { height: 55vw; min-height: 260px; }
+    }
+  </style>
 </head>
 <body>
-<div id="app">
 
-  <div id="top">
-    <div id="search-row">
-      <div id="search-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input id="sq" type="text" placeholder="기술 검색... (예: React, Python, SQL)">
-      </div>
-      <span id="count"></span>
-    </div>
-    <div id="cat-bar">
-      <button class="cchip on" data-cat="all">전체</button>
-    </div>
+<div id="header">
+  <div id="logo">DOOM<span>1993 · id Software · Shareware Ep.1</span></div>
+  <div id="hbtns">
+    <button class="hbtn" id="btn-fs" onclick="goFullscreen()">⛶ 전체화면</button>
   </div>
-
-  <div id="content">
-    <div id="sections"></div>
-    <div id="empty"><span class="e-icon">🔍</span>검색 결과가 없습니다</div>
-  </div>
-
 </div>
+
+<div id="game-wrap">
+  <!-- 로딩 오버레이 -->
+  <div id="loading-overlay">
+    <div class="skull">💀</div>
+    <div class="load-title">DOOM</div>
+    <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
+    <div class="load-msg" id="load-msg">에뮬레이터 초기화 중...</div>
+  </div>
+
+  <div id="jsdos"></div>
+</div>
+
+<div id="bottom">
+  <div class="panel">
+    <div class="panel-title">⌨ 조작법</div>
+    <div class="ctrl-grid">
+      <span class="ctrl-key">↑ W</span><span class="ctrl-desc">앞으로 이동</span>
+      <span class="ctrl-key">↓ S</span><span class="ctrl-desc">뒤로 이동</span>
+      <span class="ctrl-key">← →</span><span class="ctrl-desc">좌우 회전</span>
+      <span class="ctrl-key">Alt + ← →</span><span class="ctrl-desc">좌우 이동 (스트레이프)</span>
+      <span class="ctrl-key">Ctrl</span><span class="ctrl-desc">발사 / 공격</span>
+      <span class="ctrl-key">Space</span><span class="ctrl-desc">문 열기 · 스위치</span>
+      <span class="ctrl-key">Shift</span><span class="ctrl-desc">달리기</span>
+      <span class="ctrl-key">1 – 7</span><span class="ctrl-desc">무기 선택</span>
+      <span class="ctrl-key">Esc</span><span class="ctrl-desc">메뉴 열기 / 일시정지</span>
+      <span class="ctrl-key">Tab</span><span class="ctrl-desc">자동 지도 (오토맵)</span>
+      <span class="ctrl-key">F1</span><span class="ctrl-desc">도움말</span>
+      <span class="ctrl-key">F5</span><span class="ctrl-desc">화면 크기 조절</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">ℹ 게임 정보</div>
+    <ul class="info-list">
+      <li><strong>에피소드 1 무료 버전</strong> — Knee-Deep in the Dead (9개 맵)</li>
+      <li><strong>장르</strong> — 1인칭 슈터 (FPS). 1993년 id Software 발표</li>
+      <li><strong>목표</strong> — 각 맵의 출구를 찾아 탈출. 악마를 모두 처치할 필요 없음</li>
+      <li><strong>무기</strong> — 주먹 · 권총 · 샷건 · 로켓런처 · BFG9000 등</li>
+      <li><strong>아이템</strong> — 메디킷(❤) · 방어구(🛡) · 탄약 · 특수 파워업</li>
+    </ul>
+    <div class="tip-box">
+      <strong>팁 :</strong> 게임 창을 클릭하면 마우스가 게임에 잠깁니다.
+      해제하려면 <strong>우클릭</strong> 또는 <strong>Esc</strong>를 누르세요.<br>
+      로딩이 느릴 경우 브라우저를 새로고침(F5)하면 됩니다.
+    </div>
+  </div>
+</div>
+
 <script>
-const CATS = [
-  {
-    id: 'markup', label: '마크업 & 스타일', icon: '🎨', color: '#fb923c',
-    items: [
-      { name: 'HTML5',      badge: 'HTML',    desc: '웹 페이지의 뼈대 · 구조와 의미를 정의', use: '모든 웹사이트' },
-      { name: 'CSS3',       badge: 'CSS',     desc: '레이아웃·색상·애니메이션 · 시각 스타일', use: '모든 웹사이트' },
-      { name: 'Sass/SCSS',  badge: 'SCSS',    desc: '변수·중첩·믹스인 · CSS 전처리기', use: '중·대형 프로젝트' },
-      { name: 'Tailwind',   badge: 'TW',      desc: '유틸리티 클래스 기반 CSS 프레임워크', use: '빠른 UI 구축' },
-      { name: 'Bootstrap',  badge: 'BS',      desc: '반응형 UI 컴포넌트 모음', use: '어드민·대시보드' },
-    ]
-  },
-  {
-    id: 'lang-fe', label: '프론트엔드 언어', icon: '✏️', color: '#fbbf24',
-    items: [
-      { name: 'JavaScript', badge: 'JS',  desc: '웹 브라우저의 유일한 네이티브 스크립트 언어', use: '모든 웹' },
-      { name: 'TypeScript', badge: 'TS',  desc: 'JS에 정적 타입을 추가한 슈퍼셋 · 오류 사전 방지', use: '대형 프로젝트' },
-      { name: 'WebAssembly',badge: 'WASM',desc: '브라우저에서 C/Rust 수준의 고성능 실행', use: '게임·영상처리' },
-    ]
-  },
-  {
-    id: 'fw-fe', label: '프론트엔드 프레임워크', icon: '⚛️', color: '#60a5fa',
-    items: [
-      { name: 'React',      badge: 'React',   desc: '컴포넌트 기반 UI 라이브러리 · Meta 개발', use: 'SPA·대형 서비스' },
-      { name: 'Vue.js',     badge: 'Vue',     desc: '점진적 도입이 쉬운 JS 프레임워크', use: '중소형 프로젝트' },
-      { name: 'Angular',    badge: 'NG',      desc: 'TypeScript 기반 풀 프레임워크 · Google', use: '기업형 앱' },
-      { name: 'Svelte',     badge: 'Svelte',  desc: '빌드 타임 컴파일 · 런타임 오버헤드 없음', use: '고성능 앱' },
-      { name: 'Next.js',    badge: 'Next',    desc: 'React 기반 SSR/SSG/ISR 풀스택 프레임워크', use: 'SEO · 대형 서비스' },
-      { name: 'Nuxt.js',    badge: 'Nuxt',    desc: 'Vue 기반 SSR/SSG 풀스택 프레임워크', use: 'Vue + SEO' },
-      { name: 'Astro',      badge: 'Astro',   desc: '컨텐츠 중심 · Islands 아키텍처 · 초경량', use: '블로그·문서 사이트' },
-      { name: 'SolidJS',    badge: 'Solid',   desc: '세밀한 반응성 · React 스타일 · 초고속', use: '고성능 SPA' },
-    ]
-  },
-  {
-    id: 'lang-be', label: '백엔드 언어', icon: '🖥️', color: '#34d399',
-    items: [
-      { name: 'Node.js',    badge: 'Node',    desc: 'V8 엔진 기반 JS 서버 런타임', use: 'REST API · 실시간' },
-      { name: 'Python',     badge: 'PY',      desc: '간결한 범용 언어 · AI/ML 생태계 최강', use: 'API · AI · 데이터' },
-      { name: 'Java',       badge: 'Java',    desc: '안정성·생태계 최강 엔터프라이즈 언어', use: '대형 기업 시스템' },
-      { name: 'Go',         badge: 'Go',      desc: '고성능·간결·낮은 메모리 · Google 설계', use: '마이크로서비스 · 클라우드' },
-      { name: 'Rust',       badge: 'Rust',    desc: '메모리 안전 시스템 언어 · 가비지컬렉터 없음', use: '고성능 서버 · WASM' },
-      { name: 'PHP',        badge: 'PHP',     desc: '서버 사이드 동적 페이지 · 웹 역사의 기반', use: 'CMS · 블로그 · 워드프레스' },
-      { name: 'C#',         badge: 'C#',      desc: 'Microsoft .NET 생태계 · 멀티패러다임', use: '기업 · 게임(Unity) · 데스크톱' },
-      { name: 'Ruby',       badge: 'Ruby',    desc: '개발자 행복 최우선 설계 · DSL 친화적', use: '스타트업 MVP · 웹 앱' },
-      { name: 'Kotlin',     badge: 'KT',      desc: 'JVM 기반 간결한 언어 · Java 100% 호환', use: 'Android · Spring 서버' },
-      { name: 'Swift',      badge: 'Swift',   desc: 'Apple 공식 언어 · 안전하고 빠른 문법', use: 'iOS · macOS 앱' },
-    ]
-  },
-  {
-    id: 'fw-be', label: '백엔드 프레임워크', icon: '🔧', color: '#2dd4bf',
-    items: [
-      { name: 'Express.js', badge: 'Express', desc: 'Node.js 미니멀 웹 프레임워크 · 생태계 최대', use: 'REST API' },
-      { name: 'Fastify',    badge: 'Fastify', desc: 'Express 대비 2× 빠른 Node.js 프레임워크', use: '고성능 API' },
-      { name: 'NestJS',     badge: 'Nest',    desc: 'TypeScript 기반 구조화된 Node.js 프레임워크', use: '기업형 API' },
-      { name: 'Django',     badge: 'Django',  desc: 'Python 배터리 포함 풀스택 · ORM·관리자 내장', use: '빠른 MVP' },
-      { name: 'FastAPI',    badge: 'FastAPI', desc: 'Python 최고속 비동기 API · Swagger 자동생성', use: 'AI 서비스 · API' },
-      { name: 'Flask',      badge: 'Flask',   desc: 'Python 마이크로 프레임워크 · 가볍고 유연', use: '소형 API · 프로토타입' },
-      { name: 'Spring Boot',badge: 'Spring',  desc: 'Java 엔터프라이즈 표준 · 강력한 DI 컨테이너', use: '대형 기업 시스템' },
-      { name: 'Laravel',    badge: 'Laravel', desc: 'PHP 풀스택 프레임워크 · 우아한 문법', use: '웹 앱 · REST API' },
-      { name: 'Ruby on Rails',badge: 'Rails', desc: 'Ruby 풀스택 · 설정보다 관례 · 빠른 개발', use: '스타트업 서비스' },
-      { name: 'ASP.NET Core',badge: '.NET',   desc: 'C# 고성능 크로스플랫폼 웹 프레임워크', use: '기업 서비스' },
-    ]
-  },
-  {
-    id: 'mobile', label: '모바일 앱', icon: '📱', color: '#a78bfa',
-    items: [
-      { name: 'Swift',        badge: 'Swift',  desc: 'Apple 공식 iOS/macOS 네이티브 언어', use: 'iOS 앱' },
-      { name: 'Kotlin',       badge: 'Kotlin', desc: 'Google 공식 Android 네이티브 언어', use: 'Android 앱' },
-      { name: 'React Native', badge: 'RN',     desc: 'JS로 iOS + Android 동시 개발', use: '크로스플랫폼' },
-      { name: 'Flutter',      badge: 'Flutter',desc: 'Dart 기반 Google 크로스플랫폼 · 60fps UI', use: 'iOS + Android + 웹' },
-      { name: 'Expo',         badge: 'Expo',   desc: 'React Native 간편화 툴킷 · OTA 업데이트', use: '빠른 모바일 프로토타입' },
-    ]
-  },
-  {
-    id: 'desktop', label: '데스크톱 앱', icon: '🖥️', color: '#f472b6',
-    items: [
-      { name: 'Electron',   badge: 'Electron', desc: '웹 기술로 크로스플랫폼 데스크톱 · VS Code·Discord', use: '크로스플랫폼 앱' },
-      { name: 'Tauri',      badge: 'Tauri',    desc: 'Rust 기반 경량 데스크톱 · Electron 대비 10× 작은 용량', use: '고성능 데스크톱' },
-      { name: 'PyQt/tkinter',badge: 'Python',  desc: 'Python GUI 라이브러리 · 빠른 도구 제작', use: '유틸리티 · 내부 도구' },
-      { name: '.NET MAUI',  badge: 'MAUI',     desc: 'C# 기반 크로스플랫폼 · Windows·Mac·Mobile', use: 'Microsoft 생태계' },
-    ]
-  },
-  {
-    id: 'db', label: '데이터베이스', icon: '🗄️', color: '#f87171',
-    items: [
-      { name: 'MySQL',      badge: 'MySQL',    desc: '세계 1위 오픈소스 관계형 DB · 빠르고 안정적', use: '웹 서비스 전반' },
-      { name: 'PostgreSQL', badge: 'PG',       desc: '고급 기능·JSON 지원 오픈소스 관계형 DB', use: '복잡한 쿼리 · 대형 서비스' },
-      { name: 'SQLite',     badge: 'SQLite',   desc: '파일 기반 경량 DB · 서버 불필요', use: '모바일 · 임베디드 · 로컬' },
-      { name: 'MongoDB',    badge: 'Mongo',    desc: '문서(JSON) 기반 NoSQL DB · 유연한 스키마', use: '유연한 데이터 구조' },
-      { name: 'Redis',      badge: 'Redis',    desc: '인메모리 Key-Value 저장소 · 초고속', use: '캐시 · 세션 · 실시간 순위' },
-      { name: 'Firebase',   badge: 'FB',       desc: 'Google 실시간 NoSQL BaaS · SDK 즉시 사용', use: '빠른 MVP · 모바일 앱' },
-      { name: 'Supabase',   badge: 'SB',       desc: 'PostgreSQL 기반 오픈소스 BaaS · Firebase 대안', use: '풀스택 앱' },
-      { name: 'Prisma',     badge: 'Prisma',   desc: 'TypeScript 타입세이프 ORM · 자동 마이그레이션', use: 'Node.js DB 관리' },
-    ]
-  },
-  {
-    id: 'build', label: '빌드 & 런타임', icon: '⚙️', color: '#22d3ee',
-    items: [
-      { name: 'Vite',       badge: 'Vite',     desc: '차세대 초고속 빌드 도구 · HMR 즉시 반영', use: '현대 프론트엔드' },
-      { name: 'Webpack',    badge: 'WP',       desc: '모듈 번들러 · 풍부한 플러그인 생태계', use: '복잡한 빌드 설정' },
-      { name: 'esbuild',    badge: 'esbuild',  desc: 'Go 기반 초고속 번들러 · Vite 내부에서도 사용', use: '빠른 트랜스파일' },
-      { name: 'Bun',        badge: 'Bun',      desc: '초고속 JS 런타임 + 패키지 매니저 + 번들러 통합', use: 'Node.js 대안' },
-      { name: 'Deno',       badge: 'Deno',     desc: '보안 기본 JS/TS 런타임 · TypeScript 네이티브', use: '서버 · 스크립트' },
-      { name: 'Docker',     badge: 'Docker',   desc: '컨테이너 가상화 · "내 컴퓨터에선 되는데" 해결', use: '일관된 배포 환경' },
-      { name: 'npm/yarn/pnpm',badge: 'PKG',   desc: 'JS 패키지 매니저 · 의존성 관리', use: 'Node.js 프로젝트 전반' },
-    ]
-  },
-  {
-    id: 'cloud', label: '클라우드 & 배포', icon: '☁️', color: '#818cf8',
-    items: [
-      { name: 'AWS',        badge: 'AWS',       desc: 'Amazon 클라우드 · 200개 이상 서비스 · 점유율 1위', use: '모든 규모' },
-      { name: 'GCP',        badge: 'GCP',       desc: 'Google 클라우드 · AI·ML·BigQuery 특화', use: 'ML · 빅데이터' },
-      { name: 'Azure',      badge: 'Azure',     desc: 'Microsoft 클라우드 · 기업·Active Directory 친화', use: '기업 · MS 생태계' },
-      { name: 'Vercel',     badge: 'Vercel',    desc: '프론트엔드 특화 배포 · Git 푸시 즉시 배포', use: 'Next.js · 정적 사이트' },
-      { name: 'Netlify',    badge: 'Netlify',   desc: 'JAMstack 배포 · 폼·함수·CDN 내장', use: '정적 사이트 · 서버리스' },
-      { name: 'GitHub Actions',badge: 'GHA',   desc: 'Git 저장소 연동 CI/CD · YAML 파이프라인', use: '자동 빌드 · 배포' },
-      { name: 'Kubernetes', badge: 'K8s',       desc: '컨테이너 오케스트레이션 · 대규모 자동 운영', use: '대형 서비스 · MSA' },
-    ]
-  },
-];
+  // ── 로딩 바 애니메이션 ──
+  let loadPct = 0;
+  const bar = document.getElementById('load-bar');
+  const msg = document.getElementById('load-msg');
+  const overlay = document.getElementById('loading-overlay');
 
-/* ── 렌더링 ── */
-const catBar   = document.getElementById('cat-bar');
-const sections = document.getElementById('sections');
-const sq       = document.getElementById('sq');
-const countEl  = document.getElementById('count');
-const emptyEl  = document.getElementById('empty');
+  const MSGS = [
+    [0,  '에뮬레이터 초기화 중...'],
+    [20, 'DOSBox 로딩 중...'],
+    [45, '둠 게임 파일 수신 중...'],
+    [70, 'WAD 파일 처리 중...'],
+    [88, '악마 소환 준비 중...'],
+    [96, '거의 다 됐습니다...'],
+  ];
 
-let activeCat = 'all';
-let totalVisible = 0;
-
-// 카테고리 칩 생성
-CATS.forEach(c => {
-  const btn = document.createElement('button');
-  btn.className = 'cchip';
-  btn.dataset.cat = c.id;
-  btn.textContent = `${c.icon} ${c.label}`;
-  btn.style.setProperty('--ac', c.color);
-  catBar.appendChild(btn);
-});
-
-// 섹션 + 카드 생성
-CATS.forEach(c => {
-  const sec = document.createElement('div');
-  sec.className = 'sec';
-  sec.dataset.cat = c.id;
-
-  const head = document.createElement('div');
-  head.className = 'sec-head';
-  head.style.color = c.color;
-  head.innerHTML =
-    `<span class="sec-icon">${c.icon}</span>` +
-    `<span class="sec-label">${c.label}</span>` +
-    `<span class="sec-cnt" id="cnt-${c.id}">${c.items.length}개</span>`;
-
-  const grid = document.createElement('div');
-  grid.className = 'grid';
-
-  c.items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.setProperty('--accent', c.color);
-    card.dataset.search = (item.name + ' ' + item.desc + ' ' + item.use + ' ' + item.badge).toLowerCase();
-    card.innerHTML =
-      `<div class="card-top">` +
-        `<span class="card-badge">${item.badge}</span>` +
-        `<span class="card-name">${item.name}</span>` +
-      `</div>` +
-      `<div class="card-desc">${item.desc}</div>` +
-      `<span class="card-use">${item.use}</span>`;
-    grid.appendChild(card);
-  });
-
-  sec.appendChild(head);
-  sec.appendChild(grid);
-  sections.appendChild(sec);
-});
-
-function update() {
-  const keyword = sq.value.trim().toLowerCase();
-  totalVisible = 0;
-
-  document.querySelectorAll('.sec').forEach(sec => {
-    const catMatch = activeCat === 'all' || sec.dataset.cat === activeCat;
-    if (!catMatch) { sec.classList.add('hide'); return; }
-    sec.classList.remove('hide');
-
-    const cards = sec.querySelectorAll('.card');
-    let visible = 0;
-    cards.forEach(card => {
-      const match = !keyword || card.dataset.search.includes(keyword);
-      card.classList.toggle('hide', !match);
-      if (match) visible++;
-    });
-
-    const cntEl = document.getElementById('cnt-' + sec.dataset.cat);
-    if (cntEl) cntEl.textContent = visible + '개';
-    if (visible === 0) sec.classList.add('hide');
-    totalVisible += visible;
-  });
-
-  countEl.textContent = totalVisible + '개';
-  emptyEl.style.display = totalVisible === 0 ? 'block' : 'none';
-}
-
-// 칩 클릭
-catBar.addEventListener('click', e => {
-  const btn = e.target.closest('.cchip');
-  if (!btn) return;
-  activeCat = btn.dataset.cat;
-  document.querySelectorAll('.cchip').forEach(b => {
-    const isOn = b.dataset.cat === activeCat;
-    b.classList.toggle('on', isOn);
-    if (isOn) {
-      const cat = CATS.find(c => c.id === activeCat);
-      b.style.background = cat ? cat.color : '';
-      b.style.borderColor = cat ? cat.color : '';
-      b.style.color = cat ? '#000' : '';
-    } else {
-      b.style.background = '';
-      b.style.borderColor = '';
-      b.style.color = '';
+  const fakeTimer = setInterval(() => {
+    if (loadPct >= 96) { clearInterval(fakeTimer); return; }
+    loadPct = Math.min(96, loadPct + (Math.random() * 3 + 0.5));
+    bar.style.width = loadPct + '%';
+    for (const [pct, m] of MSGS) {
+      if (loadPct >= pct) msg.textContent = m;
     }
+  }, 300);
+
+  // ── js-dos v7 실행 ──
+  const container = document.getElementById('jsdos');
+
+  Dos(container, {
+    url: 'https://cdn.dos.zone/original/2X/b/b44eb7d566ef52e70ab0fb90ae0c3c9c.jsdos',
+  }).then(ci => {
+    // 로딩 완료
+    clearInterval(fakeTimer);
+    bar.style.width = '100%';
+    msg.textContent = '준비 완료!';
+    setTimeout(() => overlay.classList.add('hide'), 600);
+  }).catch(() => {
+    // 번들 URL 오류 시 대체 시도
+    msg.textContent = '다른 서버에서 재시도 중...';
+    bar.style.width = '30%';
+    Dos(container, {
+      url: 'https://js-dos.com/games/doom.jsdos',
+    }).then(ci => {
+      clearInterval(fakeTimer);
+      bar.style.width = '100%';
+      msg.textContent = '준비 완료!';
+      setTimeout(() => overlay.classList.add('hide'), 600);
+    }).catch(() => {
+      bar.style.background = '#8b0000';
+      msg.textContent = '로딩 실패 — 아래 안내를 확인하세요.';
+    });
   });
-  // 전체 칩은 별도 처리
-  const allChip = document.querySelector('.cchip[data-cat="all"]');
-  if (activeCat === 'all') {
-    allChip.style.background = '#fff';
-    allChip.style.borderColor = '#fff';
-    allChip.style.color = '#000';
-  } else {
-    allChip.style.background = '';
-    allChip.style.borderColor = '';
-    allChip.style.color = '';
+
+  // ── 전체화면 ──
+  function goFullscreen() {
+    const wrap = document.getElementById('game-wrap');
+    if (wrap.requestFullscreen) wrap.requestFullscreen();
+    else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
   }
-  update();
-});
-
-sq.addEventListener('input', update);
-
-// 초기 전체 칩 스타일
-const allChip = document.querySelector('.cchip[data-cat="all"]');
-allChip.style.background = '#fff';
-allChip.style.borderColor = '#fff';
-allChip.style.color = '#000';
-
-update();
 </script>
 </body>
 </html>

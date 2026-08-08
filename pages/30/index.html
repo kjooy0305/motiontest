@@ -317,7 +317,7 @@ document.querySelectorAll('.theme-btn').forEach(btn=>{
     document.getElementById('custom-row').classList.toggle('visible',isC);
     if(isC) buildCustomPickers();
     if(autoMode) rebuildEmitters();
-    if(autoMode) Music.changeTheme(currentTheme);
+    if(autoMode) Ambient.changeTheme(currentTheme);
   });
 });
 
@@ -351,187 +351,245 @@ function buildCustomPickers(){
 }
 
 // ═══════════════════════════════════════════
-//  음악 엔진 (Web Audio API)
+//  앰비언트 사운드 엔진 (노이즈 기반 자연음)
 // ═══════════════════════════════════════════
-const Music = (() => {
+const Ambient = (() => {
   let actx=null, master=null;
   let active=false, theme=null;
-  let drones=[], noiseNode=null, rvbNode=null;
-  let schedTimer=null, nextAt=0;
+  let nodes=[], gen=0;
   let vol=0.5;
 
-  // 테마별 음악 정의
-  const DEFS = {
-    // 🌲 초록 산 — C장조 5음계, 느린 사인파, 자연의 고요
-    forest:{
-      scale:[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.26,784.00,880.00],
-      bpm:52, wave:'sine', dur:1.5, nVol:.12, prob:.52,
-      drones:[{f:65.41,v:.06,w:'sine'},{f:98.00,v:.03,w:'sine'},{f:196.00,v:.02,w:'sine'}],
-      rvbDur:3.5, rvbMix:.40,
-    },
-    // 🍂 단풍 산 — A단조 5음계, 따뜻한 삼각파, 가을 서정
-    autumn:{
-      scale:[220.00,261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.26],
-      bpm:65, wave:'triangle', dur:1.0, nVol:.11, prob:.68,
-      drones:[{f:110.00,v:.07,w:'triangle'},{f:164.81,v:.04,w:'sine'},{f:220.00,v:.02,w:'triangle'}],
-      rvbDur:2.5, rvbMix:.32,
-    },
-    // ❄️ 겨울 산 — D도리안 sparse, 벨 같은 사인파, 긴 잔향
-    winter:{
-      scale:[293.66,349.23,392.00,440.00,523.25,587.33,698.46,784.00,880.00,1046.50,1174.66],
-      bpm:34, wave:'sine', dur:3.0, nVol:.09, prob:.30,
-      drones:[{f:73.42,v:.04,w:'sine'},{f:146.83,v:.025,w:'sine'}],
-      rvbDur:6.0, rvbMix:.55,
-    },
-    // 🏜 사막 — E프리지안, 필터드 톱니파, 주술적 반복
-    desert:{
-      scale:[164.81,174.61,196.00,220.00,246.94,261.63,293.66,329.63,349.23,392.00],
-      bpm:95, wave:'sawtooth', dur:.45, nVol:.07, prob:.62, filter:1200,
-      drones:[{f:82.41,v:.08,w:'sawtooth'},{f:164.81,v:.04,w:'sawtooth'},{f:246.94,v:.025,w:'sine'}],
-      rvbDur:2.2, rvbMix:.25,
-    },
-    // 🌋 화산 — 감음계(저음역), 스퀘어파+노이즈, 불안한 긴장감
-    volcano:{
-      scale:[65.41,77.78,87.31,110.00,130.81,155.56,185.00,220.00,261.63],
-      bpm:88, wave:'square', dur:.42, nVol:.08, prob:.82, filter:700,
-      drones:[{f:32.70,v:.13,w:'sawtooth'},{f:65.41,v:.07,w:'square'}],
-      rvbDur:1.4, rvbMix:.20, noise:true,
-    },
-    // 🌈 무지개 — 온음계(고음역), 빠른 삼각파, 경쾌
-    rainbow:{
-      scale:[523.25,587.33,659.26,739.99,830.61,932.33,1046.50,1174.66,1318.51,1480.00],
-      bpm:115, wave:'triangle', dur:.28, nVol:.09, prob:.88,
-      drones:[{f:130.81,v:.04,w:'sine'},{f:261.63,v:.03,w:'sine'},{f:523.25,v:.02,w:'sine'}],
-      rvbDur:1.0, rvbMix:.18,
-    },
-    // 🎨 커스텀 — F리디안, 중립적 앰비언트
-    custom:{
-      scale:[349.23,392.00,440.00,493.88,523.25,587.33,659.26,698.46,880.00],
-      bpm:55, wave:'sine', dur:1.4, nVol:.10, prob:.50,
-      drones:[{f:87.31,v:.05,w:'sine'},{f:174.61,v:.03,w:'sine'}],
-      rvbDur:3.8, rvbMix:.38,
-    },
-  };
-
-  function init(){
-    if(actx) return;
-    actx=new(window.AudioContext||window.webkitAudioContext)();
-    master=actx.createGain(); master.gain.value=0;
-    master.connect(actx.destination);
+  // 루프용 화이트 노이즈 버퍼 소스
+  function mkNoise(sec){
+    const len=actx.sampleRate*sec;
+    const buf=actx.createBuffer(1,len,actx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+    const src=actx.createBufferSource(); src.buffer=buf; src.loop=true;
+    return src;
   }
 
-  function makeImpulse(dur,decay){
-    const len=actx.sampleRate*dur;
-    const buf=actx.createBuffer(2,len,actx.sampleRate);
-    for(let ch=0;ch<2;ch++){
-      const d=buf.getChannelData(ch);
-      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
+  // 밴드패스 필터 노이즈 + LFO 바람 레이어
+  function makeWind(fC,q,lfoHz,lfoDepth,gainVal){
+    const ns=mkNoise(4);
+    const bp=actx.createBiquadFilter();
+    bp.type='bandpass'; bp.frequency.value=fC; bp.Q.value=q;
+    const lfo=actx.createOscillator();
+    lfo.type='sine'; lfo.frequency.value=lfoHz;
+    const lfoG=actx.createGain(); lfoG.gain.value=lfoDepth;
+    lfo.connect(lfoG); lfoG.connect(bp.frequency); lfo.start();
+    const g=actx.createGain(); g.gain.value=0;
+    g.gain.setTargetAtTime(gainVal,actx.currentTime,2.5);
+    ns.connect(bp); bp.connect(g); g.connect(master); ns.start();
+    nodes.push({ns,lfo,g});
+  }
+
+  // 단순 필터 노이즈 레이어
+  function makeNoise(ftype,fCut,q,gainVal){
+    const ns=mkNoise(3);
+    const f=actx.createBiquadFilter();
+    f.type=ftype; f.frequency.value=fCut; f.Q.value=q;
+    const g=actx.createGain(); g.gain.value=0;
+    g.gain.setTargetAtTime(gainVal,actx.currentTime,2);
+    ns.connect(f); f.connect(g); g.connect(master); ns.start();
+    nodes.push({ns,g});
+  }
+
+  // 저주파 드론 오실레이터 (배경 깊이감)
+  function makeDrone(freq,gainVal,wave='sine'){
+    const osc=actx.createOscillator();
+    osc.type=wave; osc.frequency.value=freq;
+    const g=actx.createGain(); g.gain.value=0;
+    g.gain.setTargetAtTime(gainVal,actx.currentTime,3);
+    osc.connect(g); g.connect(master); osc.start();
+    nodes.push({osc,g});
+  }
+
+  // 새 울음: 오실레이터 주파수 스윕
+  function bird(){
+    const t=actx.currentTime;
+    const n=1+Math.floor(Math.random()*4);
+    for(let i=0;i<n;i++){
+      const delay=i*(.08+Math.random()*.14);
+      const f0=2400+Math.random()*2000;
+      const f1=f0+300+Math.random()*900;
+      const dur=.07+Math.random()*.16;
+      const osc=actx.createOscillator(), g=actx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(f0,t+delay);
+      osc.frequency.linearRampToValueAtTime(f1,t+delay+dur*.4);
+      osc.frequency.linearRampToValueAtTime(f0*.82,t+delay+dur);
+      g.gain.setValueAtTime(0,t+delay);
+      g.gain.linearRampToValueAtTime(.065,t+delay+.008);
+      g.gain.exponentialRampToValueAtTime(.001,t+delay+dur);
+      osc.connect(g); g.connect(master);
+      osc.start(t+delay); osc.stop(t+delay+dur+.05);
     }
-    return buf;
+  }
+
+  // 낙엽/눈 밟는 소리: 짧은 노이즈 버스트
+  function crunch(isSnow,lvl){
+    lvl=lvl||.24;
+    const dur=isSnow?.08:.15+Math.random()*.05;
+    const fC=isSnow?3500+Math.random()*3000:1000+Math.random()*2500;
+    const len=(actx.sampleRate*dur)|0;
+    const buf=actx.createBuffer(1,len,actx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+    const src=actx.createBufferSource(); src.buffer=buf;
+    const f=actx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=fC; f.Q.value=3;
+    const g=actx.createGain(); g.gain.value=lvl*(.6+Math.random()*.8);
+    src.connect(f); f.connect(g); g.connect(master); src.start();
+  }
+
+  // 바람 휘파람 (사막/겨울): 사인 주파수 스윕
+  function whistle(fMin,fMax){
+    const t=actx.currentTime;
+    const dur=.35+Math.random()*1.1;
+    const f0=fMin+Math.random()*(fMax-fMin);
+    const fP=f0+250+Math.random()*500;
+    const osc=actx.createOscillator(), g=actx.createGain();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(f0,t);
+    osc.frequency.linearRampToValueAtTime(fP,t+dur*.35);
+    osc.frequency.linearRampToValueAtTime(f0*.62,t+dur);
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(.03+Math.random()*.03,t+dur*.08);
+    g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    osc.connect(g); g.connect(master);
+    osc.start(t); osc.stop(t+dur+.1);
+  }
+
+  // 화산 탁탁 소리: 노이즈 버스트
+  function crackle(){
+    const dur=.04+Math.random()*.13;
+    const len=(actx.sampleRate*dur)|0;
+    const buf=actx.createBuffer(1,len,actx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+    const src=actx.createBufferSource(); src.buffer=buf;
+    const f=actx.createBiquadFilter(); f.type='bandpass';
+    f.frequency.value=120+Math.random()*700; f.Q.value=.7;
+    const g=actx.createGain(); g.gain.value=.22+Math.random()*.32;
+    src.connect(f); f.connect(g); g.connect(master); src.start();
+  }
+
+  // 테마별 지속 레이어 시작
+  function startLayers(t){
+    switch(t){
+      case 'forest':
+        makeWind(360,.55,.07,220,.13);      // 숲 저음 바람
+        makeWind(1150,1.8,.17,380,.065);    // 나뭇잎 스침 소리
+        makeNoise('lowpass',120,1,.04);     // 나무 울림
+        break;
+      case 'autumn':
+        makeWind(580,.42,.13,310,.14);      // 건조한 가을바람
+        makeWind(1700,2.6,.24,520,.055);    // 마른 잎 스침
+        makeNoise('highpass',3800,.7,.022); // 마른잎 하이스
+        break;
+      case 'winter':
+        makeWind(1900,.95,.055,650,.125);   // 차가운 고음 바람
+        makeWind(380,.28,.04,130,.055);     // 깊은 차가운 바람
+        makeDrone(55,.04);                  // 겨울 저음
+        break;
+      case 'desert':
+        makeWind(720,.38,.11,290,.17);      // 뜨거운 사막 바람
+        makeNoise('highpass',5500,.5,.018); // 모래 쉬익
+        makeDrone(82,.05,'sine');           // 사막 드론
+        break;
+      case 'volcano':
+        makeNoise('lowpass',55,.9,.17);     // 심층 지진 울림
+        makeNoise('lowpass',110,1,.09);     // 중저 울림
+        makeNoise('highpass',2800,.5,.045); // 증기 쉬익
+        makeDrone(40,.11,'sawtooth');       // 화산 저음 드론
+        break;
+      case 'rainbow':
+        makeWind(950,.75,.21,240,.08);      // 산들바람
+        makeNoise('bandpass',2200,2,.025);  // 공기 반짝임
+        break;
+      default:
+        makeWind(470,.58,.10,200,.10);      // 중립 바람
+        break;
+    }
+  }
+
+  // 테마별 랜덤 이벤트 정의 (minD~maxD ms 간격으로 반복)
+  const EVTS={
+    forest:[
+      {fn:()=>bird(),            minD:5000, maxD:12000},
+      {fn:()=>crunch(false,.14), minD:1800, maxD:4800},
+    ],
+    autumn:[
+      {fn:()=>crunch(false,.34), minD:700,  maxD:2800},
+      {fn:()=>crunch(false,.26), minD:1100, maxD:3800},
+      {fn:()=>bird(),            minD:9000, maxD:22000},
+    ],
+    winter:[
+      {fn:()=>crunch(true,.32),  minD:2500, maxD:7000},
+      {fn:()=>whistle(1600,3000),minD:4000, maxD:10000},
+    ],
+    desert:[
+      {fn:()=>whistle(650,1050), minD:3500, maxD:9500},
+    ],
+    volcano:[
+      {fn:()=>crackle(),         minD:280,  maxD:1400},
+      {fn:()=>crackle(),         minD:500,  maxD:2200},
+    ],
+    rainbow:[
+      {fn:()=>bird(),            minD:2000, maxD:5000},
+      {fn:()=>bird(),            minD:3500, maxD:8000},
+    ],
+    custom:[
+      {fn:()=>bird(),            minD:6000, maxD:15000},
+      {fn:()=>crunch(false,.12), minD:3500, maxD:9000},
+    ],
+  };
+
+  // gen 체크로 테마 변경 시 이전 타이머 자동 종료
+  function sched(myGen){
+    if(!active||gen!==myGen) return;
+    const evts=EVTS[theme]||EVTS.custom;
+    evts.forEach(ev=>{
+      const fire=(g)=>{
+        if(!active||gen!==g) return;
+        ev.fn();
+        setTimeout(()=>fire(g), ev.minD+Math.random()*(ev.maxD-ev.minD));
+      };
+      setTimeout(()=>fire(myGen), Math.random()*ev.minD*.8);
+    });
   }
 
   function stopAll(){
-    clearTimeout(schedTimer);
-    drones.forEach(({osc,gain})=>{
-      try{gain.gain.setTargetAtTime(0,actx.currentTime,.5);osc.stop(actx.currentTime+2);}catch(e){}
+    const now=actx?actx.currentTime:0;
+    nodes.forEach(n=>{
+      try{n.g.gain.setTargetAtTime(0,now,.6);}catch(e){}
+      try{if(n.osc)n.osc.stop(now+2);}catch(e){}
+      try{if(n.ns)n.ns.stop(now+2);}catch(e){}
+      try{if(n.lfo)n.lfo.stop(now+2);}catch(e){}
     });
-    drones=[];
-    if(noiseNode){
-      try{noiseNode.gain.setTargetAtTime(0,actx.currentTime,.5);noiseNode.src.stop(actx.currentTime+2);}catch(e){}
-      noiseNode=null;
-    }
-    if(rvbNode){try{rvbNode.rvbGain.disconnect();}catch(e){} rvbNode=null;}
-  }
-
-  function playNote(freq,dur,nVol,wave,filterHz){
-    const t=actx.currentTime;
-    const osc=actx.createOscillator();
-    const gain=actx.createGain();
-    osc.type=wave;
-    osc.frequency.value=freq;
-    osc.detune.value=(Math.random()*8-4); // 약간의 음정 떨림
-    let node=osc;
-    if(filterHz){
-      const f=actx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=filterHz;
-      osc.connect(f); node=f;
-    }
-    node.connect(gain);
-    gain.gain.setValueAtTime(0,t);
-    gain.gain.linearRampToValueAtTime(nVol,t+Math.min(.08,dur*.12));
-    gain.gain.exponentialRampToValueAtTime(.001,t+dur);
-    gain.connect(master);
-    if(rvbNode) gain.connect(rvbNode.cvr);
-    osc.start(t); osc.stop(t+dur+.05);
-  }
-
-  function startLayers(def){
-    // Reverb
-    const cvr=actx.createConvolver();
-    cvr.buffer=makeImpulse(def.rvbDur,2.2);
-    const rvbGain=actx.createGain(); rvbGain.gain.value=def.rvbMix;
-    cvr.connect(rvbGain); rvbGain.connect(master);
-    rvbNode={cvr,rvbGain};
-
-    // Drones
-    def.drones.forEach(d=>{
-      const osc=actx.createOscillator();
-      const gain=actx.createGain();
-      osc.type=d.w; osc.frequency.value=d.f;
-      osc.detune.value=(Math.random()*6-3);
-      gain.gain.value=0;
-      gain.gain.setTargetAtTime(d.v,actx.currentTime,1.8);
-      osc.connect(gain); gain.connect(master); gain.connect(cvr);
-      osc.start();
-      drones.push({osc,gain});
-    });
-
-    // 화산 저음 노이즈
-    if(def.noise){
-      const blen=actx.sampleRate*2;
-      const nbuf=actx.createBuffer(1,blen,actx.sampleRate);
-      const nd=nbuf.getChannelData(0);
-      for(let i=0;i<blen;i++) nd[i]=Math.random()*2-1;
-      const src=actx.createBufferSource(); src.buffer=nbuf; src.loop=true;
-      const flt=actx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=55;
-      const gn=actx.createGain(); gn.gain.value=0;
-      gn.gain.setTargetAtTime(.15,actx.currentTime,2.5);
-      src.connect(flt); flt.connect(gn); gn.connect(master);
-      src.start();
-      noiseNode={src,gain:gn};
-    }
-  }
-
-  function schedule(){
-    const def=DEFS[theme];
-    if(!def||!active) return;
-    const ahead=.16, interval=60/def.bpm;
-    while(nextAt<actx.currentTime+ahead){
-      if(Math.random()<def.prob){
-        const freq=def.scale[Math.floor(Math.random()*def.scale.length)];
-        playNote(freq,def.dur,def.nVol,def.wave,def.filter);
-      }
-      nextAt+=interval;
-    }
-    schedTimer=setTimeout(schedule,55);
+    nodes=[];
   }
 
   return{
     start(t){
-      init();
+      if(!actx){
+        actx=new(window.AudioContext||window.webkitAudioContext)();
+        master=actx.createGain(); master.gain.value=0;
+        master.connect(actx.destination);
+      }
       if(actx.state==='suspended') actx.resume();
+      gen++;
       stopAll();
       active=true; theme=t;
-      nextAt=actx.currentTime+.2;
-      const def=DEFS[t]||DEFS.custom;
-      startLayers(def);
-      master.gain.setTargetAtTime(vol,actx.currentTime,.9);
-      schedule();
+      startLayers(t);
+      master.gain.setTargetAtTime(vol,actx.currentTime,1.0);
+      sched(gen);
     },
     stop(){
-      active=false;
+      active=false; gen++;
       if(!actx) return;
-      master.gain.setTargetAtTime(0,actx.currentTime,1.2);
-      setTimeout(stopAll,2000);
+      master.gain.setTargetAtTime(0,actx.currentTime,1.5);
+      setTimeout(stopAll,2500);
     },
     changeTheme(t){
       if(active) this.start(t);
@@ -570,7 +628,7 @@ sliderPeaks.addEventListener('input',  ()=>{
   if(autoMode) rebuildEmitters();
 });
 document.getElementById('slider-vol').addEventListener('input',e=>{
-  Music.setVol(parseInt(e.target.value)/100);
+  Ambient.setVol(parseInt(e.target.value)/100);
 });
 
 let floorOpen=false;
@@ -628,8 +686,8 @@ function toggleAuto(){
   const btn=document.getElementById('btn-auto');
   btn.classList.toggle('auto-active',autoMode);
   btn.textContent=autoMode?'⛰ 자동 산 ON':'⛰ 자동 산 OFF';
-  if(autoMode){ Music.start(currentTheme); rebuildEmitters(); }
-  else        { Music.stop(); emitters=[]; }
+  if(autoMode){ Ambient.start(currentTheme); rebuildEmitters(); }
+  else        { Ambient.stop(); emitters=[]; }
 }
 function calcDwell(){
   const s=parseInt(sliderSpeed.value),base=Math.round(200-s*17);

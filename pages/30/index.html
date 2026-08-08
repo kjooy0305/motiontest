@@ -10,8 +10,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;
      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;user-select:none;}
 
-#title{color:#e2c97e;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:7px;
-       text-shadow:0 0 10px rgba(226,201,126,.4);}
+#title{color:#e2c97e;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:6px;
+       text-shadow:0 0 10px rgba(226,201,126,.4);transition:margin .2s;}
 
 #canvas-wrap{position:relative;border:2px solid #3a3a5c;border-radius:4px;overflow:hidden;
              box-shadow:0 0 30px rgba(0,0,0,.6);}
@@ -27,39 +27,39 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 /* ── 컨트롤 패널 ─────────────────────────────── */
 #controls{
-  display:flex;flex-wrap:wrap;align-items:center;gap:7px;
-  margin-top:7px;padding:8px 12px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin-top:6px;padding:7px 11px;
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;width:100%;max-width:700px;
+  border-radius:8px;width:100%;max-width:700px;transition:max-width .2s;
 }
 .ctrl-row{
-  width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:7px;
-  padding-top:6px;border-top:1px solid rgba(255,255,255,.08);
+  width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  padding-top:5px;border-top:1px solid rgba(255,255,255,.08);
 }
-.ctrl-group{display:flex;align-items:center;gap:5px;}
+.ctrl-group{display:flex;align-items:center;gap:4px;}
 .ctrl-label{color:#a0a0c0;font-size:12px;white-space:nowrap;}
-.ctrl-divider{width:1px;height:24px;background:rgba(255,255,255,.1);}
+.ctrl-divider{width:1px;height:22px;background:rgba(255,255,255,.1);}
 
 input[type=range]{
   -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
-  background:rgba(255,255,255,.15);outline:none;cursor:pointer;width:80px;
+  background:rgba(255,255,255,.15);outline:none;cursor:pointer;
 }
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
   background:#e2c97e;cursor:pointer;box-shadow:0 0 4px rgba(226,201,126,.5);
 }
-.val-display{color:#e2c97e;font-size:12px;min-width:24px;text-align:center;}
+.val-display{color:#e2c97e;font-size:11px;min-width:26px;text-align:center;}
 
 .btn{
-  padding:6px 11px;border:none;border-radius:5px;font-size:12px;font-weight:600;
+  padding:5px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;
   cursor:pointer;transition:all .12s;letter-spacing:.3px;
 }
 #btn-floor{background:#3a1a1a;color:#ff6b6b;border:1px solid #ff4444;}
 #btn-floor.held{background:#5a1a1a;box-shadow:0 0 10px rgba(255,68,68,.4);}
 #btn-spawn{background:#1a3a1a;color:#6bff6b;border:1px solid #44ff44;}
 #btn-clear{background:#1a1a3a;color:#6b9bff;border:1px solid #4466ff;}
+#btn-fs{background:#1a2a1a;color:#a0e0a0;border:1px solid #446644;}
 
-/* 자동 산 버튼 */
 #btn-auto{background:#1a0a2e;color:#c084fc;border:1px solid #9955cc;}
 #btn-auto.auto-active{color:#fff;border-color:transparent;animation:rb-glow 2s linear infinite;}
 @keyframes rb-glow{
@@ -69,38 +69,47 @@ input[type=range]::-webkit-slider-thumb{
   100%{box-shadow:0 0 10px #ff6b6b;}
 }
 
-/* 수동 색상 스와치 */
-.color-pick{display:flex;gap:4px;align-items:center;}
-.color-swatch{
-  width:15px;height:15px;border-radius:3px;cursor:pointer;
-  border:2px solid transparent;transition:.1s;
-}
+#btn-autoreset{background:#2a1a0a;color:#f0a060;border:1px solid #a06030;}
+#btn-autoreset.active{background:#3a2000;color:#ffcc88;border-color:#ffaa44;
+  box-shadow:0 0 8px rgba(255,170,68,.3);}
+.reset-status{font-size:11px;color:#808060;min-width:80px;}
+.reset-status.countdown{color:#ff8888;animation:blink .8s step-end infinite;}
+.reset-status.draining{color:#88aaff;}
+@keyframes blink{50%{opacity:.4;}}
+
+.color-pick{display:flex;gap:3px;align-items:center;}
+.color-swatch{width:14px;height:14px;border-radius:3px;cursor:pointer;
+  border:2px solid transparent;transition:.1s;}
 .color-swatch.active{border-color:#fff;box-shadow:0 0 4px rgba(255,255,255,.5);}
 
-/* 테마 버튼 */
 .theme-btn{
-  padding:4px 9px;border:1px solid rgba(255,255,255,.15);border-radius:4px;
+  padding:3px 8px;border:1px solid rgba(255,255,255,.15);border-radius:4px;
   background:rgba(255,255,255,.04);color:#909090;font-size:11px;
   cursor:pointer;transition:.1s;white-space:nowrap;
 }
 .theme-btn:hover{background:rgba(255,255,255,.1);color:#ccc;}
 .theme-btn.active{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35);}
 
-/* 커스텀 색상 피커 행 */
 #custom-row{
-  width:100%;display:none;align-items:center;flex-wrap:wrap;gap:8px;
-  padding-top:6px;border-top:1px solid rgba(255,255,255,.08);
+  width:100%;display:none;align-items:center;flex-wrap:wrap;gap:7px;
+  padding-top:5px;border-top:1px solid rgba(255,255,255,.08);
 }
 #custom-row.visible{display:flex;}
-.cpick-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.cpick-wrap{display:flex;flex-direction:column;align-items:center;gap:1px;}
 .cpick-label{font-size:9px;color:#707090;}
 input[type=color]{
-  width:22px;height:22px;border:2px solid rgba(255,255,255,.25);
-  border-radius:4px;cursor:pointer;padding:1px;background:none;
+  width:20px;height:20px;border:2px solid rgba(255,255,255,.25);
+  border-radius:3px;cursor:pointer;padding:1px;background:none;
 }
 input[type=color]:hover{border-color:rgba(255,255,255,.5);}
 
 #stats{color:#606080;font-size:11px;margin-left:auto;}
+
+/* 전체화면 조정 */
+body.fs-mode{justify-content:flex-start;padding-top:0;}
+body.fs-mode #title{display:none;}
+body.fs-mode #controls{max-width:100%;border-radius:0;border-left:none;border-right:none;border-bottom:none;}
+body.fs-mode #canvas-wrap{border-radius:0;border-left:none;border-right:none;border-top:none;}
 </style>
 </head>
 <body>
@@ -120,13 +129,13 @@ input[type=color]:hover{border-color:rgba(255,255,255,.5);}
   </div>
   <div class="ctrl-group">
     <span class="ctrl-label">밀도</span>
-    <input type="range" id="slider-density" min="1" max="10" value="5" step="1">
+    <input type="range" id="slider-density" min="1" max="10" value="5" step="1" style="width:70px">
     <span class="val-display" id="val-density">5</span>
   </div>
   <div class="ctrl-group">
-    <span class="ctrl-label">한번에</span>
-    <input type="range" id="slider-amount" min="1" max="50" value="8" step="1">
-    <span class="val-display" id="val-amount">8</span>
+    <span class="ctrl-label">양</span>
+    <input type="range" id="slider-amount" min="1" max="500" value="80" step="1" style="width:75px">
+    <span class="val-display" id="val-amount">8.0</span>
   </div>
   <div class="ctrl-group color-pick" id="color-pick"></div>
   <div class="ctrl-group">
@@ -135,108 +144,132 @@ input[type=color]:hover{border-color:rgba(255,255,255,.5);}
   <div class="ctrl-group">
     <button class="btn" id="btn-clear">초기화</button>
   </div>
+  <div class="ctrl-group">
+    <button class="btn" id="btn-fs">⛶ 전체화면</button>
+  </div>
   <span id="stats">모래: 0</span>
 
-  <!-- ── 행 2: 자동 산 + 테마 ── -->
+  <!-- ── 행 2: 자동 산 ── -->
   <div class="ctrl-row">
     <div class="ctrl-group">
       <button class="btn" id="btn-auto">⛰ 자동 산 OFF</button>
     </div>
     <div class="ctrl-group">
       <span class="ctrl-label">봉우리</span>
-      <input type="range" id="slider-peaks" min="1" max="12" value="6" step="1">
+      <input type="range" id="slider-peaks" min="1" max="20" value="6" step="1" style="width:70px">
       <span class="val-display" id="val-peaks">6</span>
     </div>
     <div class="ctrl-group">
       <span class="ctrl-label">속도</span>
-      <input type="range" id="slider-speed" min="1" max="10" value="6" step="1">
+      <input type="range" id="slider-speed" min="1" max="10" value="6" step="1" style="width:65px">
       <span class="val-display" id="val-speed">6</span>
     </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">폭</span>
+      <input type="range" id="slider-spread" min="0" max="20" value="2" step="1" style="width:65px">
+      <span class="val-display" id="val-spread">2</span>
+    </div>
     <div class="ctrl-divider"></div>
-    <button class="theme-btn active" data-theme="forest">🌲 초록 산</button>
-    <button class="theme-btn"        data-theme="autumn">🍂 단풍 산</button>
-    <button class="theme-btn"        data-theme="winter">❄️ 겨울 산</button>
+    <button class="theme-btn active" data-theme="forest">🌲 초록</button>
+    <button class="theme-btn"        data-theme="autumn">🍂 단풍</button>
+    <button class="theme-btn"        data-theme="winter">❄️ 겨울</button>
     <button class="theme-btn"        data-theme="desert">🏜 사막</button>
     <button class="theme-btn"        data-theme="volcano">🌋 화산</button>
     <button class="theme-btn"        data-theme="rainbow">🌈 무지개</button>
     <button class="theme-btn"        data-theme="custom">🎨 커스텀</button>
   </div>
 
-  <!-- ── 행 3: 커스텀 색상 (커스텀 선택 시만 표시) ── -->
+  <!-- ── 행 3: 커스텀 색상 ── -->
   <div id="custom-row">
-    <span class="ctrl-label">봉우리 색상</span>
-    <div id="cpick-container" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;"></div>
+    <span class="ctrl-label">색상</span>
+    <div id="cpick-container" style="display:flex;gap:7px;flex-wrap:wrap;align-items:flex-end;"></div>
+  </div>
+
+  <!-- ── 행 4: 자동 초기화 ── -->
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <button class="btn" id="btn-autoreset">🔄 자동초기화 OFF</button>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">대기</span>
+      <input type="range" id="slider-delay" min="1" max="30" value="5" step="1" style="width:70px">
+      <span class="val-display" id="val-delay">5s</span>
+    </div>
+    <span class="reset-status" id="reset-status"></span>
   </div>
 
 </div>
 
 <script>
 // ── 캔버스 ───────────────────────────────────────
-const canvas = document.getElementById('canvas');
-const ctx    = canvas.getContext('2d');
-const wrap   = document.getElementById('canvas-wrap');
-const CELL   = 4;
+const canvas  = document.getElementById('canvas');
+const ctx     = canvas.getContext('2d');
+const canWrap = document.getElementById('canvas-wrap');
+const CELL    = 4;
 
 let COLS, ROWS, grid, imageData, pixels;
 
 function resize(){
-  const W = Math.min(window.innerWidth - 20, 700);
-  const H = Math.min(window.innerHeight - 178, 470);
+  const isFS  = !!document.fullscreenElement;
+  const W     = isFS ? window.innerWidth  : Math.min(window.innerWidth  - 20, 700);
+  const ctrlH = isFS ? 110 : 178;
+  const H     = Math.max(200, window.innerHeight - (isFS ? ctrlH : ctrlH));
   canvas.width  = Math.floor(W / CELL) * CELL;
   canvas.height = Math.floor(H / CELL) * CELL;
-  wrap.style.width  = canvas.width  + 'px';
-  wrap.style.height = canvas.height + 'px';
+  canWrap.style.width  = canvas.width  + 'px';
+  canWrap.style.height = canvas.height + 'px';
   COLS = canvas.width  / CELL;
   ROWS = canvas.height / CELL;
-  grid = new Uint32Array(COLS * ROWS);
+  grid      = new Uint32Array(COLS * ROWS);
   imageData = ctx.createImageData(canvas.width, canvas.height);
   pixels    = imageData.data;
 }
 
+// ── 전체화면 ──────────────────────────────────────
+const btnFS = document.getElementById('btn-fs');
+btnFS.addEventListener('click', ()=>{
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+});
+document.addEventListener('fullscreenchange',()=>{
+  const isFS = !!document.fullscreenElement;
+  document.body.classList.toggle('fs-mode', isFS);
+  document.getElementById('controls').style.maxWidth = isFS ? '100%' : '700px';
+  btnFS.textContent = isFS ? '⛶ 창모드' : '⛶ 전체화면';
+  resize();
+});
+
 // ── 색상 유틸 ────────────────────────────────────
-function hexToRgb(hex){
-  return { r:parseInt(hex.slice(1,3),16), g:parseInt(hex.slice(3,5),16), b:parseInt(hex.slice(5,7),16) };
-}
+function hexToRgb(h){return{r:parseInt(h.slice(1,3),16),g:parseInt(h.slice(3,5),16),b:parseInt(h.slice(5,7),16)};}
 function hslToRgb(h,s,l){
-  s/=100; l/=100;
-  const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l);
+  s/=100;l/=100;
+  const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l);
   const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
-  return {r:(f(0)*255)|0, g:(f(8)*255)|0, b:(f(4)*255)|0};
+  return{r:(f(0)*255)|0,g:(f(8)*255)|0,b:(f(4)*255)|0};
 }
-function packColor(r,g,b){ return (0xFF<<24)|(b<<16)|(g<<8)|r; }
-function clamp(v){ return Math.min(255,Math.max(0,v)); }
-function vary(c,amt=20){
-  const v=(Math.random()*amt*2-amt)|0;
-  return {r:clamp(c.r+v),g:clamp(c.g+v),b:clamp(c.b+v)};
-}
+function packColor(r,g,b){return(0xFF<<24)|(b<<16)|(g<<8)|r;}
+function clamp(v){return Math.min(255,Math.max(0,v));}
+function vary(c,a=18){const v=(Math.random()*a*2-a)|0;return{r:clamp(c.r+v),g:clamp(c.g+v),b:clamp(c.b+v)};}
 
-// ── 수동 배치용 팔레트 ────────────────────────────
+// ── 수동 팔레트 ───────────────────────────────────
 const PALETTES=[
-  {name:'모래',  color:'#d4a853'},
-  {name:'백모래',color:'#e8ddb5'},
-  {name:'적모래',color:'#c0533a'},
-  {name:'흑모래',color:'#3a3028'},
-  {name:'파란',  color:'#5588cc'},
-  {name:'초록',  color:'#5aaa55'},
-  {name:'보라',  color:'#9955cc'},
-  {name:'무지개',color:'rainbow'},
+  {name:'모래',  color:'#d4a853'},{name:'백모래',color:'#e8ddb5'},
+  {name:'적모래',color:'#c0533a'},{name:'흑모래',color:'#3a3028'},
+  {name:'파란',  color:'#5588cc'},{name:'초록',  color:'#5aaa55'},
+  {name:'보라',  color:'#9955cc'},{name:'무지개',color:'rainbow'},
 ];
-let currentPalette = 0;
-
+let currentPalette=0;
 function getSandColor(x){
-  const p = PALETTES[currentPalette];
+  const p=PALETTES[currentPalette];
   if(p.color==='rainbow') return hslToRgb((x/COLS*360+Date.now()*.05)%360,80,60);
   return vary(hexToRgb(p.color));
 }
-
-// 컬러 스와치 생성
-const colorPick = document.getElementById('color-pick');
+const colorPick=document.getElementById('color-pick');
 PALETTES.forEach((p,i)=>{
-  const sw = document.createElement('div');
-  sw.className = 'color-swatch'+(i===0?' active':'');
-  sw.title = p.name;
-  sw.style.background = p.color==='rainbow'
-    ? 'linear-gradient(90deg,red,orange,yellow,green,blue,violet)' : p.color;
+  const sw=document.createElement('div');
+  sw.className='color-swatch'+(i===0?' active':'');
+  sw.title=p.name;
+  sw.style.background=p.color==='rainbow'?'linear-gradient(90deg,red,orange,yellow,green,blue,violet)':p.color;
   sw.addEventListener('click',()=>{
     currentPalette=i;
     document.querySelectorAll('.color-swatch').forEach((s,j)=>s.classList.toggle('active',j===i));
@@ -244,103 +277,81 @@ PALETTES.forEach((p,i)=>{
   colorPick.appendChild(sw);
 });
 
-// ── 산 테마 팔레트 ────────────────────────────────
-const THEMES = {
-  forest: [
-    '#0c3a08','#1a5e10','#2a7c1c','#3d9e28',
-    '#52b835','#68cc46','#4a8e30','#7edd55',
-  ],
-  autumn: [
-    '#7a1400','#b02200','#d83800','#f05000',
-    '#f07200','#e09000','#c86800','#903000',
-  ],
-  winter: [
-    '#f0f8ff','#c8e0f8','#90c0ea','#58a0d8',
-    '#2078c0','#88b8e0','#d0eaff','#4888c0',
-  ],
-  desert: [
-    '#b87e10','#cc9a20','#e0b030','#f0c840',
-    '#d09020','#a87010','#e8a828','#c88018',
-  ],
-  volcano:[
-    '#060000','#280000','#580000','#900a00',
-    '#cc1800','#f02800','#ff5000','#b81800',
-  ],
-  rainbow: null, // x-position hue
-  custom:  null, // populated from user input
+// ── 산 테마 ───────────────────────────────────────
+const THEMES={
+  forest: ['#0b380a','#196012','#2a8020','#3aa030','#52c040','#6add50','#488a28','#80e060'],
+  autumn: ['#7a1000','#aa2000','#d83800','#f05000','#f07800','#e09800','#c87000','#902800'],
+  winter: ['#eef4ff','#c0d8f4','#88b8e8','#5098d4','#1870bc','#80b4e0','#d0e8ff','#4080c0'],
+  desert: ['#b47c10','#cc9820','#e0b430','#f0ca40','#d09020','#a46c08','#e8a420','#c87c10'],
+  volcano:['#050000','#250000','#540000','#8c0800','#c81800','#f02400','#ff4800','#b01400'],
+  rainbow:null,
+  custom: null,
 };
+let currentTheme='forest';
+let customColors=['#e04040','#e08844','#d4c040','#40b060','#4488e0','#9044e0','#e04490','#40c0b0','#e0a020','#40d0a0'];
 
-let currentTheme   = 'forest';
-let customColors   = ['#e04040','#e08844','#d4c040','#40b060','#4488e0','#9044e0','#e04490','#40c0b0'];
-
-// ── 에미터 색 취득 ────────────────────────────────
-function getThemePalette(){
+function getThemePal(){
   if(currentTheme==='rainbow') return null;
   if(currentTheme==='custom')  return customColors;
   return THEMES[currentTheme];
 }
-
-function getEmitterColor(em, x){
+function getEmitterColor(em,x){
   if(currentTheme==='rainbow') return hslToRgb((x/COLS*360)%360,88,58);
-  const pal = getThemePalette();
-  return vary(hexToRgb(pal[em.ci % pal.length]),18);
+  const pal=getThemePal();
+  return vary(hexToRgb(pal[em.ci%pal.length]),16);
 }
-
-function emitterIndicatorColor(em){
+function indicatorHex(em){
   if(currentTheme==='rainbow') return `hsl(${(em.x/COLS*360)%360},90%,70%)`;
-  const pal = getThemePalette();
-  return pal[em.ci % pal.length];
+  const pal=getThemePal();
+  return pal[em.ci%pal.length];
 }
 
-// ── 테마 버튼 ─────────────────────────────────────
+// 테마 버튼
 document.querySelectorAll('.theme-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    currentTheme = btn.dataset.theme;
+    currentTheme=btn.dataset.theme;
     document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b===btn));
-    const showCustom = currentTheme==='custom';
-    document.getElementById('custom-row').classList.toggle('visible', showCustom);
-    if(showCustom) buildCustomPickers();
+    document.getElementById('custom-row').classList.toggle('visible',currentTheme==='custom');
+    if(currentTheme==='custom') buildCustomPickers();
     if(autoMode) rebuildEmitters();
   });
 });
 
-// ── 커스텀 색상 피커 ──────────────────────────────
 function buildCustomPickers(){
-  const container = document.getElementById('cpick-container');
-  const count = parseInt(document.getElementById('slider-peaks').value);
-  container.innerHTML = '';
-  for(let i=0;i<count;i++){
-    const w = document.createElement('div');
-    w.className = 'cpick-wrap';
-    const lbl = document.createElement('span');
-    lbl.className = 'cpick-label';
-    lbl.textContent = i+1;
-    const inp = document.createElement('input');
-    inp.type = 'color';
-    inp.value = customColors[i % customColors.length];
-    inp.title = `봉우리 ${i+1}`;
-    const idx=i;
-    inp.addEventListener('input',e=>{ customColors[idx]=e.target.value; });
-    w.appendChild(lbl);
-    w.appendChild(inp);
-    container.appendChild(w);
+  const c=document.getElementById('cpick-container');
+  const n=parseInt(document.getElementById('slider-peaks').value);
+  if(c.children.length===n) return;
+  c.innerHTML='';
+  for(let i=0;i<n;i++){
+    const w=document.createElement('div'); w.className='cpick-wrap';
+    const lbl=document.createElement('span'); lbl.className='cpick-label'; lbl.textContent=i+1;
+    const inp=document.createElement('input'); inp.type='color'; inp.value=customColors[i%customColors.length];
+    const idx=i; inp.addEventListener('input',e=>customColors[idx]=e.target.value);
+    w.appendChild(lbl); w.appendChild(inp); c.appendChild(w);
   }
 }
 
-// ── 기본 컨트롤 ──────────────────────────────────
-const sliderDensity = document.getElementById('slider-density');
-const sliderAmount  = document.getElementById('slider-amount');
-const sliderPeaks   = document.getElementById('slider-peaks');
-const sliderSpeed   = document.getElementById('slider-speed');
-const valDensity    = document.getElementById('val-density');
-const valAmount     = document.getElementById('val-amount');
-const valPeaks      = document.getElementById('val-peaks');
-const valSpeed      = document.getElementById('val-speed');
-const statsEl       = document.getElementById('stats');
+// ── 컨트롤 ───────────────────────────────────────
+const sliderDensity=document.getElementById('slider-density');
+const sliderAmount =document.getElementById('slider-amount');
+const sliderPeaks  =document.getElementById('slider-peaks');
+const sliderSpeed  =document.getElementById('slider-speed');
+const sliderSpread =document.getElementById('slider-spread');
+const sliderDelay  =document.getElementById('slider-delay');
+const valDensity   =document.getElementById('val-density');
+const valAmount    =document.getElementById('val-amount');
+const valPeaks     =document.getElementById('val-peaks');
+const valSpeed     =document.getElementById('val-speed');
+const valSpread    =document.getElementById('val-spread');
+const valDelay     =document.getElementById('val-delay');
+const statsEl      =document.getElementById('stats');
+const resetStatus  =document.getElementById('reset-status');
 
 sliderDensity.addEventListener('input',()=>valDensity.textContent=sliderDensity.value);
-sliderAmount.addEventListener('input', ()=>valAmount.textContent=sliderAmount.value);
+sliderAmount.addEventListener('input', ()=>valAmount.textContent=(parseInt(sliderAmount.value)/10).toFixed(1));
 sliderSpeed.addEventListener('input',  ()=>valSpeed.textContent=sliderSpeed.value);
+sliderSpread.addEventListener('input', ()=>valSpread.textContent=sliderSpread.value);
+sliderDelay.addEventListener('input',  ()=>valDelay.textContent=sliderDelay.value+'s');
 sliderPeaks.addEventListener('input',  ()=>{
   valPeaks.textContent=sliderPeaks.value;
   if(autoMode) rebuildEmitters();
@@ -349,153 +360,154 @@ sliderPeaks.addEventListener('input',  ()=>{
 
 // 밑 열기
 let floorOpen=false;
-const btnFloor = document.getElementById('btn-floor');
+const btnFloor=document.getElementById('btn-floor');
 btnFloor.addEventListener('mousedown',  ()=>setFloor(true));
 btnFloor.addEventListener('touchstart', ()=>setFloor(true),{passive:true});
 btnFloor.addEventListener('mouseup',    ()=>setFloor(false));
 btnFloor.addEventListener('mouseleave', ()=>setFloor(false));
 btnFloor.addEventListener('touchend',   ()=>setFloor(false));
-function setFloor(v){ floorOpen=v; btnFloor.classList.toggle('held',v); wrap.classList.toggle('floor-open',v); }
+function setFloor(v){floorOpen=v;btnFloor.classList.toggle('held',v);canWrap.classList.toggle('floor-open',v);}
 
-// 초기화 / 소환
-document.getElementById('btn-clear').addEventListener('click',()=>grid.fill(0));
+document.getElementById('btn-clear').addEventListener('click',()=>{grid.fill(0);resetPhase='idle';});
 document.getElementById('btn-spawn').addEventListener('click',()=>{
-  const n=parseInt(sliderAmount.value);
-  for(let i=0;i<n;i++){
-    const x=(Math.random()*COLS)|0;
-    const c=getSandColor(x);
-    if(!grid[x]) placeSand(x,0,packColor(c.r,c.g,c.b));
-  }
+  const n=Math.max(1,parseInt(sliderAmount.value/10)|0)||1;
+  for(let i=0;i<n;i++){const x=(Math.random()*COLS)|0;const c=getSandColor(x);if(!grid[x])placeSand(x,0,packColor(c.r,c.g,c.b));}
 });
 
 // ── 마우스/터치 ───────────────────────────────────
-let pointerDown=false;
-canvas.addEventListener('mousedown', e=>{ pointerDown=true; addSandAt(e); });
-canvas.addEventListener('mousemove', e=>{ if(pointerDown) addSandAt(e); });
-canvas.addEventListener('mouseup',   ()=>pointerDown=false);
-canvas.addEventListener('mouseleave',()=>pointerDown=false);
-canvas.addEventListener('touchstart',e=>{ pointerDown=true; addSandAt(e.touches[0]); e.preventDefault(); },{passive:false});
-canvas.addEventListener('touchmove', e=>{ if(pointerDown) addSandAt(e.touches[0]); e.preventDefault(); },{passive:false});
-canvas.addEventListener('touchend',  ()=>pointerDown=false);
+let pDown=false;
+canvas.addEventListener('mousedown', e=>{pDown=true;addSandAt(e);});
+canvas.addEventListener('mousemove', e=>{if(pDown)addSandAt(e);});
+canvas.addEventListener('mouseup',   ()=>pDown=false);
+canvas.addEventListener('mouseleave',()=>pDown=false);
+canvas.addEventListener('touchstart',e=>{pDown=true;addSandAt(e.touches[0]);e.preventDefault();},{passive:false});
+canvas.addEventListener('touchmove', e=>{if(pDown)addSandAt(e.touches[0]);e.preventDefault();},{passive:false});
+canvas.addEventListener('touchend',  ()=>pDown=false);
 
 function addSandAt(e){
   const rect=canvas.getBoundingClientRect();
-  const px=((e.clientX-rect.left)/CELL)|0;
-  const py=((e.clientY-rect.top)/CELL)|0;
+  const px=((e.clientX-rect.left)/CELL)|0, py=((e.clientY-rect.top)/CELL)|0;
   if(px<0||px>=COLS||py<0||py>=ROWS) return;
   const radius=Math.ceil(parseInt(sliderDensity.value)/2);
-  const amount=parseInt(sliderAmount.value);
+  // amount: slider 1-500 → 0.1~50.0 grains
+  const rawAmt=parseInt(sliderAmount.value)/10;
+  const full=rawAmt|0, frac=rawAmt-full;
+  const amount=full+(Math.random()<frac?1:0);
   let placed=0;
-  for(let t=0;t<amount*3&&placed<amount;t++){
-    const ox=Math.round((Math.random()*2-1)*radius);
-    const oy=Math.round((Math.random()*2-1)*radius);
+  for(let t=0;t<(amount+1)*4&&placed<amount;t++){
+    const ox=Math.round((Math.random()*2-1)*radius), oy=Math.round((Math.random()*2-1)*radius);
     const nx=px+ox, ny=py+oy;
     if(nx>=0&&nx<COLS&&ny>=0&&ny<ROWS&&!grid[ny*COLS+nx]){
-      const c=getSandColor(nx);
-      placeSand(nx,ny,packColor(c.r,c.g,c.b));
-      placed++;
+      const c=getSandColor(nx);placeSand(nx,ny,packColor(c.r,c.g,c.b));placed++;
     }
   }
 }
-
-function placeSand(x,y,color){
-  if(x>=0&&x<COLS&&y>=0&&y<ROWS) grid[y*COLS+x]=color;
-}
+function placeSand(x,y,color){if(x>=0&&x<COLS&&y>=0&&y<ROWS)grid[y*COLS+x]=color;}
 
 // ── 자동 산 모드 ──────────────────────────────────
 let autoMode=false, emitters=[];
 const btnAuto=document.getElementById('btn-auto');
 btnAuto.addEventListener('click',toggleAuto);
-
 function toggleAuto(){
   autoMode=!autoMode;
   btnAuto.classList.toggle('auto-active',autoMode);
   btnAuto.textContent=autoMode?'⛰ 자동 산 ON':'⛰ 자동 산 OFF';
-  if(autoMode) rebuildEmitters(); else emitters=[];
+  if(autoMode)rebuildEmitters(); else emitters=[];
 }
 
 function calcDwell(){
   const spd=parseInt(sliderSpeed.value);
-  // speed 1=느림(큰 산), 10=빠름(작은 산)
   const base=Math.round(200-spd*17);
   return base+((Math.random()*base*.45)|0);
 }
-
 function rebuildEmitters(){
-  const count=parseInt(sliderPeaks.value);
-  const pal=getThemePalette();
+  const n=parseInt(sliderPeaks.value), pal=getThemePal();
   emitters=[];
-  for(let i=0;i<count;i++){
+  for(let i=0;i<n;i++){
     const jitter=(Math.random()-.5)*.7;
-    const cx=Math.round((i+.5+jitter)*COLS/count);
-    emitters.push({
-      x:   Math.min(COLS-1,Math.max(0,cx)),
-      dwell: calcDwell(),
-      ci:  pal ? i%pal.length : i,
-    });
+    const cx=Math.round((i+.5+jitter)*COLS/n);
+    emitters.push({x:Math.min(COLS-1,Math.max(0,cx)),dwell:calcDwell(),ci:pal?i%pal.length:i});
   }
 }
-
-function pickNewX(emIdx){
-  const others=emitters.map((e,i)=>i!==emIdx?e.x:-1).filter(v=>v>=0);
-  const gap=Math.max(5,(COLS/emitters.length)*.5)|0;
-  let nx,tries=0;
-  do{ nx=(Math.random()*COLS)|0; tries++; }
-  while(tries<25&&others.some(ox=>Math.abs(nx-ox)<gap));
+function pickNewX(ei){
+  const others=emitters.map((e,i)=>i!==ei?e.x:-1).filter(v=>v>=0);
+  const gap=Math.max(3,(COLS/emitters.length)*.4)|0;
+  let nx,t=0;
+  do{nx=(Math.random()*COLS)|0;t++;}while(t<25&&others.some(ox=>Math.abs(nx-ox)<gap));
   return nx;
 }
-
 function updateAutoEmitters(){
   if(!autoMode||!emitters.length) return;
-  // 봉우리가 작고 많으려면 spread 좁게, amount 조절
-  const spread=2;
-  const amount=Math.max(2,parseInt(sliderAmount.value));
+  const spread=parseInt(sliderSpread.value);
+  // amount: 0.1~50 grains per emitter per frame
+  const rawAmt=parseInt(sliderAmount.value)/10;
+  const full=rawAmt|0, frac=rawAmt-full;
+  const amount=full+(Math.random()<frac?1:0);
 
   for(let i=0;i<emitters.length;i++){
     const em=emitters[i];
     for(let k=0;k<amount;k++){
-      const ox=Math.round((Math.random()*2-1)*spread);
+      const ox=spread===0?0:Math.round((Math.random()*2-1)*spread);
       const x=Math.min(COLS-1,Math.max(0,em.x+ox));
-      if(!grid[x]){
-        const c=getEmitterColor(em,x);
-        placeSand(x,0,packColor(c.r,c.g,c.b));
-      }
+      if(!grid[x]){const c=getEmitterColor(em,x);placeSand(x,0,packColor(c.r,c.g,c.b));}
     }
     em.dwell--;
     if(em.dwell<=0){
-      em.x=pickNewX(i);
-      em.dwell=calcDwell();
-      const pal=getThemePalette();
-      if(pal) em.ci=(em.ci+1)%pal.length;
+      em.x=pickNewX(i);em.dwell=calcDwell();
+      const pal=getThemePal();if(pal)em.ci=(em.ci+1)%pal.length;
     }
+  }
+}
+
+// ── 자동 초기화 ───────────────────────────────────
+let autoReset=false, resetPhase='idle', resetTimerEnd=0;
+const DRAIN_MS=3000;
+const btnAR=document.getElementById('btn-autoreset');
+btnAR.addEventListener('click',()=>{
+  autoReset=!autoReset;
+  btnAR.classList.toggle('active',autoReset);
+  btnAR.textContent=autoReset?'🔄 자동초기화 ON':'🔄 자동초기화 OFF';
+  if(!autoReset){resetPhase='idle';setFloor(false);resetStatus.textContent='';resetStatus.className='reset-status';}
+});
+function checkFull(sandCount){
+  if(!autoReset||resetPhase!=='idle') return;
+  if(sandCount>COLS*ROWS*.88){
+    resetPhase='countdown';
+    resetTimerEnd=Date.now()+parseInt(sliderDelay.value)*1000;
+  }
+}
+function tickAutoReset(){
+  if(!autoReset||resetPhase==='idle') return;
+  const now=Date.now();
+  if(resetPhase==='countdown'){
+    const sec=Math.ceil((resetTimerEnd-now)/1000);
+    resetStatus.textContent=`${sec}초 후 초기화`;
+    resetStatus.className='reset-status countdown';
+    if(now>=resetTimerEnd){resetPhase='draining';resetTimerEnd=now+DRAIN_MS;setFloor(true);}
+  } else if(resetPhase==='draining'){
+    resetStatus.textContent='배출 중...';
+    resetStatus.className='reset-status draining';
+    if(now>=resetTimerEnd){grid.fill(0);setFloor(false);resetPhase='idle';resetStatus.textContent='';resetStatus.className='reset-status';}
   }
 }
 
 // ── 물리 시뮬레이션 ──────────────────────────────
 let tick=0;
 function update(){
-  tick++;
-  const lf=tick%2===0;
-
+  tick++;const lf=tick%2===0;
   updateAutoEmitters();
-
-  if(floorOpen){
-    for(let x=0;x<COLS;x++) grid[(ROWS-1)*COLS+x]=0;
-  }
-
+  tickAutoReset();
+  if(floorOpen){for(let x=0;x<COLS;x++)grid[(ROWS-1)*COLS+x]=0;}
   for(let y=ROWS-2;y>=0;y--){
     for(let xi=0;xi<COLS;xi++){
-      const x=lf?xi:COLS-1-xi;
-      const idx=y*COLS+x;
-      if(!grid[idx]) continue;
-      const below=(y+1)*COLS+x;
-      if(!grid[below]){ grid[below]=grid[idx]; grid[idx]=0; continue; }
+      const x=lf?xi:COLS-1-xi, idx=y*COLS+x;
+      if(!grid[idx])continue;
+      const bel=(y+1)*COLS+x;
+      if(!grid[bel]){grid[bel]=grid[idx];grid[idx]=0;continue;}
       const gl=Math.random()<.5;
       for(const dx of [gl?-1:1,gl?1:-1]){
         const nx=x+dx;
-        if(nx>=0&&nx<COLS&&!grid[(y+1)*COLS+nx]){
-          grid[(y+1)*COLS+nx]=grid[idx]; grid[idx]=0; break;
-        }
+        if(nx>=0&&nx<COLS&&!grid[(y+1)*COLS+nx]){grid[(y+1)*COLS+nx]=grid[idx];grid[idx]=0;break;}
       }
     }
   }
@@ -503,40 +515,59 @@ function update(){
 
 // ── 렌더링 ───────────────────────────────────────
 function render(){
-  const W=canvas.width;
-  const dv=new Uint32Array(pixels.buffer);
+  const W=canvas.width, dv=new Uint32Array(pixels.buffer);
   dv.fill(packColor(0x1a,0x1a,0x2e));
-
   let sandCount=0;
   for(let gy=0;gy<ROWS;gy++){
     for(let gx=0;gx<COLS;gx++){
       const color=grid[gy*COLS+gx];
-      if(!color) continue;
+      if(!color)continue;
       sandCount++;
       for(let py=0;py<CELL;py++){
         const row=(gy*CELL+py)*W+gx*CELL;
-        for(let px=0;px<CELL;px++) dv[row+px]=color;
+        for(let px=0;px<CELL;px++)dv[row+px]=color;
       }
     }
   }
   ctx.putImageData(imageData,0,0);
 
-  // 에미터 삼각형 표시
+  // 에미터 표시
   if(autoMode){
     emitters.forEach(em=>{
-      const px=em.x*CELL+CELL/2;
-      const col=emitterIndicatorColor(em);
-      ctx.save();
-      ctx.fillStyle=col;
-      ctx.shadowColor=col;
-      ctx.shadowBlur=10;
-      ctx.beginPath();
-      ctx.moveTo(px,2); ctx.lineTo(px-5,12); ctx.lineTo(px+5,12);
-      ctx.closePath(); ctx.fill();
-      ctx.restore();
+      const px=em.x*CELL+CELL/2, col=indicatorHex(em);
+      ctx.save();ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=9;
+      ctx.beginPath();ctx.moveTo(px,2);ctx.lineTo(px-4,11);ctx.lineTo(px+4,11);
+      ctx.closePath();ctx.fill();ctx.restore();
     });
   }
 
+  // 자동초기화 카운트다운 오버레이
+  if(autoReset&&resetPhase!=='idle'){
+    const now=Date.now();
+    let msg='';
+    if(resetPhase==='countdown'){
+      const sec=Math.ceil((resetTimerEnd-now)/1000);
+      msg=`초기화까지 ${sec}초`;
+    } else {
+      msg='배출 중…';
+    }
+    const W2=canvas.width;
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,.65)';
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(W2/2-75,4,150,28,5);
+    else ctx.rect(W2/2-75,4,150,28);
+    ctx.fill();
+    ctx.font='bold 12px monospace';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillStyle=resetPhase==='countdown'?'#ff9090':'#88aaff';
+    ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=6;
+    ctx.fillText(msg,W2/2,18);
+    ctx.restore();
+  }
+
+  checkFull(sandCount);
   statsEl.textContent='모래: '+sandCount.toLocaleString();
 }
 
@@ -544,11 +575,10 @@ function render(){
 let lastTime=0;
 function loop(ts){
   requestAnimationFrame(loop);
-  if(ts-lastTime<16) return;
+  if(ts-lastTime<16)return;
   lastTime=ts;
-  update(); render();
+  update();render();
 }
-
 resize();
 window.addEventListener('resize',resize);
 requestAnimationFrame(loop);

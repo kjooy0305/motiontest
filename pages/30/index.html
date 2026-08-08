@@ -101,7 +101,10 @@ input[type=range]::-webkit-slider-thumb{
 /* 전체화면 — 컨트롤·타이틀 완전 숨김, 플로팅 버튼 없음 */
 body.fs-mode #title   {display:none;}
 body.fs-mode #controls{display:none;}
-body.fs-mode #canvas-wrap{border:none;border-radius:0;box-shadow:none;}
+body.fs-mode #canvas-wrap{
+  position:fixed;top:50%;left:50%;transform-origin:center center;
+  z-index:999;border:none;border-radius:0;box-shadow:none;
+}
 </style>
 </head>
 <body>
@@ -234,7 +237,13 @@ document.addEventListener('fullscreenchange',()=>{
   const isFS=!!document.fullscreenElement;
   document.body.classList.toggle('fs-mode',isFS);
   btnFS.textContent=isFS?'⛶ 창모드':'⛶ 전체화면';
-  resize();
+  if(isFS){
+    const sx=window.innerWidth/canWrap.offsetWidth;
+    const sy=window.innerHeight/canWrap.offsetHeight;
+    canWrap.style.transform=`translate(-50%,-50%) scale(${sx},${sy})`;
+  } else {
+    canWrap.style.transform='';
+  }
 });
 
 // ═══════════════════════════════════════════
@@ -660,7 +669,8 @@ canvas.addEventListener('touchend',  ()=>pDown=false);
 
 function addSandAt(e){
   const rect=canvas.getBoundingClientRect();
-  const px=((e.clientX-rect.left)/CELL)|0,py=((e.clientY-rect.top)/CELL)|0;
+  const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+  const px=(((e.clientX-rect.left)*scaleX)/CELL)|0,py=(((e.clientY-rect.top)*scaleY)/CELL)|0;
   if(px<0||px>=COLS||py<0||py>=ROWS) return;
   const radius=Math.ceil(parseInt(sliderDensity.value)/2);
   const raw=parseInt(sliderAmount.value)/10;
@@ -848,7 +858,7 @@ function loop(ts){
   update(); render();
 }
 resize();
-window.addEventListener('resize',resize);
+window.addEventListener('resize',()=>{ if(!document.fullscreenElement) resize(); });
 requestAnimationFrame(loop);
 </script>
 </body>

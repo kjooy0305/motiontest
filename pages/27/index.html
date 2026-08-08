@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>터미널 명령어 정리 — 테스트 27</title>
+<style>
+:root{
+  --bg:#0d0d0d;--bg2:#141414;--bg3:#1e1e1e;--bg4:#252525;
+  --border:#2a2a2a;--border2:#3a3a3a;
+  --txt:#e8e8e8;--txt2:#a0a0a0;--txt3:#606060;
+  --green:#4ec94e;--green2:#2d6a2d;
+  --blue:#5ab0ff;--blue2:#1a4a7a;
+  --yellow:#f0c040;--yellow2:#7a5a10;
+  --red:#ff5f5f;--red2:#7a1a1a;
+  --purple:#b07aff;--cyan:#40d0d0;
+  --orange:#ff9040;
+  --prompt:#4ec94e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:'SFMono-Regular',Consolas,'Courier New',monospace;font-size:14px;line-height:1.6;}
+
+/* ── HEADER ── */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:0;height:52px;}
+.term-dots{display:flex;gap:6px;margin-right:16px;}
+.dot{width:12px;height:12px;border-radius:50%;}
+.dot-r{background:#ff5f57;}.dot-y{background:#ffbd2e;}.dot-g{background:#28ca41;}
+.logo{font-size:15px;font-weight:700;color:var(--green);letter-spacing:1px;margin-right:20px;}
+.logo span{color:var(--txt3);}
+.search-wrap{flex:1;max-width:360px;margin-right:16px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 12px;color:var(--txt);font-size:13px;font-family:inherit;outline:none;transition:.15s;}
+.search:focus{border-color:var(--green2);box-shadow:0 0 0 2px rgba(78,201,78,.15);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 14px;border-radius:5px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:.12s;white-space:nowrap;letter-spacing:.5px;}
+.tab:hover{background:var(--bg3);color:var(--txt);}
+.tab.active{background:var(--green2);color:var(--green);}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 52px);}
+.sidebar{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--border);padding:12px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:4px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 4px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(78,201,78,.08);color:var(--green);border-left-color:var(--green);}
+.main{flex:1;padding:20px 24px;max-width:980px;overflow-x:hidden;}
+
+/* ── PANELS ── */
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--green);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-header .hl{color:var(--yellow);}
+
+/* ── CMD TABLE ── */
+.cmd-table{width:100%;border-collapse:collapse;}
+.cmd-table tr{border-bottom:1px solid var(--border);}
+.cmd-table tr:last-child{border-bottom:none;}
+.cmd-table tr:hover td{background:rgba(255,255,255,.03);}
+.cmd-table td{padding:0;vertical-align:top;}
+.cmd-cell{padding:10px 14px 10px 16px;width:44%;}
+.desc-wrap{padding:10px 16px 10px 0;}
+.cmd{font-family:inherit;font-size:12px;color:var(--green);background:rgba(78,201,78,.07);padding:3px 8px;border-radius:4px;border:1px solid rgba(78,201,78,.15);display:inline-block;word-break:break-all;}
+.arg{color:var(--yellow);}
+.opt{color:var(--blue);}
+.desc-main{color:var(--txt);font-size:13px;margin-bottom:3px;}
+.desc-sub{color:var(--txt2);font-size:11px;line-height:1.5;}
+.desc-ex{color:var(--cyan);font-size:11px;font-family:inherit;margin-top:4px;background:rgba(64,208,208,.05);padding:3px 8px;border-radius:3px;border-left:2px solid var(--cyan);}
+
+/* ── TIP BOX ── */
+.tip{background:rgba(78,201,78,.05);border:1px solid rgba(78,201,78,.2);border-radius:6px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--green);}
+.warn{background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.25);border-radius:6px;padding:10px 14px;margin:8px 0 0;font-size:11px;color:var(--yellow);line-height:1.6;}
+.warn::before{content:'⚠ ';}
+
+/* ── SPECIAL KEYS ── */
+.key{display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--txt);margin:0 1px;box-shadow:0 1px 0 var(--border2);}
+
+/* ── SEARCH ── */
+.no-result{text-align:center;padding:40px;color:var(--txt3);font-size:13px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="term-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+  <div class="logo">user<span>@terminal</span>:~$</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="명령어 검색... (예: ls, grep, chmod)">
+  </div>
+  <div class="tab-bar" id="tabBar">
+    <button class="tab active" onclick="switchTab('basic')">📁 기본</button>
+    <button class="tab" onclick="switchTab('text')">📝 텍스트</button>
+    <button class="tab" onclick="switchTab('perm')">🔒 권한/프로세스</button>
+    <button class="tab" onclick="switchTab('net')">🌐 네트워크</button>
+    <button class="tab" onclick="switchTab('git')">🔀 Git</button>
+    <button class="tab" onclick="switchTab('tips')">💡 팁</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="mainArea">
+
+    <!-- ════════════════════ 기본 명령어 ════════════════════ -->
+    <div class="panel active" id="panel-basic">
+      <div class="sec-title">📁 기본 파일 & 디렉토리</div>
+      <div class="sec-sub">파일 시스템 탐색, 생성, 복사, 삭제 등 가장 자주 쓰이는 명령어 모음</div>
+
+      <div class="card" id="b-nav">
+        <div class="card-header"><span class="hl">01</span> 탐색 (Navigation)</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pwd</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 작업 디렉토리 경로 출력</div><div class="desc-sub">Print Working Directory. 내가 지금 어디 있는지 확인.</div><div class="desc-ex">$ pwd → /home/user/projects</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ls</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리 내용 목록 출력</div><div class="desc-sub"><span class="opt">-l</span> 상세 정보 · <span class="opt">-a</span> 숨김파일 포함 · <span class="opt">-h</span> 파일 크기 읽기 쉽게 · <span class="opt">-t</span> 시간순 정렬</div><div class="desc-ex">$ ls -lah → 숨김 포함 전체 목록 (크기 단위 표시)</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">cd <span class="arg">[경로]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리 이동</div><div class="desc-sub"><span class="arg">~</span> 홈 디렉토리 · <span class="arg">..</span> 상위 폴더 · <span class="arg">-</span> 이전 디렉토리로 돌아가기</div><div class="desc-ex">$ cd ~/Documents &nbsp;|&nbsp; $ cd .. &nbsp;|&nbsp; $ cd -</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tree <span class="arg">[경로]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리 구조를 트리 형태로 시각화</div><div class="desc-sub"><span class="opt">-L 2</span> 깊이 2단계까지 · <span class="opt">-I node_modules</span> 특정 폴더 제외</div><div class="desc-ex">$ tree -L 2 -I node_modules</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="b-file">
+        <div class="card-header"><span class="hl">02</span> 파일 생성 & 보기</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">cat <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 내용을 터미널에 출력</div><div class="desc-sub">여러 파일을 연결(concatenate)하는 게 원래 용도. <span class="opt">-n</span> 줄 번호 표시.</div><div class="desc-ex">$ cat file.txt &nbsp;|&nbsp; $ cat -n file.txt</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">less <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일을 페이지 단위로 스크롤하며 보기</div><div class="desc-sub">↑↓ 스크롤 · <span class="key">Space</span> 다음 페이지 · <span class="key">/키워드</span> 검색 · <span class="key">q</span> 종료. 대용량 로그 파일에 적합.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">head <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 앞부분 출력 (기본 10줄)</div><div class="desc-sub"><span class="opt">-n 20</span> 앞 20줄 출력. 로그 시작 부분 확인에 유용.</div><div class="desc-ex">$ head -n 20 app.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tail <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 뒷부분 출력 (기본 10줄)</div><div class="desc-sub"><span class="opt">-f</span> 실시간 감시 (로그 모니터링 필수). <span class="opt">-n 50</span> 마지막 50줄.</div><div class="desc-ex">$ tail -f /var/log/nginx/access.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">touch <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">빈 파일 생성 / 타임스탬프 갱신</div><div class="desc-sub">파일이 없으면 새로 만들고, 있으면 수정 시간만 업데이트.</div><div class="desc-ex">$ touch index.html style.css</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">echo <span class="arg">"텍스트"</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">텍스트 출력 또는 파일에 쓰기</div><div class="desc-sub"><span class="arg">&gt;</span> 파일 덮어쓰기 · <span class="arg">&gt;&gt;</span> 파일에 이어 쓰기.</div><div class="desc-ex">$ echo "Hello" &gt; file.txt &nbsp;|&nbsp; $ echo "줄 추가" &gt;&gt; file.txt</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="b-copy">
+        <div class="card-header"><span class="hl">03</span> 복사 · 이동 · 삭제</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">cp <span class="arg">원본 대상</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일/디렉토리 복사</div><div class="desc-sub"><span class="opt">-r</span> 디렉토리 재귀 복사 · <span class="opt">-p</span> 권한/타임스탬프 보존 · <span class="opt">-v</span> 진행 상황 출력.</div><div class="desc-ex">$ cp -r src/ backup/ &nbsp;|&nbsp; $ cp -p config.env config.env.bak</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">mv <span class="arg">원본 대상</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일/디렉토리 이동 또는 이름 변경</div><div class="desc-sub">같은 디렉토리 내 이동은 사실상 이름 바꾸기. <span class="opt">-i</span> 덮어쓰기 전 확인.</div><div class="desc-ex">$ mv old.txt new.txt &nbsp;|&nbsp; $ mv *.log /tmp/logs/</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">rm <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일/디렉토리 삭제</div><div class="desc-sub"><span class="opt">-r</span> 디렉토리 재귀 삭제 · <span class="opt">-f</span> 확인 없이 강제 삭제 · <span class="opt">-i</span> 삭제 전 확인.<div class="warn">rm -rf 는 복구 불가. 신중하게 사용할 것!</div></div><div class="desc-ex">$ rm file.txt &nbsp;|&nbsp; $ rm -ri ./temp/</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">mkdir <span class="arg">[폴더명]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리 생성</div><div class="desc-sub"><span class="opt">-p</span> 중간 경로까지 한 번에 생성.</div><div class="desc-ex">$ mkdir -p src/components/ui</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">rmdir <span class="arg">[폴더명]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">빈 디렉토리만 삭제</div><div class="desc-sub">내용이 있으면 실패. 내용 포함 삭제는 rm -r 사용.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="b-find">
+        <div class="card-header"><span class="hl">04</span> 파일 찾기</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">find <span class="arg">[경로] [조건]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일/디렉토리 검색</div><div class="desc-sub"><span class="opt">-name "*.js"</span> 이름 패턴 · <span class="opt">-type f/d</span> 파일/폴더 · <span class="opt">-mtime -7</span> 7일 이내 수정 · <span class="opt">-size +10M</span> 10MB 초과.</div><div class="desc-ex">$ find . -name "*.log" -mtime -3<br>$ find /home -type f -size +100M</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">locate <span class="arg">[키워드]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 위치 빠르게 검색 (인덱스 기반)</div><div class="desc-sub">find보다 훨씬 빠름. 단, DB 갱신이 필요: <span class="arg">sudo updatedb</span>.</div><div class="desc-ex">$ locate nginx.conf</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">which <span class="arg">[명령어]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">명령어의 실행 파일 경로 출력</div><div class="desc-sub">여러 버전이 설치되어 있을 때 어느 게 실행되는지 확인.</div><div class="desc-ex">$ which python3 → /usr/bin/python3</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">whereis <span class="arg">[명령어]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실행파일·소스·매뉴얼 경로 모두 표시</div><div class="desc-sub">which보다 넓은 범위를 검색.</div><div class="desc-ex">$ whereis git → git: /usr/bin/git /usr/share/man/man1/git.1.gz</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="b-disk">
+        <div class="card-header"><span class="hl">05</span> 디스크 & 시스템 정보</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">df <span class="opt">-h</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디스크 사용량 확인</div><div class="desc-sub"><span class="opt">-h</span> 사람이 읽기 쉬운 단위(GB, MB). 각 파티션의 용량·사용량·여유 공간 표시.</div><div class="desc-ex">$ df -h → /dev/sda1: 50G 중 32G 사용 (68%)</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">du <span class="opt">-sh</span> <span class="arg">[경로]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리/파일 용량 확인</div><div class="desc-sub"><span class="opt">-s</span> 합계만 · <span class="opt">-h</span> 읽기 쉬운 단위 · <span class="opt">--max-depth=1</span> 하위 1단계.</div><div class="desc-ex">$ du -sh ~/Downloads/* | sort -h</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">uname <span class="opt">-a</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">시스템 정보 출력 (OS, 커널, 아키텍처)</div><div class="desc-sub"><span class="opt">-r</span> 커널 버전만 · <span class="opt">-m</span> 아키텍처만(x86_64, arm64 등).</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">uptime</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">시스템 가동 시간 및 부하 평균 확인</div><div class="desc-sub">load average: 1분·5분·15분 평균 CPU 부하. 코어 수보다 낮으면 정상.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">free <span class="opt">-h</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">메모리 사용량 확인</div><div class="desc-sub">total / used / free / buff/cache / available 표시. available이 실제 사용 가능한 메모리.</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 텍스트 처리 ════════════════════ -->
+    <div class="panel" id="panel-text">
+      <div class="sec-title">📝 텍스트 처리 & 검색</div>
+      <div class="sec-sub">파일 내용 검색, 변환, 필터링 — 파이프(<span style="color:var(--yellow)">|</span>)와 조합하면 강력해짐</div>
+
+      <div class="card" id="t-grep">
+        <div class="card-header"><span class="hl">01</span> grep — 텍스트 검색의 핵심</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">grep <span class="arg">"패턴" 파일</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일에서 패턴(문자열/정규식)이 있는 줄 출력</div><div class="desc-sub">Global Regular Expression Print. 터미널에서 가장 많이 쓰는 명령어 중 하나.</div><div class="desc-ex">$ grep "error" app.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">grep <span class="opt">-r</span> <span class="arg">"패턴" 경로</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">디렉토리 전체를 재귀 검색</div><div class="desc-sub"><span class="opt">-n</span> 줄 번호 · <span class="opt">-i</span> 대소문자 무시 · <span class="opt">-l</span> 파일명만 출력 · <span class="opt">-v</span> 패턴 없는 줄 출력.</div><div class="desc-ex">$ grep -rn "TODO" ./src/</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">grep <span class="opt">-E</span> <span class="arg">"정규식"</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">확장 정규표현식(ERE) 사용</div><div class="desc-sub"><span class="arg">.</span> 임의 문자 · <span class="arg">*</span> 0개 이상 · <span class="arg">+</span> 1개 이상 · <span class="arg">|</span> OR · <span class="arg">^</span> 줄 시작 · <span class="arg">$</span> 줄 끝.</div><div class="desc-ex">$ grep -E "error|warn|fail" app.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">grep <span class="opt">-c</span> <span class="arg">"패턴"</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패턴이 일치하는 줄 수만 출력</div><div class="desc-sub">파일별 에러 개수 집계에 유용.</div><div class="desc-ex">$ grep -c "ERROR" server.log → 42</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="t-sed">
+        <div class="card-header"><span class="hl">02</span> sed — 텍스트 치환 & 변환</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sed <span class="arg">'s/원본/대체/'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">줄에서 첫 번째 매칭 문자열 치환</div><div class="desc-sub">Stream Editor. 파일을 직접 수정하지 않고 출력만 바꿈.</div><div class="desc-ex">$ sed 's/foo/bar/' file.txt</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sed <span class="arg">'s/원본/대체/g'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">줄 전체에서 모든 매칭 치환 (global)</div><div class="desc-sub"><span class="opt">-i</span> 파일 직접 수정 · <span class="opt">-i.bak</span> 백업 파일 만들고 수정.</div><div class="desc-ex">$ sed -i 's/localhost/0.0.0.0/g' config.json</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sed <span class="arg">-n '5,10p'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">5번~10번 줄만 출력</div><div class="desc-sub"><span class="opt">-n</span> 자동 출력 억제. <span class="arg">p</span>로 명시한 줄만 출력.</div><div class="desc-ex">$ sed -n '5,10p' file.txt</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sed <span class="arg">'/패턴/d'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패턴이 있는 줄 삭제</div><div class="desc-sub">주석 줄 제거, 빈 줄 제거 등에 활용.</div><div class="desc-ex">$ sed '/^#/d' config.txt &nbsp;# 주석 줄 제거</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="t-awk">
+        <div class="card-header"><span class="hl">03</span> awk — 열(컬럼) 처리</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">awk <span class="arg">'{print $1}'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">각 줄의 첫 번째 열(컬럼) 출력</div><div class="desc-sub"><span class="arg">$0</span> 전체 줄 · <span class="arg">$1</span> 첫 번째 열 · <span class="arg">$NF</span> 마지막 열. 기본 구분자는 공백.</div><div class="desc-ex">$ ls -l | awk '{print $9}' &nbsp;# 파일명만</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">awk <span class="opt">-F,</span> <span class="arg">'{print $2}'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">구분자를 쉼표(,)로 지정해 두 번째 열 출력</div><div class="desc-sub">CSV 파싱에 자주 활용. <span class="opt">-F</span> 로 원하는 구분자 지정 가능.</div><div class="desc-ex">$ awk -F, '{print $1, $3}' data.csv</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">awk <span class="arg">'/패턴/ {print}'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">패턴과 일치하는 줄만 출력</div><div class="desc-sub">grep보다 다양한 조건 처리 가능 (숫자 비교, 다중 조건 등).</div><div class="desc-ex">$ awk '/ERROR/ {print NR": "$0}' app.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">awk <span class="arg">'{sum+=$1} END{print sum}'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">첫 번째 열 값들의 합계 계산</div><div class="desc-sub">집계·통계 처리에 강력. <span class="arg">END</span>는 파일을 다 읽은 후 실행되는 블록.</div><div class="desc-ex">$ awk '{sum+=$5} END{print "total:", sum}' sales.txt</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="t-sort">
+        <div class="card-header"><span class="hl">04</span> 정렬 · 중복 제거 · 집계</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sort <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">줄 단위 정렬 (기본: 알파벳 오름차순)</div><div class="desc-sub"><span class="opt">-r</span> 내림차순 · <span class="opt">-n</span> 숫자 정렬 · <span class="opt">-k2</span> 2번째 열 기준 · <span class="opt">-h</span> 사람 친화적 숫자 정렬(1K, 2M…).</div><div class="desc-ex">$ du -sh * | sort -rh &nbsp;# 용량 큰 파일 순</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">uniq</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">연속된 중복 줄 제거</div><div class="desc-sub">반드시 sort 후에 사용. <span class="opt">-c</span> 중복 횟수 표시 · <span class="opt">-d</span> 중복된 줄만 출력.</div><div class="desc-ex">$ sort access.log | uniq -c | sort -rn | head -10</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">wc <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">줄 수·단어 수·바이트 수 출력</div><div class="desc-sub"><span class="opt">-l</span> 줄 수만 · <span class="opt">-w</span> 단어 수만 · <span class="opt">-c</span> 바이트만.</div><div class="desc-ex">$ wc -l *.py &nbsp;# Python 파일 총 줄 수</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">cut <span class="opt">-d: -f1</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">구분자(:)로 나눈 첫 번째 필드 추출</div><div class="desc-sub"><span class="opt">-d</span> 구분자 · <span class="opt">-f</span> 필드 번호. /etc/passwd 파싱 등에 활용.</div><div class="desc-ex">$ cut -d: -f1 /etc/passwd &nbsp;# 사용자 이름만</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tr <span class="arg">'a-z' 'A-Z'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">문자 변환 또는 삭제</div><div class="desc-sub"><span class="opt">-d</span> 문자 삭제 · <span class="opt">-s</span> 연속된 같은 문자 하나로 압축.</div><div class="desc-ex">$ echo "hello" | tr 'a-z' 'A-Z' → HELLO</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="t-pipe">
+        <div class="card-header"><span class="hl">05</span> 파이프 & 리디렉션</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd"><span class="arg">cmd1</span> | <span class="arg">cmd2</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파이프: 앞 명령어 출력을 뒤 명령어 입력으로 전달</div><div class="desc-sub">터미널의 핵심 철학. 작은 도구를 조합해 강력한 작업 수행.</div><div class="desc-ex">$ ps aux | grep nginx | grep -v grep</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd"><span class="arg">cmd</span> &gt; file</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">출력을 파일로 저장 (덮어쓰기)</div><div class="desc-sub">기존 파일 내용이 사라짐. 이어 쓰려면 <span class="arg">&gt;&gt;</span> 사용.</div><div class="desc-ex">$ ls -la &gt; list.txt</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd"><span class="arg">cmd</span> 2&gt; file</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">에러 출력(stderr)을 파일로 저장</div><div class="desc-sub"><span class="arg">2&gt;&1</span> 에러를 표준 출력으로 합치기. <span class="arg">&gt; out.txt 2&gt;&1</span> 정상+에러 모두 파일로.</div><div class="desc-ex">$ make 2&gt; errors.txt</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tee <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">출력을 화면과 파일에 동시에 저장</div><div class="desc-sub">파이프 중간에 넣어서 실시간으로 보면서 파일에도 저장.</div><div class="desc-ex">$ make 2&gt;&1 | tee build.log</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">xargs</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">표준 입력을 인수로 변환해 명령 실행</div><div class="desc-sub">파이프로 넘어온 목록을 다음 명령어의 인수로 사용.</div><div class="desc-ex">$ find . -name "*.tmp" | xargs rm -f</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 권한/프로세스 ════════════════════ -->
+    <div class="panel" id="panel-perm">
+      <div class="sec-title">🔒 권한 · 프로세스 · 사용자</div>
+      <div class="sec-sub">파일 권한 관리, 실행 중인 프로세스 제어, 사용자 전환</div>
+
+      <div class="card" id="p-perm">
+        <div class="card-header"><span class="hl">01</span> 파일 권한 (chmod · chown)</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">chmod <span class="arg">755 파일</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 권한 변경 (숫자 방식)</div><div class="desc-sub">r=4, w=2, x=1 합산. <b>755</b> = 소유자(7:rwx) 그룹(5:r-x) 기타(5:r-x). <b>644</b> = 소유자 읽기쓰기, 나머지 읽기만.</div><div class="desc-ex">$ chmod 755 script.sh &nbsp;# 실행 가능하게</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">chmod <span class="arg">+x 파일</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실행 권한 추가 (기호 방식)</div><div class="desc-sub"><span class="arg">u</span> 소유자 · <span class="arg">g</span> 그룹 · <span class="arg">o</span> 기타 · <span class="arg">a</span> 전체. <span class="arg">+</span> 추가 · <span class="arg">-</span> 제거 · <span class="arg">=</span> 설정.</div><div class="desc-ex">$ chmod u+x,go-w script.sh</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">chown <span class="arg">user:group 파일</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 소유자 및 그룹 변경</div><div class="desc-sub"><span class="opt">-R</span> 재귀 적용 (디렉토리 전체). root 권한 필요.</div><div class="desc-ex">$ sudo chown -R www-data:www-data /var/www/html</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ls <span class="opt">-l</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 권한 확인</div><div class="desc-sub"><span style="color:var(--green);font-family:inherit">-rwxr-xr-x</span> 형태로 표시. 첫 문자: -파일 d디렉토리 l링크. 이후 3자씩 소유자/그룹/기타 권한.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="p-proc">
+        <div class="card-header"><span class="hl">02</span> 프로세스 관리</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ps <span class="opt">aux</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실행 중인 프로세스 목록 전체 출력</div><div class="desc-sub"><span class="opt">a</span> 모든 사용자 · <span class="opt">u</span> 소유자 포함 · <span class="opt">x</span> 터미널 없는 프로세스도 표시.</div><div class="desc-ex">$ ps aux | grep node</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">top</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">실시간 프로세스 모니터 (CPU/메모리 순)</div><div class="desc-sub"><span class="key">P</span> CPU순 · <span class="key">M</span> 메모리순 · <span class="key">k</span> PID 입력 후 kill · <span class="key">q</span> 종료. htop 설치 시 더 편리.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">kill <span class="arg">PID</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">특정 PID 프로세스에 신호 전송 (종료)</div><div class="desc-sub"><span class="opt">-9</span> 강제 종료(SIGKILL) · <span class="opt">-15</span> 정상 종료(SIGTERM, 기본값) · <span class="opt">-1</span> 재시작(SIGHUP).</div><div class="desc-ex">$ kill -9 1234</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">pkill <span class="arg">[프로세스명]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">이름으로 프로세스 종료</div><div class="desc-sub">PID를 찾지 않고 이름으로 바로 종료. <span class="opt">-f</span> 인수까지 포함해 검색.</div><div class="desc-ex">$ pkill -f "python app.py"</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd"><span class="arg">cmd</span> &amp;</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">명령어를 백그라운드에서 실행</div><div class="desc-sub"><span class="key">Ctrl+Z</span> 현재 프로세스 일시정지 → <span class="arg">bg</span> 백그라운드 재개 · <span class="arg">fg</span> 포그라운드로 복귀 · <span class="arg">jobs</span> 백그라운드 작업 목록.</div><div class="desc-ex">$ python server.py &amp;</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">nohup <span class="arg">cmd</span> &amp;</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">터미널 종료 후에도 계속 실행</div><div class="desc-sub">SSH 접속 끊어도 프로세스 유지. 출력은 nohup.out에 저장.</div><div class="desc-ex">$ nohup ./server.sh &gt; server.log 2&gt;&1 &amp;</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="p-user">
+        <div class="card-header"><span class="hl">03</span> 사용자 & sudo</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">sudo <span class="arg">[명령어]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">관리자 권한으로 명령 실행</div><div class="desc-sub">Superuser Do. 비밀번호 입력 후 기본 15분간 캐시. <span class="arg">sudo -i</span> root 쉘로 전환.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">su <span class="arg">[사용자]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">다른 사용자 계정으로 전환</div><div class="desc-sub"><span class="arg">su -</span> root 로그인 쉘로 전환 (환경변수까지 변경). <span class="arg">exit</span>로 복귀.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">whoami</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 사용자 이름 출력</div><div class="desc-sub">sudo 후 실제 어떤 계정인지 확인할 때 유용.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">id</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 사용자 UID, GID, 그룹 정보</div><div class="desc-sub">uid=1000(user) gid=1000(user) groups=... 형태로 출력.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">passwd</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">비밀번호 변경</div><div class="desc-sub"><span class="arg">sudo passwd 사용자명</span> 으로 다른 사용자 비밀번호 변경.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="p-env">
+        <div class="card-header"><span class="hl">04</span> 환경변수 & 쉘 설정</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">export <span class="arg">VAR=값</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">환경변수 설정 (현재 세션 + 자식 프로세스)</div><div class="desc-sub">영구 적용하려면 ~/.bashrc 또는 ~/.zshrc에 추가.</div><div class="desc-ex">$ export PATH="$PATH:/usr/local/bin"</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">env</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 환경변수 전체 출력</div><div class="desc-sub"><span class="arg">env | grep PATH</span> 처럼 특정 변수만 확인.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">echo <span class="arg">$VAR</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">특정 환경변수 값 출력</div><div class="desc-sub">$ echo $HOME · $PATH · $SHELL · $USER 등.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">source <span class="arg">~/.bashrc</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">설정 파일 현재 쉘에 즉시 적용</div><div class="desc-sub"><span class="arg">.</span> (점)도 동일 기능. 재로그인 없이 .bashrc/.zshrc 변경 사항 반영.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">alias <span class="arg">이름='명령'</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">명령어 별명(단축키) 만들기</div><div class="desc-sub">~/.bashrc에 추가하면 영구 적용.</div><div class="desc-ex">$ alias ll='ls -lah' &nbsp;|&nbsp; $ alias gs='git status'</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 네트워크 ════════════════════ -->
+    <div class="panel" id="panel-net">
+      <div class="sec-title">🌐 네트워크</div>
+      <div class="sec-sub">연결 확인, 파일 다운로드, 포트 확인, SSH 접속 등</div>
+
+      <div class="card" id="n-connect">
+        <div class="card-header"><span class="hl">01</span> 연결 확인 & 진단</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ping <span class="arg">호스트</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">대상 호스트에 ICMP 패킷 전송해 응답 확인</div><div class="desc-sub"><span class="opt">-c 4</span> 4번만 보내고 종료 · <span class="opt">-i 0.5</span> 0.5초 간격. <span class="key">Ctrl+C</span>로 중단.</div><div class="desc-ex">$ ping -c 4 google.com</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">traceroute <span class="arg">호스트</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">목적지까지 경유 라우터 경로 추적</div><div class="desc-sub">네트워크 지연 원인 진단에 사용. macOS는 traceroute, Windows는 tracert.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">nslookup <span class="arg">도메인</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">도메인의 DNS 레코드 조회</div><div class="desc-sub">IP 주소, MX 레코드 등 확인. dig 명령어가 더 상세한 정보 제공.</div><div class="desc-ex">$ nslookup github.com</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">netstat <span class="opt">-tuln</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">열린 포트 및 연결 상태 확인</div><div class="desc-sub"><span class="opt">-t</span> TCP · <span class="opt">-u</span> UDP · <span class="opt">-l</span> LISTEN 상태 · <span class="opt">-n</span> 숫자로. 최신 시스템은 ss 명령어 사용.</div><div class="desc-ex">$ ss -tuln | grep 8080</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ifconfig / ip addr</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">네트워크 인터페이스 및 IP 주소 확인</div><div class="desc-sub">ifconfig는 구버전, 최신 리눅스는 <span class="arg">ip addr show</span> 권장.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="n-transfer">
+        <div class="card-header"><span class="hl">02</span> 파일 다운로드 & 전송</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">curl <span class="arg">URL</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">URL로 데이터 전송/수신 (HTTP, FTP 등)</div><div class="desc-sub"><span class="opt">-O</span> 파일명 유지 다운로드 · <span class="opt">-o 파일명</span> 저장 · <span class="opt">-I</span> 헤더만 · <span class="opt">-X POST</span> 메서드 지정 · <span class="opt">-H</span> 헤더 추가.</div><div class="desc-ex">$ curl -O https://example.com/file.zip<br>$ curl -X POST -H "Content-Type: application/json" -d '{"key":"val"}' https://api.example.com/</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">wget <span class="arg">URL</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">파일 다운로드 전용 도구</div><div class="desc-sub"><span class="opt">-c</span> 이어받기 · <span class="opt">-r</span> 재귀 다운로드 · <span class="opt">-q</span> 진행 출력 없이 조용히.</div><div class="desc-ex">$ wget -c https://example.com/largefile.iso</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">scp <span class="arg">원본 대상</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">SSH를 통한 원격 파일 복사</div><div class="desc-sub"><span class="opt">-r</span> 디렉토리 · <span class="opt">-P 포트</span> 포트 지정.</div><div class="desc-ex">$ scp file.txt user@192.168.1.10:/home/user/<br>$ scp -r user@server:/remote/dir ./local/</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">rsync <span class="opt">-avz</span> <span class="arg">원본 대상</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">변경된 파일만 동기화 (증분 전송)</div><div class="desc-sub"><span class="opt">-a</span> 아카이브(권한·링크 보존) · <span class="opt">-v</span> 진행 출력 · <span class="opt">-z</span> 압축 · <span class="opt">--delete</span> 원본에 없는 파일 삭제.</div><div class="desc-ex">$ rsync -avz ./dist/ user@server:/var/www/html/</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="n-ssh">
+        <div class="card-header"><span class="hl">03</span> SSH</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ssh <span class="arg">user@host</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">원격 서버에 SSH 접속</div><div class="desc-sub"><span class="opt">-p 포트</span> 포트 지정 · <span class="opt">-i 키파일</span> 개인키 지정 · <span class="opt">-L 로컬:원격</span> 포트 포워딩.</div><div class="desc-ex">$ ssh -i ~/.ssh/id_rsa user@192.168.1.10</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ssh-keygen</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">SSH 키 쌍 생성</div><div class="desc-sub"><span class="opt">-t ed25519</span> 최신 알고리즘 · <span class="opt">-C "이메일"</span> 코멘트. ~/.ssh/id_ed25519 (개인키), id_ed25519.pub (공개키) 생성.</div><div class="desc-ex">$ ssh-keygen -t ed25519 -C "my@email.com"</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">ssh-copy-id <span class="arg">user@host</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">공개키를 원격 서버에 자동 등록</div><div class="desc-sub">이후 비밀번호 없이 SSH 접속 가능. ~/.ssh/authorized_keys에 추가됨.</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════ Git ════════════════════ -->
+    <div class="panel" id="panel-git">
+      <div class="sec-title">🔀 Git 명령어</div>
+      <div class="sec-sub">버전 관리의 핵심 — 로컬 작업부터 원격 저장소 연동까지</div>
+
+      <div class="card" id="g-basic">
+        <div class="card-header"><span class="hl">01</span> 기본 워크플로우</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git init</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 디렉토리에 Git 저장소 초기화</div><div class="desc-sub">.git 폴더 생성. 이미 있는 프로젝트를 git으로 관리 시작할 때.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git clone <span class="arg">URL</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">원격 저장소 복제</div><div class="desc-sub"><span class="opt">--depth 1</span> 최신 커밋만 (shallow clone) · <span class="opt">-b 브랜치명</span> 특정 브랜치만.</div><div class="desc-ex">$ git clone --depth 1 https://github.com/user/repo.git</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git status</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 작업 트리 상태 확인</div><div class="desc-sub">스테이징 여부, 변경된 파일 목록 표시. 가장 먼저 확인하는 명령.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git add <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">변경 파일을 스테이징 영역에 추가</div><div class="desc-sub"><span class="arg">.</span> 전체 변경 · <span class="opt">-p</span> 변경 사항을 조각 단위로 선택적 추가.</div><div class="desc-ex">$ git add src/app.js &nbsp;|&nbsp; $ git add -p</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git commit <span class="opt">-m</span> <span class="arg">"메시지"</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">스테이징된 변경 사항 커밋</div><div class="desc-sub"><span class="opt">--amend</span> 직전 커밋 수정 · <span class="opt">-a</span> 추적 중인 파일 자동 스테이징 후 커밋.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git push <span class="arg">origin main</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">로컬 커밋을 원격 저장소에 업로드</div><div class="desc-sub"><span class="opt">-u</span> 업스트림 추적 설정 (첫 push 시). <span class="opt">--force-with-lease</span> 안전한 강제 push.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git pull</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">원격 변경 사항 가져와 병합</div><div class="desc-sub">fetch + merge 조합. <span class="opt">--rebase</span> 병합 대신 리베이스로 합침 (히스토리 선형 유지).</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="g-branch">
+        <div class="card-header"><span class="hl">02</span> 브랜치 관리</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git branch</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">브랜치 목록 확인</div><div class="desc-sub"><span class="opt">-a</span> 원격 포함 전체 · <span class="opt">-d 브랜치명</span> 브랜치 삭제 · <span class="opt">-D</span> 강제 삭제.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git checkout <span class="opt">-b</span> <span class="arg">브랜치명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">새 브랜치 생성 후 전환</div><div class="desc-sub">최신 Git에서는 <span class="arg">git switch -c 브랜치명</span> 권장.</div><div class="desc-ex">$ git checkout -b feat/login</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git merge <span class="arg">브랜치명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">지정 브랜치를 현재 브랜치에 병합</div><div class="desc-sub"><span class="opt">--no-ff</span> 항상 병합 커밋 생성 · <span class="opt">--squash</span> 커밋 압축 후 병합.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git rebase <span class="arg">브랜치명</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 브랜치 커밋을 대상 브랜치 끝에 재배치</div><div class="desc-sub">선형 히스토리 유지. 공유 브랜치에는 사용 주의.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git stash</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 변경 사항을 임시 저장 (스택)</div><div class="desc-sub"><span class="arg">pop</span> 마지막 stash 복원 후 삭제 · <span class="arg">list</span> 목록 · <span class="arg">apply</span> 삭제 없이 복원 · <span class="opt">-u</span> 미추적 파일도 포함.</div><div class="desc-ex">$ git stash -u &nbsp;|&nbsp; $ git stash pop</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="g-history">
+        <div class="card-header"><span class="hl">03</span> 히스토리 & 되돌리기</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git log <span class="opt">--oneline</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">커밋 히스토리 한 줄씩 표시</div><div class="desc-sub"><span class="opt">--graph --all</span> 브랜치 그래프 · <span class="opt">-n 10</span> 최근 10개 · <span class="opt">--author="이름"</span> 특정 사람 커밋.</div><div class="desc-ex">$ git log --oneline --graph --all</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git diff <span class="arg">[파일]</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">변경 사항 비교</div><div class="desc-sub"><span class="arg">--staged</span> 스테이징된 변경 · <span class="arg">브랜치A..브랜치B</span> 브랜치 간 비교.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git reset <span class="arg">HEAD~1</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">직전 커밋 취소 (변경 사항은 유지)</div><div class="desc-sub"><span class="opt">--soft</span> 스테이징 유지 · <span class="opt">--mixed</span> 스테이징 해제(기본) · <span class="opt">--hard</span> 변경사항까지 삭제.<div class="warn">--hard는 복구 어려움. git reflog로 확인 가능.</div></div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git revert <span class="arg">SHA</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">특정 커밋의 반대 커밋 생성 (안전한 되돌리기)</div><div class="desc-sub">히스토리를 지우지 않고 되돌림. 공유 브랜치에서 reset 대신 권장.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git cherry-pick <span class="arg">SHA</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">다른 브랜치의 특정 커밋만 가져오기</div><div class="desc-sub">hotfix를 main에도 적용하는 등 선택적 커밋 이식에 활용.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">git reflog</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">HEAD 이동 이력 전체 조회</div><div class="desc-sub">reset --hard로 지운 커밋도 복구 가능. git의 최후 안전망.</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════ 팁 ════════════════════ -->
+    <div class="panel" id="panel-tips">
+      <div class="sec-title">💡 터미널 팁 & 단축키</div>
+      <div class="sec-sub">생산성을 높이는 쉘 단축키와 고급 사용법</div>
+
+      <div class="card" id="tp-shortcut">
+        <div class="card-header"><span class="hl">01</span> 쉘 단축키 (bash / zsh 공통)</div>
+        <table class="cmd-table">
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">C</span></td><td><div class="desc-wrap"><div class="desc-main">실행 중인 프로세스 강제 종료 (SIGINT)</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">Z</span></td><td><div class="desc-wrap"><div class="desc-main">프로세스 일시 정지 (백그라운드 전환 가능)</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">D</span></td><td><div class="desc-wrap"><div class="desc-main">EOF 입력 / 쉘 종료 (exit와 동일)</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">L</span></td><td><div class="desc-wrap"><div class="desc-main">화면 지우기 (clear와 동일)</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">A</span></td><td><div class="desc-wrap"><div class="desc-main">커서를 줄 맨 앞으로 이동</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">E</span></td><td><div class="desc-wrap"><div class="desc-main">커서를 줄 맨 끝으로 이동</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">U</span></td><td><div class="desc-wrap"><div class="desc-main">커서 앞 내용 전체 삭제</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">K</span></td><td><div class="desc-wrap"><div class="desc-main">커서 뒤 내용 전체 삭제</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">W</span></td><td><div class="desc-wrap"><div class="desc-main">커서 앞 단어 하나 삭제</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Ctrl</span>+<span class="key">R</span></td><td><div class="desc-wrap"><div class="desc-main">명령어 히스토리 역방향 검색</div><div class="desc-sub">입력하면서 검색. <span class="key">Ctrl+R</span> 반복으로 이전 결과. <span class="key">Enter</span>로 실행.</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">↑</span> / <span class="key">↓</span></td><td><div class="desc-wrap"><div class="desc-main">이전/다음 명령어 히스토리 탐색</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">Tab</span></td><td><div class="desc-wrap"><div class="desc-main">명령어·파일명 자동 완성</div><div class="desc-sub">두 번 누르면 가능한 후보 목록 표시.</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">!!</span></td><td><div class="desc-wrap"><div class="desc-main">직전 명령어 재실행</div><div class="desc-sub"><span class="arg">sudo !!</span> 이전 명령을 sudo로 재실행할 때 자주 사용.</div></div></td></tr>
+          <tr><td class="cmd-cell"><span class="key">!$</span></td><td><div class="desc-wrap"><div class="desc-main">이전 명령어의 마지막 인수 사용</div><div class="desc-sub"><span class="arg">mkdir new_dir</span> 후 <span class="arg">cd !$</span> 하면 바로 이동.</div></div></td></tr>
+        </table>
+      </div>
+
+      <div class="card" id="tp-history">
+        <div class="card-header"><span class="hl">02</span> history & 명령어 재사용</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">history</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">이전 명령어 목록 출력</div><div class="desc-sub"><span class="arg">history 20</span> 최근 20개 · <span class="arg">history | grep git</span> 특정 명령 검색.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">!<span class="arg">번호</span></span></td>
+            <td><div class="desc-wrap"><div class="desc-main">history 번호 해당 명령어 재실행</div><div class="desc-sub">$ !42 → 42번 명령어 실행.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">history -c</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">히스토리 전체 삭제</div><div class="desc-sub">민감 정보가 실수로 입력됐을 때 사용.</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="tp-tmux">
+        <div class="card-header"><span class="hl">03</span> tmux — 터미널 멀티플렉서</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tmux</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">새 tmux 세션 시작</div><div class="desc-sub">SSH 접속이 끊겨도 세션 유지. 여러 창 분할 가능.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="key">Ctrl+B</span> <span class="key">D</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">세션을 백그라운드로 detach</div><div class="desc-sub">세션은 계속 살아 있음. <span class="arg">tmux attach</span>로 재연결.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="key">Ctrl+B</span> <span class="key">C</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">새 창(window) 생성</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="key">Ctrl+B</span> <span class="key">%</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">화면 좌우 분할 (pane)</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="key">Ctrl+B</span> <span class="key">"</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">화면 상하 분할</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="key">Ctrl+B</span> <span class="key">화살표</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">pane 간 이동</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd">tmux ls</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 세션 목록 확인</div></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card" id="tp-useful">
+        <div class="card-header"><span class="hl">04</span> 자주 쓰는 조합 레시피</div>
+        <table class="cmd-table">
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">grep -r "TODO" . | wc -l</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">프로젝트 전체 TODO 개수 세기</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">du -sh * | sort -rh | head -10</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">현재 폴더에서 용량 큰 항목 Top 10</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">ps aux | sort -rk3 | head -10</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">CPU 많이 쓰는 프로세스 Top 10</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">find . -name "*.log" | xargs rm</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">하위 전체 .log 파일 일괄 삭제</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 32</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">32자리 랜덤 문자열 생성 (비밀번호용)</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">watch -n 2 'df -h'</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">2초마다 디스크 사용량 자동 갱신</div><div class="desc-sub">watch 명령어: 어떤 명령이든 주기적으로 실행.</div></div></td>
+          </tr>
+          <tr>
+            <td class="cmd-cell"><span class="cmd" style="font-size:11px;">ssh -L 8080:localhost:80 user@server</span></td>
+            <td><div class="desc-wrap"><div class="desc-main">SSH 터널로 원격 80포트를 로컬 8080에 포워딩</div></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── 탭 전환 ──
+const TAB_LABELS={basic:'기본',text:'텍스트',perm:'권한',net:'네트워크',git:'Git',tips:'팁'};
+function switchTab(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  buildSidebar(id);
+}
+
+// ── 사이드바 ──
+const SIDEBAR={
+  basic:[
+    {id:'b-nav',label:'탐색'},
+    {id:'b-file',label:'파일 생성 & 보기'},
+    {id:'b-copy',label:'복사·이동·삭제'},
+    {id:'b-find',label:'파일 찾기'},
+    {id:'b-disk',label:'디스크 & 시스템'},
+  ],
+  text:[
+    {id:'t-grep',label:'grep — 텍스트 검색'},
+    {id:'t-sed',label:'sed — 텍스트 치환'},
+    {id:'t-awk',label:'awk — 열 처리'},
+    {id:'t-sort',label:'정렬·중복제거·집계'},
+    {id:'t-pipe',label:'파이프 & 리디렉션'},
+  ],
+  perm:[
+    {id:'p-perm',label:'파일 권한'},
+    {id:'p-proc',label:'프로세스 관리'},
+    {id:'p-user',label:'사용자 & sudo'},
+    {id:'p-env',label:'환경변수 & 쉘 설정'},
+  ],
+  net:[
+    {id:'n-connect',label:'연결 확인 & 진단'},
+    {id:'n-transfer',label:'파일 다운로드 & 전송'},
+    {id:'n-ssh',label:'SSH'},
+  ],
+  git:[
+    {id:'g-basic',label:'기본 워크플로우'},
+    {id:'g-branch',label:'브랜치 관리'},
+    {id:'g-history',label:'히스토리 & 되돌리기'},
+  ],
+  tips:[
+    {id:'tp-shortcut',label:'쉘 단축키'},
+    {id:'tp-history',label:'history & 재사용'},
+    {id:'tp-tmux',label:'tmux'},
+    {id:'tp-useful',label:'조합 레시피'},
+  ],
+};
+function buildSidebar(id){
+  const sb=document.getElementById('sidebar');
+  const items=SIDEBAR[id]||[];
+  sb.innerHTML='<div class="sb-label">목차</div>'+
+    items.map(it=>`<button class="sb-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('');
+}
+function scrollToSec(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+buildSidebar('basic');
+
+// ── 검색 ──
+const searchInput=document.getElementById('searchInput');
+searchInput.addEventListener('input',()=>{
+  const q=searchInput.value.trim().toLowerCase();
+  if(!q){
+    document.querySelectorAll('.cmd-table tr').forEach(r=>r.style.display='');
+    document.querySelectorAll('.card').forEach(c=>c.style.display='');
+    return;
+  }
+  // 모든 패널 보이게
+  document.querySelectorAll('.panel').forEach(p=>p.style.display='block');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.cmd-table').forEach(tbl=>{
+    let found=0;
+    tbl.querySelectorAll('tr').forEach(r=>{
+      if(r.textContent.toLowerCase().includes(q)){ r.style.display=''; found++; }
+      else r.style.display='none';
+    });
+    const card=tbl.closest('.card');
+    if(card) card.style.display=found>0?'':'none';
+  });
+});
+searchInput.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    searchInput.value='';
+    document.querySelectorAll('.panel').forEach((p,i)=>p.style.display=i===0?'block':'none');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-basic').classList.add('active');
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.querySelectorAll('.cmd-table tr').forEach(r=>r.style.display='');
+    document.querySelectorAll('.card').forEach(c=>c.style.display='');
+    buildSidebar('basic');
+  }
+});
+</script>
+</body>
+</html>

@@ -100,6 +100,7 @@ const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 let W, H, CW, CH;
+let zbuf;
 function setSize() {
   W = cv.width  = window.innerWidth;
   H = cv.height = window.innerHeight;
@@ -497,7 +498,6 @@ cv.addEventListener('touchstart',e=>{ e.preventDefault(); if(gameState==='PLAY'&
 // ══════════════════════════════════════════════════════════
 let gameState='MENU', paused=false;
 let player, enemies, items;
-let zbuf;
 let weaponFlash=0, weaponBob=0, walkPhase=0;
 let killMsgTimer=0, pickupMsgTimer=0;
 let winTriggered=false;                // 수정: 중복 win 방지

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>번개 — 테스트 24</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;}
+
+#tab-bar{
+  position:fixed;top:0;left:0;right:0;z-index:20;height:38px;
+  display:flex;background:rgba(0,0,0,0.85);
+  border-bottom:1px solid #0a1020;
+  backdrop-filter:blur(4px);
+}
+.tab{
+  flex:1;height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:'Courier New',monospace;font-size:12px;font-weight:700;
+  letter-spacing:2px;color:#2a3a5a;cursor:pointer;transition:.15s;
+  border-bottom:2px solid transparent;
+}
+.tab:hover{color:#5577aa;}
+.tab.on{color:#88bbff;border-bottom-color:#4488ff;}
+
+#cv2d{
+  position:fixed;top:38px;left:0;
+  width:100%;height:calc(100% - 38px);
+  display:block;
+}
+#wrap3d{
+  position:fixed;top:38px;left:0;
+  width:100%;height:calc(100% - 38px);
+  display:none;
+}
+
+.hint{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  font-family:'Courier New',monospace;font-size:11px;
+  color:rgba(80,120,200,0.55);letter-spacing:2px;
+  pointer-events:none;text-align:center;
+}
+.cnt{
+  position:fixed;top:46px;right:14px;
+  font-family:'Courier New',monospace;font-size:10px;
+  color:rgba(80,120,200,0.45);letter-spacing:1px;pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div id="tab-bar">
+  <div class="tab on"  onclick="sw('2d')">⚡ 2D 번개</div>
+  <div class="tab"     onclick="sw('3d')">🌩 3D 번개</div>
+</div>
+
+<canvas id="cv2d"></canvas>
+<div id="wrap3d"></div>
+
+<div class="hint" id="hint">클릭하여 번개를 소환하세요</div>
+<div class="cnt"  id="cnt">번개 0회</div>
+
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════
+//  SHARED
+// ══════════════════════════════════════════════════════
+let mode = '2d';
+let strikes = 0;
+
+function sw(m) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('on',['2d','3d'][i]===m));
+  document.getElementById('cv2d').style.display   = m==='2d'?'block':'none';
+  document.getElementById('wrap3d').style.display = m==='3d'?'block':'none';
+  strikes = 0;
+  document.getElementById('cnt').textContent = '번개 0회';
+}
+function tick() {
+  strikes++;
+  document.getElementById('cnt').textContent = `번개 ${strikes}회`;
+}
+
+// ══════════════════════════════════════════════════════
+//  AUDIO
+// ══════════════════════════════════════════════════════
+let AC = null;
+function ac() {
+  if (!AC) AC = new AudioContext();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+
+function playCrack() {
+  const a = ac();
+  const len = a.sampleRate * 0.06;
+  const buf = a.createBuffer(1, len, a.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++)
+    d[i] = (Math.random()*2-1) * Math.exp(-i/(a.sampleRate*0.012));
+  const src = a.createBufferSource(); src.buffer = buf;
+  const hi = a.createBiquadFilter(); hi.type='highpass'; hi.frequency.value=3000;
+  const g = a.createGain(); g.gain.value = 0.3;
+  src.connect(hi); hi.connect(g); g.connect(a.destination);
+  src.start();
+}
+
+function playThunder(delay=0, vol=0.38) {
+  setTimeout(() => {
+    const a = ac();
+    const dur = 2.8 + Math.random()*1.8;
+    const buf = a.createBuffer(1, a.sampleRate*dur, a.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0; i<d.length; i++) {
+      const t = i/a.sampleRate;
+      d[i] = (Math.random()*2-1) * (
+        Math.exp(-t*6)*0.8 + Math.exp(-t*1.1)*0.5
+      ) * Math.sin(t*18+Math.random()*0.5);
+    }
+    const src = a.createBufferSource(); src.buffer = buf;
+    const lo = a.createBiquadFilter(); lo.type='lowpass'; lo.frequency.value=320;
+    const g = a.createGain(); g.gain.value = vol;
+    src.connect(lo); lo.connect(g); g.connect(a.destination);
+    src.start();
+  }, delay);
+}
+
+// ══════════════════════════════════════════════════════
+//  2D  —  LIGHTNING ENGINE
+// ══════════════════════════════════════════════════════
+const cv = document.getElementById('cv2d');
+const ctx = cv.getContext('2d');
+let W, H;
+
+function resize2D() {
+  W = cv.width  = cv.offsetWidth;
+  H = cv.height = cv.offsetHeight;
+}
+resize2D();
+window.addEventListener('resize', resize2D);
+
+/* ── 번개 세그먼트 생성 (재귀 중점 변위) ── */
+function genSegs(x0,y0,x1,y1, depth, rough, main) {
+  if (depth <= 0) return [{x0,y0,x1,y1,main}];
+
+  const dx=x1-x0, dy=y1-y0;
+  const len = Math.sqrt(dx*dx+dy*dy)||1;
+  const px=-dy/len, py=dx/len;               // 수직 방향
+  const disp = (Math.random()-0.5)*len*rough;
+  const mx=(x0+x1)/2+px*disp;
+  const my=(y0+y1)/2+py*disp;
+
+  const out = [
+    ...genSegs(x0,y0,mx,my, depth-1, rough*0.62, main),
+    ...genSegs(mx,my,x1,y1, depth-1, rough*0.62, main),
+  ];
+
+  // 가지
+  if (main && depth>2 && Math.random()<0.28) {
+    const ang = Math.atan2(dy,dx) + (Math.random()-0.5)*1.5;
+    const bl  = len*(0.3+Math.random()*0.3);
+    out.push(...genSegs(mx,my, mx+Math.cos(ang)*bl, my+Math.sin(ang)*bl,
+      depth-2, rough*0.55, false));
+  }
+  return out;
+}
+
+/* ── 볼트 클래스 ── */
+class Bolt {
+  constructor(x0,y0,x1,y1) {
+    this.segs  = genSegs(x0,y0,x1,y1, 8, 0.48, true);
+    this.life  = 1.0;
+    this.decay = 1.1 + Math.random()*0.9;
+    // 가지점 → 파티클용
+    this.pts   = this.segs.filter((_,i)=>i%5===0).map(s=>({x:s.x1,y:s.y1}));
+  }
+  update(dt){ this.life -= dt*this.decay; }
+  get alive(){ return this.life>0; }
+
+  draw() {
+    if(!this.alive) return;
+    const L = this.life;
+    // 4겹 글로우 레이어
+    const layers = [
+      {blur:55, a:0.10, w:22, c:'#1133cc'},
+      {blur:28, a:0.22, w:9,  c:'#3355ff'},
+      {blur:10, a:0.50, w:3,  c:'#99bbff'},
+      {blur:0,  a:0.95, w:1,  c:'#ffffff'},
+    ];
+    for (const lyr of layers) {
+      ctx.save();
+      ctx.lineJoin='round'; ctx.lineCap='round';
+      ctx.lineWidth  = lyr.w;
+      ctx.shadowBlur = lyr.blur;
+      ctx.shadowColor= '#4466ff';
+      ctx.strokeStyle= lyr.c;
+      for (const s of this.segs) {
+        ctx.globalAlpha = lyr.a * L * (s.main?1:0.65);
+        ctx.beginPath();
+        ctx.moveTo(s.x0,s.y0);
+        ctx.lineTo(s.x1,s.y1);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+}
+
+/* ── 파티클 (스파크) ── */
+class Spark {
+  constructor(x,y) {
+    const a=Math.random()*Math.PI*2, spd=40+Math.random()*160;
+    this.x=x; this.y=y;
+    this.vx=Math.cos(a)*spd; this.vy=Math.sin(a)*spd;
+    this.life=0.35+Math.random()*0.4;
+    this.max=this.life;
+    this.r=1+Math.random()*2;
+  }
+  update(dt){
+    this.x+=this.vx*dt; this.y+=this.vy*dt;
+    this.vy+=280*dt;
+    this.life-=dt;
+  }
+  draw(){
+    const t=this.life/this.max;
+    ctx.save();
+    ctx.globalAlpha=t*0.85;
+    ctx.shadowBlur=10; ctx.shadowColor='#4488ff';
+    ctx.fillStyle=`hsl(${200+50*t},90%,${65+35*t}%)`;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r*t,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  get alive(){ return this.life>0; }
+}
+
+/* ── 빗방울 ── */
+const RAIN_N = 280;
+const rain = Array.from({length:RAIN_N},()=>({
+  x:Math.random()*2000, y:Math.random()*1200,
+  vy:380+Math.random()*220, len:7+Math.random()*10,
+}));
+
+function drawRain(dt) {
+  ctx.save();
+  ctx.strokeStyle='rgba(120,150,210,0.18)';
+  ctx.lineWidth=1;
+  for (const r of rain) {
+    r.y += r.vy*dt;
+    r.x -= 15*dt;
+    if(r.y>H){ r.y=-r.len; r.x=Math.random()*W; }
+    ctx.beginPath();
+    ctx.moveTo(r.x, r.y);
+    ctx.lineTo(r.x-3, r.y+r.len);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ── 배경 (구름) ── */
+function drawBG() {
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#020408');
+  g.addColorStop(0.55,'#040810');
+  g.addColorStop(1,'#060a14');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  for(let i=0;i<14;i++){
+    const cx=(i*157+60)%W, cy=H*0.08+(i%4)*H*0.07;
+    const rx=100+i*25, ry=30+i%3*18;
+    const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,rx);
+    cg.addColorStop(0,'rgba(18,26,42,0.45)');
+    cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=cg;
+    ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); ctx.fill();
+  }
+}
+
+/* ── 상태 ── */
+const bolts  = [];
+const sparks = [];
+let flash2D  = 0;
+let auto2D   = 2.0;
+
+function spawnBolt(cx, cy) {
+  const tx = cx !== undefined ? cx : W*(0.05+Math.random()*0.9);
+  const ty = cy !== undefined ? cy : H*(0.04+Math.random()*0.12);
+  const bx = tx+(Math.random()-0.5)*W*0.25;
+  const by = H*(0.82+Math.random()*0.18);
+
+  const b = new Bolt(tx,ty,bx,by);
+  bolts.push(b);
+  for(const p of b.pts.slice(0,20))
+    for(let i=0;i<3;i++) sparks.push(new Spark(p.x,p.y));
+
+  flash2D = 0.55+Math.random()*0.3;
+  playCrack();
+  playThunder(250+Math.random()*700);
+  tick();
+}
+
+/* ── 이벤트 ── */
+cv.addEventListener('click',   e=>{ ac(); spawnBolt(e.clientX, e.clientY-38); });
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault(); ac();
+  const t=e.touches[0]; spawnBolt(t.clientX, t.clientY-38);
+},{passive:false});
+
+/* ── 루프 ── */
+let prev2D=0;
+function loop2D(ts) {
+  requestAnimationFrame(loop2D);
+  if(mode!=='2d') return;
+  const dt=Math.min((ts-prev2D)/1000,0.05); prev2D=ts;
+
+  auto2D-=dt;
+  if(auto2D<=0){ spawnBolt(); auto2D=1.8+Math.random()*3.2; }
+
+  drawBG();
+  drawRain(dt);
+
+  // 섬광
+  if(flash2D>0){
+    ctx.fillStyle=`rgba(160,185,255,${flash2D})`;
+    ctx.fillRect(0,0,W,H);
+    flash2D=Math.max(0,flash2D-dt*5.5);
+  }
+
+  // 볼트
+  for(let i=bolts.length-1;i>=0;i--){
+    bolts[i].update(dt); bolts[i].draw();
+    if(!bolts[i].alive) bolts.splice(i,1);
+  }
+  // 스파크
+  ctx.save();
+  for(let i=sparks.length-1;i>=0;i--){
+    sparks[i].update(dt); sparks[i].draw();
+    if(!sparks[i].alive) sparks.splice(i,1);
+  }
+  ctx.restore();
+  ctx.globalAlpha=1;
+}
+requestAnimationFrame(loop2D);
+
+// ══════════════════════════════════════════════════════
+//  3D  —  THREE.JS LIGHTNING
+// ══════════════════════════════════════════════════════
+const wrap = document.getElementById('wrap3d');
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x010306);
+wrap.appendChild(renderer.domElement);
+
+const scene  = new THREE.Scene();
+scene.fog    = new THREE.FogExp2(0x010306, 0.016);
+
+const camera = new THREE.PerspectiveCamera(58,1,0.1,600);
+camera.position.set(0,18,50);
+camera.lookAt(0,6,0);
+
+/* ── 지면 ── */
+const gGeo = new THREE.PlaneGeometry(400,400,1,1);
+const gMat = new THREE.MeshStandardMaterial({color:0x030810, roughness:0.9, metalness:0.1});
+const ground = new THREE.Mesh(gGeo,gMat);
+ground.rotation.x=-Math.PI/2;
+ground.receiveShadow=true;
+scene.add(ground);
+
+/* ── 조명 ── */
+const ambL = new THREE.AmbientLight(0x050a18, 1.0);
+scene.add(ambL);
+
+/* ── 별 (배경점) ── */
+{
+  const sPts = [];
+  for(let i=0;i<1800;i++){
+    const r=180+Math.random()*100;
+    const theta=Math.random()*Math.PI;
+    const phi=Math.random()*Math.PI*2;
+    sPts.push(new THREE.Vector3(
+      r*Math.sin(theta)*Math.cos(phi),
+      r*Math.cos(theta)+40,
+      r*Math.sin(theta)*Math.sin(phi),
+    ));
+  }
+  const sGeo = new THREE.BufferGeometry().setFromPoints(sPts);
+  const sMat = new THREE.PointsMaterial({color:0x4466aa,size:0.6,transparent:true,opacity:0.35});
+  scene.add(new THREE.Points(sGeo,sMat));
+}
+
+/* ── 구름 (다크 반투명 박스) ── */
+{
+  const cMat = new THREE.MeshBasicMaterial({color:0x080c18,transparent:true,opacity:0.55,depthWrite:false});
+  for(let i=0;i<18;i++){
+    const cg = new THREE.BoxGeometry(
+      40+Math.random()*60, 8+Math.random()*12, 20+Math.random()*40
+    );
+    const m = new THREE.Mesh(cg,cMat);
+    m.position.set(
+      (Math.random()-0.5)*150, 60+Math.random()*25, (Math.random()-0.5)*150
+    );
+    scene.add(m);
+  }
+}
+
+/* ── 3D 번개 세그먼트 생성 ── */
+function gen3DSegs(p0,p1,depth,rough,main){
+  if(depth<=0) return [{p0:p0.clone(),p1:p1.clone(),main}];
+
+  const mid=p0.clone().add(p1).multiplyScalar(0.5);
+  const len=p0.distanceTo(p1);
+  // 수직 오프셋 (Y 성분 제한)
+  const perp=new THREE.Vector3(
+    (Math.random()-0.5),(Math.random()-0.5)*0.25,(Math.random()-0.5)
+  ).normalize();
+  mid.addScaledVector(perp,(Math.random()-0.5)*len*rough);
+
+  const out=[
+    ...gen3DSegs(p0,mid,depth-1,rough*0.62,main),
+    ...gen3DSegs(mid,p1,depth-1,rough*0.62,main),
+  ];
+
+  // 가지
+  if(main && depth>2 && Math.random()<0.3){
+    const dir=p1.clone().sub(p0).normalize();
+    const side=new THREE.Vector3(Math.random()-0.5,-(Math.random()*0.5),Math.random()-0.5).normalize();
+    const bEnd=mid.clone().addScaledVector(dir,len*0.3).addScaledVector(side,len*0.35);
+    out.push(...gen3DSegs(mid,bEnd,depth-2,rough*0.55,false));
+  }
+  return out;
+}
+
+/* ── 3D 볼트 클래스 ── */
+class Bolt3 {
+  constructor(x,z){
+    const y0=55+Math.random()*20;
+    const p0=new THREE.Vector3(x,y0,z);
+    const p1=new THREE.Vector3(x+(Math.random()-0.5)*4, 0.4, z+(Math.random()-0.5)*4);
+    const segs=gen3DSegs(p0,p1,7,0.5,true);
+    const pts=segs.flatMap(s=>[s.p0,s.p1]);
+
+    this.group=new THREE.Group(); scene.add(this.group);
+
+    const geo=new THREE.BufferGeometry().setFromPoints(pts);
+    // 4겹 글로우 (additive blending)
+    [
+      {c:0x1133bb,o:0.10},
+      {c:0x3355ee,o:0.22},
+      {c:0x88aaff,o:0.55},
+      {c:0xffffff,o:1.00},
+    ].forEach(({c,o})=>{
+      this.group.add(new THREE.LineSegments(geo,
+        new THREE.LineBasicMaterial({
+          color:c,transparent:true,opacity:o,
+          blending:THREE.AdditiveBlending,depthWrite:false,
+        })
+      ));
+    });
+
+    // 착지점 빛
+    this.pLight=new THREE.PointLight(0x4488ff,18,55);
+    this.pLight.position.copy(p1);
+    scene.add(this.pLight);
+
+    // 하늘 번쩍임 빛
+    this.sLight=new THREE.PointLight(0x6688ff,10,220);
+    this.sLight.position.copy(p0);
+    scene.add(this.sLight);
+
+    this.life=1.0;
+    this.decay=1.3+Math.random()*0.9;
+  }
+  update(dt){
+    this.life=Math.max(0,this.life-dt*this.decay);
+    const L=this.life;
+    this.group.children.forEach(c=>{ c.material.opacity*=(1-dt*this.decay*1.8); });
+    this.pLight.intensity=L*18;
+    this.sLight.intensity=L*10;
+    if(!this.alive){
+      scene.remove(this.group);
+      scene.remove(this.pLight);
+      scene.remove(this.sLight);
+    }
+  }
+  get alive(){ return this.life>0; }
+}
+
+/* ── 섬광 (AmbientLight 부스트) ── */
+function flash3D(){
+  ambL.intensity=8;
+  ambL.color.set(0x8899ff);
+  setTimeout(()=>{ ambL.intensity=1.0; ambL.color.set(0x050a18); },90);
+}
+
+const bolts3=[];
+let auto3D=2.0, camAng=0;
+let prev3D=0;
+
+function spawn3D(x,z){
+  const bx=x!==undefined?x:(Math.random()-0.5)*65;
+  const bz=z!==undefined?z:(Math.random()-0.5)*65;
+  bolts3.push(new Bolt3(bx,bz));
+  flash3D();
+  playCrack();
+  playThunder(200+Math.random()*600,0.35);
+  tick();
+}
+
+/* ── 이벤트 ── */
+renderer.domElement.addEventListener('click',e=>{
+  ac();
+  const nx=(e.clientX/window.innerWidth-0.5)*70;
+  const nz=(e.clientY/(window.innerHeight-38)-0.5)*50;
+  spawn3D(nx,nz);
+});
+renderer.domElement.addEventListener('touchstart',e=>{
+  e.preventDefault(); ac();
+  const t=e.touches[0];
+  const nx=(t.clientX/window.innerWidth-0.5)*70;
+  const nz=(t.clientY/(window.innerHeight-38)-0.5)*50;
+  spawn3D(nx,nz);
+},{passive:false});
+
+/* ── 리사이즈 ── */
+function resize3D(){
+  const w=window.innerWidth, h=window.innerHeight-38;
+  renderer.setSize(w,h);
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+resize3D();
+window.addEventListener('resize',resize3D);
+
+/* ── 루프 ── */
+function loop3D(ts){
+  requestAnimationFrame(loop3D);
+  if(mode!=='3d') return;
+  const dt=Math.min((ts-prev3D)/1000,0.05); prev3D=ts;
+
+  auto3D-=dt;
+  if(auto3D<=0){ spawn3D(); auto3D=1.6+Math.random()*3.2; }
+
+  camAng+=dt*0.14;
+  camera.position.x=Math.sin(camAng)*50;
+  camera.position.z=Math.cos(camAng)*50;
+  camera.lookAt(0,8,0);
+
+  for(let i=bolts3.length-1;i>=0;i--){
+    bolts3[i].update(dt);
+    if(!bolts3[i].alive) bolts3.splice(i,1);
+  }
+  renderer.render(scene,camera);
+}
+requestAnimationFrame(loop3D);
+</script>
+</body>
+</html>

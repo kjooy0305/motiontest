@@ -172,5 +172,12 @@ const PAGES = {
     desc  : 'HTML·CSS·JS·TS·React·Vue·Python·Go·Java·Rust 등 30종 · 기초·주요기능·실전 코드',
   },
 
-  // 24 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
+  24: {
+    label : '번개 시뮬레이터',
+    url   : 'pages/24/',
+    thumb : null,
+    desc  : '2D 재귀 중점변위 번개 + 빗소리 · 3D Three.js 번개 · 클릭으로 소환',
+  },
+
+  // 25 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
 };

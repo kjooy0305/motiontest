@@ -233,6 +233,7 @@ btnFS.addEventListener('click',()=>{
   if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 });
+let fsTransition=false;
 document.addEventListener('fullscreenchange',()=>{
   const isFS=!!document.fullscreenElement;
   document.body.classList.toggle('fs-mode',isFS);
@@ -242,7 +243,9 @@ document.addEventListener('fullscreenchange',()=>{
     const sy=window.innerHeight/canWrap.offsetHeight;
     canWrap.style.transform=`translate(-50%,-50%) scale(${sx},${sy})`;
   } else {
+    fsTransition=true;
     canWrap.style.transform='';
+    setTimeout(()=>fsTransition=false, 300);
   }
 });
 
@@ -858,7 +861,7 @@ function loop(ts){
   update(); render();
 }
 resize();
-window.addEventListener('resize',()=>{ if(!document.fullscreenElement) resize(); });
+window.addEventListener('resize',()=>{ if(!document.fullscreenElement&&!fsTransition) resize(); });
 requestAnimationFrame(loop);
 </script>
 </body>

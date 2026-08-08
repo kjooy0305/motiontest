@@ -1090,7 +1090,10 @@ function renderContam(){
 //  MINI-GAMES
 // ═══════════════════════════════════════════════
 let mgTimer=null;
+let _mgLock=false; // 미니게임 종료 중복 호출 방지
+
 function showMG(title,desc){
+  _mgLock=false;
   document.getElementById('mgt').textContent=title;
   document.getElementById('mgd').textContent=desc;
   document.getElementById('mgr').textContent='';
@@ -1102,12 +1105,15 @@ function showMG(title,desc){
 function hideMG(){ document.getElementById('mgo').classList.remove('active'); }
 function setMGResult(ok,msg){ const el=document.getElementById('mgr'); el.textContent=msg; el.className=ok?'ok':'no'; }
 function startMGTimer(sec,onEnd){
+  clearInterval(mgTimer);
   let rem=sec;
   const bar=document.getElementById('mgtb');
   bar.style.width='100%';
   mgTimer=setInterval(()=>{ rem-=0.1; bar.style.width=Math.max(0,rem/sec*100)+'%'; if(rem<=0){clearInterval(mgTimer);onEnd();} },100);
 }
 function stopMGTimer(){ clearInterval(mgTimer); }
+// 현재 라운드 버튼 전체 비활성화 (중복 클릭 방지)
+function disableMGButtons(){ document.querySelectorAll('#mgc .mgqb, #mgc .mgc2, #mgc .mgtpb').forEach(b=>b.disabled=true); }
 function runMinigame(type){
   if(type==='redmask') mgRedmask();
   else if(type==='elevator') mgElevator();
@@ -1124,23 +1130,35 @@ function mgRedmask(){
 }
 function redmaskRound(n){
   if(n>=3){ mgRedmaskEnd(); return; }
+  stopMGTimer();
   document.getElementById('mgd').textContent=`질문 ${n+1}/3 — "예쁘냐?"`;
   const cc=document.getElementById('mgc');
   cc.innerHTML='';
   const choices=[{t:'예쁘다',v:'yes'},{t:'안 예쁘다',v:'no'}];
   if(G.char.job==='shaman'||G.contam.has('redmask_wound')) choices.push({t:'나도 예뻐',v:'same'});
-  stopMGTimer();
   const div=document.createElement('div'); div.className='mgq';
+  let picked=false; // 이 라운드 중복 선택 방지
   choices.forEach(ch=>{
     const b=document.createElement('button'); b.className='mgqb'; b.textContent=ch.t;
-    b.onclick=()=>{ stopMGTimer(); redmaskAnswers.push(ch.v); setMGResult(true,'...'); setTimeout(()=>redmaskRound(n+1),600); };
+    b.onclick=()=>{
+      if(picked) return; picked=true;
+      stopMGTimer(); disableMGButtons();
+      redmaskAnswers.push(ch.v); setMGResult(true,'...');
+      setTimeout(()=>redmaskRound(n+1),600);
+    };
     div.appendChild(b);
   });
   cc.appendChild(div);
-  startMGTimer(2,()=>{ redmaskAnswers.push('timeout'); setMGResult(false,'너무 늦었다.'); setTimeout(()=>redmaskRound(n+1),700); });
+  startMGTimer(2,()=>{
+    if(picked) return; picked=true;
+    disableMGButtons();
+    redmaskAnswers.push('timeout'); setMGResult(false,'너무 늦었다.');
+    setTimeout(()=>redmaskRound(n+1),700);
+  });
 }
 function mgRedmaskEnd(){
-  hideMG();
+  if(_mgLock) return; _mgLock=true;
+  stopMGTimer(); hideMG();
   const ans=redmaskAnswers;
   if(ans[0]===ans[1]&&ans[1]===ans[2]){ G.stats.san-=20; G.stats.hp-=10; G.contam.add('redmask_wound'); }
   else if(ans.includes('same')){ G.stats.cor+=15; G.contam.add('redmask_obs'); }
@@ -1152,17 +1170,18 @@ function mgRedmaskEnd(){
 }
 
 // 엘리베이터
-let elevSeq=[], elevInput=[];
+let elevSeq=[], elevInput=[], elevDone=false;
 function mgElevator(){
   showMG('심연의 엘리베이터','버튼이 깜빡이는 순서를 기억하고 그대로 누르세요.');
   const floors=['B13','0','∞','B7','13','?'];
-  elevSeq=[]; elevInput=[];
+  elevSeq=[]; elevInput=[]; elevDone=false;
   const len=G.stats.ada>60?3:4;
   while(elevSeq.length<len) elevSeq.push(floors[Math.floor(Math.random()*floors.length)]);
   const cc=document.getElementById('mgc'); cc.innerHTML='';
   const grid=document.createElement('div'); grid.className='mgs';
   floors.forEach(f=>{
     const btn=document.createElement('button'); btn.className='mgc2'; btn.textContent=f; btn.dataset.f=f;
+    btn.disabled=true; // 시퀀스 표시 중 클릭 불가
     btn.onclick=()=>elevPress(btn,f);
     grid.appendChild(btn);
   });
@@ -1174,20 +1193,31 @@ function mgElevator(){
   setTimeout(()=>elevShowSeq(0,grid,info),800);
 }
 function elevShowSeq(i,grid,info){
-  if(i>=elevSeq.length){ info.textContent='같은 순서로 누르세요.'; return; }
+  if(i>=elevSeq.length){
+    info.textContent='같은 순서로 누르세요.';
+    // 시퀀스 표시 완료 후 버튼 활성화
+    grid.querySelectorAll('.mgc2').forEach(b=>b.disabled=false);
+    return;
+  }
   const btns=[...grid.querySelectorAll('.mgc2')];
   const btn=btns.find(b=>b.dataset.f===elevSeq[i]);
   if(btn){ btn.classList.add('lit'); setTimeout(()=>{ btn.classList.remove('lit'); setTimeout(()=>elevShowSeq(i+1,grid,info),300); },500); }
   else setTimeout(()=>elevShowSeq(i+1,grid,info),400);
 }
 function elevPress(btn,f){
+  if(elevDone) return;
   elevInput.push(f);
   const ok=f===elevSeq[elevInput.length-1];
   btn.classList.add(ok?'ok':'no');
   setTimeout(()=>btn.classList.remove('ok','no'),400);
-  if(!ok||elevInput.length>=elevSeq.length) setTimeout(mgElevatorEnd,600);
+  if(!ok||elevInput.length>=elevSeq.length){
+    elevDone=true;
+    disableMGButtons();
+    setTimeout(mgElevatorEnd,600);
+  }
 }
 function mgElevatorEnd(){
+  if(_mgLock) return; _mgLock=true;
   hideMG();
   const correct=elevInput.length===elevSeq.length&&elevInput.every((v,i)=>v===elevSeq[i]);
   if(correct){ G.stats.san-=5; G.contam.add('elev_floor'); }
@@ -1198,29 +1228,31 @@ function mgElevatorEnd(){
 }
 
 // 숫자 세는 아이
-let countHits=0, countMiss2=0, countBeatTimer2=null;
+let countHits=0, countBeatTimer2=null, countGameDone=false;
 function mgCounting(){
   showMG('숫자 세는 아이','"하나... 둘... 셋..." 아이의 박자에 맞춰 탭하세요.');
-  countHits=0; countMiss2=0;
+  countHits=0; countGameDone=false;
   const cc=document.getElementById('mgc');
   cc.innerHTML=`<div id="cnt-num" style="font-size:3.5rem;font-weight:900;color:var(--acc);min-height:80px;line-height:80px;text-align:center;"></div>
 <button class="mgtpb" id="cnt-btn" style="margin-top:8px;">탭!</button>`;
   document.getElementById('cnt-btn').onclick=()=>{
+    if(countGameDone) return;
     const bt=window._cbt||0, now=Date.now(), diff=Math.abs(now-bt);
     if(diff<400){ countHits++; setMGResult(true,'✓ 맞췄다'); }
-    else { countMiss2++; setMGResult(false,'박자가 맞지 않는다...'); }
+    else { setMGResult(false,'박자가 맞지 않는다...'); }
   };
   countBeat2(0);
 }
 const beatNames=['하나','둘','셋','넷','다섯'];
 function countBeat2(i){
-  if(i>=5){ setTimeout(mgCountEnd,500); return; }
+  if(i>=5){ countGameDone=true; disableMGButtons(); setTimeout(mgCountEnd,500); return; }
   const el=document.getElementById('cnt-num');
   if(el) el.textContent=beatNames[i];
   window._cbt=Date.now();
   countBeatTimer2=setTimeout(()=>countBeat2(i+1), 1800-i*80);
 }
 function mgCountEnd(){
+  if(_mgLock) return; _mgLock=true;
   clearTimeout(countBeatTimer2); hideMG();
   if(countHits>=3){ G.stats.san+=5; G.contam.add('count_comp'); }
   else { G.stats.san-=20; G.stats.hp-=10; G.contam.add('count_comp'); G.contam.add('three_c'); }
@@ -1238,14 +1270,17 @@ function mgMirror(){
 }
 function mirrorRound(n){
   if(n>=5){ mgMirrorEnd(); return; }
+  stopMGTimer();
   const dir=mDirs[Math.floor(Math.random()*4)], opp=mOpp[dir];
   document.getElementById('mgd').textContent=`라운드 ${n+1}/5 — 거울 속 자아: ${dir}`;
   const cc=document.getElementById('mgc'); cc.innerHTML='';
   const q=document.createElement('div'); q.className='mgq';
+  let picked=false; // 이 라운드 중복 선택 방지
   mDirs.forEach(d=>{
     const b=document.createElement('button'); b.className='mgqb'; b.textContent=d;
     b.onclick=()=>{
-      stopMGTimer();
+      if(picked) return; picked=true;
+      stopMGTimer(); disableMGButtons();
       const ok=d===opp;
       setMGResult(ok,ok?'정확해!':'틀렸다...');
       if(!ok){ mBad++; G.stats.san-=8; G.contam.add('mirror_other'); }
@@ -1254,10 +1289,17 @@ function mirrorRound(n){
     q.appendChild(b);
   });
   cc.appendChild(q);
-  startMGTimer(Math.max(1.5,3-n*0.3),()=>{ mBad++; G.stats.san-=12; G.contam.add('mirror_merge'); setMGResult(false,'시간 초과...'); setTimeout(()=>mirrorRound(n+1),700); });
+  startMGTimer(Math.max(1.5,3-n*0.3),()=>{
+    if(picked) return; picked=true;
+    disableMGButtons();
+    mBad++; G.stats.san-=12; G.contam.add('mirror_merge');
+    setMGResult(false,'시간 초과...');
+    setTimeout(()=>mirrorRound(n+1),700);
+  });
 }
 function mgMirrorEnd(){
-  hideMG();
+  if(_mgLock) return; _mgLock=true;
+  stopMGTimer(); hideMG();
   if(mBad===0){ G.flags.mirror_won=true; G.contam.add('self_3'); }
   else if(mBad>=3){ G.flags.mirror_lost=true; G.contam.add('self_2'); G.contam.add('mirror_merge'); }
   G.stats.san=clamp(G.stats.san,0,130);

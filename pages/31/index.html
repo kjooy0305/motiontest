@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⏳ 모래시계</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:#0e0e1a;color:#e0e0f0;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;padding:14px 10px;gap:10px;
+}
+#title{
+  color:#e2c97e;font-size:17px;font-weight:700;
+  letter-spacing:2px;text-shadow:0 0 10px rgba(226,201,126,.4);
+}
+.panel{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:10px 14px;width:100%;max-width:540px;
+}
+.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.row+.row{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);}
+.lbl{color:#a0a0c0;font-size:12px;white-space:nowrap;min-width:38px;}
+input[type=number]{
+  width:58px;padding:5px 8px;border-radius:6px;
+  background:#1a1a2e;border:1px solid #3a3a5c;
+  color:#e0e0f0;font-size:14px;text-align:center;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button{opacity:1;}
+.btn{
+  padding:5px 13px;border-radius:6px;border:1px solid rgba(255,255,255,.18);
+  background:#2a2a4a;color:#e0e0f0;font-size:12px;cursor:pointer;
+  transition:background .15s;
+}
+.btn:hover{background:#3a3a5c;}
+.btn-start{background:#1e4a18;border-color:#3a8030;color:#80e050;font-size:13px;padding:6px 16px;}
+.btn-start:hover{background:#2a6020;}
+.btn-start.running{background:#4a1a18;border-color:#803030;color:#f06060;}
+.btn-reset{background:#181830;border-color:#404070;color:#7070b0;}
+
+.tbtn{
+  padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:#1a1a2e;color:#b0b0c0;
+  transition:all .15s;
+}
+.tbtn:hover{background:#242438;}
+.tbtn.active{border-color:#e2c97e;color:#e2c97e;background:#221e0a;}
+.sbtn{
+  padding:3px 11px;border-radius:5px;font-size:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:#1a1a2e;color:#b0b0c0;
+  transition:all .15s;
+}
+.sbtn.active{border-color:#80c0ff;color:#80c0ff;background:#0a1828;}
+
+/* Main area */
+#main-area{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;max-width:540px;}
+#timer-big{
+  font-size:40px;font-weight:700;letter-spacing:5px;
+  color:#e2c97e;text-shadow:0 0 20px rgba(226,201,126,.5);
+  font-variant-numeric:tabular-nums;
+}
+#total-rem{font-size:13px;color:#7070a0;letter-spacing:1px;}
+#glass-label{color:#8080a0;font-size:12px;letter-spacing:1px;}
+#hg-canvas{display:block;border-radius:4px;}
+
+/* Queue */
+#queue-wrap{
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+  justify-content:center;width:100%;max-width:540px;
+  min-height:40px;padding:6px 10px;
+  background:rgba(0,0,0,.25);border-radius:8px;
+  border:1px solid rgba(255,255,255,.06);
+}
+.qi{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:4px 10px;border-radius:6px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+  font-size:11px;color:#8080a0;cursor:default;
+}
+.qi.cur{
+  background:rgba(226,201,126,.12);border-color:rgba(226,201,126,.45);color:#e2c97e;
+}
+.qi.done{opacity:.35;}
+.qi-icon{font-size:15px;line-height:1;}
+.q-empty{color:#303050;font-size:12px;}
+
+/* Done overlay */
+#done-banner{
+  display:none;position:absolute;left:50%;transform:translateX(-50%);
+  top:40%;font-size:22px;font-weight:700;color:#e2c97e;
+  text-shadow:0 0 20px rgba(226,201,126,.8);
+  white-space:nowrap;pointer-events:none;
+}
+#canvas-wrap{position:relative;}
+</style>
+</head>
+<body>
+
+<div id="title">⏳ 모래시계</div>
+
+<div class="panel">
+  <div class="row">
+    <span class="lbl">시간</span>
+    <input type="number" id="inp-h" min="0" max="99" value="0">
+    <span style="color:#666;font-size:12px">시간</span>
+    <input type="number" id="inp-m" min="0" max="59" value="5">
+    <span style="color:#666;font-size:12px">분</span>
+    <button class="btn btn-start" id="btn-start">▶ 시작</button>
+    <button class="btn btn-reset" id="btn-reset">↺ 초기화</button>
+  </div>
+  <div class="row">
+    <span class="lbl">디자인</span>
+    <div id="theme-grid" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+  </div>
+  <div class="row">
+    <span class="lbl">모래</span>
+    <button class="sbtn active" data-sand="solid">단색</button>
+    <button class="sbtn" data-sand="gradient">그라데이션</button>
+    <button class="sbtn" data-sand="rainbow">무지개</button>
+  </div>
+</div>
+
+<div id="main-area">
+  <div id="timer-big">00:00</div>
+  <div id="total-rem"></div>
+  <div id="glass-label">시간을 설정하고 시작하세요</div>
+  <div id="canvas-wrap">
+    <canvas id="hg-canvas" width="260" height="380"></canvas>
+    <div id="done-banner">완료! 🎉</div>
+  </div>
+</div>
+
+<div id="queue-wrap">
+  <span class="q-empty">시간을 설정하고 시작하세요</span>
+</div>
+
+<script>
+// roundRect 폴리필 (구형 브라우저 대비)
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    r=Math.min(r,w/2,h/2);
+    this.beginPath();
+    this.moveTo(x+r,y);
+    this.lineTo(x+w-r,y); this.arcTo(x+w,y,x+w,y+r,r);
+    this.lineTo(x+w,y+h-r); this.arcTo(x+w,y+h,x+w-r,y+h,r);
+    this.lineTo(x+r,y+h); this.arcTo(x,y+h,x,y+h-r,r);
+    this.lineTo(x,y+r); this.arcTo(x,y,x+r,y,r);
+    this.closePath();
+  };
+}
+
+// ═══════════════════════════════════════
+//  테마 정의 (10종)
+// ═══════════════════════════════════════
+const THEMES = [
+  { id:'ocean',   name:'🌊 바다',
+    frame:'#0c3a58', glassF:'rgba(80,180,255,.18)', glassS:'#50b0f0',
+    bgT:'#061020', bgB:'#0e2840',
+    sandA:'#f5e070', sandB:'#f09030',
+    grad:['#00c8ff','#20e8c0','#f5e070'],
+    trickle:'#f5e070' },
+  { id:'land',    name:'🌿 육지',
+    frame:'#2a3810', glassF:'rgba(100,200,60,.14)', glassS:'#78c048',
+    bgT:'#111808', bgB:'#1a2410',
+    sandA:'#d8b050', sandB:'#7a4818',
+    grad:['#60d828','#d0a838','#7a4818'],
+    trickle:'#d8b050' },
+  { id:'jungle',  name:'🌴 정글',
+    frame:'#0e3018', glassF:'rgba(20,200,70,.14)', glassS:'#28b850',
+    bgT:'#040e08', bgB:'#0a1c10',
+    sandA:'#c0e038', sandB:'#307828',
+    grad:['#00ff88','#88e020','#208040'],
+    trickle:'#a0d830' },
+  { id:'stone',   name:'🪨 돌',
+    frame:'#363636', glassF:'rgba(150,150,150,.16)', glassS:'#888888',
+    bgT:'#141414', bgB:'#202020',
+    sandA:'#c8b888', sandB:'#786848',
+    grad:['#d0c0a0','#b8a888','#786848'],
+    trickle:'#c8b888' },
+  { id:'wood',    name:'🪵 나무',
+    frame:'#582808', glassF:'rgba(200,130,50,.16)', glassS:'#c07028',
+    bgT:'#1c0800', bgB:'#2c1200',
+    sandA:'#f0c858', sandB:'#a04820',
+    grad:['#ffd860','#d09030','#a04820'],
+    trickle:'#f0c858' },
+  { id:'machine', name:'⚙️ 기계',
+    frame:'#282840', glassF:'rgba(90,110,200,.17)', glassS:'#7888e0',
+    bgT:'#0c0c18', bgB:'#161628',
+    sandA:'#90a0e0', sandB:'#3848b0',
+    grad:['#b0c8ff','#6080e0','#3848b0'],
+    trickle:'#a0b8f0' },
+  { id:'space',   name:'🌌 우주',
+    frame:'#180828', glassF:'rgba(140,60,220,.16)', glassS:'#9050e0',
+    bgT:'#04020c', bgB:'#0c0818',
+    sandA:'#e8d8ff', sandB:'#8038d0',
+    grad:['#ffffff','#d080ff','#5020c0'],
+    trickle:'#d0b8ff' },
+  { id:'glacier', name:'🧊 빙하',
+    frame:'#0e2838', glassF:'rgba(180,230,255,.20)', glassS:'#98d0f0',
+    bgT:'#061420', bgB:'#0e2030',
+    sandA:'#e8f6ff', sandB:'#78c8f0',
+    grad:['#ffffff','#c8e8ff','#58b8f0'],
+    trickle:'#d8f0ff' },
+  { id:'lava',    name:'🌋 용암',
+    frame:'#380600', glassF:'rgba(255,80,20,.14)', glassS:'#ff5818',
+    bgT:'#140200', bgB:'#240600',
+    sandA:'#ff9818', sandB:'#ff2800',
+    grad:['#ffff00','#ff8800','#ff2000'],
+    trickle:'#ff9018' },
+  { id:'rainbow', name:'🌈 무지개',
+    frame:'#28280e', glassF:'rgba(255,220,80,.13)', glassS:'#f0c050',
+    bgT:'#0c0c10', bgB:'#181818',
+    sandA:'#ff8888', sandB:'#8888ff',
+    grad:['#ff4040','#ffb040','#40ff80','#4080ff'],
+    trickle:'#ffdd40' },
+];
+
+// ═══════════════════════════════════════
+//  캔버스 지오메트리
+// ═══════════════════════════════════════
+const canvas = document.getElementById('hg-canvas');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const CX = W * 0.5, CY = H * 0.50;
+const TY = H * 0.04, BY = H * 0.96;
+const BW = W * 0.40, NW = W * 0.038;
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+// ═══════════════════════════════════════
+//  상태
+// ═══════════════════════════════════════
+let currentTheme = THEMES[0];
+let currentSand  = 'solid';
+let running      = false;
+let queue        = [];  // [{minutes, flipsLeft}]
+let curGlass     = null; // {minutes, totalSec, remSec, flipsLeft}
+let flipping     = false;
+let flipPhase    = 0;   // 0..1
+const FLIP_DUR   = 0.75;
+let animT        = 0;
+let lastTS       = null;
+let totalRemSec  = 0;
+
+// ═══════════════════════════════════════
+//  시간 분해 알고리즘
+// ═══════════════════════════════════════
+function decompose(totalMin) {
+  const units = [60, 30, 15, 5, 1];
+  const list = [];
+  let rem = totalMin;
+  for (const u of units) {
+    const n = Math.floor(rem / u);
+    for (let i = 0; i < n; i++) list.push(u);
+    rem -= n * u;
+  }
+  return list; // e.g. [60,60,30,5,1,1,1]
+}
+
+// 연속 같은 크기를 flip-aware 큐 항목으로 압축
+function buildQueue(list) {
+  const q = [];
+  let i = 0;
+  while (i < list.length) {
+    let j = i;
+    while (j < list.length && list[j] === list[i]) j++;
+    q.push({ minutes: list[i], flipsLeft: j - i - 1 });
+    i = j;
+  }
+  return q;
+}
+
+// ═══════════════════════════════════════
+//  그리기 함수들
+// ═══════════════════════════════════════
+function makeGlassPath() {
+  const p = new Path2D();
+  p.moveTo(CX - BW, TY);
+  p.lineTo(CX + BW, TY);
+  p.lineTo(CX + NW, CY);
+  p.lineTo(CX + BW, BY);
+  p.lineTo(CX - BW, BY);
+  p.lineTo(CX - NW, CY);
+  p.closePath();
+  return p;
+}
+
+function drawBackground(theme) {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, theme.bgT);
+  g.addColorStop(1, theme.bgB);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // Space: star dots
+  if (theme.id === 'space') {
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    for (let i = 0; i < 40; i++) {
+      const sx = (i * 137.5) % W;
+      const sy = (i * 73.1)  % H;
+      const sr = i % 3 === 0 ? 1.2 : 0.7;
+      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  // Ocean: subtle wave
+  if (theme.id === 'ocean') {
+    ctx.strokeStyle = 'rgba(80,160,255,.08)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) {
+      const wy = H * 0.2 + i * 40;
+      ctx.beginPath();
+      for (let x = 0; x < W; x += 2) {
+        const y = wy + Math.sin(x * 0.06 + i) * 4;
+        i === 0 && x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+}
+
+function drawFrameCaps(theme) {
+  const capW = BW + 8, capH = 13, capR = 3;
+  ctx.fillStyle = theme.frame;
+  // Top cap
+  ctx.beginPath();
+  ctx.roundRect(CX - capW, TY - capH + 2, capW * 2, capH, capR);
+  ctx.fill();
+  // Bottom cap
+  ctx.beginPath();
+  ctx.roundRect(CX - capW, BY - 2, capW * 2, capH, capR);
+  ctx.fill();
+  // Borders
+  ctx.strokeStyle = theme.glassS;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(CX - capW, TY - capH + 2, capW * 2, capH, capR);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.roundRect(CX - capW, BY - 2, capW * 2, capH, capR);
+  ctx.stroke();
+}
+
+function getSandFill(sandType, theme, t) {
+  if (sandType === 'solid') return theme.sandA;
+  if (sandType === 'gradient') {
+    const g = ctx.createLinearGradient(CX, TY, CX, BY);
+    theme.grad.forEach((c, i) => g.addColorStop(i / (theme.grad.length - 1), c));
+    return g;
+  }
+  // rainbow: HSL sweep animation (stops always 0→1 순서 보장)
+  const g = ctx.createLinearGradient(CX, TY, CX, BY);
+  const steps = 14;
+  const hShift = (t * 55) % 360;
+  for (let i = 0; i <= steps; i++) {
+    const hue = (hShift + i / steps * 360) % 360;
+    g.addColorStop(i / steps, `hsl(${hue},90%,62%)`);
+  }
+  return g;
+}
+
+function drawSand(progress, theme, sandType, t) {
+  ctx.save();
+  ctx.clip(makeGlassPath());
+
+  const fill = getSandFill(sandType, theme, t);
+  ctx.fillStyle = fill;
+
+  // ─── 상단 모래 (중력으로 아래쪽에 쌓임 → 넥 위) ───
+  if (progress < 0.999) {
+    const surfY = lerp(TY, CY, progress);
+    const surfW = lerp(BW, NW, progress);
+    ctx.beginPath();
+    ctx.moveTo(CX - surfW, surfY);
+    ctx.lineTo(CX + surfW, surfY);
+    ctx.lineTo(CX + NW, CY);
+    ctx.lineTo(CX - NW, CY);
+    ctx.closePath();
+    ctx.fill();
+    // 표면 하이라이트
+    ctx.strokeStyle = 'rgba(255,255,255,.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(CX - surfW, surfY);
+    ctx.lineTo(CX + surfW, surfY);
+    ctx.stroke();
+  }
+
+  // ─── 하단 모래 ───
+  if (progress > 0.001) {
+    ctx.fillStyle = fill; // gradient 재적용
+    const surfY = BY - (BY - CY) * progress;
+    const surfW = NW + (BW - NW) * (1 - progress);
+    ctx.beginPath();
+    ctx.moveTo(CX - surfW, surfY);
+    ctx.lineTo(CX + surfW, surfY);
+    ctx.lineTo(CX + BW, BY);
+    ctx.lineTo(CX - BW, BY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.10)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(CX - surfW, surfY);
+    ctx.lineTo(CX + surfW, surfY);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawTrickle(progress, theme, t) {
+  if (progress <= 0.002 || progress >= 0.998) return;
+  ctx.fillStyle = theme.trickle;
+  // 넥 포인트
+  ctx.fillRect(CX - 1.5, CY - 1, 3, 3);
+  // 낙하 입자들
+  const n = 7;
+  for (let i = 0; i < n; i++) {
+    const age = ((t * 2.5 + i / n) % 1);
+    const py  = CY + age * (BY - CY) * 0.35;
+    const px  = CX + Math.sin(t * 2.2 + i * 1.8) * 1.8;
+    const r   = 1.8 * (1 - age * 0.6);
+    ctx.beginPath();
+    ctx.arc(px, py, Math.max(0.5, r), 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawGlassLayer(theme) {
+  const gp = makeGlassPath();
+  // 유리 틴트
+  ctx.fillStyle = theme.glassF;
+  ctx.fill(gp);
+  // 유리 테두리
+  ctx.strokeStyle = theme.glassS;
+  ctx.lineWidth = 2;
+  ctx.stroke(gp);
+  // 반사광 (좌상단 하이라이트)
+  ctx.save();
+  ctx.clip(gp);
+  const shine = ctx.createLinearGradient(CX - BW, TY, CX - BW * 0.1, BY * 0.5);
+  shine.addColorStop(0,   'rgba(255,255,255,.16)');
+  shine.addColorStop(0.4, 'rgba(255,255,255,.05)');
+  shine.addColorStop(1,   'rgba(255,255,255,0)');
+  ctx.fillStyle = shine;
+  ctx.fill(gp);
+  ctx.restore();
+}
+
+function drawHourglass(progress, t) {
+  ctx.save();
+
+  if (flipping) {
+    // cos(0..π) = 1 → 0 → -1 : 압축 후 뒤집기 시뮬레이션
+    const scaleY = Math.cos(flipPhase * Math.PI);
+    ctx.translate(CX, CY);
+    ctx.scale(1, scaleY);
+    ctx.translate(-CX, -CY);
+  }
+
+  drawBackground(currentTheme);
+  drawFrameCaps(currentTheme);
+  drawSand(progress, currentTheme, currentSand, t);
+  drawTrickle(progress, currentTheme, t);
+  drawGlassLayer(currentTheme);
+
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════
+//  UI 렌더
+// ═══════════════════════════════════════
+function glassLabel(g) {
+  if (!g) return;
+  const name = g.minutes === 60 ? '1시간' : `${g.minutes}분`;
+  const rep  = g.flipsLeft > 0 ? ` (${g.flipsLeft + 1}회 연속)` : '';
+  document.getElementById('glass-label').textContent = name + ' 모래시계' + rep;
+}
+
+function renderQueue() {
+  const wrap = document.getElementById('queue-wrap');
+  if (!curGlass && queue.length === 0) {
+    wrap.innerHTML = '<span class="q-empty">시간을 설정하고 시작하세요</span>';
+    return;
+  }
+  let html = '';
+  function icon(m) { return m >= 60 ? '⏳' : m >= 30 ? '⌛' : m >= 15 ? '⏱' : '⏲'; }
+  function lab(m)  { return m === 60 ? '1시간' : m+'분'; }
+
+  if (curGlass) {
+    const rep = curGlass.flipsLeft > 0 ? ` ×${curGlass.flipsLeft + 1}` : '';
+    html += `<div class="qi cur"><span class="qi-icon">${icon(curGlass.minutes)}</span><span>${lab(curGlass.minutes)}${rep}</span></div>`;
+  }
+  queue.forEach(g => {
+    const rep = g.flipsLeft > 0 ? ` ×${g.flipsLeft + 1}` : '';
+    html += `<div class="qi"><span class="qi-icon">${icon(g.minutes)}</span><span>${lab(g.minutes)}${rep}</span></div>`;
+  });
+  wrap.innerHTML = html;
+}
+
+function updateDisplays() {
+  if (!curGlass) {
+    document.getElementById('timer-big').textContent = '00:00';
+    document.getElementById('total-rem').textContent = '';
+    return;
+  }
+  const rem = Math.max(0, Math.ceil(curGlass.remSec));
+  const m = Math.floor(rem / 60), s = rem % 60;
+  document.getElementById('timer-big').textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+
+  if (totalRemSec > 0) {
+    const tr = Math.max(0, Math.ceil(totalRemSec));
+    const th = Math.floor(tr / 3600), tm2 = Math.floor((tr % 3600) / 60), ts2 = tr % 60;
+    let tot = '';
+    if (th > 0) tot += th + '시간 ';
+    if (tm2 > 0) tot += tm2 + '분 ';
+    tot += ts2 + '초 남음';
+    document.getElementById('total-rem').textContent = tot;
+  }
+}
+
+// ═══════════════════════════════════════
+//  타이머 로직
+// ═══════════════════════════════════════
+function nextGlass() {
+  if (queue.length === 0) {
+    // 전부 완료
+    curGlass = null;
+    running  = false;
+    totalRemSec = 0;
+    document.getElementById('btn-start').textContent = '▶ 시작';
+    document.getElementById('btn-start').classList.remove('running');
+    document.getElementById('glass-label').textContent = '완료!';
+    document.getElementById('done-banner').style.display = 'block';
+    renderQueue();
+    updateDisplays();
+    drawHourglass(1, animT);
+    return;
+  }
+  curGlass = queue.shift();
+  curGlass.totalSec = curGlass.minutes * 60;
+  curGlass.remSec   = curGlass.totalSec;
+  glassLabel(curGlass);
+  renderQueue();
+}
+
+function loop(ts) {
+  requestAnimationFrame(loop);
+  if (!running) { drawHourglass(curGlass ? 1 - curGlass.remSec / curGlass.totalSec : 0, animT); return; }
+
+  const dt = lastTS ? Math.min((ts - lastTS) / 1000, 0.1) : 0;
+  lastTS = ts;
+  animT += dt;
+  totalRemSec = Math.max(0, totalRemSec - dt);
+
+  if (flipping) {
+    flipPhase += dt / FLIP_DUR;
+    if (flipPhase >= 1) {
+      flipping  = false;
+      flipPhase = 0;
+      curGlass.flipsLeft--;
+      curGlass.remSec   = curGlass.totalSec;
+      glassLabel(curGlass);
+    }
+  } else if (curGlass) {
+    curGlass.remSec -= dt;
+    if (curGlass.remSec <= 0) {
+      if (curGlass.flipsLeft > 0) {
+        curGlass.remSec = 0;
+        flipping  = true;
+        flipPhase = 0;
+      } else {
+        nextGlass();
+      }
+    }
+  }
+
+  const prog = curGlass ? Math.max(0, Math.min(1, 1 - curGlass.remSec / curGlass.totalSec)) : 1;
+  drawHourglass(prog, animT);
+  updateDisplays();
+}
+
+// ═══════════════════════════════════════
+//  컨트롤 이벤트
+// ═══════════════════════════════════════
+document.getElementById('btn-start').addEventListener('click', () => {
+  const btn = document.getElementById('btn-start');
+  if (!running && !curGlass) {
+    // 새 시작
+    const h = parseInt(document.getElementById('inp-h').value) || 0;
+    const m = parseInt(document.getElementById('inp-m').value) || 0;
+    const totalMin = h * 60 + m;
+    if (totalMin <= 0) return;
+    const list = decompose(totalMin);
+    queue = buildQueue(list);
+    totalRemSec = totalMin * 60;
+    document.getElementById('done-banner').style.display = 'none';
+    nextGlass();
+    running = true;
+    lastTS  = null;
+    btn.textContent = '⏸ 일시정지';
+    btn.classList.add('running');
+  } else if (running) {
+    running = false;
+    btn.textContent = '▶ 재개';
+    btn.classList.remove('running');
+  } else {
+    running = true;
+    lastTS  = null;
+    btn.textContent = '⏸ 일시정지';
+    btn.classList.add('running');
+  }
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  running = false;
+  curGlass = null;
+  queue = [];
+  flipping = false;
+  flipPhase = 0;
+  animT = 0;
+  lastTS = null;
+  totalRemSec = 0;
+  document.getElementById('btn-start').textContent = '▶ 시작';
+  document.getElementById('btn-start').classList.remove('running');
+  document.getElementById('glass-label').textContent = '시간을 설정하고 시작하세요';
+  document.getElementById('done-banner').style.display = 'none';
+  renderQueue();
+  updateDisplays();
+});
+
+// 테마 버튼
+const tgrid = document.getElementById('theme-grid');
+THEMES.forEach(th => {
+  const b = document.createElement('button');
+  b.className = 'tbtn' + (th === currentTheme ? ' active' : '');
+  b.textContent = th.name;
+  b.addEventListener('click', () => {
+    currentTheme = th;
+    document.querySelectorAll('.tbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  });
+  tgrid.appendChild(b);
+});
+
+// 모래 종류 버튼
+document.querySelectorAll('.sbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    currentSand = b.dataset.sand;
+    document.querySelectorAll('.sbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+
+// 초기 그리기 & 루프 시작
+drawHourglass(0, 0);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

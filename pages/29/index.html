@@ -1003,6 +1003,140 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     </div>
   </div>
 
+  <div class="card" id="bl-interact">
+    <div class="card-header"><span class="hl">07</span> 🖱 Interaction 엔티티 — 클릭 감지 <span class="tag-b">1.19.4+</span></div>
+    <div style="padding:12px 16px;">
+      <div class="tip"><b>minecraft:interaction</b>은 보이지 않는 히트박스 엔티티. 플레이어가 우클릭(interact)하거나 좌클릭(attack)했을 때를 감지할 수 있어서 버튼·문·NPC·GUI 등 모든 클릭 기반 시스템에 사용됩니다.</div>
+
+      <div class="mini-title">기본 소환 및 속성</div>
+      <div class="codeblock"><span class="fn">summon</span> minecraft:interaction ~ ~ ~<span class="arg">{
+  width:  <span class="num">1.0f</span>,      <span class="cmt"># 히트박스 가로 크기</span>
+  height: <span class="num">1.0f</span>,      <span class="cmt"># 히트박스 세로 크기</span>
+  response: <span class="num">1b</span>,    <span class="cmt"># 1 = 클릭 이벤트 NBT 기록 ON (필수!)</span>
+  Tags:[<span class="str">"my_button"</span>]
+}</span>
+
+<span class="cmt"># response:1b 가 있어야 attack·interaction NBT가 기록됨</span>
+<span class="cmt"># 기본적으로 완전히 투명, 물리 없음, 중력 없음</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">클릭 후 엔티티에 기록되는 NBT</div>
+      <div class="codeblock"><span class="cmt"># 우클릭(Use/Interact) 후 엔티티 NBT 예시</span>
+{
+  <span class="key">"interaction"</span>: {
+    <span class="key">"player"</span>: <span class="str">"550e8400-e29b-41d4-a716-446655440000"</span>,  <span class="cmt"># 클릭한 플레이어 UUID</span>
+    <span class="key">"timestamp"</span>: <span class="num">192837465</span>  <span class="cmt"># 게임 틱 기준 시간</span>
+  },
+  <span class="key">"attack"</span>: {
+    <span class="key">"player"</span>: <span class="str">"550e8400-e29b-41d4-a716-446655440000"</span>,  <span class="cmt"># 좌클릭한 플레이어 UUID</span>
+    <span class="key">"timestamp"</span>: <span class="num">192837488</span>
+  }
+}
+
+<span class="cmt"># data get로 직접 확인 가능</span>
+<span class="fn">data get entity</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=my_button,limit=1]</span> interaction
+<span class="fn">data get entity</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=my_button,limit=1]</span> attack</div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 1 — Advancement로 클릭 감지 (가장 깔끔)</div>
+      <div class="codeblock"><span class="cmt"># data/mypack/advancements/detect_interact.json</span>
+{
+  <span class="key">"criteria"</span>: {
+    <span class="key">"right_click"</span>: {
+      <span class="key">"trigger"</span>: <span class="str">"minecraft:player_interacted_with_entity"</span>,
+      <span class="key">"conditions"</span>: {
+        <span class="key">"entity"</span>: {
+          <span class="key">"nbt"</span>: <span class="str">"{Tags:[\"my_button\"]}"</span>  <span class="cmt"># 특정 태그 엔티티만 감지</span>
+        }
+      }
+    }
+  },
+  <span class="key">"rewards"</span>: {
+    <span class="key">"function"</span>: <span class="str">"mypack:on_right_click"</span>
+  }
+}
+
+<span class="cmt"># on_right_click.mcfunction — 클릭한 플레이어(@s)에게 실행됨</span>
+<span class="fn">advancement revoke</span> <span class="sel">@s</span> only mypack:detect_interact  <span class="cmt"># 반드시 초기화해야 재사용 가능</span>
+<span class="fn">say</span> 버튼 클릭됨!
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond <span class="num">1</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 2 — NBT 폴링으로 클릭 감지 (tick 함수에서)</div>
+      <div class="codeblock"><span class="cmt"># tick.mcfunction 에서 매 틱마다 interaction NBT 확인</span>
+<span class="cmt"># interaction NBT가 존재하면 우클릭이 발생한 것</span>
+
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=my_button]</span>
+  <span class="kw">if data entity</span> <span class="sel">@s</span> interaction
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:on_right_click_nbt</span>
+
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=my_button]</span>
+  <span class="kw">if data entity</span> <span class="sel">@s</span> attack
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:on_left_click_nbt</span>
+
+<span class="cmt"># on_right_click_nbt.mcfunction</span>
+<span class="cmt"># @s = interaction 엔티티, 클릭한 플레이어를 특정하려면:</span>
+<span class="fn">execute</span> <span class="kw">store result storage</span> mypack:temp click_uuid <span class="kw">string</span>
+  <span class="kw">run</span> <span class="fn">data get entity</span> <span class="sel">@s</span> interaction.player
+<span class="fn">data remove entity</span> <span class="sel">@s</span> interaction  <span class="cmt"># 처리 후 반드시 지워야 중복 실행 방지</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 3 — UUID로 클릭한 플레이어 특정하기</div>
+      <div class="codeblock"><span class="cmt"># interaction.player 는 클릭한 플레이어의 UUID (문자열)</span>
+<span class="cmt"># UUID로 플레이어 @s 찾기:</span>
+
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=shop_npc]</span>
+  <span class="kw">if data entity</span> <span class="sel">@s</span> interaction
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:shop/detect</span>
+
+<span class="cmt"># detect.mcfunction (@s = interaction 엔티티)</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@a</span> <span class="kw">if predicate</span> mypack:clicked_this_npc
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:shop/open</span>
+<span class="fn">data remove entity</span> <span class="sel">@s</span> interaction
+
+<span class="cmt"># data/mypack/predicates/clicked_this_npc.json</span>
+<span class="cmt"># (entity_properties로 플레이어 UUID를 interaction.player와 비교)</span>
+<span class="cmt"># — 이 방식은 복잡: 실무에서는 advancement 방법(방법 1)이 훨씬 간단</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">좌클릭(공격) 감지</div>
+      <div class="codeblock"><span class="cmt"># attack NBT = 좌클릭(공격)했을 때 기록됨</span>
+<span class="fn">execute</span> <span class="kw">as</span> <span class="sel">@e</span><span class="arg">[type=interaction,tag=my_object]</span>
+  <span class="kw">if data entity</span> <span class="sel">@s</span> attack
+  <span class="kw">run</span> <span class="fn">function</span> <span class="str">mypack:on_attack</span>
+
+<span class="cmt"># on_attack.mcfunction</span>
+<span class="fn">data remove entity</span> <span class="sel">@s</span> attack
+<span class="fn">particle</span> minecraft:explosion ~ ~1 ~ <span class="num">0 0 0 0 1</span>
+<span class="fn">playsound</span> minecraft:entity.generic.explode master <span class="sel">@a</span> ~ ~ ~ <span class="num">0.5 1</span>
+<span class="fn">function</span> <span class="str">mypack:destroy_object</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">Interaction 엔티티 실전 패턴</div>
+      <div class="codeblock"><span class="cmt"># ── 보이지 않는 버튼 만들기 ──</span>
+<span class="cmt"># 1. 소환</span>
+<span class="fn">summon</span> minecraft:interaction <span class="num">10 64 10</span><span class="arg">{width:<span class="num">1f</span>,height:<span class="num">1f</span>,response:<span class="num">1b</span>,Tags:[<span class="str">"door_btn"</span>]}</span>
+
+<span class="cmt"># 2. 위에 text_display로 레이블 표시 (선택)</span>
+<span class="fn">summon</span> minecraft:text_display <span class="num">10 65.3 10</span><span class="arg">{
+  text:<span class="str">'{"text":"[우클릭] 문 열기","color":"yellow"}'</span>,
+  billboard:<span class="str">"center"</span>,Tags:[<span class="str">"door_label"</span>]
+}</span>
+
+<span class="cmt"># 3. advancement로 클릭 감지</span>
+<span class="cmt"># data/mypack/advancements/detect_door.json</span>
+{
+  <span class="key">"criteria"</span>: {<span class="key">"click"</span>: {
+    <span class="key">"trigger"</span>: <span class="str">"minecraft:player_interacted_with_entity"</span>,
+    <span class="key">"conditions"</span>: {<span class="key">"entity"</span>: {<span class="key">"nbt"</span>: <span class="str">"{Tags:[\"door_btn\"]}"</span>}}
+  }},
+  <span class="key">"rewards"</span>: {<span class="key">"function"</span>: <span class="str">"mypack:open_door"</span>}
+}
+
+<span class="cmt"># 4. open_door.mcfunction</span>
+<span class="fn">advancement revoke</span> <span class="sel">@s</span> only mypack:detect_door
+<span class="fn">setblock</span> <span class="num">10 64 11</span> minecraft:air
+<span class="fn">playsound</span> minecraft:block.wooden_door.open block <span class="sel">@s</span> <span class="num">10 64 11</span></div>
+
+      <div class="warn" style="margin-top:8px;">⚠ Interaction 엔티티는 레이캐스트(시야)를 무시 — 벽 너머에서도 클릭됨. 위치와 크기 신중히 설정 필요.</div>
+      <div class="note">🔵 여러 개의 Interaction 엔티티를 쓸 때는 advancement를 각각 따로 만들거나, 태그로 구분해서 NBT 폴링 방식 사용.</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -1452,6 +1586,7 @@ const SIDEBAR = {
     {id:'bl-adv',label:'어드밴스먼트'},
     {id:'bl-custom',label:'🆕 커스텀 블럭 6가지'},
     {id:'bl-creative',label:'🎮 크리에이티브 추가'},
+    {id:'bl-interact',label:'🖱 Interaction 클릭 감지'},
   ],
   fx: [
     {id:'fx-particle',label:'파티클 목록'},

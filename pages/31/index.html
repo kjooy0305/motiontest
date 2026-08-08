@@ -426,7 +426,7 @@ function loop(ts){
         if(curGlass.flipsLeft>0){flipping=true;flipPhase=0;gridFlipped=false;}
         else nextGlass();
       } else {
-        physUpdate();
+        for(let i=0;i<5;i++) physUpdate();
       }
     }
   }

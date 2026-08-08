@@ -223,7 +223,7 @@ const DATA = [
  pros:['완만한 학습 곡선','공식 문서 우수','Composition API 강력'],
  cons:['React보다 작은 커뮤니티','일부 기업 채용 적음'],
  eco:['Nuxt.js','Pinia','Vite','VueRouter','Vuetify'],
- code:'<template>\n  <input v-model="search" placeholder="검색...">\n  <ul>\n    <li v-for="item in filtered" :key="item.id">{{ item.name }}</li>\n  </ul>\n</template>\n<script setup>\nconst search  = ref("");\nconst items   = ref([{id:1,name:"Apple"},{id:2,name:"Banana"}]);\nconst filtered = computed(() =>\n  items.value.filter(i => i.name.includes(search.value)));\n</script>'},
+ code:'<template>\n  <input v-model="search" placeholder="검색...">\n  <ul>\n    <li v-for="item in filtered" :key="item.id">{{ item.name }}</li>\n  </ul>\n</template>\n<script setup>\nconst search  = ref("");\nconst items   = ref([{id:1,name:"Apple"},{id:2,name:"Banana"}]);\nconst filtered = computed(() =>\n  items.value.filter(i => i.name.includes(search.value)));\n<\/script>'},
 
 /* ===== 백엔드 ===== */
 {cat:'백엔드',name:'Python',icon:'🐍',color:'#3776ab',type:'범용 언어',level:1,

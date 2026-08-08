@@ -110,6 +110,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     <button class="tab active" onclick="switchTab('basic',this)">📦 기초</button>
     <button class="tab" onclick="switchTab('cmd',this)">⚡ 명령어</button>
     <button class="tab" onclick="switchTab('sel',this)">🎯 선택자</button>
+    <button class="tab" onclick="switchTab('ench',this)">🔮 인첸트</button>
     <button class="tab" onclick="switchTab('block',this)">🧱 블럭·아이템</button>
     <button class="tab" onclick="switchTab('fx',this)">🎆 파티클·소리</button>
     <button class="tab" onclick="switchTab('tag',this)">📋 태그·레시피</button>
@@ -589,6 +590,136 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- ══════════════════════════════════════════
+     인첸트
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-ench">
+  <div class="sec-title">🔮 인첸트 전체 목록</div>
+  <div class="sec-sub">모든 인첸트 · 적용 가능 아이템 · 최대 레벨 · 상호 배타 관계 · NBT 명령어 적용법</div>
+
+  <div class="card" id="en-apply">
+    <div class="card-header"><span class="hl">▶</span> NBT로 인첸트 적용 — 레벨 제한 없음</div>
+    <div style="padding:12px 16px;">
+      <div class="tip"><b>데이터팩에서 인첸트 적용:</b> /enchant 명령어는 최대 레벨만 허용되지만, /give 의 NBT로는 레벨 32767까지 지정 가능.</div>
+      <div class="codeblock"><span class="cmt"># 일반 인첸트 적용 (/enchant — 최대 레벨 준수)</span>
+<span class="fn">enchant</span> <span class="sel">@s</span> minecraft:sharpness <span class="num">5</span>
+
+<span class="cmt"># NBT로 레벨 제한 무시 (/give)</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_sword<span class="arg">{
+  Enchantments:[
+    {id:<span class="str">"minecraft:sharpness"</span>,lvl:<span class="num">32767</span>s},
+    {id:<span class="str">"minecraft:unbreaking"</span>,lvl:<span class="num">10</span>s}
+  ]
+}</span>
+
+<span class="cmt"># 1.20.5+ 컴포넌트 방식</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_sword<span class="arg">[
+  minecraft:enchantments={
+    <span class="str">"minecraft:sharpness"</span>:<span class="num">5</span>,
+    <span class="str">"minecraft:unbreaking"</span>:<span class="num">3</span>
+  }
+]</span>
+
+<span class="cmt"># 상호 배타 인첸트도 NBT로 강제 적용 가능</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:diamond_sword<span class="arg">{
+  Enchantments:[
+    {id:<span class="str">"minecraft:sharpness"</span>,lvl:<span class="num">5</span>s},
+    {id:<span class="str">"minecraft:smite"</span>,lvl:<span class="num">5</span>s}
+  ]
+}</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="en-weapon">
+    <div class="card-header"><span class="hl">01</span> ⚔ 무기 — 검 · 도끼</div>
+    <table class="r-table">
+      <tr style="background:rgba(251,191,36,.04);"><td class="cmd-cell" style="color:var(--txt3);font-size:11px;">ID</td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;"><span style="color:var(--txt3);font-size:11px;padding:8px 0 8px 0;">한국어 이름</span><span style="color:var(--txt3);font-size:11px;padding:8px 0;">최대 레벨</span><span style="color:var(--txt3);font-size:11px;padding:8px 0;">적용 아이템</span><span style="color:var(--txt3);font-size:11px;padding:8px 0;">설명</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">sharpness</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">날카로움</span><span style="color:var(--orange);">V</span><span class="ds">검·도끼</span><span class="ds">공격 피해 증가. 레벨당 +0.5 피해(1레벨 +1). <b style="color:var(--red);">smite·bane_of_arthropods와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">smite</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">강타</span><span style="color:var(--orange);">V</span><span class="ds">검·도끼</span><span class="ds">좀비·스켈레톤 등 언데드에게 레벨당 +2.5 추가 피해. <b style="color:var(--red);">sharpness·bane과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">bane_of_arthropods</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">절지동물의 천적</span><span style="color:var(--orange);">V</span><span class="ds">검·도끼</span><span class="ds">거미·은빛물고기·지네 등에 추가 피해 + 느려짐. <b style="color:var(--red);">sharpness·smite와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">knockback</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">밀쳐내기</span><span style="color:var(--orange);">II</span><span class="ds">검</span><span class="ds">피격 대상을 더 멀리 밀쳐냄.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">fire_aspect</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">화염 속성</span><span style="color:var(--orange);">II</span><span class="ds">검</span><span class="ds">적에게 불을 붙임. Lv1=3초, Lv2=7초. 동물 처치 시 익힌 고기 드롭.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">looting</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">약탈</span><span style="color:var(--orange);">III</span><span class="ds">검</span><span class="ds">처치 시 드롭 아이템 수·종류 증가. 희귀 드롭 확률도 증가.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">sweeping_edge</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">횡단 공격</span><span style="color:var(--orange);">III</span><span class="ds">검 <span class="tag-b">Java 전용</span></span><span class="ds">횡단 공격(좌우 스윙) 시 추가 피해. Bedrock 없음.</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="en-tool">
+    <div class="card-header"><span class="hl">02</span> ⛏ 도구 — 곡괭이 · 삽 · 도끼 · 가위 · 낚싯대</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">efficiency</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">효율</span><span style="color:var(--orange);">V</span><span class="ds">곡괭이·삽·도끼·가위</span><span class="ds">채굴 속도 증가. Lv5=매우 빠름. 적합한 도구에만 효과 있음.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">silk_touch</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">정밀 채굴</span><span style="color:var(--orange);">I</span><span class="ds">곡괭이·삽·도끼·가위</span><span class="ds">블럭을 그대로 드롭(돌→돌, 얼음→얼음 등). <b style="color:var(--red);">fortune과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">fortune</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">행운</span><span style="color:var(--orange);">III</span><span class="ds">곡괭이·삽·도끼</span><span class="ds">드롭 수 증가(광석, 씨앗 등). <b style="color:var(--red);">silk_touch와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">unbreaking</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">내구력</span><span style="color:var(--orange);">III</span><span class="ds">도구·갑옷·활·낚싯대 등 모든 내구도 아이템</span><span class="ds">내구도 소모 확률 감소. Lv3=50% 확률로 내구도 소모 안됨.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">mending</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">수선</span><span style="color:var(--orange);">I</span><span class="ds">내구도 있는 모든 아이템</span><span class="ds">경험치 획득 시 들고 있는/장착 중인 아이템 내구도 회복. <b style="color:var(--red);">infinity와 배타(활)</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">luck_of_the_sea</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">바다의 행운</span><span style="color:var(--orange);">III</span><span class="ds">낚싯대</span><span class="ds">보물(인첸트 책·안장 등) 드롭 확률 증가, 쓰레기 확률 감소.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">lure</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">미끼</span><span style="color:var(--orange);">III</span><span class="ds">낚싯대</span><span class="ds">낚시 대기 시간 감소. Lv1당 5초 단축.</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="en-armor">
+    <div class="card-header"><span class="hl">03</span> 🛡 방어구 전체</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">protection</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">보호</span><span style="color:var(--orange);">IV</span><span class="ds">갑옷 전체</span><span class="ds">모든 피해 감소(최대 80%). <b style="color:var(--red);">폭발·화염·발사체·보호 4종 서로 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">blast_protection</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">폭발 보호</span><span style="color:var(--orange);">IV</span><span class="ds">갑옷 전체</span><span class="ds">폭발 피해·밀려남 감소. TNT·크리퍼·불꽃놀이에 효과.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">fire_protection</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">화염 보호</span><span style="color:var(--orange);">IV</span><span class="ds">갑옷 전체</span><span class="ds">화염 피해 감소 + 불 지속 시간 감소.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">projectile_protection</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">발사체 보호</span><span style="color:var(--orange);">IV</span><span class="ds">갑옷 전체</span><span class="ds">화살·불덩이·스노우볼 등 발사체 피해 감소.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">thorns</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">가시</span><span style="color:var(--orange);">III</span><span class="ds">갑옷 전체</span><span class="ds">피격 시 공격자에게 반사 피해. 내구도 빨리 소모됨.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">respiration</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">수중 호흡</span><span style="color:var(--orange);">III</span><span class="ds">헬멧</span><span class="ds">물속 호흡 시간 연장. Lv1당 +15초. 익사 피해 감소.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">aqua_affinity</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">수중 채굴</span><span style="color:var(--orange);">I</span><span class="ds">헬멧</span><span class="ds">물속 채굴 속도를 지상과 동일하게.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">swift_sneak</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">재빠른 잠행</span><span style="color:var(--orange);">III</span><span class="ds">레깅스 <span class="tag-b">1.19+</span></span><span class="ds">웅크리기 이동 속도 증가. Lv3=웅크리기 속도 75%.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">feather_falling</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">낙하 충격 감소</span><span style="color:var(--orange);">IV</span><span class="ds">부츠</span><span class="ds">낙하 피해 감소. Lv4+protection IV 조합 시 거의 무효화.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">depth_strider</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">해류 적응</span><span style="color:var(--orange);">III</span><span class="ds">부츠</span><span class="ds">물속 이동 속도 증가. Lv3=물속에서 지상 속도. <b style="color:var(--red);">frost_walker와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">frost_walker</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">냉기 보행</span><span style="color:var(--orange);">II</span><span class="ds">부츠</span><span class="ds">물 위를 걸으면 얼음 생성. 용암 위도 마그마 블럭 생성. <b style="color:var(--red);">depth_strider와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">soul_speed</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">영혼 질주</span><span style="color:var(--orange);">III</span><span class="ds">부츠</span><span class="ds">소울 모래·소울 흙 위 이동 속도 증가. 내구도 소모됨.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">binding_curse</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">구속의 저주</span><span style="color:var(--orange);">I</span><span class="ds">갑옷 전체 <span class="tag" style="color:var(--red);border-color:var(--red);background:rgba(248,113,113,.06);">저주</span></span><span class="ds">사망 전 장착 해제 불가. 크리에이티브 또는 사망 시에만 제거.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">vanishing_curse</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">소멸의 저주</span><span style="color:var(--orange);">I</span><span class="ds">모든 아이템 <span class="tag" style="color:var(--red);border-color:var(--red);background:rgba(248,113,113,.06);">저주</span></span><span class="ds">사망 시 아이템이 드롭되지 않고 소멸.</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="en-ranged">
+    <div class="card-header"><span class="hl">04</span> 🏹 원거리 — 활 · 석궁 · 삼지창</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">power</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">강타</span><span style="color:var(--orange);">V</span><span class="ds">활</span><span class="ds">화살 피해 증가.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">punch</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">밀쳐내기</span><span style="color:var(--orange);">II</span><span class="ds">활</span><span class="ds">화살 밀쳐내기 거리 증가.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">flame</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">화염</span><span style="color:var(--orange);">I</span><span class="ds">활</span><span class="ds">화살에 불 붙여 발사.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">infinity</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">무한</span><span style="color:var(--orange);">I</span><span class="ds">활</span><span class="ds">화살 소모 없이 발사. 인벤에 화살 1개 필요. <b style="color:var(--red);">mending과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">quick_charge</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">신속한 장전</span><span style="color:var(--orange);">III</span><span class="ds">석궁</span><span class="ds">장전 속도 증가. Lv3=거의 즉시.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">multishot</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">산탄</span><span style="color:var(--orange);">I</span><span class="ds">석궁</span><span class="ds">한 번에 3방향 화살 발사. 화살 1개만 소모. <b style="color:var(--red);">piercing과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">piercing</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">관통</span><span style="color:var(--orange);">IV</span><span class="ds">석궁</span><span class="ds">화살이 엔티티를 관통. Lv1당 1개 추가 관통. <b style="color:var(--red);">multishot과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">loyalty</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">충성도</span><span style="color:var(--orange);">III</span><span class="ds">삼지창</span><span class="ds">투척 후 자동 회수. 레벨 높을수록 빠르게 돌아옴. <b style="color:var(--red);">riptide와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">channeling</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">채널링</span><span style="color:var(--orange);">I</span><span class="ds">삼지창</span><span class="ds">폭풍(천둥번개) 중 투척 시 번개 소환. <b style="color:var(--red);">riptide와 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">riptide</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">격류</span><span style="color:var(--orange);">III</span><span class="ds">삼지창</span><span class="ds">물속·빗속에서 삼지창 투척 시 선수가 삼지창과 같이 날아감. <b style="color:var(--red);">loyalty·channeling과 배타</b></span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">impaling</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">꿰뚫기</span><span style="color:var(--orange);">V</span><span class="ds">삼지창</span><span class="ds">수중 생물(오징어·돌고래 등)에 추가 피해. Java는 물속 플레이어에게도 적용.</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="en-mace">
+    <div class="card-header"><span class="hl">05</span> 🔨 철퇴 (Mace) <span class="tag-b">1.21+</span></div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">density</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">밀도</span><span style="color:var(--orange);">V</span><span class="ds">철퇴</span><span class="ds">낙하 거리에 따른 추가 피해 증가. 레벨당 낙하 피해 보정 +1.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">breach</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">파괴</span><span style="color:var(--orange);">IV</span><span class="ds">철퇴</span><span class="ds">상대의 갑옷 방어력을 무시하는 비율 증가. Lv4=갑옷 방어력 15% 무시.</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">wind_burst</span></td><td><div class="desc-cell" style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0;padding:8px 16px 8px 0;"><span class="dm">바람 폭발</span><span style="color:var(--orange);">III</span><span class="ds">철퇴</span><span class="ds">철퇴 스매시 명중 시 대상(과 자신)이 위로 튕겨짐. 연속 낙하 콤보 가능.</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="en-excl">
+    <div class="card-header"><span class="hl">06</span> 🚫 상호 배타 관계 — 같이 적용 안 되는 인첸트</div>
+    <div style="padding:12px 16px;">
+      <div class="warn">아래 그룹 내 인첸트는 anvil·enchanting table로는 함께 적용 불가. NBT(/give)로는 강제 적용 가능.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div class="mini-card"><div class="mini-title">공격 데미지 3종</div><span class="mc">sharpness</span> / <span class="mc">smite</span> / <span class="mc">bane_of_arthropods</span></div>
+        <div class="mini-card"><div class="mini-title">보호 4종</div><span class="mc">protection</span> / <span class="mc">blast_protection</span> / <span class="mc">fire_protection</span> / <span class="mc">projectile_protection</span></div>
+        <div class="mini-card"><div class="mini-title">부츠 이동</div><span class="mc">depth_strider</span> / <span class="mc">frost_walker</span></div>
+        <div class="mini-card"><div class="mini-title">활 특수</div><span class="mc">infinity</span> / <span class="mc">mending</span></div>
+        <div class="mini-card"><div class="mini-title">석궁 발사</div><span class="mc">multishot</span> / <span class="mc">piercing</span></div>
+        <div class="mini-card"><div class="mini-title">삼지창 투척</div><span class="mc">loyalty</span> / <span class="mc">riptide</span> / <span class="mc">channeling</span> (riptide가 있으면 loyalty·channeling 불가)</div>
+        <div class="mini-card"><div class="mini-title">채굴 드롭</div><span class="mc">silk_touch</span> / <span class="mc">fortune</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
      블럭·아이템
 ═══════════════════════════════════════════ -->
 <div class="panel" id="panel-block">
@@ -720,6 +851,158 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 }</div>
     </div>
   </div>
+
+  <!-- ─── 커스텀 블럭 / 크리에이티브 추가 ─── -->
+  <div class="card" id="bl-custom">
+    <div class="card-header"><span class="hl">05</span> 🆕 새로운 블럭 만들기 — 6가지 방법</div>
+    <div style="padding:12px 16px;">
+      <div class="tip"><b>바닐라 마인크래프트에는 진짜 새 블럭 ID를 추가하는 것이 불가능합니다.</b> 그러나 아래 방법으로 완전히 다른 텍스처·모델을 가진 블럭처럼 보이는 것은 만들 수 있습니다.</div>
+
+      <div class="mini-title" style="margin-top:4px;">방법 1 — 커스텀 플레이어 헤드 (가장 쉽고 대중적)</div>
+      <div class="codeblock"><span class="cmt"># 텍스처 Base64 값은 minecraft-heads.com 또는 namemc.com 에서 획득</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:player_head<span class="arg">{
+  SkullOwner:{
+    Properties:{
+      textures:[{
+        Value:<span class="str">"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjE3NzdiMjc..."</span>
+      }]
+    }
+  },
+  display:{Name:<span class="str">'{"text":"커스텀 블럭","italic":false}'</span>}
+}</span>
+
+<span class="cmt"># 블럭으로 설치: 마인크래프트 헤드는 벽·바닥에 직접 설치 가능</span>
+<span class="cmt"># 단점: 위쪽 면 텍스처만 표시, 회전 제한됨, 전면부 텍스처 불일치</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 2 — 버섯 블럭 + 리소스팩 텍스처 교체 (6면 독립 텍스처)</div>
+      <div class="codeblock"><span class="cmt"># brown_mushroom_block은 6면 각각을 on/off 제어 가능</span>
+<span class="cmt"># 전부 false로 설정 → 갈색 반투명 블럭(무독립 텍스처)</span>
+<span class="fn">setblock</span> ~ ~ ~ minecraft:brown_mushroom_block<span class="arg">[
+  up=false,down=false,north=false,
+  south=false,east=false,west=false
+]</span>
+
+<span class="cmt"># 리소스팩 assets/minecraft/textures/block/brown_mushroom_block.png</span>
+<span class="cmt"># 를 원하는 텍스처로 교체 → 게임 내 모든 버섯 블럭이 바뀜</span>
+<span class="cmt"># 더 정교하게: note_block, mushroom_stem 등도 활용 가능</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 3 — Item Display 엔티티 + custom_model_data (1.19.4+, 가장 강력)</div>
+      <div class="codeblock"><span class="cmt"># 실제 블럭 없이 어떤 모양이든 공중에 렌더링</span>
+<span class="fn">summon</span> minecraft:item_display ~ ~ ~<span class="arg">{
+  item:{
+    id:<span class="str">"minecraft:stick"</span>,
+    count:<span class="num">1</span>,
+    tag:{CustomModelData:<span class="num">1001</span>}   <span class="cmt"># 리소스팩에서 정의한 모델 번호</span>
+  },
+  item_display:<span class="str">"fixed"</span>,       <span class="cmt"># ground·fixed·head·gui·thirdperson_lefthand 등</span>
+  transformation:{
+    translation:[<span class="num">0f,0f,0f</span>],
+    scale:[<span class="num">1f,1f,1f</span>],
+    left_rotation:[<span class="num">0f,0f,0f,1f</span>],
+    right_rotation:[<span class="num">0f,0f,0f,1f</span>]
+  },
+  brightness:{block:<span class="num">15</span>,sky:<span class="num">15</span>}  <span class="cmt"># 항상 밝게 렌더링</span>
+}</span>
+<span class="cmt"># 리소스팩에서 stick의 override에 custom_model_data:1001 → 커스텀 블럭 모양 모델 연결</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 4 — Block Display 엔티티 (실제 블럭 모델 그대로 렌더링)</div>
+      <div class="codeblock"><span class="cmt"># 실제 블럭을 설치하지 않고 블럭 모양 렌더링 (히트박스 없음)</span>
+<span class="fn">summon</span> minecraft:block_display ~ ~ ~<span class="arg">{
+  block_state:{
+    Name:<span class="str">"minecraft:diamond_block"</span>
+  },
+  transformation:{
+    translation:[<span class="num">0f,0f,0f</span>],
+    scale:[<span class="num">0.5f,0.5f,0.5f</span>],   <span class="cmt"># 0.5배 크기</span>
+    left_rotation:[<span class="num">0f,0.3827f,0f,0.9239f</span>],  <span class="cmt"># 45도 Y 회전</span>
+    right_rotation:[<span class="num">0f,0f,0f,1f</span>]
+  },
+  brightness:{block:<span class="num">15</span>,sky:<span class="num">15</span>},
+  glow_color_override:<span class="num">-1</span>
+}</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 5 — 보이지 않는 아이템 액자 + 커스텀 모델 아이템</div>
+      <div class="codeblock"><span class="cmt"># 아이템 액자를 보이지 않게 만들고 커스텀 아이템 넣기</span>
+<span class="cmt"># 리소스팩에서 item_frame.json 모델을 투명으로 교체</span>
+<span class="fn">summon</span> minecraft:item_frame ~ ~ ~<span class="arg">{
+  Invisible:<span class="num">1b</span>,
+  Fixed:<span class="num">1b</span>,
+  Item:{
+    id:<span class="str">"minecraft:stick"</span>,
+    Count:<span class="num">1b</span>,
+    tag:{CustomModelData:<span class="num">1001</span>}
+  }
+}</span>
+<span class="cmt"># 바닥·벽·천장에 부착 가능. 단점: 액자가 붙은 방향만 가능</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 6 — 장벽 블럭 + 아이템 디스플레이 (히트박스 있는 커스텀 블럭)</div>
+      <div class="codeblock"><span class="cmt"># 장벽(barrier)으로 충돌 히트박스 만들고, 그 위에 item_display로 외관</span>
+<span class="fn">setblock</span> ~ ~ ~ minecraft:barrier
+<span class="fn">summon</span> minecraft:item_display ~ ~ ~<span class="arg">{
+  item:{id:<span class="str">"minecraft:stick"</span>,count:<span class="num">1</span>,tag:{CustomModelData:<span class="num">1001</span>}},
+  item_display:<span class="str">"fixed"</span>,
+  Tags:[<span class="str">"custom_block"</span>]
+}</span>
+<span class="cmt"># 히트박스 있음 + 커스텀 외관 = 가장 블럭다운 느낌</span>
+<span class="cmt"># 단점: 마이닝 이벤트 감지(advancement로)해서 수동 처리 필요</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="bl-creative">
+    <div class="card-header"><span class="hl">06</span> 🎮 크리에이티브 인벤토리에 커스텀 아이템 추가하기</div>
+    <div style="padding:12px 16px;">
+      <div class="tip"><b>바닐라에서는 크리에이티브 탭에 새 칸을 추가할 수 없습니다.</b> 단, 아래 방법으로 커스텀 아이템을 게임 내에서 쉽게 꺼낼 수 있습니다.</div>
+
+      <div class="mini-title">방법 A — /give 명령어로 직접 지급 (핫바·채팅 활용)</div>
+      <div class="codeblock"><span class="cmt"># .mcfunction 파일에 등록하고 커맨드 블럭 또는 채팅으로 호출</span>
+<span class="fn">give</span> <span class="sel">@s</span> minecraft:stick<span class="arg">{CustomModelData:<span class="num">1001</span>,
+  display:{Name:<span class="str">'{"text":"마법 지팡이","color":"light_purple","italic":false}'</span>}
+}</span>
+
+<span class="cmt"># 또는 함수로 묶어서</span>
+<span class="fn">function</span> mypack:items/magic_wand</div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 B — 지식 책(knowledge_book)으로 클릭 지급 UI 만들기</div>
+      <div class="codeblock"><span class="cmt"># 지식 책은 크리에이티브 인벤에 있고, 클릭 시 레시피 언락 가능</span>
+<span class="cmt"># 활용: 독자적인 "아이템 책" UI — tellraw + clickEvent 조합</span>
+<span class="fn">tellraw</span> <span class="sel">@a</span> <span class="arg">[
+  {"text":"[클릭] "},
+  {"text":"⚔ 전설의 검 받기","color":"gold","underlined":true,
+   "clickEvent":{"action":"run_command","value":"/function mypack:items/legendary_sword"}},
+  {"text":"  "},
+  {"text":"🪄 마법 지팡이 받기","color":"light_purple","underlined":true,
+   "clickEvent":{"action":"run_command","value":"/function mypack:items/magic_wand"}}
+]</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 C — 크리에이티브 탭 '검색'에서 찾기 (크리에이티브 모드 한정)</div>
+      <div class="codeblock"><span class="cmt"># 1.20.5+ 컴포넌트 방식 아이템은 검색창에 아이템명으로 찾기 불가</span>
+<span class="cmt"># 단, 기본 아이템(stick, diamond_sword 등)은 검색 탭에 있음</span>
+<span class="cmt"># 크리에이티브 탭 추가: 바닐라로는 완전히 불가 → 모드(CraftTweaker, FTB Quests) 필요</span>
+<span class="cmt"># 서버에서는 커맨드 블럭 패널 or 커스텀 GUI로 대체</span></div>
+
+      <div class="mini-title" style="margin-top:12px;">방법 D — 커스텀 상점 NPC (서버 맵에서 가장 실용적)</div>
+      <div class="codeblock"><span class="cmt"># Interaction 엔티티(1.19.4+)로 클릭 감지 → 아이템 지급</span>
+<span class="fn">summon</span> minecraft:interaction <span class="num">10 64 10</span><span class="arg">{
+  width:<span class="num">1f</span>,height:<span class="num">2f</span>,response:<span class="num">1b</span>,
+  Tags:[<span class="str">"shop_npc"</span>]
+}</span>
+
+<span class="cmt"># advancement로 우클릭 감지 → 상점 메뉴 함수 실행</span>
+<span class="cmt"># data/mypack/advancements/detect_click.json</span>
+{
+  <span class="key">"criteria"</span>: {
+    <span class="key">"click"</span>: {
+      <span class="key">"trigger"</span>: <span class="str">"minecraft:player_interacted_with_entity"</span>,
+      <span class="key">"conditions"</span>: {
+        <span class="key">"entity"</span>: {<span class="key">"nbt"</span>: <span class="str">"{Tags:[\"shop_npc\"]}"</span>}
+      }
+    }
+  },
+  <span class="key">"rewards"</span>: {<span class="key">"function"</span>: <span class="str">"mypack:shop/open"</span>}
+}</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -1153,11 +1436,22 @@ const SIDEBAR = {
     {id:'s-args',label:'선택자 인수 [...]'},
     {id:'s-pred',label:'Predicate JSON'},
   ],
+  ench: [
+    {id:'en-apply',label:'인첸트 적용 방법'},
+    {id:'en-weapon',label:'⚔ 무기 (검·도끼)'},
+    {id:'en-tool',label:'⛏ 도구·낚싯대'},
+    {id:'en-armor',label:'🛡 방어구 전체'},
+    {id:'en-ranged',label:'🏹 원거리·삼지창'},
+    {id:'en-mace',label:'🔨 철퇴 (1.21+)'},
+    {id:'en-excl',label:'🚫 상호 배타 관계'},
+  ],
   block: [
     {id:'bl-state',label:'블럭 상태'},
     {id:'bl-nbt',label:'아이템 NBT'},
     {id:'bl-loot',label:'전리품 테이블'},
     {id:'bl-adv',label:'어드밴스먼트'},
+    {id:'bl-custom',label:'🆕 커스텀 블럭 6가지'},
+    {id:'bl-creative',label:'🎮 크리에이티브 추가'},
   ],
   fx: [
     {id:'fx-particle',label:'파티클 목록'},

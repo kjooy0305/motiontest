@@ -1,263 +1,697 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DOOM (1993)</title>
-  <link rel="stylesheet" href="https://js-dos.com/v7/build/js-dos.css">
-  <script src="https://js-dos.com/v7/build/js-dos.js"></script>
-  <style>
-    :root {
-      --red:   #c0392b;
-      --red2:  #e74c3c;
-      --dark:  #0a0a0a;
-      --dark2: #111;
-      --dark3: #1a1a1a;
-      --dim:   #888;
-      --txt:   #ccc;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub 정리 — 테스트 22</title>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --txt:#e6edf3;--txt2:#8b949e;--txt3:#6e7681;
+  --blue:#58a6ff;--blue2:#1f6feb;--blue3:#0d419d;
+  --green:#3fb950;--green2:#238636;
+  --purple:#bc8cff;--orange:#ffa657;--red:#f85149;
+  --yellow:#e3b341;--pink:#ff7b72;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',sans-serif;font-size:14px;line-height:1.6;}
 
-    body {
-      background: var(--dark);
-      color: var(--txt);
-      font-family: 'Courier New', Courier, monospace;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+/* ── HEADER ── */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--txt);}
+.logo svg{width:32px;height:32px;fill:var(--txt);}
+.search-wrap{flex:1;min-width:200px;max-width:400px;}
+.search{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(31,111,235,.15);}
+.tab-bar{display:flex;gap:4px;flex-wrap:wrap;}
+.tab{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--txt2);font-size:13px;font-weight:500;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg3);color:var(--txt);}
+.tab.active{background:var(--blue2);color:#fff;}
 
-    /* ── 헤더 ── */
-    #header {
-      background: #0d0000;
-      border-bottom: 2px solid var(--red);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    #logo {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: var(--red2);
-      letter-spacing: .2em;
-      text-shadow: 0 0 18px #c0392b99, 0 0 40px #c0392b44;
-      text-transform: uppercase;
-    }
-    #logo span { color: #fff; font-size: .85rem; letter-spacing: .08em; display: block; margin-top: -4px; }
-    #hbtns { display: flex; gap: 8px; }
-    .hbtn {
-      padding: 6px 16px; border-radius: 4px; font-size: .8rem; font-weight: 700;
-      cursor: pointer; border: 1px solid; font-family: inherit; letter-spacing: .05em;
-      transition: all .15s;
-    }
-    #btn-fs  { background: #1a0000; border-color: var(--red); color: var(--red2); }
-    #btn-fs:hover  { background: var(--red); color: #fff; box-shadow: 0 0 14px #c0392b80; }
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 65px);}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
+.sidebar-section{padding:4px 0 12px;}
+.sidebar-label{padding:6px 16px;font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;}
+.sidebar-item{display:block;padding:6px 16px;color:var(--txt2);text-decoration:none;font-size:13px;transition:.1s;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.sidebar-item:hover{background:var(--bg3);color:var(--txt);}
+.sidebar-item.active{background:var(--blue3);color:var(--blue);border-left:2px solid var(--blue);}
+.main{flex:1;padding:24px;max-width:900px;overflow-x:hidden;}
 
-    /* ── 게임 컨테이너 ── */
-    #game-wrap {
-      position: relative;
-      background: #000;
-      width: 100%;
-    }
-    #jsdos {
-      width: 100%;
-      height: 70vh;
-      min-height: 420px;
-      display: block;
-    }
+/* ── PANEL ── */
+.panel{display:none;}
+.panel.active{display:block;}
 
-    /* ── 로딩 화면 ── */
-    #loading-overlay {
-      position: absolute; inset: 0;
-      background: #000;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 10; gap: 16px;
-      pointer-events: none;
-      transition: opacity .5s;
-    }
-    #loading-overlay.hide { opacity: 0; pointer-events: none; }
-    .skull { font-size: 3rem; animation: pulse 1.2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:.7} }
-    .load-title { font-size: 1.4rem; font-weight: 900; color: var(--red2); letter-spacing: .2em; text-shadow: 0 0 20px #c0392b; }
-    .load-bar-wrap { width: 280px; height: 12px; background: #1a0000; border: 1px solid var(--red); border-radius: 2px; overflow: hidden; }
-    .load-bar { height: 100%; width: 0; background: linear-gradient(90deg,#8b0000,var(--red2)); transition: width .4s; }
-    .load-msg { font-size: .78rem; color: var(--dim); }
+/* ── CARDS ── */
+.section-title{font-size:20px;font-weight:600;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.section-sub{color:var(--txt2);font-size:13px;margin-bottom:20px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+.card-header{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;}
+.card-body{padding:0;}
 
-    /* ── 하단 패널 ── */
-    #bottom {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-top: 1px solid #2a0000;
-      flex: 1;
-    }
-    .panel {
-      padding: 18px 22px;
-      border-right: 1px solid #1a0000;
-    }
-    .panel:last-child { border-right: none; }
-    .panel-title {
-      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
-      color: var(--red2); text-transform: uppercase; margin-bottom: 12px;
-      padding-bottom: 6px; border-bottom: 1px solid #2a0000;
-    }
+/* ── SHORTCUT TABLE ── */
+.sc-table{width:100%;border-collapse:collapse;}
+.sc-table tr{border-bottom:1px solid var(--border);}
+.sc-table tr:last-child{border-bottom:none;}
+.sc-table tr:hover td{background:rgba(99,110,123,.1);}
+.sc-table td{padding:9px 16px;vertical-align:top;}
+.sc-table td:first-child{width:46%;color:var(--txt);font-size:13px;}
+.sc-table td:last-child{color:var(--txt2);font-size:13px;}
+.key{display:inline-flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600;color:var(--txt);font-family:'SFMono-Regular',Consolas,monospace;margin:0 2px;white-space:nowrap;box-shadow:0 1px 0 var(--border2);}
+.then{color:var(--txt3);font-size:11px;margin:0 2px;}
 
-    /* 조작법 그리드 */
-    .ctrl-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
-    .ctrl-key {
-      font-size: .78rem; color: #fff;
-      background: #1a0000; border: 1px solid #3a0000;
-      border-bottom: 2px solid #5a0000;
-      border-radius: 4px; padding: 2px 8px; white-space: nowrap;
-      text-align: center; font-family: inherit;
-    }
-    .ctrl-desc { font-size: .78rem; color: var(--dim); display: flex; align-items: center; }
+/* ── FEATURE GRID ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;transition:.15s;}
+.feat-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.feat-icon{font-size:22px;margin-bottom:8px;}
+.feat-name{font-weight:600;font-size:14px;color:var(--txt);margin-bottom:4px;}
+.feat-desc{font-size:12px;color:var(--txt2);line-height:1.5;}
+.badge{display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:500;margin-left:6px;}
+.badge-blue{background:rgba(31,111,235,.2);color:var(--blue);}
+.badge-green{background:rgba(63,185,80,.15);color:var(--green);}
+.badge-purple{background:rgba(188,140,255,.15);color:var(--purple);}
+.badge-orange{background:rgba(255,166,87,.15);color:var(--orange);}
 
-    /* 정보 목록 */
-    .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .info-list li {
-      font-size: .78rem; color: var(--dim); padding: 7px 10px;
-      background: #0d0000; border-left: 2px solid var(--red);
-      border-radius: 0 4px 4px 0;
-      line-height: 1.5;
-    }
-    .info-list li strong { color: var(--txt); }
+/* ── CLI TABLE ── */
+.cli-table{width:100%;border-collapse:collapse;}
+.cli-table tr{border-bottom:1px solid var(--border);}
+.cli-table tr:last-child{border-bottom:none;}
+.cli-table tr:hover td{background:rgba(99,110,123,.1);}
+.cli-table td{padding:9px 16px;vertical-align:top;}
+.code{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--blue);background:rgba(88,166,255,.08);padding:2px 6px;border-radius:4px;word-break:break-all;}
+.desc-cell{color:var(--txt2);font-size:13px;}
 
-    /* 팁 */
-    .tip-box {
-      background: #0d0000; border: 1px solid #2a0000;
-      border-radius: 6px; padding: 10px 12px;
-      font-size: .76rem; color: var(--dim); margin-top: 10px; line-height: 1.6;
-    }
-    .tip-box strong { color: var(--red2); }
+/* ── FLOW DIAGRAM ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:16px;margin-bottom:12px;}
+.flow-step{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:13px;font-weight:500;color:var(--txt);text-align:center;min-width:100px;}
+.flow-arrow{color:var(--txt3);font-size:18px;}
+.flow-step.highlight{border-color:var(--blue2);color:var(--blue);}
 
-    @media (max-width: 580px) {
-      #bottom { grid-template-columns: 1fr; }
-      .panel { border-right: none; border-bottom: 1px solid #1a0000; }
-      #jsdos { height: 55vw; min-height: 260px; }
-    }
-  </style>
+/* ── TAG SECTION ── */
+.tags{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid;}
+.tag-blue{background:rgba(31,111,235,.1);border-color:rgba(31,111,235,.3);color:var(--blue);}
+.tag-green{background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--green);}
+.tag-red{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red);}
+.tag-purple{background:rgba(188,140,255,.1);border-color:rgba(188,140,255,.3);color:var(--purple);}
+.tag-orange{background:rgba(255,166,87,.1);border-color:rgba(255,166,87,.3);color:var(--orange);}
+.tag-yellow{background:rgba(227,179,65,.1);border-color:rgba(227,179,65,.3);color:var(--yellow);}
+
+/* ── SEARCH HIGHLIGHT ── */
+.highlight-match{background:rgba(227,179,65,.3);border-radius:2px;}
+.no-result{text-align:center;padding:40px;color:var(--txt3);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .main{padding:16px;}
+  .feat-grid{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
 
-<div id="header">
-  <div id="logo">DOOM<span>1993 · id Software · Shareware Ep.1</span></div>
-  <div id="hbtns">
-    <button class="hbtn" id="btn-fs" onclick="goFullscreen()">⛶ 전체화면</button>
+<div class="header">
+  <div class="logo">
+    <svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+    GitHub 정리
+  </div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="검색... (단축키, 기능, 명령어)">
+  </div>
+  <div class="tab-bar" id="tabBar">
+    <button class="tab active" onclick="switchTab('shortcuts')">⌨️ 단축키</button>
+    <button class="tab" onclick="switchTab('features')">🚀 기능</button>
+    <button class="tab" onclick="switchTab('cli')">💻 CLI</button>
+    <button class="tab" onclick="switchTab('workflow')">🔄 워크플로우</button>
   </div>
 </div>
 
-<div id="game-wrap">
-  <!-- 로딩 오버레이 -->
-  <div id="loading-overlay">
-    <div class="skull">💀</div>
-    <div class="load-title">DOOM</div>
-    <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
-    <div class="load-msg" id="load-msg">에뮬레이터 초기화 중...</div>
-  </div>
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <!-- JS로 채움 -->
+  </nav>
+  <main class="main">
 
-  <div id="jsdos"></div>
-</div>
+    <!-- ══════════════════════════════ 단축키 ══════════════════════════════ -->
+    <div class="panel active" id="panel-shortcuts">
+      <div class="section-title">⌨️ GitHub 키보드 단축키</div>
+      <div class="section-sub">페이지 종류별 단축키 모음 — GitHub 어느 페이지에서든 <span class="key">?</span> 를 누르면 해당 페이지 단축키 목록이 나타남</div>
 
-<div id="bottom">
-  <div class="panel">
-    <div class="panel-title">⌨ 조작법</div>
-    <div class="ctrl-grid">
-      <span class="ctrl-key">↑ W</span><span class="ctrl-desc">앞으로 이동</span>
-      <span class="ctrl-key">↓ S</span><span class="ctrl-desc">뒤로 이동</span>
-      <span class="ctrl-key">← →</span><span class="ctrl-desc">좌우 회전</span>
-      <span class="ctrl-key">Alt + ← →</span><span class="ctrl-desc">좌우 이동 (스트레이프)</span>
-      <span class="ctrl-key">Ctrl</span><span class="ctrl-desc">발사 / 공격</span>
-      <span class="ctrl-key">Space</span><span class="ctrl-desc">문 열기 · 스위치</span>
-      <span class="ctrl-key">Shift</span><span class="ctrl-desc">달리기</span>
-      <span class="ctrl-key">1 – 7</span><span class="ctrl-desc">무기 선택</span>
-      <span class="ctrl-key">Esc</span><span class="ctrl-desc">메뉴 열기 / 일시정지</span>
-      <span class="ctrl-key">Tab</span><span class="ctrl-desc">자동 지도 (오토맵)</span>
-      <span class="ctrl-key">F1</span><span class="ctrl-desc">도움말</span>
-      <span class="ctrl-key">F5</span><span class="ctrl-desc">화면 크기 조절</span>
+      <div class="card" id="sc-global">
+        <div class="card-header">🌐 전역 단축키 (어디서나)</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">?</span></td><td>현재 페이지 단축키 목록 표시</td></tr>
+            <tr><td><span class="key">S</span> / <span class="key">/</span></td><td>검색창 포커스</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">H</span></td><td>홈(대시보드)으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">N</span></td><td>알림(Notifications)으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">P</span></td><td>내 프로필로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">E</span></td><td>탐색(Explore)으로 이동</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">K</span> / <span class="key">⌘</span>+<span class="key">K</span></td><td>Command Palette (명령 팔레트) 열기</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-repo">
+        <div class="card-header">📁 저장소(Repository) 페이지</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">C</span></td><td>코드(Code) 탭으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">I</span></td><td>이슈(Issues) 탭으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">PR</span></td><td>Pull Request 탭으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">A</span></td><td>Actions 탭으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">B</span></td><td>Projects 탭으로 이동</td></tr>
+            <tr><td><span class="key">G</span><span class="then">then</span><span class="key">W</span></td><td>Wiki 탭으로 이동</td></tr>
+            <tr><td><span class="key">T</span></td><td>파일 탐색기(File finder) 열기</td></tr>
+            <tr><td><span class="key">W</span></td><td>브랜치 / 태그 전환 패널 열기</td></tr>
+            <tr><td><span class="key">L</span></td><td>특정 줄로 이동(Jump to line)</td></tr>
+            <tr><td><span class="key">Y</span></td><td>현재 파일의 영구 링크(permalink)로 URL 변경</td></tr>
+            <tr><td><span class="key">B</span></td><td>Blame 뷰 열기 (누가 어떤 줄을 작성했는지)</td></tr>
+            <tr><td><span class="key">I</span></td><td>Issues 목록으로 이동</td></tr>
+            <tr><td><span class="key">P</span></td><td>Pull Requests 목록으로 이동</td></tr>
+            <tr><td><span class="key">C</span></td><td>새 이슈 작성</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-code">
+        <div class="card-header">📄 코드 뷰어 / 파일 보기</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">.</span> (마침표)</td><td>현재 저장소를 github.dev(웹 VS Code)에서 열기</td></tr>
+            <tr><td><span class="key">T</span></td><td>파일 검색(fuzzy finder)</td></tr>
+            <tr><td><span class="key">L</span></td><td>특정 줄 번호로 이동</td></tr>
+            <tr><td><span class="key">Y</span></td><td>현재 커밋 기준 고정 URL로 변경</td></tr>
+            <tr><td><span class="key">B</span></td><td>Git Blame 뷰로 전환</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">F</span></td><td>파일 내 텍스트 검색</td></tr>
+            <tr><td>줄 번호 클릭 후 <span class="key">Shift</span>+클릭</td><td>줄 범위 선택 (링크 공유 가능)</td></tr>
+            <tr><td>줄 번호 클릭 → <span class="key">...</span></td><td>줄 참조 복사, 파일 보기 등 메뉴</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-pr">
+        <div class="card-header">🔀 Pull Request / 코드 리뷰</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">J</span></td><td>다음 파일로 이동</td></tr>
+            <tr><td><span class="key">K</span></td><td>이전 파일로 이동</td></tr>
+            <tr><td><span class="key">E</span></td><td>현재 파일 diff 접기/펼치기</td></tr>
+            <tr><td><span class="key">N</span></td><td>다음 댓글(코멘트)로 이동</td></tr>
+            <tr><td><span class="key">P</span></td><td>이전 댓글로 이동</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">P</span></td><td>댓글 입력창 미리보기 / 수정 전환</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Enter</span></td><td>댓글 제출 (Submit comment)</td></tr>
+            <tr><td><span class="key">R</span></td><td>선택한 텍스트를 댓글에 인용(Quote reply)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-issue">
+        <div class="card-header">🐛 이슈(Issue) 페이지</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">C</span></td><td>새 이슈 작성</td></tr>
+            <tr><td><span class="key">U</span></td><td>작성자(Author) 필터</td></tr>
+            <tr><td><span class="key">L</span></td><td>레이블(Label) 필터</td></tr>
+            <tr><td><span class="key">M</span></td><td>마일스톤(Milestone) 필터</td></tr>
+            <tr><td><span class="key">A</span></td><td>담당자(Assignee) 필터</td></tr>
+            <tr><td><span class="key">X</span></td><td>이슈 선택 (체크박스 토글)</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Enter</span></td><td>댓글 제출</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">.</span></td><td>Saved Reply 빠른 삽입</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-editor">
+        <div class="card-header">✏️ 마크다운 에디터 (이슈/PR 댓글 작성 시)</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">Ctrl</span>+<span class="key">B</span></td><td>굵게 (Bold)</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">I</span></td><td>기울임 (Italic)</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">K</span></td><td>링크 삽입</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">K</span></td><td>코드 블록 삽입</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">P</span></td><td>미리보기(Preview) 전환</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">Enter</span></td><td>폼 제출 (댓글/이슈 저장)</td></tr>
+            <tr><td><span class="key">Ctrl</span>+<span class="key">G</span></td><td>첨부 파일 선택</td></tr>
+            <tr><td><span class="key">Tab</span></td><td>들여쓰기 (텍스트 선택 후)</td></tr>
+            <tr><td><span class="key">Shift</span>+<span class="key">Tab</span></td><td>내어쓰기</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="sc-notification">
+        <div class="card-header">🔔 알림(Notifications)</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="key">E</span></td><td>선택한 알림 Done(완료) 처리</td></tr>
+            <tr><td><span class="key">Shift</span>+<span class="key">U</span></td><td>선택 알림을 읽지 않음으로 표시</td></tr>
+            <tr><td><span class="key">Shift</span>+<span class="key">I</span></td><td>선택 알림을 읽음으로 표시</td></tr>
+            <tr><td><span class="key">Shift</span>+<span class="key">M</span></td><td>구독 해제(Unsubscribe)</td></tr>
+            <tr><td><span class="key">J</span></td><td>다음 알림으로 이동</td></tr>
+            <tr><td><span class="key">K</span></td><td>이전 알림으로 이동</td></tr>
+            <tr><td><span class="key">O</span> / <span class="key">Enter</span></td><td>선택한 알림 열기</td></tr>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="panel">
-    <div class="panel-title">ℹ 게임 정보</div>
-    <ul class="info-list">
-      <li><strong>에피소드 1 무료 버전</strong> — Knee-Deep in the Dead (9개 맵)</li>
-      <li><strong>장르</strong> — 1인칭 슈터 (FPS). 1993년 id Software 발표</li>
-      <li><strong>목표</strong> — 각 맵의 출구를 찾아 탈출. 악마를 모두 처치할 필요 없음</li>
-      <li><strong>무기</strong> — 주먹 · 권총 · 샷건 · 로켓런처 · BFG9000 등</li>
-      <li><strong>아이템</strong> — 메디킷(❤) · 방어구(🛡) · 탄약 · 특수 파워업</li>
-    </ul>
-    <div class="tip-box">
-      <strong>팁 :</strong> 게임 창을 클릭하면 마우스가 게임에 잠깁니다.
-      해제하려면 <strong>우클릭</strong> 또는 <strong>Esc</strong>를 누르세요.<br>
-      로딩이 느릴 경우 브라우저를 새로고침(F5)하면 됩니다.
+    <!-- ══════════════════════════════ 기능 ══════════════════════════════ -->
+    <div class="panel" id="panel-features">
+      <div class="section-title">🚀 GitHub 주요 기능</div>
+      <div class="section-sub">GitHub에서 제공하는 기능들 개요</div>
+
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-icon">📁</div>
+          <div class="feat-name">Repository</div>
+          <div class="feat-desc">프로젝트의 코드·파일·이슈·PR이 모이는 공간. Public / Private 설정 가능. Fork로 복제해 수정 후 PR 제출.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🐛</div>
+          <div class="feat-name">Issues</div>
+          <div class="feat-desc">버그 리포트, 기능 요청, 할 일 관리. 레이블·마일스톤·담당자 할당, 템플릿 설정, 타임라인 추적.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔀</div>
+          <div class="feat-name">Pull Request</div>
+          <div class="feat-desc">브랜치의 변경사항을 메인 브랜치에 병합 요청. 코드 리뷰, 댓글, 승인(Approve) / 변경 요청(Request changes).</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">⚙️</div>
+          <div class="feat-name">Actions</div>
+          <div class="feat-desc">CI/CD 자동화. push·PR·스케줄 등 이벤트에 워크플로우 실행. 빌드·테스트·배포 자동화. YAML 파일로 정의.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📋</div>
+          <div class="feat-name">Projects</div>
+          <div class="feat-desc">칸반 보드·테이블·로드맵 형태의 프로젝트 관리 도구. 이슈와 PR을 연동해 진행 상황 시각화.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📖</div>
+          <div class="feat-name">Wiki</div>
+          <div class="feat-desc">저장소별 마크다운 문서 공간. README만으로 부족한 긴 문서, 가이드, 설계 문서 작성.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">💬</div>
+          <div class="feat-name">Discussions</div>
+          <div class="feat-desc">포럼형 커뮤니티 공간. Q&A, 아이디어, 공지 카테고리. 이슈와 달리 느슨한 대화 목적.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📦</div>
+          <div class="feat-name">Packages</div>
+          <div class="feat-desc">npm·Docker·Maven 등 패키지 레지스트리. 코드와 같은 위치에서 패키지 게시·버전 관리.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🌐</div>
+          <div class="feat-name">Pages</div>
+          <div class="feat-desc">저장소에서 정적 사이트를 무료로 호스팅. <code style="color:var(--blue)">username.github.io/repo</code> 주소로 배포. Jekyll 또는 순수 HTML.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔒</div>
+          <div class="feat-name">Security</div>
+          <div class="feat-desc">Dependabot(의존성 취약점 자동 PR), Code scanning(CodeQL), Secret scanning(민감 정보 감지).</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📊</div>
+          <div class="feat-name">Insights</div>
+          <div class="feat-desc">저장소 통계 — 기여자 현황, 커밋 빈도, 코드 변경량, 트래픽, 포크·스타 추이 차트.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🏷️</div>
+          <div class="feat-name">Releases</div>
+          <div class="feat-desc">태그 기반 버전 릴리스. 바이너리 첨부 가능. 자동 생성 릴리스 노트. GitHub Actions로 자동 배포 트리거.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">💻</div>
+          <div class="feat-name">Codespaces</div>
+          <div class="feat-desc">브라우저·VS Code에서 클라우드 개발환경 즉시 실행. devcontainer.json으로 환경 정의. 무료 월 60시간.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🤖</div>
+          <div class="feat-name">Copilot</div>
+          <div class="feat-desc">AI 코드 자동완성·채팅·PR 리뷰. IDE 플러그인, GitHub.com 내 채팅, CLI 지원. 유료(개인 $10/월).</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔱</div>
+          <div class="feat-name">Fork & Star</div>
+          <div class="feat-desc">Fork: 저장소 복제해 독립적으로 수정. Star: 북마크·관심 표시. Watching: 알림 레벨 설정.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🛡️</div>
+          <div class="feat-name">Branch Protection</div>
+          <div class="feat-desc">main 브랜치 직접 push 차단, PR 필수, 승인 인원 설정, CI 통과 필수, 서명 커밋 요구 등 규칙 설정.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🔍 GitHub 검색 문법</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="code">repo:owner/name</span></td><td>특정 저장소 내 검색</td></tr>
+            <tr><td><span class="code">user:username</span></td><td>특정 사용자의 저장소/코드 검색</td></tr>
+            <tr><td><span class="code">is:issue is:open label:bug</span></td><td>열린 버그 이슈 검색</td></tr>
+            <tr><td><span class="code">is:pr is:merged</span></td><td>병합된 PR 검색</td></tr>
+            <tr><td><span class="code">author:username</span></td><td>특정 사용자가 작성한 이슈/PR</td></tr>
+            <tr><td><span class="code">assignee:username</span></td><td>담당자가 특정 사용자인 항목</td></tr>
+            <tr><td><span class="code">language:javascript</span></td><td>특정 언어의 저장소/코드 검색</td></tr>
+            <tr><td><span class="code">stars:>1000</span></td><td>스타 1000개 이상인 저장소</td></tr>
+            <tr><td><span class="code">created:>2024-01-01</span></td><td>특정 날짜 이후 생성된 항목</td></tr>
+            <tr><td><span class="code">path:src/**.ts</span></td><td>특정 경로·확장자 파일 내 코드 검색</td></tr>
+            <tr><td><span class="code">NOT fork:true</span></td><td>포크 저장소 제외</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🏷️ 이슈/PR 마크다운 특수 문법</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr><td><span class="code">#123</span></td><td>같은 저장소의 이슈·PR #123 링크</td></tr>
+            <tr><td><span class="code">owner/repo#123</span></td><td>다른 저장소의 이슈·PR 링크</td></tr>
+            <tr><td><span class="code">@username</span></td><td>멘션 — 해당 사람에게 알림 발송</td></tr>
+            <tr><td><span class="code">SHA</span> (40자 커밋 해시)</td><td>커밋 링크로 자동 변환</td></tr>
+            <tr><td><span class="code">Closes #123</span></td><td>PR 병합 시 이슈 #123 자동 닫기</td></tr>
+            <tr><td><span class="code">Fixes / Resolves #123</span></td><td>위와 동일 효과</td></tr>
+            <tr><td><span class="code">- [ ] 할 일</span></td><td>체크리스트 (이슈/PR 진행률 표시)</td></tr>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- ══════════════════════════════ CLI ══════════════════════════════ -->
+    <div class="panel" id="panel-cli">
+      <div class="section-title">💻 GitHub CLI (gh)</div>
+      <div class="section-sub"><span class="code">gh</span> 명령어로 터미널에서 GitHub 작업을 바로 처리 — <span class="code">brew install gh</span> 또는 <a href="https://cli.github.com" style="color:var(--blue)">cli.github.com</a> 에서 설치</div>
+
+      <div class="card" id="cli-auth">
+        <div class="card-header">🔑 인증</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh auth login</span></td><td class="desc-cell">GitHub 계정 로그인 (브라우저 또는 토큰)</td></tr>
+            <tr><td><span class="code">gh auth logout</span></td><td class="desc-cell">로그아웃</td></tr>
+            <tr><td><span class="code">gh auth status</span></td><td class="desc-cell">현재 인증 상태 확인</td></tr>
+            <tr><td><span class="code">gh auth token</span></td><td class="desc-cell">현재 토큰 출력</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="cli-repo">
+        <div class="card-header">📁 저장소</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh repo create</span></td><td class="desc-cell">새 저장소 생성 (인터랙티브)</td></tr>
+            <tr><td><span class="code">gh repo clone owner/repo</span></td><td class="desc-cell">저장소 클론</td></tr>
+            <tr><td><span class="code">gh repo fork owner/repo</span></td><td class="desc-cell">저장소 포크</td></tr>
+            <tr><td><span class="code">gh repo view</span></td><td class="desc-cell">현재 저장소 정보 보기</td></tr>
+            <tr><td><span class="code">gh repo view --web</span></td><td class="desc-cell">브라우저에서 저장소 열기</td></tr>
+            <tr><td><span class="code">gh repo list</span></td><td class="desc-cell">내 저장소 목록</td></tr>
+            <tr><td><span class="code">gh repo delete owner/repo</span></td><td class="desc-cell">저장소 삭제</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="cli-pr">
+        <div class="card-header">🔀 Pull Request</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh pr create</span></td><td class="desc-cell">PR 생성 (인터랙티브)</td></tr>
+            <tr><td><span class="code">gh pr create -t "제목" -b "본문"</span></td><td class="desc-cell">제목·본문 지정해 PR 생성</td></tr>
+            <tr><td><span class="code">gh pr list</span></td><td class="desc-cell">PR 목록 보기</td></tr>
+            <tr><td><span class="code">gh pr view 123</span></td><td class="desc-cell">PR #123 상세 보기</td></tr>
+            <tr><td><span class="code">gh pr checkout 123</span></td><td class="desc-cell">PR #123 브랜치 체크아웃</td></tr>
+            <tr><td><span class="code">gh pr merge 123</span></td><td class="desc-cell">PR #123 병합</td></tr>
+            <tr><td><span class="code">gh pr merge --squash</span></td><td class="desc-cell">스쿼시 병합</td></tr>
+            <tr><td><span class="code">gh pr merge --rebase</span></td><td class="desc-cell">리베이스 병합</td></tr>
+            <tr><td><span class="code">gh pr close 123</span></td><td class="desc-cell">PR 닫기</td></tr>
+            <tr><td><span class="code">gh pr review 123 --approve</span></td><td class="desc-cell">PR 승인</td></tr>
+            <tr><td><span class="code">gh pr review 123 --request-changes</span></td><td class="desc-cell">변경 요청</td></tr>
+            <tr><td><span class="code">gh pr diff 123</span></td><td class="desc-cell">PR diff 보기</td></tr>
+            <tr><td><span class="code">gh pr status</span></td><td class="desc-cell">내 PR 상태 요약</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="cli-issue">
+        <div class="card-header">🐛 이슈</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh issue create</span></td><td class="desc-cell">새 이슈 생성</td></tr>
+            <tr><td><span class="code">gh issue create -t "제목" -b "내용"</span></td><td class="desc-cell">제목·본문 지정해 생성</td></tr>
+            <tr><td><span class="code">gh issue list</span></td><td class="desc-cell">이슈 목록</td></tr>
+            <tr><td><span class="code">gh issue list -l bug</span></td><td class="desc-cell">bug 레이블 이슈만 보기</td></tr>
+            <tr><td><span class="code">gh issue view 42</span></td><td class="desc-cell">이슈 #42 보기</td></tr>
+            <tr><td><span class="code">gh issue close 42</span></td><td class="desc-cell">이슈 #42 닫기</td></tr>
+            <tr><td><span class="code">gh issue reopen 42</span></td><td class="desc-cell">이슈 #42 다시 열기</td></tr>
+            <tr><td><span class="code">gh issue comment 42 -b "댓글"</span></td><td class="desc-cell">댓글 작성</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="cli-actions">
+        <div class="card-header">⚙️ Actions / 워크플로우</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh run list</span></td><td class="desc-cell">최근 워크플로우 실행 목록</td></tr>
+            <tr><td><span class="code">gh run view</span></td><td class="desc-cell">실행 상세 보기</td></tr>
+            <tr><td><span class="code">gh run watch</span></td><td class="desc-cell">실행 실시간 추적</td></tr>
+            <tr><td><span class="code">gh workflow run workflow.yml</span></td><td class="desc-cell">워크플로우 수동 실행</td></tr>
+            <tr><td><span class="code">gh workflow list</span></td><td class="desc-cell">워크플로우 목록</td></tr>
+            <tr><td><span class="code">gh run cancel</span></td><td class="desc-cell">실행 중인 워크플로우 취소</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="cli-release">
+        <div class="card-header">🏷️ 릴리스 / 기타</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">gh release create v1.0.0</span></td><td class="desc-cell">릴리스 생성</td></tr>
+            <tr><td><span class="code">gh release list</span></td><td class="desc-cell">릴리스 목록</td></tr>
+            <tr><td><span class="code">gh release download v1.0.0</span></td><td class="desc-cell">릴리스 파일 다운로드</td></tr>
+            <tr><td><span class="code">gh gist create file.txt</span></td><td class="desc-cell">Gist 생성</td></tr>
+            <tr><td><span class="code">gh gist list</span></td><td class="desc-cell">내 Gist 목록</td></tr>
+            <tr><td><span class="code">gh secret set MY_SECRET</span></td><td class="desc-cell">저장소 Secret 설정</td></tr>
+            <tr><td><span class="code">gh secret list</span></td><td class="desc-cell">Secret 목록</td></tr>
+            <tr><td><span class="code">gh api /repos/owner/repo</span></td><td class="desc-cell">GitHub REST API 직접 호출</td></tr>
+            <tr><td><span class="code">gh browse</span></td><td class="desc-cell">현재 저장소를 브라우저로 열기</td></tr>
+            <tr><td><span class="code">gh search repos "키워드"</span></td><td class="desc-cell">저장소 검색</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ 워크플로우 ══════════════════════════════ -->
+    <div class="panel" id="panel-workflow">
+      <div class="section-title">🔄 GitHub 워크플로우</div>
+      <div class="section-sub">팀 협업과 배포에서 자주 쓰이는 흐름 정리</div>
+
+      <div class="card">
+        <div class="card-header">📌 GitHub Flow (기본 브랜치 전략)</div>
+        <div class="card-body">
+          <div class="flow">
+            <div class="flow-step highlight">main</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">feature 브랜치<br>생성</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">커밋 & 푸시</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">PR 생성</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">코드 리뷰<br>& 승인</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step highlight">main 병합<br>& 배포</div>
+          </div>
+          <table class="sc-table">
+            <tr><td><b>1. 브랜치 생성</b></td><td><span class="code">git checkout -b feature/기능명</span> — main에서 바로 분기</td></tr>
+            <tr><td><b>2. 작업 & 커밋</b></td><td>작은 단위로 자주 커밋. 커밋 메시지는 <code style="color:var(--blue)">feat: ...</code>, <code style="color:var(--blue)">fix: ...</code> 형태 권장</td></tr>
+            <tr><td><b>3. PR 생성</b></td><td>GitHub에서 Pull Request 생성. 제목·설명·리뷰어 지정</td></tr>
+            <tr><td><b>4. 리뷰</b></td><td>리뷰어가 코드 리뷰 → Approve 또는 Request changes</td></tr>
+            <tr><td><b>5. 병합</b></td><td>Merge / Squash merge / Rebase merge 선택 후 병합</td></tr>
+            <tr><td><b>6. 브랜치 삭제</b></td><td>병합 후 feature 브랜치 삭제 (GitHub에서 버튼 제공)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🔀 병합 전략 비교</div>
+        <div class="card-body">
+          <table class="sc-table">
+            <tr>
+              <td><b>Merge commit</b></td>
+              <td>모든 커밋 보존 + 병합 커밋 추가. 히스토리 그대로 보존. 기본값.</td>
+            </tr>
+            <tr>
+              <td><b>Squash merge</b></td>
+              <td>PR의 모든 커밋을 하나로 압축. main 히스토리가 깔끔해짐.</td>
+            </tr>
+            <tr>
+              <td><b>Rebase merge</b></td>
+              <td>커밋을 main 뒤에 재정렬. 선형 히스토리. 병합 커밋 없음.</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">⚙️ Actions 워크플로우 기본 구조</div>
+        <div class="card-body" style="padding:16px;">
+          <pre style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;font-size:12px;color:var(--txt2);overflow-x:auto;line-height:1.7;"><span style="color:var(--txt3)"># .github/workflows/ci.yml</span>
+<span style="color:var(--blue)">name</span>: <span style="color:var(--green)">CI</span>
+
+<span style="color:var(--blue)">on</span>:
+  <span style="color:var(--blue)">push</span>:
+    <span style="color:var(--blue)">branches</span>: [ <span style="color:var(--green)">main</span> ]
+  <span style="color:var(--blue)">pull_request</span>:
+    <span style="color:var(--blue)">branches</span>: [ <span style="color:var(--green)">main</span> ]
+
+<span style="color:var(--blue)">jobs</span>:
+  <span style="color:var(--blue)">build</span>:
+    <span style="color:var(--blue)">runs-on</span>: <span style="color:var(--green)">ubuntu-latest</span>
+    <span style="color:var(--blue)">steps</span>:
+      - <span style="color:var(--blue)">uses</span>: <span style="color:var(--green)">actions/checkout@v4</span>
+      - <span style="color:var(--blue)">name</span>: <span style="color:var(--green)">Setup Node</span>
+        <span style="color:var(--blue)">uses</span>: <span style="color:var(--green)">actions/setup-node@v4</span>
+        <span style="color:var(--blue)">with</span>:
+          <span style="color:var(--blue)">node-version</span>: <span style="color:var(--orange)">'20'</span>
+      - <span style="color:var(--blue)">run</span>: <span style="color:var(--green)">npm ci</span>
+      - <span style="color:var(--blue)">run</span>: <span style="color:var(--green)">npm test</span></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🏷️ 커밋 메시지 컨벤션 (Conventional Commits)</div>
+        <div class="card-body">
+          <div class="tags">
+            <div class="tag tag-green">feat: 새 기능</div>
+            <div class="tag tag-red">fix: 버그 수정</div>
+            <div class="tag tag-blue">docs: 문서 수정</div>
+            <div class="tag tag-purple">refactor: 리팩토링</div>
+            <div class="tag tag-orange">chore: 빌드/설정</div>
+            <div class="tag tag-yellow">test: 테스트 추가</div>
+            <div class="tag tag-blue">style: 포맷/공백</div>
+            <div class="tag tag-red">revert: 되돌리기</div>
+            <div class="tag tag-purple">perf: 성능 개선</div>
+            <div class="tag tag-orange">ci: CI 설정</div>
+          </div>
+          <table class="sc-table" style="margin-top:0;">
+            <tr><td><b>형식</b></td><td><span class="code">타입(스코프): 제목</span> — 예) <span class="code">feat(auth): 소셜 로그인 추가</span></td></tr>
+            <tr><td><b>Breaking change</b></td><td><span class="code">feat!: 기존 API 제거</span> 또는 본문에 <span class="code">BREAKING CHANGE:</span> 기재</td></tr>
+            <tr><td><b>자동 버전 범프</b></td><td>fix → patch, feat → minor, BREAKING CHANGE → major (semver)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">🔗 유용한 URL 패턴</div>
+        <div class="card-body">
+          <table class="cli-table">
+            <tr><td><span class="code">github.com/owner/repo/compare/브랜치A...브랜치B</span></td><td class="desc-cell">두 브랜치 diff 비교</td></tr>
+            <tr><td><span class="code">github.com/owner/repo/blob/main/파일경로#L10-L25</span></td><td class="desc-cell">특정 파일 줄 범위 링크</td></tr>
+            <tr><td><span class="code">github.com/owner/repo/tree/main/폴더</span></td><td class="desc-cell">특정 폴더 바로가기</td></tr>
+            <tr><td><span class="code">github.com/owner/repo/commit/SHA</span></td><td class="desc-cell">특정 커밋 보기</td></tr>
+            <tr><td><span class="code">raw.githubusercontent.com/owner/repo/main/파일</span></td><td class="desc-cell">파일 원본 내용 직접 접근</td></tr>
+            <tr><td><span class="code">github.com/owner/repo/releases/latest</span></td><td class="desc-cell">최신 릴리스 바로가기</td></tr>
+            <tr><td><span class="code">github.dev/owner/repo</span></td><td class="desc-cell">웹 VS Code에서 저장소 열기</td></tr>
+            <tr><td><span class="code">github1s.com/owner/repo</span></td><td class="desc-cell">VS Code 스타일로 저장소 탐색 (서드파티)</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <script>
-  // ── 로딩 바 애니메이션 ──
-  let loadPct = 0;
-  const bar = document.getElementById('load-bar');
-  const msg = document.getElementById('load-msg');
-  const overlay = document.getElementById('loading-overlay');
-
-  const MSGS = [
-    [0,  '에뮬레이터 초기화 중...'],
-    [20, 'DOSBox 로딩 중...'],
-    [45, '둠 게임 파일 수신 중...'],
-    [70, 'WAD 파일 처리 중...'],
-    [88, '악마 소환 준비 중...'],
-    [96, '거의 다 됐습니다...'],
-  ];
-
-  const fakeTimer = setInterval(() => {
-    if (loadPct >= 96) { clearInterval(fakeTimer); return; }
-    loadPct = Math.min(96, loadPct + (Math.random() * 3 + 0.5));
-    bar.style.width = loadPct + '%';
-    for (const [pct, m] of MSGS) {
-      if (loadPct >= pct) msg.textContent = m;
-    }
-  }, 300);
-
-  // ── js-dos v7 실행 ──
-  const container = document.getElementById('jsdos');
-
-  Dos(container, {
-    url: 'https://cdn.dos.zone/original/2X/b/b44eb7d566ef52e70ab0fb90ae0c3c9c.jsdos',
-  }).then(ci => {
-    // 로딩 완료
-    clearInterval(fakeTimer);
-    bar.style.width = '100%';
-    msg.textContent = '준비 완료!';
-    setTimeout(() => overlay.classList.add('hide'), 600);
-  }).catch(() => {
-    // 번들 URL 오류 시 대체 시도
-    msg.textContent = '다른 서버에서 재시도 중...';
-    bar.style.width = '30%';
-    Dos(container, {
-      url: 'https://js-dos.com/games/doom.jsdos',
-    }).then(ci => {
-      clearInterval(fakeTimer);
-      bar.style.width = '100%';
-      msg.textContent = '준비 완료!';
-      setTimeout(() => overlay.classList.add('hide'), 600);
-    }).catch(() => {
-      bar.style.background = '#8b0000';
-      msg.textContent = '로딩 실패 — 아래 안내를 확인하세요.';
-    });
+// ── 탭 전환 ──
+const panels={shortcuts:'단축키',features:'기능',cli:'CLI',workflow:'워크플로우'};
+function switchTab(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.textContent.includes(panels[id])) t.classList.add('active');
   });
+  buildSidebar(id);
+  document.querySelector('.main').scrollTop=0;
+}
 
-  // ── 전체화면 ──
-  function goFullscreen() {
-    const wrap = document.getElementById('game-wrap');
-    if (wrap.requestFullscreen) wrap.requestFullscreen();
-    else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+// ── 사이드바 ──
+const sidebarData={
+  shortcuts:[
+    {id:'sc-global',label:'전역 단축키'},
+    {id:'sc-repo',label:'저장소 페이지'},
+    {id:'sc-code',label:'코드 뷰어'},
+    {id:'sc-pr',label:'Pull Request'},
+    {id:'sc-issue',label:'이슈 페이지'},
+    {id:'sc-editor',label:'마크다운 에디터'},
+    {id:'sc-notification',label:'알림'},
+  ],
+  features:[
+    {id:'',label:'주요 기능 카드'},
+    {id:'',label:'검색 문법'},
+    {id:'',label:'마크다운 특수 문법'},
+  ],
+  cli:[
+    {id:'cli-auth',label:'인증'},
+    {id:'cli-repo',label:'저장소'},
+    {id:'cli-pr',label:'Pull Request'},
+    {id:'cli-issue',label:'이슈'},
+    {id:'cli-actions',label:'Actions'},
+    {id:'cli-release',label:'릴리스 / 기타'},
+  ],
+  workflow:[
+    {id:'',label:'GitHub Flow'},
+    {id:'',label:'병합 전략'},
+    {id:'',label:'Actions 구조'},
+    {id:'',label:'커밋 컨벤션'},
+    {id:'',label:'URL 패턴'},
+  ],
+};
+function buildSidebar(id){
+  const sb=document.getElementById('sidebar');
+  const items=sidebarData[id]||[];
+  sb.innerHTML='<div class="sidebar-section"><div class="sidebar-label">목차</div>'+
+    items.map(it=>`<button class="sidebar-item" onclick="${it.id?`scrollTo('${it.id}')`:''}">${it.label}</button>`).join('')+
+  '</div>';
+}
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+buildSidebar('shortcuts');
+
+// ── 검색 ──
+const searchInput=document.getElementById('searchInput');
+searchInput.addEventListener('input',()=>{
+  const q=searchInput.value.trim().toLowerCase();
+  if(!q){
+    document.querySelectorAll('.highlight-match').forEach(el=>{
+      el.outerHTML=el.textContent;
+    });
+    document.querySelectorAll('.sc-table tr,.cli-table tr').forEach(r=>r.style.display='');
+    document.querySelectorAll('.no-result').forEach(el=>el.remove());
+    return;
   }
+  // 테이블 행 필터
+  document.querySelectorAll('.sc-table,.cli-table').forEach(tbl=>{
+    let found=0;
+    tbl.querySelectorAll('tr').forEach(r=>{
+      const txt=r.textContent.toLowerCase();
+      if(txt.includes(q)){ r.style.display=''; found++; }
+      else r.style.display='none';
+    });
+    // 섹션 숨기기
+    const card=tbl.closest('.card');
+    if(card) card.style.display=found>0?'':'none';
+  });
+});
+searchInput.addEventListener('keydown',e=>{
+  if(e.key==='Escape') searchInput.value='';
+});
 </script>
 </body>
 </html>

@@ -159,10 +159,10 @@ const PAGES = {
   },
 
   22: {
-    label : 'DOOM (1993)',
+    label : 'GitHub 정리',
     url   : 'pages/22/',
     thumb : null,
-    desc  : 'id Software 클래식 FPS · 에피소드 1 셰어웨어 · 브라우저 실행',
+    desc  : '단축키 · 주요 기능 · CLI(gh) 명령어 · 워크플로우 총정리',
   },
 
   23: {

@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 코드 레퍼런스</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0d0d1a;--sb:#111122;--panel:#151528;--bdr:#252540;
+  --acc:#6c8eff;--acc2:#a78bfa;--tx:#cccce8;--mu:#5a5a88;
+  --cbg:#080814;--green:#89d185;--yellow:#dcdcaa;--orange:#ce9178;
+  --blue:#9cdcfe;--purple:#c586c0;--num:#b5cea8;
+}
+body{background:var(--bg);color:var(--tx);font:14px/1.6 'Segoe UI',system-ui,sans-serif;display:flex;height:100vh;overflow:hidden;}
+
+/* ── Sidebar ── */
+#sidebar{width:256px;min-width:256px;background:var(--sb);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;}
+#sw{padding:10px 12px;border-bottom:1px solid var(--bdr);}
+#search{width:100%;padding:7px 12px;background:#181830;border:1px solid var(--bdr);border-radius:8px;color:var(--tx);font-size:13px;outline:none;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--mu);}
+#nav{flex:1;overflow-y:auto;padding:6px 0;}
+#nav::-webkit-scrollbar{width:4px;}
+#nav::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+.ch{padding:7px 12px 3px;font-size:10px;font-weight:700;letter-spacing:1.8px;color:var(--mu);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+.ch:hover{color:var(--tx);}
+.ch .ar{transition:transform .18s;font-size:9px;}
+.ch.col .ar{transform:rotate(-90deg);}
+.ci{}
+.ci.hid{display:none;}
+.ni{padding:5px 12px 5px 20px;cursor:pointer;font-size:12.5px;border-left:2px solid transparent;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9898c0;}
+.ni:hover{background:#1c1c36;color:var(--tx);}
+.ni.on{border-left-color:var(--acc);color:var(--acc);background:#181830;}
+
+/* ── Main ── */
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+#ph{flex:1;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:16px;letter-spacing:2px;}
+#det{flex:1;overflow-y:auto;padding:28px 36px;display:none;}
+#det::-webkit-scrollbar{width:5px;}
+#det::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+#det.show{display:block;}
+#dcat{font-size:11px;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+#dname{font-size:22px;font-weight:700;color:#e8e8ff;margin-bottom:8px;}
+#ddesc{color:#9898c0;margin-bottom:22px;line-height:1.75;max-width:680px;font-size:13.5px;}
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tb{padding:5px 18px;border:1px solid var(--bdr);border-radius:20px;background:transparent;color:var(--mu);cursor:pointer;font-size:13px;transition:all .14s;}
+.tb:hover{border-color:var(--acc);color:var(--acc);}
+.tb.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600;}
+.cw{position:relative;max-width:780px;}
+#copybtn{position:absolute;top:10px;right:10px;padding:4px 11px;background:#1e1e38;border:1px solid var(--bdr);border-radius:6px;color:var(--mu);cursor:pointer;font-size:12px;transition:all .14s;z-index:2;}
+#copybtn:hover{background:#2a2a48;color:var(--tx);}
+pre{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:20px 18px;overflow-x:auto;font:13px/1.9 'Fira Code','Consolas','Courier New',monospace;tab-size:4;min-height:80px;}
+pre::-webkit-scrollbar{height:4px;}
+pre::-webkit-scrollbar-thumb{background:#2a2a48;border-radius:2px;}
+
+/* ── Syntax ── */
+.kw{color:var(--purple);}
+.bi{color:var(--blue);}
+.st{color:var(--orange);}
+.cm{color:#4e7550;font-style:italic;}
+.nu{color:var(--num);}
+.de{color:var(--yellow);}
+.fn{color:#dcdcaa;}
+</style>
+</head>
+<body>
+<aside id="sidebar">
+  <div id="sw"><input id="search" placeholder="🔍  검색..."></div>
+  <nav id="nav"></nav>
+</aside>
+<div id="main">
+  <div id="ph">← 항목을 선택하세요</div>
+  <div id="det">
+    <div id="dcat"></div>
+    <div id="dname"></div>
+    <div id="ddesc"></div>
+    <div class="tabs">
+      <button class="tb on" data-i="0">일반</button>
+      <button class="tb" data-i="1">심화</button>
+      <button class="tb" data-i="2">실전</button>
+    </div>
+    <div class="cw">
+      <button id="copybtn">복사</button>
+      <pre id="codeblock"></pre>
+    </div>
+  </div>
+</div>
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const DATA = [
+  /* === 기본 문법 === */
+  {cat:'기본 문법',name:'변수·자료형',desc:'Python은 동적 타이핑 언어입니다. 변수 선언 없이 바로 값을 할당하며 int, float, str, bool, None을 기본 자료형으로 제공합니다.',ex:[
+`x = 42          # int
+y = 3.14        # float
+name = "파이썬"  # str
+flag = True     # bool
+empty = None    # None
+print(type(x))  # <class 'int'>`,
+`a, b, c = 1, 2, 3   # 다중 할당
+x = y = 0            # 연쇄 할당
+big = 1_000_000      # 숫자 구분자
+print(int("42"), float("3.14"), str(100))`,
+`# 설정값 패턴
+DB_HOST = "localhost"
+DB_PORT = 5432
+DEBUG: bool = True     # 타입힌트 포함
+MAX_CONN: int = 10`
+  ]},
+
+  {cat:'기본 문법',name:'문자열·f-string',desc:'str은 불변 시퀀스입니다. f-string(Python 3.6+)으로 변수를 직접 삽입하고, 포맷 명세로 출력 형식을 제어합니다.',ex:[
+`s = "Hello, World!"
+print(s.upper())         # HELLO, WORLD!
+print(s.replace("World","파이썬"))
+print(len(s), s[0], s[-1])`,
+`name = "Alice"; score = 98.6
+print(f"{name!r}")          # 'Alice'  (repr)
+print(f"{score:.1f}")       # 98.6
+print(f"{'제목':^20}")       # 가운데 정렬 20칸
+print(f"{1000000:,}")       # 1,000,000`,
+`# 실전: 로그 메시지 포맷
+user_id = 42; action = "login"; ip = "127.0.0.1"
+log = f"[INFO] user={user_id} action={action} ip={ip}"
+query = f"SELECT * FROM users WHERE id = {user_id}"`
+  ]},
+
+  {cat:'기본 문법',name:'리스트',desc:'list는 순서가 있는 가변 시퀀스입니다. append, extend, insert, remove, pop, sort, index 등 다양한 메서드를 제공합니다.',ex:[
+`nums = [1, 2, 3, 4, 5]
+nums.append(6)        # 끝에 추가
+nums.insert(0, 0)     # 위치에 삽입
+nums.remove(3)        # 값으로 삭제
+print(nums.index(4))  # 위치 반환`,
+`a = [3, 1, 4, 1, 5]
+a.sort()                    # 제자리 정렬
+b = sorted(a, reverse=True) # 새 리스트 반환
+a.extend([9, 2, 6])
+print(a.count(1))  # 1의 개수`,
+`# 스택(LIFO)
+stack = []
+stack.append("a"); stack.append("b")
+top = stack.pop()   # "b"
+
+# 큐(FIFO) — collections.deque 권장
+from collections import deque
+q = deque([1,2,3]); q.appendleft(0); q.popleft()`
+  ]},
+
+  {cat:'기본 문법',name:'딕셔너리',desc:'dict는 키-값 쌍의 가변 매핑입니다. Python 3.7+에서 삽입 순서를 유지합니다. get, setdefault, update, items 등을 활용합니다.',ex:[
+`person = {"name": "Alice", "age": 30}
+print(person["name"])       # Alice
+print(person.get("email", "없음"))  # 없음
+person["city"] = "Seoul"    # 추가
+del person["age"]            # 삭제`,
+`d = {"a":1, "b":2, "c":3}
+d.update({"b":20, "d":4})    # 병합·갱신
+for k, v in d.items():
+    print(f"{k}: {v}")
+keys = list(d.keys())
+vals = list(d.values())`,
+`# 카운터 패턴
+from collections import Counter
+words = ["apple","banana","apple","cherry","banana","apple"]
+cnt = Counter(words)
+print(cnt.most_common(2))  # [('apple',3),('banana',2)]
+
+# setdefault로 그룹화
+groups = {}
+for item in ["a1","b2","a3","b4"]:
+    groups.setdefault(item[0],[]).append(item)`
+  ]},
+
+  {cat:'기본 문법',name:'튜플·셋',desc:'tuple은 불변 시퀀스(좌표, 레코드 등), set은 순서 없는 고유값 집합입니다. 집합 연산(합집합·교집합·차집합)을 지원합니다.',ex:[
+`pt = (3, 4)           # 튜플 (불변)
+x, y = pt             # 언패킹
+a = {1, 2, 3, 2, 1}  # 셋 — {1,2,3}
+a.add(4); a.discard(1)
+print(2 in a)          # True`,
+`A = {1,2,3,4}; B = {3,4,5,6}
+print(A | B)   # 합집합
+print(A & B)   # 교집합 {3,4}
+print(A - B)   # 차집합 {1,2}
+print(A ^ B)   # 대칭차집합`,
+`# 중복 제거
+items = [1,2,2,3,3,3,4]
+unique = list(set(items))
+
+# 네임드튜플 — 의미있는 필드명
+from collections import namedtuple
+Point = namedtuple("Point", ["x","y"])
+p = Point(10, 20); print(p.x, p.y)`
+  ]},
+
+  {cat:'기본 문법',name:'슬라이싱',desc:'시퀀스(리스트·문자열·튜플)를 [start:stop:step]으로 부분 추출합니다. 음수 인덱스와 step을 조합해 역순이나 간격 선택도 가능합니다.',ex:[
+`s = [0,1,2,3,4,5,6,7,8,9]
+print(s[2:5])    # [2,3,4]
+print(s[:3])     # [0,1,2]
+print(s[7:])     # [7,8,9]
+print(s[::2])    # [0,2,4,6,8]
+print(s[::-1])   # 역순`,
+`text = "Hello, World!"
+print(text[7:12])   # World
+print(text[-6:-1])  # World
+# 슬라이스 객체 재사용
+sl = slice(1, 8, 2)
+print([0,1,2,3,4,5,6,7,8][sl])  # [1,3,5,7]`,
+`# 리스트 슬라이스 복사
+original = [1,2,3,4,5]
+copy = original[:]         # 얕은 복사
+original[1:3] = [20,30]    # 슬라이스 치환
+# 문자열 처리
+csv_line = "2024,01,15,Seoul"
+parts = csv_line.split(","); year = int(parts[0])`
+  ]},
+
+  /* === 제어 흐름 === */
+  {cat:'제어 흐름',name:'if·elif·else',desc:'조건에 따라 코드 블록을 실행합니다. Python에서는 switch 대신 elif 체인, 또는 3.10+의 match·case를 사용합니다.',ex:[
+`score = 85
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+else:
+    grade = "F"
+print(grade)  # B`,
+`# 삼항 표현식
+x = 10
+result = "양수" if x > 0 else "음수 또는 0"
+
+# 중첩 조건
+age, member = 20, True
+if age >= 18:
+    if member:
+        print("회원 할인 적용")`,
+`# 다중 조건 — any/all 활용
+scores = [85, 90, 78, 92]
+if all(s >= 70 for s in scores):
+    print("전원 합격")
+if any(s >= 95 for s in scores):
+    print("우수자 있음")`
+  ]},
+
+  {cat:'제어 흐름',name:'for·in',desc:'이터러블(리스트·문자열·range·딕셔너리 등)의 각 요소를 순회합니다. enumerate로 인덱스를 함께 받고, zip으로 여러 이터러블을 병렬 순회합니다.',ex:[
+`fruits = ["apple","banana","cherry"]
+for fruit in fruits:
+    print(fruit)
+
+for i in range(5):   # 0,1,2,3,4
+    print(i)`,
+`# enumerate — 인덱스 포함
+for i, v in enumerate(["a","b","c"], start=1):
+    print(i, v)  # 1 a, 2 b, 3 c
+
+# zip — 병렬 순회
+names = ["Alice","Bob","Carol"]
+scores = [90, 85, 92]
+for name, score in zip(names, scores):
+    print(f"{name}: {score}")`,
+`# 딕셔너리 순회
+data = {"name":"Alice","age":30,"city":"Seoul"}
+for key, val in data.items():
+    print(f"{key} = {val}")
+
+# 파일 줄 단위 읽기
+with open("data.txt") as f:
+    for line in f:
+        print(line.strip())`
+  ]},
+
+  {cat:'제어 흐름',name:'while',desc:'조건이 참인 동안 블록을 반복합니다. 무한 루프와 break를 조합하거나, while-else 구문으로 루프 종료 원인을 구분할 수 있습니다.',ex:[
+`count = 0
+while count < 5:
+    print(count)
+    count += 1
+
+# 무한 루프 + break
+while True:
+    cmd = input("명령: ")
+    if cmd == "quit":
+        break`,
+`# while-else: break 없이 종료되면 else 실행
+n = 2
+while n < 100:
+    if n % 7 == 0:
+        print(f"{n}는 7의 배수")
+        break
+    n += 1
+else:
+    print("7의 배수 없음")`,
+`# 재시도 패턴
+import time
+MAX = 3; attempt = 0
+while attempt < MAX:
+    try:
+        result = fetch_data()   # 외부 API 호출
+        break
+    except Exception:
+        attempt += 1
+        time.sleep(2 ** attempt)  # 지수 백오프`
+  ]},
+
+  {cat:'제어 흐름',name:'break·continue·pass',desc:'break는 루프를 즉시 탈출, continue는 나머지를 건너뛰고 다음 반복으로, pass는 아무 동작 없이 빈 블록을 채웁니다.',ex:[
+`for n in range(10):
+    if n == 5:
+        break       # 루프 탈출
+    if n % 2 == 0:
+        continue    # 짝수 건너뜀
+    print(n)        # 1,3 출력`,
+`# pass: 구현 예정 자리
+class MyError(Exception):
+    pass   # 나중에 채울 빈 클래스
+
+def todo():
+    pass   # 미구현 함수`,
+`# 중첩 루프 탈출 — 플래그 사용
+found = False
+for row in matrix:
+    for val in row:
+        if val == target:
+            found = True; break
+    if found: break`
+  ]},
+
+  {cat:'제어 흐름',name:'match·case (3.10+)',desc:'구조적 패턴 매칭입니다. 값, 타입, 시퀀스, 매핑, OR 패턴을 지원하며 if-elif 체인보다 의도를 명확하게 표현합니다.',ex:[
+`command = "quit"
+match command:
+    case "go":
+        print("이동")
+    case "quit" | "exit":
+        print("종료")
+    case _:
+        print("알 수 없는 명령")`,
+`point = (1, 0)
+match point:
+    case (0, 0):
+        print("원점")
+    case (x, 0):
+        print(f"X축 위 ({x},0)")
+    case (0, y):
+        print(f"Y축 위 (0,{y})")
+    case (x, y):
+        print(f"점 ({x},{y})")`,
+`# 딕셔너리 패턴 매칭
+def handle(event):
+    match event:
+        case {"type":"click","button":"left"}:
+            print("좌클릭")
+        case {"type":"key","key":k}:
+            print(f"키 입력: {k}")
+        case _:
+            print("기타 이벤트")`
+  ]},
+
+  /* === 함수 === */
+  {cat:'함수',name:'def·기본인수',desc:'def로 함수를 정의합니다. 기본값 인수, 위치 인수, 반환값을 지원하며 함수도 일급 객체이므로 변수에 할당하거나 인수로 전달할 수 있습니다.',ex:[
+`def greet(name, greeting="안녕"):
+    return f"{greeting}, {name}!"
+
+print(greet("Alice"))          # 안녕, Alice!
+print(greet("Bob","반갑"))      # 반갑, Bob!`,
+`# 키워드 인수, 위치 전용(/), 키워드 전용(*)
+def create(name, /, age, *, active=True):
+    return {"name":name,"age":age,"active":active}
+
+# name은 위치 전용, active는 키워드 전용
+obj = create("Alice", age=30, active=False)`,
+`# 함수를 인수·반환값으로
+def apply(func, values):
+    return [func(v) for v in values]
+
+print(apply(str.upper, ["a","b","c"]))
+# ['A', 'B', 'C']
+
+def make_adder(n):
+    def add(x): return x + n
+    return add
+add5 = make_adder(5); print(add5(3))  # 8`
+  ]},
+
+  {cat:'함수',name:'*args·**kwargs',desc:'*args는 가변 위치 인수를 튜플로, **kwargs는 가변 키워드 인수를 딕셔너리로 받습니다. 두 가지를 조합해 매우 유연한 함수 서명을 만들 수 있습니다.',ex:[
+`def total(*args):
+    return sum(args)
+
+print(total(1,2,3))     # 6
+print(total(10,20,30))  # 60
+
+def info(**kwargs):
+    for k,v in kwargs.items():
+        print(f"{k}: {v}")
+info(name="Alice", age=30)`,
+`def func(a, b, *args, **kwargs):
+    print(a, b, args, kwargs)
+
+func(1, 2, 3, 4, x=10, y=20)
+# 1 2 (3,4) {'x':10,'y':20}
+
+# 언패킹으로 전달
+nums = [3,4]; opts = {"x":10}
+func(1, 2, *nums, **opts)`,
+`# 래퍼 함수 — 원본 서명 보존
+import functools
+def logger(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f"호출: {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"반환: {result}")
+        return result
+    return wrapper`
+  ]},
+
+  {cat:'함수',name:'lambda',desc:'한 줄짜리 익명 함수입니다. sorted의 key, map/filter의 함수 인수 등 간단한 콜백이 필요한 곳에 주로 사용합니다.',ex:[
+`square = lambda x: x ** 2
+print(square(5))  # 25
+
+add = lambda a, b: a + b
+print(add(3, 4))  # 7`,
+`# sorted key로 활용
+students = [("Alice",85),("Bob",92),("Carol",78)]
+by_score = sorted(students, key=lambda s: s[1], reverse=True)
+print(by_score[0])  # ('Bob',92)`,
+`# 다중 기준 정렬
+data = [{"name":"Alice","dept":"B","age":30},
+        {"name":"Bob","dept":"A","age":25}]
+data.sort(key=lambda x: (x["dept"], x["age"]))`
+  ]},
+
+  {cat:'함수',name:'데코레이터',desc:'함수(또는 클래스)를 감싸 동작을 변경하는 고차 함수 패턴입니다. @구문이 func = decorator(func) 단축 표기입니다.',ex:[
+`def timer(func):
+    import time
+    def wrapper(*a,**kw):
+        t = time.time()
+        r = func(*a,**kw)
+        print(f"{func.__name__}: {time.time()-t:.3f}s")
+        return r
+    return wrapper
+
+@timer
+def slow():
+    import time; time.sleep(0.1)
+slow()`,
+`# 인수 있는 데코레이터
+def repeat(n):
+    def deco(func):
+        def wrapper(*a,**kw):
+            for _ in range(n): func(*a,**kw)
+        return wrapper
+    return deco
+
+@repeat(3)
+def hello(): print("안녕!")
+hello()  # 3번 출력`,
+`# 클래스 데코레이터 — 캐싱
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def fib(n):
+    if n < 2: return n
+    return fib(n-1) + fib(n-2)
+
+print(fib(50))  # 빠름`
+  ]},
+
+  {cat:'함수',name:'클로저',desc:'내부 함수가 외부 함수의 변수를 캡처해 그 범위가 끝난 뒤에도 참조하는 기법입니다. 상태를 캡슐화하거나 팩토리 함수를 만들 때 유용합니다.',ex:[
+`def counter():
+    count = 0
+    def inc():
+        nonlocal count
+        count += 1
+        return count
+    return inc
+
+c = counter()
+print(c(), c(), c())  # 1 2 3`,
+`# 팩토리 패턴
+def multiplier(factor):
+    def multiply(x):
+        return x * factor
+    return multiply
+
+double = multiplier(2)
+triple = multiplier(3)
+print(double(5), triple(5))  # 10 15`,
+`# 설정 캡처
+def make_validator(min_val, max_val):
+    def validate(value):
+        if not (min_val <= value <= max_val):
+            raise ValueError(f"{min_val}~{max_val} 범위여야 합니다")
+        return True
+    return validate
+
+check_age = make_validator(0, 150)
+check_score = make_validator(0, 100)`
+  ]},
+
+  /* === 클래스·OOP === */
+  {cat:'클래스·OOP',name:'class·__init__',desc:'class로 새로운 자료형을 정의합니다. __init__은 인스턴스 초기화 메서드이며, self는 인스턴스 자기 자신을 가리킵니다.',ex:[
+`class Dog:
+    species = "Canis lupus"  # 클래스 변수
+
+    def __init__(self, name, age):
+        self.name = name     # 인스턴스 변수
+        self.age  = age
+
+    def bark(self):
+        return f"{self.name}: 왈!"
+
+d = Dog("바둑이", 3)
+print(d.bark())`,
+`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner   = owner
+        self._balance = balance  # 관례상 private
+
+    def deposit(self, amount):
+        self._balance += amount
+
+    def withdraw(self, amount):
+        if amount > self._balance:
+            raise ValueError("잔액 부족")
+        self._balance -= amount`,
+`# dataclass — __init__ 자동 생성
+from dataclasses import dataclass, field
+
+@dataclass
+class Product:
+    name:  str
+    price: float
+    tags:  list = field(default_factory=list)
+
+p = Product("사과", 1500, ["과일","신선"])
+print(p)  # Product(name='사과', ...)`
+  ]},
+
+  {cat:'클래스·OOP',name:'상속·super()',desc:'클래스는 다른 클래스를 상속받아 속성과 메서드를 재사용합니다. super()로 부모 메서드를 호출하고, isinstance/issubclass로 관계를 확인합니다.',ex:[
+`class Animal:
+    def __init__(self, name):
+        self.name = name
+    def speak(self):
+        return "..."
+
+class Cat(Animal):
+    def speak(self):                    # 오버라이드
+        return f"{self.name}: 야옹!"
+
+c = Cat("나비")
+print(c.speak())        # 나비: 야옹!
+print(isinstance(c, Animal))  # True`,
+`class Vehicle:
+    def __init__(self, brand, speed):
+        self.brand = brand; self.speed = speed
+
+class ElectricCar(Vehicle):
+    def __init__(self, brand, speed, battery):
+        super().__init__(brand, speed)   # 부모 init
+        self.battery = battery
+
+    def info(self):
+        return f"{self.brand} {self.battery}kWh"`,
+`# 다중 상속 + MRO
+class Flyable:
+    def move(self): return "날아갑니다"
+
+class Swimmable:
+    def move(self): return "헤엄칩니다"
+
+class Duck(Flyable, Swimmable):
+    pass
+
+d = Duck()
+print(d.move())       # 날아갑니다 (MRO 순서)
+print(Duck.__mro__)   # 해석 순서 확인`
+  ]},
+
+  {cat:'클래스·OOP',name:'매직메서드',desc:'__str__, __repr__, __len__, __eq__, __lt__, __add__ 등 더블 언더스코어 메서드로 내장 함수·연산자와 통합됩니다.',ex:[
+`class Vector:
+    def __init__(self, x, y):
+        self.x = x; self.y = y
+
+    def __repr__(self):
+        return f"Vector({self.x},{self.y})"
+
+    def __add__(self, other):
+        return Vector(self.x+other.x, self.y+other.y)
+
+    def __len__(self):
+        return int((self.x**2+self.y**2)**0.5)
+
+v1 = Vector(1,2); v2 = Vector(3,4)
+print(v1+v2, len(v2))`,
+`class Money:
+    def __init__(self, amount, currency="KRW"):
+        self.amount = amount; self.currency = currency
+
+    def __eq__(self, other):
+        return self.amount == other.amount
+    def __lt__(self, other):
+        return self.amount < other.amount
+    def __str__(self):
+        return f"{self.amount:,} {self.currency}"`,
+`# __enter__/__exit__ — 컨텍스트 매니저
+class Timer:
+    import time
+    def __enter__(self):
+        self._start = __import__("time").time()
+        return self
+    def __exit__(self, *a):
+        self.elapsed = __import__("time").time() - self._start
+
+with Timer() as t:
+    sum(range(1000000))
+print(f"{t.elapsed:.3f}s")`
+  ]},
+
+  {cat:'클래스·OOP',name:'@property',desc:'@property 데코레이터로 메서드를 속성처럼 접근하게 합니다. getter/setter/deleter를 정의해 캡슐화하면서 자연스러운 속성 접근 문법을 유지합니다.',ex:[
+`class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, v):
+        if v < 0: raise ValueError("음수 불가")
+        self._radius = v
+
+    @property
+    def area(self):
+        import math; return math.pi * self._radius**2
+
+c = Circle(5); print(c.area); c.radius = 10`,
+`class Temperature:
+    def __init__(self, celsius=0):
+        self._c = celsius
+
+    @property
+    def celsius(self): return self._c
+
+    @celsius.setter
+    def celsius(self, v): self._c = v
+
+    @property
+    def fahrenheit(self): return self._c * 9/5 + 32
+
+t = Temperature(100); print(t.fahrenheit)  # 212.0`,
+`# 캐시 프로퍼티 (functools.cached_property)
+from functools import cached_property
+class DataSet:
+    def __init__(self, data):
+        self.data = data
+    @cached_property
+    def statistics(self):     # 최초 접근 시만 계산
+        import statistics
+        return {"mean": statistics.mean(self.data)}`
+  ]},
+
+  /* === 예외 처리 === */
+  {cat:'예외 처리',name:'try·except',desc:'예외(오류)를 잡아 처리합니다. 여러 except 절로 예외 종류별 처리를 분기하며, as로 예외 객체를 받아 세부 정보를 확인할 수 있습니다.',ex:[
+`try:
+    x = int(input("숫자 입력: "))
+    print(10 / x)
+except ValueError:
+    print("숫자가 아닙니다")
+except ZeroDivisionError:
+    print("0으로 나눌 수 없습니다")
+except Exception as e:
+    print(f"예상치 못한 오류: {e}")`,
+`import json
+def load_config(path):
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}           # 기본값 반환
+    except json.JSONDecodeError as e:
+        raise ValueError(f"설정 파일 형식 오류: {e}") from e`,
+`# 예외 계층 활용
+try:
+    response = requests.get(url, timeout=5)
+    response.raise_for_status()  # 4xx/5xx → HTTPError
+    data = response.json()
+except requests.exceptions.Timeout:
+    print("요청 시간 초과")
+except requests.exceptions.HTTPError as e:
+    print(f"HTTP 오류: {e.response.status_code}")`
+  ]},
+
+  {cat:'예외 처리',name:'finally·else',desc:'else는 예외가 없을 때만 실행되고, finally는 예외 발생 여부와 관계없이 항상 실행됩니다. 리소스 해제에 finally를 활용합니다.',ex:[
+`try:
+    result = 10 / 2
+except ZeroDivisionError:
+    print("나눗셈 오류")
+else:
+    print(f"성공: {result}")   # 예외 없으면 실행
+finally:
+    print("항상 실행")         # 무조건 실행`,
+`def read_file(path):
+    f = None
+    try:
+        f = open(path)
+        return f.read()
+    except IOError as e:
+        print(f"파일 오류: {e}")
+        return None
+    finally:
+        if f: f.close()   # 항상 닫기`,
+`# DB 트랜잭션 패턴
+conn = get_db_connection()
+try:
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO ...")
+    conn.commit()       # 성공
+except Exception:
+    conn.rollback()     # 실패 시 롤백
+    raise
+finally:
+    conn.close()        # 항상 연결 종료`
+  ]},
+
+  {cat:'예외 처리',name:'raise·커스텀예외',desc:'raise로 예외를 발생시킵니다. Exception을 상속해 커스텀 예외 계층을 만들면 특정 도메인 오류를 명확하게 표현할 수 있습니다.',ex:[
+`def divide(a, b):
+    if b == 0:
+        raise ValueError("0으로 나눌 수 없습니다")
+    return a / b
+
+# 예외 연쇄
+try:
+    x = int("abc")
+except ValueError as e:
+    raise RuntimeError("변환 실패") from e`,
+`# 커스텀 예외 계층
+class AppError(Exception):
+    pass
+
+class ValidationError(AppError):
+    def __init__(self, field, msg):
+        self.field = field
+        super().__init__(f"{field}: {msg}")
+
+class NotFoundError(AppError):
+    pass
+
+raise ValidationError("email", "형식이 잘못됨")`,
+`# API 예외 처리 패턴
+class APIError(Exception):
+    def __init__(self, status, message, data=None):
+        self.status  = status
+        self.message = message
+        self.data    = data
+        super().__init__(f"[{status}] {message}")
+
+def call_api(endpoint):
+    resp = requests.get(endpoint)
+    if resp.status_code >= 400:
+        raise APIError(resp.status_code, resp.text)`
+  ]},
+
+  {cat:'예외 처리',name:'with·컨텍스트매니저',desc:'with 문은 리소스를 자동으로 정리합니다. open(), threading.Lock(), 데이터베이스 연결 등에 폭넓게 사용되며, contextlib으로 간단히 작성할 수도 있습니다.',ex:[
+`# 파일 — 자동으로 close()
+with open("data.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+
+# 여러 리소스 동시 관리
+with open("in.txt") as fin, open("out.txt","w") as fout:
+    fout.write(fin.read().upper())`,
+`# contextlib.contextmanager
+from contextlib import contextmanager
+
+@contextmanager
+def managed_resource(name):
+    print(f"{name} 열기")
+    try:
+        yield name   # with 블록 실행
+    finally:
+        print(f"{name} 닫기")
+
+with managed_resource("DB") as res:
+    print(f"{res} 사용 중")`,
+`# 스레드 안전 카운터
+import threading
+lock = threading.Lock()
+counter = 0
+
+def increment():
+    global counter
+    with lock:           # 락 자동 해제
+        counter += 1
+
+threads = [threading.Thread(target=increment) for _ in range(100)]
+for t in threads: t.start()
+for t in threads: t.join()`
+  ]},
+
+  /* === 컴프리헨션 === */
+  {cat:'컴프리헨션',name:'리스트 컴프리헨션',desc:'[표현식 for 변수 in 이터러블 if 조건] 형식으로 리스트를 간결하게 생성합니다. map+filter 조합보다 가독성이 높아 Python다운 코드로 인정받습니다.',ex:[
+`# 기본
+squares = [x**2 for x in range(10)]
+# [0,1,4,9,16,25,36,49,64,81]
+
+# 조건 필터
+evens = [x for x in range(20) if x % 2 == 0]`,
+`# 중첩 — 2D 리스트 평탄화
+matrix = [[1,2,3],[4,5,6],[7,8,9]]
+flat = [v for row in matrix for v in row]
+# [1,2,3,4,5,6,7,8,9]
+
+# 문자열 처리
+words = ["hello","world","python"]
+upper_long = [w.upper() for w in words if len(w) > 4]`,
+`# 실전: CSV 파싱
+import csv
+with open("data.csv") as f:
+    rows = [row for row in csv.reader(f)]
+
+# 조건부 변환
+data = [10, None, 20, None, 30]
+clean = [v if v is not None else 0 for v in data]`
+  ]},
+
+  {cat:'컴프리헨션',name:'딕셔너리·셋 컴프리헨션',desc:'{키:값 for ...}으로 딕셔너리를, {값 for ...}으로 셋을 생성합니다. 리스트 컴프리헨션과 동일한 조건 절을 사용할 수 있습니다.',ex:[
+`# 딕셔너리 컴프리헨션
+squares = {x: x**2 for x in range(6)}
+# {0:0, 1:1, 2:4, 3:9, 4:16, 5:25}
+
+# 셋 컴프리헨션
+unique_lens = {len(w) for w in ["hi","hello","world"]}`,
+`# 키-값 반전
+original = {"a":1, "b":2, "c":3}
+inverted = {v:k for k,v in original.items()}
+
+# 조건 필터
+scores = {"Alice":85,"Bob":42,"Carol":91}
+passed = {k:v for k,v in scores.items() if v >= 60}`,
+`# JSON 정규화
+raw = {"Name":"Alice","AGE":"30","CITY":"seoul"}
+normalized = {k.lower(): v.strip() if isinstance(v,str) else v
+              for k,v in raw.items()}`
+  ]},
+
+  {cat:'컴프리헨션',name:'제너레이터 표현식',desc:'() 안에 쓰는 표현식으로, 리스트 컴프리헨션과 문법이 같지만 지연 평가(lazy evaluation)됩니다. 메모리를 절약하며 대용량 데이터에 유리합니다.',ex:[
+`# 제너레이터 표현식 — () 사용
+gen = (x**2 for x in range(1000000))
+print(next(gen))   # 0  (즉시 계산 안 함)
+print(sum(gen))    # 나머지 합산`,
+`# 함수 인수로 직접 전달 (괄호 생략 가능)
+total = sum(x**2 for x in range(100))
+maximum = max(len(line) for line in open("text.txt"))
+any_even = any(x%2==0 for x in [1,3,5,7,8])`,
+`# 파이프라인 처리
+import csv
+# 메모리에 전부 올리지 않고 스트리밍 처리
+with open("big.csv") as f:
+    reader = csv.DictReader(f)
+    total = sum(float(row["amount"])
+                for row in reader
+                if row["status"] == "paid")`
+  ]},
+
+  /* === 제너레이터 === */
+  {cat:'제너레이터',name:'yield',desc:'yield를 포함한 함수는 제너레이터 함수입니다. 호출하면 제너레이터 객체를 반환하고, next() 또는 for 루프로 값을 하나씩 꺼냅니다. 상태를 유지하면서 값을 생성합니다.',ex:[
+`def countdown(n):
+    while n > 0:
+        yield n   # 값을 내보내고 일시 정지
+        n -= 1
+
+for v in countdown(5):
+    print(v)  # 5 4 3 2 1`,
+`def fibonacci():
+    a, b = 0, 1
+    while True:          # 무한 수열
+        yield a
+        a, b = b, a+b
+
+gen = fibonacci()
+print([next(gen) for _ in range(8)])
+# [0,1,1,2,3,5,8,13]`,
+`# 파일 청크 읽기 — 메모리 절약
+def read_chunks(path, size=4096):
+    with open(path, "rb") as f:
+        while chunk := f.read(size):
+            yield chunk
+
+for chunk in read_chunks("big_file.bin"):
+    process(chunk)`
+  ]},
+
+  {cat:'제너레이터',name:'yield from',desc:'yield from은 다른 이터러블을 투명하게 위임합니다. 하위 제너레이터의 값을 그대로 전달하고, send/throw/close도 전파합니다.',ex:[
+`def chain(*iterables):
+    for it in iterables:
+        yield from it   # 각 이터러블 위임
+
+print(list(chain([1,2],[3,4],[5])))
+# [1,2,3,4,5]`,
+`# 재귀 트리 순회
+def flatten(nested):
+    for item in nested:
+        if isinstance(item, list):
+            yield from flatten(item)  # 재귀 위임
+        else:
+            yield item
+
+print(list(flatten([1,[2,[3,4]],5])))
+# [1,2,3,4,5]`,
+`# 코루틴 위임 (asyncio)
+async def fetch_all(urls):
+    results = []
+    for url in urls:
+        result = await fetch(url)   # await는 yield from의 async 버전
+        results.append(result)
+    return results`
+  ]},
+
+  /* === 내장 함수 === */
+  {cat:'내장 함수',name:'map·filter·zip',desc:'map은 이터러블의 각 요소에 함수를 적용, filter는 조건에 맞는 요소만 선택, zip은 여러 이터러블을 묶어 튜플로 반환합니다. 모두 지연 평가됩니다.',ex:[
+`nums = [1, 2, 3, 4, 5]
+doubled  = list(map(lambda x: x*2, nums))
+odds     = list(filter(lambda x: x%2, nums))
+a = [1,2,3]; b = ["a","b","c"]
+pairs = list(zip(a, b))  # [(1,'a'),(2,'b'),(3,'c')]`,
+`# map — 문자열 변환
+words = ["  hello  ", "  world  "]
+clean = list(map(str.strip, words))
+
+# zip으로 딕셔너리 생성
+keys   = ["name","age","city"]
+values = ["Alice", 30, "Seoul"]
+d = dict(zip(keys, values))`,
+`# zip_longest — 길이가 다를 때
+from itertools import zip_longest
+a = [1,2,3]; b = ["a","b"]
+for x,y in zip_longest(a, b, fillvalue=None):
+    print(x, y)  # 3,None 포함
+
+# zip으로 행렬 전치
+matrix = [[1,2,3],[4,5,6]]
+transposed = list(zip(*matrix))`
+  ]},
+
+  {cat:'내장 함수',name:'enumerate·sorted·reversed',desc:'enumerate는 (인덱스, 값) 쌍을 생성, sorted는 새 정렬 리스트 반환, reversed는 역순 이터레이터를 반환합니다.',ex:[
+`fruits = ["apple","banana","cherry"]
+for i, f in enumerate(fruits, start=1):
+    print(f"{i}. {f}")
+
+nums = [3,1,4,1,5,9,2,6]
+print(sorted(nums))              # 오름차순
+print(sorted(nums, reverse=True))  # 내림차순`,
+`# key 함수로 정렬 기준 지정
+words = ["banana","apple","cherry","date"]
+by_len = sorted(words, key=len)
+by_last = sorted(words, key=lambda w: w[-1])
+
+data = [{"name":"Bob","score":85},{"name":"Alice","score":92}]
+data.sort(key=lambda x: x["score"], reverse=True)`,
+`# 다중 기준 정렬
+employees = [("Alice","Dev",5),("Bob","HR",3),("Carol","Dev",8)]
+# 부서 오름차순, 연차 내림차순
+employees.sort(key=lambda e: (e[1], -e[2]))
+
+# reversed
+for x in reversed(range(5)):
+    print(x)  # 4 3 2 1 0`
+  ]},
+
+  {cat:'내장 함수',name:'any·all·sum·min·max',desc:'any/all은 이터러블의 참거짓을 검사, sum/min/max는 수치 집계를 수행합니다. 제너레이터 표현식과 함께 쓰면 간결하고 효율적입니다.',ex:[
+`nums = [1, -2, 3, -4, 5]
+print(any(x < 0 for x in nums))   # True
+print(all(x > 0 for x in nums))   # False
+print(sum(nums))                   # 3
+print(min(nums), max(nums))        # -4  5`,
+`# key 함수 지원
+words = ["apple","banana","cherry"]
+longest = max(words, key=len)      # "banana"
+shortest = min(words, key=len)     # "apple"
+
+# sum의 start 인수
+nested = [[1,2],[3,4],[5,6]]
+flat = sum(nested, [])   # [1,2,3,4,5,6]`,
+`# 실전: 조건 검사
+def is_valid_config(cfg):
+    required = ["host","port","db"]
+    return all(k in cfg for k in required)
+
+scores = {"Alice":88,"Bob":45,"Carol":91}
+top = max(scores, key=scores.get)  # "Carol"
+avg = sum(scores.values()) / len(scores)`
+  ]},
+
+  {cat:'내장 함수',name:'isinstance·type·hasattr',desc:'isinstance는 타입 검사(상속 고려), type은 정확한 타입 반환, hasattr/getattr/setattr은 객체의 속성을 동적으로 다룹니다.',ex:[
+`print(isinstance(42, int))         # True
+print(isinstance(42, (int,float))) # True (여러 타입)
+print(type(42) is int)             # True
+print(type(42) is float)           # False`,
+`class A: pass
+class B(A): pass
+b = B()
+print(isinstance(b, A))   # True  (상속 관계 고려)
+print(type(b) is A)        # False (정확한 타입만)
+print(type(b).__name__)    # "B"`,
+`# 동적 속성 접근
+class Config:
+    debug = True
+    port  = 8080
+
+cfg = Config()
+for attr in ["debug","port","timeout"]:
+    val = getattr(cfg, attr, "미설정")
+    print(f"{attr}: {val}")
+
+# 딕셔너리를 속성으로
+for k, v in settings.items():
+    setattr(cfg, k, v)`
+  ]},
+
+  /* === 고급 문법 === */
+  {cat:'고급 문법',name:'언패킹·*·**',desc:'* 연산자로 이터러블을, ** 연산자로 딕셔너리를 언패킹합니다. 함수 호출, 리스트/딕셔너리 병합, 변수 할당 등에 폭넓게 활용됩니다.',ex:[
+`first, *rest = [1,2,3,4,5]
+# first=1, rest=[2,3,4,5]
+
+*head, last = [1,2,3,4,5]
+# head=[1,2,3,4], last=5
+
+a, b, *_ = (10, 20, 30, 40)
+# a=10, b=20`,
+`# 리스트·딕셔너리 병합
+a = [1,2,3]; b = [4,5,6]
+merged = [*a, *b, 7]   # [1,2,3,4,5,6,7]
+
+d1 = {"a":1,"b":2}; d2 = {"b":3,"c":4}
+merged = {**d1, **d2}  # b=3 (d2가 우선)`,
+`# 함수 인수 언패킹
+def add(a, b, c): return a+b+c
+
+args = (1,2,3)
+print(add(*args))   # 6
+
+kwargs = {"a":10,"b":20,"c":30}
+print(add(**kwargs))  # 60`
+  ]},
+
+  {cat:'고급 문법',name:'타입 힌트',desc:'Python 3.5+에서 변수·함수·클래스에 타입 정보를 명시할 수 있습니다. 런타임에는 무시되지만 IDE 자동완성과 mypy 등 정적 분석 도구가 활용합니다.',ex:[
+`from typing import Optional, Union
+
+def greet(name: str, times: int = 1) -> str:
+    return (name + "\\n") * times
+
+def find(items: list, target) -> Optional[int]:
+    try: return items.index(target)
+    except ValueError: return None`,
+`from typing import List, Dict, Tuple, Set, Callable
+
+def process(data: List[Dict[str,int]]) -> List[int]:
+    return [item["value"] for item in data]
+
+# Python 3.10+ — | 으로 Union 표현
+def f(x: int | str) -> str:
+    return str(x)`,
+`# TypedDict, Protocol — 구조적 타이핑
+from typing import TypedDict, Protocol
+
+class User(TypedDict):
+    name: str; age: int; email: str
+
+class Drawable(Protocol):
+    def draw(self) -> None: ...
+
+# 제네릭
+from typing import TypeVar, Generic
+T = TypeVar("T")
+class Stack(Generic[T]):
+    def __init__(self): self._data: List[T] = []
+    def push(self, item: T) -> None: self._data.append(item)`
+  ]},
+
+  {cat:'고급 문법',name:'walrus 연산자 :=',desc:'Python 3.8+의 := (walrus operator)는 표현식 안에서 변수에 값을 할당합니다. while 조건, 컴프리헨션, if 절을 간결하게 만들 때 유용합니다.',ex:[
+`# while — 읽기 + 조건 동시 처리
+import re
+data = "Python 3.11 출시"
+if m := re.search(r"\\d+\\.\\d+", data):
+    print(m.group())   # 3.11`,
+`# while 루프 — 값 읽기
+while chunk := file.read(4096):
+    process(chunk)
+
+# 컴프리헨션에서 중복 계산 방지
+results = [y for x in data if (y := expensive(x)) > 0]`,
+`# API 페이지네이션
+page = 1
+while (resp := fetch_page(page)) and resp["items"]:
+    for item in resp["items"]:
+        process(item)
+    page += 1`
+  ]},
+
+  /* === 주요 모듈 === */
+  {cat:'주요 모듈',name:'os',desc:'운영체제와 상호작용하는 파일시스템, 환경변수, 프로세스 관련 기능을 제공합니다. os.path는 경로 처리, os.environ은 환경변수 접근에 사용합니다.',ex:[
+`import os
+print(os.getcwd())               # 현재 디렉토리
+os.makedirs("logs/2024", exist_ok=True)
+files = os.listdir(".")          # 파일 목록
+os.rename("old.txt","new.txt")
+os.remove("temp.txt")`,
+`import os
+# 환경변수
+secret = os.environ.get("API_KEY", "default")
+# 트리 순회
+for root, dirs, files in os.walk("./src"):
+    for f in files:
+        if f.endswith(".py"):
+            print(os.path.join(root, f))`,
+`import os, shutil
+# 디렉토리 작업
+src = "backup"; dst = "backup_2024"
+shutil.copytree(src, dst)
+# 파일 크기·수정일
+stat = os.stat("data.csv")
+size  = stat.st_size
+mtime = stat.st_mtime`
+  ]},
+
+  {cat:'주요 모듈',name:'re',desc:'정규표현식으로 문자열 검색·추출·치환을 수행합니다. compile로 패턴을 미리 컴파일하면 반복 사용 시 성능이 향상됩니다.',ex:[
+`import re
+text = "이메일: user@example.com, admin@test.org"
+emails = re.findall(r"[\\w.+-]+@[\\w-]+\\.[\\w.]+", text)
+# ['user@example.com','admin@test.org']
+
+m = re.search(r"(\\d{3})-(\\d{4})","010-1234-5678")
+if m: print(m.group(1))  # 010`,
+`import re
+# 치환
+result = re.sub(r"\\s+", " ", "Hello   World")
+# 'Hello World'
+
+# 그룹 캡처
+pat = re.compile(r"(\\d{4})-(\\d{2})-(\\d{2})")
+for m in pat.finditer("2024-01-15 and 2024-06-30"):
+    y,mo,d = m.groups()
+    print(y,mo,d)`,
+`# 로그 파싱
+LOG_PAT = re.compile(
+    r"(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+) .* "
+    r'"(?P<method>\\w+) (?P<path>/\\S*)"'
+)
+with open("access.log") as f:
+    for line in f:
+        if m := LOG_PAT.match(line):
+            print(m.group("ip"), m.group("path"))`
+  ]},
+
+  {cat:'주요 모듈',name:'json',desc:'JSON 형식으로 데이터를 직렬화(dumps/dump)하거나 역직렬화(loads/load)합니다. indent 옵션으로 보기 좋게 출력하고, ensure_ascii=False로 한글을 그대로 저장합니다.',ex:[
+`import json
+data = {"name":"Alice","scores":[90,85,92]}
+text = json.dumps(data, ensure_ascii=False, indent=2)
+print(text)
+obj  = json.loads(text)
+print(obj["scores"][0])  # 90`,
+`import json
+# 파일 입출력
+with open("config.json","w",encoding="utf-8") as f:
+    json.dump({"debug":True,"port":8080}, f, indent=2)
+
+with open("config.json",encoding="utf-8") as f:
+    cfg = json.load(f)`,
+`# 커스텀 직렬화
+import json
+from datetime import datetime
+class DTEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
+data = {"created": datetime.now()}
+print(json.dumps(data, cls=DTEncoder))`
+  ]},
+
+  {cat:'주요 모듈',name:'datetime',desc:'날짜·시간 처리 모듈입니다. datetime, date, time, timedelta, timezone 클래스를 제공하며, strftime/strptime으로 문자열 변환을 수행합니다.',ex:[
+`from datetime import datetime, timedelta
+now = datetime.now()
+print(now.strftime("%Y-%m-%d %H:%M"))
+tomorrow = now + timedelta(days=1)
+diff = datetime(2025,1,1) - now
+print(diff.days, "일 남음")`,
+`from datetime import datetime, timezone, timedelta
+# UTC 시간
+utc_now = datetime.now(timezone.utc)
+# 한국 시간 (UTC+9)
+KST = timezone(timedelta(hours=9))
+kst_now = utc_now.astimezone(KST)
+
+# 문자열 파싱
+dt = datetime.strptime("2024-06-15", "%Y-%m-%d")`,
+`from datetime import datetime
+import calendar
+
+# 이번 달 마지막 날
+today = datetime.today()
+_, last_day = calendar.monthrange(today.year, today.month)
+
+# 두 날짜 사이의 날 수
+d1 = datetime(2024,1,1); d2 = datetime(2024,12,31)
+days = (d2-d1).days  # 365`
+  ]},
+
+  {cat:'주요 모듈',name:'collections',desc:'Counter, defaultdict, OrderedDict, deque, namedtuple, ChainMap 등 특수한 컨테이너 자료형을 제공합니다.',ex:[
+`from collections import Counter, defaultdict, deque
+words = "apple banana apple cherry banana apple".split()
+cnt = Counter(words)
+print(cnt.most_common(2))   # [('apple',3),('banana',2)]
+
+dd = defaultdict(list)
+for k,v in [("a",1),("a",2),("b",3)]:
+    dd[k].append(v)`,
+`from collections import deque
+q = deque(maxlen=3)    # 최대 3개
+q.append(1); q.append(2); q.append(3)
+q.append(4)            # 1 자동 제거
+print(q)               # deque([2,3,4])
+q.appendleft(0)        # 왼쪽에 추가`,
+`from collections import namedtuple, ChainMap
+# 구조체 대용
+Point = namedtuple("Point","x y")
+p = Point(10,20); print(p.x+p.y)
+
+# ChainMap — 설정 계층
+defaults = {"color":"red","size":10}
+user_cfg = {"size":20}
+cfg = ChainMap(user_cfg, defaults)
+print(cfg["color"],cfg["size"])  # red 20`
+  ]},
+
+  {cat:'주요 모듈',name:'itertools',desc:'효율적인 이터레이터를 생성하는 함수 모음입니다. chain, islice, product, permutations, combinations, groupby 등을 메모리 효율적으로 사용할 수 있습니다.',ex:[
+`import itertools as it
+print(list(it.chain([1,2],[3,4],[5])))    # [1..5]
+print(list(it.islice(it.count(10),5)))   # [10..14]
+print(list(it.accumulate([1,2,3,4])))    # [1,3,6,10]`,
+`import itertools as it
+# 순열·조합
+perm = list(it.permutations("ABC",2))  # 6가지
+comb = list(it.combinations("ABCD",2)) # 6가지
+prod = list(it.product([0,1],repeat=3)) # 8가지`,
+`import itertools as it
+data = [("A","x1"),("A","x2"),("B","y1"),("B","y2")]
+for key, group in it.groupby(data, key=lambda r:r[0]):
+    items = list(group)
+    print(key, items)
+# A [('A','x1'),('A','x2')]
+# B [('B','y1'),('B','y2')]`
+  ]},
+
+  {cat:'주요 모듈',name:'functools',desc:'고차 함수 도구 모음입니다. lru_cache(메모이제이션), partial(인수 고정), reduce(누적 연산), wraps(데코레이터 메타 보존) 등을 제공합니다.',ex:[
+`from functools import lru_cache, partial, reduce
+@lru_cache(maxsize=None)
+def fib(n):
+    if n<2: return n
+    return fib(n-1)+fib(n-2)
+print(fib(100))
+
+# partial — 인수 고정
+power_of_2 = partial(pow, 2)
+print(power_of_2(10))  # 1024`,
+`from functools import reduce
+# reduce — 누적 연산
+total = reduce(lambda a,b: a+b, [1,2,3,4,5])  # 15
+product = reduce(lambda a,b: a*b, range(1,6))  # 120 (5!)`,
+`from functools import wraps, cached_property
+# wraps — 함수 메타 보존
+def my_decorator(func):
+    @wraps(func)
+    def wrapper(*args,**kwargs):
+        return func(*args,**kwargs)
+    return wrapper
+
+# cached_property — 속성 캐시
+class Expensive:
+    @cached_property
+    def result(self):
+        print("계산 중..."); return sum(range(10**6))`
+  ]},
+
+  {cat:'주요 모듈',name:'pathlib',desc:'파일 경로를 객체 지향적으로 다룹니다. / 연산자로 경로를 조합하고, glob, read_text, write_text 등으로 파일 작업을 간결하게 처리합니다.',ex:[
+`from pathlib import Path
+p = Path("data") / "2024" / "report.csv"
+print(p.name)       # report.csv
+print(p.suffix)     # .csv
+print(p.parent)     # data/2024
+p.parent.mkdir(parents=True, exist_ok=True)`,
+`from pathlib import Path
+# 파일 읽기/쓰기
+Path("output.txt").write_text("Hello!","utf-8")
+text = Path("output.txt").read_text("utf-8")
+
+# glob 검색
+for py in Path("src").glob("**/*.py"):
+    print(py)`,
+`from pathlib import Path
+# 경로 분석
+home = Path.home()
+config = home / ".config" / "app.json"
+if config.exists():
+    data = config.read_text()
+
+# 파일 목록 정렬
+files = sorted(Path("logs").glob("*.log"),
+               key=lambda p: p.stat().st_mtime)`
+  ]},
+
+  {cat:'주요 모듈',name:'logging',desc:'print 대신 사용하는 표준 로깅 모듈입니다. DEBUG < INFO < WARNING < ERROR < CRITICAL 수준을 지원하며, 파일·콘솔·포맷을 유연하게 설정할 수 있습니다.',ex:[
+`import logging
+logging.basicConfig(level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s")
+
+logging.debug("디버그 정보")
+logging.info("서버 시작됨")
+logging.warning("디스크 90% 사용")
+logging.error("파일을 찾을 수 없음")`,
+`import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+fh = logging.FileHandler("app.log","a","utf-8")
+fh.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+logger.addHandler(fh)
+logger.info("앱 시작")`,
+`import logging
+# 예외 로깅
+try:
+    result = 1/0
+except Exception:
+    logging.exception("오류 발생")   # 스택 트레이스 포함
+
+# 구조화 로깅
+logging.info("사용자 로그인", extra={
+    "user_id": 42, "ip": "192.168.1.1"})`
+  ]},
+
+  {cat:'주요 모듈',name:'asyncio',desc:'비동기 I/O 프레임워크입니다. async def로 코루틴을 정의하고, await로 비동기 작업을 기다립니다. asyncio.gather로 여러 작업을 동시에 실행합니다.',ex:[
+`import asyncio
+async def hello():
+    print("시작")
+    await asyncio.sleep(1)   # 논블로킹 대기
+    print("완료")
+
+asyncio.run(hello())`,
+`import asyncio
+async def fetch(url):
+    await asyncio.sleep(0.5)  # 실제로는 aiohttp 사용
+    return f"결과: {url}"
+
+async def main():
+    urls = ["url1","url2","url3"]
+    results = await asyncio.gather(*[fetch(u) for u in urls])
+    print(results)  # 동시 실행
+
+asyncio.run(main())`,
+`import asyncio, aiohttp
+async def fetch_json(session, url):
+    async with session.get(url) as resp:
+        return await resp.json()
+
+async def main():
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_json(session,url) for url in URLS]
+        results = await asyncio.gather(*tasks)
+
+asyncio.run(main())`
+  ]},
+
+  {cat:'주요 모듈',name:'dataclasses',desc:'@dataclass 데코레이터로 __init__, __repr__, __eq__ 등을 자동 생성합니다. field()로 기본값 팩토리, frozen=True로 불변 객체를 만들 수 있습니다.',ex:[
+`from dataclasses import dataclass, field
+@dataclass
+class Point:
+    x: float
+    y: float
+
+    def distance(self):
+        return (self.x**2 + self.y**2)**0.5
+
+p = Point(3,4); print(p, p.distance())`,
+`from dataclasses import dataclass, field
+@dataclass
+class Inventory:
+    name: str
+    items: list = field(default_factory=list)  # 가변 기본값
+    count: int  = field(init=False, default=0) # __init__ 제외
+
+    def add(self, item):
+        self.items.append(item); self.count += 1`,
+`from dataclasses import dataclass, asdict, astuple
+
+@dataclass(frozen=True, order=True)  # 불변 + 비교 지원
+class Version:
+    major: int; minor: int; patch: int
+
+v1 = Version(1,2,3); v2 = Version(1,3,0)
+print(v1 < v2)         # True
+print(asdict(v1))      # {'major':1,'minor':2,'patch':3}`
+  ]},
+
+  {cat:'주요 모듈',name:'typing',desc:'타입 힌트 보조 모듈입니다. Optional, Union, List, Dict, Tuple, Callable, TypeVar, Generic, Protocol, TypedDict, Literal, Final 등을 제공합니다.',ex:[
+`from typing import Optional, Union, List, Dict
+def find_user(user_id: int) -> Optional[Dict]:
+    ...
+
+def process(value: Union[int, str]) -> str:
+    return str(value)
+
+def avg(nums: List[float]) -> float:
+    return sum(nums)/len(nums)`,
+`from typing import TypeVar, Generic, Callable
+T = TypeVar("T"); R = TypeVar("R")
+
+class Box(Generic[T]):
+    def __init__(self, value: T): self.value = value
+    def map(self, f: Callable[[T],R]) -> "Box[R]":
+        return Box(f(self.value))`,
+`from typing import TypedDict, Protocol, Literal, Final
+
+class UserInfo(TypedDict):
+    name: str; age: int; role: Literal["admin","user"]
+
+class Serializable(Protocol):
+    def to_dict(self) -> dict: ...
+
+MAX_SIZE: Final = 100
+Direction = Literal["north","south","east","west"]`
+  ]},
+];
+
+// ── HIGHLIGHT ─────────────────────────────────────────────────────────────────
+const KWS = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+const BIS = new Set("abs all any bin bool bytes callable chr dict dir divmod enumerate eval exec filter float format frozenset getattr globals hasattr hash help hex id input int isinstance issubclass iter len list locals map max min next object oct open ord pow print property range repr reversed round set setattr slice sorted staticmethod str sum super tuple type vars zip".split(" "));
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function highlight(code){
+  const slots=[]; const st=(h)=>{slots.push(h);return`\x00${slots.length-1}\x00`;};
+  let h=esc(code);
+  // triple strings
+  h=h.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''/g,m=>st(`<span class="st">${m}</span>`));
+  // single-line strings
+  h=h.replace(/"[^"\n]*"|'[^'\n]*'/g,m=>st(`<span class="st">${m}</span>`));
+  // comments
+  h=h.replace(/#[^\n]*/g,m=>st(`<span class="cm">${m}</span>`));
+  // decorators
+  h=h.replace(/@[\w.]+/g,m=>st(`<span class="de">${m}</span>`));
+  // tokens
+  h=h.replace(/\b([A-Za-z_]\w*)\b/g,(m,w)=>{
+    if(KWS.has(w)) return st(`<span class="kw">${w}</span>`);
+    if(BIS.has(w)) return st(`<span class="bi">${w}</span>`);
+    return m;
+  });
+  // numbers
+  h=h.replace(/\b(\d[\d_]*\.?\d*([eEjJ][+-]?\d+)?)\b/g,m=>st(`<span class="nu">${m}</span>`));
+  return h.replace(/\x00(\d+)\x00/g,(_,i)=>slots[+i]);
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let activeIdx=-1, tabIdx=0;
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function buildNav(filter=''){
+  const nav=document.getElementById('nav');
+  const q=filter.trim().toLowerCase();
+  const cats=[...new Set(DATA.map(d=>d.cat))];
+  nav.innerHTML='';
+  cats.forEach(cat=>{
+    const items=DATA.filter((d,i)=>{
+      if(q && !d.name.toLowerCase().includes(q)&&!d.cat.toLowerCase().includes(q)) return false;
+      return d.cat===cat;
+    });
+    if(!items.length) return;
+    const ch=document.createElement('div'); ch.className='ch';
+    ch.innerHTML=`<span>${cat}</span><span class="ar">▾</span>`;
+    const ci=document.createElement('div'); ci.className='ci';
+    items.forEach(d=>{
+      const i=DATA.indexOf(d);
+      const ni=document.createElement('div'); ni.className='ni'+(i===activeIdx?' on':'');
+      ni.textContent=d.name; ni.dataset.idx=i;
+      ni.onclick=()=>select(i);
+      ci.appendChild(ni);
+    });
+    ch.onclick=()=>{ch.classList.toggle('col');ci.classList.toggle('hid');};
+    nav.appendChild(ch); nav.appendChild(ci);
+  });
+}
+
+function select(i){
+  activeIdx=i; tabIdx=0;
+  document.querySelectorAll('.ni').forEach(el=>el.classList.toggle('on',+el.dataset.idx===i));
+  const d=DATA[i];
+  document.getElementById('ph').style.display='none';
+  const det=document.getElementById('det');
+  det.classList.add('show');
+  document.getElementById('dcat').textContent=d.cat;
+  document.getElementById('dname').textContent=d.name;
+  document.getElementById('ddesc').textContent=d.desc;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',+b.dataset.i===0));
+  renderCode();
+}
+
+function renderCode(){
+  const d=DATA[activeIdx];
+  if(!d) return;
+  document.getElementById('codeblock').innerHTML=highlight(d.ex[tabIdx]);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildNav();
+
+document.getElementById('search').addEventListener('input',e=>buildNav(e.target.value));
+
+document.querySelectorAll('.tb').forEach(b=>b.addEventListener('click',()=>{
+  tabIdx=+b.dataset.i;
+  document.querySelectorAll('.tb').forEach(x=>x.classList.toggle('on',+x.dataset.i===tabIdx));
+  renderCode();
+}));
+
+document.getElementById('copybtn').addEventListener('click',()=>{
+  const text=DATA[activeIdx]?.ex[tabIdx]||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copybtn');
+    btn.textContent='✓ 복사됨'; btn.style.color='var(--green)';
+    setTimeout(()=>{btn.textContent='복사';btn.style.color='';},1500);
+  });
+});
+</script>
+</body>
+</html>

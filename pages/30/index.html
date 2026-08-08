@@ -200,7 +200,7 @@ body.fs-mode #fs-overlay{display:flex;}
       <button class="btn" id="btn-autoreset">🔄 자동초기화 OFF</button>
     </div>
     <div class="ctrl-group">
-      <button class="btn" id="btn-countdown">⏱ 카운트다운 ON</button>
+      <button class="btn on" id="btn-countdown">💬 메시지 표시 ON</button>
     </div>
     <div class="ctrl-group" id="delay-group">
       <span class="ctrl-label">대기</span>
@@ -513,7 +513,7 @@ function updateAutoEmitters(){
 }
 
 // ── 자동 초기화 ───────────────────────────────────
-let autoReset=false, showCountdown=true;
+let autoReset=false, showMessage=true;
 let resetPhase='idle', resetTimerEnd=0, autoFloorOpen=false;
 const DRAIN_MS=3000;
 
@@ -527,25 +527,20 @@ btnAR.addEventListener('click',()=>{
   if(!autoReset){resetPhase='idle';autoFloorOpen=false;}
 });
 btnCD.addEventListener('click',()=>{
-  showCountdown=!showCountdown;
-  btnCD.classList.toggle('on',showCountdown);
-  btnCD.textContent=showCountdown?'⏱ 카운트다운 ON':'⏱ 카운트다운 OFF';
-  // 딜레이 슬라이더: 카운트다운 ON일 때만 의미있음 (그래도 항상 표시)
+  showMessage=!showMessage;
+  btnCD.classList.toggle('on',showMessage);
+  btnCD.textContent=showMessage?'💬 메시지 표시 ON':'💬 메시지 표시 OFF';
 });
 
-function checkFull(sandCount){
+function checkFull(){
   if(!autoReset||resetPhase!=='idle') return;
-  if(sandCount>COLS*ROWS*.88){
-    if(showCountdown){
-      resetPhase='countdown';
-      resetTimerEnd=Date.now()+parseInt(sliderDelay.value)*1000;
-    } else {
-      // 카운트다운 없이 즉시 배출 시작
-      resetPhase='draining';
-      resetTimerEnd=Date.now()+DRAIN_MS;
-      autoFloorOpen=true;
-    }
+  // 위에서 5번째 행이 가로로 완전히 찼을 때 트리거
+  const checkRow=5;
+  for(let x=0;x<COLS;x++){
+    if(!grid[checkRow*COLS+x]) return;
   }
+  resetPhase='countdown';
+  resetTimerEnd=Date.now()+parseInt(sliderDelay.value)*1000;
 }
 function tickAutoReset(){
   if(!autoReset||resetPhase==='idle') return;
@@ -563,6 +558,7 @@ function update(){
   tick++;const lf=tick%2===0;
   updateAutoEmitters();
   tickAutoReset();
+  checkFull();
   if(floorOpen||autoFloorOpen){for(let x=0;x<COLS;x++)grid[(ROWS-1)*COLS+x]=0;}
   for(let y=ROWS-2;y>=0;y--){
     for(let xi=0;xi<COLS;xi++){
@@ -606,8 +602,8 @@ function render(){
     });
   }
 
-  // 자동초기화 카운트다운 오버레이 (countdown ON일 때만)
-  if(autoReset&&showCountdown&&resetPhase!=='idle'){
+  // 자동초기화 카운트다운 오버레이 (메시지 표시 ON일 때만)
+  if(autoReset&&showMessage&&resetPhase!=='idle'){
     const now=Date.now();
     const msg=resetPhase==='countdown'
       ? `초기화까지 ${Math.ceil((resetTimerEnd-now)/1000)}초`
@@ -625,7 +621,6 @@ function render(){
     ctx.restore();
   }
 
-  checkFull(sandCount);
   statsEl.textContent='모래: '+sandCount.toLocaleString();
 }
 

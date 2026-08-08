@@ -186,6 +186,13 @@ const PAGES = {
     desc  : '레이캐스팅 FPS · 10마리 처치 후 출구 탈출 · 버그 수정판',
   },
 
+  26: {
+    label : 'HTML 완전 정복',
+    url   : 'pages/26/',
+    thumb : null,
+    desc  : '초급·중급·고급 3단계 — 태그 설명·예제·미리보기·검색 포함',
+  },
+
   27: {
     label : '터미널 명령어 정리',
     url   : 'pages/27/',

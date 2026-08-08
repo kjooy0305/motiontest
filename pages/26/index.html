@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML 완전 정복 — 테스트 26</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d40;
+  --border:#2a3347;--border2:#3a4a63;
+  --txt:#e2e8f0;--txt2:#94a3b8;--txt3:#4a5568;
+  --blue:#60a5fa;--blue2:#1e3a5f;--blue3:#2563eb;
+  --green:#34d399;--green2:#065f46;
+  --yellow:#fbbf24;--yellow2:#78350f;
+  --red:#f87171;--red2:#7f1d1d;
+  --purple:#a78bfa;--purple2:#3b1f6e;
+  --cyan:#22d3ee;--orange:#fb923c;
+  --beginner:#34d399;--intermediate:#60a5fa;--advanced:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* HEADER */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;}
+.logo{font-size:16px;font-weight:800;color:var(--orange);letter-spacing:1px;white-space:nowrap;}
+.logo span{color:var(--txt3);font-weight:400;}
+.search-wrap{flex:1;max-width:380px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:7px 13px;color:var(--txt);font-size:13px;font-family:inherit;outline:none;transition:.15s;}
+.search:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(251,146,60,.15);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 13px;border-radius:6px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg3);color:var(--txt);}
+.tab.active{color:#fff;}
+.tab[data-tab="beginner"].active{background:var(--green2);color:var(--beginner);}
+.tab[data-tab="intermediate"].active{background:var(--blue2);color:var(--intermediate);}
+.tab[data-tab="advanced"].active{background:var(--purple2);color:var(--advanced);}
+.tab[data-tab="all"].active{background:var(--bg4);color:var(--txt);}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:10px 14px 4px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(251,146,60,.08);color:var(--orange);border-left-color:var(--orange);}
+.main{flex:1;padding:20px 24px;max-width:1020px;overflow-x:hidden;}
+
+/* PANEL */
+.panel{display:none;}.panel.active{display:block;}
+
+/* SECTION TITLE */
+.sec-title{font-size:19px;font-weight:800;color:var(--orange);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:20px;line-height:1.7;}
+.level-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:18px;letter-spacing:.5px;}
+.level-badge.b{background:rgba(52,211,153,.12);color:var(--beginner);border:1px solid rgba(52,211,153,.3);}
+.level-badge.i{background:rgba(96,165,250,.12);color:var(--intermediate);border:1px solid rgba(96,165,250,.3);}
+.level-badge.a{background:rgba(167,139,250,.12);color:var(--advanced);border:1px solid rgba(167,139,250,.3);}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.card-head{padding:11px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.card-head .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap;}
+.tag-b{background:rgba(52,211,153,.15);color:var(--beginner);}
+.tag-i{background:rgba(96,165,250,.15);color:var(--intermediate);}
+.tag-a{background:rgba(167,139,250,.15);color:var(--advanced);}
+.card-head-title{font-weight:700;font-size:13px;color:var(--txt);}
+.card-head .tag-elem{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--orange);background:rgba(251,146,60,.1);padding:2px 8px;border-radius:4px;border:1px solid rgba(251,146,60,.2);}
+.card-body{padding:14px 16px;}
+
+/* DESC */
+.desc{color:var(--txt);font-size:13px;margin-bottom:12px;line-height:1.75;}
+.desc b{color:var(--cyan);}
+
+/* ATTRS TABLE */
+.attr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px;}
+.attr-table th{background:var(--bg4);color:var(--txt3);font-weight:700;padding:5px 10px;text-align:left;border:1px solid var(--border);}
+.attr-table td{padding:5px 10px;border:1px solid var(--border);vertical-align:top;}
+.attr-table td:first-child{color:var(--yellow);font-family:monospace;font-size:11px;white-space:nowrap;}
+.attr-table td:nth-child(2){color:var(--green);font-family:monospace;font-size:11px;}
+.attr-table td:last-child{color:var(--txt2);}
+.attr-table tr:hover td{background:rgba(255,255,255,.02);}
+
+/* CODE */
+.code-block{background:#0a0e1a;border:1px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:12px;}
+.code-bar{background:var(--bg4);padding:5px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-bar-label{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.copy-btn{font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer;font-family:inherit;padding:1px 6px;border-radius:3px;transition:.1s;}
+.copy-btn:hover{color:var(--txt);background:var(--bg3);}
+.code-inner{padding:12px 14px;overflow-x:auto;}
+pre{font-family:'SFMono-Regular',Consolas,'Courier New',monospace;font-size:12px;line-height:1.8;white-space:pre;}
+.hl-tag{color:#f07178;} /* element */
+.hl-attr{color:#ffcb6b;} /* attribute */
+.hl-val{color:#c3e88d;}  /* value */
+.hl-com{color:#546e7a;font-style:italic;} /* comment */
+.hl-txt{color:#e2e8f0;}  /* text */
+.hl-kw{color:#89ddff;}   /* keyword */
+
+/* PREVIEW */
+.preview-wrap{border:1px dashed var(--border2);border-radius:7px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,.02);}
+.preview-label{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.preview-content{font-size:13px;}
+.preview-content a{color:var(--blue);}
+.preview-content h1{font-size:20px;margin-bottom:4px;}
+.preview-content h2{font-size:17px;margin-bottom:3px;}
+.preview-content h3{font-size:14px;margin-bottom:2px;}
+.preview-content p{margin-bottom:6px;color:var(--txt);}
+.preview-content ul,ol{padding-left:20px;margin-bottom:6px;}
+.preview-content table{border-collapse:collapse;font-size:12px;}
+.preview-content table td,th{border:1px solid var(--border2);padding:4px 8px;}
+.preview-content form{display:flex;flex-direction:column;gap:6px;max-width:280px;}
+.preview-content input,.preview-content select,.preview-content textarea{background:var(--bg3);border:1px solid var(--border2);color:var(--txt);padding:5px 8px;border-radius:4px;font-size:12px;font-family:inherit;}
+.preview-content button{background:var(--blue3);color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;}
+.preview-content img{max-width:100%;border-radius:4px;}
+.preview-content figure{max-width:200px;}
+.preview-content figcaption{font-size:11px;color:var(--txt3);text-align:center;margin-top:4px;}
+
+/* TIP */
+.tip{background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.2);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--orange);}
+.info{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.2);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.info b{color:var(--blue);}
+.warn{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.warn b{color:var(--red);}
+
+/* GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-bottom:16px;}
+
+/* NO RESULT */
+.no-result{text-align:center;padding:60px;color:var(--txt3);font-size:13px;}
+
+/* RESPONSIVE */
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px;}.card-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">&lt;<span>/</span>&gt; HTML 완전 정복</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="태그 검색... (예: div, form, table)">
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" data-tab="all" onclick="switchTab('all')">전체</button>
+    <button class="tab" data-tab="beginner" onclick="switchTab('beginner')">🌱 초급</button>
+    <button class="tab" data-tab="intermediate" onclick="switchTab('intermediate')">🔥 중급</button>
+    <button class="tab" data-tab="advanced" onclick="switchTab('advanced')">⚡ 고급</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-label">초급</div>
+    <button class="sb-item" onclick="scrollTo('s-structure')">📄 HTML 기본 구조</button>
+    <button class="sb-item" onclick="scrollTo('s-headings')">📝 제목 태그</button>
+    <button class="sb-item" onclick="scrollTo('s-text')">✏️ 텍스트 태그</button>
+    <button class="sb-item" onclick="scrollTo('s-link')">🔗 링크</button>
+    <button class="sb-item" onclick="scrollTo('s-image')">🖼️ 이미지</button>
+    <button class="sb-item" onclick="scrollTo('s-list')">📋 목록</button>
+    <button class="sb-item" onclick="scrollTo('s-div-span')">📦 div · span</button>
+    <div class="sb-label">중급</div>
+    <button class="sb-item" onclick="scrollTo('s-form')">📋 폼 & 입력</button>
+    <button class="sb-item" onclick="scrollTo('s-table')">📊 테이블</button>
+    <button class="sb-item" onclick="scrollTo('s-media')">🎬 미디어</button>
+    <button class="sb-item" onclick="scrollTo('s-semantic')">🏗️ 시멘틱 태그</button>
+    <button class="sb-item" onclick="scrollTo('s-meta')">🔍 메타 태그</button>
+    <div class="sb-label">고급</div>
+    <button class="sb-item" onclick="scrollTo('s-data')">🗂️ 데이터 속성</button>
+    <button class="sb-item" onclick="scrollTo('s-accessibility')">♿ 접근성</button>
+    <button class="sb-item" onclick="scrollTo('s-canvas')">🎨 Canvas</button>
+    <button class="sb-item" onclick="scrollTo('s-template')">🧩 Template</button>
+    <button class="sb-item" onclick="scrollTo('s-advanced-form')">⚙️ 고급 폼</button>
+  </nav>
+
+  <main class="main" id="mainContent">
+
+    <!-- ══════════════════════════════════════════
+         🌱 초급
+    ══════════════════════════════════════════ -->
+
+    <!-- HTML 기본 구조 -->
+    <div id="s-structure" class="card" data-level="beginner" data-keywords="html head body doctype 기본 구조">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;!DOCTYPE&gt; &lt;html&gt; &lt;head&gt; &lt;body&gt;</span>
+        <span class="card-head-title">HTML 기본 구조</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">모든 HTML 문서는 아래 기본 골격으로 시작해요. <b>DOCTYPE</b>은 브라우저에게 "HTML5 문서야!"라고 알려주는 선언이에요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 항상 맨 위에! DOCTYPE 선언 --&gt;</span>
+<span class="hl-kw">&lt;!DOCTYPE html&gt;</span>
+<span class="hl-tag">&lt;html</span> <span class="hl-attr">lang</span>=<span class="hl-val">"ko"</span><span class="hl-tag">&gt;</span>
+
+<span class="hl-tag">&lt;head&gt;</span>
+  <span class="hl-com">&lt;!-- 브라우저용 정보 (화면에 보이지 않음) --&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">charset</span>=<span class="hl-val">"UTF-8"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">name</span>=<span class="hl-val">"viewport"</span> <span class="hl-attr">content</span>=<span class="hl-val">"width=device-width, initial-scale=1.0"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;title&gt;</span><span class="hl-txt">내 첫 웹페이지</span><span class="hl-tag">&lt;/title&gt;</span>
+<span class="hl-tag">&lt;/head&gt;</span>
+
+<span class="hl-tag">&lt;body&gt;</span>
+  <span class="hl-com">&lt;!-- 화면에 실제로 보이는 내용 --&gt;</span>
+  <span class="hl-tag">&lt;h1&gt;</span><span class="hl-txt">안녕하세요!</span><span class="hl-tag">&lt;/h1&gt;</span>
+  <span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">첫 번째 HTML 페이지예요.</span><span class="hl-tag">&lt;/p&gt;</span>
+<span class="hl-tag">&lt;/body&gt;</span>
+
+<span class="hl-tag">&lt;/html&gt;</span></pre></div>
+        </div>
+        <div class="tip"><b>기억하세요!</b> head 안에는 보이지 않는 설정, body 안에는 화면에 보이는 내용을 넣어요. lang="ko"는 한국어 문서라고 알려줘요.</div>
+      </div>
+    </div>
+
+    <!-- 제목 태그 -->
+    <div id="s-headings" class="card" data-level="beginner" data-keywords="h1 h2 h3 h4 h5 h6 제목 heading">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;h1&gt; ~ &lt;h6&gt;</span>
+        <span class="card-head-title">제목 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">h1~h6까지 6단계 제목이 있어요. <b>숫자가 작을수록 크고 중요한 제목</b>이에요. h1은 페이지당 하나만 쓰는 게 좋아요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;h1&gt;</span><span class="hl-txt">가장 큰 제목 (h1)</span><span class="hl-tag">&lt;/h1&gt;</span>
+<span class="hl-tag">&lt;h2&gt;</span><span class="hl-txt">두 번째 제목 (h2)</span><span class="hl-tag">&lt;/h2&gt;</span>
+<span class="hl-tag">&lt;h3&gt;</span><span class="hl-txt">세 번째 제목 (h3)</span><span class="hl-tag">&lt;/h3&gt;</span>
+<span class="hl-tag">&lt;h4&gt;</span><span class="hl-txt">네 번째 제목 (h4)</span><span class="hl-tag">&lt;/h4&gt;</span>
+<span class="hl-tag">&lt;h5&gt;</span><span class="hl-txt">다섯 번째 제목 (h5)</span><span class="hl-tag">&lt;/h5&gt;</span>
+<span class="hl-tag">&lt;h6&gt;</span><span class="hl-txt">여섯 번째 제목 (h6)</span><span class="hl-tag">&lt;/h6&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content">
+            <h1>가장 큰 제목 (h1)</h1>
+            <h2>두 번째 제목 (h2)</h2>
+            <h3>세 번째 제목 (h3)</h3>
+            <h4>네 번째 (h4)</h4>
+            <h5>다섯 번째 (h5)</h5>
+            <h6>여섯 번째 (h6)</h6>
+          </div>
+        </div>
+        <div class="tip"><b>SEO 팁!</b> 검색엔진은 h1을 가장 중요하게 봐요. 블로그 제목은 h1, 소제목은 h2~h3 순서로 써요.</div>
+      </div>
+    </div>
+
+    <!-- 텍스트 태그 -->
+    <div id="s-text" class="card" data-level="beginner" data-keywords="p br strong em u s mark small code pre blockquote 텍스트 단락">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;p&gt; &lt;br&gt; &lt;strong&gt; &lt;em&gt; &lt;mark&gt; &lt;code&gt;</span>
+        <span class="card-head-title">텍스트 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">텍스트를 꾸미고 의미를 전달하는 태그들이에요. <b>strong은 중요함</b>, em은 강조, mark는 형광펜 효과예요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">일반 단락. 자동으로 위아래 여백이 생겨요.</span><span class="hl-tag">&lt;/p&gt;</span>
+<span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">줄바꿈은 </span><span class="hl-tag">&lt;br&gt;</span><span class="hl-txt">이렇게 해요.</span><span class="hl-tag">&lt;/p&gt;</span>
+
+<span class="hl-tag">&lt;strong&gt;</span><span class="hl-txt">굵게 (중요한 내용)</span><span class="hl-tag">&lt;/strong&gt;</span>
+<span class="hl-tag">&lt;em&gt;</span><span class="hl-txt">기울임 (강조)</span><span class="hl-tag">&lt;/em&gt;</span>
+<span class="hl-tag">&lt;u&gt;</span><span class="hl-txt">밑줄</span><span class="hl-tag">&lt;/u&gt;</span>
+<span class="hl-tag">&lt;s&gt;</span><span class="hl-txt">취소선</span><span class="hl-tag">&lt;/s&gt;</span>
+<span class="hl-tag">&lt;mark&gt;</span><span class="hl-txt">형광펜 하이라이트</span><span class="hl-tag">&lt;/mark&gt;</span>
+<span class="hl-tag">&lt;small&gt;</span><span class="hl-txt">작은 텍스트</span><span class="hl-tag">&lt;/small&gt;</span>
+<span class="hl-tag">&lt;code&gt;</span><span class="hl-txt">console.log('코드')</span><span class="hl-tag">&lt;/code&gt;</span>
+
+<span class="hl-tag">&lt;blockquote&gt;</span>
+  <span class="hl-txt">인용문은 이렇게 씁니다. 들여쓰기가 생겨요.</span>
+<span class="hl-tag">&lt;/blockquote&gt;</span>
+
+<span class="hl-tag">&lt;pre&gt;</span><span class="hl-txt">공백과 줄바꿈이
+그대로 유지돼요.</span><span class="hl-tag">&lt;/pre&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content">
+            <p>일반 단락. 자동으로 위아래 여백이 생겨요.</p>
+            <p>줄바꿈은 <br>이렇게 해요.</p>
+            <p><strong>굵게</strong> · <em>기울임</em> · <u>밑줄</u> · <s>취소선</s> · <mark>형광펜</mark> · <small>작게</small> · <code>code</code></p>
+            <blockquote style="border-left:3px solid #4a5568;padding-left:12px;color:#94a3b8;margin:6px 0;">"인용문은 이렇게 씁니다."</blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 링크 -->
+    <div id="s-link" class="card" data-level="beginner" data-keywords="a href target 링크 anchor 앵커">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;a&gt;</span>
+        <span class="card-head-title">링크 (앵커) 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc"><b>href</b>에 주소를 적어요. target="_blank"를 쓰면 새 탭에서 열려요. #으로 시작하면 같은 페이지 안에서 이동해요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 외부 링크 --&gt;</span>
+<span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"https://google.com"</span><span class="hl-tag">&gt;</span><span class="hl-txt">구글로 이동</span><span class="hl-tag">&lt;/a&gt;</span>
+
+<span class="hl-com">&lt;!-- 새 탭에서 열기 --&gt;</span>
+<span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"https://google.com"</span> <span class="hl-attr">target</span>=<span class="hl-val">"_blank"</span> <span class="hl-attr">rel</span>=<span class="hl-val">"noopener"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">새 탭으로 열기</span>
+<span class="hl-tag">&lt;/a&gt;</span>
+
+<span class="hl-com">&lt;!-- 이메일 --&gt;</span>
+<span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"mailto:hello@example.com"</span><span class="hl-tag">&gt;</span><span class="hl-txt">이메일 보내기</span><span class="hl-tag">&lt;/a&gt;</span>
+
+<span class="hl-com">&lt;!-- 전화 --&gt;</span>
+<span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"tel:010-1234-5678"</span><span class="hl-tag">&gt;</span><span class="hl-txt">전화하기</span><span class="hl-tag">&lt;/a&gt;</span>
+
+<span class="hl-com">&lt;!-- 페이지 내 이동 --&gt;</span>
+<span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"#section1"</span><span class="hl-tag">&gt;</span><span class="hl-txt">섹션1로 이동</span><span class="hl-tag">&lt;/a&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">id</span>=<span class="hl-val">"section1"</span><span class="hl-tag">&gt;</span><span class="hl-txt">여기로 이동됨!</span><span class="hl-tag">&lt;/div&gt;</span></pre></div>
+        </div>
+        <div class="tip"><b>보안 팁!</b> target="_blank"를 쓸 때 rel="noopener noreferrer"를 함께 쓰면 보안에 좋아요.</div>
+      </div>
+    </div>
+
+    <!-- 이미지 -->
+    <div id="s-image" class="card" data-level="beginner" data-keywords="img src alt width height 이미지 picture">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;img&gt; &lt;figure&gt; &lt;figcaption&gt;</span>
+        <span class="card-head-title">이미지 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc"><b>src</b>에 이미지 경로, <b>alt</b>에 이미지가 안 보일 때 표시할 설명을 써요. alt는 접근성과 SEO를 위해 꼭 써야 해요!</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 기본 이미지 --&gt;</span>
+<span class="hl-tag">&lt;img</span> <span class="hl-attr">src</span>=<span class="hl-val">"cat.jpg"</span> <span class="hl-attr">alt</span>=<span class="hl-val">"귀여운 고양이"</span> <span class="hl-attr">width</span>=<span class="hl-val">"300"</span><span class="hl-tag">&gt;</span>
+
+<span class="hl-com">&lt;!-- 캡션 있는 이미지 --&gt;</span>
+<span class="hl-tag">&lt;figure&gt;</span>
+  <span class="hl-tag">&lt;img</span> <span class="hl-attr">src</span>=<span class="hl-val">"cat.jpg"</span> <span class="hl-attr">alt</span>=<span class="hl-val">"귀여운 고양이"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;figcaption&gt;</span><span class="hl-txt">그림 1. 냥냥이 사진</span><span class="hl-tag">&lt;/figcaption&gt;</span>
+<span class="hl-tag">&lt;/figure&gt;</span>
+
+<span class="hl-com">&lt;!-- 반응형 이미지 (화면 크기별 다른 이미지) --&gt;</span>
+<span class="hl-tag">&lt;picture&gt;</span>
+  <span class="hl-tag">&lt;source</span> <span class="hl-attr">media</span>=<span class="hl-val">"(max-width:600px)"</span> <span class="hl-attr">srcset</span>=<span class="hl-val">"small.jpg"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;source</span> <span class="hl-attr">media</span>=<span class="hl-val">"(max-width:1200px)"</span> <span class="hl-attr">srcset</span>=<span class="hl-val">"medium.jpg"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;img</span> <span class="hl-attr">src</span>=<span class="hl-val">"large.jpg"</span> <span class="hl-attr">alt</span>=<span class="hl-val">"풍경"</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;/picture&gt;</span></pre></div>
+        </div>
+        <div class="tip"><b>성능 팁!</b> loading="lazy"를 추가하면 스크롤 내릴 때 이미지를 불러와서 초기 로딩이 빨라져요.</div>
+      </div>
+    </div>
+
+    <!-- 목록 -->
+    <div id="s-list" class="card" data-level="beginner" data-keywords="ul ol li dl dt dd 목록 리스트 list">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;ul&gt; &lt;ol&gt; &lt;li&gt; &lt;dl&gt;</span>
+        <span class="card-head-title">목록 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc"><b>ul</b>은 순서없는 목록(●), <b>ol</b>은 순서있는 목록(1.2.3.), <b>dl</b>은 용어 정의 목록이에요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 순서 없는 목록 --&gt;</span>
+<span class="hl-tag">&lt;ul&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">사과</span><span class="hl-tag">&lt;/li&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">바나나</span><span class="hl-tag">&lt;/li&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">딸기</span><span class="hl-tag">&lt;/li&gt;</span>
+<span class="hl-tag">&lt;/ul&gt;</span>
+
+<span class="hl-com">&lt;!-- 순서 있는 목록 --&gt;</span>
+<span class="hl-tag">&lt;ol&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">물을 끓인다</span><span class="hl-tag">&lt;/li&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">라면을 넣는다</span><span class="hl-tag">&lt;/li&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">3분 기다린다</span><span class="hl-tag">&lt;/li&gt;</span>
+<span class="hl-tag">&lt;/ol&gt;</span>
+
+<span class="hl-com">&lt;!-- 중첩 목록 --&gt;</span>
+<span class="hl-tag">&lt;ul&gt;</span>
+  <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">과일
+    </span><span class="hl-tag">&lt;ul&gt;</span>
+      <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">사과</span><span class="hl-tag">&lt;/li&gt;</span>
+      <span class="hl-tag">&lt;li&gt;</span><span class="hl-txt">배</span><span class="hl-tag">&lt;/li&gt;</span>
+    <span class="hl-tag">&lt;/ul&gt;</span>
+  <span class="hl-tag">&lt;/li&gt;</span>
+<span class="hl-tag">&lt;/ul&gt;</span>
+
+<span class="hl-com">&lt;!-- 용어 정의 목록 --&gt;</span>
+<span class="hl-tag">&lt;dl&gt;</span>
+  <span class="hl-tag">&lt;dt&gt;</span><span class="hl-txt">HTML</span><span class="hl-tag">&lt;/dt&gt;</span>
+  <span class="hl-tag">&lt;dd&gt;</span><span class="hl-txt">웹페이지 구조를 만드는 언어</span><span class="hl-tag">&lt;/dd&gt;</span>
+<span class="hl-tag">&lt;/dl&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <b style="font-size:11px;color:#94a3b8;">순서 없는 목록</b>
+              <ul><li>사과</li><li>바나나</li><li>딸기</li></ul>
+            </div>
+            <div>
+              <b style="font-size:11px;color:#94a3b8;">순서 있는 목록</b>
+              <ol><li>물을 끓인다</li><li>라면을 넣는다</li><li>3분 기다린다</li></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- div · span -->
+    <div id="s-div-span" class="card" data-level="beginner" data-keywords="div span class id 컨테이너 블록 인라인">
+      <div class="card-head">
+        <span class="tag tag-b">초급</span>
+        <span class="tag-elem">&lt;div&gt; &lt;span&gt;</span>
+        <span class="card-head-title">div · span 컨테이너</span>
+      </div>
+      <div class="card-body">
+        <p class="desc"><b>div</b>는 줄 전체를 차지하는 블록 컨테이너, <b>span</b>은 텍스트 일부에 쓰는 인라인 컨테이너예요. CSS와 JS를 연결할 때 많이 써요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- div: 블록 (줄 전체 차지) --&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">class</span>=<span class="hl-val">"box"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">이 안에 여러 요소를 묶어요.</span>
+<span class="hl-tag">&lt;/div&gt;</span>
+
+<span class="hl-com">&lt;!-- span: 인라인 (텍스트 안에서 사용) --&gt;</span>
+<span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">제 이름은 </span>
+  <span class="hl-tag">&lt;span</span> <span class="hl-attr">style</span>=<span class="hl-val">"color:red"</span><span class="hl-tag">&gt;</span><span class="hl-txt">홍길동</span><span class="hl-tag">&lt;/span&gt;</span>
+<span class="hl-txt">입니다.</span><span class="hl-tag">&lt;/p&gt;</span>
+
+<span class="hl-com">&lt;!-- id: 페이지에서 유일한 이름 --&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">id</span>=<span class="hl-val">"header"</span><span class="hl-tag">&gt;</span><span class="hl-txt">헤더 영역</span><span class="hl-tag">&lt;/div&gt;</span>
+
+<span class="hl-com">&lt;!-- class: 여러 요소에 같은 이름 붙이기 --&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">class</span>=<span class="hl-val">"card"</span><span class="hl-tag">&gt;</span><span class="hl-txt">카드 1</span><span class="hl-tag">&lt;/div&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">class</span>=<span class="hl-val">"card"</span><span class="hl-tag">&gt;</span><span class="hl-txt">카드 2</span><span class="hl-tag">&lt;/div&gt;</span></pre></div>
+        </div>
+        <div class="info"><b>블록 vs 인라인:</b> div는 혼자 한 줄을 차지해요. span은 텍스트 흐름 안에서 일부만 감싸요. CSS display 속성으로 바꿀 수도 있어요.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         🔥 중급
+    ══════════════════════════════════════════ -->
+
+    <!-- 폼 & 입력 -->
+    <div id="s-form" class="card" data-level="intermediate" data-keywords="form input select textarea button label 폼 입력 양식">
+      <div class="card-head">
+        <span class="tag tag-i">중급</span>
+        <span class="tag-elem">&lt;form&gt; &lt;input&gt; &lt;select&gt; &lt;textarea&gt;</span>
+        <span class="card-head-title">폼 & 입력 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">사용자 입력을 받을 때 써요. <b>label</b>을 input과 연결하면 클릭 영역이 넓어지고 접근성도 좋아져요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;form</span> <span class="hl-attr">action</span>=<span class="hl-val">"/submit"</span> <span class="hl-attr">method</span>=<span class="hl-val">"post"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- 텍스트 입력 --&gt;</span>
+  <span class="hl-tag">&lt;label</span> <span class="hl-attr">for</span>=<span class="hl-val">"name"</span><span class="hl-tag">&gt;</span><span class="hl-txt">이름</span><span class="hl-tag">&lt;/label&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"text"</span> <span class="hl-attr">id</span>=<span class="hl-val">"name"</span> <span class="hl-attr">name</span>=<span class="hl-val">"name"</span> <span class="hl-attr">placeholder</span>=<span class="hl-val">"홍길동"</span> <span class="hl-attr">required</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- 이메일, 비밀번호, 숫자, 날짜 --&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"email"</span> <span class="hl-attr">placeholder</span>=<span class="hl-val">"이메일"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"password"</span> <span class="hl-attr">placeholder</span>=<span class="hl-val">"비밀번호"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"number"</span> <span class="hl-attr">min</span>=<span class="hl-val">"1"</span> <span class="hl-attr">max</span>=<span class="hl-val">"100"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"date"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- 체크박스, 라디오 --&gt;</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"checkbox"</span> <span class="hl-attr">id</span>=<span class="hl-val">"agree"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;label</span> <span class="hl-attr">for</span>=<span class="hl-val">"agree"</span><span class="hl-tag">&gt;</span><span class="hl-txt">동의합니다</span><span class="hl-tag">&lt;/label&gt;</span>
+
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"radio"</span> <span class="hl-attr">name</span>=<span class="hl-val">"gender"</span> <span class="hl-attr">value</span>=<span class="hl-val">"male"</span><span class="hl-tag">&gt;</span> <span class="hl-txt">남</span>
+  <span class="hl-tag">&lt;input</span> <span class="hl-attr">type</span>=<span class="hl-val">"radio"</span> <span class="hl-attr">name</span>=<span class="hl-val">"gender"</span> <span class="hl-attr">value</span>=<span class="hl-val">"female"</span><span class="hl-tag">&gt;</span> <span class="hl-txt">여</span>
+
+  <span class="hl-com">&lt;!-- 드롭다운 --&gt;</span>
+  <span class="hl-tag">&lt;select</span> <span class="hl-attr">name</span>=<span class="hl-val">"city"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;option</span> <span class="hl-attr">value</span>=<span class="hl-val">"seoul"</span><span class="hl-tag">&gt;</span><span class="hl-txt">서울</span><span class="hl-tag">&lt;/option&gt;</span>
+    <span class="hl-tag">&lt;option</span> <span class="hl-attr">value</span>=<span class="hl-val">"busan"</span><span class="hl-tag">&gt;</span><span class="hl-txt">부산</span><span class="hl-tag">&lt;/option&gt;</span>
+  <span class="hl-tag">&lt;/select&gt;</span>
+
+  <span class="hl-com">&lt;!-- 여러 줄 입력 --&gt;</span>
+  <span class="hl-tag">&lt;textarea</span> <span class="hl-attr">rows</span>=<span class="hl-val">"4"</span> <span class="hl-attr">placeholder</span>=<span class="hl-val">"내용을 입력하세요"</span><span class="hl-tag">&gt;&lt;/textarea&gt;</span>
+
+  <span class="hl-com">&lt;!-- 제출 버튼 --&gt;</span>
+  <span class="hl-tag">&lt;button</span> <span class="hl-attr">type</span>=<span class="hl-val">"submit"</span><span class="hl-tag">&gt;</span><span class="hl-txt">제출하기</span><span class="hl-tag">&lt;/button&gt;</span>
+<span class="hl-tag">&lt;/form&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content">
+            <form onsubmit="return false">
+              <input type="text" placeholder="이름">
+              <input type="email" placeholder="이메일">
+              <select><option>서울</option><option>부산</option></select>
+              <textarea rows="2" placeholder="내용을 입력하세요"></textarea>
+              <button type="submit">제출하기</button>
+            </form>
+          </div>
+        </div>
+        <div class="tip"><b>required 속성:</b> 필수 입력 필드에 required를 붙이면 브라우저가 자동으로 검증해줘요.</div>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div id="s-table" class="card" data-level="intermediate" data-keywords="table tr td th thead tbody tfoot 테이블 표 colspan rowspan">
+      <div class="card-head">
+        <span class="tag tag-i">중급</span>
+        <span class="tag-elem">&lt;table&gt; &lt;tr&gt; &lt;td&gt; &lt;th&gt;</span>
+        <span class="card-head-title">테이블 (표)</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">데이터를 행과 열로 표시해요. <b>thead</b>는 헤더, <b>tbody</b>는 본문, <b>tfoot</b>은 푸터예요. colspan/rowspan으로 셀을 합칠 수 있어요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;table&gt;</span>
+  <span class="hl-tag">&lt;thead&gt;</span>
+    <span class="hl-tag">&lt;tr&gt;</span>
+      <span class="hl-tag">&lt;th&gt;</span><span class="hl-txt">이름</span><span class="hl-tag">&lt;/th&gt;</span>
+      <span class="hl-tag">&lt;th&gt;</span><span class="hl-txt">나이</span><span class="hl-tag">&lt;/th&gt;</span>
+      <span class="hl-tag">&lt;th&gt;</span><span class="hl-txt">도시</span><span class="hl-tag">&lt;/th&gt;</span>
+    <span class="hl-tag">&lt;/tr&gt;</span>
+  <span class="hl-tag">&lt;/thead&gt;</span>
+  <span class="hl-tag">&lt;tbody&gt;</span>
+    <span class="hl-tag">&lt;tr&gt;</span>
+      <span class="hl-tag">&lt;td&gt;</span><span class="hl-txt">홍길동</span><span class="hl-tag">&lt;/td&gt;</span>
+      <span class="hl-tag">&lt;td&gt;</span><span class="hl-txt">25</span><span class="hl-tag">&lt;/td&gt;</span>
+      <span class="hl-tag">&lt;td&gt;</span><span class="hl-txt">서울</span><span class="hl-tag">&lt;/td&gt;</span>
+    <span class="hl-tag">&lt;/tr&gt;</span>
+    <span class="hl-tag">&lt;tr&gt;</span>
+      <span class="hl-com">&lt;!-- colspan: 가로 2칸 합치기 --&gt;</span>
+      <span class="hl-tag">&lt;td</span> <span class="hl-attr">colspan</span>=<span class="hl-val">"2"</span><span class="hl-tag">&gt;</span><span class="hl-txt">김철수 (합계)</span><span class="hl-tag">&lt;/td&gt;</span>
+      <span class="hl-tag">&lt;td&gt;</span><span class="hl-txt">부산</span><span class="hl-tag">&lt;/td&gt;</span>
+    <span class="hl-tag">&lt;/tr&gt;</span>
+  <span class="hl-tag">&lt;/tbody&gt;</span>
+<span class="hl-tag">&lt;/table&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content">
+            <table>
+              <thead><tr><th>이름</th><th>나이</th><th>도시</th></tr></thead>
+              <tbody>
+                <tr><td>홍길동</td><td>25</td><td>서울</td></tr>
+                <tr><td colspan="2">김철수 (합계)</td><td>부산</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="warn"><b>주의!</b> 레이아웃 용도로 table을 쓰는 건 구식이에요. 레이아웃은 CSS Flexbox나 Grid를 써요. table은 진짜 데이터 표시에만 써요.</div>
+      </div>
+    </div>
+
+    <!-- 미디어 -->
+    <div id="s-media" class="card" data-level="intermediate" data-keywords="video audio source iframe embed 비디오 오디오 미디어 영상">
+      <div class="card-head">
+        <span class="tag tag-i">중급</span>
+        <span class="tag-elem">&lt;video&gt; &lt;audio&gt; &lt;iframe&gt;</span>
+        <span class="card-head-title">미디어 태그</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">비디오, 오디오, 외부 페이지를 삽입할 수 있어요. <b>controls</b> 속성으로 재생 컨트롤러를 보여줘요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 비디오 --&gt;</span>
+<span class="hl-tag">&lt;video</span> <span class="hl-attr">width</span>=<span class="hl-val">"400"</span> <span class="hl-attr">controls</span> <span class="hl-attr">autoplay</span> <span class="hl-attr">muted</span> <span class="hl-attr">loop</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;source</span> <span class="hl-attr">src</span>=<span class="hl-val">"movie.mp4"</span> <span class="hl-attr">type</span>=<span class="hl-val">"video/mp4"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;source</span> <span class="hl-attr">src</span>=<span class="hl-val">"movie.webm"</span> <span class="hl-attr">type</span>=<span class="hl-val">"video/webm"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">브라우저가 비디오를 지원하지 않습니다.</span>
+<span class="hl-tag">&lt;/video&gt;</span>
+
+<span class="hl-com">&lt;!-- 오디오 --&gt;</span>
+<span class="hl-tag">&lt;audio</span> <span class="hl-attr">controls</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;source</span> <span class="hl-attr">src</span>=<span class="hl-val">"music.mp3"</span> <span class="hl-attr">type</span>=<span class="hl-val">"audio/mpeg"</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;/audio&gt;</span>
+
+<span class="hl-com">&lt;!-- iframe: 다른 페이지 삽입 --&gt;</span>
+<span class="hl-tag">&lt;iframe</span>
+  <span class="hl-attr">src</span>=<span class="hl-val">"https://www.youtube.com/embed/..."</span>
+  <span class="hl-attr">width</span>=<span class="hl-val">"560"</span>
+  <span class="hl-attr">height</span>=<span class="hl-val">"315"</span>
+  <span class="hl-attr">allowfullscreen</span>
+<span class="hl-tag">&gt;&lt;/iframe&gt;</span></pre></div>
+        </div>
+        <div class="tip"><b>autoplay 팁!</b> 소리 있는 영상의 자동재생은 대부분 브라우저에서 막혀요. muted를 추가하면 음소거 상태로 자동재생돼요.</div>
+      </div>
+    </div>
+
+    <!-- 시멘틱 태그 -->
+    <div id="s-semantic" class="card" data-level="intermediate" data-keywords="header footer nav main section article aside 시멘틱 semantic 레이아웃">
+      <div class="card-head">
+        <span class="tag tag-i">중급</span>
+        <span class="tag-elem">&lt;header&gt; &lt;nav&gt; &lt;main&gt; &lt;section&gt; &lt;article&gt; &lt;footer&gt;</span>
+        <span class="card-head-title">시멘틱 태그 (의미있는 구조)</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">div 대신 의미있는 태그를 쓰면 코드가 읽기 쉽고 검색엔진, 스크린리더도 내용을 잘 이해해요. <b>HTML5에서 추가</b>된 핵심 태그들이에요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;header&gt;</span>          <span class="hl-com">&lt;!-- 페이지/섹션의 머리 부분 --&gt;</span>
+  <span class="hl-tag">&lt;nav&gt;</span>            <span class="hl-com">&lt;!-- 내비게이션 메뉴 --&gt;</span>
+    <span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"/"</span><span class="hl-tag">&gt;</span><span class="hl-txt">홈</span><span class="hl-tag">&lt;/a&gt;</span>
+    <span class="hl-tag">&lt;a</span> <span class="hl-attr">href</span>=<span class="hl-val">"/about"</span><span class="hl-tag">&gt;</span><span class="hl-txt">소개</span><span class="hl-tag">&lt;/a&gt;</span>
+  <span class="hl-tag">&lt;/nav&gt;</span>
+<span class="hl-tag">&lt;/header&gt;</span>
+
+<span class="hl-tag">&lt;main&gt;</span>            <span class="hl-com">&lt;!-- 페이지의 핵심 콘텐츠 (1개만!) --&gt;</span>
+  <span class="hl-tag">&lt;section&gt;</span>      <span class="hl-com">&lt;!-- 주제별 묶음 --&gt;</span>
+    <span class="hl-tag">&lt;h2&gt;</span><span class="hl-txt">최신 글</span><span class="hl-tag">&lt;/h2&gt;</span>
+
+    <span class="hl-tag">&lt;article&gt;</span>    <span class="hl-com">&lt;!-- 독립적인 콘텐츠 (뉴스, 블로그 글) --&gt;</span>
+      <span class="hl-tag">&lt;h3&gt;</span><span class="hl-txt">블로그 글 제목</span><span class="hl-tag">&lt;/h3&gt;</span>
+      <span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">본문 내용...</span><span class="hl-tag">&lt;/p&gt;</span>
+    <span class="hl-tag">&lt;/article&gt;</span>
+  <span class="hl-tag">&lt;/section&gt;</span>
+
+  <span class="hl-tag">&lt;aside&gt;</span>         <span class="hl-com">&lt;!-- 사이드바, 관련 링크 --&gt;</span>
+    <span class="hl-txt">광고 또는 관련 글</span>
+  <span class="hl-tag">&lt;/aside&gt;</span>
+<span class="hl-tag">&lt;/main&gt;</span>
+
+<span class="hl-tag">&lt;footer&gt;</span>          <span class="hl-com">&lt;!-- 페이지 하단 (저작권, 연락처) --&gt;</span>
+  <span class="hl-txt">© 2024 My Site</span>
+<span class="hl-tag">&lt;/footer&gt;</span></pre></div>
+        </div>
+        <div class="info"><b>시멘틱의 장점:</b> 검색엔진이 내용을 더 잘 파악해 SEO에 유리하고, 시각장애인용 스크린리더가 페이지 구조를 쉽게 안내할 수 있어요.</div>
+      </div>
+    </div>
+
+    <!-- 메타 태그 -->
+    <div id="s-meta" class="card" data-level="intermediate" data-keywords="meta og twitter seo 메타 viewport description">
+      <div class="card-head">
+        <span class="tag tag-i">중급</span>
+        <span class="tag-elem">&lt;meta&gt; &lt;link&gt; &lt;script&gt;</span>
+        <span class="card-head-title">메타 태그 & 리소스 연결</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">head 안에서 브라우저와 검색엔진에게 정보를 알려줘요. <b>og 태그</b>를 쓰면 카카오톡·슬랙 공유 시 미리보기가 예쁘게 나와요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;head&gt;</span>
+  <span class="hl-com">&lt;!-- 필수 기본 --&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">charset</span>=<span class="hl-val">"UTF-8"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">name</span>=<span class="hl-val">"viewport"</span> <span class="hl-attr">content</span>=<span class="hl-val">"width=device-width, initial-scale=1.0"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">name</span>=<span class="hl-val">"description"</span> <span class="hl-attr">content</span>=<span class="hl-val">"페이지 설명 (검색 결과에 표시)"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- 오픈 그래프 (SNS 공유 미리보기) --&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">property</span>=<span class="hl-val">"og:title"</span> <span class="hl-attr">content</span>=<span class="hl-val">"페이지 제목"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">property</span>=<span class="hl-val">"og:description"</span> <span class="hl-attr">content</span>=<span class="hl-val">"페이지 설명"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">property</span>=<span class="hl-val">"og:image"</span> <span class="hl-attr">content</span>=<span class="hl-val">"https://example.com/thumb.jpg"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;meta</span> <span class="hl-attr">property</span>=<span class="hl-val">"og:url"</span> <span class="hl-attr">content</span>=<span class="hl-val">"https://example.com"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- CSS 연결 --&gt;</span>
+  <span class="hl-tag">&lt;link</span> <span class="hl-attr">rel</span>=<span class="hl-val">"stylesheet"</span> <span class="hl-attr">href</span>=<span class="hl-val">"style.css"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-com">&lt;!-- JS 연결 (defer: HTML 파싱 후 실행) --&gt;</span>
+  <span class="hl-tag">&lt;script</span> <span class="hl-attr">src</span>=<span class="hl-val">"app.js"</span> <span class="hl-attr">defer</span><span class="hl-tag">&gt;&lt;/script&gt;</span>
+<span class="hl-tag">&lt;/head&gt;</span></pre></div>
+        </div>
+        <div class="tip"><b>defer vs async:</b> defer는 HTML 파싱 끝나고 순서대로 실행, async는 다운로드 즉시 실행(순서 보장 안 됨). 보통 defer를 써요.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         ⚡ 고급
+    ══════════════════════════════════════════ -->
+
+    <!-- 데이터 속성 -->
+    <div id="s-data" class="card" data-level="advanced" data-keywords="data-* dataset 데이터 속성 custom attribute">
+      <div class="card-head">
+        <span class="tag tag-a">고급</span>
+        <span class="tag-elem">data-* 속성</span>
+        <span class="card-head-title">커스텀 데이터 속성</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">HTML 요소에 <b>data-</b>로 시작하는 속성을 만들어 데이터를 저장할 수 있어요. JS에서 <b>dataset</b>으로 읽어요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- HTML에서 데이터 저장 --&gt;</span>
+<span class="hl-tag">&lt;button</span>
+  <span class="hl-attr">data-user-id</span>=<span class="hl-val">"42"</span>
+  <span class="hl-attr">data-action</span>=<span class="hl-val">"delete"</span>
+  <span class="hl-attr">data-confirm-msg</span>=<span class="hl-val">"정말 삭제할까요?"</span>
+  <span class="hl-attr">onclick</span>=<span class="hl-val">"handleClick(this)"</span>
+<span class="hl-tag">&gt;</span><span class="hl-txt">삭제</span><span class="hl-tag">&lt;/button&gt;</span>
+
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">class</span>=<span class="hl-val">"product"</span>
+     <span class="hl-attr">data-price</span>=<span class="hl-val">"15000"</span>
+     <span class="hl-attr">data-category</span>=<span class="hl-val">"food"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">상품명</span>
+<span class="hl-tag">&lt;/div&gt;</span></pre></div>
+        </div>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">JavaScript</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-kw">function</span> <span class="hl-txt">handleClick(btn) {</span>
+  <span class="hl-com">// data-user-id → dataset.userId (카멜케이스로 변환됨)</span>
+  <span class="hl-txt">const userId = btn.dataset.userId;   </span><span class="hl-com">// "42"</span>
+  <span class="hl-txt">const action = btn.dataset.action;   </span><span class="hl-com">// "delete"</span>
+  <span class="hl-txt">const msg = btn.dataset.confirmMsg;  </span><span class="hl-com">// "정말 삭제할까요?"</span>
+
+  <span class="hl-kw">if</span><span class="hl-txt">(confirm(msg)) {</span>
+    <span class="hl-txt">console.log(`${action} user ${userId}`);</span>
+  <span class="hl-txt">}</span>
+<span class="hl-txt">}</span>
+
+<span class="hl-com">// CSS에서도 사용 가능:</span>
+<span class="hl-com">// [data-category="food"] { background: green; }</span></pre></div>
+        </div>
+        <div class="tip"><b>활용 예시:</b> 상품 ID, 필터링 카테고리, 애니메이션 옵션 등 JS에 전달할 데이터를 HTML에 깔끔하게 저장할 때 써요.</div>
+      </div>
+    </div>
+
+    <!-- 접근성 -->
+    <div id="s-accessibility" class="card" data-level="advanced" data-keywords="aria role tabindex 접근성 accessibility 스크린리더 장애">
+      <div class="card-head">
+        <span class="tag tag-a">고급</span>
+        <span class="tag-elem">aria-* role tabindex</span>
+        <span class="card-head-title">웹 접근성 (ARIA)</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">시각장애인이 스크린리더로 웹을 사용할 때 필요한 정보를 제공해요. <b>role</b>로 역할을, <b>aria-*</b>로 상태와 관계를 표현해요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 버튼 역할 + 레이블 --&gt;</span>
+<span class="hl-tag">&lt;button</span> <span class="hl-attr">aria-label</span>=<span class="hl-val">"메뉴 열기"</span> <span class="hl-attr">aria-expanded</span>=<span class="hl-val">"false"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">☰</span>
+<span class="hl-tag">&lt;/button&gt;</span>
+
+<span class="hl-com">&lt;!-- 내비게이션 역할 명시 --&gt;</span>
+<span class="hl-tag">&lt;nav</span> <span class="hl-attr">aria-label</span>=<span class="hl-val">"주 메뉴"</span><span class="hl-tag">&gt;</span> ... <span class="hl-tag">&lt;/nav&gt;</span>
+
+<span class="hl-com">&lt;!-- 라이브 영역: 동적으로 변하는 내용 알림 --&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">aria-live</span>=<span class="hl-val">"polite"</span> <span class="hl-attr">id</span>=<span class="hl-val">"status"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">파일 업로드 완료!</span>
+<span class="hl-tag">&lt;/div&gt;</span>
+
+<span class="hl-com">&lt;!-- 키보드 포커스 순서 --&gt;</span>
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">tabindex</span>=<span class="hl-val">"0"</span> <span class="hl-attr">role</span>=<span class="hl-val">"button"</span>
+     <span class="hl-attr">aria-label</span>=<span class="hl-val">"좋아요"</span>
+     <span class="hl-attr">onkeypress</span>=<span class="hl-val">"if(event.key==='Enter')like()"</span>
+     <span class="hl-attr">onclick</span>=<span class="hl-val">"like()"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-txt">❤️ 좋아요</span>
+<span class="hl-tag">&lt;/div&gt;</span>
+
+<span class="hl-com">&lt;!-- 숨김 텍스트 (스크린리더만 읽음) --&gt;</span>
+<span class="hl-tag">&lt;span</span> <span class="hl-attr">class</span>=<span class="hl-val">"sr-only"</span><span class="hl-tag">&gt;</span><span class="hl-txt">현재 페이지: 홈</span><span class="hl-tag">&lt;/span&gt;</span></pre></div>
+        </div>
+        <div class="info"><b>tabindex 규칙:</b> 0이면 자연스러운 탭 순서에 포함, -1이면 탭으로는 못 가지만 JS로 포커스 가능, 양수(1,2,3...)는 순서 지정 (잘 안 써요).</div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="s-canvas" class="card" data-level="advanced" data-keywords="canvas 2d context 그래픽 애니메이션 게임 캔버스">
+      <div class="card-head">
+        <span class="tag tag-a">고급</span>
+        <span class="tag-elem">&lt;canvas&gt;</span>
+        <span class="card-head-title">Canvas — 2D 그래픽</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">JS로 픽셀 단위의 그래픽을 그릴 수 있어요. 게임, 차트, 애니메이션에 자주 써요. <b>getContext('2d')</b>로 2D 그리기를 시작해요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-tag">&lt;canvas</span> <span class="hl-attr">id</span>=<span class="hl-val">"myCanvas"</span> <span class="hl-attr">width</span>=<span class="hl-val">"400"</span> <span class="hl-attr">height</span>=<span class="hl-val">"200"</span><span class="hl-tag">&gt;&lt;/canvas&gt;</span></pre></div>
+        </div>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">JavaScript</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-kw">const</span> <span class="hl-txt">canvas = document.getElementById(</span><span class="hl-val">'myCanvas'</span><span class="hl-txt">);</span>
+<span class="hl-kw">const</span> <span class="hl-txt">ctx = canvas.getContext(</span><span class="hl-val">'2d'</span><span class="hl-txt">);</span>
+
+<span class="hl-com">// 사각형 그리기</span>
+<span class="hl-txt">ctx.fillStyle = </span><span class="hl-val">'#60a5fa'</span><span class="hl-txt">;</span>
+<span class="hl-txt">ctx.fillRect(10, 10, 150, 80);</span>     <span class="hl-com">// x, y, width, height</span>
+
+<span class="hl-com">// 원 그리기</span>
+<span class="hl-txt">ctx.beginPath();</span>
+<span class="hl-txt">ctx.arc(250, 60, 40, 0, Math.PI * 2);</span> <span class="hl-com">// x, y, 반지름, 시작각, 끝각</span>
+<span class="hl-txt">ctx.fillStyle = </span><span class="hl-val">'#34d399'</span><span class="hl-txt">;</span>
+<span class="hl-txt">ctx.fill();</span>
+
+<span class="hl-com">// 텍스트 그리기</span>
+<span class="hl-txt">ctx.font = </span><span class="hl-val">'20px Arial'</span><span class="hl-txt">;</span>
+<span class="hl-txt">ctx.fillStyle = </span><span class="hl-val">'#fff'</span><span class="hl-txt">;</span>
+<span class="hl-txt">ctx.fillText(</span><span class="hl-val">'Hello Canvas!'</span><span class="hl-txt">, 50, 60);</span>
+
+<span class="hl-com">// 애니메이션 루프</span>
+<span class="hl-kw">let</span> <span class="hl-txt">x = 0;</span>
+<span class="hl-kw">function</span> <span class="hl-txt">animate() {</span>
+  <span class="hl-txt">ctx.clearRect(0, 0, canvas.width, canvas.height);</span>
+  <span class="hl-txt">ctx.fillRect(x, 80, 30, 30);</span>
+  <span class="hl-txt">x = (x + 2) % canvas.width;</span>
+  <span class="hl-txt">requestAnimationFrame(animate);</span>
+<span class="hl-txt">}</span>
+<span class="hl-txt">animate();</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기 (실시간)</div>
+          <canvas id="demoCanvas" width="380" height="100" style="background:#0a0e1a;border-radius:6px;width:100%;max-width:380px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template -->
+    <div id="s-template" class="card" data-level="advanced" data-keywords="template shadow dom 웹 컴포넌트 web component slot">
+      <div class="card-head">
+        <span class="tag tag-a">고급</span>
+        <span class="tag-elem">&lt;template&gt; &lt;slot&gt;</span>
+        <span class="card-head-title">Template & Web Components</span>
+      </div>
+      <div class="card-body">
+        <p class="desc"><b>template</b> 태그 안 내용은 렌더링되지 않아요. JS로 복제해서 써요. Shadow DOM과 함께 쓰면 캡슐화된 웹 컴포넌트를 만들 수 있어요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- 템플릿 정의 (화면에 안 보임) --&gt;</span>
+<span class="hl-tag">&lt;template</span> <span class="hl-attr">id</span>=<span class="hl-val">"card-tpl"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;div</span> <span class="hl-attr">class</span>=<span class="hl-val">"card"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;h3</span> <span class="hl-attr">class</span>=<span class="hl-val">"card-title"</span><span class="hl-tag">&gt;&lt;/h3&gt;</span>
+    <span class="hl-tag">&lt;p</span> <span class="hl-attr">class</span>=<span class="hl-val">"card-body"</span><span class="hl-tag">&gt;&lt;/p&gt;</span>
+  <span class="hl-tag">&lt;/div&gt;</span>
+<span class="hl-tag">&lt;/template&gt;</span>
+
+<span class="hl-tag">&lt;div</span> <span class="hl-attr">id</span>=<span class="hl-val">"container"</span><span class="hl-tag">&gt;&lt;/div&gt;</span></pre></div>
+        </div>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">JavaScript</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-kw">const</span> <span class="hl-txt">tpl = document.getElementById(</span><span class="hl-val">'card-tpl'</span><span class="hl-txt">);</span>
+<span class="hl-kw">const</span> <span class="hl-txt">data = [</span>
+  <span class="hl-txt">{ title: </span><span class="hl-val">'제목 1'</span><span class="hl-txt">, body: </span><span class="hl-val">'내용 1'</span><span class="hl-txt"> },</span>
+  <span class="hl-txt">{ title: </span><span class="hl-val">'제목 2'</span><span class="hl-txt">, body: </span><span class="hl-val">'내용 2'</span><span class="hl-txt"> },</span>
+<span class="hl-txt">];</span>
+
+<span class="hl-txt">data.forEach(item => {</span>
+  <span class="hl-com">// 템플릿 복제</span>
+  <span class="hl-kw">const</span> <span class="hl-txt">clone = tpl.content.cloneNode(</span><span class="hl-kw">true</span><span class="hl-txt">);</span>
+  <span class="hl-txt">clone.querySelector(</span><span class="hl-val">'.card-title'</span><span class="hl-txt">).textContent = item.title;</span>
+  <span class="hl-txt">clone.querySelector(</span><span class="hl-val">'.card-body'</span><span class="hl-txt">).textContent = item.body;</span>
+  <span class="hl-txt">document.getElementById(</span><span class="hl-val">'container'</span><span class="hl-txt">).appendChild(clone);</span>
+<span class="hl-txt">});</span></pre></div>
+        </div>
+        <div class="info"><b>왜 쓰나요?</b> innerHTML로 HTML 문자열을 동적으로 만드는 것보다 XSS 공격에 안전하고, 재사용 가능한 UI 조각을 만들기에 좋아요.</div>
+      </div>
+    </div>
+
+    <!-- 고급 폼 -->
+    <div id="s-advanced-form" class="card" data-level="advanced" data-keywords="datalist details summary dialog progress meter output 고급 폼 네이티브">
+      <div class="card-head">
+        <span class="tag tag-a">고급</span>
+        <span class="tag-elem">&lt;datalist&gt; &lt;dialog&gt; &lt;details&gt; &lt;progress&gt;</span>
+        <span class="card-head-title">고급 네이티브 UI 요소</span>
+      </div>
+      <div class="card-body">
+        <p class="desc">JS 없이 CSS만으로, 또는 최소한의 JS로 구현할 수 있는 강력한 네이티브 UI 태그들이에요.</p>
+        <div class="code-block">
+          <div class="code-bar"><span class="code-bar-label">HTML</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
+          <div class="code-inner"><pre><span class="hl-com">&lt;!-- datalist: 자동완성 목록 --&gt;</span>
+<span class="hl-tag">&lt;input</span> <span class="hl-attr">list</span>=<span class="hl-val">"fruits"</span> <span class="hl-attr">placeholder</span>=<span class="hl-val">"과일 선택..."</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;datalist</span> <span class="hl-attr">id</span>=<span class="hl-val">"fruits"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;option</span> <span class="hl-attr">value</span>=<span class="hl-val">"사과"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;option</span> <span class="hl-attr">value</span>=<span class="hl-val">"바나나"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;option</span> <span class="hl-attr">value</span>=<span class="hl-val">"딸기"</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;/datalist&gt;</span>
+
+<span class="hl-com">&lt;!-- details + summary: 아코디언 (JS 불필요!) --&gt;</span>
+<span class="hl-tag">&lt;details&gt;</span>
+  <span class="hl-tag">&lt;summary&gt;</span><span class="hl-txt">여기를 클릭하면 펼쳐져요 ▶</span><span class="hl-tag">&lt;/summary&gt;</span>
+  <span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">숨겨진 내용이 나타나요!</span><span class="hl-tag">&lt;/p&gt;</span>
+<span class="hl-tag">&lt;/details&gt;</span>
+
+<span class="hl-com">&lt;!-- dialog: 모달 (JS로 열기) --&gt;</span>
+<span class="hl-tag">&lt;dialog</span> <span class="hl-attr">id</span>=<span class="hl-val">"modal"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;h2&gt;</span><span class="hl-txt">모달 제목</span><span class="hl-tag">&lt;/h2&gt;</span>
+  <span class="hl-tag">&lt;p&gt;</span><span class="hl-txt">모달 내용이에요.</span><span class="hl-tag">&lt;/p&gt;</span>
+  <span class="hl-tag">&lt;button</span> <span class="hl-attr">onclick</span>=<span class="hl-val">"document.getElementById('modal').close()"</span><span class="hl-tag">&gt;</span><span class="hl-txt">닫기</span><span class="hl-tag">&lt;/button&gt;</span>
+<span class="hl-tag">&lt;/dialog&gt;</span>
+<span class="hl-tag">&lt;button</span> <span class="hl-attr">onclick</span>=<span class="hl-val">"document.getElementById('modal').showModal()"</span><span class="hl-tag">&gt;</span><span class="hl-txt">모달 열기</span><span class="hl-tag">&lt;/button&gt;</span>
+
+<span class="hl-com">&lt;!-- progress: 진행바 --&gt;</span>
+<span class="hl-tag">&lt;progress</span> <span class="hl-attr">value</span>=<span class="hl-val">"70"</span> <span class="hl-attr">max</span>=<span class="hl-val">"100"</span><span class="hl-tag">&gt;</span><span class="hl-txt">70%</span><span class="hl-tag">&lt;/progress&gt;</span>
+
+<span class="hl-com">&lt;!-- meter: 값의 상태 표시 (배터리, 점수 등) --&gt;</span>
+<span class="hl-tag">&lt;meter</span> <span class="hl-attr">value</span>=<span class="hl-val">"0.7"</span> <span class="hl-attr">min</span>=<span class="hl-val">"0"</span> <span class="hl-attr">max</span>=<span class="hl-val">"1"</span> <span class="hl-attr">low</span>=<span class="hl-val">"0.3"</span> <span class="hl-attr">high</span>=<span class="hl-val">"0.8"</span><span class="hl-tag">&gt;&lt;/meter&gt;</span></pre></div>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">미리보기</div>
+          <div class="preview-content" style="display:flex;flex-direction:column;gap:10px;">
+            <details>
+              <summary style="cursor:pointer;color:#60a5fa;">여기를 클릭하면 펼쳐져요 ▶</summary>
+              <p style="margin-top:6px;color:#94a3b8;">숨겨진 내용이 나타나요!</p>
+            </details>
+            <div><label style="font-size:11px;color:#94a3b8;">progress:</label> <progress value="70" max="100"></progress> 70%</div>
+            <div><label style="font-size:11px;color:#94a3b8;">meter:</label> <meter value="0.7" min="0" max="1" low="0.3" high="0.8"></meter></div>
+          </div>
+        </div>
+        <div class="tip"><b>dialog 팁!</b> showModal()은 배경을 어둡게 만드는 백드롭 효과가 자동으로 생겨요. show()는 백드롭 없이 그냥 보여줘요.</div>
+      </div>
+    </div>
+
+    <div class="no-result" id="noResult" style="display:none">
+      검색 결과가 없어요 😅
+    </div>
+
+  </main>
+</div>
+
+<!-- DIALOG DEMO -->
+<dialog id="demoModal" style="background:#1e2535;color:#e2e8f0;border:1px solid #3a4a63;border-radius:10px;padding:24px;min-width:280px;">
+  <h2 style="margin-bottom:8px;color:#60a5fa;">dialog 태그 모달!</h2>
+  <p style="color:#94a3b8;font-size:13px;margin-bottom:16px;">JS 없이 &lt;dialog&gt; 태그만으로 모달을 만들 수 있어요.</p>
+  <button onclick="document.getElementById('demoModal').close()" style="background:#2563eb;color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;">닫기</button>
+</dialog>
+
+<script>
+// ── 탭 전환 ─────────────────────────────────────────
+let currentTab = 'all';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  applyFilter();
+}
+
+// ── 사이드바 스크롤 ──────────────────────────────────
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ── 검색 & 필터 ─────────────────────────────────────
+function applyFilter() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.card');
+  let visible = 0;
+
+  cards.forEach(card => {
+    const level = card.dataset.level;
+    const keywords = (card.dataset.keywords || '') + card.textContent;
+    const levelOk = currentTab === 'all' || level === currentTab;
+    const searchOk = !q || keywords.toLowerCase().includes(q);
+    const show = levelOk && searchOk;
+    card.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+
+  document.getElementById('noResult').style.display = visible === 0 ? '' : 'none';
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilter);
+
+// ── 코드 복사 ────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 복사됨';
+    setTimeout(() => btn.textContent = '복사', 1500);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    btn.textContent = '✓ 복사됨';
+    setTimeout(() => btn.textContent = '복사', 1500);
+  });
+}
+
+// ── Canvas 데모 ──────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('demoCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let x = 0, hue = 0;
+
+  function draw() {
+    ctx.fillStyle = 'rgba(10,14,26,0.15)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    hue = (hue + 1) % 360;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = `hsl(${hue},100%,60%)`;
+    ctx.fillStyle = `hsl(${hue},100%,60%)`;
+    ctx.beginPath();
+    ctx.arc(x, 50, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    x = (x + 2.5) % canvas.width;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── 스크롤 시 사이드바 활성화 ─────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      const id = e.target.id;
+      document.querySelectorAll('.sb-item').forEach(i => {
+        i.classList.toggle('active', i.getAttribute('onclick')?.includes(id));
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+document.querySelectorAll('.card[id]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

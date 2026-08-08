@@ -21,7 +21,6 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   background:rgba(255,80,80,0);transition:background .15s;pointer-events:none;}
 #canvas-wrap.floor-open #floor-open-line{background:rgba(255,80,80,.7);box-shadow:0 0 8px rgba(255,80,80,.5);}
 
-/* ── 컨트롤 패널 ─────────────────────────────── */
 #controls{
   display:flex;flex-wrap:wrap;align-items:center;gap:6px;
   margin-top:6px;padding:7px 11px;
@@ -70,19 +69,16 @@ input[type=range]::-webkit-slider-thumb{
 #btn-countdown.on{background:#1a1a3a;color:#aaaaff;border-color:#6688ff;
   box-shadow:0 0 6px rgba(100,136,255,.3);}
 
-/* 수동 색상 스와치 */
 .color-pick{display:flex;gap:3px;align-items:center;}
 .color-swatch{width:14px;height:14px;border-radius:3px;cursor:pointer;
   border:2px solid transparent;transition:.1s;}
 .color-swatch.active{border-color:#fff;box-shadow:0 0 4px rgba(255,255,255,.5);}
 
-/* 테마 버튼 */
 .theme-btn{padding:3px 7px;border:1px solid rgba(255,255,255,.14);border-radius:4px;
   background:rgba(255,255,255,.04);color:#909090;font-size:11px;cursor:pointer;transition:.1s;}
 .theme-btn:hover{background:rgba(255,255,255,.1);color:#ccc;}
 .theme-btn.active{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35);}
 
-/* 커스텀 색상 행 */
 #custom-row{width:100%;display:none;align-items:flex-end;flex-wrap:wrap;gap:6px;
   padding-top:5px;border-top:1px solid rgba(255,255,255,.08);}
 #custom-row.visible{display:flex;}
@@ -97,28 +93,15 @@ input[type=range]::-webkit-slider-thumb{
 .cpick-del:hover{background:rgba(255,80,80,.45);color:#fff;}
 .cpick-add{width:22px;height:58px;border:1px dashed rgba(100,200,100,.35);border-radius:3px;
   background:rgba(100,200,100,.07);color:#88cc88;font-size:18px;cursor:pointer;
-  line-height:1;transition:.1s;align-self:flex-end;}
-.cpick-add:hover{background:rgba(100,200,100,.2);color:#aaffaa;border-color:rgba(100,200,100,.6);}
+  line-height:1;transition:.1s;}
+.cpick-add:hover{background:rgba(100,200,100,.2);color:#aaffaa;}
 
 #stats{color:#606080;font-size:11px;margin-left:auto;}
 
-/* ── 전체화면 모드 ────────────────────────────── */
+/* 전체화면 — 컨트롤·타이틀 완전 숨김, 플로팅 버튼 없음 */
 body.fs-mode #title   {display:none;}
 body.fs-mode #controls{display:none;}
 body.fs-mode #canvas-wrap{border:none;border-radius:0;box-shadow:none;}
-
-/* 전체화면 플로팅 버튼 */
-#fs-overlay{
-  position:fixed;top:10px;right:10px;z-index:999;
-  display:none;flex-direction:column;gap:5px;align-items:flex-end;
-}
-body.fs-mode #fs-overlay{display:flex;}
-#btn-fs-exit{
-  padding:5px 11px;border:1px solid rgba(255,255,255,.2);border-radius:5px;
-  background:rgba(0,0,0,.55);color:rgba(255,255,255,.6);font-size:11px;cursor:pointer;
-  transition:all .2s;
-}
-#btn-fs-exit:hover{background:rgba(0,0,0,.85);color:#fff;border-color:rgba(255,255,255,.5);}
 </style>
 </head>
 <body>
@@ -132,13 +115,13 @@ body.fs-mode #fs-overlay{display:flex;}
 
 <div id="controls">
 
-  <!-- ── 행 1: 기본 ── -->
+  <!-- 행 1: 기본 -->
   <div class="ctrl-group">
     <button class="btn" id="btn-floor">밑 열기 (꾹)</button>
   </div>
   <div class="ctrl-group">
     <span class="ctrl-label">밀도</span>
-    <input type="range" id="slider-density" min="1" max="10" value="5" step="1" style="width:65px">
+    <input type="range" id="slider-density" min="1" max="10" value="5" step="1" style="width:60px">
     <span class="val-display" id="val-density">5</span>
   </div>
   <div class="ctrl-group">
@@ -158,25 +141,29 @@ body.fs-mode #fs-overlay{display:flex;}
   </div>
   <span id="stats">모래: 0</span>
 
-  <!-- ── 행 2: 자동 산 ── -->
+  <!-- 행 2: 자동 산 + 테마 + 음량 -->
   <div class="ctrl-row">
     <div class="ctrl-group">
       <button class="btn" id="btn-auto">⛰ 자동 산 OFF</button>
     </div>
     <div class="ctrl-group">
       <span class="ctrl-label">봉우리</span>
-      <input type="range" id="slider-peaks" min="1" max="20" value="6" step="1" style="width:65px">
+      <input type="range" id="slider-peaks" min="1" max="20" value="6" step="1" style="width:60px">
       <span class="val-display" id="val-peaks">6</span>
     </div>
     <div class="ctrl-group">
       <span class="ctrl-label">속도</span>
-      <input type="range" id="slider-speed" min="1" max="10" value="6" step="1" style="width:60px">
+      <input type="range" id="slider-speed" min="1" max="10" value="6" step="1" style="width:55px">
       <span class="val-display" id="val-speed">6</span>
     </div>
     <div class="ctrl-group">
       <span class="ctrl-label">폭</span>
-      <input type="range" id="slider-spread" min="0" max="20" value="2" step="1" style="width:60px">
+      <input type="range" id="slider-spread" min="0" max="20" value="2" step="1" style="width:55px">
       <span class="val-display" id="val-spread">2</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">🔊</span>
+      <input type="range" id="slider-vol" min="0" max="100" value="50" step="1" style="width:55px">
     </div>
     <div class="ctrl-divider"></div>
     <button class="theme-btn active" data-theme="forest">🌲 초록</button>
@@ -188,13 +175,13 @@ body.fs-mode #fs-overlay{display:flex;}
     <button class="theme-btn"        data-theme="custom">🎨 커스텀</button>
   </div>
 
-  <!-- ── 행 3: 커스텀 색상 (동적) ── -->
+  <!-- 행 3: 커스텀 색상 -->
   <div id="custom-row">
     <span class="ctrl-label" style="align-self:flex-end;margin-bottom:4px;">색상</span>
     <div id="cpick-container" style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;"></div>
   </div>
 
-  <!-- ── 행 4: 자동 초기화 ── -->
+  <!-- 행 4: 자동 초기화 -->
   <div class="ctrl-row">
     <div class="ctrl-group">
       <button class="btn" id="btn-autoreset">🔄 자동초기화 OFF</button>
@@ -202,7 +189,7 @@ body.fs-mode #fs-overlay{display:flex;}
     <div class="ctrl-group">
       <button class="btn on" id="btn-countdown">💬 메시지 표시 ON</button>
     </div>
-    <div class="ctrl-group" id="delay-group">
+    <div class="ctrl-group">
       <span class="ctrl-label">대기</span>
       <input type="range" id="slider-delay" min="1" max="30" value="5" step="1" style="width:65px">
       <span class="val-display" id="val-delay">5s</span>
@@ -211,13 +198,10 @@ body.fs-mode #fs-overlay{display:flex;}
 
 </div>
 
-<!-- 전체화면용 플로팅 버튼 -->
-<div id="fs-overlay">
-  <button id="btn-fs-exit">⛶ 창모드로 돌아가기</button>
-</div>
-
 <script>
-// ── 캔버스 ───────────────────────────────────────
+// ═══════════════════════════════════════════
+//  캔버스
+// ═══════════════════════════════════════════
 const canvas  = document.getElementById('canvas');
 const ctx     = canvas.getContext('2d');
 const canWrap = document.getElementById('canvas-wrap');
@@ -228,32 +212,34 @@ function resize(){
   const isFS = !!document.fullscreenElement;
   const W = isFS ? window.innerWidth  : Math.min(window.innerWidth  - 20, 700);
   const H = isFS ? window.innerHeight : Math.min(window.innerHeight - 188, 450);
-  canvas.width  = Math.floor(Math.max(W, 100) / CELL) * CELL;
-  canvas.height = Math.floor(Math.max(H, 100) / CELL) * CELL;
+  canvas.width  = Math.floor(Math.max(W,100)/CELL)*CELL;
+  canvas.height = Math.floor(Math.max(H,100)/CELL)*CELL;
   canWrap.style.width  = canvas.width  + 'px';
   canWrap.style.height = canvas.height + 'px';
-  COLS = canvas.width  / CELL;
-  ROWS = canvas.height / CELL;
-  grid      = new Uint32Array(COLS * ROWS);
-  imageData = ctx.createImageData(canvas.width, canvas.height);
-  pixels    = imageData.data;
+  COLS=canvas.width/CELL; ROWS=canvas.height/CELL;
+  grid=new Uint32Array(COLS*ROWS);
+  imageData=ctx.createImageData(canvas.width,canvas.height);
+  pixels=imageData.data;
 }
 
-// ── 전체화면 ──────────────────────────────────────
-const btnFS = document.getElementById('btn-fs');
-btnFS.addEventListener('click', () => {
+// ═══════════════════════════════════════════
+//  전체화면 (플로팅 버튼 없음 — ESC로 탈출)
+// ═══════════════════════════════════════════
+const btnFS=document.getElementById('btn-fs');
+btnFS.addEventListener('click',()=>{
   if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 });
-document.getElementById('btn-fs-exit').addEventListener('click', () => document.exitFullscreen());
-document.addEventListener('fullscreenchange', () => {
-  const isFS = !!document.fullscreenElement;
-  document.body.classList.toggle('fs-mode', isFS);
-  btnFS.textContent = isFS ? '⛶ 창모드' : '⛶ 전체화면';
+document.addEventListener('fullscreenchange',()=>{
+  const isFS=!!document.fullscreenElement;
+  document.body.classList.toggle('fs-mode',isFS);
+  btnFS.textContent=isFS?'⛶ 창모드':'⛶ 전체화면';
   resize();
 });
 
-// ── 색상 유틸 ────────────────────────────────────
+// ═══════════════════════════════════════════
+//  색상 유틸
+// ═══════════════════════════════════════════
 function hexToRgb(h){return{r:parseInt(h.slice(1,3),16),g:parseInt(h.slice(3,5),16),b:parseInt(h.slice(5,7),16)};}
 function hslToRgb(h,s,l){
   s/=100;l/=100;
@@ -264,7 +250,9 @@ function packColor(r,g,b){return(0xFF<<24)|(b<<16)|(g<<8)|r;}
 function clamp(v){return Math.min(255,Math.max(0,v));}
 function vary(c,a=18){const v=(Math.random()*a*2-a)|0;return{r:clamp(c.r+v),g:clamp(c.g+v),b:clamp(c.b+v)};}
 
-// ── 수동 팔레트 ───────────────────────────────────
+// ═══════════════════════════════════════════
+//  수동 팔레트
+// ═══════════════════════════════════════════
 const PALETTES=[
   {name:'모래',color:'#d4a853'},{name:'백모래',color:'#e8ddb5'},
   {name:'적모래',color:'#c0533a'},{name:'흑모래',color:'#3a3028'},
@@ -290,24 +278,23 @@ PALETTES.forEach((p,i)=>{
   colorPick.appendChild(sw);
 });
 
-// ── 산 테마 ───────────────────────────────────────
+// ═══════════════════════════════════════════
+//  산 테마
+// ═══════════════════════════════════════════
 const THEMES={
   forest: ['#0b380a','#196012','#2a8020','#3aa030','#52c040','#6add50','#488a28','#80e060'],
   autumn: ['#7a1000','#aa2000','#d83800','#f05000','#f07800','#e09800','#c87000','#902800'],
   winter: ['#eef4ff','#c0d8f4','#88b8e8','#5098d4','#1870bc','#80b4e0','#d0e8ff','#4080c0'],
   desert: ['#b47c10','#cc9820','#e0b430','#f0ca40','#d09020','#a46c08','#e8a420','#c87c10'],
   volcano:['#050000','#250000','#540000','#8c0800','#c81800','#f02400','#ff4800','#b01400'],
-  rainbow:null,
-  custom: null,
+  rainbow:null, custom:null,
 };
 let currentTheme='forest';
-
-// 커스텀 색상 — 동적 배열
 let customColors=['#e04040','#e08844','#d4c040','#40b060','#4488e0'];
 
 function getThemePal(){
   if(currentTheme==='rainbow') return null;
-  if(currentTheme==='custom')  return customColors.length ? customColors : ['#ffffff'];
+  if(currentTheme==='custom')  return customColors.length?customColors:['#ffffff'];
   return THEMES[currentTheme];
 }
 function getEmitterColor(em,x){
@@ -321,60 +308,41 @@ function indicatorHex(em){
   return pal[em.ci%pal.length];
 }
 
-// ── 테마 버튼 ─────────────────────────────────────
+// 테마 버튼
 document.querySelectorAll('.theme-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     currentTheme=btn.dataset.theme;
     document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b===btn));
-    const isCustom=currentTheme==='custom';
-    document.getElementById('custom-row').classList.toggle('visible',isCustom);
-    if(isCustom) buildCustomPickers();
+    const isC=currentTheme==='custom';
+    document.getElementById('custom-row').classList.toggle('visible',isC);
+    if(isC) buildCustomPickers();
     if(autoMode) rebuildEmitters();
+    if(autoMode) Music.changeTheme(currentTheme);
   });
 });
 
-// ── 커스텀 색상 피커 (동적 추가/삭제) ────────────
+// 커스텀 색상 (동적)
 function buildCustomPickers(){
   const c=document.getElementById('cpick-container');
   c.innerHTML='';
-
   customColors.forEach((color,i)=>{
-    const item=document.createElement('div');
-    item.className='cpick-item';
-
-    const idx_lbl=document.createElement('span');
-    idx_lbl.className='cpick-idx';
-    idx_lbl.textContent=i+1;
-
-    const inp=document.createElement('input');
-    inp.type='color'; inp.className='cpick-inp'; inp.value=color;
-    const ii=i;
-    inp.addEventListener('input',e=>{customColors[ii]=e.target.value;});
-
-    const del=document.createElement('button');
-    del.className='cpick-del'; del.textContent='✕'; del.title='이 색 제거';
+    const item=document.createElement('div'); item.className='cpick-item';
+    const lbl=document.createElement('span'); lbl.className='cpick-idx'; lbl.textContent=i+1;
+    const inp=document.createElement('input'); inp.type='color'; inp.className='cpick-inp'; inp.value=color;
+    const ii=i; inp.addEventListener('input',e=>customColors[ii]=e.target.value);
+    const del=document.createElement('button'); del.className='cpick-del'; del.textContent='✕';
     del.addEventListener('click',()=>{
-      if(customColors.length<=1) return;
-      customColors.splice(ii,1);
-      buildCustomPickers();
+      if(customColors.length<=1)return;
+      customColors.splice(ii,1); buildCustomPickers();
       if(autoMode) rebuildEmitters();
     });
-
-    item.appendChild(idx_lbl);
-    item.appendChild(inp);
-    item.appendChild(del);
+    item.appendChild(lbl); item.appendChild(inp); item.appendChild(del);
     c.appendChild(item);
   });
-
-  // + 버튼
-  const addBtn=document.createElement('button');
-  addBtn.className='cpick-add'; addBtn.textContent='+'; addBtn.title='색 추가';
+  const addBtn=document.createElement('button'); addBtn.className='cpick-add'; addBtn.textContent='+';
   addBtn.addEventListener('click',()=>{
-    // 마지막 색에서 색조 약간 돌려서 추가
-    const last=hexToRgb(customColors[customColors.length-1]||'#888888');
-    const h=(Object.values(last).reduce((a,b)=>a+b,0)/3)|0;
-    const randHue=Math.random()*360;
-    const rgb=hslToRgb(randHue,75,55);
+    const rh=Math.random()*360;
+    const rgb=hslToRgb(rh,75,55);
     customColors.push('#'+[rgb.r,rgb.g,rgb.b].map(v=>v.toString(16).padStart(2,'0')).join(''));
     buildCustomPickers();
     if(autoMode) rebuildEmitters();
@@ -382,7 +350,202 @@ function buildCustomPickers(){
   c.appendChild(addBtn);
 }
 
-// ── 컨트롤 ───────────────────────────────────────
+// ═══════════════════════════════════════════
+//  음악 엔진 (Web Audio API)
+// ═══════════════════════════════════════════
+const Music = (() => {
+  let actx=null, master=null;
+  let active=false, theme=null;
+  let drones=[], noiseNode=null, rvbNode=null;
+  let schedTimer=null, nextAt=0;
+  let vol=0.5;
+
+  // 테마별 음악 정의
+  const DEFS = {
+    // 🌲 초록 산 — C장조 5음계, 느린 사인파, 자연의 고요
+    forest:{
+      scale:[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.26,784.00,880.00],
+      bpm:52, wave:'sine', dur:1.5, nVol:.12, prob:.52,
+      drones:[{f:65.41,v:.06,w:'sine'},{f:98.00,v:.03,w:'sine'},{f:196.00,v:.02,w:'sine'}],
+      rvbDur:3.5, rvbMix:.40,
+    },
+    // 🍂 단풍 산 — A단조 5음계, 따뜻한 삼각파, 가을 서정
+    autumn:{
+      scale:[220.00,261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.26],
+      bpm:65, wave:'triangle', dur:1.0, nVol:.11, prob:.68,
+      drones:[{f:110.00,v:.07,w:'triangle'},{f:164.81,v:.04,w:'sine'},{f:220.00,v:.02,w:'triangle'}],
+      rvbDur:2.5, rvbMix:.32,
+    },
+    // ❄️ 겨울 산 — D도리안 sparse, 벨 같은 사인파, 긴 잔향
+    winter:{
+      scale:[293.66,349.23,392.00,440.00,523.25,587.33,698.46,784.00,880.00,1046.50,1174.66],
+      bpm:34, wave:'sine', dur:3.0, nVol:.09, prob:.30,
+      drones:[{f:73.42,v:.04,w:'sine'},{f:146.83,v:.025,w:'sine'}],
+      rvbDur:6.0, rvbMix:.55,
+    },
+    // 🏜 사막 — E프리지안, 필터드 톱니파, 주술적 반복
+    desert:{
+      scale:[164.81,174.61,196.00,220.00,246.94,261.63,293.66,329.63,349.23,392.00],
+      bpm:95, wave:'sawtooth', dur:.45, nVol:.07, prob:.62, filter:1200,
+      drones:[{f:82.41,v:.08,w:'sawtooth'},{f:164.81,v:.04,w:'sawtooth'},{f:246.94,v:.025,w:'sine'}],
+      rvbDur:2.2, rvbMix:.25,
+    },
+    // 🌋 화산 — 감음계(저음역), 스퀘어파+노이즈, 불안한 긴장감
+    volcano:{
+      scale:[65.41,77.78,87.31,110.00,130.81,155.56,185.00,220.00,261.63],
+      bpm:88, wave:'square', dur:.42, nVol:.08, prob:.82, filter:700,
+      drones:[{f:32.70,v:.13,w:'sawtooth'},{f:65.41,v:.07,w:'square'}],
+      rvbDur:1.4, rvbMix:.20, noise:true,
+    },
+    // 🌈 무지개 — 온음계(고음역), 빠른 삼각파, 경쾌
+    rainbow:{
+      scale:[523.25,587.33,659.26,739.99,830.61,932.33,1046.50,1174.66,1318.51,1480.00],
+      bpm:115, wave:'triangle', dur:.28, nVol:.09, prob:.88,
+      drones:[{f:130.81,v:.04,w:'sine'},{f:261.63,v:.03,w:'sine'},{f:523.25,v:.02,w:'sine'}],
+      rvbDur:1.0, rvbMix:.18,
+    },
+    // 🎨 커스텀 — F리디안, 중립적 앰비언트
+    custom:{
+      scale:[349.23,392.00,440.00,493.88,523.25,587.33,659.26,698.46,880.00],
+      bpm:55, wave:'sine', dur:1.4, nVol:.10, prob:.50,
+      drones:[{f:87.31,v:.05,w:'sine'},{f:174.61,v:.03,w:'sine'}],
+      rvbDur:3.8, rvbMix:.38,
+    },
+  };
+
+  function init(){
+    if(actx) return;
+    actx=new(window.AudioContext||window.webkitAudioContext)();
+    master=actx.createGain(); master.gain.value=0;
+    master.connect(actx.destination);
+  }
+
+  function makeImpulse(dur,decay){
+    const len=actx.sampleRate*dur;
+    const buf=actx.createBuffer(2,len,actx.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=buf.getChannelData(ch);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
+    }
+    return buf;
+  }
+
+  function stopAll(){
+    clearTimeout(schedTimer);
+    drones.forEach(({osc,gain})=>{
+      try{gain.gain.setTargetAtTime(0,actx.currentTime,.5);osc.stop(actx.currentTime+2);}catch(e){}
+    });
+    drones=[];
+    if(noiseNode){
+      try{noiseNode.gain.setTargetAtTime(0,actx.currentTime,.5);noiseNode.src.stop(actx.currentTime+2);}catch(e){}
+      noiseNode=null;
+    }
+    if(rvbNode){try{rvbNode.rvbGain.disconnect();}catch(e){} rvbNode=null;}
+  }
+
+  function playNote(freq,dur,nVol,wave,filterHz){
+    const t=actx.currentTime;
+    const osc=actx.createOscillator();
+    const gain=actx.createGain();
+    osc.type=wave;
+    osc.frequency.value=freq;
+    osc.detune.value=(Math.random()*8-4); // 약간의 음정 떨림
+    let node=osc;
+    if(filterHz){
+      const f=actx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=filterHz;
+      osc.connect(f); node=f;
+    }
+    node.connect(gain);
+    gain.gain.setValueAtTime(0,t);
+    gain.gain.linearRampToValueAtTime(nVol,t+Math.min(.08,dur*.12));
+    gain.gain.exponentialRampToValueAtTime(.001,t+dur);
+    gain.connect(master);
+    if(rvbNode) gain.connect(rvbNode.cvr);
+    osc.start(t); osc.stop(t+dur+.05);
+  }
+
+  function startLayers(def){
+    // Reverb
+    const cvr=actx.createConvolver();
+    cvr.buffer=makeImpulse(def.rvbDur,2.2);
+    const rvbGain=actx.createGain(); rvbGain.gain.value=def.rvbMix;
+    cvr.connect(rvbGain); rvbGain.connect(master);
+    rvbNode={cvr,rvbGain};
+
+    // Drones
+    def.drones.forEach(d=>{
+      const osc=actx.createOscillator();
+      const gain=actx.createGain();
+      osc.type=d.w; osc.frequency.value=d.f;
+      osc.detune.value=(Math.random()*6-3);
+      gain.gain.value=0;
+      gain.gain.setTargetAtTime(d.v,actx.currentTime,1.8);
+      osc.connect(gain); gain.connect(master); gain.connect(cvr);
+      osc.start();
+      drones.push({osc,gain});
+    });
+
+    // 화산 저음 노이즈
+    if(def.noise){
+      const blen=actx.sampleRate*2;
+      const nbuf=actx.createBuffer(1,blen,actx.sampleRate);
+      const nd=nbuf.getChannelData(0);
+      for(let i=0;i<blen;i++) nd[i]=Math.random()*2-1;
+      const src=actx.createBufferSource(); src.buffer=nbuf; src.loop=true;
+      const flt=actx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=55;
+      const gn=actx.createGain(); gn.gain.value=0;
+      gn.gain.setTargetAtTime(.15,actx.currentTime,2.5);
+      src.connect(flt); flt.connect(gn); gn.connect(master);
+      src.start();
+      noiseNode={src,gain:gn};
+    }
+  }
+
+  function schedule(){
+    const def=DEFS[theme];
+    if(!def||!active) return;
+    const ahead=.16, interval=60/def.bpm;
+    while(nextAt<actx.currentTime+ahead){
+      if(Math.random()<def.prob){
+        const freq=def.scale[Math.floor(Math.random()*def.scale.length)];
+        playNote(freq,def.dur,def.nVol,def.wave,def.filter);
+      }
+      nextAt+=interval;
+    }
+    schedTimer=setTimeout(schedule,55);
+  }
+
+  return{
+    start(t){
+      init();
+      if(actx.state==='suspended') actx.resume();
+      stopAll();
+      active=true; theme=t;
+      nextAt=actx.currentTime+.2;
+      const def=DEFS[t]||DEFS.custom;
+      startLayers(def);
+      master.gain.setTargetAtTime(vol,actx.currentTime,.9);
+      schedule();
+    },
+    stop(){
+      active=false;
+      if(!actx) return;
+      master.gain.setTargetAtTime(0,actx.currentTime,1.2);
+      setTimeout(stopAll,2000);
+    },
+    changeTheme(t){
+      if(active) this.start(t);
+    },
+    setVol(v){
+      vol=v;
+      if(master&&active) master.gain.setTargetAtTime(v,actx.currentTime,.2);
+    },
+  };
+})();
+
+// ═══════════════════════════════════════════
+//  컨트롤
+// ═══════════════════════════════════════════
 const sliderDensity=document.getElementById('slider-density');
 const sliderAmount =document.getElementById('slider-amount');
 const sliderPeaks  =document.getElementById('slider-peaks');
@@ -406,8 +569,10 @@ sliderPeaks.addEventListener('input',  ()=>{
   valPeaks.textContent=sliderPeaks.value;
   if(autoMode) rebuildEmitters();
 });
+document.getElementById('slider-vol').addEventListener('input',e=>{
+  Music.setVol(parseInt(e.target.value)/100);
+});
 
-// 밑 열기
 let floorOpen=false;
 const btnFloor=document.getElementById('btn-floor');
 btnFloor.addEventListener('mousedown',  ()=>setFloor(true));
@@ -415,26 +580,17 @@ btnFloor.addEventListener('touchstart', ()=>setFloor(true),{passive:true});
 btnFloor.addEventListener('mouseup',    ()=>setFloor(false));
 btnFloor.addEventListener('mouseleave', ()=>setFloor(false));
 btnFloor.addEventListener('touchend',   ()=>setFloor(false));
-function setFloor(v){
-  floorOpen=v;
-  btnFloor.classList.toggle('held',v);
-  canWrap.classList.toggle('floor-open',v);
-}
+function setFloor(v){floorOpen=v;btnFloor.classList.toggle('held',v);canWrap.classList.toggle('floor-open',v);}
 
 document.getElementById('btn-clear').addEventListener('click',()=>{
-  grid.fill(0); resetPhase='idle'; autoFloorOpen=false;
+  grid.fill(0);resetPhase='idle';autoFloorOpen=false;
 });
 document.getElementById('btn-spawn').addEventListener('click',()=>{
-  const rawAmt=parseInt(sliderAmount.value)/10;
-  const n=(rawAmt|0)+(Math.random()<(rawAmt%1)?1:0)||1;
-  for(let i=0;i<n;i++){
-    const x=(Math.random()*COLS)|0;
-    const c=getSandColor(x);
-    if(!grid[x]) placeSand(x,0,packColor(c.r,c.g,c.b));
-  }
+  const raw=parseInt(sliderAmount.value)/10;
+  const n=(raw|0)+(Math.random()<(raw%1)?1:0)||1;
+  for(let i=0;i<n;i++){const x=(Math.random()*COLS)|0;const c=getSandColor(x);if(!grid[x])placeSand(x,0,packColor(c.r,c.g,c.b));}
 });
 
-// ── 마우스/터치 ───────────────────────────────────
 let pDown=false;
 canvas.addEventListener('mousedown', e=>{pDown=true;addSandAt(e);});
 canvas.addEventListener('mousemove', e=>{if(pDown)addSandAt(e);});
@@ -449,8 +605,8 @@ function addSandAt(e){
   const px=((e.clientX-rect.left)/CELL)|0,py=((e.clientY-rect.top)/CELL)|0;
   if(px<0||px>=COLS||py<0||py>=ROWS) return;
   const radius=Math.ceil(parseInt(sliderDensity.value)/2);
-  const rawAmt=parseInt(sliderAmount.value)/10;
-  const amount=(rawAmt|0)+(Math.random()<(rawAmt%1)?1:0);
+  const raw=parseInt(sliderAmount.value)/10;
+  const amount=(raw|0)+(Math.random()<(raw%1)?1:0);
   let placed=0;
   for(let t=0;t<(amount+1)*4&&placed<amount;t++){
     const ox=Math.round((Math.random()*2-1)*radius),oy=Math.round((Math.random()*2-1)*radius);
@@ -462,7 +618,9 @@ function addSandAt(e){
 }
 function placeSand(x,y,color){if(x>=0&&x<COLS&&y>=0&&y<ROWS)grid[y*COLS+x]=color;}
 
-// ── 자동 산 모드 ──────────────────────────────────
+// ═══════════════════════════════════════════
+//  자동 산 모드
+// ═══════════════════════════════════════════
 let autoMode=false,emitters=[];
 document.getElementById('btn-auto').addEventListener('click',toggleAuto);
 function toggleAuto(){
@@ -470,10 +628,11 @@ function toggleAuto(){
   const btn=document.getElementById('btn-auto');
   btn.classList.toggle('auto-active',autoMode);
   btn.textContent=autoMode?'⛰ 자동 산 ON':'⛰ 자동 산 OFF';
-  if(autoMode) rebuildEmitters(); else emitters=[];
+  if(autoMode){ Music.start(currentTheme); rebuildEmitters(); }
+  else        { Music.stop(); emitters=[]; }
 }
 function calcDwell(){
-  const spd=parseInt(sliderSpeed.value),base=Math.round(200-spd*17);
+  const s=parseInt(sliderSpeed.value),base=Math.round(200-s*17);
   return base+((Math.random()*base*.45)|0);
 }
 function rebuildEmitters(){
@@ -495,8 +654,8 @@ function pickNewX(ei){
 function updateAutoEmitters(){
   if(!autoMode||!emitters.length) return;
   const spread=parseInt(sliderSpread.value);
-  const rawAmt=parseInt(sliderAmount.value)/10;
-  const amount=(rawAmt|0)+(Math.random()<(rawAmt%1)?1:0);
+  const raw=parseInt(sliderAmount.value)/10;
+  const amount=(raw|0)+(Math.random()<(raw%1)?1:0);
   for(let i=0;i<emitters.length;i++){
     const em=emitters[i];
     for(let k=0;k<amount;k++){
@@ -512,33 +671,30 @@ function updateAutoEmitters(){
   }
 }
 
-// ── 자동 초기화 ───────────────────────────────────
-let autoReset=false, showMessage=true;
-let resetPhase='idle', resetTimerEnd=0, autoFloorOpen=false;
+// ═══════════════════════════════════════════
+//  자동 초기화
+// ═══════════════════════════════════════════
+let autoReset=false,showMessage=true;
+let resetPhase='idle',resetTimerEnd=0,autoFloorOpen=false;
 const DRAIN_MS=3000;
 
-const btnAR=document.getElementById('btn-autoreset');
-const btnCD=document.getElementById('btn-countdown');
-
-btnAR.addEventListener('click',()=>{
+document.getElementById('btn-autoreset').addEventListener('click',()=>{
   autoReset=!autoReset;
-  btnAR.classList.toggle('on',autoReset);
-  btnAR.textContent=autoReset?'🔄 자동초기화 ON':'🔄 자동초기화 OFF';
+  const b=document.getElementById('btn-autoreset');
+  b.classList.toggle('on',autoReset);
+  b.textContent=autoReset?'🔄 자동초기화 ON':'🔄 자동초기화 OFF';
   if(!autoReset){resetPhase='idle';autoFloorOpen=false;}
 });
-btnCD.addEventListener('click',()=>{
+document.getElementById('btn-countdown').addEventListener('click',()=>{
   showMessage=!showMessage;
-  btnCD.classList.toggle('on',showMessage);
-  btnCD.textContent=showMessage?'💬 메시지 표시 ON':'💬 메시지 표시 OFF';
+  const b=document.getElementById('btn-countdown');
+  b.classList.toggle('on',showMessage);
+  b.textContent=showMessage?'💬 메시지 표시 ON':'💬 메시지 표시 OFF';
 });
 
 function checkFull(){
   if(!autoReset||resetPhase!=='idle') return;
-  // 위에서 5번째 행이 가로로 완전히 찼을 때 트리거
-  const checkRow=5;
-  for(let x=0;x<COLS;x++){
-    if(!grid[checkRow*COLS+x]) return;
-  }
+  for(let x=0;x<COLS;x++) if(!grid[5*COLS+x]) return; // y=5 행 체크
   resetPhase='countdown';
   resetTimerEnd=Date.now()+parseInt(sliderDelay.value)*1000;
 }
@@ -552,14 +708,16 @@ function tickAutoReset(){
   }
 }
 
-// ── 물리 시뮬레이션 ──────────────────────────────
+// ═══════════════════════════════════════════
+//  물리
+// ═══════════════════════════════════════════
 let tick=0;
 function update(){
   tick++;const lf=tick%2===0;
   updateAutoEmitters();
   tickAutoReset();
   checkFull();
-  if(floorOpen||autoFloorOpen){for(let x=0;x<COLS;x++)grid[(ROWS-1)*COLS+x]=0;}
+  if(floorOpen||autoFloorOpen) for(let x=0;x<COLS;x++) grid[(ROWS-1)*COLS+x]=0;
   for(let y=ROWS-2;y>=0;y--){
     for(let xi=0;xi<COLS;xi++){
       const x=lf?xi:COLS-1-xi,idx=y*COLS+x;
@@ -575,7 +733,9 @@ function update(){
   }
 }
 
-// ── 렌더링 ───────────────────────────────────────
+// ═══════════════════════════════════════════
+//  렌더링
+// ═══════════════════════════════════════════
 function render(){
   const W=canvas.width,dv=new Uint32Array(pixels.buffer);
   dv.fill(packColor(0x1a,0x1a,0x2e));
@@ -583,16 +743,15 @@ function render(){
   for(let gy=0;gy<ROWS;gy++){
     for(let gx=0;gx<COLS;gx++){
       const color=grid[gy*COLS+gx];
-      if(!color)continue;sandCount++;
+      if(!color)continue; sandCount++;
       for(let py=0;py<CELL;py++){
         const row=(gy*CELL+py)*W+gx*CELL;
-        for(let px=0;px<CELL;px++)dv[row+px]=color;
+        for(let px=0;px<CELL;px++) dv[row+px]=color;
       }
     }
   }
   ctx.putImageData(imageData,0,0);
 
-  // 에미터 삼각형
   if(autoMode){
     emitters.forEach(em=>{
       const px=em.x*CELL+CELL/2,col=indicatorHex(em);
@@ -602,17 +761,13 @@ function render(){
     });
   }
 
-  // 자동초기화 카운트다운 오버레이 (메시지 표시 ON일 때만)
   if(autoReset&&showMessage&&resetPhase!=='idle'){
-    const now=Date.now();
     const msg=resetPhase==='countdown'
-      ? `초기화까지 ${Math.ceil((resetTimerEnd-now)/1000)}초`
-      : '배출 중…';
+      ?`초기화까지 ${Math.ceil((resetTimerEnd-Date.now())/1000)}초`:'배출 중…';
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,.65)';
     ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(W/2-72,4,144,26,5);
-    else ctx.rect(W/2-72,4,144,26);
+    if(ctx.roundRect)ctx.roundRect(W/2-72,4,144,26,5); else ctx.rect(W/2-72,4,144,26);
     ctx.fill();
     ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle=resetPhase==='countdown'?'#ff9090':'#88aaff';
@@ -624,13 +779,15 @@ function render(){
   statsEl.textContent='모래: '+sandCount.toLocaleString();
 }
 
-// ── 메인 루프 ─────────────────────────────────────
+// ═══════════════════════════════════════════
+//  메인 루프
+// ═══════════════════════════════════════════
 let lastTime=0;
 function loop(ts){
   requestAnimationFrame(loop);
-  if(ts-lastTime<16)return;
+  if(ts-lastTime<16) return;
   lastTime=ts;
-  update();render();
+  update(); render();
 }
 resize();
 window.addEventListener('resize',resize);

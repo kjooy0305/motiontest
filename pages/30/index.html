@@ -215,14 +215,25 @@ function resize(){
   const isFS = !!document.fullscreenElement;
   const W = isFS ? window.innerWidth  : Math.min(window.innerWidth  - 20, 700);
   const H = isFS ? window.innerHeight : Math.min(window.innerHeight - 188, 450);
-  canvas.width  = Math.floor(Math.max(W,100)/CELL)*CELL;
-  canvas.height = Math.floor(Math.max(H,100)/CELL)*CELL;
-  canWrap.style.width  = canvas.width  + 'px';
-  canWrap.style.height = canvas.height + 'px';
-  COLS=canvas.width/CELL; ROWS=canvas.height/CELL;
+  const newW=Math.floor(Math.max(W,100)/CELL)*CELL;
+  const newH=Math.floor(Math.max(H,100)/CELL)*CELL;
+  if(canvas.width===newW && canvas.height===newH) return; // 크기 변화 없으면 그대로
+  const oldGrid=grid, oldCols=COLS, oldRows=ROWS;
+  canvas.width=newW; canvas.height=newH;
+  canWrap.style.width=newW+'px'; canWrap.style.height=newH+'px';
+  COLS=newW/CELL; ROWS=newH/CELL;
   grid=new Uint32Array(COLS*ROWS);
-  imageData=ctx.createImageData(canvas.width,canvas.height);
+  imageData=ctx.createImageData(newW,newH);
   pixels=imageData.data;
+  // 기존 그리드 데이터를 새 크기에 비례 복사 (초기화 방지)
+  if(oldGrid&&oldCols&&oldRows){
+    for(let y=0;y<ROWS;y++){
+      const oy=Math.floor(y/ROWS*oldRows);
+      for(let x=0;x<COLS;x++){
+        grid[y*COLS+x]=oldGrid[oy*oldCols+Math.floor(x/COLS*oldCols)];
+      }
+    }
+  }
 }
 
 // ═══════════════════════════════════════════

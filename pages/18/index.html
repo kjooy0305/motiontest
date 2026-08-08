@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>단축키 모음</title>
+<style>
+:root{
+  --bg:#080c10;--surf:#0e1318;--surf2:#131920;--bdr:#1a2028;
+  --text:#c8c0b0;--dim:#556070;
+  --purple:#a78bfa;--green:#34d399;--blue:#60a5fa;--yellow:#fbbf24;--red:#f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100%;}
+
+/* ── 상단 탭 ── */
+#top{flex-shrink:0;}
+#os-tabs{display:flex;background:var(--surf);border-bottom:2px solid var(--bdr);}
+.ostab{flex:1;padding:10px 4px;font-size:13px;font-weight:600;cursor:pointer;
+  color:var(--dim);border-bottom:3px solid transparent;text-align:center;
+  transition:.15s;margin-bottom:-2px;}
+.ostab:hover{color:var(--text);}
+.ostab.on{color:var(--purple);border-bottom-color:var(--purple);}
+
+/* ── 검색 & 카운트 ── */
+#search-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;background:var(--surf);border-bottom:1px solid var(--bdr);
+}
+#search-wrap{flex:1;display:flex;align-items:center;gap:6px;
+  background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:6px 10px;}
+#search-wrap svg{flex-shrink:0;opacity:.4;}
+#sq{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:12px;font-family:inherit;}
+#sq::placeholder{color:var(--dim);}
+#count{font-size:11px;color:var(--dim);white-space:nowrap;font-family:monospace;}
+
+/* ── 카테고리 필터 ── */
+#cat-bar{
+  display:flex;gap:5px;padding:6px 12px;overflow-x:auto;
+  background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;
+  scrollbar-width:none;
+}
+#cat-bar::-webkit-scrollbar{display:none;}
+.cbt{
+  padding:3px 10px;border-radius:20px;font-size:10px;border:1px solid var(--bdr);
+  background:transparent;color:var(--dim);cursor:pointer;transition:.15s;white-space:nowrap;
+  font-family:inherit;
+}
+.cbt:hover{color:var(--text);}
+.cbt.on{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1);}
+
+/* ── 스크롤 본문 ── */
+#content{flex:1;overflow-y:auto;padding:10px 12px 20px;}
+
+/* ── 카테고리 섹션 ── */
+.cat-section{margin-bottom:16px;}
+.cat-section.hide{display:none;}
+.cat-title{
+  font-size:11px;font-weight:700;color:var(--purple);letter-spacing:.8px;
+  text-transform:uppercase;padding:6px 2px 6px;
+  border-bottom:1px solid var(--bdr);margin-bottom:4px;
+  position:sticky;top:0;background:var(--bg);z-index:2;
+}
+
+/* ── 단축키 행 ── */
+.row{
+  display:flex;align-items:center;gap:10px;
+  padding:5px 4px;border-radius:6px;
+  transition:background .1s;
+  border-bottom:1px solid rgba(26,32,40,.5);
+}
+.row:last-child{border-bottom:none;}
+.row:hover{background:rgba(167,139,250,.05);}
+.row.hide{display:none;}
+.row.highlight{background:rgba(167,139,250,.1);}
+
+/* ── 키 배지 ── */
+.keys{display:flex;align-items:center;gap:3px;flex-shrink:0;min-width:150px;flex-wrap:wrap;}
+kbd{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:2px 6px;min-width:22px;
+  background:var(--surf2);border:1px solid #2a3545;border-bottom:2px solid #1a2028;
+  border-radius:5px;font-family:monospace;font-size:10px;color:var(--text);
+  font-weight:600;white-space:nowrap;line-height:1.4;
+}
+kbd.special{color:var(--blue);border-color:#1a2d45;}
+kbd.win{color:var(--purple);border-color:#2a1d45;}
+kbd.arrow{font-size:12px;}
+.plus{color:var(--dim);font-size:10px;margin:0 1px;}
+.desc{font-size:12px;color:var(--text);flex:1;line-height:1.4;}
+.desc em{color:var(--dim);font-size:10px;font-style:normal;}
+
+/* ── 빈 검색 ── */
+#empty{display:none;text-align:center;padding:40px 20px;color:var(--dim);font-size:13px;}
+#empty.show{display:block;}
+
+/* 스크롤바 */
+#content::-webkit-scrollbar{width:4px;}
+#content::-webkit-scrollbar-track{background:transparent;}
+#content::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="top">
+  <div id="os-tabs">
+    <div class="ostab on" onclick="switchOS('win')">🪟 윈도우 단축키</div>
+    <div class="ostab"    onclick="switchOS('chrome')">🌐 크롬 단축키</div>
+  </div>
+  <div id="search-bar">
+    <div id="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="sq" type="search" placeholder="단축키 또는 설명 검색..." oninput="onSearch()">
+    </div>
+    <span id="count">—</span>
+  </div>
+  <div id="cat-bar"></div>
+</div>
+
+<div id="content"></div>
+<div id="empty">검색 결과가 없습니다.</div>
+
+</div>
+<script>
+// ══════════════════════════════════════
+//  데이터
+// ══════════════════════════════════════
+const DATA = {
+  win: [
+    { cat:'기본 단축키', list:[
+      {k:['Ctrl','C'],        d:'복사'},
+      {k:['Ctrl','X'],        d:'잘라내기'},
+      {k:['Ctrl','V'],        d:'붙여넣기'},
+      {k:['Ctrl','Z'],        d:'실행 취소'},
+      {k:['Ctrl','Y'],        d:'다시 실행'},
+      {k:['Ctrl','A'],        d:'전체 선택'},
+      {k:['Ctrl','S'],        d:'저장'},
+      {k:['Ctrl','P'],        d:'인쇄'},
+      {k:['Ctrl','F'],        d:'찾기'},
+      {k:['Ctrl','N'],        d:'새 창 / 새 문서'},
+      {k:['Ctrl','W'],        d:'현재 창 닫기'},
+      {k:['Ctrl','O'],        d:'파일 열기'},
+      {k:['Delete'],          d:'선택 항목 삭제 (휴지통으로)'},
+      {k:['Shift','Delete'],  d:'선택 항목 영구 삭제 (휴지통 안 거침)'},
+      {k:['F2'],              d:'선택 항목 이름 바꾸기'},
+      {k:['F5'],              d:'새로고침'},
+      {k:['Alt','F4'],        d:'현재 앱/창 닫기'},
+      {k:['Alt','Enter'],     d:'선택 항목 속성 열기'},
+      {k:['Alt','Tab'],       d:'열린 앱 전환'},
+      {k:['Alt','Shift','Tab'],d:'반대 방향으로 앱 전환'},
+      {k:['Alt','Esc'],       d:'현재 앱을 아래로, 다음 앱으로 포커스'},
+      {k:['Ctrl','Alt','Del'],d:'보안 옵션 화면 (잠금/로그아웃/작업관리자 등)'},
+      {k:['Ctrl','Shift','Esc'],d:'작업 관리자 바로 열기'},
+      {k:['Esc'],             d:'현재 작업 취소 또는 닫기'},
+    ]},
+    { cat:'윈도우 키 단축키', list:[
+      {k:['⊞ Win'],             d:'시작 메뉴 열기/닫기'},
+      {k:['⊞ Win','A'],         d:'빠른 설정 열기 (볼륨·밝기·Wi-Fi 등)'},
+      {k:['⊞ Win','B'],         d:'알림 영역(시스템 트레이) 포커스'},
+      {k:['⊞ Win','C'],         d:'Copilot 열기 (Windows 11)'},
+      {k:['⊞ Win','D'],         d:'바탕화면 보기 / 숨기기 토글'},
+      {k:['⊞ Win','E'],         d:'파일 탐색기 열기'},
+      {k:['⊞ Win','F'],         d:'피드백 허브 열기'},
+      {k:['⊞ Win','G'],         d:'Xbox 게임 바 열기'},
+      {k:['⊞ Win','H'],         d:'음성 입력 열기'},
+      {k:['⊞ Win','I'],         d:'Windows 설정 열기'},
+      {k:['⊞ Win','K'],         d:'캐스트 (무선 디스플레이/오디오 연결)'},
+      {k:['⊞ Win','L'],         d:'화면 잠금 / 계정 전환'},
+      {k:['⊞ Win','M'],         d:'모든 창 최소화'},
+      {k:['⊞ Win','Shift','M'], d:'최소화된 모든 창 복원'},
+      {k:['⊞ Win','N'],         d:'알림 센터 열기'},
+      {k:['⊞ Win','O'],         d:'화면 회전 잠금 (태블릿)'},
+      {k:['⊞ Win','P'],         d:'프로젝션/디스플레이 모드 선택'},
+      {k:['⊞ Win','Q'],         d:'검색 열기'},
+      {k:['⊞ Win','R'],         d:'실행 대화상자 열기'},
+      {k:['⊞ Win','S'],         d:'검색 열기'},
+      {k:['⊞ Win','T'],         d:'작업 표시줄 앱 순환'},
+      {k:['⊞ Win','U'],         d:'접근성 센터 열기'},
+      {k:['⊞ Win','V'],         d:'클립보드 기록 열기'},
+      {k:['⊞ Win','W'],         d:'위젯 열기 (Windows 11)'},
+      {k:['⊞ Win','X'],         d:'빠른 링크 메뉴 (전원 옵션·장치관리자 등)'},
+      {k:['⊞ Win','Z'],         d:'스냅 레이아웃 열기 (Windows 11)'},
+      {k:['⊞ Win','.'],         d:'이모지 및 특수문자 패널'},
+      {k:['⊞ Win',','],         d:'바탕화면 잠시 미리보기'},
+      {k:['⊞ Win','Space'],     d:'입력 언어 및 키보드 레이아웃 전환'},
+      {k:['⊞ Win','Ctrl','Space'],d:'이전 입력 방법으로 전환'},
+      {k:['⊞ Win','Tab'],       d:'작업 보기 열기'},
+      {k:['⊞ Win','Pause'],     d:'시스템 속성 열기'},
+      {k:['⊞ Win','+'],         d:'돋보기 열기 / 확대'},
+      {k:['⊞ Win','-'],         d:'돋보기 축소'},
+      {k:['⊞ Win','Esc'],       d:'돋보기 닫기'},
+    ]},
+    { cat:'창 관리 & 스냅', list:[
+      {k:['⊞ Win','←'],           d:'창을 화면 왼쪽 절반에 스냅'},
+      {k:['⊞ Win','→'],           d:'창을 화면 오른쪽 절반에 스냅'},
+      {k:['⊞ Win','↑'],           d:'창 최대화'},
+      {k:['⊞ Win','↓'],           d:'최대화된 창 복원 / 복원된 창 최소화'},
+      {k:['⊞ Win','Shift','←'],   d:'창을 왼쪽 모니터로 이동'},
+      {k:['⊞ Win','Shift','→'],   d:'창을 오른쪽 모니터로 이동'},
+      {k:['⊞ Win','Shift','↑'],   d:'창을 세로 방향 최대화'},
+      {k:['⊞ Win','Shift','↓'],   d:'세로 최대화된 창 복원'},
+      {k:['⊞ Win','Home'],         d:'현재 창 제외 다른 창 모두 최소화 / 복원'},
+    ]},
+    { cat:'가상 데스크탑', list:[
+      {k:['⊞ Win','Ctrl','D'],  d:'새 가상 데스크탑 만들기'},
+      {k:['⊞ Win','Ctrl','F4'],d:'현재 가상 데스크탑 닫기'},
+      {k:['⊞ Win','Ctrl','←'], d:'이전 가상 데스크탑으로 이동'},
+      {k:['⊞ Win','Ctrl','→'], d:'다음 가상 데스크탑으로 이동'},
+    ]},
+    { cat:'스크린샷 & 녹화', list:[
+      {k:['PrtScn'],              d:'전체 화면 캡처 → 클립보드에 복사'},
+      {k:['⊞ Win','PrtScn'],      d:'전체 화면 캡처 → 파일로 저장 (스크린샷 폴더)'},
+      {k:['Alt','PrtScn'],        d:'현재 활성 창만 캡처 → 클립보드'},
+      {k:['⊞ Win','Shift','S'],   d:'스니핑 도구 — 영역/창/전체 선택 캡처'},
+      {k:['⊞ Win','Shift','R'],   d:'스니핑 도구 화면 녹화 (Windows 11)'},
+      {k:['⊞ Win','G'],           d:'게임 바 열기 — 클립/녹화/스크린샷'},
+      {k:['⊞ Win','Alt','PrtScn'],d:'게임 바: 현재 창 스크린샷'},
+      {k:['⊞ Win','Alt','G'],     d:'게임 바: 마지막 30초 녹화 (클립)'},
+      {k:['⊞ Win','Alt','R'],     d:'게임 바: 녹화 시작/중지'},
+    ]},
+    { cat:'파일 탐색기', list:[
+      {k:['Alt','←'],           d:'이전 폴더로 이동'},
+      {k:['Alt','→'],           d:'다음 폴더로 이동'},
+      {k:['Alt','↑'],           d:'상위 폴더로 이동'},
+      {k:['Ctrl','N'],          d:'새 파일 탐색기 창 열기'},
+      {k:['Ctrl','W'],          d:'현재 창 닫기'},
+      {k:['Ctrl','Shift','N'],  d:'새 폴더 만들기'},
+      {k:['Ctrl','E'],          d:'검색창 포커스'},
+      {k:['Ctrl','L'],          d:'주소창 포커스'},
+      {k:['F4'],                d:'주소창 선택 및 드롭다운'},
+      {k:['F6'],                d:'주소창 ↔ 파일 목록 포커스 전환'},
+      {k:['F11'],               d:'전체화면 모드 전환'},
+      {k:['Ctrl','F1'],         d:'리본 표시/숨기기'},
+      {k:['Ctrl','마우스휠'],    d:'아이콘 크기 조절'},
+      {k:['Num *'],             d:'선택 폴더의 모든 하위 폴더 확장'},
+      {k:['Num +'],             d:'선택 폴더 확장'},
+      {k:['Num -'],             d:'선택 폴더 축소'},
+      {k:['Alt','D'],           d:'주소창 선택'},
+    ]},
+    { cat:'텍스트 편집', list:[
+      {k:['Ctrl','←'],          d:'단어 단위 왼쪽으로 커서 이동'},
+      {k:['Ctrl','→'],          d:'단어 단위 오른쪽으로 커서 이동'},
+      {k:['Ctrl','Shift','←'],  d:'단어 단위 왼쪽으로 선택 확장'},
+      {k:['Ctrl','Shift','→'],  d:'단어 단위 오른쪽으로 선택 확장'},
+      {k:['Home'],              d:'현재 줄의 맨 앞으로 커서 이동'},
+      {k:['End'],               d:'현재 줄의 맨 끝으로 커서 이동'},
+      {k:['Ctrl','Home'],       d:'문서 맨 위로 이동'},
+      {k:['Ctrl','End'],        d:'문서 맨 아래로 이동'},
+      {k:['Shift','Home'],      d:'커서에서 줄 처음까지 선택'},
+      {k:['Shift','End'],       d:'커서에서 줄 끝까지 선택'},
+      {k:['Ctrl','Shift','Home'],d:'커서에서 문서 처음까지 선택'},
+      {k:['Ctrl','Shift','End'], d:'커서에서 문서 끝까지 선택'},
+      {k:['Ctrl','Backspace'],  d:'커서 앞의 단어 삭제'},
+      {k:['Ctrl','Delete'],     d:'커서 뒤의 단어 삭제'},
+      {k:['Insert'],            d:'삽입 모드 / 덮어쓰기 모드 전환'},
+      {k:['Ctrl','B'],          d:'굵게 (Bold) — 지원하는 앱에서'},
+      {k:['Ctrl','I'],          d:'기울임꼴 (Italic)'},
+      {k:['Ctrl','U'],          d:'밑줄 (Underline)'},
+    ]},
+    { cat:'작업 표시줄', list:[
+      {k:['⊞ Win','1~9'],       d:'해당 번호 앱 실행 또는 전환'},
+      {k:['⊞ Win','Shift','1~9'],d:'해당 번호 앱 새 인스턴스 열기'},
+      {k:['⊞ Win','Ctrl','1~9'],d:'해당 번호 앱 마지막 활성 창으로 전환'},
+      {k:['⊞ Win','Alt','1~9'], d:'해당 번호 앱의 점프 목록 열기'},
+      {k:['Ctrl','클릭'],        d:'같은 그룹에 속한 앱 여러 창을 순서대로 전환'},
+    ]},
+    { cat:'대화상자', list:[
+      {k:['Tab'],               d:'다음 옵션 / 컨트롤로 포커스 이동'},
+      {k:['Shift','Tab'],       d:'이전 옵션 / 컨트롤로 포커스 이동'},
+      {k:['Space'],             d:'체크박스 선택/해제, 버튼 클릭'},
+      {k:['Enter'],             d:'기본 버튼 실행 (확인 등)'},
+      {k:['Esc'],               d:'취소 / 닫기'},
+      {k:['F4'],                d:'드롭다운 목록 열기'},
+      {k:['Backspace'],         d:'이전 폴더 (파일 선택 대화상자)'},
+      {k:['Alt','밑줄 문자'],   d:'해당 명령 또는 옵션 실행'},
+    ]},
+    { cat:'접근성', list:[
+      {k:['⊞ Win','U'],           d:'접근성 센터 열기'},
+      {k:['⊞ Win','+'],           d:'돋보기 열기 / 화면 확대'},
+      {k:['⊞ Win','-'],           d:'화면 축소'},
+      {k:['⊞ Win','Esc'],         d:'돋보기 닫기'},
+      {k:['⊞ Win','Ctrl','M'],    d:'돋보기 설정 열기'},
+      {k:['⊞ Win','Ctrl','H'],    d:'색상 필터 전환 (Windows 11)'},
+      {k:['Alt 왼쪽','Shift','PrtScn'],d:'고대비 모드 켜기/끄기'},
+      {k:['Alt 왼쪽','Shift','Num Lock'],d:'마우스 키 켜기/끄기'},
+      {k:['Shift 5번'],           d:'고정키 (Sticky Keys) 켜기/끄기'},
+      {k:['Num Lock 5초'],        d:'토글키 켜기/끄기'},
+      {k:['⊞ Win','Ctrl','Enter'],d:'내레이터 켜기/끄기'},
+      {k:['⊞ Win','Ctrl','C'],    d:'색상 필터 켜기/끄기 (Windows 11)'},
+    ]},
+    { cat:'기타 & 시스템', list:[
+      {k:['F1'],                d:'도움말 열기'},
+      {k:['F3'],                d:'검색 (파일 탐색기 등)'},
+      {k:['F10'],               d:'메뉴 모음 포커스'},
+      {k:['Shift','F10'],       d:'마우스 우클릭 메뉴 (컨텍스트 메뉴)'},
+      {k:['Ctrl','Shift','F'],  d:'고급 파인더 검색 (탐색기 내부)'},
+      {k:['⊞ Win','Ctrl','F'],  d:'컴퓨터 찾기 (도메인 환경)'},
+      {k:['Ctrl','F4'],         d:'다중 탭 앱에서 현재 탭 닫기'},
+      {k:['⊞ Win','Break'],     d:'시스템 속성 열기'},
+    ]},
+  ],
+
+  chrome: [
+    { cat:'탭 관리', list:[
+      {k:['Ctrl','T'],          d:'새 탭 열기'},
+      {k:['Ctrl','W'],          d:'현재 탭 닫기'},
+      {k:['Ctrl','Shift','T'],  d:'마지막으로 닫은 탭 복원'},
+      {k:['Ctrl','Tab'],        d:'다음 탭으로 이동'},
+      {k:['Ctrl','Shift','Tab'],d:'이전 탭으로 이동'},
+      {k:['Ctrl','1'],          d:'첫 번째 탭으로 이동'},
+      {k:['Ctrl','2~8'],        d:'해당 번호 탭으로 이동'},
+      {k:['Ctrl','9'],          d:'마지막 탭으로 이동'},
+      {k:['Ctrl','클릭'],       d:'링크를 새 탭(배경)에서 열기'},
+      {k:['Ctrl','Shift','클릭'],d:'링크를 새 탭(포그라운드)에서 열기'},
+      {k:['Shift','클릭'],      d:'링크를 새 창에서 열기'},
+      {k:['Alt','클릭'],        d:'링크 파일 다운로드'},
+      {k:['Ctrl','Shift','PageUp'],d:'탭을 왼쪽으로 이동'},
+      {k:['Ctrl','Shift','PageDown'],d:'탭을 오른쪽으로 이동'},
+    ]},
+    { cat:'창 관리', list:[
+      {k:['Ctrl','N'],          d:'새 창 열기'},
+      {k:['Ctrl','Shift','N'],  d:'시크릿 모드 새 창 열기'},
+      {k:['Alt','F4'],          d:'현재 창 닫기'},
+      {k:['F11'],               d:'전체화면 모드 전환'},
+      {k:['Alt','Space'],       d:'창 메뉴 열기 (최소화/최대화 등)'},
+    ]},
+    { cat:'주소창 (Omnibox)', list:[
+      {k:['Ctrl','L'],          d:'주소창 포커스 (내용 선택)'},
+      {k:['Alt','D'],           d:'주소창 포커스'},
+      {k:['F6'],                d:'주소창 포커스'},
+      {k:['Ctrl','Enter'],      d:'입력 텍스트 앞뒤에 www. 와 .com 추가 후 이동'},
+      {k:['Alt','Enter'],       d:'현재 주소창 내용을 새 탭에서 열기'},
+      {k:['Ctrl','K'],          d:'검색 모드로 전환 (? 접두사)'},
+      {k:['Ctrl','E'],          d:'검색 모드로 전환'},
+      {k:['↓ / ↑'],            d:'자동완성 제안 탐색'},
+      {k:['Shift','Delete'],    d:'선택한 자동완성 제안 삭제'},
+      {k:['Esc'],               d:'편집 취소, 원래 내용으로 복원'},
+    ]},
+    { cat:'페이지 탐색', list:[
+      {k:['Alt','←'],           d:'이전 페이지'},
+      {k:['Backspace'],         d:'이전 페이지 (입력창 없을 때)'},
+      {k:['Alt','→'],           d:'다음 페이지'},
+      {k:['F5'],                d:'페이지 새로고침'},
+      {k:['Ctrl','R'],          d:'페이지 새로고침'},
+      {k:['Ctrl','Shift','R'],  d:'강력 새로고침 (캐시 무시)'},
+      {k:['Shift','F5'],        d:'강력 새로고침'},
+      {k:['Esc'],               d:'페이지 로딩 중지'},
+      {k:['Alt','Home'],        d:'홈페이지로 이동'},
+      {k:['Ctrl','F'],          d:'페이지 내 찾기'},
+      {k:['F3'],                d:'다음 검색 결과'},
+      {k:['Ctrl','G'],          d:'다음 검색 결과'},
+      {k:['Shift','F3'],        d:'이전 검색 결과'},
+      {k:['Ctrl','Shift','G'],  d:'이전 검색 결과'},
+    ]},
+    { cat:'스크롤 & 보기', list:[
+      {k:['Space'],             d:'한 페이지 아래로 스크롤'},
+      {k:['PgDn'],              d:'한 페이지 아래로 스크롤'},
+      {k:['Shift','Space'],     d:'한 페이지 위로 스크롤'},
+      {k:['PgUp'],              d:'한 페이지 위로 스크롤'},
+      {k:['Home'],              d:'페이지 맨 위로 이동'},
+      {k:['End'],               d:'페이지 맨 아래로 이동'},
+      {k:['Ctrl','↑'],          d:'페이지 맨 위로'},
+      {k:['Ctrl','↓'],          d:'페이지 맨 아래로'},
+      {k:['F6'],                d:'페이지와 주소창 사이 포커스 전환'},
+    ]},
+    { cat:'확대 / 축소', list:[
+      {k:['Ctrl','+'],          d:'페이지 확대'},
+      {k:['Ctrl','-'],          d:'페이지 축소'},
+      {k:['Ctrl','0'],          d:'기본 크기로 재설정 (100%)'},
+      {k:['Ctrl','마우스휠 위'],d:'확대'},
+      {k:['Ctrl','마우스휠 아래'],d:'축소'},
+    ]},
+    { cat:'북마크', list:[
+      {k:['Ctrl','D'],          d:'현재 페이지 북마크에 추가'},
+      {k:['Ctrl','Shift','D'],  d:'모든 열린 탭을 북마크 폴더로 저장'},
+      {k:['Ctrl','Shift','B'],  d:'북마크 바 표시/숨기기'},
+      {k:['Ctrl','Shift','O'],  d:'북마크 관리자 열기'},
+      {k:['Alt','클릭'],        d:'링크를 북마크 바에 드래그 없이 저장'},
+    ]},
+    { cat:'다운로드 & 기록', list:[
+      {k:['Ctrl','J'],          d:'다운로드 페이지 열기'},
+      {k:['Ctrl','H'],          d:'방문 기록 열기'},
+      {k:['Ctrl','Shift','Delete'],d:'인터넷 사용 기록 삭제 대화상자'},
+    ]},
+    { cat:'개발자 도구', list:[
+      {k:['F12'],               d:'개발자 도구 열기/닫기'},
+      {k:['Ctrl','Shift','I'],  d:'개발자 도구 열기/닫기'},
+      {k:['Ctrl','Shift','J'],  d:'JavaScript 콘솔 열기'},
+      {k:['Ctrl','Shift','C'],  d:'요소 검사 모드 켜기/끄기'},
+      {k:['Ctrl','U'],          d:'페이지 소스 코드 보기'},
+      {k:['Ctrl','Shift','U'],  d:'페이지 소스 (Chrome OS)'},
+    ]},
+    { cat:'기타', list:[
+      {k:['Ctrl','S'],          d:'현재 페이지 저장'},
+      {k:['Ctrl','P'],          d:'현재 페이지 인쇄'},
+      {k:['Ctrl','A'],          d:'페이지 전체 선택'},
+      {k:['Ctrl','C'],          d:'선택 영역 복사'},
+      {k:['Ctrl','V'],          d:'붙여넣기'},
+      {k:['Ctrl','Shift','M'],  d:'사용자 계정 전환'},
+      {k:['Ctrl','Shift','A'],  d:'탭 검색 (Chrome 탭 검색 UI)'},
+      {k:['Shift','Esc'],       d:'Chrome 작업 관리자 열기'},
+      {k:['F1'],                d:'도움말 센터 열기'},
+      {k:['Ctrl','Shift','F5'], d:'강력 새로고침 (일부 버전)'},
+      {k:['Ctrl','Alt','F'],    d:'검색창 포커스 (크롬OS)'},
+    ]},
+  ],
+};
+
+// ══════════════════════════════════════
+//  상태
+// ══════════════════════════════════════
+let curOS = 'win';
+let curCat = 'all';
+let searchQ = '';
+
+// ══════════════════════════════════════
+//  렌더
+// ══════════════════════════════════════
+const SPECIAL_KEYS = new Set(['Ctrl','Shift','Alt','⊞ Win','Win','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','PrtScn','Esc','Enter','Tab','Delete','Backspace','Insert','Home','End','PgUp','PgDn','Pause','Break','Num Lock','Space']);
+const ARROW_KEYS = new Set(['←','→','↑','↓']);
+
+function kbdHtml(k) {
+  const isArrow = ARROW_KEYS.has(k);
+  const isWin   = k.includes('Win');
+  const isSp    = SPECIAL_KEYS.has(k) || k.startsWith('F') || isArrow;
+  const cls     = isArrow ? 'arrow' : isWin ? 'win' : isSp ? 'special' : '';
+  return `<kbd${cls?' class="'+cls+'"':''}>${k}</kbd>`;
+}
+
+function renderRow(item, idx) {
+  const keysHtml = item.k.map(kbdHtml).join('<span class="plus">+</span>');
+  const search = [...item.k, item.d].join(' ').toLowerCase();
+  return `<div class="row" data-search="${search}" data-idx="${idx}">${keysHtml}<span class="desc">${item.d}</span></div>`;
+}
+
+function renderAll() {
+  const data = DATA[curOS];
+  const content = document.getElementById('content');
+
+  content.innerHTML = data.map(sec => {
+    const rows = sec.list.map((item,i) => renderRow(item, i)).join('');
+    return `<div class="cat-section" data-cat="${sec.cat}">
+      <div class="cat-title">${sec.cat}</div>
+      <div class="rows">${rows}</div>
+    </div>`;
+  }).join('');
+
+  buildCatBar(data);
+  updateCount();
+}
+
+function buildCatBar(data) {
+  const bar = document.getElementById('cat-bar');
+  bar.innerHTML = `<button class="cbt${curCat==='all'?' on':''}" onclick="filterCat('all')">전체</button>` +
+    data.map(s => `<button class="cbt${curCat===s.cat?' on':''}" onclick="filterCat('${s.cat.replace(/'/g,"\\'")}')">${s.cat}</button>`).join('');
+}
+
+// ══════════════════════════════════════
+//  필터
+// ══════════════════════════════════════
+function filterCat(cat) {
+  curCat = cat;
+  document.querySelectorAll('.cbt').forEach(b => b.classList.remove('on'));
+  event?.target?.classList.add('on');
+  applyFilters();
+}
+
+function onSearch() {
+  searchQ = document.getElementById('sq').value.trim().toLowerCase();
+  applyFilters();
+}
+
+function applyFilters() {
+  let visible = 0;
+  document.querySelectorAll('.cat-section').forEach(sec => {
+    const secCat = sec.dataset.cat;
+    const catMatch = curCat === 'all' || curCat === secCat;
+    if (!catMatch) { sec.classList.add('hide'); return; }
+    sec.classList.remove('hide');
+
+    let secVisible = 0;
+    sec.querySelectorAll('.row').forEach(row => {
+      const match = !searchQ || row.dataset.search.includes(searchQ);
+      row.classList.toggle('hide', !match);
+      if (match) { secVisible++; visible++; }
+    });
+
+    // 검색 중이고 이 섹션에 결과 없으면 섹션 숨기기
+    if (searchQ && secVisible === 0) sec.classList.add('hide');
+  });
+
+  document.getElementById('count').textContent = `${visible}개`;
+  document.getElementById('empty').classList.toggle('show', visible === 0);
+}
+
+function updateCount() {
+  const total = DATA[curOS].reduce((s,c)=>s+c.list.length,0);
+  document.getElementById('count').textContent = `${total}개`;
+}
+
+// ══════════════════════════════════════
+//  OS 전환
+// ══════════════════════════════════════
+function switchOS(os) {
+  curOS = os;
+  curCat = 'all';
+  searchQ = '';
+  document.getElementById('sq').value = '';
+  document.querySelectorAll('.ostab').forEach((t,i)=>t.classList.toggle('on',['win','chrome'][i]===os));
+  renderAll();
+}
+
+// ══════════════════════════════════════
+//  초기화
+// ══════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>

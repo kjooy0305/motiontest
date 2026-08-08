@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R 코드 정리 — 테스트 28</title>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --txt:#e6edf3;--txt2:#8b949e;--txt3:#656d76;
+  --blue:#79c0ff;--blue2:#1f6feb;--blue3:#0d419d;
+  --green:#56d364;--green2:#196c2e;
+  --purple:#d2a8ff;--purple2:#6e40c9;--purple3:#2d1a6e;
+  --cyan:#39d353;--teal:#56d3b3;
+  --yellow:#e3b341;--orange:#f0883e;--red:#ff7b72;
+  --pink:#ff7b72;
+  --r-blue:#3b82f6;--r-purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── HEADER ── */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--txt);white-space:nowrap;}
+.r-badge{background:linear-gradient(135deg,#3b82f6,#a78bfa);color:#fff;font-size:14px;font-weight:900;padding:3px 10px;border-radius:6px;letter-spacing:1px;}
+.search-wrap{flex:1;min-width:180px;max-width:380px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--r-blue);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:3px;flex-wrap:wrap;}
+.tab{padding:6px 13px;border-radius:5px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:var(--blue3);color:var(--blue);}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:208px;min-width:208px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(59,130,246,.1);color:var(--blue);border-left-color:var(--blue);}
+.main{flex:1;padding:20px 24px;max-width:980px;}
+
+/* ── PANELS ── */
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--blue);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.hl{color:var(--yellow);}
+
+/* ── R TABLE ── */
+.r-table{width:100%;border-collapse:collapse;}
+.r-table tr{border-bottom:1px solid var(--border);}
+.r-table tr:last-child{border-bottom:none;}
+.r-table tr:hover td{background:rgba(255,255,255,.02);}
+.r-table td{padding:0;vertical-align:top;}
+.code-cell{padding:10px 12px 10px 16px;width:42%;}
+.desc-cell-r{padding:10px 16px 10px 0;}
+
+/* ── CODE ELEMENTS ── */
+.rc{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--blue);background:rgba(121,192,255,.08);padding:3px 7px;border-radius:4px;border:1px solid rgba(121,192,255,.15);display:inline-block;word-break:break-all;line-height:1.5;}
+.rc .kw{color:var(--purple);}        /* keyword */
+.rc .fn{color:var(--teal);}          /* function */
+.rc .st{color:var(--green);}         /* string */
+.rc .nm{color:var(--orange);}        /* number */
+.rc .cm{color:var(--txt3);font-style:italic;} /* comment */
+.rc .op{color:var(--yellow);}        /* operator */
+
+/* ── OUTPUT BOX ── */
+.out{font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;background:rgba(56,211,83,.05);border:1px solid rgba(56,211,83,.15);border-radius:4px;padding:6px 10px;margin-top:5px;color:var(--green);white-space:pre;overflow-x:auto;line-height:1.6;}
+.out .out-label{color:var(--txt3);font-size:10px;display:block;margin-bottom:2px;}
+
+/* ── CODE BLOCK (multi-line) ── */
+.codeblock{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin:8px 0;color:var(--txt2);overflow-x:auto;line-height:1.8;}
+.codeblock .kw{color:var(--purple);}
+.codeblock .fn{color:var(--teal);}
+.codeblock .st{color:var(--green);}
+.codeblock .nm{color:var(--orange);}
+.codeblock .cm{color:var(--txt3);font-style:italic;}
+.codeblock .op{color:var(--yellow);}
+.codeblock .va{color:var(--blue);}
+
+/* ── DESC ── */
+.dm{color:var(--txt);font-size:13px;margin-bottom:3px;font-weight:500;}
+.ds{color:var(--txt2);font-size:12px;line-height:1.55;}
+.use{display:inline-block;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--purple);margin:3px 2px 0;}
+
+/* ── FORMULA BOX ── */
+.formula{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:6px;padding:10px 14px;margin:6px 0;font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--blue);line-height:1.8;}
+.formula-label{font-size:10px;color:var(--txt3);margin-bottom:3px;font-family:inherit;}
+
+/* ── TIP ── */
+.tip{background:rgba(56,211,83,.05);border:1px solid rgba(56,211,83,.2);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--green);}
+.warn{font-size:11px;color:var(--yellow);margin-top:4px;padding:4px 8px;background:rgba(227,179,65,.06);border-radius:4px;border-left:2px solid var(--yellow);}
+
+/* ── GRID ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:750px){.two-col{grid-template-columns:1fr;}}
+
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="r-badge">R</span> R 코드 정리</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="검색... (예: mean, ggplot, lm, apply)">
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('basic')">⚙️ 기초 문법</button>
+    <button class="tab" onclick="switchTab('struct')">📐 데이터 구조</button>
+    <button class="tab" onclick="switchTab('stat')">📊 통계 함수</button>
+    <button class="tab" onclick="switchTab('manip')">🔧 데이터 처리</button>
+    <button class="tab" onclick="switchTab('viz')">📈 시각화</button>
+    <button class="tab" onclick="switchTab('real')">🧪 실전 예제</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main">
+
+<!-- ═══════════════════════════════════════════
+     기초 문법
+════════════════════════════════════════════ -->
+<div class="panel active" id="panel-basic">
+  <div class="sec-title">⚙️ 기초 문법</div>
+  <div class="sec-sub">변수 할당, 자료형, 연산자, 제어문, 함수 정의 — R을 처음 쓸 때 알아야 할 기본 문법</div>
+
+  <div class="card" id="b-var">
+    <div class="card-header"><span class="hl">01</span> 변수 할당 & 자료형</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc">x <span class="op">&lt;-</span> <span class="nm">42</span></span></td>
+        <td><div class="desc-cell-r"><div class="dm">변수에 값 할당 (권장 방식)</div><div class="ds"><span class="rc">=</span> 도 되지만 R에서는 <span class="rc"><span class="op">&lt;-</span></span> 를 관례적으로 사용. 우→좌 방향 화살표.</div><div class="out"><span class="out-label"># 출력</span>x
+[1] 42</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">class</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">변수의 자료형 확인</div><div class="ds">R 주요 자료형: <b>numeric</b>(실수) · <b>integer</b>(정수, 뒤에 L) · <b>character</b>(문자열) · <b>logical</b>(논리값) · <b>complex</b>(복소수)</div><div class="out">x &lt;- 42L; class(x)
+[1] "integer"
+class("hello")
+[1] "character"
+class(TRUE)
+[1] "logical"</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">is.na</span>(x) · <span class="fn">is.null</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">결측값·NULL 여부 확인</div><div class="ds"><b>NA</b>: 결측값(Not Available) · <b>NULL</b>: 객체 없음 · <b>NaN</b>: 숫자 아님 · <b>Inf</b>: 무한대</div><div class="out">is.na(NA)
+[1] TRUE
+is.null(NULL)
+[1] TRUE
+1/0
+[1] Inf</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">as.numeric</span>(x)<br><span class="fn">as.character</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">자료형 변환</div><div class="ds">as.integer · as.logical · as.factor · as.Date 등 다양한 변환 함수.</div><div class="out">as.numeric("3.14")
+[1] 3.14
+as.character(100)
+[1] "100"
+as.logical(0)
+[1] FALSE</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="b-op">
+    <div class="card-header"><span class="hl">02</span> 연산자</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="nm">5</span> <span class="op">%/%</span> <span class="nm">2</span> &nbsp; <span class="nm">5</span> <span class="op">%%</span> <span class="nm">2</span></span></td>
+        <td><div class="desc-cell-r"><div class="dm">정수 나눗셈 · 나머지 (모듈로)</div><div class="out">5 %/% 2  →  [1] 2
+5 %% 2   →  [1] 1</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="nm">2</span> <span class="op">^</span> <span class="nm">10</span></span></td>
+        <td><div class="desc-cell-r"><div class="dm">거듭제곱</div><div class="ds">** 대신 ^ 사용. <span class="rc">sqrt(x)</span> 제곱근 · <span class="rc">abs(x)</span> 절댓값.</div><div class="out">2 ^ 10  →  [1] 1024
+sqrt(144)  →  [1] 12</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">x <span class="op">%in%</span> v</span></td>
+        <td><div class="desc-cell-r"><div class="dm">벡터 포함 여부 확인</div><div class="ds">x가 벡터 v 안에 있는지 TRUE/FALSE 반환. 매우 자주 사용.</div><div class="out">3 %in% c(1,2,3,4)  →  [1] TRUE
+"a" %in% c("b","c")  →  [1] FALSE</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="op">!</span>x &nbsp; x <span class="op">&amp;</span> y &nbsp; x <span class="op">|</span> y</span></td>
+        <td><div class="desc-cell-r"><div class="dm">논리 연산자 (벡터화)</div><div class="ds"><span class="rc">&amp;&amp;</span> / <span class="rc">||</span> 는 첫 번째 요소만 비교 (스칼라용). 벡터 전체 비교는 <span class="rc">&amp;</span> / <span class="rc">|</span>.</div><div class="out">TRUE & FALSE  →  [1] FALSE
+TRUE | FALSE  →  [1] TRUE
+!TRUE         →  [1] FALSE</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="b-ctrl">
+    <div class="card-header"><span class="hl">03</span> 제어문 — if / for / while</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="formula-label">if / else if / else</div>
+          <div class="codeblock"><span class="va">x</span> <span class="op">&lt;-</span> <span class="nm">85</span>
+
+<span class="kw">if</span> (<span class="va">x</span> <span class="op">&gt;=</span> <span class="nm">90</span>) {
+  <span class="fn">print</span>(<span class="st">"A"</span>)
+} <span class="kw">else if</span> (<span class="va">x</span> <span class="op">&gt;=</span> <span class="nm">80</span>) {
+  <span class="fn">print</span>(<span class="st">"B"</span>)
+} <span class="kw">else</span> {
+  <span class="fn">print</span>(<span class="st">"C"</span>)
+}
+<span class="cm"># [1] "B"</span></div>
+          <div class="formula-label" style="margin-top:10px;">ifelse() — 벡터화 조건</div>
+          <div class="codeblock"><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="nm">55</span>, <span class="nm">80</span>, <span class="nm">92</span>)
+<span class="fn">ifelse</span>(<span class="va">scores</span> <span class="op">&gt;=</span> <span class="nm">60</span>, <span class="st">"pass"</span>, <span class="st">"fail"</span>)
+<span class="cm"># [1] "fail" "pass" "pass"</span></div>
+        </div>
+        <div>
+          <div class="formula-label">for 반복문</div>
+          <div class="codeblock"><span class="kw">for</span> (<span class="va">i</span> <span class="kw">in</span> <span class="nm">1</span><span class="op">:</span><span class="nm">5</span>) {
+  <span class="fn">cat</span>(<span class="va">i</span>, <span class="st">" "</span>)
+}
+<span class="cm"># 1 2 3 4 5</span>
+
+<span class="cm"># 벡터 순회</span>
+<span class="va">fruits</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="st">"사과"</span>, <span class="st">"바나나"</span>)
+<span class="kw">for</span> (<span class="va">f</span> <span class="kw">in</span> <span class="va">fruits</span>) {
+  <span class="fn">cat</span>(<span class="va">f</span>, <span class="st">"\n"</span>)
+}</div>
+          <div class="formula-label" style="margin-top:10px;">while / repeat</div>
+          <div class="codeblock"><span class="va">n</span> <span class="op">&lt;-</span> <span class="nm">1</span>
+<span class="kw">while</span> (<span class="va">n</span> <span class="op">&lt;=</span> <span class="nm">3</span>) {
+  <span class="fn">cat</span>(<span class="va">n</span>, <span class="st">"\n"</span>)
+  <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">+</span> <span class="nm">1</span>
+}
+<span class="cm"># break / next 로 탈출·건너뛰기</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="b-func">
+    <div class="card-header"><span class="hl">04</span> 함수 정의</div>
+    <div style="padding:14px 16px;">
+      <div class="two-col">
+        <div>
+          <div class="formula-label">기본 함수 정의</div>
+          <div class="codeblock"><span class="cm"># 기본값 인수 포함</span>
+<span class="va">greet</span> <span class="op">&lt;-</span> <span class="kw">function</span>(<span class="va">name</span>, <span class="va">lang</span> <span class="op">=</span> <span class="st">"ko"</span>) {
+  <span class="kw">if</span> (<span class="va">lang</span> <span class="op">==</span> <span class="st">"ko"</span>) {
+    <span class="fn">paste</span>(<span class="st">"안녕하세요,"</span>, <span class="va">name</span>)
+  } <span class="kw">else</span> {
+    <span class="fn">paste</span>(<span class="st">"Hello,"</span>, <span class="va">name</span>)
+  }
+}
+<span class="fn">greet</span>(<span class="st">"Alice"</span>)
+<span class="cm"># [1] "안녕하세요, Alice"</span>
+<span class="fn">greet</span>(<span class="st">"Bob"</span>, <span class="st">"en"</span>)
+<span class="cm"># [1] "Hello, Bob"</span></div>
+        </div>
+        <div>
+          <div class="formula-label">가변 인수 · 익명 함수</div>
+          <div class="codeblock"><span class="cm"># ... 으로 가변 인수 받기</span>
+<span class="va">mysum</span> <span class="op">&lt;-</span> <span class="kw">function</span>(...) {
+  <span class="fn">sum</span>(<span class="fn">c</span>(...))
+}
+<span class="fn">mysum</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>)
+<span class="cm"># [1] 10</span>
+
+<span class="cm"># 익명 함수 (람다)</span>
+<span class="fn">sapply</span>(<span class="nm">1</span><span class="op">:</span><span class="nm">5</span>, <span class="kw">function</span>(<span class="va">x</span>) <span class="va">x</span><span class="op">^</span><span class="nm">2</span>)
+<span class="cm"># [1]  1  4  9 16 25</span>
+
+<span class="cm"># R 4.1+ 파이프 연산자</span>
+<span class="nm">1</span><span class="op">:</span><span class="nm">10</span> <span class="op">|&gt;</span> <span class="fn">mean</span>()
+<span class="cm"># [1] 5.5</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="b-string">
+    <div class="card-header"><span class="hl">05</span> 문자열 함수</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">paste</span>(a, b, <span class="va">sep</span>=<span class="st">"-"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">문자열 연결</div><div class="ds"><span class="rc">paste0()</span> 는 sep="" (공백 없이 연결). 벡터에 적용하면 각 요소 연결.</div><div class="out">paste("R", "코딩", sep="-")
+[1] "R-코딩"
+paste0("x", 1:3)
+[1] "x1" "x2" "x3"</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">nchar</span>(s) · <span class="fn">toupper</span>(s)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">문자열 길이 · 대소문자</div><div class="out">nchar("hello")  →  [1] 5
+toupper("hello")  →  [1] "HELLO"
+tolower("WORLD")  →  [1] "world"</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">substr</span>(s, <span class="nm">1</span>, <span class="nm">3</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">부분 문자열 추출 (1-based)</div><div class="out">substr("banana", 1, 3)  →  [1] "ban"</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">gsub</span>(<span class="st">"패턴"</span>, <span class="st">"대체"</span>, s)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">문자열 전체 치환 (정규식 지원)</div><div class="ds"><span class="rc">sub()</span> 는 첫 번째만. <span class="rc">grepl()</span> 패턴 포함 여부 TRUE/FALSE 반환.</div><div class="out">gsub("a", "A", "banana")  →  [1] "bAnAnA"
+grepl("^R", "R코드")       →  [1] TRUE</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">strsplit</span>(s, <span class="st">","</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">구분자로 문자열 분리</div><div class="ds">결과가 리스트로 반환됨. <span class="rc">[[1]]</span> 로 첫 번째 요소 접근.</div><div class="out">strsplit("a,b,c", ",")[[1]]
+[1] "a" "b" "c"</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">sprintf</span>(<span class="st">"%.2f"</span>, x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">포맷 지정 문자열 생성</div><div class="ds">C 스타일 형식 지정. %d 정수 · %f 실수 · %s 문자열.</div><div class="out">sprintf("Pi = %.4f", pi)
+[1] "Pi = 3.1416"
+sprintf("순위 %d위", 1L)
+[1] "순위 1위"</div></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     데이터 구조
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-struct">
+  <div class="sec-title">📐 데이터 구조</div>
+  <div class="sec-sub">R의 5가지 핵심 데이터 구조 — vector · matrix · array · list · data.frame</div>
+
+  <div class="card" id="s-vec">
+    <div class="card-header"><span class="hl">01</span> Vector — R의 기본 단위</div>
+    <div class="tip"><b>R의 모든 값은 벡터다.</b> 숫자 하나도 길이 1짜리 벡터. 벡터 연산은 자동으로 원소별(element-wise) 적용됨.</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">c</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">벡터 생성</div><div class="out">c(10, 20, 30)  →  [1] 10 20 30
+c(1:5)         →  [1]  1  2  3  4  5</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">seq</span>(<span class="nm">1</span>, <span class="nm">10</span>, <span class="va">by</span>=<span class="nm">2</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">등간격 수열 생성</div><div class="ds"><span class="rc">seq(0, 1, length.out=5)</span> 개수 지정으로 생성.</div><div class="out">seq(1, 10, by=2)  →  [1] 1 3 5 7 9
+seq(0, 1, length.out=5)  →  [1] 0.00 0.25 0.50 0.75 1.00</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rep</span>(x, <span class="nm">3</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">반복 벡터 생성</div><div class="out">rep(0, 5)           →  [1] 0 0 0 0 0
+rep(c(1,2), times=3)  →  [1] 1 2 1 2 1 2
+rep(c(1,2), each=3)   →  [1] 1 1 1 2 2 2</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">v[<span class="nm">2</span>] · v[<span class="fn">c</span>(<span class="nm">1</span>,<span class="nm">3</span>)]</span></td>
+        <td><div class="desc-cell-r"><div class="dm">인덱싱 (1-based, 포함형)</div><div class="ds">Python과 달리 인덱스가 1부터 시작. 음수 인덱스는 해당 위치 <b>제외</b>.</div><div class="out">v &lt;- c(10,20,30,40,50)
+v[2]       →  [1] 20
+v[c(1,3)]  →  [1] 10 30
+v[-1]      →  [1] 20 30 40 50  # 1번 제외
+v[v > 25]  →  [1] 30 40 50     # 조건 필터</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">length</span>(v) · <span class="fn">sort</span>(v)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">길이·정렬·역순</div><div class="out">length(c(1,2,3))  →  [1] 3
+sort(c(3,1,2))    →  [1] 1 2 3
+rev(c(1,2,3))     →  [1] 3 2 1</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">which</span>(v <span class="op">&gt;</span> <span class="nm">3</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">조건을 만족하는 인덱스 반환</div><div class="out">v &lt;- c(1, 5, 3, 8, 2)
+which(v > 3)  →  [1] 2 4
+which.max(v)  →  [1] 4   # 최대값 위치
+which.min(v)  →  [1] 5   # 최소값 위치</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-mat">
+    <div class="card-header"><span class="hl">02</span> Matrix & Array</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">matrix</span>(data, <span class="va">nrow</span>, <span class="va">ncol</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">행렬 생성 (기본: 열 우선 채우기)</div><div class="ds"><span class="rc">byrow=TRUE</span> 로 행 우선 변경 가능.</div><div class="out">matrix(1:6, nrow=2, ncol=3)
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">m[<span class="nm">1</span>, <span class="nm">2</span>] · m[<span class="nm">1</span>,] · m[,<span class="nm">2</span>]</span></td>
+        <td><div class="desc-cell-r"><div class="dm">행렬 인덱싱 [행, 열]</div><div class="out">m &lt;- matrix(1:9, 3, 3)
+m[2, 3]  →  [1] 8   # 2행 3열
+m[1, ]   →  [1] 1 4 7  # 1행 전체
+m[, 2]   →  [1] 4 5 6  # 2열 전체</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">t</span>(m) · <span class="fn">det</span>(m) · m <span class="op">%*%</span> n</span></td>
+        <td><div class="desc-cell-r"><div class="dm">전치·행렬식·행렬 곱</div><div class="ds"><span class="rc">solve(m)</span> 역행렬 · <span class="rc">solve(A, b)</span> 연립방정식 풀기.</div><div class="out">m &lt;- matrix(c(1,2,3,4), 2, 2)
+det(m)    →  [1] -2
+t(m)[1,]  →  [1] 1 2</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rbind</span>(a, b) · <span class="fn">cbind</span>(a, b)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">행/열 방향으로 행렬 결합</div><div class="out">rbind(c(1,2), c(3,4))
+     [,1] [,2]
+[1,]    1    2
+[2,]    3    4</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-df">
+    <div class="card-header"><span class="hl">03</span> Data Frame — 가장 많이 쓰는 구조</div>
+    <div class="tip"><b>Data Frame</b>은 R에서 표 형태 데이터를 다루는 핵심 구조. 열(column)마다 다른 자료형 가능. 행렬과 달리 열 이름이 있음.</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">data.frame</span>(...)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">데이터프레임 생성</div><div class="codeblock"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fn">data.frame</span>(
+  <span class="va">name</span>  <span class="op">=</span> <span class="fn">c</span>(<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Carol"</span>),
+  <span class="va">score</span> <span class="op">=</span> <span class="fn">c</span>(<span class="nm">88</span>, <span class="nm">74</span>, <span class="nm">95</span>),
+  <span class="va">pass</span>  <span class="op">=</span> <span class="fn">c</span>(<span class="kw">TRUE</span>, <span class="kw">TRUE</span>, <span class="kw">TRUE</span>)
+)</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">df<span class="op">$</span>score · df[,<span class="nm">2</span>]</span></td>
+        <td><div class="desc-cell-r"><div class="dm">열 접근</div><div class="out">df$score    →  [1] 88 74 95
+df[, "name"] →  [1] "Alice" "Bob" "Carol"
+df[1, ]      →  name=Alice, score=88, pass=TRUE</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">df[df<span class="op">$</span>score <span class="op">&gt;</span> <span class="nm">80</span>, ]</span></td>
+        <td><div class="desc-cell-r"><div class="dm">조건 필터링</div><div class="out">df[df$score > 80, ]
+   name score pass
+1 Alice    88 TRUE
+3 Carol    95 TRUE</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">nrow</span> · <span class="fn">ncol</span> · <span class="fn">dim</span> · <span class="fn">str</span></span></td>
+        <td><div class="desc-cell-r"><div class="dm">구조 확인 함수들</div><div class="out">nrow(df)  →  [1] 3
+ncol(df)  →  [1] 3
+dim(df)   →  [1] 3 3
+str(df)   →  'data.frame': 3 obs. of 3 variables
+head(df, 2)  →  첫 2행 출력</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">merge</span>(df1, df2, <span class="va">by</span>=<span class="st">"id"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">공통 키로 두 데이터프레임 병합 (SQL JOIN)</div><div class="ds"><span class="rc">all.x=TRUE</span> left join · <span class="rc">all=TRUE</span> full join.</div><span class="use">🔗 DB 테이블 조인</span><span class="use">📊 데이터 결합</span></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-list">
+    <div class="card-header"><span class="hl">04</span> List & Factor</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">list</span>(a=<span class="nm">1</span>, b=<span class="st">"x"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">서로 다른 타입의 값을 담는 컨테이너</div><div class="ds"><span class="rc">lst$a</span> 또는 <span class="rc">lst[["a"]]</span> 로 접근. <span class="rc">lst[[1]]</span> 첫 번째 요소.</div><div class="out">lst &lt;- list(n=42, s="hello", v=1:3)
+lst$n      →  [1] 42
+lst[["s"]] →  [1] "hello"
+lst[[3]]   →  [1] 1 2 3</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">factor</span>(v, <span class="va">levels</span>=...)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">범주형(명목형) 변수</div><div class="ds">내부적으로 정수로 저장. <span class="rc">levels(f)</span> 수준 확인 · <span class="rc">table(f)</span> 빈도표.</div><div class="out">f &lt;- factor(c("상","중","하","상"))
+levels(f)  →  [1] "상" "중" "하"
+table(f)
+상 중 하
+ 2  1  1</div></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     통계 함수
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-stat">
+  <div class="sec-title">📊 통계 함수</div>
+  <div class="sec-sub">기술통계 · 확률분포 · 가설검정 · 회귀분석 — 공식과 실제 출력값 포함</div>
+
+  <div class="card" id="st-desc">
+    <div class="card-header"><span class="hl">01</span> 기술통계 (Descriptive Statistics)</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">mean</span>(x) · <span class="fn">median</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">평균 · 중앙값</div>
+          <div class="formula"><span class="formula-label">공식</span>평균(mean) = Σxᵢ / n
+중앙값(median) = 정렬 후 가운데 값</div>
+          <div class="out">x &lt;- c(2, 4, 4, 4, 5, 5, 7, 9)
+mean(x)    →  [1] 5
+median(x)  →  [1] 4.5</div><span class="use">📈 중심 경향 측정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">var</span>(x) · <span class="fn">sd</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">분산 · 표준편차</div>
+          <div class="formula"><span class="formula-label">공식 (표본)</span>분산 s² = Σ(xᵢ - x̄)² / (n-1)
+표준편차 s = √s²</div>
+          <div class="out">x &lt;- c(2, 4, 4, 4, 5, 5, 7, 9)
+var(x)  →  [1] 4.571429
+sd(x)   →  [1] 2.138090</div><span class="use">📉 산포도 측정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">quantile</span>(x, <span class="nm">0.25</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">분위수</div><div class="ds">0.25=1사분위(Q1) · 0.5=중앙값 · 0.75=3사분위(Q3). IQR = Q3 - Q1.</div><div class="out">x &lt;- c(1:10)
+quantile(x)
+  0%  25%  50%  75% 100%
+ 1.0  3.25  5.5  7.75 10.0
+IQR(x)  →  [1] 4.5</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">summary</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">6가지 요약 통계 한 번에</div><div class="out">x &lt;- c(3,1,4,1,5,9,2,6)
+summary(x)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+  1.000   1.750   3.500   3.875   5.250   9.000</div><span class="use">📊 데이터 탐색</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">cor</span>(x, y) · <span class="fn">cov</span>(x, y)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">상관계수 · 공분산</div>
+          <div class="formula"><span class="formula-label">피어슨 상관계수 공식</span>r = Σ[(xᵢ-x̄)(yᵢ-ȳ)] / [(n-1)·sₓ·s_y]
+-1 ≤ r ≤ 1  (0: 무관, ±1: 완전 선형관계)</div>
+          <div class="out">x &lt;- c(1,2,3,4,5)
+y &lt;- c(2,4,5,4,5)
+cor(x, y)  →  [1] 0.9449112
+cov(x, y)  →  [1] 2.1</div><span class="use">🔗 변수 간 관계 분석</span></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="st-dist">
+    <div class="card-header"><span class="hl">02</span> 확률 분포 함수</div>
+    <div class="tip"><b>R 분포 함수 접두어 규칙:</b> <b style="color:var(--blue)">d</b>-밀도함수(PDF) · <b style="color:var(--blue)">p</b>-누적분포(CDF) · <b style="color:var(--blue)">q</b>-분위수(역CDF) · <b style="color:var(--blue)">r</b>-난수 생성<br>예: dnorm · pnorm · qnorm · rnorm</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rnorm</span>(n, <span class="va">mean</span>, <span class="va">sd</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">정규분포 난수 생성</div>
+          <div class="formula"><span class="formula-label">정규분포 PDF</span>f(x) = 1/(σ√2π) · exp(-(x-μ)²/2σ²)</div>
+          <div class="out">set.seed(42)
+rnorm(5, mean=0, sd=1)
+[1]  1.371 -0.565  0.363  0.633  0.404
+
+pnorm(1.96)        →  [1] 0.9750021  # P(Z≤1.96)
+qnorm(0.975)       →  [1] 1.959964   # 95% 신뢰구간 임계값</div><span class="use">🎲 Monte Carlo 시뮬레이션</span><span class="use">📐 통계 검정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rt</span>(n, <span class="va">df</span>)<br><span class="fn">pt</span>(t, <span class="va">df</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">t분포 난수 · 누적확률</div>
+          <div class="formula"><span class="formula-label">t 통계량</span>t = (x̄ - μ₀) / (s/√n)   df = n-1</div>
+          <div class="out">pt(2.0, df=9)      →  [1] 0.9633306
+qt(0.975, df=9)   →  [1] 2.262157  # t 임계값</div><span class="use">📊 소표본 평균 검정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rbinom</span>(n, <span class="va">size</span>, <span class="va">prob</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">이항분포 난수 생성</div>
+          <div class="formula"><span class="formula-label">이항분포 PMF</span>P(X=k) = C(n,k) · pᵏ · (1-p)^(n-k)
+E(X) = np,  Var(X) = np(1-p)</div>
+          <div class="out">set.seed(1)
+rbinom(5, size=10, prob=0.5)
+[1] 4 4 6 6 3
+dbinom(5, 10, 0.5)  →  [1] 0.2460938  # P(X=5)</div><span class="use">🎯 성공/실패 실험</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">rpois</span>(n, <span class="va">lambda</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">포아송분포 난수 생성</div>
+          <div class="formula"><span class="formula-label">포아송 PMF</span>P(X=k) = e^(-λ) · λᵏ / k!   E(X) = Var(X) = λ</div>
+          <div class="out">dpois(3, lambda=2)  →  [1] 0.180447  # P(X=3)
+ppois(3, lambda=2)  →  [1] 0.857123  # P(X≤3)</div><span class="use">📦 단위 시간 내 사건 빈도</span></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="st-test">
+    <div class="card-header"><span class="hl">03</span> 가설 검정</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">t.test</span>(x, <span class="va">mu</span>=<span class="nm">0</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">일표본 t 검정</div>
+          <div class="formula"><span class="formula-label">귀무가설 H₀: μ = μ₀</span>t = (x̄ - μ₀) / (s/√n)   p-value < 0.05 → H₀ 기각</div>
+          <div class="out">set.seed(1); x &lt;- rnorm(30, mean=5, sd=2)
+t.test(x, mu=4)
+  t = 3.12, df = 29, p-value = 0.004
+  95% CI: [4.32, 5.89]  → H₀ 기각 (μ≠4)</div><span class="use">🧪 모집단 평균 검정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">t.test</span>(x, y)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">이표본 t 검정 (두 집단 평균 비교)</div>
+          <div class="formula"><span class="formula-label">귀무가설 H₀: μ₁ = μ₂</span>t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)</div>
+          <div class="out">A &lt;- c(82,88,75,90,86); B &lt;- c(70,74,78,72,68)
+t.test(A, B)
+  t = 4.12, p-value = 0.003 → 유의미한 차이</div><span class="use">🔬 AB 테스트</span><span class="use">📊 집단 비교</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">chisq.test</span>(<span class="fn">table</span>(x))</span></td>
+        <td><div class="desc-cell-r"><div class="dm">카이제곱 검정 (범주형 독립성 검정)</div>
+          <div class="formula"><span class="formula-label">χ² 통계량</span>χ² = Σ (관측값 - 기대값)² / 기대값   df = (r-1)(c-1)</div>
+          <div class="out">observed &lt;- c(30, 45, 25)
+chisq.test(observed, p=c(1/3, 1/3, 1/3))
+  X-squared = 6.5, df = 2, p-value = 0.0388</div><span class="use">📋 빈도 분석</span><span class="use">🔗 독립성 검정</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">wilcox.test</span>(x, y)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">윌콕슨 검정 (비모수 t 대안)</div><div class="ds">정규성 가정 위반 시 사용. Mann-Whitney U 검정.</div><span class="use">📊 비정규 분포 비교</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">shapiro.test</span>(x)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">정규성 검정 (Shapiro-Wilk)</div><div class="ds">p-value > 0.05 → 정규분포 가정 기각 실패(정규분포로 봄). n < 5000 권장.</div><div class="out">shapiro.test(rnorm(50))
+  W = 0.978, p-value = 0.4843 → 정규분포로 볼 수 있음</div><span class="use">✅ 검정 가정 확인</span></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="st-reg">
+    <div class="card-header"><span class="hl">04</span> 회귀 분석</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">lm</span>(y <span class="op">~</span> x, <span class="va">data</span>=df)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">단순/다중 선형 회귀</div>
+          <div class="formula"><span class="formula-label">단순 선형 회귀 모델</span>ŷ = β₀ + β₁x + ε
+β₁ = Σ(xᵢ-x̄)(yᵢ-ȳ) / Σ(xᵢ-x̄)²
+β₀ = ȳ - β₁x̄</div>
+          <div class="codeblock"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fn">data.frame</span>(<span class="va">x</span><span class="op">=</span><span class="fn">c</span>(<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>), <span class="va">y</span><span class="op">=</span><span class="fn">c</span>(<span class="nm">2</span>,<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">4</span>,<span class="nm">5</span>))
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fn">lm</span>(<span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, <span class="va">data</span><span class="op">=</span><span class="va">df</span>)
+<span class="fn">summary</span>(<span class="va">model</span>)</div>
+          <div class="out">Coefficients:
+(Intercept)   x
+ 2.2000    0.6000
+R-squared: 0.6389  # 설명력 64%
+p-value: 0.1179    # 회귀선 유의성</div><span class="use">📈 예측 모델</span><span class="use">🔗 인과 분석</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">predict</span>(model, newdata)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">새 데이터 예측값 계산</div><div class="out">predict(model, newdata=data.frame(x=6))
+[1] 5.8   # x=6일 때 예측값</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">glm</span>(y <span class="op">~</span> x, <span class="va">family</span>=<span class="st">"binomial"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">로지스틱 회귀 (이진 분류)</div>
+          <div class="formula"><span class="formula-label">로지스틱 함수</span>P(y=1) = 1 / (1 + e^-(β₀+β₁x))
+log(p/1-p) = β₀ + β₁x  (로그 오즈)</div>
+          <span class="use">🤖 이진 분류</span><span class="use">📊 확률 예측</span></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     데이터 처리
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-manip">
+  <div class="sec-title">🔧 데이터 처리</div>
+  <div class="sec-sub">apply 계열 함수, dplyr 패키지, 파일 입출력 — 실무에서 가장 많이 쓰는 처리 패턴</div>
+
+  <div class="card" id="m-apply">
+    <div class="card-header"><span class="hl">01</span> apply 계열 함수</div>
+    <div class="tip">R에서 반복문 대신 사용하는 <b>함수형 프로그래밍</b> 도구. 코드가 짧고 빠름.</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">apply</span>(m, <span class="nm">1</span>, fn)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">행렬/배열의 행(1) 또는 열(2) 방향 적용</div><div class="out">m &lt;- matrix(1:9, 3, 3)
+apply(m, 1, sum)  →  [1] 12 15 18  # 행별 합계
+apply(m, 2, mean) →  [1]  2  5  8  # 열별 평균</div><span class="use">🔢 행렬 연산</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">lapply</span>(lst, fn)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">리스트 각 요소에 함수 적용 → 리스트 반환</div><div class="out">lapply(list(1:3, 4:6), mean)
+[[1]]  [1] 2
+[[2]]  [1] 5</div><span class="use">📋 리스트 처리</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">sapply</span>(v, fn)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">벡터 각 요소에 함수 적용 → 벡터/행렬 반환</div><div class="ds">lapply의 간결 버전. 결과를 자동으로 단순화.</div><div class="out">sapply(1:5, function(x) x^2)
+[1]  1  4  9 16 25</div><span class="use">🔄 벡터 변환</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">tapply</span>(x, grp, fn)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">그룹별 함수 적용 (그룹 집계)</div><div class="out">score &lt;- c(80,90,70,85,95)
+group &lt;- c("A","B","A","B","A")
+tapply(score, group, mean)
+  A    B
+81.67 87.50</div><span class="use">📊 그룹별 통계</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">Map</span>(fn, lst1, lst2)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">여러 리스트를 함께 순회</div><div class="out">Map("+", list(1,2,3), list(10,20,30))
+[[1]] [1] 11  [[2]] [1] 22  [[3]] [1] 33</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="m-dplyr">
+    <div class="card-header"><span class="hl">02</span> dplyr 패키지 (tidyverse)</div>
+    <div class="tip"><b>install.packages("dplyr")</b> 후 library(dplyr). <b>%&gt;%</b> (파이프 연산자) 또는 R 4.1+ 기본 파이프 <b>|&gt;</b> 와 조합해서 사용.</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">filter</span>(df, 조건)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">행 필터링 (WHERE)</div><div class="out">df |&gt; filter(score &gt; 80, grade == "A")</div><span class="use">🔍 행 선택</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">select</span>(df, 열이름...)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">열 선택 (SELECT)</div><div class="out">df |&gt; select(name, score)
+df |&gt; select(-id)       # id 열 제외
+df |&gt; select(starts_with("sc"))</div><span class="use">📋 열 선택</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">mutate</span>(df, 새열=식)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">새 열 추가 / 기존 열 변환</div><div class="out">df |&gt; mutate(
+  grade = ifelse(score &gt;= 90, "A", "B"),
+  score_z = (score - mean(score)) / sd(score)
+)</div><span class="use">🔢 파생 변수 생성</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">summarise</span>(df, ...)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">집계 통계 계산</div><div class="out">df |&gt; summarise(
+  avg = mean(score),
+  n   = n(),
+  sd  = sd(score)
+)
+  avg   n       sd
+ 83.5  10  8.234</div><span class="use">📊 요약 통계</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">group_by</span>(df, 열)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">그룹 지정 후 summarise와 조합</div><div class="out">df |&gt; group_by(class) |&gt;
+  summarise(avg=mean(score), n=n())
+  class   avg   n
+  A      88.2   5
+  B      76.4   5</div><span class="use">🗂️ 그룹별 집계</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">arrange</span>(df, <span class="fn">desc</span>(열))</span></td>
+        <td><div class="desc-cell-r"><div class="dm">정렬 (기본 오름차순)</div><div class="out">df |&gt; arrange(desc(score))  # 점수 내림차순</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">left_join</span>(df1, df2, <span class="va">by</span>=<span class="st">"id"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">dplyr JOIN 계열</div><div class="ds">inner_join · left_join · right_join · full_join · anti_join</div><span class="use">🔗 테이블 결합</span></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="m-io">
+    <div class="card-header"><span class="hl">03</span> 파일 입출력</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">read.csv</span>(<span class="st">"파일.csv"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">CSV 파일 읽기</div><div class="ds"><span class="rc">header=TRUE</span>(기본) · <span class="rc">sep="\t"</span> 탭 구분 · <span class="rc">stringsAsFactors=FALSE</span> 문자열 유지. readr 패키지의 <span class="rc">read_csv()</span>가 더 빠름.</div><div class="out">df &lt;- read.csv("data.csv", encoding="UTF-8")
+# 또는
+df &lt;- readr::read_csv("data.csv")</div><span class="use">📂 데이터 로드</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">write.csv</span>(df, <span class="st">"파일.csv"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">데이터프레임을 CSV로 저장</div><div class="ds"><span class="rc">row.names=FALSE</span> 로 행 번호 제외 권장.</div><div class="out">write.csv(df, "result.csv", row.names=FALSE)</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">readRDS</span> / <span class="fn">saveRDS</span></span></td>
+        <td><div class="desc-cell-r"><div class="dm">R 전용 바이너리 형식으로 저장/읽기</div><div class="ds">CSV보다 빠르고 R 객체 그대로 보존. 모델, 대용량 데이터에 유리.</div><div class="out">saveRDS(model, "model.rds")
+model &lt;- readRDS("model.rds")</div><span class="use">💾 모델 저장</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc">readxl<span class="op">::</span><span class="fn">read_excel</span>(<span class="st">"파일.xlsx"</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">엑셀 파일 읽기</div><div class="ds"><span class="rc">sheet=2</span> 시트 지정 · <span class="rc">range="A1:C10"</span> 범위 지정.</div><span class="use">📊 엑셀 분석</span></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     시각화
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-viz">
+  <div class="sec-title">📈 시각화</div>
+  <div class="sec-sub">base R 그래픽 + ggplot2 패키지 — 그래프 종류와 주요 인수 정리</div>
+
+  <div class="card" id="v-base">
+    <div class="card-header"><span class="hl">01</span> base R 그래픽</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">plot</span>(x, y)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">산점도 (Scatter Plot)</div><div class="ds">x, y 두 변수 관계 시각화. 인수: <span class="rc">type="l"</span> 선 · <span class="rc">col</span> 색 · <span class="rc">pch</span> 점 모양 · <span class="rc">main</span> 제목 · <span class="rc">xlab/ylab</span> 축 이름.</div><div class="codeblock"><span class="fn">plot</span>(<span class="va">x</span>, <span class="va">y</span>,
+  <span class="va">main</span> <span class="op">=</span> <span class="st">"산점도"</span>,
+  <span class="va">xlab</span> <span class="op">=</span> <span class="st">"X축"</span>,
+  <span class="va">ylab</span> <span class="op">=</span> <span class="st">"Y축"</span>,
+  <span class="va">col</span>  <span class="op">=</span> <span class="st">"steelblue"</span>,
+  <span class="va">pch</span>  <span class="op">=</span> <span class="nm">19</span>)</div><span class="use">🔗 변수 관계 파악</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">hist</span>(x, <span class="va">breaks</span>=<span class="nm">20</span>)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">히스토그램 — 분포 시각화</div><div class="ds"><span class="rc">freq=FALSE</span> 밀도 기준 · <span class="rc">col</span> 막대 색.</div><div class="codeblock"><span class="fn">hist</span>(<span class="fn">rnorm</span>(<span class="nm">1000</span>),
+  <span class="va">breaks</span> <span class="op">=</span> <span class="nm">30</span>,
+  <span class="va">col</span>    <span class="op">=</span> <span class="st">"#5ab0ff"</span>,
+  <span class="va">main</span>   <span class="op">=</span> <span class="st">"정규분포 히스토그램"</span>)</div><span class="use">📊 분포 확인</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">boxplot</span>(y <span class="op">~</span> grp)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">박스플롯 — 그룹 간 분포 비교</div><div class="ds">중앙값·Q1·Q3·이상치를 동시에 표현. 그룹 비교에 최적.</div><div class="codeblock"><span class="fn">boxplot</span>(<span class="va">score</span> <span class="op">~</span> <span class="va">class</span>, <span class="va">data</span><span class="op">=</span><span class="va">df</span>,
+  <span class="va">col</span> <span class="op">=</span> <span class="fn">c</span>(<span class="st">"#79c0ff"</span>,<span class="st">"#56d364"</span>))</div><span class="use">📦 이상치 탐색</span><span class="use">🔬 그룹 비교</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">barplot</span>(<span class="fn">table</span>(x))</span></td>
+        <td><div class="desc-cell-r"><div class="dm">막대 그래프 — 빈도/집계 시각화</div><div class="codeblock"><span class="fn">barplot</span>(<span class="fn">c</span>(<span class="va">A</span><span class="op">=</span><span class="nm">30</span>,<span class="va">B</span><span class="op">=</span><span class="nm">45</span>,<span class="va">C</span><span class="op">=</span><span class="nm">25</span>),
+  <span class="va">col</span> <span class="op">=</span> <span class="st">"#d2a8ff"</span>, <span class="va">main</span> <span class="op">=</span> <span class="st">"그룹별 빈도"</span>)</div><span class="use">📋 범주형 데이터</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">pairs</span>(df)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">변수 쌍별 산점도 행렬 (탐색적 분석)</div><span class="use">🔍 다변수 탐색</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">par</span>(<span class="va">mfrow</span>=<span class="fn">c</span>(<span class="nm">2</span>,<span class="nm">2</span>))</span></td>
+        <td><div class="desc-cell-r"><div class="dm">그래프 창 2×2 분할</div><div class="ds">par()로 그래픽 파라미터 설정. mfrow=c(행,열).</div><div class="codeblock"><span class="fn">par</span>(<span class="va">mfrow</span><span class="op">=</span><span class="fn">c</span>(<span class="nm">2</span>,<span class="nm">2</span>))
+<span class="fn">plot</span>(<span class="va">model</span>)  <span class="cm"># 회귀진단 4그래프</span></div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card" id="v-ggplot">
+    <div class="card-header"><span class="hl">02</span> ggplot2 패키지</div>
+    <div class="tip"><b>install.packages("ggplot2")</b> | 문법 구조: <b>ggplot(data, aes()) + geom_*() + theme*()</b> — 레이어를 <b>+</b>로 쌓아 올리는 방식</div>
+    <table class="r-table">
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">ggplot</span>(df, <span class="fn">aes</span>(x, y))</span></td>
+        <td><div class="desc-cell-r"><div class="dm">ggplot 기본 구조 — aes()로 변수 매핑</div><div class="codeblock"><span class="fn">library</span>(<span class="va">ggplot2</span>)
+<span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">score</span>, <span class="va">y</span><span class="op">=</span><span class="va">grade</span>,
+               <span class="va">color</span><span class="op">=</span><span class="va">class</span>)) <span class="op">+</span>
+  <span class="fn">geom_point</span>(<span class="va">size</span><span class="op">=</span><span class="nm">3</span>) <span class="op">+</span>
+  <span class="fn">labs</span>(<span class="va">title</span><span class="op">=</span><span class="st">"성적 분포"</span>,
+       <span class="va">x</span><span class="op">=</span><span class="st">"점수"</span>, <span class="va">y</span><span class="op">=</span><span class="st">"등급"</span>) <span class="op">+</span>
+  <span class="fn">theme_minimal</span>()</div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">geom_histogram</span>()</span></td>
+        <td><div class="desc-cell-r"><div class="dm">히스토그램</div><div class="codeblock"><span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">score</span>)) <span class="op">+</span>
+  <span class="fn">geom_histogram</span>(<span class="va">bins</span><span class="op">=</span><span class="nm">20</span>,
+    <span class="va">fill</span><span class="op">=</span><span class="st">"#79c0ff"</span>, <span class="va">color</span><span class="op">=</span><span class="st">"white"</span>) <span class="op">+</span>
+  <span class="fn">theme_dark</span>()</div><span class="use">📊 분포 시각화</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">geom_boxplot</span>()</span></td>
+        <td><div class="desc-cell-r"><div class="dm">박스플롯</div><div class="codeblock"><span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">class</span>, <span class="va">y</span><span class="op">=</span><span class="va">score</span>,
+               <span class="va">fill</span><span class="op">=</span><span class="va">class</span>)) <span class="op">+</span>
+  <span class="fn">geom_boxplot</span>() <span class="op">+</span>
+  <span class="fn">scale_fill_brewer</span>(<span class="va">palette</span><span class="op">=</span><span class="st">"Set2"</span>)</div><span class="use">🔬 그룹 비교</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">geom_bar</span>() · <span class="fn">geom_col</span>()</span></td>
+        <td><div class="desc-cell-r"><div class="dm">막대 그래프 · 값 기반 막대</div><div class="ds">geom_bar()는 빈도 자동 계산, geom_col()은 y값 그대로 사용.</div><div class="codeblock"><span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">grade</span>, <span class="va">fill</span><span class="op">=</span><span class="va">grade</span>)) <span class="op">+</span>
+  <span class="fn">geom_bar</span>() <span class="op">+</span>
+  <span class="fn">coord_flip</span>()  <span class="cm"># 가로 막대</span></div></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">geom_line</span>() · <span class="fn">geom_smooth</span>()</span></td>
+        <td><div class="desc-cell-r"><div class="dm">선 그래프 · 추세선</div><div class="codeblock"><span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">date</span>, <span class="va">y</span><span class="op">=</span><span class="va">value</span>)) <span class="op">+</span>
+  <span class="fn">geom_line</span>(<span class="va">color</span><span class="op">=</span><span class="st">"#56d364"</span>) <span class="op">+</span>
+  <span class="fn">geom_smooth</span>(<span class="va">method</span><span class="op">=</span><span class="st">"lm"</span>, <span class="va">se</span><span class="op">=</span><span class="kw">TRUE</span>)</div><span class="use">📈 시계열 분석</span></div></td>
+      </tr>
+      <tr>
+        <td class="code-cell"><span class="rc"><span class="fn">facet_wrap</span>(<span class="op">~</span> 변수)</span></td>
+        <td><div class="desc-cell-r"><div class="dm">그룹별 소그래프 분할 (faceting)</div><div class="codeblock"><span class="fn">ggplot</span>(<span class="va">df</span>, <span class="fn">aes</span>(<span class="va">x</span><span class="op">=</span><span class="va">score</span>)) <span class="op">+</span>
+  <span class="fn">geom_histogram</span>() <span class="op">+</span>
+  <span class="fn">facet_wrap</span>(<span class="op">~</span> <span class="va">class</span>, <span class="va">ncol</span><span class="op">=</span><span class="nm">2</span>)</div><span class="use">🗂️ 그룹별 비교</span></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     실전 예제
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-real">
+  <div class="sec-title">🧪 실전 예제</div>
+  <div class="sec-sub">실제 분석 흐름 — 데이터 로드 → 전처리 → 분석 → 시각화까지 완성 코드</div>
+
+  <div class="card" id="r-eda">
+    <div class="card-header"><span class="hl">01</span> 탐색적 데이터 분석 (EDA) 흐름</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cm"># 1. 데이터 로드</span>
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="fn">read.csv</span>(<span class="st">"students.csv"</span>, <span class="va">stringsAsFactors</span><span class="op">=</span><span class="kw">FALSE</span>)
+
+<span class="cm"># 2. 기본 구조 파악</span>
+<span class="fn">dim</span>(<span class="va">df</span>)          <span class="cm"># 행수, 열수</span>
+<span class="fn">str</span>(<span class="va">df</span>)          <span class="cm"># 각 열 타입 확인</span>
+<span class="fn">head</span>(<span class="va">df</span>)         <span class="cm"># 처음 6행</span>
+<span class="fn">summary</span>(<span class="va">df</span>)      <span class="cm"># 기술통계 요약</span>
+
+<span class="cm"># 3. 결측값 확인</span>
+<span class="fn">colSums</span>(<span class="fn">is.na</span>(<span class="va">df</span>))    <span class="cm"># 열별 NA 개수</span>
+<span class="va">df_clean</span> <span class="op">&lt;-</span> <span class="fn">na.omit</span>(<span class="va">df</span>)  <span class="cm"># NA 행 제거</span>
+
+<span class="cm"># 또는 평균으로 대체</span>
+<span class="va">df</span><span class="op">$</span><span class="va">score</span>[<span class="fn">is.na</span>(<span class="va">df</span><span class="op">$</span><span class="va">score</span>)] <span class="op">&lt;-</span> <span class="fn">mean</span>(<span class="va">df</span><span class="op">$</span><span class="va">score</span>, <span class="va">na.rm</span><span class="op">=</span><span class="kw">TRUE</span>)
+
+<span class="cm"># 4. 이상치 확인 (IQR 방법)</span>
+<span class="va">Q1</span> <span class="op">&lt;-</span> <span class="fn">quantile</span>(<span class="va">df</span><span class="op">$</span><span class="va">score</span>, <span class="nm">0.25</span>)
+<span class="va">Q3</span> <span class="op">&lt;-</span> <span class="fn">quantile</span>(<span class="va">df</span><span class="op">$</span><span class="va">score</span>, <span class="nm">0.75</span>)
+<span class="va">IQR</span> <span class="op">&lt;-</span> <span class="va">Q3</span> <span class="op">-</span> <span class="va">Q1</span>
+<span class="va">outliers</span> <span class="op">&lt;-</span> <span class="va">df</span>[<span class="va">df</span><span class="op">$</span><span class="va">score</span> <span class="op">&lt;</span> <span class="va">Q1</span> <span class="op">-</span> <span class="nm">1.5</span><span class="op">*</span><span class="va">IQR</span> <span class="op">|</span> <span class="va">df</span><span class="op">$</span><span class="va">score</span> <span class="op">&gt;</span> <span class="va">Q3</span> <span class="op">+</span> <span class="nm">1.5</span><span class="op">*</span><span class="va">IQR</span>, ]
+
+<span class="cm"># 5. 분포 시각화</span>
+<span class="fn">hist</span>(<span class="va">df</span><span class="op">$</span><span class="va">score</span>, <span class="va">breaks</span><span class="op">=</span><span class="nm">15</span>, <span class="va">col</span><span class="op">=</span><span class="st">"#79c0ff"</span>)
+<span class="fn">boxplot</span>(<span class="va">score</span> <span class="op">~</span> <span class="va">class</span>, <span class="va">data</span><span class="op">=</span><span class="va">df</span>)</div>
+    </div>
+  </div>
+
+  <div class="card" id="r-lm">
+    <div class="card-header"><span class="hl">02</span> 선형 회귀 분석 전체 과정</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cm"># 데이터 준비</span>
+<span class="fn">set.seed</span>(<span class="nm">42</span>)
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="nm">100</span>
+<span class="va">study_hours</span> <span class="op">&lt;-</span> <span class="fn">runif</span>(<span class="va">n</span>, <span class="nm">1</span>, <span class="nm">10</span>)
+<span class="va">score</span>       <span class="op">&lt;-</span> <span class="nm">50</span> <span class="op">+</span> <span class="nm">5</span> <span class="op">*</span> <span class="va">study_hours</span> <span class="op">+</span> <span class="fn">rnorm</span>(<span class="va">n</span>, <span class="nm">0</span>, <span class="nm">5</span>)
+<span class="va">df</span>          <span class="op">&lt;-</span> <span class="fn">data.frame</span>(<span class="va">study_hours</span>, <span class="va">score</span>)
+
+<span class="cm"># 모델 적합</span>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fn">lm</span>(<span class="va">score</span> <span class="op">~</span> <span class="va">study_hours</span>, <span class="va">data</span><span class="op">=</span><span class="va">df</span>)
+<span class="fn">summary</span>(<span class="va">model</span>)
+<span class="cm"># Intercept ≈ 50, slope ≈ 5, R² ≈ 0.92</span>
+
+<span class="cm"># 잔차 정규성 검정</span>
+<span class="fn">shapiro.test</span>(<span class="fn">residuals</span>(<span class="va">model</span>))
+
+<span class="cm"># 시각화</span>
+<span class="fn">plot</span>(<span class="va">df</span><span class="op">$</span><span class="va">study_hours</span>, <span class="va">df</span><span class="op">$</span><span class="va">score</span>,
+  <span class="va">pch</span><span class="op">=</span><span class="nm">19</span>, <span class="va">col</span><span class="op">=</span><span class="st">"#79c0ff"</span>, <span class="va">main</span><span class="op">=</span><span class="st">"공부시간 vs 점수"</span>)
+<span class="fn">abline</span>(<span class="va">model</span>, <span class="va">col</span><span class="op">=</span><span class="st">"red"</span>, <span class="va">lwd</span><span class="op">=</span><span class="nm">2</span>)
+
+<span class="cm"># 예측</span>
+<span class="fn">predict</span>(<span class="va">model</span>, <span class="fn">data.frame</span>(<span class="va">study_hours</span><span class="op">=</span><span class="fn">c</span>(<span class="nm">5</span>, <span class="nm">8</span>)))
+<span class="cm"># study_hours=5 → 약 75점, 8 → 약 90점</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="r-class">
+    <div class="card-header"><span class="hl">03</span> 분류 — 로지스틱 회귀 + 정확도 평가</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cm"># 이진 분류 예제 (합격/불합격 예측)</span>
+<span class="fn">set.seed</span>(<span class="nm">1</span>)
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="fn">data.frame</span>(
+  <span class="va">score</span> <span class="op">=</span> <span class="fn">c</span>(<span class="fn">rnorm</span>(<span class="nm">50</span>, <span class="nm">75</span>, <span class="nm">10</span>), <span class="fn">rnorm</span>(<span class="nm">50</span>, <span class="nm">55</span>, <span class="nm">10</span>)),
+  <span class="va">pass</span>  <span class="op">=</span> <span class="fn">c</span>(<span class="fn">rep</span>(<span class="nm">1</span>, <span class="nm">50</span>), <span class="fn">rep</span>(<span class="nm">0</span>, <span class="nm">50</span>))
+)
+
+<span class="cm"># 훈련/테스트 분리</span>
+<span class="va">idx</span>   <span class="op">&lt;-</span> <span class="fn">sample</span>(<span class="fn">nrow</span>(<span class="va">df</span>), <span class="nm">0.8</span><span class="op">*</span><span class="fn">nrow</span>(<span class="va">df</span>))
+<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">df</span>[<span class="va">idx</span>, ];  <span class="va">test</span> <span class="op">&lt;-</span> <span class="va">df</span>[<span class="op">-</span><span class="va">idx</span>, ]
+
+<span class="cm"># 로지스틱 회귀</span>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fn">glm</span>(<span class="va">pass</span> <span class="op">~</span> <span class="va">score</span>, <span class="va">data</span><span class="op">=</span><span class="va">train</span>, <span class="va">family</span><span class="op">=</span><span class="st">"binomial"</span>)
+
+<span class="cm"># 예측 확률 → 클래스 변환</span>
+<span class="va">prob</span> <span class="op">&lt;-</span> <span class="fn">predict</span>(<span class="va">model</span>, <span class="va">test</span>, <span class="va">type</span><span class="op">=</span><span class="st">"response"</span>)
+<span class="va">pred</span> <span class="op">&lt;-</span> <span class="fn">ifelse</span>(<span class="va">prob</span> <span class="op">&gt;</span> <span class="nm">0.5</span>, <span class="nm">1</span>, <span class="nm">0</span>)
+
+<span class="cm"># 혼동 행렬 & 정확도</span>
+<span class="fn">table</span>(<span class="va">pred</span>, <span class="va">test</span><span class="op">$</span><span class="va">pass</span>)
+<span class="fn">mean</span>(<span class="va">pred</span> <span class="op">==</span> <span class="va">test</span><span class="op">$</span><span class="va">pass</span>)  <span class="cm"># 정확도 ≈ 0.90</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="r-ts">
+    <div class="card-header"><span class="hl">04</span> 시계열 분석 기초</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cm"># ts 객체 생성</span>
+<span class="va">sales</span> <span class="op">&lt;-</span> <span class="fn">ts</span>(<span class="fn">c</span>(<span class="nm">120</span>,<span class="nm">132</span>,<span class="nm">141</span>,<span class="nm">158</span>,<span class="nm">175</span>,<span class="nm">162</span>,<span class="nm">180</span>,
+             <span class="nm">195</span>,<span class="nm">210</span>,<span class="nm">198</span>,<span class="nm">225</span>,<span class="nm">240</span>),
+           <span class="va">start</span><span class="op">=</span><span class="fn">c</span>(<span class="nm">2023</span>, <span class="nm">1</span>), <span class="va">frequency</span><span class="op">=</span><span class="nm">12</span>)
+
+<span class="cm"># 시계열 분해 (추세 + 계절성 + 잔차)</span>
+<span class="va">decomp</span> <span class="op">&lt;-</span> <span class="fn">decompose</span>(<span class="va">sales</span>)
+<span class="fn">plot</span>(<span class="va">decomp</span>)
+
+<span class="cm"># 이동 평균 (단순)</span>
+<span class="fn">filter</span>(<span class="va">sales</span>, <span class="fn">rep</span>(<span class="nm">1</span><span class="op">/</span><span class="nm">3</span>, <span class="nm">3</span>), <span class="va">sides</span><span class="op">=</span><span class="nm">2</span>)
+
+<span class="cm"># ARIMA 모델 자동 선택 (forecast 패키지)</span>
+<span class="cm"># library(forecast)</span>
+<span class="cm"># auto.arima(sales) |&gt; forecast(h=6) |&gt; plot()</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="r-useful">
+    <div class="card-header"><span class="hl">05</span> 알아두면 유용한 패키지 목록</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">tidyverse</td><td><div class="desc-cell-r"><div class="dm">dplyr + ggplot2 + tidyr + readr 등 핵심 패키지 묶음</div><div class="ds">데이터 분석의 사실상 표준 생태계.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">tidyr</td><td><div class="desc-cell-r"><div class="dm">데이터 형태 변환 — pivot_wider / pivot_longer</div><div class="ds">wide ↔ long 형식 변환. 시각화 전 데이터 정형화에 필수.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">caret / tidymodels</td><td><div class="desc-cell-r"><div class="dm">머신러닝 통합 인터페이스</div><div class="ds">SVM, Random Forest, XGBoost 등 다양한 모델을 동일한 문법으로.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">forecast / prophet</td><td><div class="desc-cell-r"><div class="dm">시계열 예측</div><div class="ds">ARIMA, ETS 자동 선택(forecast) / 페이스북 Prophet 모델.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">plotly / shiny</td><td><div class="desc-cell-r"><div class="dm">인터랙티브 시각화 / 웹 대시보드</div><div class="ds">ggplot2 결과를 plotly로 변환 가능. Shiny로 R 앱 웹 배포.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">DBI / RMySQL</td><td><div class="desc-cell-r"><div class="dm">데이터베이스 연결</div><div class="ds">MySQL, PostgreSQL, SQLite 등 DB에서 직접 데이터 조회.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">stringr</td><td><div class="desc-cell-r"><div class="dm">일관된 문자열 처리 (tidyverse)</div><div class="ds">str_detect · str_replace · str_extract · str_split 등.</div></div></td></tr>
+        <tr><td class="code-cell" style="color:var(--blue);font-family:monospace;font-size:12px;">lubridate</td><td><div class="desc-cell-r"><div class="dm">날짜/시간 처리</div><div class="ds">ymd() · hms() · year() · month() · diff in days 등 직관적 API.</div></div></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+  </main>
+</div>
+
+<script>
+const SIDEBAR = {
+  basic: [
+    {id:'b-var', label:'변수 할당 & 자료형'},
+    {id:'b-op',  label:'연산자'},
+    {id:'b-ctrl',label:'제어문'},
+    {id:'b-func',label:'함수 정의'},
+    {id:'b-string',label:'문자열 함수'},
+  ],
+  struct: [
+    {id:'s-vec', label:'Vector'},
+    {id:'s-mat', label:'Matrix & Array'},
+    {id:'s-df',  label:'Data Frame'},
+    {id:'s-list',label:'List & Factor'},
+  ],
+  stat: [
+    {id:'st-desc',label:'기술통계'},
+    {id:'st-dist',label:'확률 분포'},
+    {id:'st-test',label:'가설 검정'},
+    {id:'st-reg', label:'회귀 분석'},
+  ],
+  manip: [
+    {id:'m-apply',label:'apply 계열'},
+    {id:'m-dplyr',label:'dplyr'},
+    {id:'m-io',   label:'파일 입출력'},
+  ],
+  viz: [
+    {id:'v-base',  label:'base R 그래픽'},
+    {id:'v-ggplot',label:'ggplot2'},
+  ],
+  real: [
+    {id:'r-eda',   label:'EDA 흐름'},
+    {id:'r-lm',    label:'선형 회귀 전체 과정'},
+    {id:'r-class', label:'로지스틱 회귀 분류'},
+    {id:'r-ts',    label:'시계열 분석'},
+    {id:'r-useful',label:'유용한 패키지'},
+  ],
+};
+
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  buildSidebar(id);
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  const items = SIDEBAR[id] || [];
+  sb.innerHTML = '<div class="sb-label">목차</div>' +
+    items.map(it => `<button class="sb-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('');
+}
+
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+buildSidebar('basic');
+
+// 검색
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.panel').forEach((p, i) => {
+      p.style.display = ''; p.classList.remove('active');
+    });
+    document.getElementById('panel-basic').classList.add('active');
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList[i===0?'add':'remove']('active'));
+    document.querySelectorAll('.r-table tr').forEach(r => r.style.display = '');
+    document.querySelectorAll('.card').forEach(c => c.style.display = '');
+    buildSidebar('basic');
+    return;
+  }
+  document.querySelectorAll('.panel').forEach(p => { p.style.display = 'block'; p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.r-table').forEach(tbl => {
+    let found = 0;
+    tbl.querySelectorAll('tr').forEach(r => {
+      if (r.textContent.toLowerCase().includes(q)) { r.style.display = ''; found++; }
+      else r.style.display = 'none';
+    });
+    const card = tbl.closest('.card');
+    if (card) card.style.display = found > 0 ? '' : 'none';
+  });
+  // codeblock 카드 검색
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.querySelector('.r-table')) {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    }
+  });
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); }
+});
+</script>
+</body>
+</html>

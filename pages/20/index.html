@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>유니티 가이드</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --bg2: #1a1d27;
+      --bg3: #22263a;
+      --acc: #5bc4f5;
+      --acc2: #a78bfa;
+      --acc3: #34d399;
+      --acc4: #fb923c;
+      --warn: #f87171;
+      --txt: #e2e8f0;
+      --dim: #94a3b8;
+      --border: #2d3352;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ─── TOP BAR ─── */
+    #topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: #0d1020ee;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    #topbar h1 { font-size: 1.05rem; color: var(--acc); letter-spacing: .08em; white-space: nowrap; }
+    #search-wrap { flex: 1; min-width: 180px; max-width: 340px; position: relative; }
+    #search {
+      width: 100%; padding: 6px 34px 6px 12px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--txt); font-size: .85rem; outline: none;
+    }
+    #search:focus { border-color: var(--acc); }
+    #search-icon {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--dim); font-size: .85rem; pointer-events: none;
+    }
+    #tab-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab {
+      padding: 5px 14px; border-radius: 20px; font-size: .78rem; font-weight: 600;
+      cursor: pointer; border: 1px solid transparent; transition: all .15s; white-space: nowrap;
+    }
+    .tab:hover { border-color: var(--acc); color: var(--acc); }
+    .tab.active { background: var(--acc); color: #0f1117; border-color: var(--acc); }
+
+    /* ─── LAYOUT ─── */
+    #layout { display: flex; min-height: calc(100vh - 52px); }
+    #sidebar {
+      width: 200px; min-width: 180px; flex-shrink: 0;
+      background: var(--bg2); border-right: 1px solid var(--border);
+      padding: 16px 0; position: sticky; top: 52px;
+      height: calc(100vh - 52px); overflow-y: auto;
+    }
+    .sb-group { margin-bottom: 6px; }
+    .sb-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      color: var(--dim); padding: 6px 16px 2px;
+      text-transform: uppercase;
+    }
+    .sb-item {
+      display: block; padding: 6px 16px; font-size: .82rem;
+      color: var(--dim); cursor: pointer; border-left: 2px solid transparent;
+      transition: all .12s; text-decoration: none;
+    }
+    .sb-item:hover { color: var(--txt); background: var(--bg3); }
+    .sb-item.active { color: var(--acc); border-left-color: var(--acc); background: #1c2a3a; }
+
+    /* ─── CONTENT ─── */
+    #content { flex: 1; padding: 24px 28px; max-width: 900px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    h2 {
+      font-size: 1.3rem; color: var(--acc); margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+    }
+    h3 { font-size: 1rem; color: var(--acc2); margin: 22px 0 10px; }
+    h4 { font-size: .9rem; color: var(--acc4); margin: 16px 0 8px; }
+    p { color: var(--dim); margin-bottom: 10px; }
+
+    /* ─── CARDS ─── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+      transition: border-color .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--acc); transform: translateY(-2px); }
+    .card-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .card-title { font-size: .85rem; font-weight: 700; color: var(--txt); margin-bottom: 4px; }
+    .card-desc { font-size: .75rem; color: var(--dim); line-height: 1.5; }
+
+    /* ─── SHORTCUT TABLE ─── */
+    .sc-section { margin-bottom: 28px; }
+    .sc-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--bg2); border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .sc-table thead th {
+      background: var(--bg3); padding: 9px 14px;
+      font-size: .75rem; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .06em; text-align: left;
+    }
+    .sc-table tbody tr { border-top: 1px solid var(--border); transition: background .1s; }
+    .sc-table tbody tr:hover { background: var(--bg3); }
+    .sc-table td { padding: 8px 14px; font-size: .82rem; vertical-align: middle; }
+    .sc-table td:first-child { width: 220px; }
+
+    /* ─── KEY CHIPS ─── */
+    .keys { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    kbd {
+      display: inline-block; padding: 2px 7px;
+      background: #1e2233; border: 1px solid #3a4060;
+      border-bottom: 2px solid #3a4060;
+      border-radius: 5px; font-size: .75rem; font-family: 'Courier New', monospace;
+      color: var(--acc); white-space: nowrap;
+    }
+    .plus { color: var(--dim); font-size: .75rem; }
+
+    /* ─── TAG / BADGE ─── */
+    .tag {
+      display: inline-block; padding: 1px 7px; border-radius: 20px;
+      font-size: .68rem; font-weight: 600; margin-left: 6px;
+    }
+    .tag-new { background: #1a3a20; color: var(--acc3); border: 1px solid var(--acc3); }
+    .tag-scene { background: #1a2a3a; color: var(--acc); border: 1px solid var(--acc); }
+    .tag-code { background: #2a1a3a; color: var(--acc2); border: 1px solid var(--acc2); }
+
+    /* ─── TIP BOXES ─── */
+    .tip-box {
+      border-radius: 8px; padding: 12px 14px; margin: 12px 0; font-size: .82rem;
+    }
+    .tip-box.info { background: #0d2233; border-left: 3px solid var(--acc); color: var(--dim); }
+    .tip-box.warn { background: #2a1a0d; border-left: 3px solid var(--acc4); color: #fdba74; }
+    .tip-box.ok   { background: #0d2a1a; border-left: 3px solid var(--acc3); color: #6ee7b7; }
+
+    /* ─── STEP LIST ─── */
+    .step-list { counter-reset: step; list-style: none; margin: 10px 0 18px; }
+    .step-list li {
+      counter-increment: step;
+      display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;
+    }
+    .step-list li::before {
+      content: counter(step);
+      min-width: 22px; height: 22px; border-radius: 50%;
+      background: var(--acc); color: #0f1117;
+      font-size: .72rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step-list li span { color: var(--dim); font-size: .83rem; padding-top: 2px; }
+
+    /* ─── CODE BLOCK ─── */
+    pre {
+      background: #0d1020; border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; overflow-x: auto;
+      font-size: .78rem; color: #a5f3fc; margin: 10px 0;
+      font-family: 'Courier New', monospace; line-height: 1.6;
+    }
+    code { font-family: 'Courier New', monospace; font-size: .82rem; color: var(--acc3); }
+
+    /* ─── COLLAPSE ─── */
+    .collapsible { margin-bottom: 8px; }
+    .col-head {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      font-size: .85rem; font-weight: 600; color: var(--txt);
+      transition: background .12s;
+    }
+    .col-head:hover { background: var(--bg3); }
+    .col-head .arrow { transition: transform .2s; font-size: .8rem; color: var(--dim); }
+    .col-head.open .arrow { transform: rotate(90deg); }
+    .col-body {
+      display: none; padding: 14px; background: var(--bg2);
+      border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 8px 8px;
+    }
+    .col-body.open { display: block; }
+
+    /* ─── SEARCH HIGHLIGHT ─── */
+    mark { background: #ffd70040; color: var(--acc); border-radius: 2px; padding: 0 1px; }
+
+    /* ─── NO RESULT ─── */
+    #no-result { display: none; padding: 40px; text-align: center; color: var(--dim); }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 600px) {
+      #sidebar { display: none; }
+      #content { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <h1>🎮 유니티 가이드</h1>
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="검색 (단축키, 기능, 메뉴...)">
+    <span id="search-icon">🔍</span>
+  </div>
+  <div id="tab-bar">
+    <div class="tab active" data-tab="overview">개요</div>
+    <div class="tab" data-tab="interface">인터페이스</div>
+    <div class="tab" data-tab="workflow">워크플로</div>
+    <div class="tab" data-tab="shortcuts">단축키</div>
+    <div class="tab" data-tab="features">기능</div>
+    <div class="tab" data-tab="scripting">스크립팅</div>
+    <div class="tab" data-tab="tips">팁</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+  <nav id="sidebar">
+    <div class="sb-group" data-group="overview">
+      <div class="sb-label">개요</div>
+      <a class="sb-item active" data-sec="overview" href="#">Unity 란?</a>
+      <a class="sb-item" data-sec="overview" href="#">설치 · 버전</a>
+    </div>
+    <div class="sb-group" data-group="interface">
+      <div class="sb-label">인터페이스</div>
+      <a class="sb-item" data-sec="interface" href="#">5대 창</a>
+      <a class="sb-item" data-sec="interface" href="#">레이아웃</a>
+    </div>
+    <div class="sb-group" data-group="workflow">
+      <div class="sb-label">워크플로</div>
+      <a class="sb-item" data-sec="workflow" href="#">씬·게임오브젝트</a>
+      <a class="sb-item" data-sec="workflow" href="#">프리팹</a>
+      <a class="sb-item" data-sec="workflow" href="#">빌드</a>
+    </div>
+    <div class="sb-group" data-group="shortcuts">
+      <div class="sb-label">단축키</div>
+      <a class="sb-item" data-sec="shortcuts" href="#">에디터 공통</a>
+      <a class="sb-item" data-sec="shortcuts" href="#">씬 뷰 조작</a>
+      <a class="sb-item" data-sec="shortcuts" href="#">툴 전환</a>
+      <a class="sb-item" data-sec="shortcuts" href="#">재생 제어</a>
+    </div>
+    <div class="sb-group" data-group="features">
+      <div class="sb-label">기능</div>
+      <a class="sb-item" data-sec="features" href="#">렌더링</a>
+      <a class="sb-item" data-sec="features" href="#">물리 엔진</a>
+      <a class="sb-item" data-sec="features" href="#">애니메이션</a>
+      <a class="sb-item" data-sec="features" href="#">UI 시스템</a>
+      <a class="sb-item" data-sec="features" href="#">오디오</a>
+    </div>
+    <div class="sb-group" data-group="scripting">
+      <div class="sb-label">스크립팅</div>
+      <a class="sb-item" data-sec="scripting" href="#">MonoBehaviour</a>
+      <a class="sb-item" data-sec="scripting" href="#">자주 쓰는 API</a>
+    </div>
+    <div class="sb-group" data-group="tips">
+      <div class="sb-label">팁</div>
+      <a class="sb-item" data-sec="tips" href="#">성능 최적화</a>
+      <a class="sb-item" data-sec="tips" href="#">협업 팁</a>
+    </div>
+  </nav>
+
+  <main id="content">
+    <div id="no-result">검색 결과가 없습니다.</div>
+
+    <!-- ═══════════════ 개요 ═══════════════ -->
+    <section class="section active" id="sec-overview">
+      <h2>🎮 Unity 란?</h2>
+      <div class="card-grid">
+        <div class="card"><div class="card-icon">🌐</div><div class="card-title">크로스 플랫폼</div><div class="card-desc">PC, 모바일, 콘솔, VR/AR, WebGL 등 20+ 플랫폼에 단일 코드베이스로 배포</div></div>
+        <div class="card"><div class="card-icon">💻</div><div class="card-title">C# 스크립팅</div><div class="card-desc">.NET 기반 C#으로 게임 로직 작성, Visual Studio / Rider 연동</div></div>
+        <div class="card"><div class="card-icon">🛒</div><div class="card-title">에셋 스토어</div><div class="card-desc">수백만 개의 무료·유료 에셋, 플러그인, 툴 마켓플레이스</div></div>
+        <div class="card"><div class="card-icon">🔧</div><div class="card-title">컴포넌트 기반</div><div class="card-desc">GameObject에 Component를 조합하는 ECS 친화적 설계</div></div>
+        <div class="card"><div class="card-icon">🎨</div><div class="card-title">HDRP / URP</div><div class="card-desc">고품질 렌더 파이프라인(HDRP)과 경량 파이프라인(URP) 선택</div></div>
+        <div class="card"><div class="card-icon">🤝</div><div class="card-title">Unity Cloud</div><div class="card-desc">Version Control, Build, Analytics 등 클라우드 서비스 제공</div></div>
+      </div>
+
+      <h3>설치 및 버전 관리</h3>
+      <ol class="step-list">
+        <li><span><strong>Unity Hub</strong> 설치 — 버전 관리·라이선스·프로젝트 허브 역할</span></li>
+        <li><span>Hub에서 <code>Installs → Add</code>로 원하는 Unity 버전 설치 (LTS 권장)</span></li>
+        <li><span>모듈 추가: Android Build Support, iOS Build Support, WebGL 등 빌드 타겟 선택</span></li>
+        <li><span><code>Projects → New Project</code>로 템플릿 선택 후 생성</span></li>
+        <li><span>Visual Studio(또는 Rider)를 기본 에디터로 지정: <code>Edit → Preferences → External Tools</code></span></li>
+      </ol>
+
+      <div class="tip-box info">Unity 개인 라이선스(Personal)는 연 수익 $200,000 이하 무료. LTS(Long Term Support) 버전은 2년간 버그픽스 지원이 보장됩니다.</div>
+
+      <h3>프로젝트 폴더 구조</h3>
+      <pre>MyProject/
+├── Assets/          ← 게임 에셋 (스크립트·씬·스프라이트 등)
+│   ├── Scenes/
+│   ├── Scripts/
+│   ├── Prefabs/
+│   └── Materials/
+├── Packages/        ← Package Manager 패키지
+├── ProjectSettings/ ← 빌드·물리·레이어 설정
+└── Library/         ← 자동 생성 캐시 (Git 제외)</pre>
+      <div class="tip-box warn">Library/ 폴더는 <code>.gitignore</code>에 반드시 추가하세요. 자동 재생성됩니다.</div>
+    </section>
+
+    <!-- ═══════════════ 인터페이스 ═══════════════ -->
+    <section class="section" id="sec-interface">
+      <h2>🖥️ 인터페이스</h2>
+      <h3>5대 핵심 창</h3>
+      <div class="card-grid">
+        <div class="card"><div class="card-icon">🌲</div><div class="card-title">Hierarchy</div><div class="card-desc">현재 씬의 모든 GameObject 트리 목록. 드래그로 부모·자식 관계 설정</div></div>
+        <div class="card"><div class="card-icon">🏔️</div><div class="card-title">Scene View</div><div class="card-desc">3D/2D 씬 편집 공간. 카메라·오브젝트를 마우스로 직접 배치</div></div>
+        <div class="card"><div class="card-icon">🎮</div><div class="card-title">Game View</div><div class="card-desc">실제 플레이어 카메라 시점 미리보기. Play 버튼으로 실행 테스트</div></div>
+        <div class="card"><div class="card-icon">📂</div><div class="card-title">Project</div><div class="card-desc">Assets 폴더 브라우저. 에셋 가져오기·생성·정리</div></div>
+        <div class="card"><div class="card-icon">⚙️</div><div class="card-title">Inspector</div><div class="card-desc">선택한 오브젝트/에셋의 컴포넌트·속성 편집 패널</div></div>
+        <div class="card"><div class="card-icon">📦</div><div class="card-title">Package Manager</div><div class="card-desc">Window → Package Manager. 공식 패키지·에셋스토어 패키지 관리</div></div>
+      </div>
+
+      <h3>레이아웃 커스터마이징</h3>
+      <p>창은 도킹(Dock) 방식으로 자유 배치 가능합니다. 메뉴 <code>Window → Layouts</code>에서 저장·불러오기.</p>
+      <div class="tip-box info">자주 쓰는 레이아웃 — <strong>2by3</strong>(좌: Hierarchy+Project, 중: Scene+Game, 우: Inspector), <strong>Wide</strong>(가로 확장)</div>
+
+      <h3>씬 뷰 조작 버튼</h3>
+      <table class="sc-table">
+        <thead><tr><th>버튼</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>2D / 3D 토글</td><td>씬 뷰를 2D/3D 모드로 전환</td></tr>
+          <tr><td>조명 아이콘</td><td>씬 내 조명 켜기/끄기</td></tr>
+          <tr><td>오디오 아이콘</td><td>씬 내 오디오 미리듣기</td></tr>
+          <tr><td>Gizmos 버튼</td><td>기즈모·그리드 표시 제어</td></tr>
+          <tr><td>카메라 아이콘</td><td>씬 뷰 카메라 속도·원근감 설정</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════════════ 워크플로 ═══════════════ -->
+    <section class="section" id="sec-workflow">
+      <h2>⚙️ 워크플로</h2>
+
+      <h3>씬과 GameObject</h3>
+      <ol class="step-list">
+        <li><span>씬 생성: <code>File → New Scene</code> 또는 Project 창에서 우클릭 → <code>Create → Scene</code></span></li>
+        <li><span>GameObject 생성: <code>GameObject</code> 메뉴 또는 Hierarchy 우클릭</span></li>
+        <li><span>컴포넌트 추가: Inspector에서 <code>Add Component</code> 버튼</span></li>
+        <li><span>스크립트 붙이기: Project에서 .cs 파일을 Inspector로 드래그, 또는 Add Component → 스크립트 이름</span></li>
+      </ol>
+
+      <h3>프리팹 (Prefab)</h3>
+      <p>재사용 가능한 GameObject 템플릿입니다. 하나를 수정하면 씬에 놓인 모든 인스턴스에 반영됩니다.</p>
+      <ol class="step-list">
+        <li><span>Hierarchy의 GameObject를 Project 창으로 드래그 → 프리팹 생성</span></li>
+        <li><span>프리팹을 씬에 드래그하면 인스턴스 배치</span></li>
+        <li><span>파란색 이름 오브젝트 클릭 → Inspector 상단 <code>Open Prefab</code>으로 편집</span></li>
+        <li><span>Prefab Variant: 기존 프리팹을 기반으로 일부만 다른 변형 생성 가능</span></li>
+      </ol>
+
+      <h3>빌드 과정</h3>
+      <ol class="step-list">
+        <li><span><code>File → Build Settings</code> 열기</span></li>
+        <li><span>플랫폼 선택 후 <code>Switch Platform</code></span></li>
+        <li><span>씬을 <code>Add Open Scenes</code>로 빌드 리스트에 추가</span></li>
+        <li><span><code>Player Settings</code>에서 회사명·앱 이름·아이콘 설정</span></li>
+        <li><span><code>Build</code> 또는 <code>Build And Run</code> 클릭</span></li>
+      </ol>
+      <div class="tip-box ok">Android 빌드: Android SDK · JDK 경로를 <code>Preferences → External Tools</code>에 지정해야 합니다.</div>
+    </section>
+
+    <!-- ═══════════════ 단축키 ═══════════════ -->
+    <section class="section" id="sec-shortcuts">
+      <h2>⌨️ 단축키</h2>
+      <p>Windows 기준. Mac은 <kbd>Ctrl</kbd> → <kbd>Cmd</kbd>, <kbd>Alt</kbd> → <kbd>Option</kbd> 으로 대체.</p>
+
+      <div class="sc-section">
+        <h3>에디터 공통</h3>
+        <table class="sc-table">
+          <thead><tr><th>단축키</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>S</kbd></div></td><td>현재 씬 저장</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>S</kbd></div></td><td>다른 이름으로 씬 저장</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Z</kbd></div></td><td>실행 취소</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Y</kbd></div></td><td>다시 실행</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>D</kbd></div></td><td>선택 오브젝트 복제</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>C</kbd> / <kbd>V</kbd></div></td><td>복사 / 붙여넣기</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>X</kbd></div></td><td>잘라내기</td></tr>
+            <tr><td><div class="keys"><kbd>Delete</kbd></div></td><td>선택 오브젝트 삭제</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>F</kbd></div></td><td>Hierarchy / Project 검색 포커스</td></tr>
+            <tr><td><div class="keys"><kbd>F2</kbd></div></td><td>선택 항목 이름 변경</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>N</kbd></div></td><td>빈 GameObject 생성</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Alt</kbd><span class="plus">+</span><kbd>N</kbd></div></td><td>자식 GameObject 생성</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-section">
+        <h3>씬 뷰 카메라 조작</h3>
+        <table class="sc-table">
+          <thead><tr><th>입력</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>우클릭</kbd> 드래그</div></td><td>카메라 회전 (FPS 스타일)</td></tr>
+            <tr><td><div class="keys"><kbd>우클릭</kbd><span class="plus">+</span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div></td><td>Fly-through 이동</td></tr>
+            <tr><td><div class="keys"><kbd>Alt</kbd><span class="plus">+</span><kbd>좌클릭</kbd></div></td><td>선택 오브젝트 주위로 Orbit</td></tr>
+            <tr><td><div class="keys"><kbd>Alt</kbd><span class="plus">+</span><kbd>우클릭</kbd> / 스크롤</div></td><td>줌 인/아웃</td></tr>
+            <tr><td><div class="keys"><kbd>중간 버튼</kbd> 드래그</div></td><td>패닝 (카메라 평행 이동)</td></tr>
+            <tr><td><div class="keys"><kbd>F</kbd></div></td><td>선택 오브젝트로 포커스</td></tr>
+            <tr><td><div class="keys"><kbd>Shift</kbd><span class="plus">+</span><kbd>F</kbd></div></td><td>오브젝트를 씬 뷰 중앙에 고정 (잠금)</td></tr>
+            <tr><td><div class="keys"><kbd>숫자 패드</kbd></div></td><td>0: 카메라 뷰 / 1: 앞 / 2: 뒤 / 3: 우 / 4: 좌 / 5: 투영 전환</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-section">
+        <h3>씬 뷰 툴 전환</h3>
+        <table class="sc-table">
+          <thead><tr><th>단축키</th><th>툴</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>Q</kbd></div></td><td>Hand (View)</td><td>씬 뷰 패닝</td></tr>
+            <tr><td><div class="keys"><kbd>W</kbd></div></td><td>Move</td><td>위치 이동 (X·Y·Z 핸들)</td></tr>
+            <tr><td><div class="keys"><kbd>E</kbd></div></td><td>Rotate</td><td>회전</td></tr>
+            <tr><td><div class="keys"><kbd>R</kbd></div></td><td>Scale</td><td>크기 조절</td></tr>
+            <tr><td><div class="keys"><kbd>T</kbd></div></td><td>Rect Transform</td><td>2D UI 변환 (크기·위치 박스)</td></tr>
+            <tr><td><div class="keys"><kbd>Y</kbd></div></td><td>Transform</td><td>이동·회전·크기 통합 핸들</td></tr>
+            <tr><td><div class="keys"><kbd>U</kbd></div></td><td>Custom Editor Tool</td><td>사용자 정의 툴</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-section">
+        <h3>재생 제어</h3>
+        <table class="sc-table">
+          <thead><tr><th>단축키</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>P</kbd></div></td><td>Play / Stop 토글</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>P</kbd></div></td><td>Pause 토글</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Alt</kbd><span class="plus">+</span><kbd>P</kbd></div></td><td>Step (한 프레임 진행)</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box warn">Play 모드에서 변경한 값은 Stop 후 초기화됩니다. 중요한 변경은 Stop 후 적용하세요.</div>
+      </div>
+
+      <div class="sc-section">
+        <h3>Inspector / Hierarchy</h3>
+        <table class="sc-table">
+          <thead><tr><th>단축키</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>A</kbd></div></td><td>Add Component 검색창 열기</td></tr>
+            <tr><td><div class="keys"><kbd>Alt</kbd><span class="plus">+</span><kbd>▶</kbd></div></td><td>Hierarchy 하위 트리 모두 펼치기</td></tr>
+            <tr><td><div class="keys"><kbd>Alt</kbd><span class="plus">+</span><kbd>◀</kbd></div></td><td>Hierarchy 하위 트리 모두 접기</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-section">
+        <h3>코드 에디터 (Visual Studio)</h3>
+        <table class="sc-table">
+          <thead><tr><th>단축키</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Space</kbd></div></td><td>IntelliSense (자동 완성)</td></tr>
+            <tr><td><div class="keys"><kbd>F12</kbd></div></td><td>정의로 이동</td></tr>
+            <tr><td><div class="keys"><kbd>Shift</kbd><span class="plus">+</span><kbd>F12</kbd></div></td><td>모든 참조 찾기</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd><span class="plus">,</span><kbd>R</kbd></div></td><td>이름 리팩터링 (Rename)</td></tr>
+            <tr><td><div class="keys"><kbd>F5</kbd></div></td><td>디버그 실행 (Unity 연결)</td></tr>
+            <tr><td><div class="keys"><kbd>F9</kbd></div></td><td>중단점(Breakpoint) 토글</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>K</kbd>, <kbd>C</kbd></div></td><td>선택 영역 주석 처리</td></tr>
+            <tr><td><div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>K</kbd>, <kbd>U</kbd></div></td><td>선택 영역 주석 해제</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 기능 ═══════════════ -->
+    <section class="section" id="sec-features">
+      <h2>🔧 주요 기능</h2>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">🎨 렌더링 파이프라인 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <table class="sc-table">
+            <thead><tr><th>파이프라인</th><th>특징</th><th>적합한 프로젝트</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Built-in</strong></td><td>기본 내장. 가장 호환성 높음</td><td>레거시·소규모·학습용</td></tr>
+              <tr><td><strong>URP</strong> <span class="tag tag-new">권장</span></td><td>경량·모바일 최적화, 셰이더 그래프 지원</td><td>모바일·인디·2D</td></tr>
+              <tr><td><strong>HDRP</strong></td><td>고품질 PBR, 볼류메트릭, 레이트레이싱</td><td>AAA·시네마틱·PC/콘솔</td></tr>
+            </tbody>
+          </table>
+          <div class="tip-box warn">프로젝트 생성 후 파이프라인 변경은 매우 번거롭습니다. 처음부터 신중히 선택하세요.</div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">⚡ 물리 엔진 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <h4>3D 물리 (PhysX)</h4>
+          <table class="sc-table">
+            <thead><tr><th>컴포넌트</th><th>역할</th></tr></thead>
+            <tbody>
+              <tr><td>Rigidbody</td><td>중력·힘·충돌 반응 활성화</td></tr>
+              <tr><td>Collider (Box·Sphere·Mesh 등)</td><td>충돌 영역 정의</td></tr>
+              <tr><td>Physics Material</td><td>마찰(Friction)·반발(Bounciness) 설정</td></tr>
+              <tr><td>Joint (Hinge·Fixed·Spring)</td><td>오브젝트 연결·제약</td></tr>
+              <tr><td>CharacterController</td><td>물리 없이 캡슐 이동 제어 (게임 캐릭터용)</td></tr>
+            </tbody>
+          </table>
+          <h4>2D 물리 (Box2D)</h4>
+          <table class="sc-table">
+            <thead><tr><th>컴포넌트</th><th>역할</th></tr></thead>
+            <tbody>
+              <tr><td>Rigidbody 2D</td><td>2D 중력·힘 적용</td></tr>
+              <tr><td>Collider 2D (Box·Circle·Polygon·Edge)</td><td>2D 충돌 영역</td></tr>
+              <tr><td>Effector 2D (Area·Buoyancy·Point)</td><td>중력 변형·부력·끌어당김 효과</td></tr>
+            </tbody>
+          </table>
+          <div class="tip-box info"><code>FixedUpdate()</code> 안에서 물리 연산(AddForce 등)을 처리해야 프레임 독립적 동작이 보장됩니다.</div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">🎬 애니메이션 시스템 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <h4>Animator 컨트롤러</h4>
+          <ol class="step-list">
+            <li><span>Animator 컴포넌트를 GameObject에 추가</span></li>
+            <li><span>Project에서 Animator Controller 생성 후 연결</span></li>
+            <li><span>Animation Clip을 상태(State)로 추가, Transition 화살표로 연결</span></li>
+            <li><span>Parameters(Bool·Int·Float·Trigger)로 전환 조건 설정</span></li>
+            <li><span>스크립트에서 <code>animator.SetBool("이름", true)</code> 으로 제어</span></li>
+          </ol>
+          <h4>Timeline</h4>
+          <p>시네마틱·컷씬 제작에 특화. 여러 트랙(Animation·Audio·Activation·Cinemachine)을 시간 축으로 편집.</p>
+          <h4>Animation Rigging</h4>
+          <p>IK(역운동학) 체인으로 손·발이 목표 지점을 추적하는 애니메이션을 런타임에 생성.</p>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">🖼️ UI 시스템 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <h4>uGUI (기존 Canvas 방식)</h4>
+          <table class="sc-table">
+            <thead><tr><th>요소</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>Canvas</td><td>UI 루트 컨테이너. Render Mode 3가지 (Overlay·Camera·World Space)</td></tr>
+              <tr><td>RectTransform</td><td>UI 전용 Transform. Anchor·Pivot으로 반응형 레이아웃</td></tr>
+              <tr><td>Image / Text (TMP)</td><td>스프라이트·텍스트 표시. TextMeshPro 권장</td></tr>
+              <tr><td>Button / Toggle / Slider</td><td>인터랙션 컴포넌트, OnClick 이벤트 연결</td></tr>
+              <tr><td>Layout Group</td><td>Horizontal·Vertical·Grid 자동 정렬</td></tr>
+            </tbody>
+          </table>
+          <h4>UI Toolkit (새 방식)</h4>
+          <p>UXML(구조) + USS(스타일)로 웹 개발과 유사한 방식. 에디터 확장 및 복잡한 UI에 권장.</p>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">🔊 오디오 시스템 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <table class="sc-table">
+            <thead><tr><th>컴포넌트/개념</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>AudioSource</td><td>소리를 재생하는 컴포넌트. Play()·Stop()·Pause() 제어</td></tr>
+              <tr><td>AudioListener</td><td>소리를 듣는 귀. 보통 Main Camera에 부착</td></tr>
+              <tr><td>AudioClip</td><td>오디오 파일 에셋 (.wav, .mp3, .ogg)</td></tr>
+              <tr><td>Audio Mixer</td><td>채널별 볼륨·이펙트 조절. BGM·SFX·Voice 분리 관리</td></tr>
+              <tr><td>3D Sound</td><td>AudioSource의 Spatial Blend를 1로 설정 → 거리에 따른 감쇠</td></tr>
+            </tbody>
+          </table>
+          <div class="tip-box ok"><code>AudioSource.PlayOneShot(clip)</code>을 사용하면 한 소스에서 여러 소리를 중첩 재생할 수 있습니다.</div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">📦 기타 주요 기능 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <div class="card-grid">
+            <div class="card"><div class="card-title">Cinemachine</div><div class="card-desc">절차적 카메라 제어. 추적·흔들림·전환·Timeline 연동</div></div>
+            <div class="card"><div class="card-title">NavMesh</div><div class="card-desc">AI 경로탐색. Bake 후 NavMeshAgent로 자동 이동</div></div>
+            <div class="card"><div class="card-title">Shader Graph</div><div class="card-desc">노드 기반 시각적 셰이더 제작 (URP/HDRP 전용)</div></div>
+            <div class="card"><div class="card-title">VFX Graph</div><div class="card-desc">GPU 파티클 시스템. 수백만 파티클 실시간 처리</div></div>
+            <div class="card"><div class="card-title">Addressables</div><div class="card-desc">에셋 번들 관리·런타임 로드·메모리 최적화</div></div>
+            <div class="card"><div class="card-title">Input System</div><div class="card-desc">새 입력 시스템. 멀티 디바이스·리매핑 지원</div></div>
+            <div class="card"><div class="card-title">Terrain</div><div class="card-desc">지형 생성·페인팅·나무 배치 내장 도구</div></div>
+            <div class="card"><div class="card-title">ProBuilder</div><div class="card-desc">에디터 내 3D 모델링 도구. 빠른 레벨 디자인</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 스크립팅 ═══════════════ -->
+    <section class="section" id="sec-scripting">
+      <h2>💻 스크립팅</h2>
+
+      <h3>MonoBehaviour 수명 주기</h3>
+      <pre>Awake()        // 오브젝트 생성 직후. 비활성 상태에서도 호출
+OnEnable()     // 오브젝트 활성화될 때마다
+Start()        // 첫 프레임 직전 (활성화된 경우)
+FixedUpdate()  // 물리 업데이트 (고정 60Hz)
+Update()       // 매 프레임
+LateUpdate()   // Update 후. 카메라 추적 등
+OnDisable()    // 오브젝트 비활성화 시
+OnDestroy()    // 오브젝트 파괴 시</pre>
+      <div class="tip-box info">카메라 추적 로직은 반드시 <code>LateUpdate()</code>에, 물리는 <code>FixedUpdate()</code>에 작성하세요.</div>
+
+      <h3>자주 쓰는 API</h3>
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">GameObject · Transform <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre>// 오브젝트 찾기
+GameObject obj = GameObject.Find("이름");
+GameObject obj = GameObject.FindWithTag("태그");
+T comp = GetComponent&lt;T&gt;();
+T comp = GetComponentInChildren&lt;T&gt;();
+
+// 생성 / 삭제
+GameObject go = Instantiate(prefab, position, rotation);
+Destroy(go);
+Destroy(go, 3f); // 3초 후 삭제
+
+// Transform
+transform.position = new Vector3(x, y, z);
+transform.Translate(Vector3.forward * speed * Time.deltaTime);
+transform.Rotate(Vector3.up, angle);
+transform.localScale = new Vector3(1, 2, 1);</pre>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">입력 처리 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre>// Legacy Input
+float h = Input.GetAxis("Horizontal"); // -1 ~ 1
+if (Input.GetKeyDown(KeyCode.Space)) Jump();
+if (Input.GetMouseButtonDown(0)) Fire();
+
+// New Input System (패키지 설치 필요)
+using UnityEngine.InputSystem;
+var move = InputSystem.actions["Move"].ReadValue&lt;Vector2&gt;();</pre>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">코루틴 (Coroutine) <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre>// 코루틴 시작
+StartCoroutine(MyRoutine());
+
+IEnumerator MyRoutine() {
+    Debug.Log("시작");
+    yield return new WaitForSeconds(2f); // 2초 대기
+    Debug.Log("2초 후");
+    yield return null; // 다음 프레임까지 대기
+    yield return new WaitUntil(() => condition);
+}
+
+// 중단
+Coroutine co = StartCoroutine(MyRoutine());
+StopCoroutine(co);</pre>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">물리 · 충돌 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre>// 힘 적용
+Rigidbody rb = GetComponent&lt;Rigidbody&gt;();
+rb.AddForce(Vector3.up * 10f, ForceMode.Impulse);
+
+// 충돌 콜백
+void OnCollisionEnter(Collision col) {
+    if (col.gameObject.CompareTag("Enemy")) TakeDamage();
+}
+
+// 트리거 콜백
+void OnTriggerEnter(Collider other) {
+    if (other.CompareTag("Item")) PickUp();
+}
+
+// 레이캐스트
+Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+if (Physics.Raycast(ray, out RaycastHit hit, 100f)) {
+    Debug.Log(hit.collider.name);
+}</pre>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">씬 관리 · PlayerPrefs <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre>// 씬 이동
+using UnityEngine.SceneManagement;
+SceneManager.LoadScene("씬이름");
+SceneManager.LoadScene(1);
+SceneManager.LoadSceneAsync("씬이름"); // 비동기
+
+// 데이터 저장
+PlayerPrefs.SetInt("Score", 100);
+PlayerPrefs.SetFloat("Volume", 0.8f);
+PlayerPrefs.SetString("Name", "Player1");
+PlayerPrefs.Save();
+
+int score = PlayerPrefs.GetInt("Score", 0); // 기본값 0</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 팁 ═══════════════ -->
+    <section class="section" id="sec-tips">
+      <h2>💡 팁 & 최적화</h2>
+
+      <h3>성능 최적화</h3>
+      <div class="card-grid">
+        <div class="card"><div class="card-icon">📦</div><div class="card-title">오브젝트 풀링</div><div class="card-desc">총알·파티클처럼 반복 생성/삭제 대신 미리 생성해두고 재사용. Instantiate 비용 절감</div></div>
+        <div class="card"><div class="card-icon">🎨</div><div class="card-title">Draw Call 줄이기</div><div class="card-desc">같은 Material 사용 → 배치(Batching). Sprite Atlas로 스프라이트 통합</div></div>
+        <div class="card"><div class="card-icon">📷</div><div class="card-title">Occlusion Culling</div><div class="card-desc">카메라에 보이지 않는 오브젝트를 자동 렌더링 제외. Window → Rendering → Occlusion Culling</div></div>
+        <div class="card"><div class="card-icon">📊</div><div class="card-title">Profiler 사용</div><div class="card-desc">Window → Analysis → Profiler. CPU·GPU·메모리·렌더링 병목 지점 확인</div></div>
+        <div class="card"><div class="card-icon">🗜️</div><div class="card-title">LOD 설정</div><div class="card-desc">Level of Detail — 거리별로 다른 폴리곤 수의 메시 사용. 먼 오브젝트 렌더링 비용 절감</div></div>
+        <div class="card"><div class="card-icon">💾</div><div class="card-title">캐싱</div><div class="card-desc">Update()에서 GetComponent 반복 호출 금지. Awake/Start에서 한 번만 캐싱</div></div>
+      </div>
+
+      <h3>협업 팁</h3>
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">Git / 버전 관리 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <pre># 권장 .gitignore (Unity 공식)
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+*.csproj
+*.sln
+*.userprefs</pre>
+          <div class="tip-box info">씬·프리팹을 여러 명이 동시 수정하면 머지 충돌이 납니다. <code>Edit → Project Settings → Editor → Asset Serialization Mode → Force Text</code>로 설정하면 텍스트 diff가 가능합니다.</div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">자주 하는 실수 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <table class="sc-table">
+            <thead><tr><th>실수</th><th>해결</th></tr></thead>
+            <tbody>
+              <tr><td>Update에서 GetComponent 매 프레임 호출</td><td>Awake/Start에서 변수로 캐싱</td></tr>
+              <tr><td>Find() 남용</td><td>직접 참조·Singleton·이벤트 시스템 활용</td></tr>
+              <tr><td>Physics.Raycast를 Update에서 무조건 실행</td><td>필요할 때만, 또는 FixedUpdate에서 실행</td></tr>
+              <tr><td>Play 모드에서 Inspector 값 변경 후 Stop</td><td>변경 사항이 사라짐. 코드나 ScriptableObject에 저장</td></tr>
+              <tr><td>씬에 AudioListener 두 개</td><td>경고 발생. Main Camera 외에는 제거</td></tr>
+              <tr><td>텍스처에 Mipmap 비활성화</td><td>원거리에서 flickering 발생. 기본 활성화 유지</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <div class="col-head" onclick="toggleCol(this)">유용한 패키지 모음 <span class="arrow">▶</span></div>
+        <div class="col-body">
+          <table class="sc-table">
+            <thead><tr><th>패키지</th><th>용도</th></tr></thead>
+            <tbody>
+              <tr><td>Cinemachine</td><td>카메라 연출</td></tr>
+              <tr><td>TextMeshPro</td><td>고품질 텍스트 렌더링</td></tr>
+              <tr><td>Input System</td><td>현대적 입력 처리</td></tr>
+              <tr><td>Addressables</td><td>에셋 번들·DLC</td></tr>
+              <tr><td>Unity.Netcode</td><td>멀티플레이어 네트워킹</td></tr>
+              <tr><td>DOTween (에셋스토어)</td><td>트위닝 애니메이션</td></tr>
+              <tr><td>Odin Inspector (에셋스토어)</td><td>Inspector 확장</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // ─── TAB 전환 ───
+  const TABS = ['overview','interface','workflow','shortcuts','features','scripting','tips'];
+  const SEC_NAMES = {
+    overview: ['sec-overview'], interface: ['sec-interface'], workflow: ['sec-workflow'],
+    shortcuts: ['sec-shortcuts'], features: ['sec-features'], scripting: ['sec-scripting'], tips: ['sec-tips']
+  };
+
+  function showTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const sec = document.getElementById('sec-' + id);
+    if (sec) sec.classList.add('active');
+    document.querySelectorAll('.sb-item').forEach(a => {
+      a.classList.toggle('active', a.dataset.sec === id);
+    });
+  }
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => showTab(t.dataset.tab));
+  });
+
+  document.querySelectorAll('.sb-item').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      showTab(a.dataset.sec);
+    });
+  });
+
+  // ─── COLLAPSIBLE ───
+  function toggleCol(head) {
+    head.classList.toggle('open');
+    const body = head.nextElementSibling;
+    body.classList.toggle('open');
+  }
+
+  // ─── SEARCH ───
+  const searchInput = document.getElementById('search');
+  const noResult = document.getElementById('no-result');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) { clearSearch(); return; }
+
+    // 모든 섹션 보이기
+    document.querySelectorAll('.section').forEach(s => s.classList.add('active'));
+    document.getElementById('no-result').style.display = 'none';
+
+    let totalHits = 0;
+
+    // 검색 대상: td, .card-title, .card-desc, kbd, .col-head, step-list li span, p
+    const all = document.querySelectorAll('.section td, .section .card-title, .section .card-desc, .section .col-head, .section li > span, .section p, .section h3, .section h4');
+    all.forEach(el => {
+      const text = el.textContent;
+      const lower = text.toLowerCase();
+      if (q && lower.includes(q)) {
+        totalHits++;
+        el.innerHTML = text.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>');
+        // 부모 collapsible 열기
+        let p = el.closest('.col-body');
+        if (p) { p.classList.add('open'); p.previousElementSibling.classList.add('open'); }
+      } else {
+        el.innerHTML = text; // 하이라이트 제거
+      }
+    });
+
+    if (totalHits === 0) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      noResult.style.display = 'block';
+    }
+  });
+
+  function clearSearch() {
+    const all = document.querySelectorAll('.section td, .section .card-title, .section .card-desc, .section .col-head, .section li > span, .section p, .section h3, .section h4');
+    all.forEach(el => { el.innerHTML = el.textContent; });
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-overview').classList.add('active');
+    noResult.style.display = 'none';
+  }
+
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+</script>
+</body>
+</html>

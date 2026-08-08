@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Godot Engine 정리</title>
+<style>
+:root{
+  --bg:#080c10;--surf:#0e1318;--surf2:#131920;--bdr:#1a2028;
+  --text:#c8c0b0;--dim:#556070;
+  --purple:#a78bfa;--green:#34d399;--blue:#60a5fa;--yellow:#fbbf24;--red:#f87171;--pink:#f472b6;
+  --code-bg:#060a0e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Malgun Gothic',sans-serif;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100%;}
+
+/* ── 탭 ── */
+#tab-bar{display:flex;background:var(--surf);border-bottom:2px solid var(--bdr);flex-shrink:0;}
+.tab{flex:1;padding:9px 4px;font-size:11px;font-weight:600;cursor:pointer;color:var(--dim);
+  border-bottom:2px solid transparent;text-align:center;transition:.15s;margin-bottom:-2px;}
+.tab:hover{color:var(--text);}
+.tab.on{color:var(--purple);border-bottom-color:var(--purple);}
+
+/* ── 서브바 (검색+카테고리) ── */
+#sub-bar{flex-shrink:0;}
+#search-row{display:flex;align-items:center;gap:8px;padding:7px 12px;
+  background:var(--surf);border-bottom:1px solid var(--bdr);}
+#sw{flex:1;display:flex;align-items:center;gap:6px;background:var(--surf2);
+  border:1px solid var(--bdr);border-radius:8px;padding:5px 10px;}
+#sw svg{flex-shrink:0;opacity:.4;}
+#sq{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:12px;font-family:inherit;}
+#sq::placeholder{color:var(--dim);}
+#cnt{font-size:11px;color:var(--dim);white-space:nowrap;font-family:monospace;}
+#cat-bar{display:flex;gap:5px;padding:5px 12px;overflow-x:auto;
+  background:var(--surf);border-bottom:1px solid var(--bdr);scrollbar-width:none;}
+#cat-bar::-webkit-scrollbar{display:none;}
+.cbt{padding:3px 10px;border-radius:20px;font-size:10px;border:1px solid var(--bdr);
+  background:transparent;color:var(--dim);cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit;}
+.cbt:hover{color:var(--text);}
+.cbt.on{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1);}
+
+/* ── 본문 ── */
+#content{flex:1;overflow-y:auto;padding:12px;}
+#content::-webkit-scrollbar{width:4px;}
+#content::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px;}
+
+.panel{display:none;flex-direction:column;gap:14px;}
+.panel.on{display:flex;}
+
+/* ── 섹션 헤더 ── */
+.sec-hd{font-size:11px;font-weight:700;color:var(--purple);letter-spacing:.8px;
+  text-transform:uppercase;padding:5px 2px;border-bottom:1px solid var(--bdr);margin-bottom:4px;
+  position:sticky;top:0;background:var(--bg);z-index:2;}
+.sec-block{margin-bottom:8px;}
+.sec-block.hide{display:none;}
+
+/* ── 소개 탭 ── */
+.info-hero{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;
+  padding:18px 16px;text-align:center;}
+.info-hero h1{font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.info-hero p{font-size:12px;color:var(--dim);line-height:1.7;}
+.info-hero .badge-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px;}
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;border:1px solid;font-weight:600;}
+.b-green{border-color:var(--green);color:var(--green);}
+.b-blue{border-color:var(--blue);color:var(--blue);}
+.b-purple{border-color:var(--purple);color:var(--purple);}
+.b-yellow{border-color:var(--yellow);color:var(--yellow);}
+
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(min-width:500px){.card-grid{grid-template-columns:1fr 1fr 1fr;}}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:12px 10px;}
+.card h3{font-size:12px;color:var(--text);margin-bottom:4px;}
+.card p{font-size:11px;color:var(--dim);line-height:1.6;}
+.card .ci{font-size:20px;margin-bottom:6px;}
+
+.ver-table{width:100%;border-collapse:collapse;font-size:11px;}
+.ver-table th{color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--bdr);text-align:left;}
+.ver-table td{padding:6px 8px;border-bottom:1px solid rgba(26,32,40,.5);color:var(--text);}
+.ver-table td:first-child{color:var(--purple);font-family:monospace;font-weight:700;}
+.ver-table tr:last-child td{border-bottom:none;}
+
+.lang-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.lang-card{flex:1;min-width:130px;background:var(--surf);border:1px solid var(--bdr);
+  border-radius:10px;padding:10px 12px;}
+.lang-card h4{font-size:12px;color:var(--text);margin-bottom:3px;}
+.lang-card p{font-size:10px;color:var(--dim);line-height:1.5;}
+
+.platform-row{display:flex;flex-wrap:wrap;gap:6px;}
+.plat{display:flex;align-items:center;gap:5px;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text);}
+
+/* ── 코드 탭 ── */
+.code-item{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
+  overflow:hidden;margin-bottom:6px;}
+.code-item.hide{display:none;}
+.code-title{padding:8px 12px;font-size:11px;font-weight:600;color:var(--text);
+  background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;
+  align-items:center;justify-content:space-between;}
+.code-title .tag{font-size:9px;color:var(--dim);font-weight:400;}
+.code-body{padding:10px 12px;overflow-x:auto;}
+pre{margin:0;font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:11px;line-height:1.7;color:#abb2bf;}
+/* ── GDScript 하이라이팅 ── */
+.c-kw{color:#c678dd;}        /* 키워드 */
+.c-dec{color:#e5c07b;}        /* 데코레이터 @export 등 */
+.c-type{color:#56b6c2;}       /* 내장 타입 Vector2 등 */
+.c-fn{color:#61afef;}         /* 함수 이름 */
+.c-str{color:#98c379;}        /* 문자열 */
+.c-num{color:#d19a66;}        /* 숫자 */
+.c-cmt{color:#5c6370;font-style:italic;} /* 주석 */
+.c-const{color:#e06c75;}      /* 상수/true/false/null */
+.c-self{color:#e06c75;}       /* self/super */
+
+/* ── 기능 탭 ── */
+.feat-item{display:flex;gap:10px;padding:7px 4px;
+  border-bottom:1px solid rgba(26,32,40,.5);align-items:flex-start;}
+.feat-item:last-child{border-bottom:none;}
+.feat-item.hide{display:none;}
+.feat-name{font-size:12px;color:var(--blue);font-family:monospace;font-weight:600;
+  flex-shrink:0;min-width:140px;}
+.feat-desc{font-size:11px;color:var(--dim);line-height:1.6;}
+.feat-desc b{color:var(--text);}
+
+/* ── 단축키 탭 ── */
+.key-row{display:flex;align-items:center;gap:8px;padding:5px 4px;
+  border-bottom:1px solid rgba(26,32,40,.5);}
+.key-row:last-child{border-bottom:none;}
+.key-row.hide{display:none;}
+.keys{display:flex;align-items:center;gap:3px;flex-shrink:0;min-width:160px;flex-wrap:wrap;}
+kbd{display:inline-flex;align-items:center;justify-content:center;
+  padding:2px 6px;min-width:22px;background:var(--surf2);
+  border:1px solid #2a3545;border-bottom:2px solid #1a2028;
+  border-radius:5px;font-family:monospace;font-size:10px;color:var(--text);
+  font-weight:600;white-space:nowrap;}
+kbd.sp{color:var(--blue);}
+kbd.fn{color:var(--green);}
+.plus{color:var(--dim);font-size:10px;margin:0 1px;}
+.kdesc{font-size:12px;color:var(--text);flex:1;}
+
+#empty{display:none;text-align:center;padding:40px;color:var(--dim);}
+#empty.show{display:block;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="tab-bar">
+  <div class="tab on"  onclick="sw('intro')">📖 소개</div>
+  <div class="tab"     onclick="sw('code')">💻 GDScript</div>
+  <div class="tab"     onclick="sw('feat')">⚙️ 기능</div>
+  <div class="tab"     onclick="sw('keys')">⌨️ 단축키</div>
+</div>
+
+<div id="sub-bar">
+  <div id="search-row">
+    <div id="sw">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="sq" type="search" placeholder="검색..." oninput="onSrch()">
+    </div>
+    <span id="cnt"></span>
+  </div>
+  <div id="cat-bar"></div>
+</div>
+
+<div id="content">
+  <!-- ══ 소개 ══ -->
+  <div id="panel-intro" class="panel on"></div>
+  <!-- ══ GDScript ══ -->
+  <div id="panel-code" class="panel"></div>
+  <!-- ══ 기능 ══ -->
+  <div id="panel-feat" class="panel"></div>
+  <!-- ══ 단축키 ══ -->
+  <div id="panel-keys" class="panel"></div>
+</div>
+<div id="empty"></div>
+
+</div>
+<script>
+// ══════════════════════════════════════════
+//  GDScript 신택스 하이라이터
+// ══════════════════════════════════════════
+const KW = new Set(['var','const','func','class','class_name','extends','signal',
+  'if','elif','else','for','while','match','return','pass','break','continue',
+  'and','or','not','in','is','as','static','enum','void','await']);
+const CONSTS = new Set(['true','false','null','PI','TAU','INF','NAN','FAILED','OK']);
+const SELF_KW = new Set(['self','super']);
+const TYPES = new Set(['int','float','bool','String','StringName','NodePath',
+  'Array','Dictionary','PackedStringArray','PackedFloat32Array','PackedInt32Array',
+  'Vector2','Vector2i','Vector3','Vector3i','Vector4','Color','Rect2','Rect2i',
+  'Transform2D','Transform3D','Basis','Quaternion','Plane','AABB','RID','Callable','Signal',
+  'Object','RefCounted','Resource','Node','Node2D','Node3D','CanvasItem',
+  'CharacterBody2D','CharacterBody3D','RigidBody2D','RigidBody3D',
+  'StaticBody2D','StaticBody3D','Area2D','Area3D','Sprite2D','AnimatedSprite2D',
+  'AnimationPlayer','AnimationTree','Tween','Timer','Label','Button','LineEdit',
+  'TextEdit','RichTextLabel','Control','Container','VBoxContainer','HBoxContainer',
+  'GridContainer','MarginContainer','PanelContainer','ScrollContainer',
+  'TabContainer','SubViewport','CanvasLayer','AudioStreamPlayer','AudioStreamPlayer2D',
+  'AudioStreamPlayer3D','TileMap','TileSet','Camera2D','Camera3D',
+  'CollisionShape2D','CollisionShape3D','MeshInstance3D','DirectionalLight3D',
+  'OmniLight3D','SpotLight3D','GPUParticles2D','CPUParticles2D','Line2D','Polygon2D',
+  'Path2D','PathFollow2D','NavigationAgent2D','NavigationAgent3D','Input','InputEvent',
+  'InputEventKey','InputEventMouseButton','InputEventMouseMotion','OS','Engine',
+  'ProjectSettings','ResourceLoader','SceneTree','Viewport','World2D','World3D',
+  'PhysicsDirectBodyState2D','KinematicCollision2D']);
+
+function hlGD(src) {
+  let i = 0, out = '';
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  while (i < src.length) {
+    // 주석
+    if (src[i] === '#') {
+      let j = i; while (j < src.length && src[j] !== '\n') j++;
+      out += `<span class="c-cmt">${esc(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    // 문자열
+    if (src[i] === '"' || src[i] === "'") {
+      const q = src[i]; let j = i+1;
+      while (j < src.length && src[j] !== q) { if (src[j]==='\\') j++; j++; }
+      j++;
+      out += `<span class="c-str">${esc(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    // 숫자
+    if (/\d/.test(src[i]) || (src[i]==='.' && /\d/.test(src[i+1]||''))) {
+      let j = i;
+      while (j < src.length && /[\d._xXa-fA-F]/.test(src[j])) j++;
+      out += `<span class="c-num">${esc(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    // 식별자 / 키워드
+    if (/[@a-zA-Z_]/.test(src[i])) {
+      let j = i;
+      if (src[i]==='@') j++;
+      while (j < src.length && /\w/.test(src[j])) j++;
+      const w = src.slice(i,j);
+      let cls = '';
+      if (w.startsWith('@')) cls='c-dec';
+      else if (SELF_KW.has(w)) cls='c-self';
+      else if (CONSTS.has(w)) cls='c-const';
+      else if (KW.has(w)) cls='c-kw';
+      else if (TYPES.has(w)) cls='c-type';
+      else if (j < src.length && src[j]==='(') cls='c-fn';
+      out += cls ? `<span class="${cls}">${esc(w)}</span>` : esc(w);
+      i = j; continue;
+    }
+    out += esc(src[i]); i++;
+  }
+  return out;
+}
+
+// ══════════════════════════════════════════
+//  데이터 — GDScript 코드
+// ══════════════════════════════════════════
+const CODE = [
+  { cat:'변수와 타입', items:[
+    { title:'변수 선언', code:
+`# 기본 변수 (타입 추론)
+var score = 0
+var player_name = "영웅"
+var speed = 3.14
+var alive = true
+
+# 명시적 타입 지정
+var health: int = 100
+var mana: float = 50.0
+var tag: String = "player"
+
+# 상수
+const MAX_HP = 100
+const GRAVITY = 980.0`},
+    { title:'@export — 인스펙터 노출', code:
+`@export var speed: float = 200.0
+@export var player_name: String = "Hero"
+@export_range(0, 100, 1) var health_pct: int = 100
+@export var jump_texture: Texture2D
+@export_file("*.json") var data_path: String
+@export_enum("Idle", "Run", "Jump") var anim_state: int`},
+    { title:'@onready — 씬 로드 후 자동 할당', code:
+`@onready var sprite: Sprite2D = $Sprite2D
+@onready var timer: Timer = $Timer
+@onready var label: Label = $UI/Label
+@onready var anim: AnimationPlayer = $AnimationPlayer
+
+# _ready()보다 먼저 실행되어 노드 참조 준비`},
+    { title:'내장 타입', code:
+`var v2 = Vector2(100, 200)
+var v3 = Vector3(1, 2, 3)
+var col = Color(1, 0, 0, 1)        # RGBA (0~1)
+var col2 = Color.RED
+var col3 = Color.from_string("#ff0000", Color.WHITE)
+var rect = Rect2(Vector2(0,0), Vector2(100,50))
+var arr: Array[int] = [1, 2, 3]
+var dict: Dictionary = {"hp": 100, "mp": 50}`},
+  ]},
+  { cat:'함수', items:[
+    { title:'기본 함수', code:
+`func greet(name: String) -> String:
+    return "안녕, " + name + "!"
+
+func add(a: int, b: int) -> int:
+    return a + b
+
+# 기본값 매개변수
+func move(dir: Vector2 = Vector2.ZERO, spd: float = 100.0):
+    position += dir * spd
+
+# 가변 인수
+func log_all(*args) -> void:
+    for a in args:
+        print(a)`},
+    { title:'내장 함수 오버라이드', code:
+`func _ready():
+    # 씬 트리에 추가된 직후 1회 호출
+    print("준비 완료")
+
+func _process(delta: float):
+    # 매 프레임 호출 (60fps 기준 ~16ms마다)
+    position.x += speed * delta
+
+func _physics_process(delta: float):
+    # 물리 프레임마다 호출 (기본 60Hz 고정)
+    move_and_slide()
+
+func _input(event: InputEvent):
+    # 입력 이벤트 발생 시 호출
+    if event.is_action_pressed("ui_accept"):
+        confirm()
+
+func _unhandled_input(event: InputEvent):
+    # UI가 먼저 처리하지 않은 입력만 도달
+
+func _notification(what: int):
+    if what == NOTIFICATION_WM_CLOSE_REQUEST:
+        save_and_quit()`},
+    { title:'람다 함수', code:
+`# 람다 (익명 함수)
+var double = func(x): return x * 2
+print(double.call(5))  # 10
+
+# 배열 메서드에서 활용
+var nums = [1, 2, 3, 4, 5]
+var evens = nums.filter(func(x): return x % 2 == 0)
+var doubled = nums.map(func(x): return x * 2)
+nums.sort_custom(func(a, b): return a > b)
+
+# 시그널 연결에서 활용
+button.pressed.connect(func(): print("클릭!"))`},
+    { title:'정적 함수', code:
+`class_name MathHelper
+
+static func lerp_angle(from: float, to: float, t: float) -> float:
+    var diff = fmod(to - from, TAU)
+    return from + fmod(2.0 * diff, TAU) - diff * t
+
+static func random_color() -> Color:
+    return Color(randf(), randf(), randf(), 1.0)`},
+  ]},
+  { cat:'제어문', items:[
+    { title:'if / elif / else', code:
+`if health <= 0:
+    die()
+elif health < 30:
+    play_hurt_animation()
+elif health < 70:
+    set_status("부상")
+else:
+    set_status("정상")
+
+# 인라인 if
+var msg = "생존" if health > 0 else "사망"
+
+# 타입 확인
+if node is CharacterBody2D:
+    node.jump()`},
+    { title:'for 루프', code:
+`# range
+for i in range(5):          # 0 1 2 3 4
+    print(i)
+for i in range(2, 8, 2):    # 2 4 6
+    print(i)
+
+# 배열 순회
+for item in inventory:
+    use(item)
+
+# 딕셔너리 순회
+for key in stats:
+    print(key, ":", stats[key])
+
+# 인덱스 포함
+for i in items.size():
+    print(i, items[i])`},
+    { title:'while / match', code:
+`# while
+while not is_on_floor():
+    apply_gravity()
+
+# match (switch와 유사, 패턴 매칭)
+match state:
+    State.IDLE:
+        play("idle")
+    State.RUN:
+        play("run")
+    State.JUMP, State.FALL:   # 여러 값
+        play("air")
+    _:                         # default
+        push_warning("unknown state")
+
+# 범위 패턴
+match damage:
+    0:           push_warning("무효")
+    1, 2, 3:     take_light()
+    _:           take_heavy()`},
+  ]},
+  { cat:'클래스와 상속', items:[
+    { title:'클래스 기본', code:
+`# 파일 이름이 곧 클래스 이름 (권장)
+extends CharacterBody2D
+class_name Player
+
+# 멤버 변수
+var health: int = 100
+var speed: float = 200.0
+
+# 내부 클래스
+class Inventory:
+    var items: Array[String] = []
+    var gold: int = 0
+
+    func add_item(item: String) -> void:
+        items.append(item)
+
+    func remove_item(item: String) -> bool:
+        if item in items:
+            items.erase(item)
+            return true
+        return false
+
+# 사용
+var bag = Inventory.new()
+bag.add_item("검")
+bag.gold = 100`},
+    { title:'상속과 super', code:
+`# 기반 클래스
+class_name Entity
+extends Node2D
+
+var health: int = 100
+
+func take_damage(amount: int) -> void:
+    health = max(0, health - amount)
+
+func die() -> void:
+    queue_free()
+
+# ──────────────────────────────────
+# 파생 클래스
+class_name Player
+extends Entity
+
+var mana: int = 50
+
+func take_damage(amount: int) -> void:
+    super.take_damage(amount)   # 부모 함수 호출
+    play_hurt_animation()
+    if health <= 0:
+        die()`},
+    { title:'열거형 (Enum)', code:
+`# 전역 enum
+enum State { IDLE, RUN, JUMP, FALL, DEAD }
+enum Direction { LEFT = -1, NONE = 0, RIGHT = 1 }
+
+var current_state: State = State.IDLE
+var facing: Direction = Direction.RIGHT
+
+func update_state() -> void:
+    match current_state:
+        State.IDLE: play("idle")
+        State.RUN: play("run")
+
+    # 값 확인
+    print(State.keys()[current_state])  # "IDLE"`},
+  ]},
+  { cat:'시그널', items:[
+    { title:'시그널 선언과 발생', code:
+`extends Node
+class_name Player
+
+# 시그널 선언 (매개변수 타입 지정 가능)
+signal health_changed(new_health: int, max_health: int)
+signal player_died
+signal item_picked_up(item_name: String, item_id: int)
+
+var health: int = 100
+const MAX_HP = 100
+
+func take_damage(amount: int) -> void:
+    health = max(0, health - amount)
+    health_changed.emit(health, MAX_HP)  # 시그널 발생
+
+    if health <= 0:
+        player_died.emit()`},
+    { title:'시그널 연결 (코드)', code:
+`func _ready() -> void:
+    # 메서드로 연결
+    health_changed.connect(_on_health_changed)
+    player_died.connect(_on_player_died)
+
+    # 람다로 연결
+    player_died.connect(func():
+        $GameOverLabel.visible = true
+        get_tree().paused = true
+    )
+
+    # 다른 노드의 시그널 연결
+    $Enemy.health_changed.connect(_on_enemy_health_changed)
+    $Timer.timeout.connect(spawn_enemy)
+
+func _on_health_changed(new_hp: int, max_hp: int) -> void:
+    $HUD/HealthBar.value = float(new_hp) / max_hp * 100
+
+func _on_player_died() -> void:
+    print("게임 오버")`},
+    { title:'await — 시그널 대기', code:
+`func cutscene() -> void:
+    $Animator.play("intro")
+    await $Animator.animation_finished  # 애니메이션 끝날 때까지 대기
+
+    $DialogBox.show_text("...")
+    await $DialogBox.closed             # 대화창 닫힐 때까지 대기
+
+    await get_tree().create_timer(1.0).timeout  # 1초 대기
+
+    change_scene()
+
+func async_load(path: String) -> Resource:
+    ResourceLoader.load_threaded_request(path)
+    while ResourceLoader.load_threaded_get_status(path) != ResourceLoader.THREAD_LOAD_LOADED:
+        await get_tree().process_frame
+    return ResourceLoader.load_threaded_get(path)`},
+  ]},
+  { cat:'노드 조작', items:[
+    { title:'노드 접근', code:
+`# $ 단축 문법
+var sprite = $Sprite2D
+var label = $UI/HealthLabel       # 경로 사용
+
+# get_node (명시적)
+var player = get_node("Player")
+var hud = get_node("../HUD")       # 부모에서 접근
+var root_node = get_node("/root/GameScene/Player")
+
+# 타입 캐스팅
+var player = $Player as Player
+if not player:
+    push_error("Player 노드 없음")
+
+# 옵셔널 접근 (없으면 null)
+var maybe = get_node_or_null("MaybeNode")
+
+# 부모/자식 탐색
+var parent = get_parent()
+var child = get_child(0)
+var children = get_children()
+var count = get_child_count()
+
+# find_child (깊은 탐색)
+var btn = find_child("StartButton", true, false)`},
+    { title:'노드 추가 / 제거', code:
+`# 프리로드 (컴파일 타임)
+const BulletScene = preload("res://scenes/Bullet.tscn")
+
+# 동적 로드 (런타임)
+var enemy_scene = load("res://scenes/Enemy.tscn")
+
+func spawn_bullet(pos: Vector2) -> void:
+    var bullet = BulletScene.instantiate()
+    bullet.position = pos
+    bullet.direction = aim_direction
+    get_parent().add_child(bullet)  # 자신의 부모에 추가
+
+func despawn(node: Node) -> void:
+    node.queue_free()  # 다음 프레임에 안전하게 삭제
+
+# 씬 트리에 바로 추가
+get_tree().root.add_child(node)
+
+# 소유자 설정 (씬 저장 시 포함)
+add_child(node)
+node.owner = get_tree().edited_scene_root`},
+    { title:'그룹', code:
+`# 그룹 추가 (코드)
+add_to_group("enemies")
+add_to_group("damageable")
+
+# 그룹 확인
+if is_in_group("enemies"):
+    print("적이에요")
+
+# 그룹 전체 호출
+get_tree().call_group("enemies", "take_damage", 10)
+get_tree().call_group("damageable", "die")
+
+# 그룹의 모든 노드 가져오기
+var enemies = get_tree().get_nodes_in_group("enemies")
+for e in enemies:
+    e.alert(player_position)
+
+# 그룹에서 제거
+remove_from_group("enemies")`},
+  ]},
+  { cat:'씬 관리', items:[
+    { title:'씬 전환', code:
+`# 현재 씬을 다른 씬으로 교체
+func go_to_game():
+    get_tree().change_scene_to_file("res://scenes/Game.tscn")
+
+# 미리 로드한 씬으로 교체 (빠름)
+const GameScene = preload("res://scenes/Game.tscn")
+func start_game():
+    get_tree().change_scene_to_packed(GameScene)
+
+# 현재 씬 재시작
+get_tree().reload_current_scene()
+
+# 씬을 인스턴스화해서 추가 (팝업 등)
+var popup = preload("res://ui/Popup.tscn").instantiate()
+add_child(popup)
+
+# 게임 종료
+get_tree().quit()
+
+# 일시정지
+get_tree().paused = true
+# 특정 노드는 일시정지 무시
+process_mode = Node.PROCESS_MODE_ALWAYS`},
+    { title:'SceneTree 활용', code:
+`# 현재 씬 루트
+var scene_root = get_tree().current_scene
+
+# 프레임 대기
+await get_tree().process_frame
+await get_tree().physics_frame
+
+# 일정 시간 후 실행
+await get_tree().create_timer(2.0).timeout
+print("2초 경과")
+
+# 모든 노드 순회
+for node in get_tree().get_nodes_in_group("all"):
+    print(node.name)
+
+# 씬 트리 신호
+get_tree().node_added.connect(_on_node_added)
+get_tree().node_removed.connect(_on_node_removed)`},
+  ]},
+  { cat:'입력 처리', items:[
+    { title:'Input 클래스', code:
+`func _process(delta: float) -> void:
+    # 액션 (프로젝트 설정 > 입력 맵에서 정의)
+    if Input.is_action_pressed("move_right"):
+        velocity.x = speed
+
+    if Input.is_action_just_pressed("jump"):    # 누른 순간 1회
+        jump()
+
+    if Input.is_action_just_released("attack"): # 뗀 순간 1회
+        end_attack()
+
+    # 축 값 (-1 ~ 1)
+    var h = Input.get_axis("move_left", "move_right")
+    var v = Input.get_axis("move_up", "move_down")
+    velocity = Vector2(h, v).normalized() * speed
+
+    # 벡터 값 (조이스틱)
+    var joy = Input.get_vector("left", "right", "up", "down")
+
+    # 직접 키/마우스 확인
+    if Input.is_key_pressed(KEY_SPACE): jump()
+    if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT): shoot()
+
+    var mouse_pos = get_global_mouse_position()`},
+    { title:'_input / _unhandled_input', code:
+`func _input(event: InputEvent) -> void:
+    # 모든 입력 이벤트 수신
+    if event is InputEventKey:
+        if event.keycode == KEY_ESCAPE and event.pressed:
+            toggle_pause()
+
+    if event is InputEventMouseButton:
+        if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+            click_at(event.position)
+
+    if event is InputEventMouseMotion:
+        rotate(event.relative.x * 0.01)
+
+    # 이벤트 소비 (하위 노드에 전달 안 함)
+    get_viewport().set_input_as_handled()
+
+func _unhandled_input(event: InputEvent) -> void:
+    # UI 노드가 처리하지 않은 입력만 여기 도달
+    if event.is_action_pressed("open_menu"):
+        open_menu()`},
+  ]},
+  { cat:'물리', items:[
+    { title:'CharacterBody2D', code:
+`extends CharacterBody2D
+
+const SPEED = 300.0
+const JUMP_VEL = -600.0
+var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
+
+func _physics_process(delta: float) -> void:
+    # 중력 적용
+    if not is_on_floor():
+        velocity.y += gravity * delta
+
+    # 점프
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = JUMP_VEL
+
+    # 수평 이동
+    var direction = Input.get_axis("move_left", "move_right")
+    if direction:
+        velocity.x = direction * SPEED
+    else:
+        velocity.x = move_toward(velocity.x, 0, SPEED * delta * 8)
+
+    move_and_slide()
+
+    # 충돌 정보
+    for i in get_slide_collision_count():
+        var col = get_slide_collision(i)
+        print("충돌: ", col.get_collider().name)`},
+    { title:'RigidBody2D', code:
+`extends RigidBody2D
+
+func _ready() -> void:
+    # RigidBody는 물리 엔진이 velocity 관리
+    gravity_scale = 1.0
+    mass = 2.0
+    linear_damp = 0.5
+
+func _physics_process(delta: float) -> void:
+    # 직접 힘 적용
+    if Input.is_action_pressed("thrust"):
+        apply_central_force(Vector2.UP * 500)
+
+    apply_central_impulse(Vector2(100, 0))  # 충격량
+    apply_torque(10.0)                       # 회전 토크
+
+func _on_body_entered(body: Node2D) -> void:
+    if body.is_in_group("ground"):
+        print("착지")`},
+    { title:'Area2D — 범위 감지', code:
+`extends Area2D
+
+func _ready() -> void:
+    body_entered.connect(_on_body_entered)
+    body_exited.connect(_on_body_exited)
+    area_entered.connect(_on_area_entered)
+
+func _on_body_entered(body: Node2D) -> void:
+    if body.is_in_group("player"):
+        print("플레이어 감지!")
+        body.take_damage(10)
+
+func _on_body_exited(body: Node2D) -> void:
+    print(body.name, " 나감")
+
+# 겹치는 바디 목록
+func get_nearby_enemies() -> Array:
+    return get_overlapping_bodies().filter(
+        func(b): return b.is_in_group("enemies")
+    )`},
+  ]},
+  { cat:'타이머와 비동기', items:[
+    { title:'Timer 노드 활용', code:
+`extends Node
+
+@onready var timer: Timer = $Timer
+
+func _ready() -> void:
+    timer.wait_time = 2.0
+    timer.one_shot = false          # 반복 여부
+    timer.autostart = false
+    timer.timeout.connect(_on_timer_timeout)
+    timer.start()
+
+func _on_timer_timeout() -> void:
+    spawn_enemy()
+
+# 코드로 타이머 생성
+func start_countdown(seconds: float) -> void:
+    var t = Timer.new()
+    add_child(t)
+    t.wait_time = seconds
+    t.one_shot = true
+    t.timeout.connect(func():
+        print("카운트다운 종료")
+        t.queue_free()
+    )
+    t.start()`},
+    { title:'Tween — 부드러운 애니메이션', code:
+`func animate_ui() -> void:
+    var tween = create_tween()
+    tween.set_ease(Tween.EASE_OUT)
+    tween.set_trans(Tween.TRANS_CUBIC)
+
+    # 위치 이동
+    tween.tween_property($Panel, "position", Vector2(0, 0), 0.5)
+
+    # 체이닝 (순서대로 실행)
+    tween.tween_property($Label, "modulate:a", 1.0, 0.3)
+
+    # 병렬 실행
+    tween.parallel().tween_property($Icon, "scale", Vector2(1,1), 0.3)
+
+    # 콜백 삽입
+    tween.tween_callback(func(): print("완료"))
+
+    # 딜레이
+    tween.tween_interval(0.5)
+    tween.tween_property($Panel, "modulate:a", 0.0, 0.3)
+
+func bounce(node: Node2D) -> void:
+    var tw = create_tween()
+    tw.tween_property(node, "scale", Vector2(1.2, 1.2), 0.1)
+    tw.tween_property(node, "scale", Vector2(1.0, 1.0), 0.15)`},
+  ]},
+  { cat:'자료구조', items:[
+    { title:'Array', code:
+`var arr: Array[int] = [3, 1, 4, 1, 5, 9]
+
+arr.append(2)             # 끝에 추가
+arr.insert(0, 0)          # 인덱스에 삽입
+arr.remove_at(2)          # 인덱스로 제거
+arr.erase(4)              # 값으로 제거 (첫 번째)
+arr.pop_back()            # 마지막 제거 및 반환
+arr.pop_front()           # 첫 번째 제거 및 반환
+
+print(arr.size())         # 크기
+print(arr.is_empty())     # 비어있는지
+print(arr.has(5))         # 포함 여부
+print(arr.find(5))        # 인덱스 반환 (-1이면 없음)
+
+arr.sort()                          # 오름차순 정렬
+arr.sort_custom(func(a, b): return a > b)  # 내림차순
+arr.shuffle()             # 랜덤 섞기
+arr.reverse()             # 뒤집기
+
+# 함수형
+var evens = arr.filter(func(x): return x % 2 == 0)
+var doubled = arr.map(func(x): return x * 2)
+var sum = arr.reduce(func(acc, x): return acc + x, 0)
+
+# 슬라이싱
+var sub = arr.slice(1, 4)  # [1] 부터 [3] 까지`},
+    { title:'Dictionary', code:
+`var stats: Dictionary = {
+    "hp": 100,
+    "mp": 50,
+    "name": "용사",
+}
+
+# 읽기 / 쓰기
+print(stats["hp"])
+print(stats.hp)          # 점 표기법
+stats["atk"] = 30        # 추가/수정
+stats.def_ = 20
+
+# 안전한 접근
+var lvl = stats.get("level", 1)   # 없으면 기본값 1
+
+# 확인
+if "hp" in stats:
+    print("hp 있음")
+if stats.has("mp"):
+    print("mp 있음")
+
+# 삭제
+stats.erase("name")
+
+# 순회
+for key in stats:
+    print(key, " = ", stats[key])
+for value in stats.values():
+    print(value)
+
+# 크기
+print(stats.size())
+print(stats.is_empty())`},
+  ]},
+  { cat:'수학 & 벡터', items:[
+    { title:'내장 수학 함수', code:
+`# 기본 수학
+abs(-5)           # 5
+ceil(1.2)         # 2.0
+floor(1.8)        # 1.0
+round(1.5)        # 2.0
+sign(-3)          # -1
+clamp(15, 0, 10)  # 10
+max(3, 7)         # 7
+min(3, 7)         # 3
+fmod(10.0, 3.0)   # 1.0
+pow(2, 10)        # 1024.0
+sqrt(16)          # 4.0
+log(E)            # 1.0
+exp(1)            # 2.718...
+
+# 보간
+lerp(0.0, 100.0, 0.25)        # 25.0
+lerp_angle(0.0, PI, 0.5)      # PI/2
+inverse_lerp(0.0, 100.0, 25.0)  # 0.25
+smoothstep(0.0, 1.0, 0.5)     # 부드러운 보간
+move_toward(0.0, 10.0, 3.0)   # 3.0 (스텝)
+
+# 삼각함수
+sin(PI / 2)      # 1.0
+cos(0)           # 1.0
+tan(PI / 4)      # ~1.0
+asin(1.0)        # PI/2
+atan2(1, 1)      # PI/4
+deg_to_rad(180)  # PI
+rad_to_deg(PI)   # 180.0
+
+# 난수
+randf()                  # 0.0 ~ 1.0
+randi()                  # 임의 정수
+randf_range(1.0, 6.0)    # 범위 실수
+randi_range(1, 6)        # 범위 정수
+seed(42); randomize()`},
+    { title:'Vector2 / Vector3', code:
+`var a = Vector2(3, 4)
+var b = Vector2(1, 0)
+
+# 연산
+a + b               # Vector2(4, 4)
+a - b               # Vector2(2, 4)
+a * 2               # Vector2(6, 8)
+a / 2               # Vector2(1.5, 2)
+
+# 메서드
+a.length()          # 5.0  (크기)
+a.length_squared()  # 25.0 (빠름, sqrt 없음)
+a.normalized()      # 방향 벡터 (크기=1)
+a.dot(b)            # 내적: 3.0
+a.cross(b)          # 외적 (2D: 스칼라): -4.0
+a.distance_to(b)    # 거리
+a.direction_to(b)   # 방향 벡터
+a.angle()           # 각도 (라디안)
+a.angle_to(b)       # 두 벡터의 각도 차
+a.rotated(PI / 4)   # 회전
+a.lerp(b, 0.5)      # 선형 보간
+a.bounce(normal)    # 반사
+a.reflect(normal)   # 반사
+a.slide(normal)     # 슬라이딩
+
+# 상수
+Vector2.ZERO   # (0, 0)
+Vector2.ONE    # (1, 1)
+Vector2.UP     # (0, -1)  ← Godot Y축 반전!
+Vector2.DOWN   # (0, 1)
+Vector2.LEFT   # (-1, 0)
+Vector2.RIGHT  # (1, 0)`},
+  ]},
+  { cat:'디버그 & 유틸', items:[
+    { title:'출력과 경고', code:
+`print("일반 출력")
+print("값: ", health, " / ", max_health)
+prints("여러", "인수", "공백", "구분")   # "여러 인수 공백 구분"
+printerr("에러 출력 (빨간 글씨)")
+print_rich("[color=red]빨간 텍스트[/color]")
+
+push_warning("경고 메시지")    # 에디터 경고
+push_error("에러 메시지")      # 에디터 에러, 실행 중지
+
+# 타입 확인
+typeof(42)          # TYPE_INT
+type_string(typeof(42))  # "int"
+is_instance_valid(node)  # null 또는 삭제된 노드 확인
+
+# 어설션
+assert(health > 0, "HP가 0 이하!")
+assert(node != null)
+
+# 조건부 디버그 출력
+if OS.is_debug_build():
+    print("디버그 전용 출력")`},
+    { title:'Resource & 파일 입출력', code:
+`# 리소스 로드
+var texture = load("res://art/hero.png") as Texture2D
+var scene = preload("res://scenes/Enemy.tscn")
+var data = load("res://data/config.tres")
+
+# JSON 읽기
+func load_json(path: String) -> Dictionary:
+    var file = FileAccess.open(path, FileAccess.READ)
+    if not file:
+        return {}
+    var json = JSON.new()
+    json.parse(file.get_as_text())
+    return json.get_data()
+
+# JSON 쓰기
+func save_json(path: String, data: Dictionary) -> void:
+    var file = FileAccess.open(path, FileAccess.WRITE)
+    file.store_string(JSON.stringify(data, "\\t"))
+
+# 사용자 데이터 경로 (user://)
+var save_path = "user://save.json"
+# user:// → Windows: %APPDATA%/Godot/app_userdata/<프로젝트>/
+#          → Linux:  ~/.local/share/godot/app_userdata/<프로젝트>/`},
+  ]},
+];
+
+// ══════════════════════════════════════════
+//  데이터 — 기능 정리
+// ══════════════════════════════════════════
+const FEAT = [
+  { cat:'핵심 노드 타입', items:[
+    {n:'Node',             d:'<b>모든 노드의 기반</b>. 씬 트리를 구성하는 기본 단위. 시그널, 그룹, 프로세스 기능 제공.'},
+    {n:'Node2D',           d:'2D 공간의 노드. position, rotation, scale, z_index 속성 포함.'},
+    {n:'Node3D',           d:'3D 공간의 노드. Transform3D로 위치/회전/스케일 관리.'},
+    {n:'Control',          d:'UI 노드의 기반. 앵커, 마진, 최소 크기, 마우스 필터 등 UI 레이아웃 속성 제공.'},
+    {n:'CanvasItem',       d:'Node2D와 Control의 공통 기반. 가시성, 색상, 머티리얼, Z레이어 등 렌더링 관련.'},
+  ]},
+  { cat:'2D 주요 노드', items:[
+    {n:'Sprite2D',         d:'텍스처를 화면에 표시. region_rect으로 스프라이트 시트 지원.'},
+    {n:'AnimatedSprite2D', d:'SpriteFrames 리소스 기반 프레임 애니메이션. play(), stop(), is_playing().'},
+    {n:'TileMap',          d:'타일 기반 맵 제작. TileSet 리소스로 타일 정의. 레이어, 충돌, 네비게이션 지원.'},
+    {n:'Camera2D',         d:'2D 카메라. 부드러운 추적(drag), 한계(limit), 줌, 오프셋 지원.'},
+    {n:'Line2D',           d:'점 배열을 선으로 연결. 두께, 색상, 텍스처, 굵기 프로파일 지원.'},
+    {n:'Polygon2D',        d:'다각형 영역 채우기. UV 텍스처, 스켈레톤 변형 지원.'},
+    {n:'GPUParticles2D',   d:'GPU 기반 파티클 시스템. 고성능, 셰이더 커스텀 가능.'},
+    {n:'CPUParticles2D',   d:'CPU 기반 파티클. GPU 미지원 환경용, 유연한 커스텀.'},
+    {n:'Path2D + PathFollow2D',d:'경로를 따라 노드 이동. progress로 위치 제어.'},
+    {n:'CanvasLayer',      d:'씬 트리와 독립된 캔버스 레이어. HUD, UI 오버레이에 사용.'},
+  ]},
+  { cat:'물리 노드 (2D)', items:[
+    {n:'StaticBody2D',     d:'움직이지 않는 물체. 바닥, 벽에 사용. constant_linear_velocity로 컨베이어 벨트 효과.'},
+    {n:'CharacterBody2D',  d:'플레이어 제어용. move_and_slide(), is_on_floor() 등 편의 메서드 포함.'},
+    {n:'RigidBody2D',      d:'물리 엔진이 움직임 관리. 충돌, 중력, 힘(apply_impulse) 자동 처리.'},
+    {n:'Area2D',           d:'물리적 충돌 없이 감지만 함. 피격 판정, 트리거 존, 음향 영역에 사용.'},
+    {n:'CollisionShape2D', d:'충돌 모양 정의 자식 노드. CircleShape2D, RectangleShape2D, CapsuleShape2D 등.'},
+    {n:'CollisionPolygon2D',d:'다각형 충돌 모양 정의.'},
+    {n:'RayCast2D',        d:'레이캐스트. force_raycast_update()로 즉시 결과. 벽 감지, 시야 확인에 활용.'},
+    {n:'ShapeCast2D',      d:'모양 기반 캐스트. 이동 전 충돌 예측에 사용.'},
+    {n:'NavigationAgent2D',d:'내비게이션 메시 경로 탐색. get_next_path_position()으로 다음 이동 위치.'},
+  ]},
+  { cat:'UI 노드 (Control)', items:[
+    {n:'Label',            d:'텍스트 표시. autowrap_mode, horizontal_alignment, BBCode 지원(RichTextLabel).'},
+    {n:'Button',           d:'클릭 버튼. pressed 시그널. toggle_mode로 토글 버튼 전환.'},
+    {n:'LineEdit',         d:'한 줄 텍스트 입력. text_changed, text_submitted 시그널.'},
+    {n:'TextEdit',         d:'여러 줄 텍스트 편집기.'},
+    {n:'RichTextLabel',    d:'[color], [b], [i], [url] 등 BBCode 서식 지원 텍스트.'},
+    {n:'ProgressBar',      d:'진행 바. min_value, max_value, value 설정.'},
+    {n:'Slider',           d:'값 조절 슬라이더. HSlider, VSlider.'},
+    {n:'CheckBox / CheckButton',d:'체크박스, 토글 스위치.'},
+    {n:'OptionButton',     d:'드롭다운 선택. add_item(), get_selected_id().'},
+    {n:'TabContainer',     d:'탭 인터페이스. current_tab으로 활성 탭 제어.'},
+    {n:'ScrollContainer',  d:'자식 콘텐츠 스크롤. scroll_horizontal, scroll_vertical.'},
+    {n:'VBoxContainer / HBoxContainer',d:'수직/수평 자동 정렬 컨테이너.'},
+    {n:'GridContainer',    d:'격자 형태 자동 정렬. columns 속성으로 열 수 지정.'},
+    {n:'MarginContainer',  d:'상하좌우 여백(margin) 추가.'},
+    {n:'PanelContainer',   d:'StyleBox로 배경 패널 표시.'},
+    {n:'ColorRect',        d:'단색 사각형. 배경, 구분선 등에 활용.'},
+    {n:'TextureRect',      d:'텍스처를 직사각형 영역에 표시. stretch_mode 조절.'},
+  ]},
+  { cat:'애니메이션', items:[
+    {n:'AnimationPlayer',  d:'키프레임 기반 애니메이션. play(), stop(), seek(). 어느 속성도 애니메이션 가능.'},
+    {n:'AnimationTree',    d:'상태 머신, 블렌드 스페이스로 복잡한 애니메이션 전환 관리.'},
+    {n:'Tween',            d:'코드 기반 부드러운 값 변화. create_tween()으로 생성. 체이닝 가능.'},
+    {n:'AnimationMixer',   d:'여러 AnimationPlayer 병합. Godot 4.1+에서 AnimationPlayer 기반.'},
+  ]},
+  { cat:'오디오', items:[
+    {n:'AudioStreamPlayer',d:'2D/3D 무관 오디오 재생. UI 효과음, BGM에 사용.'},
+    {n:'AudioStreamPlayer2D',d:'2D 공간 오디오. 거리/패닝 자동 처리.'},
+    {n:'AudioStreamPlayer3D',d:'3D 공간 오디오. 감쇠, 도플러 효과 지원.'},
+    {n:'AudioBus',         d:'믹서 버스. 볼륨, 이펙트(Reverb, Compressor 등) 처리. AudioServer로 제어.'},
+  ]},
+  { cat:'3D 주요 노드', items:[
+    {n:'MeshInstance3D',   d:'3D 메시 렌더링. Mesh 리소스(BoxMesh, CylinderMesh 등) 또는 임포트 모델 사용.'},
+    {n:'Camera3D',         d:'3D 씬의 시야. fov, near, far, projection(원근/직교) 설정.'},
+    {n:'DirectionalLight3D',d:'태양과 같은 방향성 조명. 그림자 맵 지원.'},
+    {n:'OmniLight3D',      d:'전방위 포인트 조명.'},
+    {n:'SpotLight3D',      d:'원뿔형 스폿 조명.'},
+    {n:'CharacterBody3D',  d:'3D 캐릭터 물리. move_and_slide(), is_on_floor().'},
+    {n:'RigidBody3D',      d:'3D 물리 강체.'},
+    {n:'StaticBody3D',     d:'3D 고정 물체. 바닥, 벽.'},
+    {n:'Area3D',           d:'3D 감지 영역.'},
+    {n:'GPUParticles3D',   d:'3D GPU 파티클 시스템.'},
+    {n:'NavigationAgent3D',d:'3D 내비게이션 경로 탐색.'},
+    {n:'SubViewport',      d:'씬 안의 씬. 렌더 텍스처, 분할 화면, 미니맵에 활용.'},
+  ]},
+  { cat:'리소스 시스템', items:[
+    {n:'Resource',         d:'데이터 보관 기본 클래스. .tres(텍스트) 또는 .res(바이너리)로 저장.'},
+    {n:'preload()',        d:'컴파일 타임에 리소스 로드. 빠르지만 경로가 정적이어야 함.'},
+    {n:'load()',           d:'런타임에 리소스 로드. 동적 경로 사용 가능. 캐싱됨.'},
+    {n:'ResourceLoader',   d:'비동기 로드(load_threaded_request), 의존성 분석 등 고급 기능.'},
+    {n:'@export var',      d:'인스펙터에서 리소스 직접 드래그 할당. 씬별 설정에 편리.'},
+    {n:'res:// 경로',      d:'프로젝트 루트 기준 경로. 빌드 후에도 유효.'},
+    {n:'user:// 경로',     d:'OS별 사용자 데이터 폴더. 세이브, 설정 파일 저장에 사용.'},
+  ]},
+  { cat:'프로젝트 설정 & 내보내기', items:[
+    {n:'ProjectSettings',  d:'프로젝트 전역 설정. get_setting("physics/2d/default_gravity") 등 코드로 접근.'},
+    {n:'Input Map',        d:'프로젝트 설정 > 입력 맵에서 액션 정의. 플랫폼별 키 다중 바인딩 지원.'},
+    {n:'내보내기 프리셋',   d:'플랫폼별 빌드 설정. Windows(exe), Android(apk/aab), iOS, Web(HTML5), macOS.'},
+    {n:'GDExtension',      d:'C++ 등 네이티브 코드 확장. Godot 4의 GDNative 대체. .gdextension 파일로 설정.'},
+    {n:'Autoload (싱글톤)', d:'프로젝트 > 자동 로드에 씬/스크립트 등록. 전역 접근 가능한 싱글톤 구현.'},
+  ]},
+];
+
+// ══════════════════════════════════════════
+//  데이터 — 단축키
+// ══════════════════════════════════════════
+const KEYS = [
+  { cat:'에디터 일반', list:[
+    {k:['Ctrl','S'],          d:'현재 씬/파일 저장'},
+    {k:['Ctrl','Shift','S'],  d:'다른 이름으로 저장'},
+    {k:['Ctrl','Z'],          d:'실행 취소'},
+    {k:['Ctrl','Shift','Z'],  d:'다시 실행'},
+    {k:['Ctrl','Y'],          d:'다시 실행 (Windows)'},
+    {k:['Ctrl','N'],          d:'새 씬 만들기'},
+    {k:['Ctrl','O'],          d:'씬 열기'},
+    {k:['Ctrl','Shift','O'],  d:'다른 씬 열기 (빠른 검색)'},
+    {k:['Ctrl','Alt','O'],    d:'프로젝트 설정 열기'},
+    {k:['Ctrl','Q'],          d:'Godot 에디터 종료'},
+    {k:['F5'],                d:'프로젝트 실행 (메인 씬)'},
+    {k:['F6'],                d:'현재 씬 실행'},
+    {k:['F7'],                d:'실행 일시정지'},
+    {k:['F8'],                d:'실행 중지'},
+    {k:['Ctrl','F5'],         d:'프로젝트 디버그 없이 실행'},
+    {k:['Ctrl',','],          d:'에디터 설정 열기'},
+    {k:['Alt','F4'],          d:'에디터 종료'},
+  ]},
+  { cat:'씬 편집기', list:[
+    {k:['Q'],                 d:'선택 도구 (이동 없음)'},
+    {k:['W'],                 d:'이동 도구 (Move)'},
+    {k:['E'],                 d:'회전 도구 (Rotate)'},
+    {k:['R'],                 d:'크기 조절 도구 (Scale)'},
+    {k:['S'],                 d:'픽셀 스냅 토글'},
+    {k:['Ctrl','D'],          d:'선택 노드 복제'},
+    {k:['Delete'],            d:'선택 노드 삭제'},
+    {k:['Ctrl','G'],          d:'선택 노드 그룹화 (부모 노드로 묶음)'},
+    {k:['Ctrl','Shift','G'],  d:'그룹 해제'},
+    {k:['Ctrl','↑'],          d:'노드를 씬 트리에서 위로 이동'},
+    {k:['Ctrl','↓'],          d:'노드를 씬 트리에서 아래로 이동'},
+    {k:['Ctrl','A'],          d:'자식 노드 추가 대화상자'},
+    {k:['Ctrl','Shift','A'],  d:'씬 인스턴스 추가'},
+    {k:['Ctrl','Shift','F'],  d:'루트 노드 선택'},
+    {k:['H'],                 d:'선택 노드 숨기기 토글'},
+    {k:['Ctrl','H'],          d:'자식 포함 숨기기 토글'},
+    {k:['F'],                 d:'선택 항목으로 카메라 포커스 (2D)'},
+    {k:['V'],                 d:'픽셀 정렬 (스마트 스냅)'},
+    {k:['Ctrl','클릭'],       d:'자식 노드 클릭 선택'},
+  ]},
+  { cat:'스크립트 에디터', list:[
+    {k:['Ctrl','Space'],      d:'코드 자동 완성'},
+    {k:['Ctrl','F'],          d:'찾기'},
+    {k:['Ctrl','H'],          d:'찾기 / 바꾸기'},
+    {k:['Ctrl','G'],          d:'특정 줄 번호로 이동'},
+    {k:['F3'],                d:'다음 검색 결과'},
+    {k:['Shift','F3'],        d:'이전 검색 결과'},
+    {k:['Ctrl','K'],          d:'선택 줄 주석 처리/해제'},
+    {k:['Ctrl','/'],          d:'현재 줄 주석 처리/해제'},
+    {k:['Ctrl','D'],          d:'현재 줄 복제'},
+    {k:['Ctrl','Shift','↑'],  d:'현재 줄 위로 이동'},
+    {k:['Ctrl','Shift','↓'],  d:'현재 줄 아래로 이동'},
+    {k:['Tab'],               d:'들여쓰기 추가'},
+    {k:['Shift','Tab'],       d:'들여쓰기 제거'},
+    {k:['Ctrl','L'],          d:'현재 줄 전체 선택'},
+    {k:['Ctrl','클릭'],       d:'심볼 정의로 이동 (Go to Definition)'},
+    {k:['Alt','클릭'],        d:'다중 커서 추가'},
+    {k:['Ctrl','F2'],         d:'함수/메서드 모두 찾기'},
+    {k:['F9'],                d:'현재 줄 중단점 설정/해제'},
+    {k:['Ctrl','F9'],         d:'모든 중단점 지우기'},
+    {k:['Ctrl','Shift','X'],  d:'닫힌 스크립트 탭 복원'},
+    {k:['Ctrl','W'],          d:'현재 스크립트 탭 닫기'},
+    {k:['Ctrl','Tab'],        d:'다음 스크립트 탭'},
+    {k:['Ctrl','Shift','Tab'],d:'이전 스크립트 탭'},
+    {k:['Ctrl','R'],          d:'스크립트 다시 열기 (새로고침)'},
+  ]},
+  { cat:'디버거', list:[
+    {k:['F5'],                d:'디버그 실행 시작'},
+    {k:['F6'],                d:'현재 씬 디버그 실행'},
+    {k:['F7'],                d:'일시정지 / 재개'},
+    {k:['F8'],                d:'실행 중지'},
+    {k:['F10'],               d:'스텝 오버 (Step Over) — 함수 넘어감'},
+    {k:['F11'],               d:'스텝 인 (Step Into) — 함수 내부로'},
+    {k:['Shift','F11'],       d:'스텝 아웃 (Step Out) — 함수에서 나옴'},
+    {k:['F9'],                d:'중단점 설정/해제'},
+  ]},
+  { cat:'2D 뷰포트', list:[
+    {k:['중간 마우스+드래그'],d:'뷰 패닝 (이동)'},
+    {k:['마우스 휠'],         d:'확대 / 축소'},
+    {k:['Ctrl','마우스 휠'],  d:'확대 / 축소 (빠르게)'},
+    {k:['숫자 키패드 +'],     d:'확대'},
+    {k:['숫자 키패드 -'],     d:'축소'},
+    {k:['숫자 키패드 0'],     d:'원본 크기 (100%)'},
+    {k:['G'],                 d:'그리드 스냅 토글'},
+    {k:['스페이스+드래그'],   d:'뷰 이동'},
+    {k:['F'],                 d:'선택 노드에 뷰 포커스'},
+    {k:['Ctrl','B'],          d:'뼈대 보이기/숨기기 (Skeleton2D)'},
+    {k:['P'],                 d:'팬 모드 전환'},
+    {k:['Z'],                 d:'줌 모드 전환'},
+  ]},
+  { cat:'3D 뷰포트', list:[
+    {k:['중간 마우스+드래그'],d:'뷰 회전 (Orbit)'},
+    {k:['Shift+중간 마우스'], d:'뷰 이동 (Pan)'},
+    {k:['마우스 휠'],         d:'전진 / 후진 (Dolly)'},
+    {k:['우클릭+WASD'],       d:'플라이 카메라 (Fly Mode)'},
+    {k:['숫자 키패드 1'],     d:'정면 뷰'},
+    {k:['숫자 키패드 3'],     d:'우측 뷰'},
+    {k:['숫자 키패드 7'],     d:'상단 뷰'},
+    {k:['숫자 키패드 Ctrl+1'],d:'후면 뷰'},
+    {k:['숫자 키패드 Ctrl+3'],d:'좌측 뷰'},
+    {k:['숫자 키패드 Ctrl+7'],d:'하단 뷰'},
+    {k:['숫자 키패드 5'],     d:'원근(Perspective) / 직교(Orthographic) 전환'},
+    {k:['숫자 키패드 0'],     d:'선택한 Camera3D의 뷰로 전환'},
+    {k:['F'],                 d:'선택 오브젝트에 뷰 포커스'},
+    {k:['T'],                 d:'상단 툴바 토글'},
+    {k:['Z'],                 d:'와이어프레임 모드 토글'},
+    {k:['숫자 키패드 /'],     d:'선택 오브젝트만 표시 (Isolate)'},
+  ]},
+  { cat:'에셋 임포트 & 파일시스템', list:[
+    {k:['Ctrl','A'],          d:'파일시스템 패널에서 모두 선택'},
+    {k:['F2'],                d:'파일/폴더 이름 바꾸기'},
+    {k:['Delete'],            d:'파일 삭제'},
+    {k:['Ctrl','C'],          d:'파일 경로 복사'},
+    {k:['Ctrl','R'],          d:'파일시스템 새로고침'},
+    {k:['더블클릭'],          d:'씬 파일 열기 / 스크립트 편집기에서 열기'},
+    {k:['드래그 (씬으로)'],   d:'파일을 씬에 인스턴스로 추가'},
+  ]},
+];
+
+// ══════════════════════════════════════════
+//  상태 & 렌더
+// ══════════════════════════════════════════
+let curTab='intro', curCat='all', srchQ='';
+
+function sw(tab){
+  curTab=tab; curCat='all'; srchQ='';
+  document.getElementById('sq').value='';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['intro','code','feat','keys'][i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+tab).classList.add('on');
+  const hasSearch=tab!=='intro';
+  document.getElementById('sub-bar').style.display=hasSearch?'':'none';
+  if(tab==='intro') renderIntro();
+  else if(tab==='code') renderCode();
+  else if(tab==='feat') renderFeat();
+  else renderKeys();
+}
+
+// ── 소개 패널 ──────────────────────────────
+function renderIntro(){
+  document.getElementById('panel-intro').innerHTML=`
+<div class="info-hero">
+  <h1>🤖 Godot Engine</h1>
+  <p>Godot는 <b>무료 오픈소스</b> 게임 엔진으로 2014년에 공개됐습니다.<br>
+  씬(Scene)과 노드(Node) 기반 아키텍처로 2D/3D 게임을 모두 제작할 수 있으며,<br>
+  자체 스크립트 언어인 <b>GDScript</b>와 <b>C#</b>을 지원합니다.</p>
+  <div class="badge-row">
+    <span class="badge b-green">MIT 라이선스</span>
+    <span class="badge b-blue">무료 &amp; 오픈소스</span>
+    <span class="badge b-purple">로열티 없음</span>
+    <span class="badge b-yellow">크로스플랫폼</span>
+  </div>
+</div>
+
+<div class="sec-hd">핵심 특징</div>
+<div class="card-grid">
+  <div class="card"><div class="ci">🌳</div><h3>씬 &amp; 노드 시스템</h3><p>모든 것이 노드. 씬은 노드의 트리. 씬을 재사용 가능한 프리팹처럼 활용.</p></div>
+  <div class="card"><div class="ci">📝</div><h3>GDScript</h3><p>Python 문법과 유사한 경량 스크립트. 타입 힌트, 시그널 내장.</p></div>
+  <div class="card"><div class="ci">💻</div><h3>C# 지원</h3><p>.NET 기반 C# 완전 지원 (Mono/NativeAOT). Visual Studio 연동.</p></div>
+  <div class="card"><div class="ci">🎨</div><h3>2D &amp; 3D 통합</h3><p>별도 에디터 없이 2D/3D 동시 개발. 독자 렌더러 (Vulkan/GL3 기반).</p></div>
+  <div class="card"><div class="ci">📦</div><h3>내장 에디터</h3><p>스크립트, 씬, 애니메이션, 셰이더, 타일맵 편집기 모두 내장.</p></div>
+  <div class="card"><div class="ci">⚡</div><h3>경량 &amp; 빠름</h3><p>설치 파일 40~100MB. 빠른 반복 개발. 로열티 없는 내보내기.</p></div>
+</div>
+
+<div class="sec-hd">버전 히스토리</div>
+<table class="ver-table">
+  <tr><th>버전</th><th>출시</th><th>주요 변경</th></tr>
+  <tr><td>1.0</td><td>2014</td><td>최초 오픈소스 공개</td></tr>
+  <tr><td>2.x</td><td>2016</td><td>2D 엔진 대폭 개선, GDNative 도입</td></tr>
+  <tr><td>3.0</td><td>2018</td><td>Vulkan 예비 지원, C# 지원, PBR 3D</td></tr>
+  <tr><td>3.5</td><td>2022</td><td>NavigationServer, 멀티플레이어 개선</td></tr>
+  <tr><td>4.0</td><td>2023</td><td>신규 렌더러(RenderingDevice), GDExtension, GDScript 2.0</td></tr>
+  <tr><td>4.1</td><td>2023</td><td>멀티스레드 씬, AnimationMixer, 성능 개선</td></tr>
+  <tr><td>4.2</td><td>2023</td><td>Android Vulkan, 타일맵 개선, 에디터 개선</td></tr>
+  <tr><td>4.3</td><td>2024</td><td>Web 내보내기 개선, PhysicsServer 개선</td></tr>
+</table>
+
+<div class="sec-hd">지원 언어</div>
+<div class="lang-grid">
+  <div class="lang-card"><h4>GDScript</h4><p>Godot 전용 스크립트. Python 유사 문법. 가장 빠른 반복 개발. 내장 시그널/타입 지원.</p></div>
+  <div class="lang-card"><h4>C#</h4><p>.NET 기반. 강타입, IDE 지원 우수. 성능↑ 문법 복잡도↑. Godot.NET 패키지 사용.</p></div>
+  <div class="lang-card"><h4>C++ (GDExtension)</h4><td></td><p>네이티브 확장. 최고 성능 필요 시 사용. .gdextension 파일로 등록.</p></div>
+  <div class="lang-card"><h4>기타</h4><p>커뮤니티가 만든 Python, Rust, Swift, Lua 바인딩 존재 (공식 미지원).</p></div>
+</div>
+
+<div class="sec-hd">내보내기 (Export) 지원 플랫폼</div>
+<div class="platform-row">
+  <div class="plat">🪟 Windows</div>
+  <div class="plat">🍎 macOS</div>
+  <div class="plat">🐧 Linux</div>
+  <div class="plat">📱 Android</div>
+  <div class="plat">📱 iOS</div>
+  <div class="plat">🌐 Web (HTML5)</div>
+  <div class="plat">🎮 콘솔 (별도 라이선스)</div>
+</div>
+`;
+}
+
+// ── 코드 패널 ──────────────────────────────
+function renderCode(){
+  const cats=['전체',...CODE.map(s=>s.cat)];
+  document.getElementById('cat-bar').innerHTML=cats.map((c,i)=>
+    `<button class="cbt${i===0?' on':''}" onclick="filterCat('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
+  ).join('');
+
+  document.getElementById('panel-code').innerHTML=CODE.map(sec=>`
+    <div class="sec-block" data-cat="${sec.cat}">
+      <div class="sec-hd">${sec.cat}</div>
+      ${sec.items.map(item=>`
+        <div class="code-item" data-search="${item.title.toLowerCase()} ${item.code.toLowerCase()}">
+          <div class="code-title">${item.title}</div>
+          <div class="code-body"><pre>${hlGD(item.code)}</pre></div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const total=CODE.reduce((s,c)=>s+c.items.length,0);
+  document.getElementById('cnt').textContent=total+'개';
+}
+
+// ── 기능 패널 ──────────────────────────────
+function renderFeat(){
+  const cats=['전체',...FEAT.map(s=>s.cat)];
+  document.getElementById('cat-bar').innerHTML=cats.map((c,i)=>
+    `<button class="cbt${i===0?' on':''}" onclick="filterCat('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
+  ).join('');
+
+  document.getElementById('panel-feat').innerHTML=FEAT.map(sec=>`
+    <div class="sec-block" data-cat="${sec.cat}">
+      <div class="sec-hd">${sec.cat}</div>
+      ${sec.items.map(item=>`
+        <div class="feat-item" data-search="${item.n.toLowerCase()} ${item.d.toLowerCase()}">
+          <span class="feat-name">${item.n}</span>
+          <span class="feat-desc">${item.d}</span>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const total=FEAT.reduce((s,c)=>s+c.items.length,0);
+  document.getElementById('cnt').textContent=total+'개';
+}
+
+// ── 단축키 패널 ──────────────────────────────
+function kbdHtml(k){
+  const sp=/^(Ctrl|Shift|Alt|F\d+|Delete|Esc|Enter|Tab|Home|End|PgUp|PgDn|Insert|Backspace|Space|우클릭)/.test(k);
+  const fn=/^F\d+$/.test(k);
+  return `<kbd class="${fn?'fn':sp?'sp':''}">${k}</kbd>`;
+}
+
+function renderKeys(){
+  const cats=['전체',...KEYS.map(s=>s.cat)];
+  document.getElementById('cat-bar').innerHTML=cats.map((c,i)=>
+    `<button class="cbt${i===0?' on':''}" onclick="filterCat('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
+  ).join('');
+
+  document.getElementById('panel-keys').innerHTML=KEYS.map(sec=>`
+    <div class="sec-block" data-cat="${sec.cat}">
+      <div class="sec-hd">${sec.cat}</div>
+      ${sec.list.map(item=>`
+        <div class="key-row" data-search="${item.k.join(' ').toLowerCase()} ${item.d.toLowerCase()}">
+          <div class="keys">${item.k.map(kbdHtml).join('<span class="plus">+</span>')}</div>
+          <span class="kdesc">${item.d}</span>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const total=KEYS.reduce((s,c)=>s+c.list.length,0);
+  document.getElementById('cnt').textContent=total+'개';
+}
+
+// ── 필터 ──────────────────────────────────
+function filterCat(cat,btn){
+  curCat=cat;
+  document.querySelectorAll('.cbt').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  applyFilter();
+}
+
+function onSrch(){
+  srchQ=document.getElementById('sq').value.trim().toLowerCase();
+  applyFilter();
+}
+
+function applyFilter(){
+  const panel=document.getElementById('panel-'+curTab);
+  let vis=0;
+  panel.querySelectorAll('.sec-block').forEach(sec=>{
+    const cm=curCat==='전체'||curCat===sec.dataset.cat;
+    if(!cm){sec.classList.add('hide');return;}
+    sec.classList.remove('hide');
+    let sv=0;
+    sec.querySelectorAll('.code-item,.feat-item,.key-row').forEach(row=>{
+      const m=!srchQ||row.dataset.search.includes(srchQ);
+      row.classList.toggle('hide',!m);
+      if(m) sv++;
+    });
+    if(srchQ&&sv===0) sec.classList.add('hide');
+    else vis+=sv;
+  });
+  document.getElementById('cnt').textContent=vis+'개';
+  document.getElementById('empty').textContent=vis===0?'검색 결과가 없습니다.':'';
+  document.getElementById('empty').className=vis===0?'show':'';
+}
+
+// ── 초기화 ────────────────────────────────
+renderIntro();
+document.getElementById('sub-bar').style.display='none';
+</script>
+</body>
+</html>

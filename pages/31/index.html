@@ -209,33 +209,35 @@ function initSand(){
   }
 }
 
-// ─── 물리 엔진 (페이지 30 동일 방식) ───────────────────────
+// ─── 물리 엔진 ────────────────────────────────────────────
 let tick=0, neckAllowance=0;
+const moved=new Uint8Array(COLS*ROWS);
 
 function physUpdate(){
   tick++;
+  moved.fill(0);
   const lf=(tick%2===0);
-  for(let y=ROWS-2;y>=0;y--){
+  // top-to-bottom 스캔: 연쇄 낙하 방지 (빈 칸이 한 프레임에 전체 컬럼을 비우지 않음)
+  for(let y=0;y<ROWS-1;y++){
     for(let xi=0;xi<COLS;xi++){
       const x=lf?xi:COLS-1-xi;
       const i=y*COLS+x;
-      if(!grid[i]) continue;
-      // 넥 스로틀: CY_CELL-1 행에서 아래로 이동 시 제한
-      const isNeck=(y===CY_CELL-1 && isGlass[i]);
-      if(isNeck && neckAllowance<1) continue;
+      if(!grid[i]||moved[i]) continue;
+      const isNeck=(y===CY_CELL-1&&isGlass[i]);
+      if(isNeck&&neckAllowance<1) continue;
       const bel=(y+1)*COLS+x;
-      if(isGlass[bel]&&!grid[bel]){
+      if(isGlass[bel]&&!grid[bel]&&!moved[bel]){
         if(isNeck) neckAllowance--;
-        grid[bel]=grid[i]; grid[i]=0; continue;
+        grid[bel]=grid[i]; grid[i]=0; moved[bel]=1; continue;
       }
       const gl=Math.random()<.5;
       for(const dx of[gl?-1:1,gl?1:-1]){
         const nx=x+dx;
         if(nx<0||nx>=COLS) continue;
         const di=(y+1)*COLS+nx;
-        if(isGlass[di]&&!grid[di]){
+        if(isGlass[di]&&!grid[di]&&!moved[di]){
           if(isNeck) neckAllowance--;
-          grid[di]=grid[i]; grid[i]=0; break;
+          grid[di]=grid[i]; grid[i]=0; moved[di]=1; break;
         }
       }
     }

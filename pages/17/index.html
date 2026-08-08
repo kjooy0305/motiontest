@@ -299,11 +299,21 @@ input.ni:focus{outline:none;border-color:var(--ac);}
       🙏 구걸 : <em>쿨타임 8초</em> — 소소한 용돈<br>
       🏦 은행 : <em>분당 2% 이자</em>, 최소 3분 예치
     </div>
-    <div class="s-label">⏱ 게임 시간 선택</div>
+    <div class="s-label">⏱ 게임 시간 설정</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+      <input id="min-input" type="number" min="1" max="999" value="10"
+        style="background:var(--p2);border:2px solid var(--bd);border-radius:6px;
+               color:var(--tx);padding:8px 12px;font-size:18px;font-weight:bold;
+               font-family:inherit;width:90px;text-align:center;"
+        oninput="syncMinInput()">
+      <span style="font-size:15px;color:var(--tx2);">분</span>
+    </div>
     <div class="time-row">
+      <button class="t-btn" data-min="3">3분</button>
       <button class="t-btn" data-min="5">5분</button>
-      <button class="t-btn sel" data-min="10">10분</button>
-      <button class="t-btn" data-min="15">15분</button>
+      <button class="t-btn" data-min="10">10분</button>
+      <button class="t-btn" data-min="20">20분</button>
+      <button class="t-btn" data-min="30">30분</button>
     </div>
     <button class="s-go" id="go-btn">게임 시작 ▶</button>
   </div>
@@ -1246,19 +1256,35 @@ function endGame() {
 // ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
-let selectedMin = 10;
+function syncMinInput() {
+  const v = parseInt(document.getElementById('min-input').value) || 10;
+  document.querySelectorAll('.t-btn').forEach(b => {
+    b.classList.toggle('sel', parseInt(b.dataset.min) === v);
+  });
+}
 
 document.querySelectorAll('.t-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
-    selectedMin = parseInt(btn.dataset.min);
+    const m = parseInt(btn.dataset.min);
+    document.getElementById('min-input').value = m;
+    syncMinInput();
   });
 });
 
-document.getElementById('go-btn').addEventListener('click', () => {
-  startGame(selectedMin);
+document.getElementById('min-input').addEventListener('focus', function() {
+  this.style.borderColor = 'var(--ac)';
 });
+document.getElementById('min-input').addEventListener('blur', function() {
+  this.style.borderColor = 'var(--bd)';
+  if (!this.value || parseInt(this.value) < 1) this.value = 1;
+});
+
+document.getElementById('go-btn').addEventListener('click', () => {
+  const m = Math.max(1, parseInt(document.getElementById('min-input').value) || 10);
+  startGame(m);
+});
+
+syncMinInput();
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {

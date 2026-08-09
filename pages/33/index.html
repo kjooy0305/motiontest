@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notion 완전 정복</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f0f13;--bg2:#16161c;--bg3:#1e1e28;--bg4:#26263a;
+  --border:#2e2e42;--text:#e0e0f0;--muted:#7070a0;--accent:#e2c97e;
+  --blue:#60a8f0;--green:#58d08a;--red:#f06060;--purple:#c080f0;--orange:#f0a050;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.6;}
+a{color:var(--blue);text-decoration:none;}
+
+/* HEADER */
+#header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+#header h1{font-size:18px;font-weight:700;color:var(--accent);}
+#header .sub{font-size:12px;color:var(--muted);}
+#search{flex:1;max-width:360px;padding:7px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;outline:none;}
+#search:focus{border-color:var(--accent);}
+.plan-badge{background:rgba(226,201,126,.15);border:1px solid rgba(226,201,126,.4);color:var(--accent);font-size:11px;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:4px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 14px;border-radius:6px;border:1px solid transparent;font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap;background:none;transition:all .15s;}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{background:var(--bg4);border-color:var(--border);color:var(--accent);}
+
+/* MAIN */
+#main{padding:20px;max-width:1100px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* CARD GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.card-title .icon{font-size:16px;}
+
+/* SHORTCUT TABLE */
+.sc-group{margin-bottom:20px;}
+.sc-group h3{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);letter-spacing:.5px;text-transform:uppercase;}
+.sc-row{display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.sc-row:last-child{border-bottom:none;}
+kbd{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-family:monospace;font-size:12px;color:var(--blue);white-space:nowrap;}
+.sc-desc{color:var(--muted);}
+
+/* BLOCK LIST */
+.block-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.block-item:last-child{border-bottom:none;}
+.block-cmd{background:var(--bg4);border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:110px;}
+.block-desc{color:var(--muted);}
+
+/* DB PROPS */
+.prop-row{display:grid;grid-template-columns:130px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.prop-row:last-child{border-bottom:none;}
+.prop-name{color:var(--purple);font-weight:600;}
+.prop-desc{color:var(--muted);}
+
+/* TIPS */
+.tip{background:var(--bg3);border-left:3px solid var(--accent);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:13px;}
+.tip-title{font-weight:700;color:var(--accent);margin-bottom:4px;font-size:12px;}
+.tip p{color:var(--muted);line-height:1.6;}
+.tip code{background:var(--bg4);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:12px;color:var(--green);}
+
+/* WARNING / INFO */
+.info{background:rgba(96,168,240,.08);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#a0c8f0;}
+.warn{background:rgba(240,100,100,.08);border-left:3px solid var(--red);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#f0a0a0;}
+.ok{background:rgba(88,208,138,.08);border-left:3px solid var(--green);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#80e0a0;}
+
+/* PLAN FEATURES */
+.plan-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.plan-row:last-child{border-bottom:none;}
+.feat-name{flex:1;color:var(--text);}
+.badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.badge.free{background:rgba(112,112,160,.2);color:var(--muted);}
+.badge.plus{background:rgba(226,201,126,.18);color:var(--accent);}
+.badge.ai{background:rgba(192,128,240,.18);color:var(--purple);}
+
+/* SECTION HEADER */
+.sec-header{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+/* BROADCAST TABLE */
+.bc-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+.bc-table th{background:var(--bg3);color:var(--muted);font-weight:600;padding:8px 12px;text-align:left;border:1px solid var(--border);}
+.bc-table td{padding:8px 12px;border:1px solid var(--border);color:var(--muted);vertical-align:top;}
+.bc-table td:first-child{color:var(--text);font-weight:500;}
+.dot-ok::before{content:'✓ ';color:var(--green);}
+.dot-warn::before{content:'⚠ ';color:var(--orange);}
+.dot-bad::before{content:'✕ ';color:var(--red);}
+
+/* NO RESULT */
+#no-result{display:none;color:var(--muted);text-align:center;padding:40px;font-size:14px;}
+.highlight{background:rgba(226,201,126,.28);border-radius:2px;padding:0 1px;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>📓 Notion 완전 정복</h1>
+  <span class="sub">학생 Plus 기준</span>
+  <input id="search" type="text" placeholder="🔍 기능·단축키·속성 검색…" oninput="doSearch(this.value)">
+  <span class="plan-badge">🎓 Student Plus</span>
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="switchTab('shortcuts')">⌨️ 단축키</button>
+  <button class="tab" onclick="switchTab('blocks')">🧱 블록</button>
+  <button class="tab" onclick="switchTab('database')">🗄️ 데이터베이스</button>
+  <button class="tab" onclick="switchTab('ai')">✨ AI 기능</button>
+  <button class="tab" onclick="switchTab('student')">🎓 학생 활용법</button>
+  <button class="tab" onclick="switchTab('broadcast')">📡 방송 노출</button>
+  <button class="tab" onclick="switchTab('plan')">🌟 Plus 플랜</button>
+</div>
+
+<div id="main">
+
+<!-- ── 단축키 ─────────────────────────────────────────── -->
+<div id="tab-shortcuts" class="section active">
+  <div class="sec-header">⌨️ 단축키 전체 정리</div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🧭</span>탐색 · 이동</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>Ctrl + P</kbd><span class="sc-desc">빠른 검색 / 최근 페이지 열기</span></div>
+        <div class="sc-row"><kbd>Ctrl + [</kbd><span class="sc-desc">뒤로 가기</span></div>
+        <div class="sc-row"><kbd>Ctrl + ]</kbd><span class="sc-desc">앞으로 가기</span></div>
+        <div class="sc-row"><kbd>Ctrl + \</kbd><span class="sc-desc">사이드바 접기/펼치기</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + L</kbd><span class="sc-desc">다크/라이트 모드 전환</span></div>
+        <div class="sc-row"><kbd>Ctrl + Enter</kbd><span class="sc-desc">현재 페이지 전체 화면 열기</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + E</kbd><span class="sc-desc">새 탭으로 페이지 열기</span></div>
+        <div class="sc-row"><kbd>Esc</kbd><span class="sc-desc">블록 선택 해제 / 입력 종료</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + N</kbd><span class="sc-desc">새 Notion 창 열기</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✏️</span>블록 생성 · 편집</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>/</kbd><span class="sc-desc">슬래시 명령어 메뉴 열기</span></div>
+        <div class="sc-row"><kbd>Enter</kbd><span class="sc-desc">새 블록 줄 추가</span></div>
+        <div class="sc-row"><kbd>Shift + Enter</kbd><span class="sc-desc">블록 내 줄바꿈 (소프트 개행)</span></div>
+        <div class="sc-row"><kbd>Tab</kbd><span class="sc-desc">블록 들여쓰기 (자식으로)</span></div>
+        <div class="sc-row"><kbd>Shift + Tab</kbd><span class="sc-desc">블록 내어쓰기 (부모로)</span></div>
+        <div class="sc-row"><kbd>Ctrl + D</kbd><span class="sc-desc">블록 복제</span></div>
+        <div class="sc-row"><kbd>Ctrl + Z</kbd><span class="sc-desc">실행 취소</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + Z</kbd><span class="sc-desc">다시 실행</span></div>
+        <div class="sc-row"><kbd>Ctrl + /</kbd><span class="sc-desc">선택한 블록 타입 변경</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + M</kbd><span class="sc-desc">블록 이동</span></div>
+        <div class="sc-row"><kbd>Backspace (빈 블록)</kbd><span class="sc-desc">블록 삭제</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + Del</kbd><span class="sc-desc">선택 블록 삭제</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🖊️</span>텍스트 서식</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>Ctrl + B</kbd><span class="sc-desc">굵게 (Bold)</span></div>
+        <div class="sc-row"><kbd>Ctrl + I</kbd><span class="sc-desc">기울임 (Italic)</span></div>
+        <div class="sc-row"><kbd>Ctrl + U</kbd><span class="sc-desc">밑줄 (Underline)</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + S</kbd><span class="sc-desc">취소선 (Strikethrough)</span></div>
+        <div class="sc-row"><kbd>Ctrl + E</kbd><span class="sc-desc">인라인 코드 (Inline code)</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + H</kbd><span class="sc-desc">텍스트 하이라이트</span></div>
+        <div class="sc-row"><kbd>Ctrl + K</kbd><span class="sc-desc">링크 삽입</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + A</kbd><span class="sc-desc">링크 제거</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">💬</span>멘션 · 특수 입력</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>@</kbd><span class="sc-desc">사람·페이지·날짜 멘션</span></div>
+        <div class="sc-row"><kbd>[[</kbd><span class="sc-desc">페이지 링크 삽입</span></div>
+        <div class="sc-row"><kbd>+</kbd><span class="sc-desc">페이지 생성 후 링크</span></div>
+        <div class="sc-row"><kbd>::</kbd><span class="sc-desc">이모지 피커 열기</span></div>
+        <div class="sc-row"><kbd>---</kbd><span class="sc-desc">구분선 자동 삽입</span></div>
+        <div class="sc-row"><kbd>`코드`</kbd><span class="sc-desc">마크다운 인라인 코드</span></div>
+        <div class="sc-row"><kbd>**굵게**</kbd><span class="sc-desc">마크다운 bold</span></div>
+        <div class="sc-row"><kbd>*기울임*</kbd><span class="sc-desc">마크다운 italic</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🏗️</span>블록 선택 · 이동</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>Esc</kbd><span class="sc-desc">현재 블록 선택 모드</span></div>
+        <div class="sc-row"><kbd>↑ / ↓</kbd><span class="sc-desc">위아래 블록 이동</span></div>
+        <div class="sc-row"><kbd>Shift + ↑/↓</kbd><span class="sc-desc">여러 블록 범위 선택</span></div>
+        <div class="sc-row"><kbd>Ctrl + A</kbd><span class="sc-desc">전체 블록 선택</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + ↑</kbd><span class="sc-desc">블록 위로 이동</span></div>
+        <div class="sc-row"><kbd>Ctrl + Shift + ↓</kbd><span class="sc-desc">블록 아래로 이동</span></div>
+        <div class="sc-row"><kbd>Ctrl + G</kbd><span class="sc-desc">선택 블록 그룹화 (토글로)</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🗄️</span>데이터베이스 내 단축키</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd>Ctrl + L</kbd><span class="sc-desc">DB 필터 열기</span></div>
+        <div class="sc-row"><kbd>Enter (셀)</kbd><span class="sc-desc">레코드 열기</span></div>
+        <div class="sc-row"><kbd>Shift + Enter</kbd><span class="sc-desc">레코드 전체 화면으로</span></div>
+        <div class="sc-row"><kbd>Tab</kbd><span class="sc-desc">다음 셀로 이동</span></div>
+        <div class="sc-row"><kbd>Shift + Tab</kbd><span class="sc-desc">이전 셀로 이동</span></div>
+        <div class="sc-row"><kbd>Esc</kbd><span class="sc-desc">셀 편집 종료</span></div>
+        <div class="sc-row"><kbd>Ctrl + Enter</kbd><span class="sc-desc">체크박스 토글</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔠</span>마크다운 자동 변환</div>
+      <div class="sc-group">
+        <div class="sc-row"><kbd># 공백</kbd><span class="sc-desc">제목 1 (H1)</span></div>
+        <div class="sc-row"><kbd>## 공백</kbd><span class="sc-desc">제목 2 (H2)</span></div>
+        <div class="sc-row"><kbd>### 공백</kbd><span class="sc-desc">제목 3 (H3)</span></div>
+        <div class="sc-row"><kbd>- 공백 / * 공백</kbd><span class="sc-desc">글머리 기호 목록</span></div>
+        <div class="sc-row"><kbd>1. 공백</kbd><span class="sc-desc">번호 매기기 목록</span></div>
+        <div class="sc-row"><kbd>[] 공백</kbd><span class="sc-desc">체크박스 (할 일)</span></div>
+        <div class="sc-row"><kbd>> 공백</kbd><span class="sc-desc">인용 블록</span></div>
+        <div class="sc-row"><kbd>```언어</kbd><span class="sc-desc">코드 블록</span></div>
+        <div class="sc-row"><kbd>---</kbd><span class="sc-desc">구분선</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 블록 ──────────────────────────────────────────── -->
+<div id="tab-blocks" class="section">
+  <div class="sec-header">🧱 블록 타입 전체 (슬래시 명령어)</div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📝</span>텍스트 블록</div>
+      <div class="block-item"><span class="block-cmd">/text</span><span class="block-desc">기본 텍스트 단락</span></div>
+      <div class="block-item"><span class="block-cmd">/h1 · /h2 · /h3</span><span class="block-desc">제목 1·2·3</span></div>
+      <div class="block-item"><span class="block-cmd">/bullet</span><span class="block-desc">글머리 기호 목록</span></div>
+      <div class="block-item"><span class="block-cmd">/numbered</span><span class="block-desc">번호 매기기 목록</span></div>
+      <div class="block-item"><span class="block-cmd">/todo</span><span class="block-desc">체크박스 (할 일)</span></div>
+      <div class="block-item"><span class="block-cmd">/toggle</span><span class="block-desc">접기/펼치기 블록</span></div>
+      <div class="block-item"><span class="block-cmd">/quote</span><span class="block-desc">인용 블록</span></div>
+      <div class="block-item"><span class="block-cmd">/callout</span><span class="block-desc">콜아웃 (이모지+강조 텍스트)</span></div>
+      <div class="block-item"><span class="block-cmd">/divider</span><span class="block-desc">가로 구분선</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">💻</span>코드 · 수식</div>
+      <div class="block-item"><span class="block-cmd">/code</span><span class="block-desc">코드 블록 (30+ 언어 하이라이트)</span></div>
+      <div class="block-item"><span class="block-cmd">/math · /equation</span><span class="block-desc">LaTeX 수식 블록</span></div>
+      <div class="block-item"><span class="block-cmd">Ctrl+E (인라인)</span><span class="block-desc">인라인 코드 서식</span></div>
+      <div class="block-item"><span class="block-cmd">$…$ (인라인)</span><span class="block-desc">인라인 수식</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🖼️</span>미디어 · 파일</div>
+      <div class="block-item"><span class="block-cmd">/image</span><span class="block-desc">이미지 업로드 / URL 삽입</span></div>
+      <div class="block-item"><span class="block-cmd">/video</span><span class="block-desc">동영상 업로드 / YouTube 등</span></div>
+      <div class="block-item"><span class="block-cmd">/audio</span><span class="block-desc">음성·음악 파일</span></div>
+      <div class="block-item"><span class="block-cmd">/file</span><span class="block-desc">파일 첨부 (Plus: 무제한)</span></div>
+      <div class="block-item"><span class="block-cmd">/pdf</span><span class="block-desc">PDF 인라인 뷰어</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔗</span>임베드</div>
+      <div class="block-item"><span class="block-cmd">/embed</span><span class="block-desc">URL로 다양한 콘텐츠 임베드</span></div>
+      <div class="block-item"><span class="block-cmd">/youtube</span><span class="block-desc">YouTube 동영상</span></div>
+      <div class="block-item"><span class="block-cmd">/figma</span><span class="block-desc">Figma 디자인</span></div>
+      <div class="block-item"><span class="block-cmd">/maps</span><span class="block-desc">Google 지도</span></div>
+      <div class="block-item"><span class="block-cmd">/codepen</span><span class="block-desc">CodePen</span></div>
+      <div class="block-item"><span class="block-cmd">/github</span><span class="block-desc">GitHub Gist</span></div>
+      <div class="block-item"><span class="block-cmd">/tweet</span><span class="block-desc">트위터/X 게시글</span></div>
+      <div class="block-item"><span class="block-cmd">/loom</span><span class="block-desc">Loom 영상</span></div>
+      <div class="block-item"><span class="block-cmd">/framer</span><span class="block-desc">Framer 프로토타입</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🗄️</span>데이터베이스 블록</div>
+      <div class="block-item"><span class="block-cmd">/table (인라인)</span><span class="block-desc">인라인 테이블 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/board</span><span class="block-desc">칸반 보드 뷰 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/calendar</span><span class="block-desc">캘린더 뷰 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/gallery</span><span class="block-desc">갤러리 뷰 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/timeline</span><span class="block-desc">타임라인 뷰 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/list</span><span class="block-desc">리스트 뷰 DB</span></div>
+      <div class="block-item"><span class="block-cmd">/linked view</span><span class="block-desc">기존 DB를 다른 뷰로 연결</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚡</span>고급 · 레이아웃</div>
+      <div class="block-item"><span class="block-cmd">/columns</span><span class="block-desc">다단 레이아웃 (드래그로 생성)</span></div>
+      <div class="block-item"><span class="block-cmd">/toc</span><span class="block-desc">목차 자동 생성</span></div>
+      <div class="block-item"><span class="block-cmd">/breadcrumb</span><span class="block-desc">상위 페이지 경로 표시</span></div>
+      <div class="block-item"><span class="block-cmd">/button</span><span class="block-desc">자동화 버튼 (페이지 생성 등)</span></div>
+      <div class="block-item"><span class="block-cmd">/template</span><span class="block-desc">페이지 내 반복 템플릿 버튼</span></div>
+      <div class="block-item"><span class="block-cmd">/synced block</span><span class="block-desc">동기화 블록 (여러 페이지 공유)</span></div>
+      <div class="block-item"><span class="block-cmd">/mention page</span><span class="block-desc">다른 페이지 언급·미리보기</span></div>
+      <div class="block-item"><span class="block-cmd">/simple table</span><span class="block-desc">단순 표 (DB 기능 없음)</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 데이터베이스 ──────────────────────────────────── -->
+<div id="tab-database" class="section">
+  <div class="sec-header">🗄️ 데이터베이스 완전 정리</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title"><span class="icon">👁️</span>뷰(View) 6종</div>
+      <div class="prop-row"><span class="prop-name">📋 Table</span><span class="prop-desc">행·열 스프레드시트 형태. 모든 속성 한눈에 보기</span></div>
+      <div class="prop-row"><span class="prop-name">📌 Board</span><span class="prop-desc">칸반 보드. 상태별 카드 이동 (프로젝트 관리)</span></div>
+      <div class="prop-row"><span class="prop-name">📅 Calendar</span><span class="prop-desc">날짜 속성 기준 월별 캘린더</span></div>
+      <div class="prop-row"><span class="prop-name">🖼️ Gallery</span><span class="prop-desc">카드+이미지 갤러리 (포트폴리오·아이디어)</span></div>
+      <div class="prop-row"><span class="prop-name">📊 Timeline</span><span class="prop-desc">간트 차트형. 시작~종료일 시각화</span></div>
+      <div class="prop-row"><span class="prop-name">📝 List</span><span class="prop-desc">간결한 목록형. 빠른 탐색에 최적</span></div>
+      <div class="prop-row"><span class="prop-name">📈 Chart</span><span class="prop-desc">막대·원형 차트 (최신 기능)</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🏷️</span>DB 속성(Property) 기본</div>
+      <div class="prop-row"><span class="prop-name">Title</span><span class="prop-desc">모든 DB의 필수 이름 속성</span></div>
+      <div class="prop-row"><span class="prop-name">Text</span><span class="prop-desc">자유 텍스트 입력</span></div>
+      <div class="prop-row"><span class="prop-name">Number</span><span class="prop-desc">숫자 (통화·퍼센트 등 서식 선택 가능)</span></div>
+      <div class="prop-row"><span class="prop-name">Select</span><span class="prop-desc">단일 선택 태그</span></div>
+      <div class="prop-row"><span class="prop-name">Multi-select</span><span class="prop-desc">다중 선택 태그</span></div>
+      <div class="prop-row"><span class="prop-name">Status</span><span class="prop-desc">Not started / In progress / Done 상태</span></div>
+      <div class="prop-row"><span class="prop-name">Date</span><span class="prop-desc">날짜 또는 날짜 범위</span></div>
+      <div class="prop-row"><span class="prop-name">Checkbox</span><span class="prop-desc">완료 여부 체크</span></div>
+      <div class="prop-row"><span class="prop-name">URL / Email / Phone</span><span class="prop-desc">링크·이메일·전화번호</span></div>
+      <div class="prop-row"><span class="prop-name">Files & Media</span><span class="prop-desc">파일·이미지 첨부</span></div>
+      <div class="prop-row"><span class="prop-name">Person</span><span class="prop-desc">워크스페이스 멤버 지정</span></div>
+      <div class="prop-row"><span class="prop-name">Created / Last Edited</span><span class="prop-desc">생성·수정 시각·작성자 자동 기록</span></div>
+      <div class="prop-row"><span class="prop-name">ID</span><span class="prop-desc">자동 고유 번호 부여</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span>DB 속성(Property) 고급</div>
+      <div class="prop-row"><span class="prop-name">Formula</span><span class="prop-desc">수식으로 계산. <code>prop("마감일") - now()</code> 등</span></div>
+      <div class="prop-row"><span class="prop-name">Relation</span><span class="prop-desc">다른 DB 레코드와 연결</span></div>
+      <div class="prop-row"><span class="prop-name">Rollup</span><span class="prop-desc">Relation 연결 DB 값 집계 (합계·카운트 등)</span></div>
+      <div class="prop-row"><span class="prop-name">Button</span><span class="prop-desc">클릭 시 자동화 실행 (레코드 내)</span></div>
+      <div class="prop-row"><span class="prop-name">Verification</span><span class="prop-desc">검토·승인 상태 추적</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔍</span>필터·정렬·그룹</div>
+      <div class="prop-row"><span class="prop-name">Filter</span><span class="prop-desc">조건별 레코드 표시. AND/OR 복합 조건 가능</span></div>
+      <div class="prop-row"><span class="prop-name">Sort</span><span class="prop-desc">속성 기준 오름/내림차순. 다중 정렬 가능</span></div>
+      <div class="prop-row"><span class="prop-name">Group by</span><span class="prop-desc">Select·Status 등으로 그룹 묶기</span></div>
+      <div class="prop-row"><span class="prop-name">Hide properties</span><span class="prop-desc">뷰마다 다른 속성 숨김 설정</span></div>
+      <div class="prop-row"><span class="prop-name">Limit</span><span class="prop-desc">Gallery/List에서 표시 개수 제한</span></div>
+      <div class="prop-row"><span class="prop-name">Show / Hide</span><span class="prop-desc">뷰별 독립적인 레이아웃 저장</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔄</span>자동화 (Automation)</div>
+      <div class="prop-row"><span class="prop-name">트리거</span><span class="prop-desc">속성 변경됨 / 페이지 추가됨 / 날짜 도달</span></div>
+      <div class="prop-row"><span class="prop-name">액션</span><span class="prop-desc">속성 수정 / 페이지 추가 / 알림 보내기</span></div>
+      <div class="prop-row"><span class="prop-name">Button block</span><span class="prop-desc">버튼 클릭 → 페이지 생성·속성 변경·DB 추가</span></div>
+      <div class="tip" style="margin-top:8px;"><div class="tip-title">활용 예시</div><p>마감일 도달 시 Status → "완료" 알림 / 버튼 클릭으로 오늘 날짜 일지 자동 생성</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔗</span>링크드 뷰 (Linked Database)</div>
+      <div class="prop-row"><span class="prop-name">개념</span><span class="prop-desc">동일 DB를 다른 페이지에서 다른 뷰로 표시</span></div>
+      <div class="prop-row"><span class="prop-name">용도</span><span class="prop-desc">메인 과제 DB → 과목별 페이지에 필터링해서 표시</span></div>
+      <div class="prop-row"><span class="prop-name">독립 설정</span><span class="prop-desc">링크드 뷰마다 필터·정렬·표시 속성 독립 설정</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── AI ─────────────────────────────────────────────── -->
+<div id="tab-ai" class="section">
+  <div class="sec-header">✨ Notion AI 기능 (별도 구독)</div>
+
+  <div class="warn">Notion AI는 Student Plus 플랜에 포함되지 않는 <strong>별도 유료 추가 기능</strong>입니다. 월 $10/멤버(연결제 시 할인). 단, Notion에서 교육 할인 프로모션을 진행하는 경우 있음.</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✍️</span>글쓰기 보조</div>
+      <div class="block-item"><span class="block-cmd">드래프트 작성</span><span class="block-desc">주제·키워드 입력 → AI가 초안 작성</span></div>
+      <div class="block-item"><span class="block-cmd">계속 쓰기</span><span class="block-desc">작성 중인 내용을 이어서 완성</span></div>
+      <div class="block-item"><span class="block-cmd">요약</span><span class="block-desc">긴 페이지·텍스트를 핵심만 요약</span></div>
+      <div class="block-item"><span class="block-cmd">번역</span><span class="block-desc">선택한 텍스트를 다른 언어로</span></div>
+      <div class="block-item"><span class="block-cmd">교정</span><span class="block-desc">문법·맞춤법 오류 수정</span></div>
+      <div class="block-item"><span class="block-cmd">어조 변경</span><span class="block-desc">격식체·비격식체·전문적으로 변환</span></div>
+      <div class="block-item"><span class="block-cmd">길이 조정</span><span class="block-desc">더 길게 / 더 짧게</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔍</span>AI 검색 (Q&A)</div>
+      <div class="block-item"><span class="block-cmd">워크스페이스 검색</span><span class="block-desc">내 Notion 페이지 전체를 AI가 학습해 Q&A</span></div>
+      <div class="block-item"><span class="block-cmd">AI에게 질문</span><span class="block-desc">"지난 달 과제 목록 알려줘" 등 자연어 질문</span></div>
+      <div class="block-item"><span class="block-cmd">회의록 분석</span><span class="block-desc">미팅 노트에서 액션 아이템·결정 사항 추출</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span>AI DB 기능</div>
+      <div class="block-item"><span class="block-cmd">AI 자동 채우기</span><span class="block-desc">DB 속성을 AI가 자동으로 분류·채우기</span></div>
+      <div class="block-item"><span class="block-cmd">AI 요약 속성</span><span class="block-desc">레코드 페이지 내용을 속성에 자동 요약</span></div>
+      <div class="block-item"><span class="block-cmd">AI 분류</span><span class="block-desc">텍스트 내용 기반 자동 태그 분류</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 학생 활용법 ─────────────────────────────────────── -->
+<div id="tab-student" class="section">
+  <div class="sec-header">🎓 학생 Plus 활용법 베스트 7</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📚</span>강의 노트 시스템</div>
+      <div class="tip"><div class="tip-title">구조 추천</div>
+      <p>과목별 페이지 → 강의별 토글 → 안에 노트+이미지+수식 블록. <code>/toggle</code>로 날짜별 접기, <code>/math</code>로 LaTeX 수식, <code>/code</code>로 프로그래밍 실습 코드 보관.</p></div>
+      <div class="tip"><div class="tip-title">핵심 블록</div>
+      <p>Callout으로 핵심 개념 강조, Synced Block으로 공통 공식을 여러 과목에 연결.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✅</span>과제·시험 트래커 DB</div>
+      <div class="tip"><div class="tip-title">속성 구성</div>
+      <p>과목(Select), 과제명(Title), 마감일(Date), 비중(Number·%), 상태(Status), 제출 링크(URL)</p></div>
+      <div class="tip"><div class="tip-title">뷰 활용</div>
+      <p>Table 뷰 → 마감일 오름차순 정렬 | Calendar 뷰 → 월별 마감일 한눈에 | Board 뷰 → 상태별(할 일/진행중/완료) 이동</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📖</span>독서·논문 기록</div>
+      <div class="tip"><div class="tip-title">속성 구성</div>
+      <p>제목(Title), 저자(Text), 분야(Multi-select), 읽은 날(Date), 별점(Number), 핵심 내용(Text), 인용 페이지 링크</p></div>
+      <div class="tip"><div class="tip-title">갤러리 뷰</div>
+      <p>표지 이미지를 Card preview로 설정 → 읽은 책이 책장처럼 보임</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎯</span>학기 대시보드</div>
+      <div class="tip"><div class="tip-title">구조</div>
+      <p>한 페이지에 이번 주 할 일(Linked DB·필터:이번 주), 오늘 일정(캘린더 임베드), 과목별 성적 현황(Rollup), 메모 영역을 컬럼으로 배치.</p></div>
+      <div class="tip"><div class="tip-title">핵심</div>
+      <p>모든 정보는 다른 DB에서 <b>Linked view</b>로 가져오기 → 한 곳에서 수정하면 대시보드도 자동 반영.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🗂️</span>포트폴리오·이력서</div>
+      <div class="tip"><div class="tip-title">공개 공유</div>
+      <p>프로젝트 갤러리 DB를 <b>웹에 게시</b>하면 URL 하나로 포트폴리오 공유. Plus 플랜은 <b>커스텀 도메인</b> 사용 가능.</p></div>
+      <div class="tip"><div class="tip-title">속성 구성</div>
+      <p>프로젝트명, 기간(Date Range), 사용 기술(Multi-select), GitHub(URL), 데모 영상(Files), 역할(Select)</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔁</span>습관·루틴 트래커</div>
+      <div class="tip"><div class="tip-title">Daily Log DB</div>
+      <p>날짜(Title·자동 날짜 버튼), 운동(Checkbox), 공부(Number·시간), 기분(Select), 오늘 한 일(Text)</p></div>
+      <div class="tip"><div class="tip-title">버튼 자동화</div>
+      <p><code>/button</code>으로 "오늘 일지 만들기" 버튼 → 클릭 시 오늘 날짜 레코드 자동 생성</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">👥</span>팀 프로젝트 협업</div>
+      <div class="tip"><div class="tip-title">Plus 게스트 무제한</div>
+      <p>팀원을 <b>게스트로 무제한 초대</b>. 페이지별 권한 설정(편집/댓글/읽기 전용).</p></div>
+      <div class="tip"><div class="tip-title">구조 추천</div>
+      <p>팀 공간 페이지 → 회의록 DB / 역할 분담 DB / 리소스 페이지. @멘션으로 담당자 지정, 댓글로 피드백.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">💡</span>유용한 팁</div>
+      <div class="tip"><div class="tip-title">템플릿 갤러리</div>
+      <p>Notion 공식 템플릿 갤러리에서 강의 노트·시험 준비·독서 기록 등 학생용 템플릿 무료 다운로드.</p></div>
+      <div class="tip"><div class="tip-title">Web Clipper</div>
+      <p>브라우저 확장 → 웹 기사·논문을 Notion DB에 바로 클리핑. 속성 자동 추출.</p></div>
+      <div class="tip"><div class="tip-title">30일 버전 기록</div>
+      <p>Plus 플랜은 30일 이내 모든 페이지 변경 이력 복원 가능 (실수로 삭제해도 OK).</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 방송 노출 ─────────────────────────────────────── -->
+<div id="tab-broadcast" class="section">
+  <div class="sec-header">📡 방송·스트리밍에 Notion 노출 가이드</div>
+
+  <div class="ok">결론: <strong>노션은 방송에 노출해도 됩니다.</strong> 단, 아래 체크리스트를 지키면 개인 정보 유출 없이 안전하게 사용할 수 있습니다.</div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✅</span>방송에 노출해도 되는 것</div>
+      <div class="prop-row"><span class="prop-name dot-ok">페이지 내용</span><span class="prop-desc">텍스트, 이미지, DB 내용 — 완전히 괜찮음</span></div>
+      <div class="prop-row"><span class="prop-name dot-ok">공개 게시 페이지</span><span class="prop-desc">Share → Publish 한 페이지는 누구나 볼 수 있게 설계됨</span></div>
+      <div class="prop-row"><span class="prop-name dot-ok">워크스페이스 이름</span><span class="prop-desc">사이드바에 표시. 민감하면 "개인 학습" 등 중립적 이름으로 변경</span></div>
+      <div class="prop-row"><span class="prop-name dot-ok">데이터베이스 뷰</span><span class="prop-desc">과제·일정 DB를 화면에 보여주는 것 자체는 문제 없음</span></div>
+      <div class="prop-row"><span class="prop-name dot-ok">단축키·기능 시연</span><span class="prop-desc">Notion 사용법 방송 → 콘텐츠로 아주 좋음</span></div>
+      <div class="prop-row"><span class="prop-name dot-ok">빈 템플릿 시연</span><span class="prop-desc">더미 데이터로 채운 데모 페이지 → 안전하고 깔끔</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚠️</span>주의가 필요한 것</div>
+      <div class="prop-row"><span class="prop-name dot-warn">프로필 사진·이름</span><span class="prop-desc">좌측 하단에 표시됨. 익명 방송이라면 우클릭 → 설정에서 변경</span></div>
+      <div class="prop-row"><span class="prop-name dot-warn">알림 패널</span><span class="prop-desc">멘션·댓글 알림에 이름·내용 노출. 방송 전 닫기</span></div>
+      <div class="prop-row"><span class="prop-name dot-warn">사이드바 개인 페이지</span><span class="prop-desc">개인 일기·금전 기록 등이 사이드바에 보일 수 있음 → 접거나 숨기기</span></div>
+      <div class="prop-row"><span class="prop-name dot-warn">검색창 (Ctrl+P)</span><span class="prop-desc">최근 열람 페이지 이름이 드롭다운에 표시됨</span></div>
+      <div class="prop-row"><span class="prop-name dot-warn">Person 속성</span><span class="prop-desc">DB에 팀원 이름이 들어간 레코드 노출 주의</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🚫</span>방송에 노출하면 안 되는 것</div>
+      <div class="prop-row"><span class="prop-name dot-bad">Settings 화면</span><span class="prop-desc">이메일 주소, 결제 정보, API Key가 있음</span></div>
+      <div class="prop-row"><span class="prop-name dot-bad">Integration 설정</span><span class="prop-desc">연결된 앱 토큰·API 키 노출 위험</span></div>
+      <div class="prop-row"><span class="prop-name dot-bad">공유 설정 화면</span><span class="prop-desc">초대된 게스트 이메일이 보임</span></div>
+      <div class="prop-row"><span class="prop-name dot-bad">개인 DB의 민감 데이터</span><span class="prop-desc">성적, 금전, 개인 정보가 담긴 레코드</span></div>
+      <div class="prop-row"><span class="prop-name dot-bad">커넥티드 앱 설정</span><span class="prop-desc">Slack·GitHub 등 연결 토큰</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span>방송 전 체크리스트</div>
+      <div class="block-item"><span class="block-cmd">① 알림 닫기</span><span class="block-desc">우상단 종 아이콘 패널 닫기</span></div>
+      <div class="block-item"><span class="block-cmd">② 사이드바 정리</span><span class="block-desc">보여주지 않을 페이지 접기 or 숨김</span></div>
+      <div class="block-item"><span class="block-cmd">③ 데모 페이지 준비</span><span class="block-desc">더미 데이터로 채운 시연용 페이지 따로 제작</span></div>
+      <div class="block-item"><span class="block-cmd">④ 검색 기록 주의</span><span class="block-desc">Ctrl+P 자동완성에 개인 페이지 노출 여부 확인</span></div>
+      <div class="block-item"><span class="block-cmd">⑤ 설정 탭 금지</span><span class="block-desc">Settings & Members 절대 열지 않기</span></div>
+      <div class="block-item"><span class="block-cmd">⑥ OBS 소스 영역 제한</span><span class="block-desc">캔버스 캡처 범위를 Notion 창만으로 한정</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🌐</span>공개 페이지 게시 (Publish)</div>
+      <div class="prop-row"><span class="prop-name">게시 방법</span><span class="prop-desc">우상단 Share → Publish to web → 링크 공개</span></div>
+      <div class="prop-row"><span class="prop-name">표시되는 것</span><span class="prop-desc">페이지 내용, 워크스페이스 이름</span></div>
+      <div class="prop-row"><span class="prop-name">표시 안 되는 것</span><span class="prop-desc">이메일, 비공개 페이지, 설정 정보</span></div>
+      <div class="prop-row"><span class="prop-name">검색 엔진 허용</span><span class="prop-desc">설정에서 검색 노출 ON/OFF 선택 가능</span></div>
+      <div class="prop-row"><span class="prop-name">커스텀 도메인</span><span class="prop-desc"><b>Plus 플랜 전용</b> — 개인 도메인으로 Notion 페이지 연결</span></div>
+      <div class="prop-row"><span class="prop-name">중복 템플릿 링크</span><span class="prop-desc">Allow duplicate → 시청자가 내 템플릿 복사 가능</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎬</span>방송 콘텐츠 아이디어</div>
+      <div class="block-item"><span class="block-cmd">노션 시스템 공개</span><span class="block-desc">내 공부·과제 관리 방법 시연</span></div>
+      <div class="block-item"><span class="block-cmd">라이브 노트 정리</span><span class="block-desc">방송 중 실시간으로 Notion에 필기</span></div>
+      <div class="block-item"><span class="block-cmd">템플릿 만들기 방송</span><span class="block-desc">시청자가 복사할 수 있는 템플릿 제작 과정</span></div>
+      <div class="block-item"><span class="block-cmd">챌린지 기록</span><span class="block-desc">100일 공부·운동 챌린지 현황 DB 공개</span></div>
+      <div class="block-item"><span class="block-cmd">독서 기록 공유</span><span class="block-desc">책 갤러리 DB를 배경화면처럼 활용</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Plus 플랜 ─────────────────────────────────────── -->
+<div id="tab-plan" class="section">
+  <div class="sec-header">🌟 Student Plus 플랜 기능 비교</div>
+
+  <div class="info">Notion Education Plus는 재학생 인증(.edu 이메일 또는 학교 도메인) 시 <strong>무료 또는 대폭 할인</strong>으로 제공됩니다. 졸업 후 재인증 필요.</div>
+
+  <div class="grid">
+    <div class="card" style="grid-column:1/-1;">
+      <div class="card-title"><span class="icon">📊</span>Free vs Plus 비교</div>
+      <div class="plan-row"><span class="feat-name">📄 블록 수</span><span class="badge plus">Plus: 무제한</span><span class="badge free">Free: 무제한 (개인)</span></div>
+      <div class="plan-row"><span class="feat-name">📁 파일 업로드 크기</span><span class="badge plus">Plus: 무제한</span><span class="badge free">Free: 5MB 제한</span></div>
+      <div class="plan-row"><span class="feat-name">👥 게스트(협업자)</span><span class="badge plus">Plus: 무제한</span><span class="badge free">Free: 10명</span></div>
+      <div class="plan-row"><span class="feat-name">🕐 페이지 버전 기록</span><span class="badge plus">Plus: 30일</span><span class="badge free">Free: 7일</span></div>
+      <div class="plan-row"><span class="feat-name">🌐 커스텀 도메인</span><span class="badge plus">Plus: 사용 가능</span><span class="badge free">Free: 불가</span></div>
+      <div class="plan-row"><span class="feat-name">🔒 페이지 잠금</span><span class="badge plus">Plus: 가능</span><span class="badge free">Free: 불가</span></div>
+      <div class="plan-row"><span class="feat-name">📊 페이지 분석</span><span class="badge plus">Plus: 상세 분석</span><span class="badge free">Free: 기본</span></div>
+      <div class="plan-row"><span class="feat-name">⚡ 자동화 (Automation)</span><span class="badge plus">Plus: 무제한</span><span class="badge free">Free: 월 50회</span></div>
+      <div class="plan-row"><span class="feat-name">🔗 API 통합</span><span class="badge plus">Plus: 가능</span><span class="badge free">Free: 가능</span></div>
+      <div class="plan-row"><span class="feat-name">✨ Notion AI</span><span class="badge ai">AI: 별도 구독 필요</span><span class="badge ai">AI: 별도 구독 필요</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔑</span>Plus 핵심 혜택 요약</div>
+      <div class="tip"><div class="tip-title">파일 무제한 업로드</div><p>강의 PDF, 발표 파일, 영상 등 용량 걱정 없이 업로드. Free는 파일 하나당 5MB 제한.</p></div>
+      <div class="tip"><div class="tip-title">게스트 무제한</div><p>팀 프로젝트 인원 제한 없음. 링크 공유·이메일 초대 모두 무제한.</p></div>
+      <div class="tip"><div class="tip-title">30일 버전 기록</div><p>실수로 내용 지워도 최대 30일 이내라면 복원 가능. 매우 중요한 기능.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎓</span>학생 인증 방법</div>
+      <div class="block-item"><span class="block-cmd">① 이메일 인증</span><span class="block-desc">.edu 또는 대학교 공식 이메일로 가입</span></div>
+      <div class="block-item"><span class="block-cmd">② 학생증 업로드</span><span class="block-desc">인증 페이지에서 재학 증명서 제출</span></div>
+      <div class="block-item"><span class="block-cmd">③ UNiDAYS 연동</span><span class="block-desc">학생 할인 플랫폼으로 인증 (일부 학교)</span></div>
+      <div class="block-item"><span class="block-cmd">매년 재인증</span><span class="block-desc">재학 기간 동안 매년 1회 재인증 필요</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔗</span>유용한 통합(Integration)</div>
+      <div class="block-item"><span class="block-cmd">Google Calendar</span><span class="block-desc">캘린더 뷰와 구글 캘린더 일정 동기화</span></div>
+      <div class="block-item"><span class="block-cmd">Slack</span><span class="block-desc">Notion 페이지·댓글을 Slack 채널로 알림</span></div>
+      <div class="block-item"><span class="block-cmd">GitHub</span><span class="block-desc">이슈·PR을 Notion DB와 연결</span></div>
+      <div class="block-item"><span class="block-cmd">Zapier / Make</span><span class="block-desc">다양한 앱과 자동화 워크플로우 연결</span></div>
+      <div class="block-item"><span class="block-cmd">Notion API</span><span class="block-desc">직접 DB 읽기·쓰기 스크립트 작성 가능</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</div><!-- /main -->
+
+<script>
+// 탭 전환
+function switchTab(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  doSearch(document.getElementById('search').value);
+}
+
+// 검색
+function doSearch(q){
+  q=q.trim().toLowerCase();
+  const sections=document.querySelectorAll('.section.active');
+  if(!q){
+    sections.forEach(s=>{
+      s.querySelectorAll('.card,.sc-row,.block-item,.prop-row,.plan-row,.tip,.info,.warn,.ok,.bc-table tr').forEach(el=>el.style.display='');
+    });
+    document.getElementById('no-result').style.display='none';
+    return;
+  }
+  let found=0;
+  sections.forEach(sec=>{
+    // highlight and filter all text-bearing rows
+    const targets=sec.querySelectorAll('.card,.sc-row,.block-item,.prop-row,.plan-row,.tip,.info,.warn,.ok');
+    targets.forEach(el=>{
+      const txt=el.textContent.toLowerCase();
+      if(txt.includes(q)){el.style.display='';found++;}
+      else el.style.display='none';
+    });
+    // show cards that have visible children
+    sec.querySelectorAll('.card').forEach(card=>{
+      const rows=card.querySelectorAll('.sc-row,.block-item,.prop-row,.plan-row,.tip');
+      const anyVisible=[...rows].some(r=>r.style.display!=='none');
+      card.style.display=(anyVisible||!rows.length)?'':'none';
+    });
+  });
+  document.getElementById('no-result').style.display=found?'none':'block';
+}
+</script>
+</body>
+</html>

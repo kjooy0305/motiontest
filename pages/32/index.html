@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마인크래프트 리소스팩 — 테스트 32</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b22;--bg3:#1a2030;--bg4:#1e2636;
+  --border:#2d3748;--border2:#4a5568;
+  --txt:#e2e8f0;--txt2:#a0aec0;--txt3:#718096;
+  --green:#4ade80;--green2:#16a34a;--green3:#052e16;
+  --yellow:#fbbf24;--yellow2:#d97706;
+  --blue:#60a5fa;--blue2:#1d4ed8;--blue3:#1e3a5f;
+  --red:#f87171;--orange:#fb923c;
+  --purple:#c084fc;--teal:#2dd4bf;
+  --dirt:#8B6914;--grass:#5D8B3C;--stone:#8a8a8a;
+  --wood:#C4A265;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--purple);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--txt);white-space:nowrap;}
+.mc-badge{background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff;font-size:13px;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:1px;border:1px solid #c084fc;image-rendering:pixelated;}
+.search-wrap{flex:1;min-width:160px;max-width:360px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(192,132,252,.15);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 12px;border-radius:4px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(124,58,237,.18);color:var(--purple);border:1px solid #7c3aed;}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(192,132,252,.08);color:var(--purple);border-left-color:var(--purple);}
+.main{flex:1;padding:20px 24px;max-width:1000px;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--purple);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.hl{color:var(--yellow);}
+
+.r-table{width:100%;border-collapse:collapse;}
+.r-table tr{border-bottom:1px solid var(--border);}
+.r-table tr:last-child{border-bottom:none;}
+.r-table tr:hover td{background:rgba(255,255,255,.02);}
+.r-table td{padding:0;vertical-align:top;}
+.cmd-cell{padding:10px 12px 10px 16px;width:44%;font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;}
+.desc-cell{padding:10px 16px 10px 0;}
+
+.mc{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--green);background:rgba(74,222,128,.07);padding:3px 7px;border-radius:3px;border:1px solid rgba(74,222,128,.15);display:inline-block;word-break:break-all;line-height:1.5;}
+.mc .kw{color:var(--yellow);}
+.mc .str{color:var(--teal);}
+.mc .num{color:var(--orange);}
+.mc .sel{color:var(--purple);}
+.mc .cmt{color:var(--txt3);font-style:italic;}
+.mc .arg{color:var(--blue);}
+
+.codeblock{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;margin:8px 0;color:var(--txt2);overflow-x:auto;line-height:1.9;white-space:pre;}
+.codeblock .kw{color:var(--yellow);}
+.codeblock .str{color:var(--teal);}
+.codeblock .num{color:var(--orange);}
+.codeblock .sel{color:var(--purple);}
+.codeblock .cmt{color:var(--txt3);font-style:italic;}
+.codeblock .fn{color:var(--green);}
+.codeblock .key{color:var(--blue);}
+.codeblock .va{color:var(--txt);}
+
+.dm{color:var(--txt);font-size:13px;margin-bottom:3px;font-weight:500;}
+.ds{color:var(--txt2);font-size:12px;line-height:1.55;}
+.tag{display:inline-block;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--green);margin:3px 2px 0;}
+.tag-b{display:inline-block;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--blue);margin:3px 2px 0;}
+.tag-y{display:inline-block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--yellow);margin:3px 2px 0;}
+.tag-r{display:inline-block;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--red);margin:3px 2px 0;}
+.tag-p{display:inline-block;background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.25);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--purple);margin:3px 2px 0;}
+
+.tip{background:rgba(192,132,252,.05);border:1px solid rgba(192,132,252,.2);border-radius:5px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--purple);}
+.warn{font-size:11px;color:var(--yellow);margin-top:5px;padding:4px 8px;background:rgba(251,191,36,.06);border-radius:3px;border-left:2px solid var(--yellow);}
+.note{font-size:11px;color:var(--blue);margin-top:5px;padding:4px 8px;background:rgba(96,165,250,.06);border-radius:3px;border-left:2px solid var(--blue);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+@media(max-width:800px){.two-col,.three-col{grid-template-columns:1fr;}}
+
+.mini-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;}
+.mini-title{font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+
+.version-badge{display:inline-block;background:rgba(251,191,36,.12);border:1px solid var(--yellow2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--yellow);font-family:monospace;margin-left:6px;}
+
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="mc-badge">🎨 RP</span> 마인크래프트 리소스팩</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="검색... (예: sounds.json, particle, custom_model_data, font)">
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('basic',this)">📦 기초</button>
+    <button class="tab" onclick="switchTab('model',this)">🧱 모델·텍스처</button>
+    <button class="tab" onclick="switchTab('sound',this)">🔊 소리</button>
+    <button class="tab" onclick="switchTab('particle',this)">🎆 파티클</button>
+    <button class="tab" onclick="switchTab('font',this)">✒️ 폰트·언어</button>
+    <button class="tab" onclick="switchTab('adv',this)">🌈 가능 목록·심화</button>
+    <button class="tab" onclick="switchTab('map',this)">🗺️ 맵 제작 기법</button>
+    <button class="tab" onclick="switchTab('ex',this)">💡 실전 예제</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="mainArea">
+
+<!-- ══════════════════════════════════════════
+     기초
+═══════════════════════════════════════════ -->
+<div class="panel active" id="panel-basic">
+  <div class="sec-title">📦 리소스팩 기초</div>
+  <div class="sec-sub">폴더 구조 · pack.mcmeta · pack_format 버전표 · 적용 방법 · 배포 · 데이터팩과의 차이</div>
+
+  <div class="card" id="b-what">
+    <div class="card-header"><span class="hl">01</span> 리소스팩 vs 데이터팩</div>
+    <div style="padding:14px 16px;">
+      <div class="tip"><b>리소스팩</b>은 <b>클라이언트(보이는 것·들리는 것)</b>를 바꾸고, <b>데이터팩</b>은 <b>서버(게임 규칙·명령어)</b>를 바꿉니다. 커스텀 맵은 보통 <b>둘을 세트로</b> 사용합니다 — 데이터팩이 "무엇이 일어날지"를, 리소스팩이 "어떻게 보이고 들릴지"를 담당.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">리소스팩 (assets/)</span></td><td class="desc-cell"><div class="dm">텍스처 · 모델 · 소리 · 폰트 · 언어 · 셰이더 · GUI</div><div class="ds">클라이언트에 설치. <b>.minecraft/resourcepacks/</b> 폴더</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">데이터팩 (data/)</span></td><td class="desc-cell"><div class="dm">함수 · 전리품 · 레시피 · 어드밴스먼트 · 월드젠</div><div class="ds">월드에 설치. <b>세계폴더/datapacks/</b> — 테스트 29 참고</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">공통점</span></td><td class="desc-cell"><div class="ds">둘 다 <b>pack.mcmeta</b> 필수, ZIP 배포 가능, 네임스페이스 구조 동일</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="b-struct">
+    <div class="card-header"><span class="hl">02</span> 리소스팩 폴더 구조 (전체)</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># 리소스팩이 건드릴 수 있는 모든 폴더</span>
+<span class="fn">my_resourcepack/</span>
+├── <span class="kw">pack.mcmeta</span>              <span class="cmt"># 필수 — 팩 정보·버전</span>
+├── pack.png                  <span class="cmt"># 선택 — 팩 아이콘 (64×64 권장)</span>
+└── <span class="fn">assets/</span>
+    └── <span class="sel">minecraft/</span>           <span class="cmt"># 바닐라 덮어쓰기 (내 네임스페이스도 가능)</span>
+        ├── <span class="str">textures/</span>        <span class="cmt"># 모든 그림 (PNG)</span>
+        │   ├── block/  item/  entity/  gui/
+        │   ├── particle/  environment/  painting/
+        │   ├── font/  map/  misc/  mob_effect/
+        │   ├── colormap/  models/(갑옷)  trims/
+        ├── <span class="str">models/</span>          <span class="cmt"># 3D 모델 JSON</span>
+        │   ├── block/  item/
+        ├── <span class="str">blockstates/</span>     <span class="cmt"># 블럭 상태 → 모델 연결</span>
+        ├── <span class="str">items/</span>           <span class="cmt"># 1.21.4+ 아이템 모델 정의</span>
+        ├── <span class="str">sounds/</span>          <span class="cmt"># OGG 소리 파일</span>
+        ├── <span class="kw">sounds.json</span>      <span class="cmt"># 소리 이벤트 등록</span>
+        ├── <span class="str">font/</span>            <span class="cmt"># 폰트 정의 JSON</span>
+        ├── <span class="str">lang/</span>            <span class="cmt"># 언어 파일 (ko_kr.json 등)</span>
+        ├── <span class="str">texts/</span>           <span class="cmt"># splashes.txt · credits.json 등</span>
+        ├── <span class="str">shaders/</span>         <span class="cmt"># 셰이더 (core / post / include)</span>
+        ├── <span class="str">atlases/</span>         <span class="cmt"># 텍스처 아틀라스 등록</span>
+        ├── <span class="str">particles/</span>       <span class="cmt"># 파티클 텍스처 순서 정의</span>
+        ├── <span class="str">equipment/</span>       <span class="cmt"># 1.21.2+ 장비(갑옷) 모델 정의</span>
+        ├── <span class="str">sounds.json</span>·regional_compliancies.json 등
+        └── gpu_warnlist.json</div>
+      <div class="note">💡 <b>assets/minecraft/</b> 안의 파일은 바닐라를 <b>덮어쓰고</b>, <b>assets/내이름/</b>처럼 새 네임스페이스를 만들면 <b>추가</b>가 됩니다. 커스텀 맵은 보통 둘 다 사용.</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-mcmeta">
+    <div class="card-header"><span class="hl">03</span> pack.mcmeta</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock">{
+  <span class="key">"pack"</span>: {
+    <span class="key">"pack_format"</span>: <span class="num">46</span>,                <span class="cmt">// 게임 버전에 맞는 숫자 (아래 표)</span>
+    <span class="key">"description"</span>: <span class="str">"§d나만의 리소스팩§r\n§7맵 전용"</span>,
+    <span class="key">"supported_formats"</span>: [<span class="num">34</span>, <span class="num">46</span>]      <span class="cmt">// 선택 — 여러 버전 동시 지원 (1.20.2+)</span>
+  }
+}</div>
+      <div class="warn">⚠ description에는 <b>§ 색코드</b> 또는 JSON 텍스트 컴포넌트 사용 가능. pack_format이 맞지 않으면 "호환되지 않는 팩" 경고가 뜨지만 대부분 정상 작동합니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-format">
+    <div class="card-header"><span class="hl">04</span> pack_format 버전표 (리소스팩)</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">8</span></span></td><td class="desc-cell"><div class="ds">1.18 – 1.18.2</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">9</span></span></td><td class="desc-cell"><div class="ds">1.19 – 1.19.2</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">12</span> / <span class="num">13</span></span></td><td class="desc-cell"><div class="ds">1.19.3 / 1.19.4</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">15</span></span></td><td class="desc-cell"><div class="ds">1.20 – 1.20.1</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">18</span> / <span class="num">22</span></span></td><td class="desc-cell"><div class="ds">1.20.2 / 1.20.3 – 1.20.4</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">32</span></span></td><td class="desc-cell"><div class="ds">1.20.5 – 1.20.6</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">34</span></span></td><td class="desc-cell"><div class="ds">1.21 – 1.21.1</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">42</span></span></td><td class="desc-cell"><div class="ds">1.21.2 – 1.21.3 <span class="version-badge">장비 모델 분리</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">46</span></span></td><td class="desc-cell"><div class="ds">1.21.4 <span class="version-badge">items/ 아이템 정의 도입</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">55</span></span></td><td class="desc-cell"><div class="ds">1.21.5</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="num">63</span> / <span class="num">64</span></span></td><td class="desc-cell"><div class="ds">1.21.6 / 1.21.7 – 1.21.8 <span class="version-badge">최신</span></div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;"><div class="note">💡 정확한 숫자는 위키 "Pack format" 문서에서 확인. <b>데이터팩과 리소스팩의 pack_format은 서로 다른 번호 체계</b>입니다!</div></div>
+  </div>
+
+  <div class="card" id="b-apply">
+    <div class="card-header"><span class="hl">05</span> 적용 방법 4가지</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">①</span> resourcepacks 폴더</span></td><td class="desc-cell"><div class="dm">.minecraft/resourcepacks/ 에 넣고 설정 → 리소스팩</div><div class="ds">가장 기본. 폴더째로 넣어도 되고 ZIP으로 넣어도 됨</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">②</span> 월드 내장 <span class="str">resources.zip</span></span></td><td class="desc-cell"><div class="dm">세계 폴더 안에 <b>resources.zip</b> 이름으로 넣기</div><div class="ds">그 월드에 들어가면 <b>자동 적용</b> — 배포 맵의 정석! 맵 폴더 하나만 공유하면 끝</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">③</span> 서버 강제 적용</span></td><td class="desc-cell"><div class="dm">server.properties → <b>resource-pack=URL</b></div><div class="ds"><b>require-resource-pack=true</b>로 거부 시 접속 차단. <b>resource-pack-sha1</b>로 캐시 관리</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">④</span> 기본팩으로 승격</span></td><td class="desc-cell"><div class="ds">options.txt의 resourcePacks 목록 — 런처 프로필별 자동 적용 구성 가능</div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;">
+      <div class="tip"><b>F3 + T</b> = 리소스팩 새로고침 (게임 재시작 불필요!) · <b>F3 + S</b> = 소리 포함 강제 리로드. 제작 중에는 ZIP 말고 <b>폴더 상태</b>로 두고 F3+T로 즉시 확인하는 게 빠릅니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-tools">
+    <div class="card-header"><span class="hl">06</span> 제작 도구 & 바닐라 원본 추출</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">Blockbench</span></td><td class="desc-cell"><div class="dm">3D 모델 제작의 표준 (무료)</div><div class="ds">blockbench.net — Java Block/Item 프리셋으로 만들면 바로 호환. 디스플레이 설정(손·머리·액자)도 GUI로 조정</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">바닐라 원본 추출</span></td><td class="desc-cell"><div class="dm">.minecraft/versions/1.21.x/1.21.x.jar 를 압축해제</div><div class="ds">jar 안의 <b>assets/minecraft/</b>가 바닐라 리소스팩 전체 — 원본을 복사해서 수정하는 것이 기본기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">소리 원본</span></td><td class="desc-cell"><div class="ds">.minecraft/assets/objects/ 에 해시 이름으로 저장됨 — assets/indexes/*.json에서 실제 경로 확인</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">Aseprite · Paint.NET · GIMP</span></td><td class="desc-cell"><div class="ds">픽셀 텍스처 편집. 16×16이 기본 해상도, 32×·64× 등 배수 해상도 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">Audacity + OGG</span></td><td class="desc-cell"><div class="ds">소리는 반드시 <b>.ogg (Vorbis)</b> — MP3/WAV 불가. Audacity에서 "OGG로 내보내기"</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">Misode / 검증 도구</span></td><td class="desc-cell"><div class="ds">misode.github.io — JSON 생성기·검증. 잘못된 JSON은 로그(latest.log)에 에러 표시</div></td></tr>
+    </table>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     모델·텍스처
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-model">
+  <div class="sec-title">🧱 모델 · 텍스처</div>
+  <div class="sec-sub">텍스처 교체 · 애니메이션 · blockstates · 모델 JSON · custom_model_data · 1.21.4+ items 정의 · 아틀라스</div>
+
+  <div class="card" id="m-texture">
+    <div class="card-header"><span class="hl">01</span> 텍스처 교체 — 가장 쉬운 것부터</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">바닐라와 <b>같은 경로·같은 이름</b>으로 PNG를 넣으면 그냥 바뀝니다. 예: <b>assets/minecraft/textures/item/diamond_sword.png</b>를 넣으면 다이아몬드 검 텍스처 교체 끝.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">textures/block/*.png</span></td><td class="desc-cell"><div class="ds">블럭 텍스처 (16×16 기본, 배수 해상도 가능)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/item/*.png</span></td><td class="desc-cell"><div class="ds">아이템 텍스처</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/entity/**</span></td><td class="desc-cell"><div class="ds">몹·보트·화살 등 엔티티 스킨 (UV 전개도 형태 — 원본 위에 그리기)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/gui/**</span></td><td class="desc-cell"><div class="ds">인벤토리·체력바·핫바·컨테이너 등 UI 전부 (1.20.2+ sprites/ 분리)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/environment/*</span></td><td class="desc-cell"><div class="ds">해(sun.png)·달(moon_phases.png)·비·눈·구름·엔드 하늘</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/painting/*</span></td><td class="desc-cell"><div class="ds">그림 액자 — 맵에서 커스텀 일러스트 걸 때 애용</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/particle/*</span></td><td class="desc-cell"><div class="ds">파티클 텍스처 (particles/*.json으로 프레임 순서 제어)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/colormap/*</span></td><td class="desc-cell"><div class="ds">grass.png·foliage.png — 바이옴별 풀·나뭇잎 색상표</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/misc/*</span></td><td class="desc-cell"><div class="ds">인더밴트(포탈 반짝임)·펌킨블러(호박 시야)·조준점 등</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/map/*</span></td><td class="desc-cell"><div class="ds">지도 아이콘·지도 배경</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/mob_effect/*</span></td><td class="desc-cell"><div class="ds">물약 효과 아이콘</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">textures/trims/* · models/armor/*</span></td><td class="desc-cell"><div class="ds">갑옷 장식(도금)·갑옷 착용 텍스처 (1.21.2+는 equipment/ 정의와 연동)</div></td></tr>
+      </table>
+      <div class="note">💡 투명도(알파 채널) 지원. 반투명은 블럭 종류에 따라 렌더 타입이 달라 안 될 수 있음 (유리류는 OK).</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-anim">
+    <div class="card-header"><span class="hl">02</span> 텍스처 애니메이션 (.mcmeta)</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">텍스처 PNG를 <b>세로로 프레임을 이어붙이고</b>, 같은 이름에 <b>.png.mcmeta</b> 파일을 추가하면 애니메이션이 됩니다. 용암·물·마그마가 이 방식.</div>
+      <div class="codeblock"><span class="cmt">// stone.png (16×64 = 16×16 프레임 4장) + stone.png.mcmeta</span>
+{
+  <span class="key">"animation"</span>: {
+    <span class="key">"frametime"</span>: <span class="num">4</span>,          <span class="cmt">// 프레임당 틱 수 (4틱 = 0.2초)</span>
+    <span class="key">"interpolate"</span>: <span class="kw">true</span>,    <span class="cmt">// 프레임 사이 부드럽게 보간</span>
+    <span class="key">"frames"</span>: [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>, <span class="num">1</span>]  <span class="cmt">// 재생 순서 (생략 시 위→아래 순서)</span>
+  }
+}</div>
+      <div class="ds">활용: 움직이는 TV 화면, 깜빡이는 네온사인, 흐르는 폭포 소품, 빛나는 룬 문자 등 — 맵 분위기 연출의 핵심 도구.</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-blockstate">
+    <div class="card-header"><span class="hl">03</span> blockstates — 블럭 상태 → 모델 연결</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">// assets/minecraft/blockstates/note_block.json — 상태별로 다른 모델</span>
+{
+  <span class="key">"variants"</span>: {
+    <span class="str">"instrument=harp,note=0,powered=false"</span>: { <span class="key">"model"</span>: <span class="str">"mypack:block/custom_chair"</span> },
+    <span class="str">""</span>: { <span class="key">"model"</span>: <span class="str">"minecraft:block/note_block"</span> }   <span class="cmt">// 기본값</span>
+  }
+}
+
+<span class="cmt">// 랜덤 배리에이션 — 같은 상태에 모델 여러 개 (돌·풀이 이 방식)</span>
+{
+  <span class="key">"variants"</span>: {
+    <span class="str">""</span>: [
+      { <span class="key">"model"</span>: <span class="str">"block/stone"</span>, <span class="key">"weight"</span>: <span class="num">3</span> },
+      { <span class="key">"model"</span>: <span class="str">"block/stone"</span>, <span class="key">"y"</span>: <span class="num">90</span> },      <span class="cmt">// 90도 회전</span>
+      { <span class="key">"model"</span>: <span class="str">"block/stone_alt"</span> }
+    ]
+  }
+}</div>
+      <div class="note">💡 <b>노트블럭·버섯블럭 기법</b>: 상태 조합이 많은 블럭(노트블럭 1,150개, 버섯블럭 64개)의 상태마다 다른 모델을 연결하면 <b>새 블럭 수백 개</b>를 만드는 효과 — 커스텀 맵 가구·장식의 고전 기법. 데이터팩으로 setblock해서 배치 (테스트 29의 "커스텀 블럭" 참고).</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-model">
+    <div class="card-header"><span class="hl">04</span> 모델 JSON 구조</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">// assets/mypack/models/item/ruby_sword.json</span>
+{
+  <span class="key">"parent"</span>: <span class="str">"minecraft:item/handheld"</span>,   <span class="cmt">// 부모 모델 상속</span>
+  <span class="key">"textures"</span>: {
+    <span class="key">"layer0"</span>: <span class="str">"mypack:item/ruby_sword"</span>  <span class="cmt">// textures/item/ruby_sword.png</span>
+  }
+}
+
+<span class="cmt">// 직접 3D 모델 — 큐브(element) 조합</span>
+{
+  <span class="key">"textures"</span>: { <span class="key">"all"</span>: <span class="str">"mypack:block/crate"</span>, <span class="key">"particle"</span>: <span class="str">"mypack:block/crate"</span> },
+  <span class="key">"elements"</span>: [
+    {
+      <span class="key">"from"</span>: [<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>],  <span class="key">"to"</span>: [<span class="num">16</span>, <span class="num">10</span>, <span class="num">16</span>],   <span class="cmt">// 1블럭 = 16 단위, -16~32까지 허용</span>
+      <span class="key">"rotation"</span>: { <span class="key">"origin"</span>: [<span class="num">8</span>,<span class="num">8</span>,<span class="num">8</span>], <span class="key">"axis"</span>: <span class="str">"y"</span>, <span class="key">"angle"</span>: <span class="num">22.5</span> },  <span class="cmt">// ±22.5·±45만 가능</span>
+      <span class="key">"faces"</span>: {
+        <span class="key">"north"</span>: { <span class="key">"uv"</span>: [<span class="num">0</span>,<span class="num">0</span>,<span class="num">16</span>,<span class="num">10</span>], <span class="key">"texture"</span>: <span class="str">"#all"</span> },
+        <span class="key">"up"</span>:    { <span class="key">"uv"</span>: [<span class="num">0</span>,<span class="num">0</span>,<span class="num">16</span>,<span class="num">16</span>], <span class="key">"texture"</span>: <span class="str">"#all"</span>, <span class="key">"rotation"</span>: <span class="num">90</span> }
+        <span class="cmt">// south·east·west·down 동일 — 생략한 면은 안 그려짐</span>
+      }
+    }
+  ],
+  <span class="key">"display"</span>: {   <span class="cmt">// 위치별 크기·회전 (Blockbench의 Display 탭)</span>
+    <span class="key">"gui"</span>:                      { <span class="key">"rotation"</span>:[<span class="num">30</span>,<span class="num">225</span>,<span class="num">0</span>], <span class="key">"scale"</span>:[<span class="num">0.625</span>,<span class="num">0.625</span>,<span class="num">0.625</span>] },
+    <span class="key">"thirdperson_righthand"</span>:    { <span class="key">"rotation"</span>:[<span class="num">75</span>,<span class="num">45</span>,<span class="num">0</span>],  <span class="key">"scale"</span>:[<span class="num">0.375</span>,<span class="num">0.375</span>,<span class="num">0.375</span>] },
+    <span class="key">"firstperson_righthand"</span>:    { <span class="key">"rotation"</span>:[<span class="num">0</span>,<span class="num">45</span>,<span class="num">0</span>],   <span class="key">"scale"</span>:[<span class="num">0.4</span>,<span class="num">0.4</span>,<span class="num">0.4</span>] },
+    <span class="key">"head"</span>: {}, <span class="key">"ground"</span>: {}, <span class="key">"fixed"</span>: {}  <span class="cmt">// 머리·바닥·액자(fixed)</span>
+  }
+}</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">item/generated</span></td><td class="desc-cell"><div class="ds">평면 아이템 (layer0~layer4 겹치기 가능 — 물약처럼 색만 다른 레이어)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">item/handheld</span></td><td class="desc-cell"><div class="ds">도구·무기용 — 손에 들었을 때 기울어진 각도</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">block/cube_all</span></td><td class="desc-cell"><div class="ds">6면 같은 텍스처 큐브 ("all" 하나만 지정)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">block/cube_column · orientable · cross</span></td><td class="desc-cell"><div class="ds">기둥형(통나무) · 방향성(화로) · X자 식물형(꽃)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">builtin/entity</span></td><td class="desc-cell"><div class="ds">상자·침대 등 엔티티 렌더러 사용 — JSON으로 수정 불가</div></td></tr>
+      </table>
+      <div class="warn">⚠ 회전은 <b>-45 / -22.5 / 0 / 22.5 / 45도</b>만 가능. 자유 회전이 필요하면 디스플레이 엔티티(맵 제작 기법 탭)로 해결.</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-cmd">
+    <div class="card-header"><span class="hl">05</span> custom_model_data — 아이템 하나로 모델 무한 추가 <span class="version-badge">~1.21.3 방식</span></div>
+    <div style="padding:14px 16px;">
+      <div class="tip"><b>커스텀 맵의 핵심 기술.</b> 바닐라 아이템에 CustomModelData 값을 붙이면 <b>같은 아이템이 다른 모델</b>로 보입니다. 종이(paper) 하나로 가구·음식·무기 수천 종을 만드는 방식.</div>
+      <div class="codeblock"><span class="cmt">// assets/minecraft/models/item/paper.json — overrides 방식 (1.21.3까지)</span>
+{
+  <span class="key">"parent"</span>: <span class="str">"minecraft:item/generated"</span>,
+  <span class="key">"textures"</span>: { <span class="key">"layer0"</span>: <span class="str">"minecraft:item/paper"</span> },
+  <span class="key">"overrides"</span>: [
+    { <span class="key">"predicate"</span>: { <span class="key">"custom_model_data"</span>: <span class="num">1</span> }, <span class="key">"model"</span>: <span class="str">"mypack:item/chair"</span> },
+    { <span class="key">"predicate"</span>: { <span class="key">"custom_model_data"</span>: <span class="num">2</span> }, <span class="key">"model"</span>: <span class="str">"mypack:item/table"</span> },
+    { <span class="key">"predicate"</span>: { <span class="key">"custom_model_data"</span>: <span class="num">3</span> }, <span class="key">"model"</span>: <span class="str">"mypack:item/burger"</span> }
+  ]
+}
+
+<span class="cmt"># 지급 명령어 (1.20.5+ 컴포넌트 문법)</span>
+<span class="kw">/give</span> <span class="sel">@s</span> paper[<span class="key">custom_model_data</span>=<span class="num">1</span>]
+<span class="cmt"># 1.20.4 이하: /give @s paper{CustomModelData:1}</span></div>
+      <div class="note">💡 관례: 자주 쓰는 베이스 아이템은 <b>paper · carrot_on_a_stick(우클릭 감지용) · warped_fungus_on_a_stick</b>. 번호는 팀별로 대역을 나눠 충돌 방지 (예: 가구 1000번대, 음식 2000번대).</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-items">
+    <div class="card-header"><span class="hl">06</span> items/ 아이템 정의 <span class="version-badge">1.21.4+ 새 방식</span></div>
+    <div style="padding:14px 16px;">
+      <div class="tip">1.21.4부터 <b>assets/네임스페이스/items/아이템.json</b>이 아이템 모델을 결정합니다. overrides/predicate 대신 <b>셀렉터 트리</b> 구조 — 더 강력하지만 구버전과 호환 안 됨.</div>
+      <div class="codeblock"><span class="cmt">// assets/minecraft/items/paper.json — custom_model_data 분기 (1.21.4+)</span>
+{
+  <span class="key">"model"</span>: {
+    <span class="key">"type"</span>: <span class="str">"minecraft:select"</span>,
+    <span class="key">"property"</span>: <span class="str">"minecraft:custom_model_data"</span>,  <span class="cmt">// strings 값으로 분기</span>
+    <span class="key">"cases"</span>: [
+      { <span class="key">"when"</span>: <span class="str">"chair"</span>,  <span class="key">"model"</span>: { <span class="key">"type"</span>: <span class="str">"minecraft:model"</span>, <span class="key">"model"</span>: <span class="str">"mypack:item/chair"</span> } },
+      { <span class="key">"when"</span>: <span class="str">"burger"</span>, <span class="key">"model"</span>: { <span class="key">"type"</span>: <span class="str">"minecraft:model"</span>, <span class="key">"model"</span>: <span class="str">"mypack:item/burger"</span> } }
+    ],
+    <span class="key">"fallback"</span>: { <span class="key">"type"</span>: <span class="str">"minecraft:model"</span>, <span class="key">"model"</span>: <span class="str">"minecraft:item/paper"</span> }
+  }
+}
+
+<span class="cmt"># 이제 CMD는 숫자 대신 문자열도 가능</span>
+<span class="kw">/give</span> <span class="sel">@s</span> paper[<span class="key">custom_model_data</span>={<span class="key">strings</span>:[<span class="str">"chair"</span>]}]</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">type: model</span></td><td class="desc-cell"><div class="ds">모델 직접 지정 (말단 노드)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">type: select</span></td><td class="desc-cell"><div class="ds">속성값으로 분기 — custom_model_data · display_context · main_hand · charge_type 등</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">type: condition</span></td><td class="desc-cell"><div class="ds">true/false 분기 — using_item · broken · damaged · fishing_rod/cast 등</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">type: range_dispatch</span></td><td class="desc-cell"><div class="ds">숫자 범위 분기 — damage · count · cooldown · time · compass 등 (활 당김 단계가 이 방식)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">type: composite</span></td><td class="desc-cell"><div class="ds">모델 여러 개 겹치기</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">special (head·shield·trident…)</span></td><td class="desc-cell"><div class="ds">특수 렌더러 필요 아이템</div></td></tr>
+      </table>
+      <div class="warn">⚠ 어느 방식을 쓸지는 <b>목표 게임 버전</b>으로 결정: 1.21.3 이하 → overrides, 1.21.4+ → items/. 두 버전 다 지원하려면 둘 다 넣으면 됩니다 (구버전은 items/ 무시, 신버전은 overrides 무시).</div>
+    </div>
+  </div>
+
+  <div class="card" id="m-atlas">
+    <div class="card-header"><span class="hl">07</span> atlases — 커스텀 텍스처 폴더 등록</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">블럭·아이템 모델이 <b>textures/block, textures/item 밖의 폴더</b>를 참조하면 아틀라스에 등록해야 보입니다 (아니면 보라·검정 체크무늬).</div>
+      <div class="codeblock"><span class="cmt">// assets/minecraft/atlases/blocks.json</span>
+{
+  <span class="key">"sources"</span>: [
+    { <span class="key">"type"</span>: <span class="str">"directory"</span>, <span class="key">"source"</span>: <span class="str">"furniture"</span>, <span class="key">"prefix"</span>: <span class="str">"furniture/"</span> }
+    <span class="cmt">// textures/furniture/** 전부 블럭·아이템 모델에서 사용 가능해짐</span>
+  ]
+}</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     소리
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-sound">
+  <div class="sec-title">🔊 소리</div>
+  <div class="sec-sub">sounds.json · 커스텀 소리 추가 · /playsound · 카테고리 · 바닐라 소리 이벤트 목록 (전체 약 1,600개 중 실전 핵심)</div>
+
+  <div class="card" id="s-custom">
+    <div class="card-header"><span class="hl">01</span> 커스텀 소리 추가 — 전체 흐름</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">소리는 <b>덮어쓰기</b>(바닐라 소리 파일 교체)와 <b>신규 등록</b>(sounds.json에 새 이벤트 추가) 두 가지. 맵 제작은 거의 항상 <b>신규 등록</b> — 바닐라 소리를 건드리지 않아 안전합니다.</div>
+      <div class="codeblock"><span class="cmt"># 1) OGG 파일 배치</span>
+assets/<span class="sel">mypack</span>/sounds/bgm/title.ogg
+assets/<span class="sel">mypack</span>/sounds/voice/npc_hello.ogg
+
+<span class="cmt"># 2) 소리 이벤트 등록 — assets/mypack/sounds.json</span>
+{
+  <span class="key">"bgm.title"</span>: {
+    <span class="key">"sounds"</span>: [ { <span class="key">"name"</span>: <span class="str">"mypack:bgm/title"</span>, <span class="key">"stream"</span>: <span class="kw">true</span> } ]
+    <span class="cmt">// stream:true = 긴 음악용 (메모리에 안 올리고 스트리밍 — BGM은 필수!)</span>
+  },
+  <span class="key">"voice.npc_hello"</span>: {
+    <span class="key">"subtitle"</span>: <span class="str">"NPC가 인사한다"</span>,      <span class="cmt">// 자막 (lang 키도 가능)</span>
+    <span class="key">"sounds"</span>: [
+      { <span class="key">"name"</span>: <span class="str">"mypack:voice/npc_hello"</span>, <span class="key">"volume"</span>: <span class="num">1.0</span>, <span class="key">"pitch"</span>: <span class="num">1.0</span> },
+      { <span class="key">"name"</span>: <span class="str">"mypack:voice/npc_hello2"</span>, <span class="key">"weight"</span>: <span class="num">2</span> }
+      <span class="cmt">// 여러 개 넣으면 랜덤 재생 (weight = 확률 가중치)</span>
+    ]
+  }
+}
+
+<span class="cmt"># 3) 재생</span>
+<span class="kw">/playsound</span> <span class="str">mypack:bgm.title</span> <span class="arg">music</span> <span class="sel">@a</span>
+<span class="kw">/playsound</span> <span class="str">mypack:voice.npc_hello</span> <span class="arg">voice</span> <span class="sel">@a</span> <span class="num">~ ~ ~</span> <span class="num">1.0</span> <span class="num">1.0</span> <span class="num">0.3</span>
+<span class="cmt">#           소리이벤트            카테고리  대상  좌표    볼륨  피치  최소볼륨</span>
+<span class="kw">/stopsound</span> <span class="sel">@a</span> <span class="arg">music</span> <span class="str">mypack:bgm.title</span>   <span class="cmt"># 정지 (카테고리·이벤트 생략 가능)</span></div>
+      <div class="warn">⚠ 반드시 <b>.ogg (Vorbis)</b> 포맷 + <b>모노</b> 권장(스테레오는 위치 무시 전역 재생 → BGM은 스테레오, 효과음은 모노). 파일명은 <b>소문자·숫자·_</b>만. 볼륨은 1.0 초과 시 들리는 거리만 늘어남(16블럭×볼륨).</div>
+      <div class="note">💡 피치 범위 0.5~2.0. 같은 소리도 피치를 바꾸면 완전히 다른 효과음처럼 들려서, 효과음 하나로 여러 연출을 만들 수 있습니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="s-category">
+    <div class="card-header"><span class="hl">02</span> 소리 카테고리 (설정 슬라이더와 연동)</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">master</span></td><td class="desc-cell"><div class="ds">전체 볼륨 — 무조건 들려야 하는 소리에</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music</span></td><td class="desc-cell"><div class="ds">배경음악 — 커스텀 BGM은 여기로 (바닐라 음악과 함께 조절됨)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">record</span></td><td class="desc-cell"><div class="ds">주크박스 — <b>같은 위치에 다시 재생하면 이전 소리가 끊기는 유일한 카테고리</b> (BGM 교체 트릭)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">weather / block / hostile / neutral</span></td><td class="desc-cell"><div class="ds">날씨 / 블럭 / 적대적 몹 / 중립 몹</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">player / ambient / voice</span></td><td class="desc-cell"><div class="ds">플레이어 / 환경음(동굴) / 음성·자막 — 성우 더빙은 voice로</div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;"><div class="note">💡 카테고리는 이 목록이 전부이며 새로 만들 수 없습니다. sounds.json이 아니라 <b>/playsound 할 때</b> 지정합니다.</div></div>
+  </div>
+
+  <div class="card" id="s-ui">
+    <div class="card-header"><span class="hl">03</span> 소리 이벤트 — UI · 알림</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">ui.button.click</span></td><td class="desc-cell"><div class="ds">버튼 클릭 — 메뉴 조작음의 표준</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ui.toast.in / ui.toast.out / ui.toast.challenge_complete</span></td><td class="desc-cell"><div class="ds">알림 등장/퇴장 / 도전과제 달성 팡파레</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.player.levelup</span></td><td class="desc-cell"><div class="ds">레벨업 — 성공·보상 연출 단골</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.experience_orb.pickup</span></td><td class="desc-cell"><div class="ds">경험치 획득 "띠링" — 포인트 획득음 단골</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.arrow.hit_player</span></td><td class="desc-cell"><div class="ds">화살 명중 "팅" — 히트 확인음 (PvP 맵 필수)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.villager.yes / no / trade</span></td><td class="desc-cell"><div class="ds">주민 수락/거절/거래 — NPC 대화 반응음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.note_block.*</span></td><td class="desc-cell"><div class="ds">harp·bass·bell·chime·flute·guitar·xylophone·bit·banjo·pling 등 16종 — 피치 조합으로 멜로디 제작</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.ender_eye.death</span></td><td class="desc-cell"><div class="ds">엔더의 눈 파괴 — 신비한 실패음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.anvil.land / use</span></td><td class="desc-cell"><div class="ds">모루 낙하 "쾅" / 사용 — 무거운 충격·실패 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.elder_guardian.curse</span></td><td class="desc-cell"><div class="ds">가디언 저주 — 디버프·불길한 연출</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-block">
+    <div class="card-header"><span class="hl">04</span> 소리 이벤트 — 블럭</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">block.chest.open / close</span></td><td class="desc-cell"><div class="ds">상자 열기/닫기 (ender_chest·barrel·shulker_box도 동일 패턴)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.wooden_door.open / close</span></td><td class="desc-cell"><div class="ds">나무문 (iron_door·wooden_trapdoor·fence_gate 동일 패턴)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.piston.extend / contract</span></td><td class="desc-cell"><div class="ds">피스톤 — 기계 작동음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.bell.use / resonate</span></td><td class="desc-cell"><div class="ds">종 — 시작 알림·경보</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.beacon.activate / deactivate / power_select</span></td><td class="desc-cell"><div class="ds">신호기 — 구역 활성화 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.portal.ambient / travel / trigger</span></td><td class="desc-cell"><div class="ds">네더 포탈 웅웅거림/이동/진입 — 텔레포트 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.end_portal.spawn</span></td><td class="desc-cell"><div class="ds">엔드 포탈 개방 — 웅장한 이벤트 시작음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.respawn_anchor.charge / set_spawn</span></td><td class="desc-cell"><div class="ds">리스폰 정박기 — 마법 충전 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.amethyst_block.chime / resonate</span></td><td class="desc-cell"><div class="ds">자수정 차임 — 영롱한 판타지 효과음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.sculk_sensor.clicking · block.sculk_shrieker.shriek</span></td><td class="desc-cell"><div class="ds">스컬크 감지/비명 — 호러 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.fire.ambient / extinguish</span></td><td class="desc-cell"><div class="ds">불 타는 소리 / 꺼지는 "치익"</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.water.ambient · block.lava.ambient / pop</span></td><td class="desc-cell"><div class="ds">물·용암 환경음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.glass.break</span></td><td class="desc-cell"><div class="ds">유리 깨짐 — 파괴 연출 단골</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.grass.break / step · block.stone.break / step …</span></td><td class="desc-cell"><div class="ds">모든 블럭 재질별 break·step·place·hit·fall 5종 세트 (wood·gravel·sand·metal·wool·bamboo·nether_wood·copper 등)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.enchantment_table.use · block.grindstone.use · block.smithing_table.use</span></td><td class="desc-cell"><div class="ds">작업대류 사용음 — 제작 시스템 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.dispenser.dispense / fail · block.lever.click</span></td><td class="desc-cell"><div class="ds">발사기 발사/실패 · 레버 딸깍 — 장치 조작음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block.brewing_stand.brew · block.furnace.fire_crackle</span></td><td class="desc-cell"><div class="ds">양조기 보글보글 · 화로 장작 소리</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-entity">
+    <div class="card-header"><span class="hl">05</span> 소리 이벤트 — 엔티티 · 보스</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">entity.lightning_bolt.thunder / impact</span></td><td class="desc-cell"><div class="ds">천둥 / 벼락 — 극적 연출 1순위</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.ender_dragon.growl / death / flap</span></td><td class="desc-cell"><div class="ds">엔더드래곤 포효/사망/날갯짓 — 보스 등장 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.wither.spawn / death / ambient</span></td><td class="desc-cell"><div class="ds">위더 소환(전 세계에 들림)/사망 — 대형 이벤트 시그널</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.warden.emerge / roar / heartbeat / sonic_boom</span></td><td class="desc-cell"><div class="ds">워든 등장/포효/심장박동/음파 — 호러·긴장감 연출 최강</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.ghast.scream / shoot</span></td><td class="desc-cell"><div class="ds">가스트 비명/발사 — 괴성 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.enderman.teleport / stare / scream</span></td><td class="desc-cell"><div class="ds">엔더맨 순간이동/응시/비명</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.zombie.ambient / attack_wooden_door / break_wooden_door</span></td><td class="desc-cell"><div class="ds">좀비 신음/문 두드리기/문 부수기 — 좀비 아포칼립스 필수</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.creeper.primed</span></td><td class="desc-cell"><div class="ds">크리퍼 "치이익" — 카운트다운 긴장음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.generic.explode</span></td><td class="desc-cell"><div class="ds">폭발 — 만능 폭발음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.tnt.primed</span></td><td class="desc-cell"><div class="ds">TNT 점화</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.firework_rocket.launch / blast / twinkle</span></td><td class="desc-cell"><div class="ds">폭죽 발사/폭발/반짝임 — 축하 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.player.attack.crit / sweep / strong / weak</span></td><td class="desc-cell"><div class="ds">공격 타격음 4종 — 전투 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.player.hurt / death · entity.player.burp</span></td><td class="desc-cell"><div class="ds">피격/사망 / 트림</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.wolf.howl · entity.cat.purr · entity.bat.takeoff</span></td><td class="desc-cell"><div class="ds">늑대 하울링(밤 분위기) · 고양이 · 박쥐</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.horse.gallop · entity.pig.saddle</span></td><td class="desc-cell"><div class="ds">말 질주 · 안장</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.item.pickup / break</span></td><td class="desc-cell"><div class="ds">아이템 줍기 "촵" / 도구 부서짐 — 인벤토리 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.allay.item_given · entity.bee.loop</span></td><td class="desc-cell"><div class="ds">알레이 하트 · 벌 날갯짓</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.evoker.prepare_summon / cast_spell · entity.vex.charge</span></td><td class="desc-cell"><div class="ds">소환사 주문 — 마법 시전 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.iron_golem.repair · entity.villager.work_*</span></td><td class="desc-cell"><div class="ds">골렘 수리 · 주민 직업 작업음 (armorer·butcher·cleric 등 13종)</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-item">
+    <div class="card-header"><span class="hl">06</span> 소리 이벤트 — 아이템 · 특수</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">item.totem.use</span></td><td class="desc-cell"><div class="ds">불사의 토템 발동 — 부활·기적 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.trident.throw / thunder / return</span></td><td class="desc-cell"><div class="ds">삼지창 투척/벼락/회수</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.goat_horn.sound.0 ~ 7</span></td><td class="desc-cell"><div class="ds">염소 뿔피리 8종 — 전투 시작·신호 나팔</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.elytra.flying</span></td><td class="desc-cell"><div class="ds">겉날개 비행 바람소리</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.bottle.fill / empty · item.bucket.fill / empty</span></td><td class="desc-cell"><div class="ds">병·양동이 — 액체 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.book.page_turn · item.book.put</span></td><td class="desc-cell"><div class="ds">책장 넘기기 — 대화·일지 UI 효과음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.flintandsteel.use · item.firecharge.use</span></td><td class="desc-cell"><div class="ds">부싯돌 착화</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.armor.equip_* (leather·chain·iron·gold·diamond·netherite·elytra·generic)</span></td><td class="desc-cell"><div class="ds">갑옷 장착 — 장비 시스템 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.chorus_fruit.teleport</span></td><td class="desc-cell"><div class="ds">후렴과 순간이동</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.crossbow.loading_start / loading_end / shoot · entity.arrow.shoot</span></td><td class="desc-cell"><div class="ds">석궁 장전/발사 · 활 발사</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.shield.block / break</span></td><td class="desc-cell"><div class="ds">방패 막기/파괴</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item.spyglass.use / stop_using</span></td><td class="desc-cell"><div class="ds">망원경</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.splash_potion.break · block.brewing_stand.brew</span></td><td class="desc-cell"><div class="ds">투척 물약 깨짐</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity.fishing_bobber.splash / retrieve</span></td><td class="desc-cell"><div class="ds">낚시찌 입질/회수</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="s-ambient">
+    <div class="card-header"><span class="hl">07</span> 소리 이벤트 — 환경음 · 음악 · 음반</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">ambient.cave</span></td><td class="desc-cell"><div class="ds">동굴 괴음 — 으스스한 랜덤 환경음 19종</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ambient.underwater.loop / enter / exit</span></td><td class="desc-cell"><div class="ds">수중 환경음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ambient.nether_wastes.loop / additions / mood (바이옴별 5종)</span></td><td class="desc-cell"><div class="ds">네더 바이옴 환경음 — basalt_deltas·crimson_forest·soul_sand_valley·warped_forest</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">weather.rain / rain.above</span></td><td class="desc-cell"><div class="ds">빗소리</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music.game / creative / menu / under_water / end / dragon</span></td><td class="desc-cell"><div class="ds">상황별 BGM — 여기를 <b>빈 ogg로 덮어쓰면 바닐라 음악 제거</b> (커스텀 맵 단골 기법)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music.nether.* / music.overworld.* (바이옴별)</span></td><td class="desc-cell"><div class="ds">차원·바이옴별 BGM</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">music_disc.13 · cat · blocks · chirp · far · mall · mellohi · stal · strad · ward · 11 · wait · pigstep · otherside · 5 · relic · precipice · creator · tears · lava_chicken</span></td><td class="desc-cell"><div class="ds">음반 전체 목록 — 음반 파일을 교체하면 커스텀 주크박스 음악</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ambient.raid.horn (event.raid.horn)</span></td><td class="desc-cell"><div class="ds">습격 뿔나팔 — 웨이브 시작 신호</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">portal.travel 등 나머지</span></td><td class="desc-cell"><div class="ds">전체 소리 이벤트는 약 <b>1,600개</b> — 게임 내에서 <b>/playsound 입력 후 Tab 자동완성</b>으로 전부 검색 가능. 위키 "Sounds.json" 문서에 전체 목록</div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;">
+      <div class="tip"><b>실전 팁 — BGM 루프</b>: 바닐라에는 루프 기능이 없어, 데이터팩에서 스코어보드 타이머로 곡 길이(초×20틱)마다 다시 /playsound 하는 방식으로 루프를 구현합니다. 구역 진입 감지(execute if entity @s[x=..,dx=..]) + stopsound → playsound 조합이 정석.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     파티클
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-particle">
+  <div class="sec-title">🎆 파티클</div>
+  <div class="sec-sub">/particle 문법 · 전체 파티클 목록 (약 110종) · 파티클 텍스처 커스텀</div>
+
+  <div class="card" id="p-syntax">
+    <div class="card-header"><span class="hl">01</span> /particle 문법</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="kw">/particle</span> <span class="str">flame</span> <span class="num">~ ~1 ~</span> <span class="num">0.5 0.5 0.5</span> <span class="num">0.01</span> <span class="num">50</span> <span class="arg">force</span> <span class="sel">@a</span>
+<span class="cmt">#          이름    위치     퍼짐(x y z)   속도  개수  force=멀리서도 표시</span>
+
+<span class="cmt"># 옵션이 필요한 파티클 (1.20.5+ 문법)</span>
+<span class="kw">/particle</span> <span class="str">dust</span>{<span class="key">color</span>:[<span class="num">1.0</span>,<span class="num">0.0</span>,<span class="num">0.0</span>],<span class="key">scale</span>:<span class="num">2</span>} <span class="num">~ ~1 ~</span>          <span class="cmt"># 빨간 먼지 ×2 크기</span>
+<span class="kw">/particle</span> <span class="str">dust_color_transition</span>{<span class="key">from_color</span>:[<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>],<span class="key">to_color</span>:[<span class="num">0</span>,<span class="num">0</span>,<span class="num">1</span>],<span class="key">scale</span>:<span class="num">1</span>}
+<span class="kw">/particle</span> <span class="str">block</span>{<span class="key">block_state</span>:<span class="str">"minecraft:diamond_block"</span>} <span class="num">~ ~ ~</span> <span class="cmt"># 블럭 파편</span>
+<span class="kw">/particle</span> <span class="str">item</span>{<span class="key">item</span>:<span class="str">"minecraft:apple"</span>} <span class="num">~ ~ ~</span>                <span class="cmt"># 아이템 파편</span>
+<span class="kw">/particle</span> <span class="str">entity_effect</span>{<span class="key">color</span>:[<span class="num">0.2</span>,<span class="num">1.0</span>,<span class="num">0.2</span>,<span class="num">1.0</span>]}              <span class="cmt"># 물약 소용돌이(RGBA)</span>
+<span class="kw">/particle</span> <span class="str">sculk_charge</span>{<span class="key">roll</span>:<span class="num">1.57</span>}   <span class="kw">/particle</span> <span class="str">shriek</span>{<span class="key">delay</span>:<span class="num">10</span>}
+<span class="kw">/particle</span> <span class="str">vibration</span>{<span class="key">destination</span>:{<span class="key">type</span>:<span class="str">"block"</span>,<span class="key">pos</span>:[<span class="num">0</span>,<span class="num">64</span>,<span class="num">0</span>]},<span class="key">arrival_in_ticks</span>:<span class="num">40</span>}
+<span class="kw">/particle</span> <span class="str">trail</span>{<span class="key">target</span>:[<span class="num">0.0</span>,<span class="num">70.0</span>,<span class="num">0.0</span>],<span class="key">color</span>:<span class="num">16711680</span>,<span class="key">duration</span>:<span class="num">40</span>} <span class="cmt"># 1.21.2+</span></div>
+      <div class="note">💡 <b>속도의 비밀</b>: 개수를 <b>0</b>으로 하면 퍼짐(x y z)이 <b>방향 벡터</b>가 되고 속도값이 적용됩니다 — 한 방향으로 뿜는 연출. 1.20.4 이하는 dust 1 0 0 2 처럼 공백 인자 문법.</div>
+    </div>
+  </div>
+
+  <div class="card" id="p-need">
+    <div class="card-header"><span class="hl">02</span> 옵션(인자)이 필요한 파티클</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">dust</span></td><td class="desc-cell"><div class="ds">색 먼지 — color [R,G,B](0~1) + scale (0.01~4). 레드스톤 가루의 그 입자. <b>색 자유자재라 연출 1순위</b></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dust_color_transition</span></td><td class="desc-cell"><div class="ds">색이 변하는 먼지 — from_color → to_color</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">block · block_marker · falling_dust · dust_pillar · block_crumble</span></td><td class="desc-cell"><div class="ds">블럭 파편 / 정지 마커(barrier·light가 이것) / 떨어지는 가루 / 기둥(1.21) / 부서짐(1.21.2)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">item</span></td><td class="desc-cell"><div class="ds">아이템 파편 — 먹기 이펙트</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">entity_effect</span></td><td class="desc-cell"><div class="ds">물약 소용돌이 — RGBA 색 지정 (1.20.5+, 이전엔 ambient_entity_effect와 색 인자)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">sculk_charge · shriek · vibration</span></td><td class="desc-cell"><div class="ds">스컬크 전하(roll) / 비명(delay) / 진동 신호(목적지·도달시간) — 빨려가는 연출 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">trail</span></td><td class="desc-cell"><div class="ds">1.21.2+ 목적지로 흘러가는 입자 (target·color·duration) — 유도선 연출</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="p-magic">
+    <div class="card-header"><span class="hl">03</span> 마법 · 이펙트 계열</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">enchant</span></td><td class="desc-cell"><div class="ds">마법부여대 룬 문자 — 마법 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">portal · reverse_portal</span></td><td class="desc-cell"><div class="ds">포탈 보라 입자 (빨려들기 / 뿜어나오기)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">end_rod</span></td><td class="desc-cell"><div class="ds">엔드 막대 — 하얀 반짝임, 천천히 떠다님. 성스러운 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dragon_breath</span></td><td class="desc-cell"><div class="ds">드래곤 브레스 보라 구름</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">witch</span></td><td class="desc-cell"><div class="ds">마녀 보라 입자</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">effect · instant_effect · ambient_entity_effect</span></td><td class="desc-cell"><div class="ds">물약 나선 / 즉효 물약 / 신호기 버프</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">totem_of_undying</span></td><td class="desc-cell"><div class="ds">토템 발동 초록·노랑 폭발 — 부활 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">soul · sculk_soul</span></td><td class="desc-cell"><div class="ds">영혼 입자 — 파란 유령 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">glow · glow_squid_ink</span></td><td class="desc-cell"><div class="ds">발광 오징어 반짝임</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">note</span></td><td class="desc-cell"><div class="ds">음표 — 색은 좌표 퍼짐 x값으로 결정</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">nautilus</span></td><td class="desc-cell"><div class="ds">전달체 소용돌이 — 중심으로 빨려드는 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">enchanted_hit</span></td><td class="desc-cell"><div class="ds">마법 무기 타격 반짝임</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ominous_spawning · trial_omen · raid_omen · trial_spawner_detection(_ominous) · vault_connection · infested</span></td><td class="desc-cell"><div class="ds">1.21 불길한 전조·시련 스포너·금고 계열</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="p-fire">
+    <div class="card-header"><span class="hl">04</span> 불 · 연기 · 폭발 계열</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">flame · small_flame · soul_fire_flame</span></td><td class="desc-cell"><div class="ds">불꽃 / 작은 불꽃(촛불) / 영혼 불꽃(파란색)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">smoke · large_smoke · white_smoke · campfire_cosy_smoke · campfire_signal_smoke</span></td><td class="desc-cell"><div class="ds">연기 5종 — 모닥불 연기는 높이 올라감</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">explosion · explosion_emitter</span></td><td class="desc-cell"><div class="ds">폭발 구름 / 대폭발(구름 여러 개 자동 생성)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">firework</span></td><td class="desc-cell"><div class="ds">폭죽 불티</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">lava</span></td><td class="desc-cell"><div class="ds">용암 튐</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">flash</span></td><td class="desc-cell"><div class="ds">폭죽 섬광 — 화면 번쩍 (한 번에 크게)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ash · white_ash</span></td><td class="desc-cell"><div class="ds">재 — 현무암 삼각주·영혼 모래 골짜기의 떠다니는 재</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dust_plume</span></td><td class="desc-cell"><div class="ds">1.20.3+ 장식 항아리 깨질 때 먼지 기둥</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="p-water">
+    <div class="card-header"><span class="hl">05</span> 물 · 액체 계열</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">splash · rain · underwater</span></td><td class="desc-cell"><div class="ds">물 튀김 / 빗방울 / 수중 부유물</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">bubble · bubble_pop · bubble_column_up · current_down</span></td><td class="desc-cell"><div class="ds">기포 4종 — 수중 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">fishing</span></td><td class="desc-cell"><div class="ds">낚시찌 물결</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dripping_water · falling_water · dripping_lava · falling_lava · landing_lava</span></td><td class="desc-cell"><div class="ds">천장 물·용암 방울 (매달림→낙하→착지 3단계)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dripping_dripstone_water / _lava · falling_dripstone_water / _lava</span></td><td class="desc-cell"><div class="ds">종유석 방울</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dripping_honey · falling_honey · landing_honey</span></td><td class="desc-cell"><div class="ds">꿀 방울</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dripping_obsidian_tear · falling_obsidian_tear · landing_obsidian_tear</span></td><td class="desc-cell"><div class="ds">우는 흑요석 보라 눈물</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">squid_ink</span></td><td class="desc-cell"><div class="ds">오징어 먹물</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">dolphin</span></td><td class="desc-cell"><div class="ds">돌고래 물살</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="p-nature">
+    <div class="card-header"><span class="hl">06</span> 자연 · 환경 계열</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">cherry_leaves · pale_oak_leaves · tinted_leaves</span></td><td class="desc-cell"><div class="ds">벚꽃잎(1.20) · 창백참나무잎(1.21.4) · 색지정 낙엽(1.21.5, color 옵션) — 꽃비 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">snowflake</span></td><td class="desc-cell"><div class="ds">눈송이 — 겨울 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">cloud</span></td><td class="desc-cell"><div class="ds">하얀 뭉게 입자 — 몹 사망 시의 그 연기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">mycelium</span></td><td class="desc-cell"><div class="ds">균사체 포자 — 미세 먼지 느낌</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">crimson_spore · warped_spore · spore_blossom_air · falling_spore_blossom</span></td><td class="desc-cell"><div class="ds">네더 숲 포자 · 포자꽃 (공중 부유 연출)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">falling_nectar</span></td><td class="desc-cell"><div class="ds">벌 꽃가루 방울</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">composter</span></td><td class="desc-cell"><div class="ds">퇴비통 초록 반짝임</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">firefly</span></td><td class="desc-cell"><div class="ds">1.21.5+ 반딧불이 — 밤 숲 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">gust · small_gust · gust_emitter_large / _small</span></td><td class="desc-cell"><div class="ds">1.20.5 돌풍 — 바람 폭발 연출</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="p-combat">
+    <div class="card-header"><span class="hl">07</span> 전투 · 상태 · 기타</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">crit · damage_indicator · sweep_attack · sonic_boom</span></td><td class="desc-cell"><div class="ds">치명타 / 피해 하트 / 휩쓸기 / 워든 음파</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">heart · angry_villager · happy_villager</span></td><td class="desc-cell"><div class="ds">하트 / 화남(번개구름) / 초록 반짝임(행복) — 감정 표현 3종</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">poof</span></td><td class="desc-cell"><div class="ds">몹 사망 연기 — 소환·소멸 연출 단골</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">sneeze · spit</span></td><td class="desc-cell"><div class="ds">아기 판다 재채기 / 라마 침</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">elder_guardian</span></td><td class="desc-cell"><div class="ds">엘더 가디언 잔상 — 화면 전체 유령 (점프스케어급)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">egg_crack · item_slime · item_cobweb · item_snowball</span></td><td class="desc-cell"><div class="ds">달걀 파편 / 슬라임 / 거미줄(1.21) / 눈덩이</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">electric_spark · wax_on · wax_off · scrape</span></td><td class="desc-cell"><div class="ds">구리 피뢰침 스파크 / 밀랍 칠·제거 / 녹 긁기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">barrier·light → block_marker</span></td><td class="desc-cell"><div class="ds">1.18부터 block_marker{block_state:"barrier"} 로 통합</div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;">
+      <div class="tip"><b>파티클 텍스처 커스텀</b>: <b>textures/particle/*.png</b> 교체 + <b>particles/파티클명.json</b>에서 프레임 순서 지정 → 커스텀 마법진·낙엽·불꽃 제작 가능. 예: particles/flame.json → {"textures":["minecraft:flame"]}. 텍스처만 바꾸는 게 리소스팩의 한계이며, <b>새 파티클 타입 추가는 불가</b> — 그래서 dust 색 조합과 커스텀 텍스처 교체를 조합해 씁니다.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     폰트·언어
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-font">
+  <div class="sec-title">✒️ 폰트 · 언어</div>
+  <div class="sec-sub">커스텀 폰트 · 비트맵 글리프 · 이미지 폰트(UI 제작의 핵심) · 음수 공백 · 언어 파일</div>
+
+  <div class="card" id="f-font">
+    <div class="card-header"><span class="hl">01</span> 폰트 정의 — font/*.json</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">폰트는 <b>글자 모양 교체</b>를 넘어서 커스텀 맵 UI 제작의 <b>비밀 병기</b>입니다. 임의의 PNG를 "글자"로 등록하면 채팅·타이틀·액션바·책에 <b>이미지를 출력</b>할 수 있기 때문.</div>
+      <div class="codeblock"><span class="cmt">// assets/minecraft/font/default.json — 기본 폰트에 글리프 추가/교체</span>
+<span class="cmt">// assets/mypack/font/ui.json — 새 폰트 만들기 (권장)</span>
+{
+  <span class="key">"providers"</span>: [
+    {
+      <span class="key">"type"</span>: <span class="str">"bitmap"</span>,
+      <span class="key">"file"</span>: <span class="str">"mypack:font/dialog_box.png"</span>,  <span class="cmt">// textures/font/dialog_box.png</span>
+      <span class="key">"height"</span>: <span class="num">100</span>,        <span class="cmt">// 표시 높이 (기본 8) — 크게 = 풀스크린 이미지 가능</span>
+      <span class="key">"ascent"</span>: <span class="num">50</span>,         <span class="cmt">// 기준선 위 높이 — 세로 위치 조절 (height 이하)</span>
+      <span class="key">"chars"</span>: [<span class="str">""</span>]   <span class="cmt">// 이 문자를 치면 이 이미지가 나옴</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="str">"space"</span>,      <span class="cmt">// 1.19+ 공백 프로바이더</span>
+      <span class="key">"advances"</span>: { <span class="str">""</span>: <span class="num">-100</span>, <span class="str">""</span>: <span class="num">4</span> }
+      <span class="cmt">// 음수 = 커서를 왼쪽으로! → 이미지 위에 글자 겹치기 가능</span>
+    },
+    { <span class="key">"type"</span>: <span class="str">"reference"</span>, <span class="key">"id"</span>: <span class="str">"minecraft:include/default"</span> }  <span class="cmt">// 기본 글자 포함</span>
+  ]
+}
+
+<span class="cmt"># 사용 — tellraw·title·actionbar·item name 어디든</span>
+<span class="kw">/tellraw</span> <span class="sel">@a</span> {<span class="key">"text"</span>:<span class="str">""</span>,<span class="key">"font"</span>:<span class="str">"mypack:ui"</span>}
+<span class="kw">/title</span> <span class="sel">@a</span> actionbar {<span class="key">"text"</span>:<span class="str">"체력 ❤❤❤"</span>,<span class="key">"font"</span>:<span class="str">"mypack:ui"</span>}</div>
+      <div class="note">💡 커스텀 글리프는 <b>사용자 영역(Private Use Area) U+E000~U+F8FF</b>를 쓰는 것이 관례 — 실제 글자와 충돌하지 않습니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="f-providers">
+    <div class="card-header"><span class="hl">02</span> 폰트 프로바이더 종류</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">bitmap</span></td><td class="desc-cell"><div class="dm">PNG 이미지 글리프</div><div class="ds">chars 배열에 여러 줄 넣으면 이미지를 격자로 잘라 배정. 한글 폰트도 이 방식으로 제작 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">space</span></td><td class="desc-cell"><div class="dm">글자폭 지정 (1.19+)</div><div class="ds"><b>음수 폭</b>이 핵심 — UI 겹치기·정렬의 필수 도구</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">ttf</span></td><td class="desc-cell"><div class="dm">트루타입 폰트</div><div class="ds">font/*.ttf — 실제 폰트 파일 사용 (한글 폰트 교체가 쉬움). size·oversample·shift·skip 옵션</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">unihex</span></td><td class="desc-cell"><div class="dm">유니코드 hex 폰트 (1.20+)</div><div class="ds">바닐라 CJK 글리프가 이 방식 (구 legacy_unicode 대체)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">reference</span></td><td class="desc-cell"><div class="dm">다른 폰트 정의 포함 (1.20+)</div><div class="ds">include/default·include/space 재사용</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="f-ui">
+    <div class="card-header"><span class="hl">03</span> 이미지 폰트 UI 기법 (맵 제작 필수)</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">대화창</span></td><td class="desc-cell"><div class="ds">① 대화창 배경 PNG를 글리프로 등록(height 크게) ② title/actionbar로 출력 ③ 음수 공백으로 커서를 되돌려 이름·대사 텍스트를 위에 겹침 → RPG 대화창 완성</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">커스텀 HUD</span></td><td class="desc-cell"><div class="ds">체력바·마나바·미니맵 테두리 등을 actionbar 또는 보스바 이름에 글리프로 상시 표시 (1틱마다 title actionbar 갱신)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">풀스크린 컷신</span></td><td class="desc-cell"><div class="ds">height 256짜리 일러스트 글리프 + /title로 화면 전체 이미지 — 엔딩·챕터 전환 연출</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">아이콘 문자</span></td><td class="desc-cell"><div class="ds">코인·열쇠·스킬 아이콘을 8×8 글리프로 만들어 채팅·스코어보드·아이템 이름에 삽입</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">빈 글자 트릭</span></td><td class="desc-cell"><div class="ds">기본 폰트(default.json)의 특정 문자를 투명 PNG로 덮으면 그 글자를 "지울" 수도 있음 — 스코어보드 사이드바 숫자 숨기기 등</div></td></tr>
+      </table>
+      <div class="warn">⚠ 이미지 폰트는 GUI 스케일에 따라 크기가 달라집니다. 배포 시 "GUI 스케일 2 권장" 같은 안내를 넣는 이유. 또한 채팅 폭 제한이 있어 아주 넓은 이미지는 title 쪽이 안전.</div>
+    </div>
+  </div>
+
+  <div class="card" id="f-lang">
+    <div class="card-header"><span class="hl">04</span> 언어 파일 — lang/*.json</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">// assets/minecraft/lang/ko_kr.json — 게임 텍스트 전부 교체 가능</span>
+{
+  <span class="key">"item.minecraft.diamond_sword"</span>: <span class="str">"전설의 검"</span>,
+  <span class="key">"block.minecraft.stone"</span>: <span class="str">"단단한 돌"</span>,
+  <span class="key">"death.attack.lava"</span>: <span class="str">"%1$s님이 용암 온천을 즐기다 갔습니다"</span>,
+  <span class="key">"gui.done"</span>: <span class="str">"확인!"</span>,
+  <span class="key">"mypack.dialog.chapter1"</span>: <span class="str">"1장 — 시작"</span>   <span class="cmt">// 커스텀 키 추가도 가능</span>
+}
+
+<span class="cmt"># 커스텀 키 사용 — translate 컴포넌트</span>
+<span class="kw">/tellraw</span> <span class="sel">@a</span> {<span class="key">"translate"</span>:<span class="str">"mypack.dialog.chapter1"</span>}</div>
+      <div class="ds">사망 메시지·메뉴·아이템 이름 등 <b>게임 내 모든 문자열</b>이 교체 대상입니다. 커스텀 키를 등록하면 데이터팩과 연동해 다국어 맵도 가능. 파일 하나로 유쾌한 "말투 팩"을 만들 수도 있습니다.</div>
+      <div class="note">💡 splashes(시작화면 노란 문구)는 <b>assets/minecraft/texts/splashes.txt</b> — 한 줄에 하나씩. credits.json·postcredits.txt(엔딩 크레딧)도 texts/ 폴더.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     가능 목록·심화
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-adv">
+  <div class="sec-title">🌈 리소스팩으로 가능한 모든 것</div>
+  <div class="sec-sub">가능 ✅ · 조건부 🔶 · 불가능 ❌ 총목록 — 그리고 셰이더·그림·환경 심화</div>
+
+  <div class="card" id="a-can">
+    <div class="card-header"><span class="hl">01</span> ✅ 가능한 것 전체 목록</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">블럭·아이템 텍스처/모델</span></td><td class="desc-cell"><div class="ds">교체·3D 모델화·랜덤 배리에이션·애니메이션 <span class="tag">textures</span><span class="tag">models</span><span class="tag">blockstates</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">커스텀 아이템 무한 추가</span></td><td class="desc-cell"><div class="ds">custom_model_data / items 정의 — 외형상 새 아이템 <span class="tag">overrides</span><span class="tag-b">1.21.4 items/</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">몹(엔티티) 텍스처</span></td><td class="desc-cell"><div class="ds">스킨 교체 — 단 <b>모델(형태) 변경은 불가</b> <span class="tag">textures/entity</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">소리 교체·추가</span></td><td class="desc-cell"><div class="ds">모든 효과음·BGM·음반 + 신규 등록 무제한 <span class="tag">sounds.json</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">음악 제거·교체</span></td><td class="desc-cell"><div class="ds">music.* 덮어쓰기 — 맵 전용 OST 구성</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">폰트·이미지 글리프</span></td><td class="desc-cell"><div class="ds">TTF·비트맵·아이콘·UI 이미지 출력 <span class="tag">font</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">언어(모든 게임 문자열)</span></td><td class="desc-cell"><div class="ds">아이템명·메뉴·사망 메시지 + 커스텀 번역키 <span class="tag">lang</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">GUI 전부</span></td><td class="desc-cell"><div class="ds">인벤토리·상자·핫바·체력·경험치바·보스바·타이틀화면 로고 <span class="tag">textures/gui</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">하늘·환경</span></td><td class="desc-cell"><div class="ds">해·달·비·눈·구름·엔드 하늘 텍스처 <span class="tag">environment</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">그림(painting) 32종</span></td><td class="desc-cell"><div class="ds">모든 그림을 커스텀 일러스트로 <span class="tag">textures/painting</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">파티클 텍스처</span></td><td class="desc-cell"><div class="ds">모양 교체 (신규 타입 추가는 ❌) <span class="tag">textures/particle</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">갑옷·장비 외형</span></td><td class="desc-cell"><div class="ds">착용 갑옷·말 갑옷·늑대 갑옷·장식(trim) <span class="tag-b">1.21.2+ equipment/</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">풀·나뭇잎·물 색</span></td><td class="desc-cell"><div class="ds">colormap + 바이옴 착색 (물색은 바이옴 데이터도 관여) <span class="tag">colormap</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">지도 아이콘·물약 아이콘·이펙트 아이콘</span></td><td class="desc-cell"><div class="ds"><span class="tag">textures/map</span><span class="tag">mob_effect</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">시작화면 문구·엔딩 크레딧</span></td><td class="desc-cell"><div class="ds">splashes.txt · credits.json <span class="tag">texts</span></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">셰이더</span></td><td class="desc-cell"><div class="ds">코어 셰이더·포스트 이펙트 (아래 심화) <span class="tag">shaders</span></div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="a-cond">
+    <div class="card-header"><span class="hl">02</span> 🔶 조건부 — 데이터팩·모드가 필요한 것</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">🔶 "진짜" 새 블럭</span></td><td class="desc-cell"><div class="ds">리소스팩(모델) + 데이터팩(노트블럭 기법·상호작용) 조합으로 유사 구현 — 테스트 29 참고</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">🔶 아이템 효과·기능</span></td><td class="desc-cell"><div class="ds">외형은 리소스팩, 기능(우클릭 스킬 등)은 데이터팩 담당</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">🔶 몹 모델(형태) 변경</span></td><td class="desc-cell"><div class="ds">바닐라 ❌ — OptiFine/CEM(Entity Model Features 모드) 필요. 대안: 갑옷 거치대·디스플레이 엔티티에 커스텀 모델 씌우기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">🔶 같은 아이템인데 이름별로 다른 텍스처(CIT)</span></td><td class="desc-cell"><div class="ds">바닐라 ❌(OptiFine 기능) — 대신 custom_model_data가 바닐라 정석</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">🔶 연결 텍스처·발광 텍스처·커스텀 하늘(스카이박스)</span></td><td class="desc-cell"><div class="ds">OptiFine·Continuity·FabricSkyboxes 등 모드 영역</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">🔶 그림자·조명 품질(Shaders)</span></td><td class="desc-cell"><div class="ds">흔히 말하는 "쉐이더"(SEUS·BSL)는 OptiFine/Iris 모드 영역 — 리소스팩 셰이더와 다름</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="a-cant">
+    <div class="card-header"><span class="hl">03</span> ❌ 리소스팩만으로 불가능한 것</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">❌ 게임 규칙 변경</span></td><td class="desc-cell"><div class="ds">데미지·드롭·레시피 로직 → 데이터팩 영역</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">❌ 새 파티클·새 소리 카테고리·새 엔티티 타입</span></td><td class="desc-cell"><div class="ds">레지스트리 추가는 모드만 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">❌ 블럭 히트박스·크기 변경</span></td><td class="desc-cell"><div class="ds">모델을 키워도 충돌 판정은 그대로</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">❌ 자유 각도 모델 회전 (22.5° 단위 외)</span></td><td class="desc-cell"><div class="ds">→ 디스플레이 엔티티로 우회</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">❌ 서버 강제 없이 모두에게 같은 화면 보장</span></td><td class="desc-cell"><div class="ds">리소스팩은 클라이언트 선택 사항 — 강제하려면 서버 설정·월드 내장 사용</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="a-shader">
+    <div class="card-header"><span class="hl">04</span> 심화 — 셰이더 (shaders/)</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">리소스팩 셰이더는 <b>코어 셰이더</b>(게임 렌더링 GLSL 교체)와 <b>포스트 이펙트</b>(화면 후처리) 두 종류. 크리퍼 시점의 초록 화면, 스펙테이터로 엔더맨 빙의 시 반전 화면이 포스트 이펙트입니다.</div>
+      <div class="codeblock">assets/minecraft/shaders/
+├── <span class="fn">core/</span>       <span class="cmt"># rendertype_*.vsh/.fsh/.json — 텍스트·엔티티·하늘 등 렌더 교체</span>
+├── <span class="fn">post/</span>       <span class="cmt"># 후처리 체인 JSON (blur·invert·creeper·spider…)</span>
+├── <span class="fn">program/</span>    <span class="cmt"># 후처리 프로그램</span>
+└── <span class="fn">include/</span>    <span class="cmt"># 공용 GLSL</span></div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">무지개 글자·흔들리는 글자</span></td><td class="desc-cell"><div class="ds">rendertype_text 코어 셰이더 수정 — 특정 색상 코드의 글자만 애니메이션시키는 유명 기법</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">화면 연출</span></td><td class="desc-cell"><div class="ds">스펙테이터 빙의(spectate) + 몹별 post 셰이더를 커스텀으로 교체 → 흑백·왜곡·취함 등 컷신 필터</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">하늘 색·별 렌더링</span></td><td class="desc-cell"><div class="ds">rendertype 계열 수정으로 하늘 연출 (버전 간 깨짐 잦음)</div></td></tr>
+      </table>
+      <div class="warn">⚠ 셰이더는 <b>버전 업데이트마다 자주 깨지는</b> 비공식 영역에 가깝습니다 (1.21.2에서 대격변). 맵을 특정 버전에 고정하고 쓰는 것을 추천.</div>
+    </div>
+  </div>
+
+  <div class="card" id="a-gui">
+    <div class="card-header"><span class="hl">05</span> 심화 — GUI·환경 텍스처 경로 치트시트</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">gui/sprites/hud/*</span></td><td class="desc-cell"><div class="ds">1.20.2+ 하트·갑옷·배고픔·경험치바 개별 스프라이트</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">gui/container/*.png</span></td><td class="desc-cell"><div class="ds">인벤토리·상자·화로·마을주민 거래 등 컨테이너 창</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">gui/title/minecraft.png</span></td><td class="desc-cell"><div class="ds">타이틀 로고 — 맵 전용 로고로 교체 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">gui/options_background.png → 1.20.5+ menu_background</span></td><td class="desc-cell"><div class="ds">메뉴 배경 (흙 텍스처)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">environment/sun.png · moon_phases.png</span></td><td class="desc-cell"><div class="ds">해 · 달(8단계 시트) — 달을 행성·이클립스로 바꾸는 연출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">environment/rain.png · snow.png · clouds.png</span></td><td class="desc-cell"><div class="ds">비를 벚꽃비·재로 바꾸기 등</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">environment/end_sky.png</span></td><td class="desc-cell"><div class="ds">엔드 하늘 별무늬</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">misc/pumpkinblur.png · vignette.png · nausea.png</span></td><td class="desc-cell"><div class="ds">호박 시야·화면 가장자리 어둠·멀미 — <b>호박 시야를 헬멧 오버레이 HUD로 쓰는 기법</b></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">misc/shadow.png</span></td><td class="desc-cell"><div class="ds">엔티티 그림자</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="a-equip">
+    <div class="card-header"><span class="hl">06</span> 심화 — 장비(equipment) 정의 <span class="version-badge">1.21.2+</span></div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">// assets/mypack/equipment/ruby_armor.json — 착용 모습 정의</span>
+{
+  <span class="key">"layers"</span>: {
+    <span class="key">"humanoid"</span>:      [ { <span class="key">"texture"</span>: <span class="str">"mypack:ruby"</span> } ],  <span class="cmt">// textures/entity/equipment/humanoid/ruby.png</span>
+    <span class="key">"humanoid_leggings"</span>: [ { <span class="key">"texture"</span>: <span class="str">"mypack:ruby"</span> } ]
+  }
+}
+<span class="cmt"># 데이터팩·give에서 equippable 컴포넌트로 연결</span>
+<span class="kw">/give</span> <span class="sel">@s</span> iron_chestplate[<span class="key">equippable</span>={<span class="key">slot</span>:<span class="str">"chest"</span>,<span class="key">asset_id</span>:<span class="str">"mypack:ruby_armor"</span>}]</div>
+      <div class="ds">1.21.2부터 <b>어떤 아이템이든 갑옷으로</b> 만들 수 있고 착용 텍스처도 자유 — 커스텀 의상·코스튬 제작이 공식 지원됩니다.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     맵 제작 기법
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-map">
+  <div class="sec-title">🗺️ 맵 제작 기법</div>
+  <div class="sec-sub">마플·토템 등 유명 유튜버/맵 제작 팀 스타일의 콘텐츠 맵에서 공통적으로 쓰이는 구현 방식 총정리</div>
+
+  <div class="card" id="mp-flow">
+    <div class="card-header"><span class="hl">01</span> 전문 맵 제작의 기본 공식</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">퀄리티 높은 콘텐츠 맵은 예외 없이 <b>「리소스팩(보이는 것·들리는 것) + 데이터팩(게임 로직) + 월드(세트장)」 3종 세트</b>입니다. 유튜버 콘텐츠 맵(상황극·탈출맵·미니게임)의 "모드 같은데 모드가 아닌" 연출이 전부 이 조합.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">①</span> 기획</span></td><td class="desc-cell"><div class="ds">필요한 소품·효과음·UI를 목록화 → CMD 번호표·소리 이벤트 이름 규칙 먼저 정하기</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">②</span> 세트장</span></td><td class="desc-cell"><div class="ds">WorldEdit/Axiom(모드, 제작 단계에서만 사용)으로 지형·건축 → 배포본은 바닐라</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">③</span> 리소스팩</span></td><td class="desc-cell"><div class="ds">Blockbench 소품 모델 + Audacity 효과음/성우 녹음 + 폰트 UI</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">④</span> 데이터팩</span></td><td class="desc-cell"><div class="ds">진행 로직·트리거·연출 타이밍 (playsound·particle·title 호출)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">⑤</span> 배포</span></td><td class="desc-cell"><div class="ds">월드에 resources.zip 내장 or 서버 강제 적용 → 시청자 배포판은 폴더 하나로 끝</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="mp-props">
+    <div class="card-header"><span class="hl">02</span> 소품(가구·음식·장식) 배치 — 3대 기법</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">A.</span> 디스플레이 엔티티 <span class="version-badge">1.19.4+ 정석</span></span></td><td class="desc-cell"><div class="dm">item_display · block_display · text_display</div><div class="ds">자유 회전·크기·기울기·발광·보간 애니메이션까지 — 현대 맵 소품의 표준</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">B.</span> 투명 아이템 액자</span></td><td class="desc-cell"><div class="dm">item_frame {Invisible:1b, Fixed:1b}</div><div class="ds">액자는 안 보이고 아이템(CMD 모델)만 보임 — 접시 위 음식·벽걸이 소품의 고전 기법</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">C.</span> 갑옷 거치대</span></td><td class="desc-cell"><div class="dm">armor_stand {Invisible:1b, Marker:1b} 머리에 CMD 아이템</div><div class="ds">1.19.3 이전 유일한 방법이었던 구식 — 지금은 A로 대체 추세지만 호환성 좋음</div></td></tr>
+      </table>
+      <div class="codeblock"><span class="cmt"># 디스플레이 엔티티로 의자 소품 배치 (자유 회전·스케일)</span>
+<span class="kw">/summon</span> item_display <span class="num">~ ~ ~</span> {<span class="key">item</span>:{<span class="key">id</span>:<span class="str">"minecraft:paper"</span>,<span class="key">count</span>:<span class="num">1</span>,
+  <span class="key">components</span>:{<span class="key">"minecraft:custom_model_data"</span>:<span class="num">1</span>}},
+  <span class="key">transformation</span>:{<span class="key">translation</span>:[<span class="num">0f</span>,<span class="num">0.5f</span>,<span class="num">0f</span>],<span class="key">scale</span>:[<span class="num">1.5f</span>,<span class="num">1.5f</span>,<span class="num">1.5f</span>],
+    <span class="key">left_rotation</span>:[<span class="num">0f</span>,<span class="num">0.383f</span>,<span class="num">0f</span>,<span class="num">0.924f</span>],<span class="key">right_rotation</span>:[<span class="num">0f</span>,<span class="num">0f</span>,<span class="num">0f</span>,<span class="num">1f</span>]},
+  <span class="key">brightness</span>:{<span class="key">sky</span>:<span class="num">15</span>,<span class="key">block</span>:<span class="num">15</span>}}   <span class="cmt"># 항상 밝게 (그늘 무시)</span>
+
+<span class="cmt"># 투명 액자 (벽면 소품)</span>
+<span class="kw">/summon</span> item_frame <span class="num">~ ~ ~</span> {<span class="key">Invisible</span>:<span class="num">1b</span>,<span class="key">Fixed</span>:<span class="num">1b</span>,<span class="key">Facing</span>:<span class="num">1b</span>,
+  <span class="key">Item</span>:{<span class="key">id</span>:<span class="str">"minecraft:paper"</span>,<span class="key">count</span>:<span class="num">1</span>,<span class="key">components</span>:{<span class="key">"minecraft:custom_model_data"</span>:<span class="num">2</span>}}}</div>
+      <div class="note">💡 앉는 의자 = 소품 모델 + 투명한 탈것(text_display나 마커에 Passengers로 태우기, 구식은 보이지 않는 마인카트) + 우클릭 감지(interaction 엔티티). 테스트 29의 Interaction 참고.</div>
+    </div>
+  </div>
+
+  <div class="card" id="mp-sound">
+    <div class="card-header"><span class="hl">03</span> 사운드 연출 — 유튜버 맵 감성의 8할</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">시청자용 콘텐츠 맵의 몰입감은 <b>소리 디자인</b>이 만듭니다. 상황극 맵은 사실상 "커스텀 효과음 + 성우 더빙 + BGM" 3요소가 핵심.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">챕터별 BGM 시스템</span></td><td class="desc-cell"><div class="ds">music.* 덮어써서 바닐라 음악 제거 → 구역 진입 시 stopsound + playsound (music 카테고리, stream:true) → 스코어보드 타이머로 루프</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">성우 더빙·내레이션</span></td><td class="desc-cell"><div class="ds">대사를 voice 카테고리로 등록, tellraw 자막과 동시에 재생 — schedule로 대사 타이밍 관리</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">앰비언스 루프</span></td><td class="desc-cell"><div class="ds">병원 소음·바람·시계 소리 등을 구역별 반복 재생 — 좌표 지정 playsound로 "소리 나는 곳" 연출</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">점프스케어·긴장감</span></td><td class="desc-cell"><div class="ds">entity.warden.heartbeat(심장), ambient.cave(괴음), 커스텀 비명 + title 이미지 동시 타격</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">피치 트릭</span></td><td class="desc-cell"><div class="ds">같은 소리 피치 0.5~2.0 변주로 효과음 가짓수 늘리기 · 노트블럭 소리로 멜로디 시퀀싱</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">전역 방송</span></td><td class="desc-cell"><div class="ds">playsound ... @a ~ ~ ~ 10000 — 볼륨을 크게 주면 거리 무시 전역 재생 (안내 방송·사이렌)</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="mp-ui">
+    <div class="card-header"><span class="hl">04</span> 화면 연출 — 대화창·컷신·HUD</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">RPG 대화창</span></td><td class="desc-cell"><div class="ds">폰트 글리프 대화창(✒️ 탭) + 초상화 글리프 + tellraw 클릭 이벤트("▶ 다음")로 분기 대화</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">타이틀 연출</span></td><td class="desc-cell"><div class="ds">/title times로 페이드 조절 → 챕터 제목·"미션 시작!" · subtitle과 조합</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">풀스크린 컷신 이미지</span></td><td class="desc-cell"><div class="ds">대형 글리프를 title로 — 엔딩 일러스트·회상 장면</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">카메라 워크</span></td><td class="desc-cell"><div class="ds">/spectate + 보이지 않는 엔티티 경로 이동, 또는 플레이어를 디스플레이 엔티티 경로에 태우기 · teleport ~ ~ ~ facing으로 시선 강제</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">화면 암전·필터</span></td><td class="desc-cell"><div class="ds">blindness/darkness 효과 · 검은 글리프 풀스크린 · 포스트 셰이더 교체(심화)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">상시 HUD</span></td><td class="desc-cell"><div class="ds">보스바(진행도·체력) + actionbar 갱신(돈·목표) + 사이드바 스코어보드 — 셋 다 폰트 글리프로 꾸미기</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">호박 오버레이</span></td><td class="desc-cell"><div class="ds">misc/pumpkinblur를 커스텀 프레임으로 교체 + 조각 호박 착용 강제 = 헬멧 시야·CCTV 화면</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="mp-npc">
+    <div class="card-header"><span class="hl">05</span> NPC · 몹 연출</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">NPC 만들기</span></td><td class="desc-cell"><div class="ds">주민 {NoAI:1b, Silent:1b, Invulnerable:1b} + 이름표, 또는 갑옷 거치대/디스플레이에 플레이어 머리(SkullOwner) — 대화는 interaction 엔티티 우클릭 감지</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">몹 리스킨</span></td><td class="desc-cell"><div class="ds">textures/entity 교체로 좀비→괴물 등 — 형태 변경은 불가하니 실루엣이 비슷한 몹 선택이 요령</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">거대 보스 연출</span></td><td class="desc-cell"><div class="ds">실제 몹(판정) + 겹쳐 태운 item_display 커스텀 모델(외형) — 모델은 크게, 판정은 원본</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">몹 애니메이션</span></td><td class="desc-cell"><div class="ds">디스플레이 엔티티 interpolation(start_interpolation·transformation 갱신)으로 부드러운 이동·회전 키프레임</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="mp-detail">
+    <div class="card-header"><span class="hl">06</span> 프로 맵의 디테일 체크리스트</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">☑ 리소스팩 월드 내장</span></td><td class="desc-cell"><div class="ds">resources.zip — 시청자·참가자가 설치 실수할 여지 제거</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ 게임룰 세팅</span></td><td class="desc-cell"><div class="ds">doDaylightCycle·doWeatherCycle·doMobSpawning off, commandBlockOutput off, sendCommandFeedback off — 몰입 깨는 요소 차단</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ 시간·날씨 고정</span></td><td class="desc-cell"><div class="ds">장면마다 time set + weather — 조명이 연출의 절반</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ 텍스처 해상도 통일</span></td><td class="desc-cell"><div class="ds">16×과 32×를 섞으면 화면이 지저분 — 팩 전체 해상도 통일</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ 사운드 음량 노멀라이즈</span></td><td class="desc-cell"><div class="ds">녹음 소스 볼륨 편차를 편집 단계에서 맞추기 (게임 볼륨 인자로 때우지 않기)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ ZIP 최적화</span></td><td class="desc-cell"><div class="ds">서버 배포용은 용량 제한 고려(기본 수백 MB 상한) — OGG 비트레이트 조절·PNG 압축</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ 버전 고정 명시</span></td><td class="desc-cell"><div class="ds">"1.21.4 전용" 등 명확한 표기 — 셰이더·CMD 방식이 버전을 탐</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">☑ F3+T 반복 테스트</span></td><td class="desc-cell"><div class="ds">수정 → F3+T → 확인 루프. 소리 추가 시엔 F3+S(전체 리로드)</div></td></tr>
+    </table>
+    <div style="padding:8px 16px 12px;">
+      <div class="note">💡 마플·토템류 콘텐츠 맵의 특징을 요약하면 — <b>넓은 세트장 + 커스텀 소품(CMD) 물량 + 상황별 효과음/BGM + 타이틀·자막 연출 + 참가자별 역할 시스템(데이터팩)</b>. 각 요소는 전부 이 페이지의 기법들로 구현됩니다.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     실전 예제
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-ex">
+  <div class="sec-title">💡 실전 예제</div>
+  <div class="sec-sub">복사해서 바로 쓰는 완성 예제 — 커스텀 아이템 · 커스텀 소리 · 커스텀 음반 · 대화 연출 · 소품 세트</div>
+
+  <div class="card" id="e-item">
+    <div class="card-header"><span class="hl">01</span> 커스텀 아이템 A to Z — "루비 검"</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># 파일 3개면 끝 (1.21.3 이하 기준)</span>
+
+<span class="cmt">// ① assets/minecraft/models/item/carrot_on_a_stick.json</span>
+{
+  <span class="key">"parent"</span>: <span class="str">"minecraft:item/handheld"</span>,
+  <span class="key">"textures"</span>: { <span class="key">"layer0"</span>: <span class="str">"minecraft:item/carrot_on_a_stick"</span> },
+  <span class="key">"overrides"</span>: [
+    { <span class="key">"predicate"</span>: { <span class="key">"custom_model_data"</span>: <span class="num">1001</span> }, <span class="key">"model"</span>: <span class="str">"mypack:item/ruby_sword"</span> }
+  ]
+}
+
+<span class="cmt">// ② assets/mypack/models/item/ruby_sword.json</span>
+{
+  <span class="key">"parent"</span>: <span class="str">"minecraft:item/handheld"</span>,
+  <span class="key">"textures"</span>: { <span class="key">"layer0"</span>: <span class="str">"mypack:item/ruby_sword"</span> }
+}
+
+<span class="cmt"># ③ assets/mypack/textures/item/ruby_sword.png (16×16 그림)</span>
+
+<span class="cmt"># 지급 — 이름·색·공격력까지</span>
+<span class="kw">/give</span> <span class="sel">@s</span> carrot_on_a_stick[<span class="key">custom_model_data</span>=<span class="num">1001</span>,
+  <span class="key">custom_name</span>=<span class="str">'{"text":"루비 검","color":"red","italic":false}'</span>,
+  <span class="key">attribute_modifiers</span>=[{<span class="key">type</span>:<span class="str">"attack_damage"</span>,<span class="key">amount</span>:<span class="num">10</span>,<span class="key">operation</span>:<span class="str">"add_value"</span>,
+    <span class="key">slot</span>:<span class="str">"mainhand"</span>,<span class="key">id</span>:<span class="str">"mypack:ruby_dmg"</span>}]]</div>
+      <div class="note">💡 carrot_on_a_stick을 베이스로 쓰면 데이터팩에서 <b>우클릭 감지</b>(minecraft.used:minecraft.carrot_on_a_stick 스코어보드)로 스킬 발동까지 연결 가능 — 테스트 29 참고.</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-sound">
+    <div class="card-header"><span class="hl">02</span> 커스텀 효과음 + 성우 대사</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># ① OGG 배치</span>
+assets/mypack/sounds/sfx/door_creak.ogg     <span class="cmt"># 모노 권장</span>
+assets/mypack/sounds/voice/ch1_intro.ogg
+
+<span class="cmt">// ② assets/mypack/sounds.json</span>
+{
+  <span class="key">"sfx.door_creak"</span>: { <span class="key">"sounds"</span>: [<span class="str">"mypack:sfx/door_creak"</span>] },
+  <span class="key">"voice.ch1_intro"</span>: {
+    <span class="key">"subtitle"</span>: <span class="str">"???: 드디어 왔군..."</span>,
+    <span class="key">"sounds"</span>: [ { <span class="key">"name"</span>: <span class="str">"mypack:voice/ch1_intro"</span>, <span class="key">"stream"</span>: <span class="kw">true</span> } ]
+  }
+}
+
+<span class="cmt"># ③ 데이터팩 연출 — 문 열리며 대사 (mcfunction)</span>
+<span class="kw">playsound</span> mypack:sfx.door_creak block <span class="sel">@a</span> <span class="num">100 65 200</span> <span class="num">1 0.8</span>
+<span class="kw">schedule</span> function mypack:ch1/line1 <span class="num">30t</span>   <span class="cmt"># 1.5초 뒤 대사</span>
+
+<span class="cmt"># mypack/ch1/line1.mcfunction</span>
+<span class="kw">playsound</span> mypack:voice.ch1_intro voice <span class="sel">@a</span>
+<span class="kw">tellraw</span> <span class="sel">@a</span> [{<span class="key">"text"</span>:<span class="str">"???: "</span>,<span class="key">"color"</span>:<span class="str">"dark_red"</span>},{<span class="key">"text"</span>:<span class="str">"드디어 왔군..."</span>,<span class="key">"color"</span>:<span class="str">"gray"</span>}]</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-disc">
+    <div class="card-header"><span class="hl">03</span> 커스텀 음반 (주크박스 BGM)</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># 가장 쉬운 방법 — 기존 음반 소리 덮어쓰기</span>
+assets/minecraft/sounds/records/13.ogg   <span class="cmt"># "13" 음반이 내 곡으로</span>
+
+<span class="cmt"># 또는 신규 등록 + 1.21+ jukebox_playable 컴포넌트</span>
+<span class="cmt">// assets/mypack/sounds.json → "music.mysong": {"sounds":[{"name":"mypack:music/mysong","stream":true}]}</span>
+<span class="cmt">// 데이터팩 data/mypack/jukebox_song/mysong.json</span>
+{
+  <span class="key">"sound_event"</span>: <span class="str">"mypack:music.mysong"</span>,
+  <span class="key">"description"</span>: { <span class="key">"text"</span>: <span class="str">"나만의 OST"</span> },
+  <span class="key">"length_in_seconds"</span>: <span class="num">185.0</span>,
+  <span class="key">"comparator_output"</span>: <span class="num">7</span>
+}
+<span class="kw">/give</span> <span class="sel">@s</span> music_disc_13[<span class="key">jukebox_playable</span>=<span class="str">"mypack:mysong"</span>]</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-dialog">
+    <div class="card-header"><span class="hl">04</span> 폰트 대화창 UI</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># ① 대화창 배경 PNG (예: 256×64) → assets/mypack/textures/font/dialog.png</span>
+
+<span class="cmt">// ② assets/mypack/font/ui.json</span>
+{
+  <span class="key">"providers"</span>: [
+    { <span class="key">"type"</span>: <span class="str">"bitmap"</span>, <span class="key">"file"</span>: <span class="str">"mypack:font/dialog.png"</span>,
+      <span class="key">"height"</span>: <span class="num">40</span>, <span class="key">"ascent"</span>: <span class="num">-4</span>, <span class="key">"chars"</span>: [<span class="str">""</span>] },
+    { <span class="key">"type"</span>: <span class="str">"space"</span>, <span class="key">"advances"</span>: { <span class="str">""</span>: <span class="num">-160</span> } }
+  ]
+}
+
+<span class="cmt"># ③ 출력 — 배경 글리프 → 음수 공백으로 되돌아가 → 대사 겹침</span>
+<span class="kw">/title</span> <span class="sel">@a</span> actionbar [
+  {<span class="key">"text"</span>:<span class="str">""</span>,<span class="key">"font"</span>:<span class="str">"mypack:ui"</span>},
+  {<span class="key">"text"</span>:<span class="str">"안녕, 여행자여"</span>,<span class="key">"font"</span>:<span class="str">"minecraft:default"</span>,<span class="key">"color"</span>:<span class="str">"white"</span>}
+]</div>
+      <div class="warn">⚠  같은 이스케이프는 mcfunction에서 실제 유니코드 문자로 넣어야 합니다 (VS Code에서 붙여넣기). ascent·advance 수치는 이미지 크기에 맞게 미세조정 필요.</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-props">
+    <div class="card-header"><span class="hl">05</span> 소품 세트 배치 함수</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt"># mypack/props/cafe_table.mcfunction — 카페 테이블 세트 한 방에</span>
+<span class="kw">summon</span> item_display <span class="num">~ ~ ~</span> {<span class="key">Tags</span>:[<span class="str">"prop"</span>],<span class="key">item</span>:{<span class="key">id</span>:<span class="str">"paper"</span>,<span class="key">count</span>:<span class="num">1</span>,
+  <span class="key">components</span>:{<span class="key">"minecraft:custom_model_data"</span>:<span class="num">1</span>}}}          <span class="cmt"># 테이블</span>
+<span class="kw">summon</span> item_display <span class="num">~ ~1.05 ~0.2</span> {<span class="key">Tags</span>:[<span class="str">"prop"</span>],<span class="key">item</span>:{<span class="key">id</span>:<span class="str">"paper"</span>,<span class="key">count</span>:<span class="num">1</span>,
+  <span class="key">components</span>:{<span class="key">"minecraft:custom_model_data"</span>:<span class="num">2</span>}},
+  <span class="key">transformation</span>:{<span class="key">scale</span>:[<span class="num">0.4f</span>,<span class="num">0.4f</span>,<span class="num">0.4f</span>]}}                <span class="cmt"># 커피잔</span>
+<span class="kw">summon</span> interaction <span class="num">~ ~ ~</span> {<span class="key">Tags</span>:[<span class="str">"prop"</span>,<span class="str">"chair_seat"</span>],<span class="key">width</span>:<span class="num">0.8f</span>,<span class="key">height</span>:<span class="num">0.8f</span>}
+
+<span class="cmt"># 소품 전체 삭제 (재배치용)</span>
+<span class="kw">kill</span> <span class="sel">@e</span>[<span class="key">tag</span>=prop,<span class="key">distance</span>=..<span class="num">3</span>]</div>
+      <div class="ds">소품 조합을 함수로 만들어 두면 세트장 어디든 <b>/function mypack:props/cafe_table</b> 한 줄로 복제 — 물량전이 필요한 콘텐츠 맵의 실전 워크플로우입니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="e-check">
+    <div class="card-header"><span class="hl">06</span> 트러블슈팅 — 안 될 때 보는 표</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">보라·검정 체크무늬</span></td><td class="desc-cell"><div class="ds">텍스처 경로 오타 or 아틀라스 미등록 — 모델 JSON의 네임스페이스:경로 재확인</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">모델이 그냥 원본으로 나옴</span></td><td class="desc-cell"><div class="ds">JSON 문법 오류(쉼표!) — latest.log 검색, F3+T 후 로그 확인</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">소리가 안 남</span></td><td class="desc-cell"><div class="ds">① OGG 맞는지 ② 파일명 대문자·공백 ③ sounds.json 이벤트명과 playsound 이름 일치 ④ F3+S ⑤ 해당 카테고리 볼륨 0인지</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">소리가 어디서나 들림</span></td><td class="desc-cell"><div class="ds">스테레오 파일 — 위치 소리는 모노로 변환</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">글리프가 □로 나옴</span></td><td class="desc-cell"><div class="ds">폰트 JSON 경로·chars 문자 불일치, font 지정 누락</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">팩이 목록에 안 뜸</span></td><td class="desc-cell"><div class="ds">pack.mcmeta가 ZIP 최상위에 있는지 (폴더 한 겹 더 감싸는 실수가 1위)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">"호환되지 않는 팩" 경고</span></td><td class="desc-cell"><div class="ds">pack_format 숫자만 버전표에 맞게 — 대부분은 그냥 적용해도 작동</div></td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const SIDEBAR = {
+  basic: [
+    {id:'b-what',label:'리소스팩 vs 데이터팩'},
+    {id:'b-struct',label:'폴더 구조'},
+    {id:'b-mcmeta',label:'pack.mcmeta'},
+    {id:'b-format',label:'pack_format 버전표'},
+    {id:'b-apply',label:'적용 방법 4가지'},
+    {id:'b-tools',label:'제작 도구·원본 추출'},
+  ],
+  model: [
+    {id:'m-texture',label:'텍스처 교체'},
+    {id:'m-anim',label:'텍스처 애니메이션'},
+    {id:'m-blockstate',label:'blockstates'},
+    {id:'m-model',label:'모델 JSON'},
+    {id:'m-cmd',label:'custom_model_data'},
+    {id:'m-items',label:'1.21.4+ items 정의'},
+    {id:'m-atlas',label:'아틀라스'},
+  ],
+  sound: [
+    {id:'s-custom',label:'커스텀 소리 추가'},
+    {id:'s-category',label:'카테고리'},
+    {id:'s-ui',label:'UI·알림 소리'},
+    {id:'s-block',label:'블럭 소리'},
+    {id:'s-entity',label:'엔티티·보스 소리'},
+    {id:'s-item',label:'아이템·특수 소리'},
+    {id:'s-ambient',label:'환경음·음악·음반'},
+  ],
+  particle: [
+    {id:'p-syntax',label:'/particle 문법'},
+    {id:'p-need',label:'옵션 필요 파티클'},
+    {id:'p-magic',label:'마법·이펙트'},
+    {id:'p-fire',label:'불·연기·폭발'},
+    {id:'p-water',label:'물·액체'},
+    {id:'p-nature',label:'자연·환경'},
+    {id:'p-combat',label:'전투·상태·기타'},
+  ],
+  font: [
+    {id:'f-font',label:'폰트 정의'},
+    {id:'f-providers',label:'프로바이더 종류'},
+    {id:'f-ui',label:'이미지 폰트 UI 기법'},
+    {id:'f-lang',label:'언어 파일'},
+  ],
+  adv: [
+    {id:'a-can',label:'✅ 가능한 것 전부'},
+    {id:'a-cond',label:'🔶 조건부'},
+    {id:'a-cant',label:'❌ 불가능한 것'},
+    {id:'a-shader',label:'셰이더'},
+    {id:'a-gui',label:'GUI·환경 치트시트'},
+    {id:'a-equip',label:'1.21.2+ 장비 정의'},
+  ],
+  map: [
+    {id:'mp-flow',label:'제작 기본 공식'},
+    {id:'mp-props',label:'소품 배치 3대 기법'},
+    {id:'mp-sound',label:'사운드 연출'},
+    {id:'mp-ui',label:'화면 연출·컷신'},
+    {id:'mp-npc',label:'NPC·몹 연출'},
+    {id:'mp-detail',label:'디테일 체크리스트'},
+  ],
+  ex: [
+    {id:'e-item',label:'커스텀 아이템 A to Z'},
+    {id:'e-sound',label:'효과음+성우 대사'},
+    {id:'e-disc',label:'커스텀 음반'},
+    {id:'e-dialog',label:'폰트 대화창 UI'},
+    {id:'e-props',label:'소품 세트 함수'},
+    {id:'e-check',label:'트러블슈팅'},
+  ],
+};
+
+let curTab = 'basic';
+
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  curTab = id;
+  buildSidebar(id);
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  const items = SIDEBAR[id] || [];
+  sb.innerHTML = '<div class="sb-label">목차</div>' +
+    items.map(it => `<button class="sb-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('');
+}
+
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.sb-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(id));
+  });
+}
+
+buildSidebar('basic');
+
+// 검색
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.panel').forEach(p => p.style.display = '');
+    document.getElementById('panel-' + curTab).classList.add('active');
+    document.querySelectorAll('.card').forEach(c => c.style.display = '');
+    document.querySelectorAll('.r-table tr').forEach(r => r.style.display = '');
+    return;
+  }
+  // 모든 패널 표시 (검색 시)
+  document.querySelectorAll('.panel').forEach(p => { p.style.display = 'block'; p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.r-table').forEach(tbl => {
+    let vis = 0;
+    tbl.querySelectorAll('tr').forEach(r => {
+      const show = r.textContent.toLowerCase().includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    const card = tbl.closest('.card');
+    if (card) card.style.display = vis > 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.querySelector('.r-table')) {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    }
+  });
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); }
+});
+</script>
+</body>
+</html>

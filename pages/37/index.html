@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>병합 폭포 — 테스트 37</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1220;}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;
+     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;user-select:none;}
+
+#title{color:#7ec8e2;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:6px;
+       text-shadow:0 0 10px rgba(126,200,226,.4);}
+
+#canvas-wrap{position:relative;border:2px solid #2a3a5c;border-radius:4px;overflow:hidden;
+             box-shadow:0 0 30px rgba(0,0,0,.6);}
+#canvas{display:block;cursor:crosshair;}
+
+#drain-line{position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:rgba(80,180,255,0);transition:background .15s;pointer-events:none;}
+#canvas-wrap.draining #drain-line{background:rgba(80,180,255,.7);box-shadow:0 0 8px rgba(80,180,255,.5);}
+
+#stats{position:absolute;top:6px;left:8px;color:rgba(160,200,230,.75);font-size:11px;
+  font-family:Consolas,monospace;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.8);line-height:1.5;}
+
+#controls{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin-top:6px;padding:7px 11px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;width:100%;max-width:700px;
+}
+.ctrl-row{
+  width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  padding-top:5px;border-top:1px solid rgba(255,255,255,.08);
+}
+.ctrl-row:first-child{padding-top:0;border-top:none;}
+.ctrl-group{display:flex;align-items:center;gap:4px;}
+.ctrl-label{color:#a0b8d0;font-size:12px;white-space:nowrap;}
+.ctrl-divider{width:1px;height:22px;background:rgba(255,255,255,.1);}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.15);outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:#7ec8e2;cursor:pointer;
+}
+.val-display{color:#7ec8e2;font-size:11px;min-width:26px;text-align:center;}
+
+.btn{padding:5px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;
+     cursor:pointer;transition:all .12s;letter-spacing:.3px;}
+#btn-fall {background:#0a2a3a;color:#66ccff;border:1px solid #3399cc;}
+#btn-fall.on{background:#0a3a55;color:#aaeeff;border-color:#66ccff;box-shadow:0 0 10px rgba(102,204,255,.4);}
+#btn-rain {background:#1a1a3a;color:#8899ff;border:1px solid #5566cc;}
+#btn-rain.on{background:#22224f;color:#bbccff;border-color:#8899ff;box-shadow:0 0 10px rgba(136,153,255,.4);}
+#btn-merge{background:#0a2a1a;color:#55dd99;border:1px solid #2a9955;}
+#btn-merge.on{background:#0a3a24;color:#88ffbb;border-color:#55dd99;box-shadow:0 0 8px rgba(85,221,153,.35);}
+#btn-drain{background:#3a1a1a;color:#ff6b6b;border:1px solid #ff4444;}
+#btn-drain.held{background:#5a1a1a;box-shadow:0 0 10px rgba(255,68,68,.4);}
+#btn-clear{background:#1a1a3a;color:#6b9bff;border:1px solid #4466ff;}
+#btn-fs   {background:#1a2a2a;color:#80d0d0;border:1px solid #406060;}
+
+#hint{color:rgba(160,200,230,.45);font-size:11px;margin-top:5px;letter-spacing:.3px;}
+</style>
+</head>
+<body>
+
+<div id="title">💧 병합 폭포</div>
+
+<div id="canvas-wrap">
+  <canvas id="canvas"></canvas>
+  <div id="stats"></div>
+  <div id="drain-line"></div>
+</div>
+
+<div id="controls">
+  <div class="ctrl-row">
+    <button class="btn on" id="btn-fall">🌊 폭포</button>
+    <button class="btn" id="btn-rain">🌧 비</button>
+    <div class="ctrl-divider"></div>
+    <button class="btn on" id="btn-merge">⚛ 병합 ON</button>
+    <div class="ctrl-divider"></div>
+    <button class="btn" id="btn-drain">🕳 배수 (꾹)</button>
+    <button class="btn" id="btn-clear">↺ 초기화</button>
+    <button class="btn" id="btn-fs">⛶ 전체화면</button>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <span class="ctrl-label">소환량</span>
+      <input type="range" id="sl-rate" min="1" max="20" value="6" style="width:80px;">
+      <span class="val-display" id="v-rate">6</span>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">방울 크기</span>
+      <input type="range" id="sl-size" min="2" max="10" value="4" style="width:80px;">
+      <span class="val-display" id="v-size">4</span>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">중력</span>
+      <input type="range" id="sl-grav" min="2" max="20" value="9" style="width:80px;">
+      <span class="val-display" id="v-grav">0.9</span>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">폭포 폭</span>
+      <input type="range" id="sl-width" min="10" max="200" value="60" style="width:80px;">
+      <span class="val-display" id="v-width">60</span>
+    </div>
+  </div>
+</div>
+<div id="hint">클릭·드래그로 물방울 뿌리기 — 방울끼리 닿으면 합쳐져 커지고, 클수록 빨리 떨어집니다</div>
+
+<script>
+'use strict';
+
+/* ══════════════ 캔버스 ══════════════ */
+const wrap   = document.getElementById('canvas-wrap');
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+let W = 0, H = 0;
+
+function sizeCanvas() {
+  const fs = document.fullscreenElement === wrap;
+  const targetW = fs ? window.innerWidth  : Math.min(700, window.innerWidth - 30);
+  const targetH = fs ? window.innerHeight : Math.min(520, window.innerHeight - 170);
+  // 수위 비율 보존
+  const poolFrac = H > 0 ? poolH / H : 0;
+  W = canvas.width  = Math.max(300, targetW);
+  H = canvas.height = Math.max(240, targetH);
+  poolH = poolFrac * H;
+  initSurface();
+}
+
+/* ══════════════ 상태 ══════════════ */
+let drops    = [];     // 낙하 중인 물방울
+let splashes = [];     // 물보라 입자
+let flashes  = [];     // 병합 플래시
+let poolH    = 0;      // 바닥 물 높이(px)
+let mergeCount = 0;
+let frame = 0;
+
+const MAX_DROPS = 700;
+
+// 수면 물결 (스프링 열)
+const COLS = 140;
+let surf, surfV;
+function initSurface() {
+  surf  = new Float32Array(COLS);
+  surfV = new Float32Array(COLS);
+}
+initSurface();
+
+/* ══════════════ 설정 ══════════════ */
+const cfg = {
+  fall  : true,    // 폭포 모드
+  rain  : false,   // 비 모드
+  merge : true,    // 병합 on/off
+  rate  : 6,
+  size  : 4,
+  grav  : 0.9,
+  fallW : 60,      // 폭포 폭
+};
+
+/* ══════════════ 물방울 ══════════════ */
+function spawnDrop(x, y, vx, vy, r) {
+  if (drops.length >= MAX_DROPS) return;
+  drops.push({
+    x, y,
+    vx: vx || 0,
+    vy: vy || 0,
+    r : r  || cfg.size * (0.6 + Math.random() * 0.9),
+    ph: Math.random() * Math.PI * 2,   // 흔들림 위상
+  });
+}
+
+function surfaceYAt(x) {
+  const i = Math.max(0, Math.min(COLS - 1, Math.floor(x / W * COLS)));
+  return H - poolH + surf[i];
+}
+
+function updateDrops() {
+  const g = cfg.grav * 0.1;
+  for (let i = drops.length - 1; i >= 0; i--) {
+    const d = drops[i];
+    d.vy += g;
+    // 공기 저항 — 작은 방울일수록 종단속도 낮음
+    const term = 3 + d.r * 1.6;
+    if (d.vy > term) d.vy += (term - d.vy) * 0.18;
+    d.vx *= 0.985;
+    // 작은 방울 흔들림
+    d.x += d.vx + Math.sin(frame * 0.15 + d.ph) * (2.2 / d.r) * 0.35;
+    d.y += d.vy;
+
+    // 좌우 벽
+    if (d.x < d.r)     { d.x = d.r;     d.vx =  Math.abs(d.vx) * 0.4; }
+    if (d.x > W - d.r) { d.x = W - d.r; d.vx = -Math.abs(d.vx) * 0.4; }
+
+    // 수면 착수
+    if (d.y + d.r >= surfaceYAt(d.x)) {
+      landDrop(d);
+      drops.splice(i, 1);
+    }
+  }
+}
+
+/* ══════════════ 병합 — 공간 해시 ══════════════ */
+function mergeDrops() {
+  if (!cfg.merge || drops.length < 2) return;
+  const cell = Math.max(16, cfg.size * 6);
+  const grid = new Map();
+  for (let i = 0; i < drops.length; i++) {
+    const d = drops[i];
+    const key = ((d.x / cell) | 0) + ',' + ((d.y / cell) | 0);
+    if (!grid.has(key)) grid.set(key, []);
+    grid.get(key).push(i);
+  }
+  const dead = new Set();
+  for (let i = 0; i < drops.length; i++) {
+    if (dead.has(i)) continue;
+    const a = drops[i];
+    const cx = (a.x / cell) | 0, cy = (a.y / cell) | 0;
+    for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) {
+      const bucket = grid.get((cx + ox) + ',' + (cy + oy));
+      if (!bucket) continue;
+      for (const j of bucket) {
+        if (j <= i || dead.has(j) || dead.has(i)) continue;
+        const b = drops[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const rr = (a.r + b.r) * 0.88;
+        if (dx * dx + dy * dy < rr * rr) {
+          // 병합 — 면적·운동량 보존, 큰 쪽이 흡수
+          const ma = a.r * a.r, mb = b.r * b.r, m = ma + mb;
+          a.x  = (a.x * ma + b.x * mb) / m;
+          a.y  = (a.y * ma + b.y * mb) / m;
+          a.vx = (a.vx * ma + b.vx * mb) / m;
+          a.vy = (a.vy * ma + b.vy * mb) / m;
+          a.r  = Math.sqrt(m);
+          dead.add(j);
+          mergeCount++;
+          flashes.push({ x: a.x, y: a.y, r: a.r, t: 0 });
+        }
+      }
+    }
+  }
+  if (dead.size) drops = drops.filter((_, idx) => !dead.has(idx));
+}
+
+/* ══════════════ 착수 — 수위 상승·물결·물보라 ══════════════ */
+function landDrop(d) {
+  // 부피 → 수위 (방울 면적을 폭으로 나눔)
+  poolH += (Math.PI * d.r * d.r) / W * 0.9;
+  if (poolH > H * 0.85) poolH = H * 0.85;
+
+  // 수면 출렁임
+  const col = Math.max(0, Math.min(COLS - 1, Math.floor(d.x / W * COLS)));
+  const power = Math.min(22, d.vy * d.r * 0.16);
+  surfV[col] += power;
+  if (col > 0)        surfV[col - 1] += power * 0.5;
+  if (col < COLS - 1) surfV[col + 1] += power * 0.5;
+
+  // 물보라 — 충돌 에너지에 비례
+  const n = Math.min(14, Math.floor(d.r * d.vy * 0.12));
+  const sy = surfaceYAt(d.x);
+  for (let k = 0; k < n; k++) {
+    splashes.push({
+      x : d.x + (Math.random() - 0.5) * d.r * 2,
+      y : sy,
+      vx: (Math.random() - 0.5) * d.vy * 0.55,
+      vy: -Math.random() * d.vy * 0.5 - 1,
+      r : Math.random() * 1.8 + 0.8,
+      life: 1,
+    });
+  }
+}
+
+function updateSurface() {
+  const TENSION = 0.022, DAMP = 0.975, SPREAD = 0.22;
+  for (let i = 0; i < COLS; i++) {
+    surfV[i] += -surf[i] * TENSION;
+    surfV[i] *= DAMP;
+    surf[i]  += surfV[i];
+  }
+  // 이웃으로 파동 전파 (2패스)
+  for (let pass = 0; pass < 2; pass++) {
+    for (let i = 0; i < COLS; i++) {
+      if (i > 0)        surfV[i - 1] += (surf[i] - surf[i - 1]) * SPREAD * 0.5;
+      if (i < COLS - 1) surfV[i + 1] += (surf[i] - surf[i + 1]) * SPREAD * 0.5;
+    }
+  }
+}
+
+function updateSplashes() {
+  const g = cfg.grav * 0.1;
+  for (let i = splashes.length - 1; i >= 0; i--) {
+    const s = splashes[i];
+    s.vy += g * 0.8;
+    s.x += s.vx; s.y += s.vy;
+    s.life -= 0.03;
+    if (s.life <= 0 || s.y > surfaceYAt(s.x) + 4) splashes.splice(i, 1);
+  }
+}
+
+/* ══════════════ 소환 ══════════════ */
+function autoSpawn() {
+  if (cfg.fall) {
+    // 폭포 — 상단 중앙에서 연속 낙하
+    for (let k = 0; k < cfg.rate; k++) {
+      if (Math.random() < 0.75) {
+        const x = W / 2 + (Math.random() - 0.5) * cfg.fallW;
+        spawnDrop(x, -10 - Math.random() * 20, (Math.random() - 0.5) * 0.6, 1 + Math.random() * 2);
+      }
+    }
+  }
+  if (cfg.rain) {
+    // 비 — 전체 폭 랜덤
+    for (let k = 0; k < cfg.rate; k++) {
+      if (Math.random() < 0.4) {
+        spawnDrop(Math.random() * W, -10, (Math.random() - 0.5) * 0.4, 2 + Math.random() * 3);
+      }
+    }
+  }
+}
+
+/* ══════════════ 그리기 ══════════════ */
+function draw() {
+  // 배경
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#0d1b30');
+  bg.addColorStop(1, '#0a1425');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // 바닥 물
+  if (poolH > 0.5) {
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, H - poolH + surf[0]);
+    for (let i = 1; i < COLS; i++) {
+      ctx.lineTo(i / (COLS - 1) * W, H - poolH + surf[i]);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    const wg = ctx.createLinearGradient(0, H - poolH - 10, 0, H);
+    wg.addColorStop(0, 'rgba(90,170,235,.75)');
+    wg.addColorStop(1, 'rgba(30,80,150,.85)');
+    ctx.fillStyle = wg;
+    ctx.fill();
+    // 수면 하이라이트
+    ctx.beginPath();
+    ctx.moveTo(0, H - poolH + surf[0]);
+    for (let i = 1; i < COLS; i++) {
+      ctx.lineTo(i / (COLS - 1) * W, H - poolH + surf[i]);
+    }
+    ctx.strokeStyle = 'rgba(180,225,255,.8)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // 물방울 — 속도에 따라 세로로 길쭉
+  for (const d of drops) {
+    const stretch = 1 + Math.min(d.vy * 0.028, 0.55);
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    ctx.scale(1 / Math.sqrt(stretch), stretch);
+    const g = ctx.createRadialGradient(-d.r * 0.3, -d.r * 0.35, d.r * 0.1, 0, 0, d.r);
+    g.addColorStop(0, 'rgba(210,240,255,.95)');
+    g.addColorStop(0.35, 'rgba(120,195,240,.85)');
+    g.addColorStop(1, 'rgba(50,120,200,.75)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, d.r, 0, Math.PI * 2);
+    ctx.fill();
+    // 반사광
+    ctx.fillStyle = 'rgba(255,255,255,.55)';
+    ctx.beginPath();
+    ctx.ellipse(-d.r * 0.35, -d.r * 0.4, d.r * 0.22, d.r * 0.14, -0.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 물보라
+  for (const s of splashes) {
+    ctx.globalAlpha = s.life * 0.8;
+    ctx.fillStyle = 'rgba(160,215,250,1)';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // 병합 플래시 — 퍼지는 링
+  for (let i = flashes.length - 1; i >= 0; i--) {
+    const f = flashes[i];
+    f.t += 0.12;
+    if (f.t >= 1) { flashes.splice(i, 1); continue; }
+    ctx.globalAlpha = (1 - f.t) * 0.6;
+    ctx.strokeStyle = 'rgba(190,235,255,1)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.r * (1 + f.t * 1.4), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // 통계
+  document.getElementById('stats').textContent =
+    `방울 ${drops.length} · 병합 ${mergeCount} · 수위 ${(poolH / H * 100).toFixed(1)}%`;
+}
+
+/* ══════════════ 루프 ══════════════ */
+let draining = false;
+function loop() {
+  frame++;
+  autoSpawn();
+  if (pointerDown) pointerSpawn();
+  updateDrops();
+  mergeDrops();
+  updateSurface();
+  updateSplashes();
+  if (draining && poolH > 0) {
+    poolH = Math.max(0, poolH - Math.max(0.6, poolH * 0.015));
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* ══════════════ 입력 ══════════════ */
+let pointerDown = false, px = 0, py = 0;
+
+function canvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {
+    x: (t.clientX - rect.left) / rect.width  * W,
+    y: (t.clientY - rect.top)  / rect.height * H,
+  };
+}
+function pointerSpawn() {
+  for (let k = 0; k < Math.ceil(cfg.rate / 2); k++) {
+    spawnDrop(
+      px + (Math.random() - 0.5) * 26,
+      py + (Math.random() - 0.5) * 26,
+      (Math.random() - 0.5) * 1.5,
+      Math.random() * 1.5
+    );
+  }
+}
+canvas.addEventListener('pointerdown', e => { pointerDown = true; const p = canvasPos(e); px = p.x; py = p.y; });
+canvas.addEventListener('pointermove', e => { const p = canvasPos(e); px = p.x; py = p.y; });
+window.addEventListener('pointerup', () => pointerDown = false);
+canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+
+/* ══════════════ 컨트롤 ══════════════ */
+const $ = id => document.getElementById(id);
+
+$('btn-fall').addEventListener('click', () => {
+  cfg.fall = !cfg.fall;
+  $('btn-fall').classList.toggle('on', cfg.fall);
+});
+$('btn-rain').addEventListener('click', () => {
+  cfg.rain = !cfg.rain;
+  $('btn-rain').classList.toggle('on', cfg.rain);
+});
+$('btn-merge').addEventListener('click', () => {
+  cfg.merge = !cfg.merge;
+  $('btn-merge').classList.toggle('on', cfg.merge);
+  $('btn-merge').textContent = cfg.merge ? '⚛ 병합 ON' : '⚛ 병합 OFF';
+});
+$('btn-clear').addEventListener('click', () => {
+  drops = []; splashes = []; flashes = [];
+  poolH = 0; mergeCount = 0;
+  initSurface();
+});
+
+// 배수 — 꾹 누르는 동안
+const drainBtn = $('btn-drain');
+function drainOn(e)  { e.preventDefault(); draining = true;  drainBtn.classList.add('held');  wrap.classList.add('draining'); }
+function drainOff()  { draining = false; drainBtn.classList.remove('held'); wrap.classList.remove('draining'); }
+drainBtn.addEventListener('pointerdown', drainOn);
+window.addEventListener('pointerup', drainOff);
+drainBtn.addEventListener('pointerleave', drainOff);
+
+// 전체화면
+$('btn-fs').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else wrap.requestFullscreen();
+});
+document.addEventListener('fullscreenchange', sizeCanvas);
+window.addEventListener('resize', sizeCanvas);
+
+// 슬라이더
+function bindSlider(id, valId, key, fmt) {
+  $(id).addEventListener('input', e => {
+    const v = +e.target.value;
+    cfg[key] = fmt ? fmt(v) : v;
+    $(valId).textContent = fmt ? fmt(v) : v;
+  });
+}
+bindSlider('sl-rate',  'v-rate',  'rate');
+bindSlider('sl-size',  'v-size',  'size');
+bindSlider('sl-grav',  'v-grav',  'grav', v => v / 10);
+bindSlider('sl-width', 'v-width', 'fallW');
+
+/* ══════════════ 시작 ══════════════ */
+sizeCanvas();
+loop();
+</script>
+</body>
+</html>

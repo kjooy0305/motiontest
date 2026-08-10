@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>절차적 맵 생성 — 테스트 40</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#12101c;}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;
+     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;user-select:none;}
+
+#title{color:#c9a2e2;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:6px;
+       text-shadow:0 0 10px rgba(201,162,226,.4);}
+
+#canvas-wrap{position:relative;border:2px solid #3a2a5c;border-radius:4px;overflow:hidden;
+             box-shadow:0 0 30px rgba(0,0,0,.6);background:#0d0b14;}
+#canvas{display:block;cursor:pointer;image-rendering:pixelated;}
+
+#stats{position:absolute;top:6px;left:8px;color:rgba(220,200,240,.8);font-size:11px;
+  font-family:Consolas,monospace;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.9);line-height:1.5;}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#c9a2e2;font-size:13px;background:#0d0b14;}
+
+#controls{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin-top:6px;padding:7px 11px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;width:100%;max-width:760px;
+}
+.ctrl-row{
+  width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  padding-top:5px;border-top:1px solid rgba(255,255,255,.08);
+}
+.ctrl-row:first-child{padding-top:0;border-top:none;}
+.ctrl-group{display:flex;align-items:center;gap:4px;}
+.ctrl-label{color:#b0a0c8;font-size:12px;white-space:nowrap;}
+.ctrl-divider{width:1px;height:22px;background:rgba(255,255,255,.1);}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.15);outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:#c9a2e2;cursor:pointer;
+}
+.val-display{color:#c9a2e2;font-size:11px;min-width:24px;text-align:center;}
+
+#seed-input{width:90px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);
+  border-radius:4px;padding:4px 8px;color:#e8d8f8;font-size:12px;font-family:Consolas,monospace;outline:none;}
+#seed-input:focus{border-color:#c9a2e2;}
+
+.btn{padding:5px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;
+     cursor:pointer;transition:all .12s;letter-spacing:.3px;}
+#btn-new  {background:#2a1a4a;color:#c9a2e2;border:1px solid #8a55cc;}
+#btn-new:hover{background:#3a2a5a;box-shadow:0 0 10px rgba(138,85,204,.4);}
+.mode-btn{background:rgba(255,255,255,.05);color:#909090;border:1px solid rgba(255,255,255,.15);}
+.mode-btn.on{background:#2a1a4a;color:#e8c8ff;border-color:#aa77ee;box-shadow:0 0 8px rgba(170,119,238,.35);}
+#btn-mon  {background:#1a2a1a;color:#88cc88;border:1px solid #44aa44;}
+#btn-mon.on{background:#1a3a1a;color:#aaffaa;border-color:#66dd66;box-shadow:0 0 8px rgba(102,221,102,.3);}
+#btn-save {background:#1a2a3a;color:#80b0d0;border:1px solid #406080;}
+#btn-fs   {background:#1a2a2a;color:#80d0d0;border:1px solid #406060;}
+
+#hint{color:rgba(200,180,220,.45);font-size:11px;margin-top:5px;letter-spacing:.3px;}
+</style>
+</head>
+<body>
+
+<div id="title">🗺️ 절차적 맵 생성</div>
+
+<div class="canvas-outer" id="canvas-wrap">
+  <canvas id="canvas"></canvas>
+  <div id="stats"></div>
+  <div id="loading">타일 로딩 중...</div>
+</div>
+
+<div id="controls">
+  <div class="ctrl-row">
+    <button class="btn mode-btn on" id="btn-dungeon">🏰 던전</button>
+    <button class="btn mode-btn" id="btn-field">🌿 초원</button>
+    <div class="ctrl-divider"></div>
+    <span class="ctrl-label">시드</span>
+    <input id="seed-input" type="text" spellcheck="false">
+    <button class="btn" id="btn-new">🎲 새 맵</button>
+    <div class="ctrl-divider"></div>
+    <button class="btn on" id="btn-mon">👾 몬스터</button>
+    <button class="btn" id="btn-save">💾 PNG</button>
+    <button class="btn" id="btn-fs">⛶ 전체화면</button>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <span class="ctrl-label">크기</span>
+      <button class="btn mode-btn" data-size="s">소</button>
+      <button class="btn mode-btn on" data-size="m">중</button>
+      <button class="btn mode-btn" data-size="l">대</button>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label" id="lb-a">방 개수</span>
+      <input type="range" id="sl-a" min="4" max="16" value="9" style="width:80px;">
+      <span class="val-display" id="v-a">9</span>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label" id="lb-b">방 크기</span>
+      <input type="range" id="sl-b" min="4" max="12" value="8" style="width:80px;">
+      <span class="val-display" id="v-b">8</span>
+    </div>
+    <div class="ctrl-divider"></div>
+    <div class="ctrl-group">
+      <span class="ctrl-label" id="lb-c">장식 밀도</span>
+      <input type="range" id="sl-c" min="0" max="10" value="5" style="width:80px;">
+      <span class="val-display" id="v-c">5</span>
+    </div>
+  </div>
+</div>
+<div id="hint">캔버스 클릭 = 새 맵 · 같은 시드는 항상 같은 맵 · 타일: 2D Pixel Dungeon Pack &amp; Pixel Art Top Down</div>
+
+<script>
+'use strict';
+
+/* ══════════════ 시드 랜덤 (mulberry32 + 문자열 해시) ══════════════ */
+function xmur3(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = h << 13 | h >>> 19;
+  }
+  return () => {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+}
+function mulberry32(a) {
+  return () => {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+let rng = Math.random;
+const ri = (a, b) => a + Math.floor(rng() * (b - a + 1));   // 정수 [a,b]
+const pick = arr => arr[Math.floor(rng() * arr.length)];
+
+/* ══════════════ 에셋 ══════════════ */
+const IMG = {};
+const SOURCES = {
+  dungeon: 'assets/dungeon_tileset.png',
+  chars  : 'assets/dungeon_character.png',
+  grass  : 'assets/grass.png',
+  plant  : 'assets/plant.png',
+  stone  : 'assets/stone.png',
+};
+let loaded = 0;
+const total = Object.keys(SOURCES).length;
+for (const [k, src] of Object.entries(SOURCES)) {
+  IMG[k] = new Image();
+  IMG[k].onload = () => { if (++loaded === total) init(); };
+  IMG[k].src = src;
+}
+
+/* ══════════════ 설정 ══════════════ */
+const cfg = {
+  mode : 'dungeon',      // dungeon | field
+  size : 'm',
+  a : 9,   // 던전: 방 개수  | 초원: 나무 밀도
+  b : 8,   // 던전: 방 크기  | 초원: 꽃 밀도
+  c : 5,   // 던전: 장식 밀도 | 초원: 돌밭 규모
+  monsters : true,
+  seed : '',
+};
+const SIZES = {
+  dungeon: { s: [40, 26], m: [56, 34], l: [76, 46] },
+  field  : { s: [26, 17], m: [36, 23], l: [48, 30] },
+};
+
+/* ══════════════ 캔버스 ══════════════ */
+const wrap    = document.getElementById('canvas-wrap');
+const canvas  = document.getElementById('canvas');
+const ctx     = canvas.getContext('2d');
+const native  = document.createElement('canvas');   // 원본 해상도
+const nctx    = native.getContext('2d');
+nctx.imageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled  = false;
+
+function fitCanvas() {
+  const fs = document.fullscreenElement === wrap;
+  const maxW = fs ? window.innerWidth  : Math.min(760, window.innerWidth - 30);
+  const maxH = fs ? window.innerHeight : Math.min(520, window.innerHeight - 190);
+  const scale = Math.max(1, Math.min(maxW / native.width, maxH / native.height));
+  canvas.width  = Math.round(native.width  * scale);
+  canvas.height = Math.round(native.height * scale);
+  ctx.imageSmoothingEnabled = false;
+  blit();
+}
+function blit() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(native, 0, 0, canvas.width, canvas.height);
+}
+
+/* ══════════════ 던전 생성 ══════════════ */
+const T = 16;
+const VOID = 0, FLOOR = 1, WALL = 2;
+let world = null;   // 생성 결과
+
+function genDungeon(GW, GH) {
+  const g = Array.from({length: GH}, () => new Uint8Array(GW));
+
+  // 1) 방 배치 (겹침 거부)
+  const rooms = [];
+  const maxR = cfg.a;
+  const rs = cfg.b;   // 방 크기 상한 기준
+  for (let t = 0; t < 300 && rooms.length < maxR; t++) {
+    const w = ri(4, Math.max(5, rs + 2));
+    const h = ri(3, Math.max(4, rs));
+    const x = ri(1, GW - w - 2), y = ri(1, GH - h - 2);
+    if (rooms.some(r => x < r.x + r.w + 2 && r.x < x + w + 2 &&
+                        y < r.y + r.h + 2 && r.y < y + h + 2)) continue;
+    rooms.push({x, y, w, h});
+  }
+  for (const r of rooms)
+    for (let j = r.y; j < r.y + r.h; j++)
+      for (let i = r.x; i < r.x + r.w; i++) g[j][i] = FLOOR;
+
+  // 2) 복도 — 가까운 방끼리 잇기 (프림 MST + L자, 2칸 폭)
+  const cs = rooms.map(r => [r.x + (r.w >> 1), r.y + (r.h >> 1)]);
+  const inTree = new Set([0]);
+  const edges = [];
+  while (inTree.size < cs.length) {
+    let best = null;
+    for (const a of inTree) for (let b = 0; b < cs.length; b++) {
+      if (inTree.has(b)) continue;
+      const d = Math.abs(cs[a][0]-cs[b][0]) + Math.abs(cs[a][1]-cs[b][1]);
+      if (!best || d < best[2]) best = [a, b, d];
+    }
+    inTree.add(best[1]);
+    edges.push(best);
+  }
+  const carve = (x, y) => {
+    if (y >= 0 && y < GH && x >= 0 && x < GW) g[y][x] = FLOOR;
+  };
+  for (const [a, b] of edges) {
+    let [x, y] = cs[a];
+    const [tx, ty] = cs[b];
+    const xFirst = rng() < 0.5;
+    const goX = () => { while (x !== tx) { carve(x, y); carve(x, Math.min(y+1, GH-1)); x += tx > x ? 1 : -1; } };
+    const goY = () => { while (y !== ty) { carve(x, y); carve(Math.min(x+1, GW-1), y); y += ty > y ? 1 : -1; } };
+    xFirst ? (goX(), goY()) : (goY(), goX());
+    carve(x, y);
+  }
+
+  // 3) 벽 — 바닥에 8방향 인접한 빈 칸
+  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+    if (g[j][i] !== VOID) continue;
+    outer:
+    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+      const nj = j + dj, ni = i + di;
+      if (nj >= 0 && nj < GH && ni >= 0 && ni < GW && g[nj][ni] === FLOOR) {
+        g[j][i] = WALL; break outer;
+      }
+    }
+  }
+
+  // 4) 장식·개체 배치
+  const decos = [];    // {i, j, tiles:[[c,r],..] 애니 프레임}
+  const entities = []; // {i, j, col, row}  chars 시트
+  const density = cfg.c / 10;
+  const items = [[0,8],[1,8],[6,8],[7,8],[9,8],[7,7],[8,8],[4,8]];  // 상자·동전·물약·해골·열쇠
+  for (const r of rooms) {
+    // 벽 장식 — 방 위쪽 벽면에 횃불·문장
+    for (let i = r.x; i < r.x + r.w; i++) {
+      const wj = r.y - 1;
+      if (wj >= 0 && g[wj][i] === WALL && g[wj + 1][i] === FLOOR) {
+        if (rng() < 0.22 * density * 2) decos.push({i, j: wj, anim: [[0,9],[1,9]]});     // 횃불
+        else if (rng() < 0.08 * density * 2) decos.push({i, j: wj, anim: [[4,7],[4,7]]}); // 문장
+      }
+    }
+    // 바닥 아이템
+    const n = Math.round(r.w * r.h * 0.05 * density * 2);
+    for (let k = 0; k < n; k++) {
+      const i = ri(r.x, r.x + r.w - 1), j = ri(r.y, r.y + r.h - 1);
+      decos.push({i, j, anim: [pick(items)]});
+    }
+  }
+  // 용사 — 첫 방, 몬스터 — 나머지 방
+  if (rooms.length) {
+    const r0 = rooms[0];
+    entities.push({i: r0.x + (r0.w >> 1), j: r0.y + (r0.h >> 1), col: ri(0, 6), row: 0});
+    for (let k = 1; k < rooms.length; k++) {
+      const r = rooms[k];
+      const n = ri(0, 2);
+      for (let m = 0; m < n; m++)
+        entities.push({i: ri(r.x, r.x + r.w - 1), j: ri(r.y, r.y + r.h - 1), col: ri(0, 6), row: 1});
+    }
+  }
+  return {kind: 'dungeon', g, GW, GH, rooms, decos, entities};
+}
+
+/* 던전 오토타일 — 프로토타입 검증 좌표 그대로 */
+const FLOOR_POOL = [[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3]];
+const VOID_POOL  = [[6,0],[7,0],[8,0],[9,0]];   // 균일한 어두운 배경 타일만
+function dungeonWallTile(w, i, j) {
+  const at = (x, y) => (x >= 0 && x < w.GW && y >= 0 && y < w.GH) ? w.g[y][x] : VOID;
+  const F = (x, y) => at(x, y) === FLOOR;
+  const N = F(i, j-1), S = F(i, j+1), E = F(i+1, j), W_ = F(i-1, j);
+  if (S && !(E || W_)) return pick([[1,0],[2,0],[3,0],[4,0]]);   // 북벽 면
+  if (N && !(E || W_)) return pick([[1,5],[2,5],[3,5],[4,5]]);   // 남벽 면
+  if (E && !(N || S))  return pick([[0,1],[0,2],[0,3]]);         // 서벽
+  if (W_ && !(N || S)) return pick([[5,1],[5,2],[5,3]]);         // 동벽
+  if (S && E)  return [0,0];
+  if (S && W_) return [5,0];
+  if (N && E)  return [0,5];
+  if (N && W_) return [5,5];
+  if (F(i+1, j+1)) return [0,0];
+  if (F(i-1, j+1)) return [5,0];
+  if (F(i+1, j-1)) return [0,5];
+  if (F(i-1, j-1)) return [5,5];
+  return pick(VOID_POOL);
+}
+
+function renderDungeon(w, frame) {
+  native.width = w.GW * T; native.height = w.GH * T;
+  nctx.imageSmoothingEnabled = false;
+  const dt = (c, r, i, j) => nctx.drawImage(IMG.dungeon, c*T, r*T, T, T, i*T, j*T, T, T);
+  for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
+    const cell = w.g[j][i];
+    let t;
+    if (cell === VOID) t = w.voidCache[j*w.GW+i];
+    else if (cell === FLOOR) t = w.floorCache[j*w.GW+i];
+    else t = w.wallCache[j*w.GW+i];
+    dt(t[0], t[1], i, j);
+  }
+  for (const d of w.decos) {
+    const t = d.anim[frame % d.anim.length];
+    dt(t[0], t[1], d.i, d.j);
+  }
+  if (cfg.monsters) {
+    for (const e of w.entities) {
+      const fr = (frame + e.i) % 2;                 // 개체마다 위상 다르게
+      nctx.drawImage(IMG.chars, e.col*T, (e.row + fr*2)*T, T, T, e.i*T, e.j*T, T, T);
+    }
+  }
+}
+
+/* ══════════════ 초원 생성 ══════════════ */
+const GT = 32;
+function valueNoise(GW, GH, cell) {
+  // 격자 랜덤 + 이중선형 보간
+  const gw = Math.ceil(GW / cell) + 2, gh = Math.ceil(GH / cell) + 2;
+  const grid = Array.from({length: gh}, () => Array.from({length: gw}, () => rng()));
+  const sm = t => t * t * (3 - 2 * t);
+  const out = [];
+  for (let j = 0; j < GH; j++) {
+    out.push([]);
+    for (let i = 0; i < GW; i++) {
+      const gx = i / cell, gy = j / cell;
+      const x0 = gx | 0, y0 = gy | 0;
+      const fx = sm(gx - x0), fy = sm(gy - y0);
+      const v = grid[y0][x0]     * (1-fx) * (1-fy) + grid[y0][x0+1]   * fx * (1-fy)
+              + grid[y0+1][x0]   * (1-fx) * fy     + grid[y0+1][x0+1] * fx * fy;
+      out[j].push(v);
+    }
+  }
+  return out;
+}
+
+const GRASS_PLAIN  = [[0,0],[1,0],[2,0],[3,0],[0,1],[1,1],[2,1],[3,1],[0,2],[1,2],[2,2],[3,2],[0,3],[1,3],[2,3],[3,3]];
+const GRASS_FLOWER = [[4,0],[5,0],[6,0],[7,0],[4,1],[5,1],[6,1],[7,1],[4,2],[5,2],[6,2],[7,2],[4,3],[5,3],[6,3],[7,3]];
+const TREES  = [[32,0,112,152],[160,0,112,152],[288,0,96,152]];   // [sx,sy,sw,sh]
+const BUSHES = [[32,184,32,40],[64,184,32,40],[160,184,32,40],[224,184,32,40]];
+
+function genField(GW, GH) {
+  const stoneN  = valueNoise(GW, GH, 8);
+  const flowerN = valueNoise(GW, GH, 5);
+  const treeN   = valueNoise(GW, GH, 6);
+  const stoneT  = 1 - cfg.c * 0.033;         // 돌밭 규모
+  const flowerT = 1 - cfg.b * 0.05;          // 꽃 밀도
+  let stone = Array.from({length: GH}, (_, j) =>
+    Array.from({length: GW}, (_, i) => stoneN[j][i] > stoneT));
+  // 침식 — 외로운 돌 제거 (2패스, 블롭이 2×2 이상 유지되게)
+  for (let p = 0; p < 2; p++) {
+    const nxt = Array.from({length: GH}, () => new Array(GW).fill(false));
+    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+      if (!stone[j][i]) continue;
+      let n = 0;
+      for (const [di, dj] of [[0,-1],[0,1],[1,0],[-1,0]]) {
+        const x = i+di, y = j+dj;
+        if (x >= 0 && x < GW && y >= 0 && y < GH && stone[y][x]) n++;
+      }
+      nxt[j][i] = n >= 2;
+    }
+    stone = nxt;
+  }
+  const sAt = (i, j) => i >= 0 && i < GW && j >= 0 && j < GH && stone[j][i];
+
+  const base = [];    // 잔디 바닥 캐시
+  const paving = [];  // 돌 포장 캐시 (null = 없음) — 블롭 오토타일
+  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+    base.push(flowerN[j][i] > flowerT && rng() < 0.5 ? pick(GRASS_FLOWER) : pick(GRASS_PLAIN));
+    if (stone[j][i]) {
+      const L = sAt(i-1,j), R = sAt(i+1,j), U = sAt(i,j-1), D = sAt(i,j+1);
+      let col = !L ? 0 : (!R ? 3 : pick([1,2]));
+      let row = !U ? 0 : (!D ? 3 : pick([1,2]));
+      if (col >= 1 && col <= 2 && row >= 1 && row <= 2 && rng() < 0.25) {
+        col = pick([5,6]); row = pick([1,2]);   // 자갈 박힌 내부 변주
+      }
+      paving.push([col, row]);
+    } else paving.push(null);
+  }
+
+  // 나무·수풀 — 노이즈 봉우리 + 최소 간격
+  const trees = [];
+  const treeT = 1 - cfg.a * 0.04;
+  for (let j = 1; j < GH - 1; j++) for (let i = 1; i < GW; i++) {
+    if (stone[j][i] || treeN[j][i] < treeT || rng() > 0.5) continue;
+    if (trees.some(t => Math.abs(t.i - i) < 3 && Math.abs(t.j - j) < 3)) continue;
+    trees.push({i, j, spr: pick(TREES)});
+  }
+  const bushes = [];
+  for (let k = 0; k < GW * GH * 0.02 * (cfg.a / 8); k++) {
+    const i = ri(0, GW - 1), j = ri(1, GH - 1);
+    if (stone[j][i]) continue;
+    if (trees.some(t => Math.abs(t.i - i) < 2 && Math.abs(t.j - j) < 2)) continue;
+    bushes.push({i, j, spr: pick(BUSHES)});
+  }
+  return {kind: 'field', GW, GH, base, paving, trees, bushes};
+}
+
+function renderField(w) {
+  native.width = w.GW * GT; native.height = w.GH * GT;
+  nctx.imageSmoothingEnabled = false;
+  for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
+    const t = w.base[j * w.GW + i];
+    nctx.drawImage(IMG.grass, t[0]*GT, t[1]*GT, GT, GT, i*GT, j*GT, GT, GT);
+    const p = w.paving[j * w.GW + i];
+    if (p) nctx.drawImage(IMG.stone, p[0]*GT, p[1]*GT, GT, GT, i*GT, j*GT, GT, GT);
+  }
+  // 수풀 → 나무 순서로 (painter's algorithm: y 정렬)
+  for (const b of w.bushes)
+    nctx.drawImage(IMG.plant, b.spr[0], b.spr[1], b.spr[2], b.spr[3],
+                   b.i*GT, b.j*GT - (b.spr[3] - GT), b.spr[2], b.spr[3]);
+  const sorted = [...w.trees].sort((a, b) => a.j - b.j);
+  for (const t of sorted) {
+    const [sx, sy, sw, sh] = t.spr;
+    nctx.drawImage(IMG.plant, sx, sy, sw, sh,
+                   t.i*GT - (sw >> 1) + (GT >> 1), (t.j+1)*GT - sh, sw, sh);
+  }
+}
+
+/* ══════════════ 생성·그리기 총괄 ══════════════ */
+let animFrame = 0;
+
+function generate(newSeed) {
+  if (newSeed || !cfg.seed) cfg.seed = Math.random().toString(36).slice(2, 8);
+  document.getElementById('seed-input').value = cfg.seed;
+  rng = mulberry32(xmur3(cfg.mode + ':' + cfg.seed)());
+
+  const [GW, GH] = SIZES[cfg.mode][cfg.size];
+  if (cfg.mode === 'dungeon') {
+    world = genDungeon(GW, GH);
+    // 타일 선택 결과 캐시 (애니 리렌더 시 재추첨 방지)
+    world.voidCache = [], world.floorCache = [], world.wallCache = [];
+    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+      const idx = j * GW + i;
+      world.voidCache[idx]  = pick(VOID_POOL);
+      world.floorCache[idx] = world.g[j][i] === FLOOR && world.g[Math.min(j+1,GH-1)][i] === WALL
+        ? pick([[1,4],[2,4],[3,4],[4,4]]) : pick(FLOOR_POOL);
+      world.wallCache[idx]  = dungeonWallTile(world, i, j);
+    }
+  } else {
+    world = genField(GW, GH);
+  }
+  redraw();
+  fitCanvas();
+  updateStats();
+}
+
+function redraw() {
+  if (!world) return;
+  if (world.kind === 'dungeon') renderDungeon(world, animFrame);
+  else renderField(world);
+  blit();
+}
+
+function updateStats() {
+  const s = document.getElementById('stats');
+  if (world.kind === 'dungeon')
+    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 방 ${world.rooms.length} · 몬스터 ${world.entities.length - 1}`;
+  else
+    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 나무 ${world.trees.length} · 수풀 ${world.bushes.length}`;
+}
+
+// 횃불·캐릭터 2프레임 애니메이션
+setInterval(() => {
+  animFrame++;
+  if (world && world.kind === 'dungeon') redraw();
+}, 350);
+
+/* ══════════════ 컨트롤 ══════════════ */
+const $ = id => document.getElementById(id);
+const MODE_LABELS = {
+  dungeon: ['방 개수', '방 크기', '장식 밀도'],
+  field  : ['나무 밀도', '꽃 밀도', '돌밭 규모'],
+};
+
+function setMode(m) {
+  cfg.mode = m;
+  $('btn-dungeon').classList.toggle('on', m === 'dungeon');
+  $('btn-field').classList.toggle('on', m === 'field');
+  $('btn-mon').style.display = m === 'dungeon' ? '' : 'none';
+  const [la, lb, lc] = MODE_LABELS[m];
+  $('lb-a').textContent = la; $('lb-b').textContent = lb; $('lb-c').textContent = lc;
+  generate(false);
+}
+$('btn-dungeon').addEventListener('click', () => setMode('dungeon'));
+$('btn-field').addEventListener('click', () => setMode('field'));
+
+$('btn-new').addEventListener('click', () => generate(true));
+canvas.addEventListener('click', () => generate(true));
+
+$('seed-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    cfg.seed = e.target.value.trim() || cfg.seed;
+    generate(false);
+  }
+});
+
+$('btn-mon').addEventListener('click', () => {
+  cfg.monsters = !cfg.monsters;
+  $('btn-mon').classList.toggle('on', cfg.monsters);
+  redraw();
+});
+
+document.querySelectorAll('[data-size]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-size]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    cfg.size = b.dataset.size;
+    generate(false);
+  });
+});
+
+function bindSlider(id, valId, key) {
+  $(id).addEventListener('input', e => {
+    cfg[key] = +e.target.value;
+    $(valId).textContent = e.target.value;
+    generate(false);
+  });
+}
+bindSlider('sl-a', 'v-a', 'a');
+bindSlider('sl-b', 'v-b', 'b');
+bindSlider('sl-c', 'v-c', 'c');
+
+$('btn-save').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.download = `map_${cfg.mode}_${cfg.seed}.png`;
+  a.href = native.toDataURL('image/png');
+  a.click();
+});
+
+$('btn-fs').addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else wrap.requestFullscreen();
+});
+document.addEventListener('fullscreenchange', fitCanvas);
+window.addEventListener('resize', fitCanvas);
+
+/* ══════════════ 시작 ══════════════ */
+function init() {
+  document.getElementById('loading').style.display = 'none';
+  generate(true);
+}
+</script>
+</body>
+</html>

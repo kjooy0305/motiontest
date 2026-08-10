@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 바다 시뮬레이션 — 테스트 39</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:#050c1a;
+  font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#fff;
+  user-select:none;}
+
+/* ─── Selection Screen ─── */
+#sel{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 70%,#0d2a4a 0%,#050c1a 70%);
+  z-index:100;overflow-y:auto;padding:20px;
+  transition:opacity .6s,transform .6s;
+}
+#sel.hide{opacity:0;transform:scale(1.06);pointer-events:none;}
+
+#sel h1{font-size:clamp(20px,5vw,32px);font-weight:800;letter-spacing:1px;
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8,#0ea5e9);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;}
+#sel p{font-size:13px;color:#64748b;margin-bottom:24px;}
+
+.cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:680px;}
+.card{
+  width:120px;flex-shrink:0;border:2px solid #1e3a5f;border-radius:14px;
+  padding:16px 10px 14px;background:#0d1f35;cursor:pointer;
+  transition:border-color .2s,background .2s,transform .15s,box-shadow .2s;
+  text-align:center;
+}
+.card:hover{transform:translateY(-3px);background:#112540;}
+.card.active{border-color:var(--c);background:#0a1e36;
+  box-shadow:0 0 18px var(--c)44;}
+.card .icon{font-size:28px;margin-bottom:8px;}
+.card .name{font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:4px;}
+.card .desc{font-size:10px;color:#64748b;line-height:1.4;}
+
+#btn-enter{
+  margin-top:22px;padding:12px 44px;border:none;border-radius:30px;
+  background:linear-gradient(135deg,#0ea5e9,#3b82f6);
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+  opacity:.35;pointer-events:none;
+  transition:opacity .25s,transform .15s,box-shadow .25s;
+  box-shadow:0 4px 20px #3b82f644;
+}
+#btn-enter.ready{opacity:1;pointer-events:all;}
+#btn-enter.ready:hover{transform:scale(1.04);box-shadow:0 6px 28px #3b82f666;}
+
+/* ─── Main 3D View ─── */
+#main{position:absolute;inset:0;display:none;}
+#main.show{display:block;}
+#canvas{display:block;width:100%;height:100%;}
+
+/* ─── UI Overlay ─── */
+#ui{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,rgba(3,10,24,.92) 60%,transparent);
+  padding:14px 16px 16px;
+  display:flex;flex-direction:column;gap:9px;
+  transition:opacity .3s;
+}
+#ui.hide{opacity:0;pointer-events:none;}
+
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.lbl{font-size:11px;color:#94a3b8;white-space:nowrap;min-width:50px;}
+
+/* Wave chips */
+.wchip{
+  padding:4px 11px;border-radius:20px;border:1px solid #1e3a5f;
+  background:transparent;color:#94a3b8;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.wchip.on{background:var(--c);color:#000;border-color:var(--c);}
+
+/* Sliders */
+input[type=range]{
+  -webkit-appearance:none;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.15);outline:none;cursor:pointer;
+  flex:1;min-width:60px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:#38bdf8;cursor:pointer;
+  box-shadow:0 0 6px #38bdf888;
+}
+.val{font-size:11px;color:#38bdf8;min-width:32px;text-align:right;}
+
+/* Time mode */
+.tmchip{
+  padding:3px 9px;border-radius:12px;border:1px solid #1e3a5f;
+  background:transparent;color:#94a3b8;font-size:11px;cursor:pointer;
+  transition:all .15s;
+}
+.tmchip.on{background:#1e3a5f;color:#7dd3fc;border-color:#38bdf8;}
+
+/* Buttons */
+.ibtn{
+  padding:5px 12px;border-radius:8px;border:1px solid #1e3a5f;
+  background:rgba(30,58,95,.5);color:#94a3b8;font-size:12px;cursor:pointer;
+  transition:background .15s,color .15s;flex-shrink:0;
+}
+.ibtn:hover{background:#1e3a5f;color:#e2e8f0;}
+.ibtn.on{background:#0ea5e9;color:#000;border-color:#0ea5e9;}
+
+/* Stats */
+#stats{
+  position:absolute;top:10px;left:12px;
+  font-size:11px;color:rgba(148,163,184,.7);
+  font-family:Consolas,monospace;line-height:1.7;
+  pointer-events:none;
+  text-shadow:0 1px 3px rgba(0,0,0,.9);
+}
+
+/* UI toggle hint */
+#hint{
+  position:absolute;top:10px;right:12px;
+  font-size:11px;color:rgba(148,163,184,.5);
+  pointer-events:none;
+}
+
+/* Cursor */
+#main{cursor:grab;}
+#main:active{cursor:grabbing;}
+</style>
+</head>
+<body>
+
+<!-- ─── Selection Screen ─── -->
+<div id="sel">
+  <h1>🌊 3D 바다 시뮬레이션</h1>
+  <p>파도 유형을 선택한 뒤 입장하세요</p>
+  <div class="cards">
+    <div class="card" data-mode="0" style="--c:#4fc3f7">
+      <div class="icon">〰️</div>
+      <div class="name">사인파</div>
+      <div class="desc">수학적 정현파<br>규칙적·부드러운</div>
+    </div>
+    <div class="card" data-mode="1" style="--c:#29b6f6">
+      <div class="icon">🌊</div>
+      <div class="name">거스너파</div>
+      <div class="desc">트로코이드 파형<br>날카로운 마루</div>
+    </div>
+    <div class="card" data-mode="2" style="--c:#26c6da">
+      <div class="icon">🌀</div>
+      <div class="name">복합파</div>
+      <div class="desc">거스너+사인 합성<br>가장 자연스러운</div>
+    </div>
+    <div class="card" data-mode="3" style="--c:#ef5350">
+      <div class="icon">⚠️</div>
+      <div class="name">변칙파</div>
+      <div class="desc">갑작스러운<br>이상 파도</div>
+    </div>
+    <div class="card" data-mode="4" style="--c:#ff9800">
+      <div class="icon">🌏</div>
+      <div class="name">쓰나미형</div>
+      <div class="desc">초장파·고속<br>거대 파도</div>
+    </div>
+  </div>
+  <button id="btn-enter">입장 →</button>
+</div>
+
+<!-- ─── Main 3D View ─── -->
+<div id="main">
+  <canvas id="canvas"></canvas>
+  <div id="stats"></div>
+  <div id="hint">H: UI 숨기기</div>
+
+  <div id="ui">
+    <!-- Row 1: wave chips + fullscreen -->
+    <div class="row">
+      <span class="lbl">파도</span>
+      <button class="wchip" data-mode="0" style="--c:#4fc3f7">사인</button>
+      <button class="wchip" data-mode="1" style="--c:#29b6f6">거스너</button>
+      <button class="wchip" data-mode="2" style="--c:#26c6da">복합</button>
+      <button class="wchip" data-mode="3" style="--c:#ef5350">변칙</button>
+      <button class="wchip" data-mode="4" style="--c:#ff9800">쓰나미</button>
+      <span style="flex:1"></span>
+      <button class="ibtn" id="btn-fs">⛶ 전체화면</button>
+    </div>
+
+    <!-- Row 2: intensity + sound -->
+    <div class="row">
+      <span class="lbl">강도</span>
+      <input type="range" id="sl-intensity" min="0.1" max="3" step="0.05" value="1">
+      <span class="val" id="v-intensity">1.0×</span>
+      <span class="lbl" style="margin-left:10px;">🔊</span>
+      <button class="ibtn on" id="btn-sound">소리 ON</button>
+      <input type="range" id="sl-vol" min="0" max="1" step="0.05" value="0.45" style="max-width:80px;">
+    </div>
+
+    <!-- Row 3: time -->
+    <div class="row">
+      <span class="lbl">시간대</span>
+      <button class="tmchip" id="tm-realtime">실시간</button>
+      <button class="tmchip on" id="tm-sim">시뮬레이션</button>
+      <button class="tmchip" id="tm-manual">수동</button>
+      <span class="lbl" style="margin-left:6px;">속도</span>
+      <input type="range" id="sl-daylen" min="1" max="60" step="1" value="5" style="max-width:90px;">
+      <span class="val" id="v-daylen">5분/일</span>
+      <span class="lbl" style="margin-left:6px;">시각</span>
+      <input type="range" id="sl-time" min="0" max="1440" step="1" value="720" style="max-width:90px;" disabled>
+      <span class="val" id="v-time">12:00</span>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ══════════════════════════════════════════════════════
+   GLSL — Ocean Vertex Shader
+══════════════════════════════════════════════════════ */
+const oceanVert = /* glsl */`
+uniform float uTime;
+uniform int   uMode;
+uniform float uIntensity;
+
+varying vec3  vWorld;
+varying vec3  vNormal;
+varying float vHeight;
+varying float vFoam;
+
+#define PI 3.14159265359
+#define TAU 6.28318530718
+
+// ── Sine wave sum ──────────────────────────────────
+float sineH(vec2 p){
+  float t=uTime, h=0.0;
+  h += 0.80 * sin(0.090*p.x                    - 0.80*t);
+  h += 0.55 * sin(0.120*p.x*0.77+0.120*p.z*0.64- 1.10*t + 1.1);
+  h += 0.35 * sin(0.160*p.z                    - 1.40*t + 2.3);
+  h += 0.20 * sin(0.220*p.x*0.50-0.220*p.z*0.87- 1.80*t + 0.7);
+  h += 0.10 * sin(0.380*p.x                    - 2.40*t + 3.5);
+  h += 0.06 * sin(0.600*p.z*0.60+0.600*p.x*0.80- 3.20*t + 1.8);
+  return h;
+}
+
+// ── Gerstner wave height ───────────────────────────
+float gerstH(vec2 p){
+  float t=uTime, h=0.0;
+  // dir, amplitude, wavelength, speed
+  float dirs[6*2];
+  dirs[0]=1.0; dirs[1]=0.6;
+  dirs[2]=-0.5;dirs[3]=1.0;
+  dirs[4]=0.8; dirs[5]=-0.4;
+  dirs[6]=0.2; dirs[7]=0.9;
+  dirs[8]=-0.9;dirs[9]=0.2;
+  dirs[10]=0.6;dirs[11]=-0.8;
+
+  float amps[6]; amps[0]=0.9; amps[1]=0.65; amps[2]=0.45; amps[3]=0.30; amps[4]=0.20; amps[5]=0.14;
+  float lens[6]; lens[0]=35.0;lens[1]=25.0;lens[2]=18.0;lens[3]=12.0;lens[4]=8.0; lens[5]=5.5;
+
+  for(int i=0;i<6;i++){
+    vec2 d=normalize(vec2(dirs[i*2],dirs[i*2+1]));
+    float k=TAU/lens[i];
+    float c=sqrt(9.8/k);
+    h += amps[i]*sin(k*dot(d,p)-c*t);
+  }
+  return h;
+}
+
+// ── Combined (Gerstner large + sine chop) ─────────
+float combinedH(vec2 p){
+  return gerstH(p) + sineH(p)*0.3;
+}
+
+// ── Rogue wave (Gaussian envelope × cosine) ───────
+float rogueH(vec2 p){
+  float t=uTime;
+  float bg = sineH(p)*0.25;  // calm background
+
+  // rogue wave travels in +X, period 20 sec
+  float cx = -160.0 + mod(t*9.0,520.0);
+  float dx = p.x - cx;
+  float dz = p.z;
+  float env = exp(-(dx*dx*0.0006 + dz*dz*0.0004));
+  float rogue = 6.5 * env * sin(0.28*dx - 2.0*t);
+  return bg + rogue;
+}
+
+// ── Tsunami / KdV soliton ─────────────────────────
+float tsunamiH(vec2 p){
+  float t=uTime;
+  float bg = sineH(p)*0.12;
+
+  // Two soliton waves
+  float cx1=-200.0+mod(t*13.0,640.0);
+  float cx2=-320.0+mod(t*10.0,640.0);
+  float k=0.065;
+  float s1=cosh(k*(p.x-cx1)); float s2=cosh(k*(p.x-cx2));
+  return bg + 7.0/(s1*s1) + 4.5/(s2*s2);
+}
+
+// ── Unified height + normal via FD ────────────────
+float getH(vec2 p){
+  float I = uIntensity;
+  if(uMode==0) return sineH(p)*I;
+  if(uMode==1) return gerstH(p)*I;
+  if(uMode==2) return combinedH(p)*I;
+  if(uMode==3) return rogueH(p)*I;
+  if(uMode==4) return tsunamiH(p)*I;
+  return 0.0;
+}
+
+void main(){
+  vec2 xz = position.xz;
+  float h  = getH(xz);
+
+  float eps = 0.7;
+  float hpx = getH(xz+vec2(eps,0.0));
+  float hnx = getH(xz-vec2(eps,0.0));
+  float hpz = getH(xz+vec2(0.0,eps));
+  float hnz = getH(xz-vec2(0.0,eps));
+
+  vec3 nrm = normalize(vec3(hnx-hpx, 2.0*eps, hnz-hpz));
+
+  // Gerstner horizontal displacement (mode 1, 2)
+  vec3 newPos = position;
+  newPos.y = h;
+  if(uMode==1||uMode==2){
+    float t=uTime;
+    vec2 disp=vec2(0.0);
+    float lens[3]; lens[0]=35.0;lens[1]=25.0;lens[2]=18.0;
+    float amps[3]; amps[0]=0.9; amps[1]=0.65; amps[2]=0.45;
+    vec2 dirs2[3];
+    dirs2[0]=normalize(vec2(1.0,0.6));
+    dirs2[1]=normalize(vec2(-0.5,1.0));
+    dirs2[2]=normalize(vec2(0.8,-0.4));
+    for(int i=0;i<3;i++){
+      float k=TAU/lens[i];
+      float c=sqrt(9.8/k);
+      float Q=0.55;
+      float f=k*dot(dirs2[i],xz)-c*t;
+      disp += Q*amps[i]*dirs2[i]*cos(f)*uIntensity;
+    }
+    newPos.x += disp.x;
+    newPos.z += disp.y;
+  }
+
+  vWorld  = (modelMatrix*vec4(newPos,1.0)).xyz;
+  vNormal = normalMatrix*nrm;
+  vHeight = h;
+  vFoam   = smoothstep(0.9, 2.5, h) * uIntensity;
+
+  gl_Position = projectionMatrix*modelViewMatrix*vec4(newPos,1.0);
+}
+`;
+
+/* ══════════════════════════════════════════════════════
+   GLSL — Ocean Fragment Shader
+══════════════════════════════════════════════════════ */
+const oceanFrag = /* glsl */`
+uniform vec3  uSunDir;
+uniform vec3  uSunColor;
+uniform vec3  uCamPos;
+uniform float uTime;
+
+varying vec3  vWorld;
+varying vec3  vNormal;
+varying float vHeight;
+varying float vFoam;
+
+vec3 deepCol   = vec3(0.014, 0.060, 0.18);
+vec3 shallowCol= vec3(0.040, 0.20, 0.45);
+vec3 foamCol   = vec3(0.88, 0.94, 1.00);
+
+void main(){
+  vec3 N = normalize(vNormal);
+  vec3 V = normalize(uCamPos - vWorld);
+  vec3 L = normalize(uSunDir);
+  vec3 H = normalize(L+V);
+
+  // Fresnel
+  float fres = pow(1.0-max(dot(N,V),0.0),4.0);
+  fres = mix(0.04, 1.0, fres);
+
+  // Diffuse water depth
+  float depth = clamp((vHeight*0.2+0.5),0.0,1.0);
+  vec3 water  = mix(deepCol, shallowCol, depth);
+
+  // Specular
+  float spec = pow(max(dot(N,H),0.0), 200.0);
+  vec3 color = water + uSunColor*spec*1.8;
+
+  // Foam
+  color = mix(color, foamCol, vFoam*0.75);
+
+  // Fake sky reflection tint
+  color = mix(color, vec3(0.45,0.68,0.95)*0.55, fres*0.35);
+
+  // Sub-surface scatter tint when lit
+  float ss = pow(max(dot(L,N),0.0),0.6)*0.15;
+  color += vec3(0.0,0.3,0.6)*ss;
+
+  // Horizon fog
+  float dist = length(vWorld.xz);
+  float fog  = smoothstep(120.0,320.0,dist);
+  color = mix(color, vec3(0.35,0.52,0.72)*0.5, fog*0.7);
+
+  gl_FragColor = vec4(color,1.0);
+}
+`;
+
+/* ══════════════════════════════════════════════════════
+   GLSL — Sky Shader (sphere, backside)
+══════════════════════════════════════════════════════ */
+const skyVert = /* glsl */`
+varying vec3 vDir;
+void main(){
+  vDir = position;
+  gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+}
+`;
+
+const skyFrag = /* glsl */`
+uniform vec3  uSunDir;
+uniform float uDayFactor; // 0=night 1=day
+varying vec3  vDir;
+
+vec3 skyColor(vec3 dir, vec3 sun, float day){
+  float elev   = dir.y;
+  float sunElev= sun.y;
+
+  // Base day sky
+  vec3 zenD = vec3(0.10,0.26,0.72);
+  vec3 horD = vec3(0.60,0.78,0.97);
+  // Base night sky
+  vec3 zenN = vec3(0.005,0.008,0.025);
+  vec3 horN = vec3(0.010,0.012,0.040);
+
+  vec3 zen = mix(zenN, zenD, day);
+  vec3 hor = mix(horN, horD, day);
+
+  float e = pow(clamp(elev,0.0,1.0),0.5);
+  vec3 sky = mix(hor, zen, e);
+
+  // Below horizon — water dark
+  if(elev<0.0){
+    sky = mix(sky, vec3(0.02,0.04,0.09), min(1.0,-elev*8.0));
+  }
+
+  // Sunset/sunrise glow
+  float sunH  = clamp((0.25-abs(sunElev))*4.0,0.0,1.0);
+  float hGlow = pow(clamp(1.0-abs(elev)*2.5,0.0,1.0),3.0);
+  sky = mix(sky, vec3(1.0,0.32,0.05)*0.9, sunH*hGlow*0.9);
+
+  // Sun disk
+  float sunA = dot(normalize(dir), sun);
+  float disk  = smoothstep(0.9992,0.9998,sunA);
+  sky += disk * vec3(2.2,2.1,1.8) * day;
+  // Glow halo
+  sky += pow(max(sunA,0.0),12.0)*vec3(0.7,0.4,0.1)*sunH*0.8;
+
+  return sky;
+}
+
+// Simple pseudo-random stars
+float star(vec3 d){
+  vec3 s = floor(d*220.0);
+  float r = fract(sin(dot(s,vec3(127.1,311.7,74.9)))*43758.5);
+  float br= fract(sin(dot(s,vec3(269.5,183.3,124.1)))*43758.5);
+  return step(0.995,r)*br;
+}
+
+void main(){
+  vec3 dir = normalize(vDir);
+  vec3 sun = normalize(uSunDir);
+  float day= clamp(uDayFactor,0.0,1.0);
+
+  vec3 col = skyColor(dir,sun,day);
+  // Stars (night only)
+  col += star(dir)*(1.0-day)*0.9;
+
+  gl_FragColor = vec4(col,1.0);
+}
+`;
+
+/* ══════════════════════════════════════════════════════
+   APP STATE
+══════════════════════════════════════════════════════ */
+let waveMode   = 0;
+let intensity  = 1.0;
+let timeMode   = 'sim'; // 'realtime'|'sim'|'manual'
+let dayMinutes = 5;     // minutes per simulated day
+let manualMin  = 720;   // minutes since midnight for manual mode
+let simAngle   = Math.PI * 0.5; // current sun angle (radians)
+let soundOn    = true;
+let vol        = 0.45;
+let uiVisible  = true;
+
+let renderer, scene, camera, controls;
+let oceanUni, skyUni, sunLight, ambLight;
+let audioCtx, masterGain, soundNodes = null;
+let animId, fps=0, lastT=0, frameCount=0, fpsT=0;
+
+/* ══════════════════════════════════════════════════════
+   SELECTION SCREEN
+══════════════════════════════════════════════════════ */
+const selEl  = document.getElementById('sel');
+const mainEl = document.getElementById('main');
+const enterBtn = document.getElementById('btn-enter');
+
+document.querySelectorAll('.card').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.card').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    waveMode = parseInt(c.dataset.mode);
+    enterBtn.classList.add('ready');
+  });
+});
+
+enterBtn.addEventListener('click',()=>{
+  if(!enterBtn.classList.contains('ready')) return;
+  selEl.classList.add('hide');
+  mainEl.classList.add('show');
+  initScene();
+  initAudio();
+  animate();
+  syncWaveChips();
+  setTimeout(()=>selEl.style.display='none',700);
+});
+
+/* ══════════════════════════════════════════════════════
+   THREE.JS SCENE
+══════════════════════════════════════════════════════ */
+function initScene(){
+  const canvas = document.getElementById('canvas');
+
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x061428, 0.0018);
+
+  camera = new THREE.PerspectiveCamera(65, canvas.clientWidth/canvas.clientHeight, 0.5, 1200);
+  camera.position.set(0, 22, 55);
+  camera.lookAt(0, 0, 0);
+
+  controls = new OrbitControls(camera, canvas);
+  controls.enableDamping   = true;
+  controls.dampingFactor   = 0.08;
+  controls.minDistance     = 3;
+  controls.maxDistance     = 350;
+  controls.maxPolarAngle   = Math.PI * 0.485;
+  controls.target.set(0,0,0);
+
+  // ── Sky sphere ──────────────────────────────────
+  skyUni = {
+    uSunDir:   { value: new THREE.Vector3(0,1,0) },
+    uDayFactor:{ value: 1.0 },
+  };
+  const skyGeo  = new THREE.SphereGeometry(700,48,24);
+  const skyMat  = new THREE.ShaderMaterial({
+    uniforms:skyUni, vertexShader:skyVert, fragmentShader:skyFrag,
+    side:THREE.BackSide, depthWrite:false,
+  });
+  scene.add(new THREE.Mesh(skyGeo,skyMat));
+
+  // ── Ocean ────────────────────────────────────────
+  oceanUni = {
+    uTime:     { value: 0 },
+    uMode:     { value: waveMode },
+    uIntensity:{ value: intensity },
+    uSunDir:   { value: new THREE.Vector3(0,1,0) },
+    uSunColor: { value: new THREE.Color(1.0,0.92,0.76) },
+    uCamPos:   { value: new THREE.Vector3() },
+  };
+  const oceanGeo = new THREE.PlaneGeometry(480,480,220,220);
+  oceanGeo.rotateX(-Math.PI/2);
+  const oceanMat = new THREE.ShaderMaterial({
+    uniforms:oceanUni, vertexShader:oceanVert, fragmentShader:oceanFrag,
+    side:THREE.FrontSide,
+  });
+  scene.add(new THREE.Mesh(oceanGeo, oceanMat));
+
+  // ── Lights ───────────────────────────────────────
+  sunLight = new THREE.DirectionalLight(0xffe8c0,2.5);
+  sunLight.position.set(80,120,60);
+  scene.add(sunLight);
+
+  ambLight = new THREE.AmbientLight(0x2a4060, 0.6);
+  scene.add(ambLight);
+
+  // ── Sun sphere ───────────────────────────────────
+  const sunGeo = new THREE.SphereGeometry(5,16,8);
+  const sunMat = new THREE.MeshBasicMaterial({color:0xffe8a0});
+  const sunMesh= new THREE.Mesh(sunGeo,sunMat);
+  scene.add(sunMesh);
+  window._sunMesh = sunMesh;
+
+  window.addEventListener('resize', onResize);
+}
+
+/* ── Resize ── */
+function onResize(){
+  const c = document.getElementById('canvas');
+  const w = c.clientWidth, h = c.clientHeight;
+  if(!w||!h) return;
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+}
+
+/* ══════════════════════════════════════════════════════
+   TIME OF DAY
+══════════════════════════════════════════════════════ */
+function sunAngleToDir(angle){
+  // angle 0 = midnight (below), π/2 = sunrise, π = noon, 3π/2 = sunset
+  const x = Math.sin(angle) * 0.7;
+  const y = Math.sin(angle - Math.PI/2); // -1 at midnight, +1 at noon
+  const z = Math.cos(angle) * 0.5;
+  return new THREE.Vector3(x,y,z).normalize();
+}
+
+function angleToMinutes(a){
+  // map [0, 2π) → [0, 1440)
+  return ((a / (Math.PI*2)) * 1440 + 360) % 1440; // offset so π = noon
+}
+
+function minutesToAngle(m){
+  return ((m - 360) / 1440) * Math.PI * 2;
+}
+
+function updateSun(angle){
+  const dir = sunAngleToDir(angle);
+
+  sunLight.position.copy(dir.clone().multiplyScalar(300));
+  sunLight.color.setHSL(
+    dir.y>0.2 ? 0.12 : dir.y>-0.1 ? 0.08 : 0.12,
+    dir.y>0.2 ? 0.5 : dir.y>-0.1 ? 0.9 : 0.2,
+    Math.max(0.05, dir.y*0.8+0.3)
+  );
+  sunLight.intensity = Math.max(0.0, dir.y*3.0+0.1);
+
+  const dayF = THREE.MathUtils.clamp(dir.y*3+0.5,0,1);
+  ambLight.intensity = dayF*0.6+0.08;
+  ambLight.color.setHSL(0.62, dayF*0.4, 0.15+dayF*0.15);
+
+  oceanUni.uSunDir.value.copy(dir);
+  oceanUni.uSunColor.value.setHSL(
+    dir.y>0 ? 0.12 : 0.07,
+    dir.y>0.3 ? 0.3 : 0.7,
+    Math.max(0.3, dir.y*0.5+0.6)
+  );
+
+  skyUni.uSunDir.value.copy(dir);
+  skyUni.uDayFactor.value = dayF;
+
+  if(window._sunMesh){
+    window._sunMesh.position.copy(dir.clone().multiplyScalar(500));
+    window._sunMesh.visible = dir.y > -0.05;
+  }
+
+  scene.fog.color.setHSL(0.60, dayF*0.3+0.1, dayF*0.15+0.04);
+
+  // Update time display
+  const mins = ((angleToMinutes(angle)+1440)%1440);
+  const hh = String(Math.floor(mins/60)).padStart(2,'0');
+  const mm = String(Math.floor(mins%60)).padStart(2,'0');
+  document.getElementById('v-time').textContent = hh+':'+mm;
+  if(timeMode!=='manual'){
+    document.getElementById('sl-time').value = mins;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   AUDIO
+══════════════════════════════════════════════════════ */
+function initAudio(){
+  if(audioCtx) return;
+  try{
+    audioCtx = new AudioContext();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = soundOn ? vol : 0;
+    masterGain.connect(audioCtx.destination);
+    buildSound();
+  }catch(e){ console.warn('Audio failed:',e); }
+}
+
+function buildSound(){
+  if(!audioCtx) return;
+  if(soundNodes){ soundNodes.forEach(n=>{ try{n.stop?.(); n.disconnect?.();}catch(_){} }); soundNodes=null; }
+
+  const sr = audioCtx.sampleRate;
+  // 8-second looping noise buffer
+  const len = sr*8;
+  const buf = audioCtx.createBuffer(2,len,sr);
+  for(let ch=0;ch<2;ch++){
+    const d=buf.getChannelData(ch);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<len;i++){
+      const wn=(Math.random()*2-1);
+      // Pink noise approximation
+      b0=0.99886*b0+wn*0.0555179;
+      b1=0.99332*b1+wn*0.0750759;
+      b2=0.96900*b2+wn*0.1538520;
+      b3=0.86650*b3+wn*0.3104856;
+      b4=0.55000*b4+wn*0.5329522;
+      b5=-0.7616*b5-wn*0.0168980;
+      d[i]=(b0+b1+b2+b3+b4+b5+b6+wn*0.5362)*0.11;
+      b6=wn*0.115926;
+    }
+  }
+
+  const src=audioCtx.createBufferSource();
+  src.buffer=buf; src.loop=true;
+
+  // Low rumble
+  const lp=audioCtx.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value=320; lp.Q.value=1.2;
+
+  // Mid wash
+  const bp=audioCtx.createBiquadFilter();
+  bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=0.8;
+
+  // Combine: two paths
+  const g1=audioCtx.createGain(); g1.gain.value=1.0;
+  const g2=audioCtx.createGain(); g2.gain.value=0.4;
+
+  src.connect(lp); lp.connect(g1); g1.connect(masterGain);
+  src.connect(bp); bp.connect(g2); g2.connect(masterGain);
+  src.start();
+
+  // Slow oscillating gain for "wave rhythm"
+  const lfo=audioCtx.createOscillator();
+  lfo.frequency.value=0.18;
+  const lfoG=audioCtx.createGain();
+  lfoG.gain.value=0.25;
+  lfo.connect(lfoG);
+  lfoG.connect(g1.gain);
+  lfo.start();
+
+  soundNodes=[src,lfo];
+}
+
+/* ══════════════════════════════════════════════════════
+   ANIMATION LOOP
+══════════════════════════════════════════════════════ */
+function animate(){
+  animId=requestAnimationFrame(animate);
+  const now=performance.now()/1000;
+  const dt=Math.min(now-lastT,0.1);
+  lastT=now;
+
+  // FPS
+  frameCount++;
+  if(now-fpsT>=0.75){ fps=Math.round(frameCount/(now-fpsT)); frameCount=0; fpsT=now; }
+
+  // Time of day
+  if(timeMode==='realtime'){
+    const d=new Date();
+    const m=d.getHours()*60+d.getMinutes()+d.getSeconds()/60;
+    simAngle=minutesToAngle(m);
+  } else if(timeMode==='sim'){
+    simAngle += (Math.PI*2)/(dayMinutes*60) * dt;
+    if(simAngle>Math.PI*2) simAngle-=Math.PI*2;
+  }
+  // manual: simAngle set by slider
+
+  updateSun(simAngle);
+
+  // Ocean uniforms
+  oceanUni.uTime.value += dt;
+  oceanUni.uCamPos.value.copy(camera.position);
+
+  // Stats
+  document.getElementById('stats').innerHTML =
+    `FPS: ${fps}<br>Mode: ${['사인','거스너','복합','변칙','쓰나미'][waveMode]}<br>`+
+    `Intensity: ${intensity.toFixed(1)}×`;
+
+  controls.update();
+  renderer.render(scene,camera);
+}
+
+/* ══════════════════════════════════════════════════════
+   UI CONTROLS
+══════════════════════════════════════════════════════ */
+function syncWaveChips(){
+  document.querySelectorAll('.wchip').forEach(c=>{
+    c.classList.toggle('on', parseInt(c.dataset.mode)===waveMode);
+  });
+}
+
+document.querySelectorAll('.wchip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    waveMode=parseInt(c.dataset.mode);
+    if(oceanUni) oceanUni.uMode.value=waveMode;
+    syncWaveChips();
+  });
+});
+
+const slInt=document.getElementById('sl-intensity');
+const vInt=document.getElementById('v-intensity');
+slInt.addEventListener('input',()=>{
+  intensity=parseFloat(slInt.value);
+  if(oceanUni) oceanUni.uIntensity.value=intensity;
+  vInt.textContent=intensity.toFixed(2)+'×';
+});
+
+const slVol=document.getElementById('sl-vol');
+slVol.addEventListener('input',()=>{
+  vol=parseFloat(slVol.value);
+  if(masterGain) masterGain.gain.value=soundOn?vol:0;
+});
+
+const btnSound=document.getElementById('btn-sound');
+btnSound.addEventListener('click',()=>{
+  soundOn=!soundOn;
+  if(!audioCtx){ initAudio(); }
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  if(masterGain) masterGain.gain.value=soundOn?vol:0;
+  btnSound.textContent=soundOn?'소리 ON':'소리 OFF';
+  btnSound.classList.toggle('on',soundOn);
+});
+
+// Time mode buttons
+['realtime','sim','manual'].forEach(m=>{
+  document.getElementById('tm-'+m).addEventListener('click',()=>{
+    timeMode=m;
+    ['realtime','sim','manual'].forEach(x=>document.getElementById('tm-'+x).classList.toggle('on',x===m));
+    document.getElementById('sl-time').disabled = m!=='manual';
+    document.getElementById('sl-daylen').disabled = m!=='sim';
+  });
+});
+
+const slDay=document.getElementById('sl-daylen');
+slDay.addEventListener('input',()=>{
+  dayMinutes=parseInt(slDay.value);
+  document.getElementById('v-daylen').textContent=dayMinutes+'분/일';
+});
+
+const slTime=document.getElementById('sl-time');
+slTime.addEventListener('input',()=>{
+  manualMin=parseInt(slTime.value);
+  simAngle=minutesToAngle(manualMin);
+});
+
+// Fullscreen
+document.getElementById('btn-fs').addEventListener('click',()=>{
+  const el=document.documentElement;
+  if(!document.fullscreenElement){
+    el.requestFullscreen?.()
+      || el.webkitRequestFullscreen?.()
+      || el.mozRequestFullScreen?.();
+    document.getElementById('btn-fs').textContent='✕ 전체화면 종료';
+  } else {
+    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen)?.call(document);
+    document.getElementById('btn-fs').textContent='⛶ 전체화면';
+  }
+});
+
+// H key — toggle UI
+document.addEventListener('keydown',e=>{
+  if(e.key==='h'||e.key==='H'){
+    uiVisible=!uiVisible;
+    document.getElementById('ui').classList.toggle('hide',!uiVisible);
+    document.getElementById('hint').style.opacity=uiVisible?'0.5':'0.2';
+  }
+});
+
+// Resize observer
+new ResizeObserver(onResize).observe(document.getElementById('main'));
+
+</script>
+</body>
+</html>

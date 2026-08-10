@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>엑셀 완전 정복 — 테스트 34</title>
+<style>
+:root{
+  --bg:#0f1117;--bg2:#161b22;--bg3:#1a2030;--bg4:#1e2636;
+  --border:#2d3748;--border2:#4a5568;
+  --txt:#e2e8f0;--txt2:#a0aec0;--txt3:#718096;
+  --green:#4ade80;--green2:#16a34a;--green3:#052e16;
+  --yellow:#fbbf24;--yellow2:#d97706;
+  --blue:#60a5fa;--blue2:#1d4ed8;--blue3:#1e3a5f;
+  --red:#f87171;--orange:#fb923c;
+  --purple:#c084fc;--teal:#2dd4bf;
+  --xl:#21a366;--xl2:#107c41;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--xl);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--txt);white-space:nowrap;}
+.mc-badge{background:linear-gradient(135deg,#21a366,#0e5c30);color:#fff;font-size:13px;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:1px;border:1px solid #4ade80;}
+.search-wrap{flex:1;min-width:160px;max-width:360px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--xl);box-shadow:0 0 0 2px rgba(33,163,102,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 12px;border-radius:4px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(33,163,102,.18);color:var(--green);border:1px solid var(--xl2);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(74,222,128,.08);color:var(--green);border-left-color:var(--green);}
+.main{flex:1;padding:20px 24px;max-width:1000px;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--green);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.hl{color:var(--yellow);}
+
+.r-table{width:100%;border-collapse:collapse;}
+.r-table tr{border-bottom:1px solid var(--border);}
+.r-table tr:last-child{border-bottom:none;}
+.r-table tr:hover td{background:rgba(255,255,255,.02);}
+.r-table td{padding:0;vertical-align:top;}
+.cmd-cell{padding:10px 12px 10px 16px;width:44%;font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;}
+.desc-cell{padding:10px 16px 10px 0;}
+
+.mc{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;color:var(--green);background:rgba(74,222,128,.07);padding:3px 7px;border-radius:3px;border:1px solid rgba(74,222,128,.15);display:inline-block;word-break:break-all;line-height:1.5;}
+.mc .kw{color:var(--yellow);}
+.mc .str{color:var(--teal);}
+.mc .num{color:var(--orange);}
+.mc .sel{color:var(--purple);}
+.mc .cmt{color:var(--txt3);font-style:italic;}
+.mc .arg{color:var(--blue);}
+
+.codeblock{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;margin:8px 0;color:var(--txt2);overflow-x:auto;line-height:1.9;white-space:pre;}
+.codeblock .kw{color:var(--yellow);}
+.codeblock .str{color:var(--teal);}
+.codeblock .num{color:var(--orange);}
+.codeblock .sel{color:var(--purple);}
+.codeblock .cmt{color:var(--txt3);font-style:italic;}
+.codeblock .fn{color:var(--green);}
+.codeblock .key{color:var(--blue);}
+.codeblock .va{color:var(--txt);}
+
+.dm{color:var(--txt);font-size:13px;margin-bottom:3px;font-weight:500;}
+.ds{color:var(--txt2);font-size:12px;line-height:1.55;}
+.tag{display:inline-block;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--green);margin:3px 2px 0;}
+.tag-b{display:inline-block;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--blue);margin:3px 2px 0;}
+.tag-y{display:inline-block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--yellow);margin:3px 2px 0;}
+
+.tip{background:rgba(33,163,102,.07);border:1px solid rgba(33,163,102,.3);border-radius:5px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.tip b{color:var(--green);}
+.warn{font-size:11px;color:var(--yellow);margin-top:5px;padding:4px 8px;background:rgba(251,191,36,.06);border-radius:3px;border-left:2px solid var(--yellow);}
+.note{font-size:11px;color:var(--blue);margin-top:5px;padding:4px 8px;background:rgba(96,165,250,.06);border-radius:3px;border-left:2px solid var(--blue);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+
+.mini-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;}
+.mini-title{font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+
+.version-badge{display:inline-block;background:rgba(251,191,36,.12);border:1px solid var(--yellow2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--yellow);font-family:monospace;margin-left:6px;}
+.kbd{display:inline-block;background:var(--bg4);border:1px solid var(--border2);border-bottom-width:2px;border-radius:4px;padding:1px 7px;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;color:var(--txt);margin:1px;}
+
+@media(max-width:680px){.sidebar{display:none;}.main{padding:14px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="mc-badge">X</span> 엑셀 완전 정복</div>
+  <div class="search-wrap">
+    <input class="search" id="searchInput" type="text" placeholder="검색... (예: vlookup, 피벗, 조건부 서식, vba)">
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('basic',this)">📗 기초</button>
+    <button class="tab" onclick="switchTab('key',this)">⌨️ 단축키</button>
+    <button class="tab" onclick="switchTab('fn',this)">🧮 함수 기본</button>
+    <button class="tab" onclick="switchTab('lookup',this)">🔍 찾기·참조</button>
+    <button class="tab" onclick="switchTab('agg',this)">📊 집계·배열</button>
+    <button class="tab" onclick="switchTab('data',this)">📈 데이터 도구</button>
+    <button class="tab" onclick="switchTab('vba',this)">💻 VBA 매크로</button>
+    <button class="tab" onclick="switchTab('ex',this)">💡 실전·오류</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="mainArea">
+
+<!-- ══════════════════════════════════════════
+     기초
+═══════════════════════════════════════════ -->
+<div class="panel active" id="panel-basic">
+  <div class="sec-title">📗 엑셀 기초</div>
+  <div class="sec-sub">셀 참조 · 수식 규칙 · 자동 채우기 · 표(Table) · 이름 정의 · 셀 서식 코드 · 붙여넣기 옵션</div>
+
+  <div class="card" id="b-ref">
+    <div class="card-header"><span class="hl">01</span> 셀 참조 — 상대·절대·혼합 (모든 수식의 뿌리)</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">A1</span></td><td class="desc-cell"><div class="dm">상대 참조</div><div class="ds">수식을 복사하면 위치 따라 <b>같이 이동</b> — 기본값</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">$A$1</span></td><td class="desc-cell"><div class="dm">절대 참조</div><div class="ds">복사해도 <b>고정</b> — 환율·기준값 등 한 셀을 계속 참조할 때</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">A$1 / $A1</span></td><td class="desc-cell"><div class="dm">혼합 참조 (행 고정 / 열 고정)</div><div class="ds">구구단표·행렬 계산처럼 한 방향만 고정할 때</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">F4</span> 키</span></td><td class="desc-cell"><div class="ds">수식 입력 중 참조 위에서 F4 → A1 → $A$1 → A$1 → $A1 순환 — 손으로 $ 칠 필요 없음</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">'매출'!A1</span></td><td class="desc-cell"><div class="ds">다른 시트 참조 (시트명에 공백 있으면 작은따옴표)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">[예산.xlsx]1월!A1</span></td><td class="desc-cell"><div class="ds">다른 파일 참조 — 파일 닫혀 있으면 전체 경로로 표시됨</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">A1:C10 · A:A · 3:3</span></td><td class="desc-cell"><div class="ds">범위 · 열 전체 · 행 전체</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="b-formula">
+    <div class="card-header"><span class="hl">02</span> 수식 기본 규칙</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">=</span> 로 시작</td><td class="desc-cell"><div class="ds">모든 수식은 = 부터. +로 시작해도 되지만 =가 표준</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">+ - * / ^</span></td><td class="desc-cell"><div class="ds">사칙연산 + 거듭제곱(^). 우선순위는 수학과 동일, 괄호로 제어</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">&amp;</span></td><td class="desc-cell"><div class="dm">텍스트 연결</div><div class="ds">="이름: "&amp;A1 → "이름: 홍길동"</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">= &lt;&gt; &gt;= &lt;=</span></td><td class="desc-cell"><div class="ds">비교 연산 — 결과는 TRUE/FALSE. <b>같지 않다</b>는 &lt;&gt;</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">"텍스트"</span></td><td class="desc-cell"><div class="ds">수식 안 문자는 큰따옴표. 따옴표 자체는 "" 두 번</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">F9</span></span></td><td class="desc-cell"><div class="ds">수식 일부를 드래그하고 F9 → 그 부분만 계산 결과 미리보기 (Esc로 취소) — 디버깅 필수기술</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc"><span class="kw">Ctrl + `</span></span></td><td class="desc-cell"><div class="ds">시트 전체 수식 보기 토글</div></td></tr>
+      </table>
+      <div class="note">💡 수식이 안 먹고 글자 그대로 보이면: ① 셀 서식이 '텍스트'로 되어 있음 → '일반'으로 바꾸고 F2+Enter ② '수식 표시' 모드가 켜져 있음 (Ctrl+`)</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-fill">
+    <div class="card-header"><span class="hl">03</span> 자동 채우기 (Fill Handle)</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">핸들 드래그</span></td><td class="desc-cell"><div class="ds">셀 오른쪽 아래 ＋를 드래그 — 수식·패턴(1,2,3… 월,화,수…) 자동 연장</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">핸들 <span class="kw">더블클릭</span></span></td><td class="desc-cell"><div class="ds">옆 열 데이터 끝까지 <b>한 번에</b> 채움 — 수천 행도 0.1초 (실무 최애 기능)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">Ctrl + 드래그</span></td><td class="desc-cell"><div class="ds">동작 반전 — 숫자 하나면 복사↔연속 전환</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">빠른 채우기 <span class="kw">Ctrl+E</span></span></td><td class="desc-cell"><div class="ds">예시 1~2개를 쳐주면 패턴을 학습해서 나머지 자동 완성 — "홍길동 → 홍"처럼 함수 없이 텍스트 분리·조합</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">사용자 지정 목록</span></td><td class="desc-cell"><div class="ds">옵션 → 고급 → 사용자 지정 목록 — 지점명·부서명 순서를 등록하면 드래그로 자동 채우기 가능</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="b-table">
+    <div class="card-header"><span class="hl">04</span> 표(Table) — <span class="kw">Ctrl+T</span></div>
+    <div style="padding:14px 16px;">
+      <div class="tip">데이터 범위를 <b>표로 변환</b>하면: 행 추가 시 수식·서식 <b>자동 확장</b>, 정렬·필터 내장, 구조적 참조 사용 가능. 피벗테이블·수식의 원본은 표로 만드는 게 정석입니다.</div>
+      <div class="codeblock"><span class="cmt">' 구조적 참조 — 셀 주소 대신 열 이름으로</span>
+=SUM(판매표[금액])          <span class="cmt">' 금액 열 전체 합계 (행 늘어나도 자동 반영)</span>
+=[@단가]*[@수량]            <span class="cmt">' 같은 행의 단가×수량 (@=현재 행)</span>
+=판매표[#머리글]            <span class="cmt">' 머리글 행</span></div>
+      <div class="ds">표 이름은 표 선택 → [테이블 디자인] 탭에서 변경. 요약 행(Ctrl+Shift+T)을 켜면 열별 합계·평균 드롭다운 제공.</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-name">
+    <div class="card-header"><span class="hl">05</span> 이름 정의</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">이름 상자에 직접 입력</span></td><td class="desc-cell"><div class="ds">범위 선택 → 수식 입력줄 왼쪽 이름 상자에 "환율" 입력 → Enter</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=단가*환율</span></td><td class="desc-cell"><div class="ds">수식에서 셀 주소 대신 이름 사용 — 가독성↑, 절대참조 효과</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">Ctrl+F3</span></td><td class="desc-cell"><div class="ds">이름 관리자 — 정의된 이름 확인·수정·삭제</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="b-format">
+    <div class="card-header"><span class="hl">06</span> 셀 서식 코드 — <span class="kw">Ctrl+1</span> → 사용자 지정</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">표시 형식은 <b>값은 그대로 두고 보이는 모양만</b> 바꿉니다. 구조: <b>양수;음수;0;텍스트</b> (세미콜론 구분, 뒤쪽 생략 가능)</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">#,##0</span></td><td class="desc-cell"><div class="ds">천 단위 콤마 → 1,234,567</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">#,##0.00</span></td><td class="desc-cell"><div class="ds">소수 둘째 자리까지 → 1,234.50</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">#,##0,"천원"</span></td><td class="desc-cell"><div class="ds">콤마 하나당 천 단위 절삭 → 1234567 → 1,235천원 (,, 는 백만 단위)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">0%  ·  0.0%</span></td><td class="desc-cell"><div class="ds">백분율</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">yyyy-mm-dd (aaa)</span></td><td class="desc-cell"><div class="ds">2026-08-10 (월) — aaa=요일 한 글자, aaaa=월요일</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">[h]:mm</span></td><td class="desc-cell"><div class="ds">24시간 넘는 누적 시간 → 32:15 (근무시간 합계 필수)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">#,##0;[빨강]-#,##0;"-"</span></td><td class="desc-cell"><div class="ds">양수는 검정, 음수는 빨강, 0은 "-" 표시 — 재무 보고서 표준</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">000-0000-0000</span></td><td class="desc-cell"><div class="ds">전화번호 (0은 자리 강제, #은 있을 때만)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">@"님"</span></td><td class="desc-cell"><div class="ds">텍스트 뒤에 자동으로 "님" 붙이기 (@=입력된 텍스트)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">;;;</span></td><td class="desc-cell"><div class="ds">셀 내용 숨기기 (값은 남고 화면·인쇄만 숨김)</div></td></tr>
+      </table>
+      <div class="note">💡 엑셀 날짜의 정체: 1900-01-01 = 1 인 <b>일련번호</b>입니다. 그래서 날짜끼리 빼기(=B1-A1)가 되고, 시간은 소수(0.5=12:00)로 계산됩니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="b-paste">
+    <div class="card-header"><span class="hl">07</span> 선택하여 붙여넣기 — <span class="kw">Ctrl+Alt+V</span></div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">값만 (V)</span></td><td class="desc-cell"><div class="ds">수식 결과를 값으로 고정 — <b>실무 사용 빈도 1위</b>. 수식 제거하고 결과만 남길 때</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">서식만 (T)</span></td><td class="desc-cell"><div class="ds">모양만 복사 (서식 복사 붓과 동일)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">행/열 바꿈 (E)</span></td><td class="desc-cell"><div class="ds">가로표 ↔ 세로표 전환 (Transpose)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">연산 — 곱하기 등</span></td><td class="desc-cell"><div class="ds">빈 셀에 1000 복사 → 범위에 '나누기' 붙여넣기 = 전체를 천원 단위로 일괄 변환</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">연결하여 붙여넣기 (L)</span></td><td class="desc-cell"><div class="ds">원본 셀 참조 수식으로 붙여넣음</div></td></tr>
+    </table>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     단축키
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-key">
+  <div class="sec-title">⌨️ 단축키</div>
+  <div class="sec-sub">이동 · 선택 · 편집 · 서식 · 행/열 · 기능 호출 — 실무 속도를 결정하는 핵심만</div>
+
+  <div class="card" id="k-move">
+    <div class="card-header"><span class="hl">01</span> 이동</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">방향키</span></td><td class="desc-cell"><div class="ds">데이터 끝으로 점프 — 수만 행도 한 번에</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Home</span> / <span class="kbd">Ctrl</span>+<span class="kbd">End</span></td><td class="desc-cell"><div class="ds">A1로 / 데이터 마지막 셀로</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">PgUp</span> / <span class="kbd">PgDn</span></td><td class="desc-cell"><div class="ds">이전 / 다음 시트</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">G</span> 또는 <span class="kbd">F5</span></td><td class="desc-cell"><div class="ds">이동 대화상자 — "옵션"에서 빈 셀만·수식만·상수만 선택 가능 (빈 셀 일괄 채우기의 시작점)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Tab</span> / <span class="kbd">Enter</span></td><td class="desc-cell"><div class="ds">오른쪽 / 아래로 확정 이동 (Shift 붙이면 반대 방향)</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="k-select">
+    <div class="card-header"><span class="hl">02</span> 선택</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">방향키</span></td><td class="desc-cell"><div class="ds">현재 셀부터 데이터 끝까지 선택 — <b>가장 많이 쓰는 조합</b></div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">A</span></td><td class="desc-cell"><div class="ds">현재 데이터 영역 선택 (한 번 더 = 시트 전체)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Space</span> / <span class="kbd">Shift</span>+<span class="kbd">Space</span></td><td class="desc-cell"><div class="ds">열 전체 / 행 전체 선택</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Shift</span>+<span class="kbd">클릭</span> · <span class="kbd">Ctrl</span>+<span class="kbd">클릭</span></td><td class="desc-cell"><div class="ds">연속 범위 / 떨어진 범위 추가 선택</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="k-edit">
+    <div class="card-header"><span class="hl">03</span> 편집</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="kbd">F2</span></td><td class="desc-cell"><div class="ds">셀 편집 모드 — 수식 확인·수정 (참조가 색깔로 표시됨)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Alt</span>+<span class="kbd">Enter</span></td><td class="desc-cell"><div class="ds">셀 안 줄바꿈</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></td><td class="desc-cell"><div class="ds">선택한 <b>모든 셀에 동시 입력</b> — 빈 셀 일괄 채우기 (F5 → 빈 셀 → =위셀 → Ctrl+Enter)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">D</span> / <span class="kbd">Ctrl</span>+<span class="kbd">R</span></td><td class="desc-cell"><div class="ds">위 셀 아래로 복사 / 왼쪽 셀 오른쪽으로 복사</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">;</span> / <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">;</span></td><td class="desc-cell"><div class="ds">오늘 날짜 / 현재 시각 입력 (값으로 고정됨 — TODAY()와 다름)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Alt</span>+<span class="kbd">↓</span></td><td class="desc-cell"><div class="ds">같은 열에 이미 입력된 값 드롭다운 선택</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">F</span> / <span class="kbd">Ctrl</span>+<span class="kbd">H</span></td><td class="desc-cell"><div class="ds">찾기 / 바꾸기 (* ? 와일드카드, 서식으로 찾기 가능)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">F4</span></td><td class="desc-cell"><div class="ds">편집 중=참조 고정 순환 · 편집 아닐 때=<b>마지막 작업 반복</b> (서식 반복 적용에 최고)</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="k-format">
+    <div class="card-header"><span class="hl">04</span> 서식 · 행/열</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">1</span></td><td class="desc-cell"><div class="ds">셀 서식 대화상자 — 엑셀에서 가장 중요한 단축키</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">B</span> / <span class="kbd">I</span> / <span class="kbd">U</span></td><td class="desc-cell"><div class="ds">굵게 / 기울임 / 밑줄</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">1</span></td><td class="desc-cell"><div class="ds">천 단위 콤마 서식 (Ctrl+Shift+5=%, 4=통화, 3=날짜, 2=시간, ~=일반)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">+</span> / <span class="kbd">Ctrl</span>+<span class="kbd">-</span></td><td class="desc-cell"><div class="ds">행·열·셀 삽입 / 삭제 (행·열 선택 후 쓰면 행·열 삽입)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">9</span> / <span class="kbd">Ctrl</span>+<span class="kbd">0</span></td><td class="desc-cell"><div class="ds">행 숨기기 / 열 숨기기</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="k-func">
+    <div class="card-header"><span class="hl">05</span> 기능 호출</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="kbd">Alt</span>+<span class="kbd">=</span></td><td class="desc-cell"><div class="ds">자동 합계 (SUM 자동 입력) — 범위 선택 후 누르면 한 번에</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">T</span></td><td class="desc-cell"><div class="ds">표로 변환</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">L</span></td><td class="desc-cell"><div class="ds">필터 토글</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Ctrl</span>+<span class="kbd">E</span></td><td class="desc-cell"><div class="ds">빠른 채우기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">F9</span> / <span class="kbd">Shift</span>+<span class="kbd">F9</span></td><td class="desc-cell"><div class="ds">전체 재계산 / 현재 시트만 재계산</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Shift</span>+<span class="kbd">F11</span></td><td class="desc-cell"><div class="ds">새 시트</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Alt</span>+<span class="kbd">F11</span> / <span class="kbd">Alt</span>+<span class="kbd">F8</span></td><td class="desc-cell"><div class="ds">VBA 편집기 / 매크로 목록</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">F12</span></td><td class="desc-cell"><div class="ds">다른 이름으로 저장</div></td></tr>
+      <tr><td class="cmd-cell"><span class="kbd">Alt</span> 누르고 리본 탐색</td><td class="desc-cell"><div class="ds">Alt를 누르면 리본에 키 힌트 표시 — 모든 메뉴를 키보드로 (예: Alt→H→O→I 열 너비 자동)</div></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     함수 기본
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-fn">
+  <div class="sec-title">🧮 함수 기본</div>
+  <div class="sec-sub">수학·통계 · 논리(IF) · 텍스트 · 날짜/시간 — 인수 표기: [ ]는 생략 가능</div>
+
+  <div class="card" id="fn-math">
+    <div class="card-header"><span class="hl">01</span> 수학 · 통계</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">=SUM(A1:A10)</span></td><td class="desc-cell"><div class="ds">합계 — 범위 여러 개 가능 =SUM(A:A, C:C)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=AVERAGE(범위)</span></td><td class="desc-cell"><div class="ds">평균 (빈 셀은 제외, 0은 포함 — 함정 주의)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=COUNT(범위) / =COUNTA(범위)</span></td><td class="desc-cell"><div class="ds">숫자 셀 개수 / 비어있지 않은 셀 개수 · COUNTBLANK=빈 셀</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=MAX(범위) / =MIN(범위)</span></td><td class="desc-cell"><div class="ds">최대 / 최소 · LARGE(범위,2)=2번째로 큰 값, SMALL=작은 값</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=ROUND(수, 자릿수)</span></td><td class="desc-cell"><div class="ds">반올림 — ROUND(1234.567, 1)=1234.6 · 자릿수 -2면 백 단위 → 1200 · ROUNDUP=올림, ROUNDDOWN=내림</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=INT(수) / =MOD(수, 나눌수)</span></td><td class="desc-cell"><div class="ds">내림 정수 / 나머지 — MOD(ROW(),2)=0 으로 짝수 행 판별</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=ABS(수) · =SQRT(수) · =POWER(수, 지수)</span></td><td class="desc-cell"><div class="ds">절댓값 · 제곱근 · 거듭제곱</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=RANDBETWEEN(1, 45)</span></td><td class="desc-cell"><div class="ds">1~45 난수 (재계산마다 변함) · RAND()=0~1 소수</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=RANK.EQ(A2, $A$2:$A$100)</span></td><td class="desc-cell"><div class="ds">순위 — 범위는 <b>절대참조 필수</b>. 3번째 인수 1이면 오름차순</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=MEDIAN · =MODE.SNGL · =STDEV.S</span></td><td class="desc-cell"><div class="ds">중앙값 · 최빈값 · 표준편차</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="fn-logic">
+    <div class="card-header"><span class="hl">02</span> 논리 — IF 가족</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="fn">=IF</span>(조건, 참일때, 거짓일때)
+<span class="fn">=IF</span>(A2&gt;=<span class="num">60</span>, <span class="str">"합격"</span>, <span class="str">"불합격"</span>)
+
+<span class="cmt">' 다중 조건 — IF 중첩 대신 IFS (2019+)</span>
+<span class="fn">=IFS</span>(A2&gt;=<span class="num">90</span>,<span class="str">"A"</span>, A2&gt;=<span class="num">80</span>,<span class="str">"B"</span>, A2&gt;=<span class="num">70</span>,<span class="str">"C"</span>, TRUE,<span class="str">"F"</span>)   <span class="cmt">' TRUE = 나머지 전부</span>
+
+<span class="cmt">' AND / OR 조합</span>
+<span class="fn">=IF</span>(<span class="fn">AND</span>(A2&gt;=<span class="num">60</span>, B2&gt;=<span class="num">60</span>), <span class="str">"합격"</span>, <span class="str">"불합격"</span>)   <span class="cmt">' 둘 다 만족</span>
+<span class="fn">=IF</span>(<span class="fn">OR</span>(A2=<span class="str">"서울"</span>, A2=<span class="str">"경기"</span>), <span class="str">"수도권"</span>, <span class="str">"지방"</span>)
+
+<span class="cmt">' 오류 처리 — 실무 수식의 마무리 습관</span>
+<span class="fn">=IFERROR</span>(VLOOKUP(...), <span class="str">"없음"</span>)     <span class="cmt">' 모든 오류를 대체</span>
+<span class="fn">=IFNA</span>(VLOOKUP(...), <span class="str">"없음"</span>)        <span class="cmt">' #N/A만 대체 (추천 — 다른 오류는 드러나게)</span>
+
+<span class="cmt">' 값 매핑 — SWITCH (2019+)</span>
+<span class="fn">=SWITCH</span>(A2, <span class="num">1</span>,<span class="str">"월"</span>, <span class="num">2</span>,<span class="str">"화"</span>, <span class="num">3</span>,<span class="str">"수"</span>, <span class="str">"기타"</span>)</div>
+    </div>
+  </div>
+
+  <div class="card" id="fn-text">
+    <div class="card-header"><span class="hl">03</span> 텍스트</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">=LEFT(A1,3) / =RIGHT(A1,4) / =MID(A1,2,5)</span></td><td class="desc-cell"><div class="ds">왼쪽 3글자 / 오른쪽 4글자 / 2번째부터 5글자 — 주민번호·사번 자르기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=LEN(A1)</span></td><td class="desc-cell"><div class="ds">글자 수</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=FIND("@", A1) / =SEARCH("@", A1)</span></td><td class="desc-cell"><div class="ds">위치 찾기 — FIND는 대소문자 구분, SEARCH는 무시+와일드카드. MID와 조합해 이메일 아이디 추출</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=SUBSTITUTE(A1, "-", "")</span></td><td class="desc-cell"><div class="ds">특정 문자 바꾸기/제거 — 전화번호 하이픈 제거. REPLACE는 위치 기준</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TRIM(A1)</span></td><td class="desc-cell"><div class="ds">앞뒤·중복 공백 제거 — <b>VLOOKUP 안 될 때 1순위 의심</b></div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=UPPER / =LOWER / =PROPER</span></td><td class="desc-cell"><div class="ds">대문자 / 소문자 / 첫 글자만 대문자</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TEXT(A1, "yyyy-mm-dd")</span></td><td class="desc-cell"><div class="ds">숫자·날짜를 서식 입힌 <b>텍스트</b>로 — ="오늘은 "&amp;TEXT(TODAY(),"m월 d일") · 반대는 VALUE()</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TEXTJOIN(", ", TRUE, A1:A10)</span></td><td class="desc-cell"><div class="ds">구분자로 합치기 (TRUE=빈 셀 무시) · CONCAT=그냥 연결</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TEXTSPLIT(A1, ",")</span> <span class="version-badge">365</span></td><td class="desc-cell"><div class="ds">구분자로 나누기 (여러 셀로 스필) · TEXTBEFORE/TEXTAFTER=구분자 앞/뒤만</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=REPT("★", 5)</span></td><td class="desc-cell"><div class="ds">반복 — REPT("■", B2/10) 로 셀 안 미니 막대그래프</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="fn-date">
+    <div class="card-header"><span class="hl">04</span> 날짜 · 시간</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">=TODAY() / =NOW()</span></td><td class="desc-cell"><div class="ds">오늘 날짜 / 현재 일시 (열 때마다 갱신 — 고정하려면 Ctrl+;)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=DATE(2026, 8, 10)</span></td><td class="desc-cell"><div class="ds">연·월·일로 날짜 만들기 — =DATE(YEAR(A1), MONTH(A1)+3, 1) 처럼 계산 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=YEAR / =MONTH / =DAY / =WEEKDAY</span></td><td class="desc-cell"><div class="ds">연/월/일/요일 추출 — WEEKDAY는 1(일)~7(토), TEXT(A1,"aaa")로 "월" 표시가 편함</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=EOMONTH(A1, 0)</span></td><td class="desc-cell"><div class="ds">그 달 말일 — 0=당월, -1=전월 말, 1=익월 말. <b>말일+1=월초</b> 패턴으로 월별 집계</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=EDATE(A1, 6)</span></td><td class="desc-cell"><div class="ds">6개월 후 같은 날 — 계약 만기·유효기간</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=DATEDIF(A1, B1, "y")</span></td><td class="desc-cell"><div class="ds">기간 차이 — "y"=만 나이/근속연수, "m"=개월, "d"=일 (함수 목록에 안 뜨는 숨은 함수)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=NETWORKDAYS(A1, B1, [휴일범위])</span></td><td class="desc-cell"><div class="ds">주말·공휴일 뺀 영업일 수 · WORKDAY(A1, 5)=5영업일 후 날짜</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TIME(9, 30, 0) · =HOUR / MINUTE</span></td><td class="desc-cell"><div class="ds">시각 만들기 / 추출 — 근무시간 =(퇴근-출근)*24 (시간은 하루=1인 소수라 ×24)</div></td></tr>
+    </table>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     찾기·참조
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-lookup">
+  <div class="sec-title">🔍 찾기 · 참조</div>
+  <div class="sec-sub">VLOOKUP · XLOOKUP · INDEX+MATCH — 실무 엑셀의 심장부</div>
+
+  <div class="card" id="l-vlookup">
+    <div class="card-header"><span class="hl">01</span> VLOOKUP — 고전이자 표준</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="fn">=VLOOKUP</span>(찾을값, 표범위, 열번호, [일치방식])
+
+<span class="fn">=VLOOKUP</span>(A2, <span class="sel">$F$2:$H$100</span>, <span class="num">3</span>, <span class="kw">FALSE</span>)
+<span class="cmt">' A2 값을 F열에서 찾아 → 표의 3번째 열(H) 값을 가져옴</span>
+<span class="cmt">' FALSE(또는 0) = 정확히 일치 — 실무에서는 거의 항상 FALSE!</span>
+
+<span class="cmt">' TRUE(근사 일치)를 쓰는 유일한 경우 — 구간표 (오름차순 정렬 필수)</span>
+<span class="cmt">'   0 → F  /  60 → D  /  70 → C  /  80 → B  /  90 → A</span>
+<span class="fn">=VLOOKUP</span>(점수, 구간표, <span class="num">2</span>, <span class="kw">TRUE</span>)   <span class="cmt">' 세율표·할인율표·학점표</span></div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">⚠ 왼쪽을 못 봄</span></td><td class="desc-cell"><div class="ds">찾는 열은 반드시 표의 <b>맨 왼쪽</b>, 가져올 값은 그 오른쪽 — 왼쪽이 필요하면 XLOOKUP·INDEX+MATCH</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">⚠ 표범위는 절대참조</span></td><td class="desc-cell"><div class="ds">아래로 복사할 거면 $F$2:$H$100 — 안 하면 표가 밀려 내려가며 #N/A</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">⚠ 열번호는 표 기준</span></td><td class="desc-cell"><div class="ds">시트의 열이 아니라 <b>지정한 표범위 안에서</b> 몇 번째인지</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">HLOOKUP</span></td><td class="desc-cell"><div class="ds">가로로 누운 표용 — 행 번호로 가져옴 (구조는 동일)</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="l-xlookup">
+    <div class="card-header"><span class="hl">02</span> XLOOKUP — 현대의 정답 <span class="version-badge">2021 · 365</span></div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="fn">=XLOOKUP</span>(찾을값, 찾을범위, 가져올범위, [없을때], [일치방식], [검색방향])
+
+<span class="fn">=XLOOKUP</span>(A2, F:F, H:H, <span class="str">"없음"</span>)
+<span class="cmt">' 열 번호 세기 없음 · 왼쪽/오른쪽 어디든 가능 · 기본이 정확 일치 · 없을 때 값 내장</span>
+
+<span class="fn">=XLOOKUP</span>(A2, F:F, D:D)                <span class="cmt">' 왼쪽 열 가져오기 — VLOOKUP은 불가능</span>
+<span class="fn">=XLOOKUP</span>(A2, F:F, H:H,, <span class="num">-1</span>)          <span class="cmt">' -1 = 없으면 작은 값 쪽 근사 (구간표)</span>
+<span class="fn">=XLOOKUP</span>(A2, F:F, H:H,,, <span class="num">-1</span>)         <span class="cmt">' 검색방향 -1 = 아래→위 (마지막 항목 찾기)</span>
+
+<span class="cmt">' 이중 XLOOKUP = 행·열 교차값 (2차원 검색)</span>
+<span class="fn">=XLOOKUP</span>(행값, 행머리글, <span class="fn">XLOOKUP</span>(열값, 열머리글, 데이터표))</div>
+      <div class="note">💡 여러 열을 한 번에 가져오려면 가져올범위를 여러 열로 (=XLOOKUP(A2, F:F, G:I) → 3개 셀에 스필). 구버전 엑셀(2019 이하)과 파일을 공유한다면 VLOOKUP을 유지하는 게 안전합니다.</div>
+    </div>
+  </div>
+
+  <div class="card" id="l-indexmatch">
+    <div class="card-header"><span class="hl">03</span> INDEX + MATCH — 만능 조합</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="fn">=INDEX</span>(가져올범위, 행번호, [열번호])   <span class="cmt">' 범위에서 N번째 값</span>
+<span class="fn">=MATCH</span>(찾을값, 범위, <span class="num">0</span>)               <span class="cmt">' 값이 몇 번째인지 (0=정확 일치)</span>
+
+<span class="cmt">' 조합 — "몇 번째인지 찾아서(MATCH) 그 위치의 값을 꺼낸다(INDEX)"</span>
+<span class="fn">=INDEX</span>(H:H, <span class="fn">MATCH</span>(A2, F:F, <span class="num">0</span>))       <span class="cmt">' XLOOKUP과 동일 — 전 버전에서 작동</span>
+
+<span class="cmt">' 2차원 — 행·열 모두 MATCH</span>
+<span class="fn">=INDEX</span>(<span class="sel">$B$2:$E$50</span>, <span class="fn">MATCH</span>(A2,<span class="sel">$A$2:$A$50</span>,<span class="num">0</span>), <span class="fn">MATCH</span>(B1,<span class="sel">$B$1:$E$1</span>,<span class="num">0</span>))
+
+<span class="cmt">' 다중 조건 검색 (배열 수식 — 365는 그냥 Enter, 구버전 Ctrl+Shift+Enter)</span>
+<span class="fn">=INDEX</span>(C:C, <span class="fn">MATCH</span>(<span class="num">1</span>, (A:A=<span class="str">"서울"</span>)*(B:B=<span class="str">"3월"</span>), <span class="num">0</span>))</div>
+    </div>
+  </div>
+
+  <div class="card" id="l-etc">
+    <div class="card-header"><span class="hl">04</span> 기타 참조 함수</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">=OFFSET(A1, 2, 3, [높이], [너비])</span></td><td class="desc-cell"><div class="ds">A1에서 2행↓ 3열→ 이동한 셀(또는 범위) — 동적 범위·이동 참조 (휘발성이라 남용 금지)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=INDIRECT("A"&amp;B1)</span></td><td class="desc-cell"><div class="ds">텍스트를 실제 참조로 — =INDIRECT(A1&amp;"!B2") 로 시트명이 값인 셀 참조 (시트별 집계)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=ROW() / =COLUMN()</span></td><td class="desc-cell"><div class="ds">현재 행/열 번호 — =ROW()-1 로 삭제해도 안 깨지는 연번</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=CHOOSE(2, "금","은","동")</span></td><td class="desc-cell"><div class="ds">N번째 항목 선택 → "은"</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=TRANSPOSE(범위)</span></td><td class="desc-cell"><div class="ds">행↔열 뒤집기 (수식으로 — 원본과 연동됨)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=HYPERLINK("#Sheet2!A1", "이동")</span></td><td class="desc-cell"><div class="ds">클릭 링크 — 시트 내비게이션·URL</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=FORMULATEXT(A1)</span></td><td class="desc-cell"><div class="ds">그 셀의 수식을 텍스트로 표시 (문서화·검수용)</div></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     집계·배열
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-agg">
+  <div class="sec-title">📊 조건 집계 · 동적 배열</div>
+  <div class="sec-sub">SUMIFS · COUNTIFS · SUMPRODUCT · FILTER/SORT/UNIQUE · LET · LAMBDA</div>
+
+  <div class="card" id="g-ifs">
+    <div class="card-header"><span class="hl">01</span> 조건 집계 — SUMIF(S) · COUNTIF(S) 가족</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">' 단일 조건 — 조건이 하나면 IF, 순서: (조건범위, 조건, [합계범위])</span>
+<span class="fn">=SUMIF</span>(A:A, <span class="str">"서울"</span>, C:C)        <span class="cmt">' A열이 서울인 행의 C열 합</span>
+<span class="fn">=COUNTIF</span>(A:A, <span class="str">"서울"</span>)           <span class="cmt">' 개수</span>
+
+<span class="cmt">' 다중 조건 — IFS, 순서가 다름: (합계범위, 조건범위1, 조건1, ...)</span>
+<span class="fn">=SUMIFS</span>(C:C, A:A,<span class="str">"서울"</span>, B:B,<span class="str">"3월"</span>)
+<span class="fn">=COUNTIFS</span>(A:A,<span class="str">"서울"</span>, C:C,<span class="str">"&gt;=100"</span>)
+<span class="fn">=AVERAGEIFS</span>(C:C, A:A,<span class="str">"서울"</span>)  ·  <span class="fn">=MAXIFS</span> / <span class="fn">=MINIFS</span>
+
+<span class="cmt">' 조건 문법 — 따옴표 안에</span>
+<span class="str">"&gt;=100"</span>          <span class="cmt">' 비교</span>
+<span class="str">"&gt;="</span>&amp;A1          <span class="cmt">' 셀 값과 비교 — &amp;로 연결 (가장 많이 틀리는 부분!)</span>
+<span class="str">"김*"</span>            <span class="cmt">' 와일드카드: 김으로 시작 (*=여러 글자, ?=한 글자)</span>
+<span class="str">"&lt;&gt;"</span>             <span class="cmt">' 비어있지 않음</span>
+
+<span class="cmt">' 날짜 구간 (이번 달 합계)</span>
+<span class="fn">=SUMIFS</span>(C:C, B:B,<span class="str">"&gt;="</span>&amp;<span class="fn">DATE</span>(<span class="num">2026</span>,<span class="num">8</span>,<span class="num">1</span>), B:B,<span class="str">"&lt;="</span>&amp;<span class="fn">EOMONTH</span>(<span class="fn">DATE</span>(<span class="num">2026</span>,<span class="num">8</span>,<span class="num">1</span>),<span class="num">0</span>))</div>
+    </div>
+  </div>
+
+  <div class="card" id="g-sumproduct">
+    <div class="card-header"><span class="hl">02</span> SUMPRODUCT — 구버전 만능 집계</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="fn">=SUMPRODUCT</span>(B2:B10, C2:C10)              <span class="cmt">' 단가×수량의 합 (곱해서 더함)</span>
+<span class="fn">=SUMPRODUCT</span>((A2:A99=<span class="str">"서울"</span>)*(C2:C99))     <span class="cmt">' 조건 합계 — TRUE=1, FALSE=0 트릭</span>
+<span class="fn">=SUMPRODUCT</span>((A2:A99=<span class="str">"서울"</span>)*(B2:B99=<span class="str">"3월"</span>))  <span class="cmt">' 다중 조건 개수</span>
+<span class="cmt">' OR 조건·계산 조건 등 SUMIFS가 못 하는 것도 가능 — 대신 느림 (열 전체 참조 금지)</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="g-subtotal">
+    <div class="card-header"><span class="hl">03</span> SUBTOTAL · AGGREGATE — 필터와 친한 집계</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">=SUBTOTAL(9, C2:C100)</span></td><td class="desc-cell"><div class="ds"><b>필터로 숨긴 행 제외</b> 합계 — 필터 결과만 집계할 때 SUM 대신 필수. 9=SUM, 1=AVERAGE, 3=COUNTA (109·101·103은 수동 숨김도 제외)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">=AGGREGATE(9, 6, C2:C100)</span></td><td class="desc-cell"><div class="ds">SUBTOTAL 확장판 — 옵션 6 = <b>오류값 무시</b>하고 집계 (오류 섞인 범위 합계)</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="g-dynamic">
+    <div class="card-header"><span class="hl">04</span> 동적 배열 함수 <span class="version-badge">2021 · 365</span> — 결과가 알아서 펼쳐짐(스필)</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">수식 하나가 여러 셀로 <b>넘쳐 흐르는(spill)</b> 새 세대 함수. 파란 테두리가 스필 범위이고, <b>C2#</b> 처럼 #을 붙이면 스필 전체를 참조합니다. 결과 자리에 다른 값이 있으면 #SPILL! 오류.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">=FILTER(A2:C100, B2:B100="서울", "없음")</span></td><td class="desc-cell"><div class="ds">조건에 맞는 행만 추출 — VLOOKUP의 "여러 개 찾기" 버전. 조건 곱하기로 AND: (조건1)*(조건2)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=SORT(범위, 2, -1)</span></td><td class="desc-cell"><div class="ds">2번째 열 기준 내림차순 정렬본 생성 · SORTBY(범위, 기준범위, -1)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=UNIQUE(A2:A100)</span></td><td class="desc-cell"><div class="ds">중복 제거 목록 — 드롭다운 원본·거래처 목록 자동화</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=SEQUENCE(10, 1, 1, 1)</span></td><td class="desc-cell"><div class="ds">연속 숫자 생성 (행,열,시작,증가) — 1~10 자동 연번</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=XMATCH(값, 범위)</span></td><td class="desc-cell"><div class="ds">MATCH 신버전 — 기본 정확 일치, 역방향 검색</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=RANDARRAY(5, 1, 1, 100, TRUE)</span></td><td class="desc-cell"><div class="ds">난수 배열 (행,열,최소,최대,정수여부)</div></td></tr>
+      </table>
+      <div class="codeblock"><span class="cmt">' 조합 예 — 서울 매출 상위 5건: 필터 → 정렬 → 자르기</span>
+<span class="fn">=TAKE</span>(<span class="fn">SORT</span>(<span class="fn">FILTER</span>(A2:C100, A2:A100=<span class="str">"서울"</span>), <span class="num">3</span>, <span class="num">-1</span>), <span class="num">5</span>)</div>
+    </div>
+  </div>
+
+  <div class="card" id="g-let">
+    <div class="card-header"><span class="hl">05</span> LET · LAMBDA — 수식에 변수와 사용자 함수 <span class="version-badge">365</span></div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">' LET — 반복되는 계산에 이름 붙이기 (가독성 + 성능)</span>
+<span class="fn">=LET</span>(매출, <span class="fn">SUMIFS</span>(C:C, A:A, F1),
+     목표, G1,
+     <span class="fn">IF</span>(매출&gt;=목표, <span class="str">"달성 "</span>&amp;<span class="fn">TEXT</span>(매출/목표,<span class="str">"0%"</span>), <span class="str">"미달"</span>))
+
+<span class="cmt">' LAMBDA — 나만의 함수 만들기 (이름 관리자에 등록해서 사용)</span>
+<span class="cmt">' 이름: 부가세 / 참조 대상:</span>
+<span class="fn">=LAMBDA</span>(금액, 금액*<span class="num">0.1</span>)
+<span class="cmt">' 이후 시트 어디서나 =부가세(B2)</span></div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     데이터 도구
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-data">
+  <div class="sec-title">📈 데이터 도구</div>
+  <div class="sec-sub">정렬·필터 · 피벗테이블 · 조건부 서식 · 유효성 검사 · 차트 · 파워 쿼리</div>
+
+  <div class="card" id="d-sortfilter">
+    <div class="card-header"><span class="hl">01</span> 정렬 · 필터</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">필터 <span class="kw">Ctrl+Shift+L</span></span></td><td class="desc-cell"><div class="ds">머리글에 드롭다운 — 값·색·조건(포함/이상/상위 10) 필터. 필터 결과 집계는 SUBTOTAL로</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">다중 기준 정렬</span></td><td class="desc-cell"><div class="ds">데이터 → 정렬 → "기준 추가" — 부서별 → 매출 내림차순 같은 2차 정렬</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">사용자 지정 순서 정렬</span></td><td class="desc-cell"><div class="ds">가나다가 아닌 "본사→지사→대리점" 순서 — 사용자 지정 목록 등록 후 정렬 기준으로 선택</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">중복 제거</span></td><td class="desc-cell"><div class="ds">데이터 → 중복된 항목 제거 — 기준 열 선택 가능. 지우기 전에 COUNTIF로 확인하는 습관</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">텍스트 나누기</span></td><td class="desc-cell"><div class="ds">데이터 → 텍스트 나누기 — 구분자(콤마·탭)나 고정 너비로 열 분리. <b>텍스트로 저장된 숫자 일괄 변환 꼼수</b>로도 사용(구분자 없이 마침)</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="d-pivot">
+    <div class="card-header"><span class="hl">02</span> 피벗테이블 — 집계의 왕</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">수식 없이 드래그만으로 <b>그룹별 집계표</b>를 만드는 도구. 원본은 머리글 있는 표(Ctrl+T 권장), 삽입 → 피벗테이블.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">4개 영역</span></td><td class="desc-cell"><div class="ds"><b>행</b>=세로 그룹, <b>열</b>=가로 그룹, <b>값</b>=집계할 숫자, <b>필터</b>=전체 조건 — 필드를 드래그해서 배치</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">값 요약 기준</span></td><td class="desc-cell"><div class="ds">값 필드 우클릭 → 합계·개수·평균·최대 / "값 표시 형식" → 총합계 비율·누계·순위</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">그룹화</span></td><td class="desc-cell"><div class="ds">날짜 필드 우클릭 → 그룹 → 월·분기·연 단위 자동 묶기 / 숫자는 구간(0-100, 100-200…)으로</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">슬라이서 · 시간 표시 막대</span></td><td class="desc-cell"><div class="ds">삽입 → 슬라이서 — 버튼 클릭식 필터 (대시보드의 핵심)</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">새로 고침</span></td><td class="desc-cell"><div class="ds">원본이 바뀌면 자동 반영 안 됨! 우클릭 → 새로 고침 (Alt+F5) — 피벗 1순위 함정</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">=GETPIVOTDATA(...)</span></td><td class="desc-cell"><div class="ds">피벗 값을 수식으로 참조 (피벗 셀 클릭 시 자동 생성)</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="d-cf">
+    <div class="card-header"><span class="hl">03</span> 조건부 서식</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">기본 규칙</span></td><td class="desc-cell"><div class="ds">홈 → 조건부 서식 — 보다 큼·상위 10·중복 값 강조 / 데이터 막대·색조·아이콘</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">수식 기반 규칙</span></td><td class="desc-cell"><div class="ds">"수식을 사용하여 서식 지정" — TRUE인 셀에 서식. <b>기준 셀은 선택 영역의 첫 셀 기준 상대참조</b>로 작성</div></td></tr>
+      </table>
+      <div class="codeblock"><span class="cmt">' 행 전체 강조 — 열만 고정($)하는 게 포인트 (A2:F100 선택 상태)</span>
+=<span class="sel">$E2</span>&gt;=<span class="num">100</span>              <span class="cmt">' E열이 100 이상인 행 전체 색칠</span>
+=<span class="fn">COUNTIF</span>(<span class="sel">$A$2:$A$100</span>, <span class="sel">$A2</span>)&gt;<span class="num">1</span>   <span class="cmt">' 중복 행 강조</span>
+=<span class="fn">MOD</span>(<span class="fn">ROW</span>(),<span class="num">2</span>)=<span class="num">0</span>        <span class="cmt">' 줄무늬 배경</span>
+=<span class="sel">$B2</span>&lt;<span class="fn">TODAY</span>()          <span class="cmt">' 기한 지난 행</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="d-valid">
+    <div class="card-header"><span class="hl">04</span> 데이터 유효성 검사 — 입력 통제</div>
+    <div style="padding:14px 16px;">
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">목록 (드롭다운)</span></td><td class="desc-cell"><div class="ds">데이터 → 데이터 유효성 검사 → 목록 — 원본에 "서울,부산,대구" 직접 입력 or 범위 참조. UNIQUE 스필과 연결(=$G$2#)하면 자동 갱신 드롭다운</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">정수·날짜 범위 제한</span></td><td class="desc-cell"><div class="ds">1~100만 허용, 오늘 이후만 허용 등 — 오류 메시지 커스텀 가능</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">수식 조건</span></td><td class="desc-cell"><div class="ds">사용자 지정 → =COUNTIF($A:$A,A1)=1 (중복 입력 차단)</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="d-chart">
+    <div class="card-header"><span class="hl">05</span> 차트 · 화면 관리</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">추천 차트 · <span class="kw">Alt+F1</span></span></td><td class="desc-cell"><div class="ds">범위 선택 → Alt+F1 = 즉석 차트. 세로막대=비교, 꺾은선=추세, 원형=구성비(5조각 이하), 분산형=상관</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">콤보 차트 · 보조 축</span></td><td class="desc-cell"><div class="ds">매출(막대)+증감률(선) — 차트 종류 변경 → 콤보, 단위 차이 크면 보조 축 체크</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">스파크라인</span></td><td class="desc-cell"><div class="ds">삽입 → 스파크라인 — 셀 안에 들어가는 미니 추세 그래프</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">틀 고정</span></td><td class="desc-cell"><div class="ds">보기 → 틀 고정 — 머리글 행·열을 스크롤에서 고정 (B2 선택 후 고정 = 1행+A열)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">인쇄 설정</span></td><td class="desc-cell"><div class="ds">페이지 레이아웃 → 인쇄 영역·<b>반복할 행</b>(매 페이지 머리글)·한 페이지에 맞추기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">시트 보호</span></td><td class="desc-cell"><div class="ds">검토 → 시트 보호 — 잠금 해제할 셀만 Ctrl+1 → 보호 → 잠금 해제 후 보호 걸기</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="d-pq">
+    <div class="card-header"><span class="hl">06</span> 파워 쿼리 — 데이터 가져오기·정제 자동화</div>
+    <div style="padding:14px 16px;">
+      <div class="tip">데이터 → <b>데이터 가져오기</b> — CSV·폴더·웹·DB에서 불러와 정제(열 분리·형 변환·피벗 해제)하는 과정을 <b>기록해두고 새로 고침 한 번으로 재실행</b>하는 도구. "매주 받는 CSV 정리"가 업무라면 이것부터 배우세요.</div>
+      <table class="r-table">
+        <tr><td class="cmd-cell"><span class="mc">폴더에서 가져오기</span></td><td class="desc-cell"><div class="ds">폴더 안 파일 전부 <b>자동 병합</b> — 월별 파일 수십 개 합치기가 클릭 몇 번</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">피벗 해제 (Unpivot)</span></td><td class="desc-cell"><div class="ds">1월|2월|3월… 가로 표를 세로 데이터로 — 피벗테이블용 원본 만들기의 필수기</div></td></tr>
+        <tr><td class="cmd-cell"><span class="mc">쿼리 병합</span></td><td class="desc-cell"><div class="ds">두 표를 키로 연결 (VLOOKUP의 대량 버전)</div></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     VBA 매크로
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-vba">
+  <div class="sec-title">💻 VBA 매크로</div>
+  <div class="sec-sub">매크로 기록 · VBA 기본 문법 · Range/Cells · 반복문 · 이벤트 · 사용자 정의 함수</div>
+
+  <div class="card" id="v-start">
+    <div class="card-header"><span class="hl">01</span> 시작하기</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">개발 도구 탭 켜기</span></td><td class="desc-cell"><div class="ds">파일 → 옵션 → 리본 사용자 지정 → "개발 도구" 체크</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">매크로 기록</span></td><td class="desc-cell"><div class="ds">개발 도구 → 매크로 기록 → 작업 수행 → 기록 중지 — <b>내 작업이 코드로 저장됨</b>. VBA 배우기 최고의 교재 (기록 후 코드 열어보기)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">Alt+F11</span></span></td><td class="desc-cell"><div class="ds">VBA 편집기(VBE) — 삽입 → 모듈에 코드 작성. F5=실행, F8=한 줄씩 실행(디버깅)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc"><span class="kw">Alt+F8</span></span></td><td class="desc-cell"><div class="ds">매크로 목록·실행 — 도형에 "매크로 지정"하면 버튼 만들기 가능</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">.xlsm 저장</span></td><td class="desc-cell"><div class="ds">매크로 포함 파일은 반드시 <b>매크로 사용 통합 문서(.xlsm)</b>로 — .xlsx로 저장하면 코드 소실!</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="v-syntax">
+    <div class="card-header"><span class="hl">02</span> 기본 문법</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="kw">Sub</span> <span class="fn">인사하기</span>()                     <span class="cmt">' 매크로 = Sub ~ End Sub</span>
+    <span class="kw">Dim</span> 이름 <span class="kw">As String</span>              <span class="cmt">' 변수 선언 (String·Long·Double·Boolean·Range)</span>
+    이름 = <span class="str">"홍길동"</span>
+    <span class="kw">Dim</span> 나이 <span class="kw">As Long</span>: 나이 = <span class="num">20</span>   <span class="cmt">' 정수는 Integer 대신 Long 권장</span>
+
+    <span class="kw">If</span> 나이 &gt;= <span class="num">20</span> <span class="kw">Then</span>
+        MsgBox 이름 &amp; <span class="str">"님은 성인입니다"</span>
+    <span class="kw">ElseIf</span> 나이 &gt;= <span class="num">14</span> <span class="kw">Then</span>
+        MsgBox <span class="str">"청소년"</span>
+    <span class="kw">Else</span>
+        MsgBox <span class="str">"어린이"</span>
+    <span class="kw">End If</span>
+
+    <span class="kw">Dim</span> i <span class="kw">As Long</span>
+    <span class="kw">For</span> i = <span class="num">1</span> <span class="kw">To</span> <span class="num">10</span>                <span class="cmt">' 반복문</span>
+        Cells(i, <span class="num">1</span>).Value = i * <span class="num">10</span>  <span class="cmt">' A1~A10에 10,20,...100</span>
+    <span class="kw">Next</span> i
+
+    <span class="kw">Dim</span> 답 <span class="kw">As String</span>
+    답 = InputBox(<span class="str">"이름을 입력하세요"</span>)   <span class="cmt">' 사용자 입력 받기</span>
+<span class="kw">End Sub</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="v-range">
+    <div class="card-header"><span class="hl">03</span> Range · Cells — 셀 다루기</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock">Range(<span class="str">"A1"</span>).Value = <span class="num">100</span>              <span class="cmt">' 값 쓰기</span>
+Range(<span class="str">"A1:C10"</span>).ClearContents        <span class="cmt">' 내용 지우기 (서식 유지)</span>
+Cells(<span class="num">3</span>, <span class="num">2</span>).Value = <span class="str">"B3입니다"</span>       <span class="cmt">' Cells(행, 열) — 숫자라서 반복문에 적합</span>
+
+Range(<span class="str">"A1"</span>).Copy Range(<span class="str">"D1"</span>)         <span class="cmt">' 복사</span>
+Range(<span class="str">"B2:B100"</span>).NumberFormat = <span class="str">"#,##0"</span>
+Range(<span class="str">"A1"</span>).Font.Bold = <span class="kw">True</span>
+Range(<span class="str">"A1"</span>).Interior.Color = RGB(<span class="num">255</span>, <span class="num">255</span>, <span class="num">0</span>)   <span class="cmt">' 배경 노랑</span>
+
+<span class="cmt">' 마지막 행 찾기 — VBA 실무 최중요 한 줄</span>
+<span class="kw">Dim</span> lastRow <span class="kw">As Long</span>
+lastRow = Cells(Rows.Count, <span class="num">1</span>).End(xlUp).Row   <span class="cmt">' A열 맨 아래에서 Ctrl+↑</span>
+
+<span class="cmt">' 다른 시트 — 항상 시트를 명시하는 습관</span>
+Worksheets(<span class="str">"매출"</span>).Range(<span class="str">"A1"</span>).Value = <span class="num">1</span>
+
+<span class="kw">With</span> Worksheets(<span class="str">"매출"</span>).Range(<span class="str">"A1"</span>)   <span class="cmt">' With로 반복 참조 줄이기</span>
+    .Value = <span class="str">"제목"</span>
+    .Font.Size = <span class="num">14</span>
+    .Font.Bold = <span class="kw">True</span>
+<span class="kw">End With</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="v-loop">
+    <div class="card-header"><span class="hl">04</span> 실전 패턴 — 반복 · 조건 · 시트 순회</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">' ① 데이터 끝까지 돌면서 조건 처리 — 60점 미만 빨간 표시</span>
+<span class="kw">Sub</span> <span class="fn">불합격표시</span>()
+    <span class="kw">Dim</span> i <span class="kw">As Long</span>, lastRow <span class="kw">As Long</span>
+    lastRow = Cells(Rows.Count, <span class="num">2</span>).End(xlUp).Row
+    <span class="kw">For</span> i = <span class="num">2</span> <span class="kw">To</span> lastRow                 <span class="cmt">' 2행부터 (1행은 머리글)</span>
+        <span class="kw">If</span> Cells(i, <span class="num">2</span>).Value &lt; <span class="num">60</span> <span class="kw">Then</span>
+            Cells(i, <span class="num">2</span>).Font.Color = vbRed
+            Cells(i, <span class="num">3</span>).Value = <span class="str">"재시험"</span>
+        <span class="kw">End If</span>
+    <span class="kw">Next</span> i
+<span class="kw">End Sub</span>
+
+<span class="cmt">' ② 모든 시트 순회 — 시트마다 A1에 시트명 쓰기</span>
+<span class="kw">Sub</span> <span class="fn">전시트처리</span>()
+    <span class="kw">Dim</span> ws <span class="kw">As</span> Worksheet
+    <span class="kw">For Each</span> ws <span class="kw">In</span> ThisWorkbook.Worksheets
+        ws.Range(<span class="str">"A1"</span>).Value = ws.Name
+    <span class="kw">Next</span> ws
+<span class="kw">End Sub</span>
+
+<span class="cmt">' ③ 속도 3대 옵션 — 대량 작업 앞뒤로</span>
+Application.ScreenUpdating = <span class="kw">False</span>   <span class="cmt">' 화면 갱신 끄기</span>
+Application.Calculation = xlCalculationManual
+<span class="cmt">' ... 작업 ...</span>
+Application.Calculation = xlCalculationAutomatic
+Application.ScreenUpdating = <span class="kw">True</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="v-event">
+    <div class="card-header"><span class="hl">05</span> 이벤트 · 사용자 정의 함수</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">' 이벤트 — 시트 모듈(프로젝트 창에서 시트 더블클릭)에 작성</span>
+<span class="kw">Private Sub</span> <span class="fn">Worksheet_Change</span>(<span class="kw">ByVal</span> Target <span class="kw">As</span> Range)
+    <span class="kw">If Not</span> Intersect(Target, Range(<span class="str">"B:B"</span>)) <span class="kw">Is Nothing Then</span>
+        Target.Offset(<span class="num">0</span>, <span class="num">1</span>).Value = Now   <span class="cmt">' B열 입력 시 C열에 입력시각 자동 기록</span>
+    <span class="kw">End If</span>
+<span class="kw">End Sub</span>
+
+<span class="cmt">' 사용자 정의 함수(UDF) — 일반 모듈에 Function으로 작성, 시트에서 =수수료(B2)</span>
+<span class="kw">Function</span> <span class="fn">수수료</span>(금액 <span class="kw">As Double</span>) <span class="kw">As Double</span>
+    <span class="kw">If</span> 금액 &gt;= <span class="num">1000000</span> <span class="kw">Then</span>
+        수수료 = 금액 * <span class="num">0.01</span>
+    <span class="kw">Else</span>
+        수수료 = 금액 * <span class="num">0.02</span>
+    <span class="kw">End If</span>
+<span class="kw">End Function</span></div>
+      <div class="warn">⚠ 매크로 실행이 막히면: 파일 → 옵션 → 보안 센터 → 매크로 설정 확인. 인터넷에서 받은 파일은 속성 → "차단 해제"가 필요할 수 있습니다. 출처 불명 매크로 파일은 함부로 실행하지 마세요.</div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     실전·오류
+═══════════════════════════════════════════ -->
+<div class="panel" id="panel-ex">
+  <div class="sec-title">💡 실전 패턴 · 오류 해결</div>
+  <div class="sec-sub">실무 단골 수식 모음 · 오류값 사전 · 성능 팁</div>
+
+  <div class="card" id="e-pattern">
+    <div class="card-header"><span class="hl">01</span> 실무 단골 수식 모음</div>
+    <div style="padding:14px 16px;">
+      <div class="codeblock"><span class="cmt">' 누계 (위에서부터 합) — 시작만 고정</span>
+<span class="fn">=SUM</span>(<span class="sel">$C$2</span>:C2)                          <span class="cmt">' 아래로 복사</span>
+
+<span class="cmt">' 만 나이 / 근속연수</span>
+<span class="fn">=DATEDIF</span>(생일, <span class="fn">TODAY</span>(), <span class="str">"y"</span>)
+
+<span class="cmt">' 주민번호 → 성별</span>
+<span class="fn">=IF</span>(<span class="fn">ISODD</span>(<span class="fn">MID</span>(A2,<span class="num">8</span>,<span class="num">1</span>)), <span class="str">"남"</span>, <span class="str">"여"</span>)
+
+<span class="cmt">' 이메일 아이디만 추출</span>
+<span class="fn">=LEFT</span>(A2, <span class="fn">FIND</span>(<span class="str">"@"</span>, A2)-<span class="num">1</span>)
+
+<span class="cmt">' 두 명단 비교 — B명단에 있는지</span>
+<span class="fn">=IF</span>(<span class="fn">COUNTIF</span>(명단B, A2)&gt;<span class="num">0</span>, <span class="str">"있음"</span>, <span class="str">"없음"</span>)
+
+<span class="cmt">' 텍스트로 저장된 숫자 → 숫자 (초록 삼각형 해결)</span>
+<span class="fn">=VALUE</span>(<span class="fn">TRIM</span>(A2))   <span class="cmt">' 또는 A2*1 · 또는 텍스트 나누기 한 방</span>
+
+<span class="cmt">' 조건 순위 — 부서 내 매출 순위</span>
+<span class="fn">=COUNTIFS</span>(<span class="sel">$A$2:$A$100</span>,A2, <span class="sel">$C$2:$C$100</span>,<span class="str">"&gt;"</span>&amp;C2)+<span class="num">1</span>
+
+<span class="cmt">' N번째 등장만 표시 (첫 등장만 남기기)</span>
+<span class="fn">=IF</span>(<span class="fn">COUNTIF</span>(<span class="sel">$A$2</span>:A2, A2)=<span class="num">1</span>, <span class="str">"최초"</span>, <span class="str">"중복"</span>)
+
+<span class="cmt">' 여러 시트 같은 위치 합계 (3D 참조)</span>
+<span class="fn">=SUM</span>(<span class="str">'1월:12월'</span>!B10)                   <span class="cmt">' 1월~12월 시트의 B10 전부</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="e-error">
+    <div class="card-header"><span class="hl">02</span> 오류값 사전 — 뜨는 이유와 해결</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">#N/A</span></td><td class="desc-cell"><div class="dm">찾는 값이 없음 (VLOOKUP류)</div><div class="ds">오타·공백(TRIM)·숫자vs텍스트 불일치 확인 → 정상이면 IFNA로 감싸기</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#REF!</span></td><td class="desc-cell"><div class="dm">참조하던 셀이 삭제됨</div><div class="ds">행·열 삭제가 원인 — Ctrl+Z, 수식의 #REF! 부분 재지정</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#DIV/0!</span></td><td class="desc-cell"><div class="dm">0 또는 빈 셀로 나눔</div><div class="ds">=IF(B2=0, "", A2/B2) 또는 IFERROR</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#VALUE!</span></td><td class="desc-cell"><div class="dm">타입이 안 맞음 (숫자 자리에 텍스트)</div><div class="ds">범위에 문자가 섞였는지 확인 — 눈에 안 보이는 공백이 범인일 때 많음</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#NAME?</span></td><td class="desc-cell"><div class="dm">함수·이름 철자 오류</div><div class="ds">오타, 또는 구버전에 없는 함수(XLOOKUP을 2016에서) 사용</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#SPILL!</span></td><td class="desc-cell"><div class="dm">스필 결과 자리에 값이 있음</div><div class="ds">아래·옆 셀 비우기 (동적 배열 함수 전용 오류)</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">#####</span></td><td class="desc-cell"><div class="dm">열이 좁음 (오류 아님)</div><div class="ds">열 경계 더블클릭 = 자동 맞춤. 음수 시간일 때도 발생</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">순환 참조 경고</span></td><td class="desc-cell"><div class="dm">수식이 자기 자신을 참조</div><div class="ds">수식 → 오류 검사 → 순환 참조에서 위치 확인</div></td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="e-tips">
+    <div class="card-header"><span class="hl">03</span> 성능 · 관리 팁</div>
+    <table class="r-table">
+      <tr><td class="cmd-cell"><span class="mc">열 전체 참조 남용 금지</span></td><td class="desc-cell"><div class="ds">SUMPRODUCT·배열수식에 A:A를 쓰면 100만 행 전체 계산 — 표(Ctrl+T) 참조나 필요한 범위만</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">휘발성 함수 주의</span></td><td class="desc-cell"><div class="ds">NOW·TODAY·OFFSET·INDIRECT·RAND는 <b>모든 편집마다 재계산</b> — 수천 개 깔리면 파일이 굼떠짐</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">수식 → 값 고정</span></td><td class="desc-cell"><div class="ds">확정된 과거 데이터는 복사 → 값만 붙여넣기로 계산 부하 제거</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">원본·계산·보고서 시트 분리</span></td><td class="desc-cell"><div class="ds">원본 데이터는 세로 1줄 1건으로(집계는 피벗에 맡기기) — 병합 셀은 원본 시트에서 금지</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">Ctrl+Z 한계 대비</span></td><td class="desc-cell"><div class="ds">대규모 바꾸기·매크로 전엔 저장 또는 사본 — 매크로 작업은 <b>실행 취소 불가</b>!</div></td></tr>
+      <tr><td class="cmd-cell"><span class="mc">자동 저장·버전</span></td><td class="desc-cell"><div class="ds">OneDrive 자동 저장 시 파일 → 정보 → 버전 기록으로 과거 시점 복원 가능</div></td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const SIDEBAR = {
+  basic: [
+    {id:'b-ref',label:'셀 참조 (상대·절대)'},
+    {id:'b-formula',label:'수식 기본 규칙'},
+    {id:'b-fill',label:'자동 채우기'},
+    {id:'b-table',label:'표(Table) · Ctrl+T'},
+    {id:'b-name',label:'이름 정의'},
+    {id:'b-format',label:'셀 서식 코드'},
+    {id:'b-paste',label:'선택하여 붙여넣기'},
+  ],
+  key: [
+    {id:'k-move',label:'이동'},
+    {id:'k-select',label:'선택'},
+    {id:'k-edit',label:'편집'},
+    {id:'k-format',label:'서식 · 행/열'},
+    {id:'k-func',label:'기능 호출'},
+  ],
+  fn: [
+    {id:'fn-math',label:'수학 · 통계'},
+    {id:'fn-logic',label:'논리 — IF 가족'},
+    {id:'fn-text',label:'텍스트'},
+    {id:'fn-date',label:'날짜 · 시간'},
+  ],
+  lookup: [
+    {id:'l-vlookup',label:'VLOOKUP'},
+    {id:'l-xlookup',label:'XLOOKUP'},
+    {id:'l-indexmatch',label:'INDEX + MATCH'},
+    {id:'l-etc',label:'기타 참조 함수'},
+  ],
+  agg: [
+    {id:'g-ifs',label:'SUMIFS · COUNTIFS'},
+    {id:'g-sumproduct',label:'SUMPRODUCT'},
+    {id:'g-subtotal',label:'SUBTOTAL · AGGREGATE'},
+    {id:'g-dynamic',label:'동적 배열 (FILTER 등)'},
+    {id:'g-let',label:'LET · LAMBDA'},
+  ],
+  data: [
+    {id:'d-sortfilter',label:'정렬 · 필터'},
+    {id:'d-pivot',label:'피벗테이블'},
+    {id:'d-cf',label:'조건부 서식'},
+    {id:'d-valid',label:'데이터 유효성'},
+    {id:'d-chart',label:'차트 · 화면 관리'},
+    {id:'d-pq',label:'파워 쿼리'},
+  ],
+  vba: [
+    {id:'v-start',label:'시작하기'},
+    {id:'v-syntax',label:'기본 문법'},
+    {id:'v-range',label:'Range · Cells'},
+    {id:'v-loop',label:'실전 패턴'},
+    {id:'v-event',label:'이벤트 · UDF'},
+  ],
+  ex: [
+    {id:'e-pattern',label:'실무 단골 수식'},
+    {id:'e-error',label:'오류값 사전'},
+    {id:'e-tips',label:'성능 · 관리 팁'},
+  ],
+};
+
+let curTab = 'basic';
+
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  curTab = id;
+  buildSidebar(id);
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  const items = SIDEBAR[id] || [];
+  sb.innerHTML = '<div class="sb-label">목차</div>' +
+    items.map(it => `<button class="sb-item" onclick="scrollToSec('${it.id}')">${it.label}</button>`).join('');
+}
+
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.sb-item').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(id));
+  });
+}
+
+buildSidebar('basic');
+
+// 검색
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.panel').forEach(p => p.style.display = '');
+    document.getElementById('panel-' + curTab).classList.add('active');
+    document.querySelectorAll('.card').forEach(c => c.style.display = '');
+    document.querySelectorAll('.r-table tr').forEach(r => r.style.display = '');
+    return;
+  }
+  // 모든 패널 표시 (검색 시)
+  document.querySelectorAll('.panel').forEach(p => { p.style.display = 'block'; p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.r-table').forEach(tbl => {
+    let vis = 0;
+    tbl.querySelectorAll('tr').forEach(r => {
+      const show = r.textContent.toLowerCase().includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    const card = tbl.closest('.card');
+    if (card) card.style.display = vis > 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.card').forEach(card => {
+    if (!card.querySelector('.r-table')) {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    }
+  });
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); }
+});
+</script>
+</body>
+</html>

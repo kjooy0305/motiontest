@@ -85,6 +85,10 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <button class="tab" onclick="sw('myths',this)">📜 신화 이야기</button>
   <button class="tab" onclick="sw('weapons',this)">🔱 무기·유물</button>
   <button class="tab" onclick="sw('monsters',this)">🐉 괴물·생물</button>
+  <button class="tab" onclick="sw('places',this)">🏛️ 장소·지리</button>
+  <button class="tab" onclick="sw('groups',this)">✨ 신성한 집단</button>
+  <button class="tab" onclick="sw('mortals',this)">👤 유명 인간</button>
+  <button class="tab" onclick="sw('roman',this)">🦅 로마 신화</button>
 </div>
 <div id="main">
 
@@ -792,11 +796,531 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 </div>
 </div>
 
+<!-- ══════════════ 장소·지리 ══════════════ -->
+<div id="tab-places" class="section">
+<div class="sec-title">🏛️ 신화 속 장소·지리 완전 정리</div>
+
+<div class="sub-sec">🌑 저승 (Underworld) 지리</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌑</span><div class="card-names"><div class="gname">타르타로스 Tartaros</div><div class="rname">저승 가장 깊은 심연</div></div></div>
+  <span class="domain-tag">영원한 형벌의 장소</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">하데스 아래 가장 깊은 곳 — 하데스에서 지상까지의 거리만큼 더 아래</span></div>
+  <div class="row"><span class="row-key">수감자</span><span class="row-val">타이탄족 · 시시포스 · 탄탈로스 · 익시온 · 다나이데스 50명 · 살인자·반역자</span></div>
+  <div class="row"><span class="row-key">구조</span><span class="row-val">불꽃 강 플레게톤이 둘러쌈 · 에리니에스가 감시 · 청동 성벽과 삼중 철문</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌿</span><div class="card-names"><div class="gname">엘리시온 Elysion</div><div class="rname">축복받은 자의 낙원</div></div></div>
+  <span class="domain-tag">영웅·덕인의 사후 세계</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">저승 서쪽 끝, 오케아노스 강 너머</span></div>
+  <div class="row"><span class="row-key">풍경</span><span class="row-val">항상 봄, 꽃밭, 황금빛 들판, 음악과 향연 · 고통과 죽음이 없음</span></div>
+  <div class="row"><span class="row-key">거주자</span><span class="row-val">영웅·반신반인·덕을 쌓은 인간 · 세 번 환생하여 세 번 모두 덕을 쌓은 자는 복자의 섬으로</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌫️</span><div class="card-names"><div class="gname">아스포델 들판 Asphodel Meadows</div><div class="rname">평범한 자의 사후 세계</div></div></div>
+  <span class="domain-tag">대다수 혼령의 거처</span>
+  <div class="row"><span class="row-key">거주자</span><span class="row-val">특별히 선하지도 악하지도 않은 평범한 인간의 혼령</span></div>
+  <div class="row"><span class="row-key">풍경</span><span class="row-val">흐릿하고 단조로운 들판 · 혼령들이 생전 행동을 반복하며 표류</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔥</span><div class="card-names"><div class="gname">에레보스 Erebos</div><div class="rname">저승 입구의 어둠</div></div></div>
+  <span class="domain-tag">어둠·저승 초입</span>
+  <div class="row"><span class="row-key">설명</span><span class="row-val">죽은 혼령들이 가장 먼저 지나는 어둠의 공간 · 카론의 나루터로 이어짐</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">⛵</span><div class="card-names"><div class="gname">저승의 5대 강</div><div class="rname">Underworld Rivers</div></div></div>
+  <span class="domain-tag">저승 지형의 경계</span>
+  <div class="row"><span class="row-key">스틱스 Styx</span><span class="row-val">증오의 강 · 산 자와 죽은 자의 경계 · 신들의 맹세를 보증 · 카론이 건네줌</span></div>
+  <div class="row"><span class="row-key">레테 Lethe</span><span class="row-val">망각의 강 · 마시면 전생 기억 완전 삭제 · 환생 전 마심</span></div>
+  <div class="row"><span class="row-key">아케론 Acheron</span><span class="row-val">슬픔·통곡의 강 · 카론이 건너게 해주는 주요 도강 지점</span></div>
+  <div class="row"><span class="row-key">플레게톤 Phlegethon</span><span class="row-val">불꽃의 강 · 타르타로스를 둘러쌈 · 마시면 몸이 불에 타는 느낌</span></div>
+  <div class="row"><span class="row-key">코키토스 Kokytos</span><span class="row-val">통곡의 강 · 장례를 받지 못한 혼령들이 방황하는 곳</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">⛵</span><div class="card-names"><div class="gname">카론 Charon</div><div class="rname">저승 뱃사공</div></div></div>
+  <span class="domain-tag">저승 도강자</span>
+  <div class="row"><span class="row-key">외형</span><span class="row-val">무서운 노인, 낡은 나룻배, 긴 노</span></div>
+  <div class="row"><span class="row-key">요금</span><span class="row-val">오볼로스 1개 (동전) — 시신의 눈이나 입에 넣어 장례를 치러야 함. 동전 없으면 100년 방황</span></div>
+  <div class="row"><span class="row-key">예외</span><span class="row-val">헤라클레스·오르페우스·오디세우스·아이네이아스 — 산 채로 건넘</span></div>
+</div>
+
+</div>
+
+<div class="sub-sec">⛰️ 신성한 장소 · 성지</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">⛅</span><div class="card-names"><div class="gname">올림포스 산 Olympos</div><div class="rname">신들의 궁전</div></div></div>
+  <span class="domain-tag">12신의 거처</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">그리스 북부 실제 산(2917m) · 신화에서는 구름 위 천상 궁전으로 묘사</span></div>
+  <div class="row"><span class="row-key">구조</span><span class="row-val">황금 대문 · 각 신마다 독립 궁전 · 헤파이스토스가 건설 · 구름과 안개로 가려짐</span></div>
+  <div class="row"><span class="row-key">넥타르·암브로시아</span><span class="row-val">신들의 음료(넥타르)와 식품(암브로시아) — 불사의 원천</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔮</span><div class="card-names"><div class="gname">델포이 Delphoi</div><div class="rname">아폴론의 신탁소</div></div></div>
+  <span class="domain-tag">세계의 배꼽(옴팔로스)</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">파르나소스 산 기슭 · 그리스 중부</span></div>
+  <div class="row"><span class="row-key">구조</span><span class="row-val">아폴론 신전 · 피티아(무녀)가 지하 균열에서 올라오는 가스 흡입 후 신탁 전달</span></div>
+  <div class="row"><span class="row-key">옴팔로스</span><span class="row-val">배꼽 모양 돌 — 제우스가 두 독수리를 반대 방향으로 날려 만난 지점 = 세계 중심</span></div>
+  <div class="row"><span class="row-key">유명 신탁</span><span class="row-val">오이디푸스 비극 예언 · 크로이소스의 전쟁 예언 · "너 자신을 알라" 경구</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌳</span><div class="card-names"><div class="gname">헤스페리데스 동산 Garden of Hesperides</div><div class="rname">황금 사과나무 동산</div></div></div>
+  <span class="domain-tag">세계 서쪽 끝</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">아틀라스 산맥 너머 세계 서쪽 끝 · 오케아노스 강가</span></div>
+  <div class="row"><span class="row-key">내용물</span><span class="row-val">불사의 황금 사과나무 · 헤라가 결혼 선물로 받음 · 라돈(용)과 헤스페리데스 3자매가 수호</span></div>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">헤라클레스 11과업 · 에리스가 황금 사과 던짐 → 파리스 심판 → 트로이 전쟁 발단</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌀</span><div class="card-names"><div class="gname">크레타 미궁 Labyrinthus</div><div class="rname">다이달로스가 설계한 미로</div></div></div>
+  <span class="domain-tag">미노타우로스의 거처</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">크노소스 궁전 지하</span></div>
+  <div class="row"><span class="row-key">설계자</span><span class="row-val">다이달로스 — 한 번 들어가면 나올 수 없는 구조</span></div>
+  <div class="row"><span class="row-key">탈출 방법</span><span class="row-val">아리아드네의 실타래 — 입구에 묶고 풀며 이동 후 역추적</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🏙️</span><div class="card-names"><div class="gname">트로이 Troia / Ilion</div><div class="rname">일리온 — 트로이 전쟁의 무대</div></div></div>
+  <span class="domain-tag">소아시아 북서부 도시</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">현재 튀르키예 차나칼레 주 히사를르크 언덕 (실제 발굴됨)</span></div>
+  <div class="row"><span class="row-key">건설</span><span class="row-val">포세이돈과 아폴론이 라오메돈 왕을 위해 성벽 건설 → 약속 어김 → 분노</span></div>
+  <div class="row"><span class="row-key">성벽 약점</span><span class="row-val">헤라클레스가 이전에 한 번 점령할 때 뚫린 부분 → 아이네이아스의 방어 구역</span></div>
+  <div class="row"><span class="row-key">함락</span><span class="row-val">10년 포위 → 목마 작전 → 내부에서 불 지름 → 완전 파괴</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌊</span><div class="card-names"><div class="gname">콜키스 Kolchis</div><div class="rname">황금 양털의 땅</div></div></div>
+  <span class="domain-tag">흑해 동쪽 끝 신비의 나라</span>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">현재 조지아 서부 지역</span></div>
+  <div class="row"><span class="row-key">왕</span><span class="row-val">아이에테스(태양신 헬리오스의 아들) · 마녀 메데이아의 고향</span></div>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">이아손과 아르고 원정대 · 황금 양털 탈취</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🏝️</span><div class="card-names"><div class="gname">오디세우스 경유 섬들</div><div class="rname">오디세이아의 무대</div></div></div>
+  <span class="domain-tag">귀향 경로</span>
+  <div class="row"><span class="row-key">아이아이에 Aiaia</span><span class="row-val">마녀 키르케의 섬 — 1년 체류 · 인간을 돼지로 변신</span></div>
+  <div class="row"><span class="row-key">오기기에 Ogygia</span><span class="row-val">님프 칼립소의 섬 — 7년 억류 · 불사 제안을 거절하고 탈출</span></div>
+  <div class="row"><span class="row-key">스케리아 Scheria</span><span class="row-val">파이아케스인의 나라 — 알키노오스 왕이 배 제공</span></div>
+  <div class="row"><span class="row-key">이타케 Ithake</span><span class="row-val">오디세우스의 고향 섬 · 왕비 페넬로페가 구혼자들을 20년간 거절</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌋</span><div class="card-names"><div class="gname">카우카소스 산맥 Kaukasos</div><div class="rname">프로메테우스의 형벌 장소</div></div></div>
+  <span class="domain-tag">신화적 극지</span>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">프로메테우스가 쇠사슬에 묶인 곳 · 매일 독수리가 간 먹음 · 헤라클레스가 독수리 사살·해방</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🏺</span><div class="card-names"><div class="gname">테베 Thebai</div><div class="rname">오이디푸스·안티고네의 도시</div></div></div>
+  <span class="domain-tag">보이오티아의 주요 도시</span>
+  <div class="row"><span class="row-key">건설자</span><span class="row-val">카드모스 — 용을 퇴치하고 이빨을 심어 전사(스파르토이) 탄생</span></div>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">오이디푸스 비극 · 안티고네 · 7인의 원정대 vs 테베 · 에피고노이 원정</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🐂</span><div class="card-names"><div class="gname">크레타 Krete</div><div class="rname">미노스 문명의 섬</div></div></div>
+  <span class="domain-tag">에게 해 최대 섬</span>
+  <div class="row"><span class="row-key">왕</span><span class="row-val">미노스 — 제우스와 에우로파의 아들 · 지혜롭고 강력한 왕 · 사후 저승 수석 심판관</span></div>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">미노타우로스·미궁·다이달로스·테세우스·아리아드네</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">💧</span><div class="card-names"><div class="gname">히포크레네 샘 Hippokrene</div><div class="rname">뮤즈의 영감의 샘</div></div></div>
+  <span class="domain-tag">헬리콘 산의 성수</span>
+  <div class="row"><span class="row-key">유래</span><span class="row-val">페가수스 발굽이 닿아 솟아난 샘 · 마시면 시적 영감 획득</span></div>
+  <div class="row"><span class="row-key">위치</span><span class="row-val">헬리콘 산 — 9뮤즈의 거처</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌾</span><div class="card-names"><div class="gname">엘레우시스 Eleusis</div><div class="rname">비교(秘敎)의 성지</div></div></div>
+  <span class="domain-tag">데메테르·페르세포네 숭배</span>
+  <div class="row"><span class="row-key">엘레우시스 비의</span><span class="row-val">데메테르가 페르세포네를 찾아 헤매다 엘레우시스 왕가에서 환대받음 → 죽음과 재생의 비밀 전수 · 비교 입문자는 내세 보장</span></div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ 신성한 집단 ══════════════ -->
+<div id="tab-groups" class="section">
+<div class="sec-title">✨ 신성한 집단 · 반신반인 · 자연 정령</div>
+
+<div class="sub-sec">🎨 9뮤즈 (Mousai) — 예술·학문의 여신들</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🎭</span><div class="card-names"><div class="gname">9뮤즈 Nine Muses</div><div class="rname">제우스와 므네모시네(기억의 여신)의 딸들</div></div></div>
+  <span class="domain-tag">헬리콘 산·피에리아 산 거주</span>
+  <div class="row"><span class="row-key">칼리오페 Kalliope</span><span class="row-val">🎤 서사시·웅변 — 황금 서판과 철필. 뮤즈 중 으뜸. 오르페우스의 어머니</span></div>
+  <div class="row"><span class="row-key">클레이오 Kleio</span><span class="row-val">📜 역사 — 두루마리·트럼펫. "영광"이란 뜻</span></div>
+  <div class="row"><span class="row-key">에라토 Erato</span><span class="row-val">💕 사랑시·서정시 — 리라. "욕망"이란 뜻</span></div>
+  <div class="row"><span class="row-key">에우테르페 Euterpe</span><span class="row-val">🎵 음악·서정시 — 아울로스(이중 피리)</span></div>
+  <div class="row"><span class="row-key">멜포메네 Melpomene</span><span class="row-val">😢 비극 — 비극 가면·칼·왕관. "노래하는 자"</span></div>
+  <div class="row"><span class="row-key">폴리힘니아 Polyhymnia</span><span class="row-val">🙏 찬가·수사학·미메 — 베일을 두름. 표정 없이 생각에 잠긴 모습</span></div>
+  <div class="row"><span class="row-key">테르프시코레 Terpsichore</span><span class="row-val">💃 춤·합창 — 리라·화환. "춤의 기쁨"</span></div>
+  <div class="row"><span class="row-key">탈레이아 Thalia</span><span class="row-val">😄 희극·전원시 — 희극 가면·목동 지팡이·담쟁이관</span></div>
+  <div class="row"><span class="row-key">우라니아 Urania</span><span class="row-val">🌌 천문학·우주 — 천구와 나침반. "천상의"란 뜻</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🧵 모이라이 (Moirai) — 운명의 세 여신</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🧶</span><div class="card-names"><div class="gname">모이라이 Moirai / 파르카이 Parcae (로마)</div><div class="rname">제우스와 테미스의 딸 · 혹은 태초부터 존재</div></div></div>
+  <span class="domain-tag">모든 존재의 운명을 결정</span>
+  <div class="row"><span class="row-key">클로토 Klotho</span><span class="row-val">🪡 실을 잣는 자 — 생명의 실을 방적. 탄생의 순간을 결정</span></div>
+  <div class="row"><span class="row-key">라케시스 Lakhesis</span><span class="row-val">📏 실을 배분하는 자 — 삶의 길이와 운명을 측정</span></div>
+  <div class="row"><span class="row-key">아트로포스 Atropos</span><span class="row-val">✂️ 실을 자르는 자 — 죽음의 순간 결정. "피할 수 없는 자"란 뜻</span></div>
+  <div class="row"><span class="row-key">권력</span><span class="row-val">제우스조차도 모이라이의 결정을 바꿀 수 없음 (일부 설화에서는 가능)</span></div>
+</div>
+</div>
+
+<div class="sub-sec">😠 에리니에스 (Erinyes) — 복수의 세 여신</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🐍</span><div class="card-names"><div class="gname">에리니에스 Erinyes / 푸리아이 Furiae (로마)</div><div class="rname">우라노스 피 또는 뉙스의 딸들</div></div></div>
+  <span class="domain-tag">죄인·맹세 위반자 추적·처벌</span>
+  <div class="row"><span class="row-key">알렉토 Alekto</span><span class="row-val">분노·쉬지 않는 자 — 특히 도덕적 죄악 추적</span></div>
+  <div class="row"><span class="row-key">메가이라 Megaira</span><span class="row-val">질투·원한 — 시기와 질투의 죄악 추적</span></div>
+  <div class="row"><span class="row-key">티시포네 Tisiphone</span><span class="row-val">살인 복수자 — 특히 가족 살해자 추적</span></div>
+  <div class="row"><span class="row-key">외형</span><span class="row-val">머리카락이 뱀, 박쥐 날개, 눈에서 피눈물, 횃불과 채찍</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">오레스테스 추적(어머니 클리타임네스트라 살해) → 아테나 재판소에서 에우메니데스(자비로운 자)로 변환</span></div>
+</div>
+</div>
+
+<div class="sub-sec">✨ 카리테스 · 호라이 · 기타 여신 집단</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">💐</span><div class="card-names"><div class="gname">카리테스 Charites</div><div class="rname">로마명: Gratiae (그라티아이·그레이스)</div></div></div>
+  <span class="domain-tag">미·우아·창의·기쁨의 세 여신</span>
+  <div class="row"><span class="row-key">아글라이아 Aglaia</span><span class="row-val">광채·아름다움</span></div>
+  <div class="row"><span class="row-key">에우프로시네 Euphrosyne</span><span class="row-val">기쁨·즐거움</span></div>
+  <div class="row"><span class="row-key">탈레이아 Thalia</span><span class="row-val">축제·풍요 (뮤즈 탈레이아와 동명)</span></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">아프로디테의 시녀 · 축제·예술·우아함 상징 · 보티첼리 "봄"에 춤추는 세 미신</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌸</span><div class="card-names"><div class="gname">호라이 Horai</div><div class="rname">계절·질서의 여신들</div></div></div>
+  <span class="domain-tag">계절·시간·질서</span>
+  <div class="row"><span class="row-key">에이레네 Eirene</span><span class="row-val">평화 · 로마명: Pax</span></div>
+  <div class="row"><span class="row-key">디케 Dike</span><span class="row-val">정의 · 테미스의 딸</span></div>
+  <div class="row"><span class="row-key">에우노미아 Eunomia</span><span class="row-val">질서·법치</span></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">올림포스 문 개폐 담당 · 계절 변화 주관 · 제우스 보좌</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌊</span><div class="card-names"><div class="gname">네레이데스 Nereides</div><div class="rname">바다 님프 50명</div></div></div>
+  <span class="domain-tag">에게 해·지중해 정령</span>
+  <div class="row"><span class="row-key">유명 네레이스</span><span class="row-val">테티스(아킬레우스 어머니) · 암피트리테(포세이돈 아내) · 갈라테이아(키클로페스 폴리페모스의 짝사랑 대상)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌲</span><div class="card-names"><div class="gname">님프 Nymphe 종류</div><div class="rname">자연의 정령들</div></div></div>
+  <span class="domain-tag">자연 각 영역의 정령</span>
+  <div class="row"><span class="row-key">나이아데스 Naiades</span><span class="row-val">강·샘·호수·우물의 님프</span></div>
+  <div class="row"><span class="row-key">오레이아데스 Oreades</span><span class="row-val">산·동굴의 님프 (에코가 오레이아스)</span></div>
+  <div class="row"><span class="row-key">드리아데스 Dryades</span><span class="row-val">나무·숲의 님프 (나무가 죽으면 함께 죽음)</span></div>
+  <div class="row"><span class="row-key">하마드리아데스 Hamadryades</span><span class="row-val">특정 나무에 결합된 님프</span></div>
+  <div class="row"><span class="row-key">오케아니데스 Okeanides</span><span class="row-val">오케아노스 강의 3000 딸들 · 구름·비·안개 주관</span></div>
+</div>
+</div>
+
+<div class="sub-sec">💨 4방위 바람의 신 (Anemoi)</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🌬️</span><div class="card-names"><div class="gname">아네모이 Anemoi</div><div class="rname">로마명: Venti</div></div></div>
+  <span class="domain-tag">4방위 바람의 신</span>
+  <div class="row"><span class="row-key">보레아스 Boreas</span><span class="row-val">🌨️ 북풍 · 날개 달린 청년, 혹독한 추위 · 아테나 여성 오레이티이아 납치 · 아테나의 동맹(페르시아 함대 파괴)</span></div>
+  <div class="row"><span class="row-key">제피로스 Zephyros</span><span class="row-val">🌸 서풍 · 온화한 봄바람 · 클로리스(꽃의 여신)와 결혼 · 히아킨토스 죽음에 관여</span></div>
+  <div class="row"><span class="row-key">노토스 Notos</span><span class="row-val">🌧️ 남풍 · 폭우와 안개를 몰고 옴 · 가을 폭풍</span></div>
+  <div class="row"><span class="row-key">에우로스 Euros</span><span class="row-val">🍂 동풍(또는 남동풍) · 불운의 바람으로 묘사</span></div>
+  <div class="row"><span class="row-key">아이올로스 Aiolos</span><span class="row-val">바람의 지배자 — 바람들을 가죽 주머니에 담아 관리 · 오디세우스에게 바람 주머니 선물</span></div>
+</div>
+</div>
+
+<div class="sub-sec">⚕️ 의술의 신 아스클레피오스 일가</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🐍</span><div class="card-names"><div class="gname">아스클레피오스 Asklepios</div><div class="rname">로마명: Aesculapius</div></div></div>
+  <span class="domain-tag">의술·치유의 신</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">아폴론 + 코로니스(인간 여성)</span></div>
+  <div class="row"><span class="row-key">스승</span><span class="row-val">켄타우로스 케이론에게 의술 배움</span></div>
+  <div class="row"><span class="row-key">능력</span><span class="row-val">뱀 피로 죽은 자를 부활시킴 → 하데스 항의 → 제우스 번개로 처형 → 아폴론 분노 → 협상으로 별자리(뱀주인자리)로</span></div>
+  <div class="row"><span class="row-key">상징</span><span class="row-val">단뱀 지팡이 (의학의 상징) — 카두케우스(두 뱀)와 혼동 주의</span></div>
+  <div class="row"><span class="row-key">자녀</span><span class="row-val">히기에이아(건강) · 파나케이아(만병통치) · 이아소(치료) · 아케소(회복)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚔️</span><div class="card-names"><div class="gname">디오스쿠로이 Dioskouroi</div><div class="rname">로마명: Castor and Pollux</div></div></div>
+  <span class="domain-tag">쌍둥이 영웅 · 쌍둥이자리</span>
+  <div class="row"><span class="row-key">카스토르 Kastor</span><span class="row-val">말의 조련사·전사 (인간, 레다와 틴다레오스의 아들)</span></div>
+  <div class="row"><span class="row-key">폴리데우케스 Polydeukes</span><span class="row-val">권투의 달인 (신, 레다와 제우스의 아들 — 백조 변신)</span></div>
+  <div class="row"><span class="row-key">불사 공유</span><span class="row-val">카스토르 전사 → 폴리데우케스가 불사를 나눔 → 번갈아 올림포스·저승 생활 → 쌍둥이자리</span></div>
+  <div class="row"><span class="row-key">관련 신화</span><span class="row-val">아르고 원정 참여 · 칼리돈 멧돼지 사냥 · 선원의 수호신(세인트 엘모의 불)</span></div>
+</div>
+</div>
+
+</div>
+
+<!-- ══════════════ 유명 인간 ══════════════ -->
+<div id="tab-mortals" class="section">
+<div class="sec-title">👤 신화 속 유명 인간·왕족·마녀</div>
+
+<div class="sub-sec">👑 트로이 전쟁의 주요 인물</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">👸</span><div class="card-names"><div class="gname">헬레네 Helene</div><div class="rname">트로이 전쟁의 원인</div></div></div>
+  <span class="domain-tag">세상에서 가장 아름다운 여인</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">제우스(백조 변신) + 레다 · 쌍둥이: 폴리데우케스·카스토르·클리타임네스트라</span></div>
+  <div class="row"><span class="row-key">남편</span><span class="row-val">스파르타 왕 메넬라오스 (정실) → 파리스에게 납치(혹은 자발적 도주)</span></div>
+  <div class="row"><span class="row-key">파리스의 심판</span><span class="row-val">아프로디테가 "가장 아름다운 여인"을 약속 → 파리스가 아프로디테 선택 → 헬레네 탈취 → 트로이 전쟁</span></div>
+  <div class="row"><span class="row-key">전후</span><span class="row-val">트로이 함락 후 메넬라오스와 재결합 · 스파르타로 귀환</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔮</span><div class="card-names"><div class="gname">카산드라 Kassandra</div><div class="rname">믿어지지 않는 예언자</div></div></div>
+  <span class="domain-tag">트로이 왕녀·예언자</span>
+  <div class="row"><span class="row-key">저주</span><span class="row-val">아폴론의 사랑 거절 → 예언 능력은 유지, 아무도 믿지 않는 저주</span></div>
+  <div class="row"><span class="row-key">예언</span><span class="row-val">파리스의 귀환 경고 · 목마 경고 · 트로이 멸망 예언 — 모두 무시당함</span></div>
+  <div class="row"><span class="row-key">최후</span><span class="row-val">트로이 함락 후 아가멤논의 전리품 → 귀국 후 클리타임네스트라에게 살해</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚔️</span><div class="card-names"><div class="gname">헥토르 Hektor</div><div class="rname">트로이 최강의 전사</div></div></div>
+  <span class="domain-tag">트로이의 수호자</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">트로이 왕 프리아모스 + 헤카베</span></div>
+  <div class="row"><span class="row-key">가족</span><span class="row-val">아내 안드로마케 · 아들 아스티아낙스 (트로이 함락 후 성벽에서 던져짐)</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">파트로클로스 살해 → 아킬레우스 분노 복귀 → 아킬레우스와 1대1 결투 → 전사 → 시신이 전차에 묶여 끌려다님 → 프리아모스가 몸값으로 회수</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">😢</span><div class="card-names"><div class="gname">안드로마케 Andromakhe</div><div class="rname">헥토르의 아내</div></div></div>
+  <span class="domain-tag">비극적 사랑의 상징</span>
+  <div class="row"><span class="row-key">최후</span><span class="row-val">트로이 함락 후 아킬레우스의 아들 네오프톨레모스의 전리품이 됨</span></div>
+  <div class="row"><span class="row-key">의미</span><span class="row-val">전쟁의 피해자·충실한 아내의 표상으로 수천 년간 문학에 인용</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">😡</span><div class="card-names"><div class="gname">아가멤논 Agamemnon</div><div class="rname">그리스 연합군 총사령관</div></div></div>
+  <span class="domain-tag">미케네 왕·트로이 원정대장</span>
+  <div class="row"><span class="row-key">가족</span><span class="row-val">아내 클리타임네스트라 · 딸 이피게네이아·엘렉트라 · 아들 오레스테스</span></div>
+  <div class="row"><span class="row-key">이피게네이아</span><span class="row-val">원정 출발 위한 순풍 → 아르테미스에게 딸 이피게네이아 제물 → 클리타임네스트라의 원한</span></div>
+  <div class="row"><span class="row-key">최후</span><span class="row-val">트로이 승전 귀환 → 아내 클리타임네스트라와 그 정부 아이기스토스에게 살해 → 아들 오레스테스가 복수</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🗡️</span><div class="card-names"><div class="gname">파리스 Paris / 알렉산드로스</div><div class="rname">트로이 왕자</div></div></div>
+  <span class="domain-tag">트로이 전쟁의 발단</span>
+  <div class="row"><span class="row-key">예언</span><span class="row-val">태어나기 전 "트로이를 멸망시킬 자"로 예언 → 버려짐 → 목동으로 성장 → 귀환</span></div>
+  <div class="row"><span class="row-key">심판</span><span class="row-val">헤라(권력)·아테나(지혜·전투 승리)·아프로디테(헬레네) 중 아프로디테 선택</span></div>
+  <div class="row"><span class="row-key">최후</span><span class="row-val">아킬레우스를 화살로 발꿈치에 맞춰 살해 → 아폴론이 화살 유도 → 필록테테스의 헤라클레스 화살에 사망</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🧙 마녀·마법사</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🧪</span><div class="card-names"><div class="gname">메데이아 Medeia</div><div class="rname">콜키스의 마녀 공주</div></div></div>
+  <span class="domain-tag">최강의 마녀·이아손의 아내</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">아이에테스 왕(헬리오스의 아들) · 헤카테의 사제</span></div>
+  <div class="row"><span class="row-key">능력</span><span class="row-val">포션·독약 제조 · 젊음 회복 마법 · 예언 · 공중 비행(용이 끄는 전차)</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">이아손을 위해 황금 양털 획득 도움(용 잠재우기·이복오빠 살해) → 이아손과 결혼 → 이아손이 새 왕비와 결혼하려 배신 → 새 신부와 장인 독살 → 자신의 두 아들 살해 → 아테나이로 도주 → 아이게우스 왕과 재혼</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🐷</span><div class="card-names"><div class="gname">키르케 Kirke</div><div class="rname">마법의 섬 아이아이에 거주</div></div></div>
+  <span class="domain-tag">변신 마법의 대가</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">헬리오스(태양신) + 페르세이스(오케아니데스)</span></div>
+  <div class="row"><span class="row-key">능력</span><span class="row-val">인간을 동물로 변신 · 포션 제조 · 예언 능력</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">오디세우스 선원들을 돼지로 변신 → 오디세우스가 헤르메스 약초(몰리)로 저항 → 키르케가 반함 → 1년 체류 · 저승 방문 조언 · 스킬라·카립디스 경로 안내</span></div>
+</div>
+</div>
+
+<div class="sub-sec">😔 비극적 운명의 인간들</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🍇</span><div class="card-names"><div class="gname">탄탈로스 Tantalos</div><div class="rname">영원한 고통의 형벌</div></div></div>
+  <span class="domain-tag">타르타로스의 형벌자</span>
+  <div class="row"><span class="row-key">죄악</span><span class="row-val">신들을 시험하려 아들 펠롭스를 요리해 대접 (다른 설: 신들의 음식 훔침)</span></div>
+  <div class="row"><span class="row-key">형벌</span><span class="row-val">목까지 물에 잠겨 있으나 마시려 하면 물이 빠짐 · 머리 위 과일이 달렸으나 먹으려 하면 바람에 날아감 = 탄탈라이즈(tantalize) 어원</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🦷</span><div class="card-names"><div class="gname">펠롭스 Pelops</div><div class="rname">올림픽 경기의 기원</div></div></div>
+  <span class="domain-tag">탄탈로스의 아들</span>
+  <div class="row"><span class="row-key">탄생</span><span class="row-val">아버지에게 요리됨 → 신들이 복원 · 데메테르가 어깨 한 조각 먹어 상아 어깨로 복원</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">히포다메이아 구혼: 전차 경주 승리자만 결혼 조건 → 장인의 마부 미르틸로스를 매수(바퀴핀 제거) → 승리 후 미르틸로스를 바다에 던짐 → 저주가 후손에 이어짐 (아트레우스 가문의 저주)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎰</span><div class="card-names"><div class="gname">익시온 Ixion</div><div class="rname">영원히 회전하는 수레바퀴의 형벌</div></div></div>
+  <span class="domain-tag">배신과 오만의 화신</span>
+  <div class="row"><span class="row-key">죄악</span><span class="row-val">장인 살해 → 제우스가 용서 → 올림포스에서 헤라에게 욕정 → 헤라 구름 분신 네펠레를 헤라로 착각해 범함 → 켄타우로스족 탄생</span></div>
+  <div class="row"><span class="row-key">형벌</span><span class="row-val">타르타로스에서 불바퀴에 묶여 영원히 회전</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🦢</span><div class="card-names"><div class="gname">가니메데스 Ganymedes</div><div class="rname">신들의 잔 시중</div></div></div>
+  <span class="domain-tag">트로이 왕자·올림포스 시동</span>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">트로이 왕자, 역사상 가장 아름다운 인간 남성 → 제우스가 독수리(혹은 독수리로 변신)로 납치 → 올림포스에서 신들의 술(넥타르) 시중 · 별자리 물병자리(아쿠아리우스)가 됨</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">💧</span><div class="card-names"><div class="gname">다나이데스 Danaides</div><div class="rname">다나오스의 50딸들</div></div></div>
+  <span class="domain-tag">영원한 형벌자</span>
+  <div class="row"><span class="row-key">죄악</span><span class="row-val">아버지 명령으로 첫날밤에 남편 49명 살해 (1명만 거절)</span></div>
+  <div class="row"><span class="row-key">형벌</span><span class="row-val">타르타로스에서 구멍 뚫린 항아리에 물 채우기 — 절대 채워지지 않음</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌺</span><div class="card-names"><div class="gname">아도니스 Adonis</div><div class="rname">아프로디테가 사랑한 미소년</div></div></div>
+  <span class="domain-tag">아름다움과 죽음의 상징</span>
+  <div class="row"><span class="row-key">탄생</span><span class="row-val">몰약나무(미르라) 속에서 탄생 — 어머니가 아버지를 속인 근친 관계로 신들에게 저주받아 나무로 변신</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">아프로디테와 페르세포네 모두 사랑함 → 제우스 중재: 1년의 1/3 아프로디테, 1/3 페르세포네, 1/3 자유 → 아프로디테 선택 → 사냥 중 멧돼지에게 죽음 → 아네모네꽃 탄생</span></div>
+</div>
+</div>
+
+<div class="sub-sec">👸 제우스의 연인들 (변신 이야기)</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🦅</span><div class="card-names"><div class="gname">제우스의 주요 변신·연애 사건들</div><div class="rname">수십 건 중 대표적인 것들</div></div></div>
+  <div class="row"><span class="row-key">에우로파 Europa</span><span class="row-val">🐂 흰 황소로 변신 → 등에 태워 크레타로 납치 → 미노스·라다만토스·사르페돈 탄생 (유럽 Europe의 어원)</span></div>
+  <div class="row"><span class="row-key">이오 Io</span><span class="row-val">🐄 암소로 변신(헤라 속임) → 헤라가 100눈 아르고스로 감시 → 헤르메스가 아르고스 퇴치 → 헤라가 쇠파리 보내 전 세계 방황 → 이집트에서 이시스와 동일시</span></div>
+  <div class="row"><span class="row-key">레다 Leda</span><span class="row-val">🦢 백조로 변신 → 헬레네·폴리데우케스 탄생 (알에서 태어남)</span></div>
+  <div class="row"><span class="row-key">다나에 Danae</span><span class="row-val">🌟 황금 빗물로 변신 → 청동 탑에 갇힌 다나에에게 스며들어 페르세우스 탄생</span></div>
+  <div class="row"><span class="row-key">알크메네 Alkmene</span><span class="row-val">👤 남편 암피트리온으로 변신 → 헤라클레스 탄생</span></div>
+  <div class="row"><span class="row-key">세멜레 Semele</span><span class="row-val">🔥 헤라의 꼬드김 → 진짜 신의 모습 보여달라고 졸라 → 번개에 소멸 → 태아 디오니소스를 제우스 허벅지에 꿰매 완성</span></div>
+  <div class="row"><span class="row-key">칼리스토 Kallisto</span><span class="row-val">🐻 아르테미스로 변신 → 아르테미스 사냥단의 칼리스토 유혹 → 임신 발각 → 아르테미스 또는 헤라가 곰으로 변신 → 아들 아르카스가 사냥하려 할 때 제우스가 큰곰·작은곰자리로</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════ 로마 신화 ══════════════ -->
+<div id="tab-roman" class="section">
+<div class="sec-title">🦅 로마 고유 신화 · 로마 특유의 신들</div>
+
+<div class="info-box" style="background:rgba(120,180,240,.08);border-left:3px solid var(--blue);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#a0c8f0;">
+그리스 신화를 흡수한 로마는 대부분의 신을 대응시켰지만, 고유 신화와 독자적 신도 존재합니다. 로마는 신화보다 건국 서사와 국가 종교에 더 초점을 맞췄습니다.</div>
+
+<div class="sub-sec">🏛️ 로마 고유 신들</div>
+<div class="grid">
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🚪</span><div class="card-names"><div class="gname">야누스 Ianus</div><div class="rname">그리스 대응 없는 순수 로마 신</div></div></div>
+  <span class="domain-tag">시작·문·시간·전환</span>
+  <div class="row"><span class="row-key">외형</span><span class="row-val">두 얼굴 — 앞뒤를 동시에 바라봄 (과거와 미래, 시작과 끝)</span></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">모든 출입문·관문 수호 · 1월(January) 어원 · 전쟁 선포 시 야누스 신전 문을 열고 평화 시 닫음</span></div>
+  <div class="row"><span class="row-key">신화</span><span class="row-val">티탄 신이라는 설 · 사투르누스(크로노스)에게 왕국을 나눠준 후 두 얼굴을 선물받음 · 로마 최초의 왕 중 하나</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔥</span><div class="card-names"><div class="gname">베스타 Vesta</div><div class="rname">그리스명: Hestia (헤스티아)</div></div></div>
+  <span class="domain-tag">화로·가정·국가의 불</span>
+  <div class="row"><span class="row-key">외형</span><span class="row-val">베일을 쓴 순결한 여신. 거의 의인화되지 않고 불꽃 자체로 표현</span></div>
+  <div class="row"><span class="row-key">베스탈 처녀</span><span class="row-val">베스타 신전의 화로 불을 영원히 유지하는 6명의 여사제 · 30년 임기 · 순결 서약 위반 시 생매장</span></div>
+  <div class="row"><span class="row-key">중요성</span><span class="row-val">베스타의 불이 꺼지면 로마 멸망의 전조로 여김</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌾</span><div class="card-names"><div class="gname">사투르누스 Saturnus</div><div class="rname">그리스명: Kronos (크로노스)</div></div></div>
+  <span class="domain-tag">농업·시간·황금시대</span>
+  <div class="row"><span class="row-key">로마 특색</span><span class="row-val">그리스에서는 악한 신이나 로마에서는 황금시대를 다스린 자비로운 왕으로 숭배</span></div>
+  <div class="row"><span class="row-key">사투르날리아</span><span class="row-val">12월 17~23일 축제 — 노예와 주인이 역할 바꿈 · 선물 교환 · 크리스마스의 기원 중 하나</span></div>
+  <div class="row"><span class="row-key">토성 Saturn</span><span class="row-val">태양계 6번째 행성 이름의 유래</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌊</span><div class="card-names"><div class="gname">야누스 야외신 (Lares·Penates)</div><div class="rname">가정 수호신</div></div></div>
+  <span class="domain-tag">로마 가정 종교의 핵심</span>
+  <div class="row"><span class="row-key">라레스 Lares</span><span class="row-val">조상 혼령이 가정을 수호 · 집의 화로 옆 신상 안치 · 매 식사마다 제물 바침</span></div>
+  <div class="row"><span class="row-key">페나테스 Penates</span><span class="row-val">식품 창고(페누스) 수호 · 로마 국가 페나테스는 아이네이아스가 트로이에서 가져왔다는 신성한 물건들</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌿</span><div class="card-names"><div class="gname">실바누스 Silvanus</div><div class="rname">로마 고유 산림신</div></div></div>
+  <span class="domain-tag">숲·농업·목축·경계</span>
+  <div class="row"><span class="row-key">외형</span><span class="row-val">숲 속 노인, 낫이나 소나무 가지 소지</span></div>
+  <div class="row"><span class="row-key">그리스 대응</span><span class="row-val">판(Pan)과 유사하나 더 온화하고 농촌적 성격</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">🕊️</span><div class="card-names"><div class="gname">팍스 Pax / 콩코르디아 Concordia</div><div class="rname">로마의 추상 신들</div></div></div>
+  <span class="domain-tag">평화·화합의 의인화 신</span>
+  <div class="row"><span class="row-key">팍스</span><span class="row-val">평화 — 올리브 가지·코르누코피아·홀 · "팍스 로마나(로마의 평화)" 시대 상징</span></div>
+  <div class="row"><span class="row-key">콩코르디아</span><span class="row-val">화합·조화 — 저울·코르누코피아 · 로마 광장 신전</span></div>
+</div>
+
+</div>
+
+<div class="sub-sec">🐺 로마 건국 신화</div>
+<div class="grid">
+
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">🐺</span><div class="card-names"><div class="gname">로물루스와 레무스 Romulus &amp; Remus</div><div class="rname">로마 건국의 쌍둥이</div></div></div>
+  <span class="domain-tag">기원전 753년 로마 건국 신화</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">마르스(전쟁신) + 레아 실비아(베스탈 처녀·알바 롱가 왕녀)</span></div>
+  <div class="row"><span class="row-key">출생</span><span class="row-val">외삼촌 아물리우스가 왕위 찬탈 → 쌍둥이를 티베르 강에 버림 → 암늑대(루파)가 젖 먹여 기름 → 목동 파우스툴루스가 발견·양육</span></div>
+  <div class="row"><span class="row-key">복수</span><span class="row-val">성장 후 아물리우스 타도 → 외조부 누미토르 복위 → 새 도시 건설</span></div>
+  <div class="row"><span class="row-key">로마 건국</span><span class="row-val">팔라티누스 언덕(로물루스) vs 아벤티누스 언덕(레무스) 다툼 → 조짐 다툼 → 로물루스가 성벽 넘는 레무스를 살해 → 혼자 로마 건국·초대 왕</span></div>
+  <div class="row"><span class="row-key">사비니 여인 납치</span><span class="row-val">여성이 부족한 로마 → 이웃 사비니족 여성 납치 → 전쟁 → 사비니 여인들이 중재 → 두 민족 합병</span></div>
+  <div class="row"><span class="row-key">신격화</span><span class="row-val">로물루스가 폭풍 속에서 사라짐 → 쿠이리누스(전쟁신) 신격화</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚓</span><div class="card-names"><div class="gname">아이네이아스 Aineias</div><div class="rname">로마명: Aeneas</div></div></div>
+  <span class="domain-tag">트로이→로마 건국 조상</span>
+  <div class="row"><span class="row-key">부모</span><span class="row-val">아프로디테(베누스) + 안키세스 (트로이 왕족)</span></div>
+  <div class="row"><span class="row-key">주요 신화</span><span class="row-val">트로이 함락 → 노부 아버지를 등에 업고 탈출 (효심의 표상) → 아이네이스(베르길리우스) 서사시 → 지중해 방랑 → 카르타고 여왕 디도와 사랑·이별 → 이탈리아 라티움 도착 → 라티누스 왕과 동맹·결혼 → 알바 롱가 건설 → 후손이 로물루스·레무스</span></div>
+  <div class="row"><span class="row-key">저승 방문</span><span class="row-val">아버지 안키세스 혼령을 만나러 황금가지(미슬토)를 들고 저승 방문 → 로마의 미래를 예언받음</span></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-icon">💔</span><div class="card-names"><div class="gname">디도 Dido</div><div class="rname">카르타고 건국 여왕</div></div></div>
+  <span class="domain-tag">비극적 사랑의 여왕</span>
+  <div class="row"><span class="row-key">신화</span><span class="row-val">페니키아 공주 → 남편 피살 후 탈출 → 카르타고 건국 · 아이네이아스 방문 → 사랑에 빠짐 → 제우스 명령에 아이네이아스 출발 → 자살(장작 위에서) · 훗날 아이네이아스가 저승에서 만나지만 외면당함</span></div>
+</div>
+
+</div>
+
+<div class="sub-sec">🗺️ 그리스-로마 신 대응표</div>
+<div class="grid">
+<div class="card" style="grid-column:1/-1;">
+  <div class="card-head"><span class="card-icon">📋</span><div class="card-names"><div class="gname">그리스명 → 로마명 전체 대응</div></div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;margin-top:6px;">
+    <div class="row"><span class="row-key">제우스</span><span class="row-val">유피테르 (Jupiter)</span></div>
+    <div class="row"><span class="row-key">헤라</span><span class="row-val">유노 (Juno)</span></div>
+    <div class="row"><span class="row-key">포세이돈</span><span class="row-val">넵투누스 (Neptune)</span></div>
+    <div class="row"><span class="row-key">데메테르</span><span class="row-val">케레스 (Ceres)</span></div>
+    <div class="row"><span class="row-key">아테나</span><span class="row-val">미네르바 (Minerva)</span></div>
+    <div class="row"><span class="row-key">아폴론</span><span class="row-val">아폴로 (Apollo) — 동일</span></div>
+    <div class="row"><span class="row-key">아르테미스</span><span class="row-val">디아나 (Diana)</span></div>
+    <div class="row"><span class="row-key">아레스</span><span class="row-val">마르스 (Mars)</span></div>
+    <div class="row"><span class="row-key">아프로디테</span><span class="row-val">베누스 (Venus)</span></div>
+    <div class="row"><span class="row-key">헤파이스토스</span><span class="row-val">불카누스 (Vulcan)</span></div>
+    <div class="row"><span class="row-key">헤르메스</span><span class="row-val">메르쿠리우스 (Mercury)</span></div>
+    <div class="row"><span class="row-key">디오니소스</span><span class="row-val">바쿠스 (Bacchus)</span></div>
+    <div class="row"><span class="row-key">하데스</span><span class="row-val">플루토 (Pluto)</span></div>
+    <div class="row"><span class="row-key">페르세포네</span><span class="row-val">프로세르피나 (Proserpina)</span></div>
+    <div class="row"><span class="row-key">에로스</span><span class="row-val">쿠피도 (Cupid)</span></div>
+    <div class="row"><span class="row-key">에오스</span><span class="row-val">아우로라 (Aurora)</span></div>
+    <div class="row"><span class="row-key">헬리오스</span><span class="row-val">솔 (Sol)</span></div>
+    <div class="row"><span class="row-key">셀레네</span><span class="row-val">루나 (Luna)</span></div>
+    <div class="row"><span class="row-key">헤스티아</span><span class="row-val">베스타 (Vesta)</span></div>
+    <div class="row"><span class="row-key">니케</span><span class="row-val">빅토리아 (Victoria)</span></div>
+    <div class="row"><span class="row-key">크로노스</span><span class="row-val">사투르누스 (Saturn)</span></div>
+    <div class="row"><span class="row-key">히프노스</span><span class="row-val">솜누스 (Somnus)</span></div>
+    <div class="row"><span class="row-key">모이라이</span><span class="row-val">파르카이 (Parcae)</span></div>
+    <div class="row"><span class="row-key">에리니에스</span><span class="row-val">푸리아이 (Furiae)</span></div>
+    <div class="row"><span class="row-key">판</span><span class="row-val">파우누스 (Faunus)</span></div>
+    <div class="row"><span class="row-key">튀케</span><span class="row-val">포르투나 (Fortuna)</span></div>
+    <div class="row"><span class="row-key">네메시스</span><span class="row-val">인비디아 (Invidia)</span></div>
+    <div class="row"><span class="row-key">헤카테</span><span class="row-val">트리비아 (Trivia)</span></div>
+    <div class="row"><span class="row-key">아스클레피오스</span><span class="row-val">아에스쿨라피우스 (Aesculapius)</span></div>
+    <div class="row"><span class="row-key">보레아스</span><span class="row-val">아퀼로 (Aquilo)</span></div>
+  </div>
+</div>
+</div>
+
+</div>
+
 <div id="no-result">검색 결과가 없습니다.</div>
 </div><!-- /main -->
 
 <script>
-const allTabs=[['olympos','⚡ 올림포스 12신'],['others','🌊 기타 신들'],['heroes','🗡️ 영웅들'],['myths','📜 신화 이야기'],['weapons','🔱 무기·유물'],['monsters','🐉 괴물·생물']];
+const allTabs=[['olympos','⚡ 올림포스 12신'],['others','🌊 기타 신들'],['heroes','🗡️ 영웅들'],['myths','📜 신화 이야기'],['weapons','🔱 무기·유물'],['monsters','🐉 괴물·생물'],['places','🏛️ 장소·지리'],['groups','✨ 신성한 집단'],['mortals','👤 유명 인간'],['roman','🦅 로마 신화']];
 function sw(name,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));

@@ -17,8 +17,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
              box-shadow:0 0 30px rgba(0,0,0,.6);background:#0d0b14;}
 #canvas{display:block;cursor:pointer;image-rendering:pixelated;}
 
-#stats{position:absolute;top:6px;left:8px;color:rgba(220,200,240,.8);font-size:11px;
-  font-family:Consolas,monospace;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.9);line-height:1.5;}
+#stats{position:absolute;top:6px;left:8px;color:rgba(220,200,240,.85);font-size:11px;
+  font-family:Consolas,monospace;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.95);line-height:1.55;}
+#legend{position:absolute;top:6px;right:8px;color:rgba(220,200,240,.75);font-size:10px;
+  font-family:Consolas,monospace;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.95);
+  line-height:1.5;text-align:right;}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   color:#c9a2e2;font-size:13px;background:#0d0b14;}
 
@@ -26,7 +29,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   display:flex;flex-wrap:wrap;align-items:center;gap:6px;
   margin-top:6px;padding:7px 11px;
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;width:100%;max-width:760px;
+  border-radius:8px;width:100%;max-width:820px;
 }
 .ctrl-row{
   width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;
@@ -72,13 +75,14 @@ input[type=range]::-webkit-slider-thumb{
 <div class="canvas-outer" id="canvas-wrap">
   <canvas id="canvas"></canvas>
   <div id="stats"></div>
+  <div id="legend"></div>
   <div id="loading">타일 로딩 중...</div>
 </div>
 
 <div id="controls">
   <div class="ctrl-row">
     <button class="btn mode-btn on" id="btn-dungeon">🏰 던전</button>
-    <button class="btn mode-btn" id="btn-field">🌿 초원</button>
+    <button class="btn mode-btn" id="btn-field">🌿 야외</button>
     <div class="ctrl-divider"></div>
     <span class="ctrl-label">시드</span>
     <input id="seed-input" type="text" spellcheck="false">
@@ -98,8 +102,8 @@ input[type=range]::-webkit-slider-thumb{
     <div class="ctrl-divider"></div>
     <div class="ctrl-group">
       <span class="ctrl-label" id="lb-a">방 개수</span>
-      <input type="range" id="sl-a" min="4" max="16" value="9" style="width:80px;">
-      <span class="val-display" id="v-a">9</span>
+      <input type="range" id="sl-a" min="5" max="18" value="10" style="width:80px;">
+      <span class="val-display" id="v-a">10</span>
     </div>
     <div class="ctrl-divider"></div>
     <div class="ctrl-group">
@@ -115,12 +119,18 @@ input[type=range]::-webkit-slider-thumb{
     </div>
   </div>
 </div>
-<div id="hint">캔버스 클릭 = 새 맵 · 같은 시드는 항상 같은 맵 · 타일: 2D Pixel Dungeon Pack &amp; Pixel Art Top Down</div>
+<div id="hint">캔버스 클릭 = 새 맵 · 같은 시드는 항상 같은 맵 · 타일: 2D Pixel Dungeon Pack · Enemy Animations · Pixel Art Top Down</div>
 
 <script>
 'use strict';
 
-/* ══════════════ 시드 랜덤 (mulberry32 + 문자열 해시) ══════════════ */
+/* ══════════════════════════════════════════════════════════════════
+   GEN CORE START
+   ── DOM 을 전혀 건드리지 않는 순수 생성부.
+      브라우저와 검증용 Node 스크립트가 똑같이 이 블록만 실행한다.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ─── 시드 랜덤 (mulberry32 + 문자열 해시) ─── */
 function xmur3(str) {
   let h = 1779033703 ^ str.length;
   for (let i = 0; i < str.length; i++) {
@@ -142,53 +152,808 @@ function mulberry32(a) {
   };
 }
 let rng = Math.random;
-const ri = (a, b) => a + Math.floor(rng() * (b - a + 1));   // 정수 [a,b]
+const ri   = (a, b) => a + Math.floor(rng() * (b - a + 1));
 const pick = arr => arr[Math.floor(rng() * arr.length)];
+const chance = p => rng() < p;
+/* 배열을 섞어 앞에서부터 꺼내면 "모든 항목이 골고루" 나온다 */
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
 
-/* ══════════════ 에셋 ══════════════ */
+/* ═══════════ 아틀라스 좌표표 (pack 스크립트가 뽑아낸 값) ═══════════ */
+const ATLAS = {
+  /* mobs.png — 16px, 행마다 4프레임. 앞 8행 몬스터, 뒤 6행 사제 */
+  MOBS: [
+    {name:'skeleton1_v1',row:0,hostile:1},{name:'skeleton1_v2',row:1,hostile:1},
+    {name:'skeleton2_v1',row:2,hostile:1},{name:'skeleton2_v2',row:3,hostile:1},
+    {name:'skull_v1',row:4,hostile:1},{name:'skull_v2',row:5,hostile:1},
+    {name:'vampire_v1',row:6,hostile:1},{name:'vampire_v2',row:7,hostile:1},
+    {name:'priest1_v1',row:8,hostile:0},{name:'priest1_v2',row:9,hostile:0},
+    {name:'priest2_v1',row:10,hostile:0},{name:'priest2_v2',row:11,hostile:0},
+    {name:'priest3_v1',row:12,hostile:0},{name:'priest3_v2',row:13,hostile:0},
+  ],
+  /* items.png — {x,y,w,h,n} n=프레임수, 가로로 이어짐 */
+  ITEMS: {
+    box_1:{x:0,y:0,w:16,h:16,n:4},          box_2:{x:0,y:16,w:16,h:16,n:4},
+    chest:{x:0,y:32,w:16,h:16,n:4},         chest_open:{x:0,y:48,w:16,h:16,n:4},
+    coin:{x:0,y:64,w:16,h:16,n:4},          flag:{x:0,y:80,w:16,h:16,n:4},
+    flask_1:{x:0,y:96,w:16,h:16,n:4},       flask_2:{x:0,y:112,w:16,h:16,n:4},
+    flask_3:{x:0,y:128,w:16,h:16,n:4},      flask_4:{x:0,y:144,w:16,h:16,n:4},
+    key_1:{x:0,y:160,w:16,h:16,n:4},        key_2:{x:0,y:176,w:16,h:16,n:4},
+    mini_box_1:{x:0,y:192,w:16,h:16,n:4},   mini_box_2:{x:0,y:208,w:16,h:16,n:4},
+    mini_chest:{x:0,y:224,w:16,h:16,n:4},   mini_chest_open:{x:0,y:240,w:16,h:16,n:4},
+    peaks:{x:0,y:256,w:16,h:16,n:4},
+    candlestick_1:{x:0,y:272,w:16,h:16,n:4},candlestick_2:{x:0,y:288,w:16,h:16,n:4},
+    side_torch:{x:0,y:304,w:16,h:16,n:4},   torch:{x:0,y:320,w:16,h:16,n:4},
+    arrow:{x:64,y:0,w:16,h:32,n:4},         flamethrower_v:{x:64,y:32,w:16,h:32,n:4},
+    flamethrower_h:{x:64,y:96,w:32,h:16,n:4,grid:2},
+    just_arrow:{x:64,y:128,w:16,h:16,n:1},
+  },
+  /* ui.png — 6열 4행 */
+  UI: {arrow:0, square_left:4, square_left_2:8, square_right:12, square_right_2:16, square_up_down:20},
+  /* boss.png — 32px, 18열. 동작별 시작 인덱스와 프레임 수 */
+  BOSS: {cols:18, anim:{
+    skeleton1:{idle:{s:0,n:6},move:{s:6,n:10},attack:{s:16,n:9},hurt:{s:25,n:5},death:{s:30,n:17}},
+    skeleton2:{idle:{s:47,n:6},move:{s:53,n:10},attack:{s:63,n:15},hurt:{s:78,n:5},death:{s:83,n:15},death2:{s:98,n:15}},
+    vampire  :{idle:{s:113,n:6},move:{s:119,n:8},attack:{s:127,n:16},hurt:{s:143,n:5},death:{s:148,n:14}},
+  }},
+  /* props.png / plant.png / struct.png — 알파 연결요소로 뽑은 스프라이트 상자 */
+  PROPS: [[386,1,29,63],[226,8,28,54],[31,17,34,48],[159,17,34,48],[291,18,58,43],[444,20,39,74],
+    [95,29,34,33],[95,75,34,51],[162,85,28,41],[287,86,66,38],[386,97,29,63],[226,90,28,68],
+    [28,102,39,52],[452,117,24,39],[161,152,30,38],[287,157,34,59],[98,159,29,34],[28,165,11,55],
+    [56,165,11,55],[351,173,34,79],[226,182,28,40],[415,193,34,59],[164,216,23,36],[95,223,29,34],
+    [224,238,32,43],[288,250,32,31],[352,268,96,74],[163,287,27,29],[226,302,28,42],[287,305,34,48],
+    [164,347,23,34],[419,358,57,51],[2,429,59,44],[161,481,29,29],[129,483,29,24],[288,485,33,21],
+    [67,486,26,21],[99,486,26,21],[262,487,21,18],[230,488,20,18],[39,489,18,16],[9,491,13,12]],
+  PLANTS: [[41,7,115,141],[168,10,97,138],[295,15,81,122],[219,178,49,44],[288,180,42,37],
+    [163,183,40,34],[352,185,41,47],[105,187,29,27],[42,190,24,21],[10,390,17,13],[45,392,16,12],
+    [77,393,14,12],[109,392,17,12],[10,424,14,10],[42,423,18,12],[74,425,15,11],[106,424,14,11],
+    [10,455,16,9],[42,455,19,11],[74,457,12,13],[107,458,12,12],[11,488,14,12],[43,487,17,13],
+    [75,489,10,10]],
+  STRUCT: [[416,26,92,98],[30,30,66,98],[126,30,66,98],[222,30,67,98],[416,158,66,66],
+    [30,158,66,98],[126,158,66,98],[222,158,67,98],[46,286,90,98],[174,286,90,98],
+    [46,382,90,98],[174,382,90,98]],
+  /* wall.png — 통째로 배치할 담장 조각 (셀=32px).
+     내용이 있는 61칸이 아래 9조각으로 빠짐없이 덮인다. 서로 붙어 있다고
+     한 덩어리로 묶으면(10x4) 너무 커서 놓을 자리가 없어 영영 안 쓰인다. */
+  WALL_STAMPS: [[1,1,4,4],[5,1,3,2],[5,4,4,1],[8,1,3,3],[12,1,3,4],
+                [1,6,4,2],[6,6,1,2],[1,9,2,2],[4,9,2,2]],
+};
+
+/* 프롭 42개를 테마별로 나눈다 — 합집합이 정확히 0..41 전체 */
+const PROP_SET = {
+  grave  : [1,10,15,20,24,25,28,9,4],       // 묘비·석관·석재 벤치
+  monu   : [5,19,21,29,2],                  // 석상·기념비·석판
+  village: [3,6,7,8,12,13,14,16,22,23,27,30,17,18],  // 궤·통·항아리·표지판·문·기둥
+  plaza  : [26,31],                          // 제단·우물 (광장 중심물)
+  ruin   : [0,11],                           // 쓰러진 석주
+  rock   : [32,33,34,35,36,37,38,39,40,41],  // 바위·돌덩이
+};
+
+/* ═══════════ 던전 타일 좌표 (dungeon_tiles.png, 10x10 @16px) ═══════════
+   100칸 전부를 아래 풀 중 하나에 배정했다. */
+const DT = {
+  VOID      : [8,7],                                              // 유일한 진짜 어두운 칸
+  FLOOR_TEX : [[1,1],[2,1],[3,1],[4,1],[1,2],[4,2],[1,3],[2,3],[3,3],[4,3]],
+  FLOOR_FLAT: [[6,0],[7,0],[8,0],[9,0],[6,1],[7,1],[8,1],[9,1],[6,2],[7,2],[8,2],[9,2],
+               [2,2],[3,2],[0,7],[1,7],[2,7],[3,7],[9,7],[0,6],[1,6],[2,6],[3,6]],
+  FLOOR_BASE: [[1,4],[2,4],[3,4],[4,4]],                          // 남쪽 벽에 접한 바닥 (굽 있음)
+  WALL_N    : [[1,0],[2,0],[3,0],[4,0]],
+  WALL_S    : [[1,5],[2,5],[3,5],[4,5]],
+  WALL_W    : [[0,1],[0,2],[0,3]],  WALL_W_BOT: [0,4],
+  WALL_E    : [[5,1],[5,2],[5,3]],  WALL_E_BOT: [5,4],
+  NW:[0,0], NE:[5,0], SW:[0,5], SE:[5,5],
+  BARS      : [[6,3],[7,3],[6,4],[7,4],[8,4],[6,5],[7,5],[8,5]],  // 감옥 창살
+  DOOR      : [8,3],
+  LADDER    : [9,3],
+  TABLE     : [[9,4],[9,5]],
+  BANNER    : [[4,6],[4,7]],
+  WEAPON    : [[5,6],[5,7],[6,7]],
+  BARREL    : [[6,6],[7,6]],
+  BONES     : [[8,6],[7,7]],
+  WOOD      : [9,6],                                              // 단색 나무 바닥
+  CHESTS    : [[0,8],[1,8],[2,8],[3,8],[4,8],[5,8]],
+  LOOT      : [[6,8],[7,8],[8,8],[9,8]],
+  CANDLES   : [[2,9],[3,9],[4,9],[5,9],[6,9]],
+  TORCHES   : [[0,9],[1,9]],
+  POTIONS   : [[7,9],[8,9],[9,9]],
+};
+
+const VOID = 0, FLOOR = 1, WALL = 2;
+const SIZES = {
+  dungeon: {s:[46,28], m:[64,38], l:[86,52]},
+  field  : {s:[28,18], m:[40,25], l:[54,34]},
+};
+const TILE = {dungeon:16, field:32};
+
+/* ══════════════════════ 던전 생성 ══════════════════════ */
+const ROOM_KINDS = ['treasure','prison','shrine','trap','storage','armory'];
+
+function genDungeon(GW, GH, cfg) {
+  const g = Array.from({length:GH}, () => new Uint8Array(GW));
+
+  /* 1) 방 배치 — 겹치지 않게, 최소 2칸 간격 */
+  const rooms = [];
+  for (let t = 0; t < 400 && rooms.length < cfg.a; t++) {
+    const w = ri(5, Math.max(6, cfg.b + 2));
+    const h = ri(4, Math.max(5, cfg.b));
+    const x = ri(2, GW - w - 3), y = ri(2, GH - h - 3);
+    if (rooms.some(r => x < r.x + r.w + 3 && r.x < x + w + 3 &&
+                        y < r.y + r.h + 3 && r.y < y + h + 3)) continue;
+    rooms.push({x, y, w, h, cx:x + (w >> 1), cy:y + (h >> 1)});
+  }
+  for (const r of rooms)
+    for (let j = r.y; j < r.y + r.h; j++)
+      for (let i = r.x; i < r.x + r.w; i++) g[j][i] = FLOOR;
+
+  /* 2) 복도 — 프림 최소신장트리 + L자, 폭 1칸 (넓으면 벽이 뭉개진다) */
+  const inTree = new Set([0]), edges = [];
+  while (inTree.size < rooms.length) {
+    let best = null;
+    for (const a of inTree) for (let b = 0; b < rooms.length; b++) {
+      if (inTree.has(b)) continue;
+      const d = Math.abs(rooms[a].cx - rooms[b].cx) + Math.abs(rooms[a].cy - rooms[b].cy);
+      if (!best || d < best[2]) best = [a, b, d];
+    }
+    inTree.add(best[1]); edges.push(best);
+  }
+  /* 순환로 몇 개 추가 — 트리만 있으면 막다른 길만 생겨 단조롭다 */
+  for (let k = 0; k < Math.floor(rooms.length * 0.25); k++) {
+    const a = ri(0, rooms.length - 1), b = ri(0, rooms.length - 1);
+    if (a !== b) edges.push([a, b, 0]);
+  }
+  const corridor = [];
+  const carve = (x, y) => {
+    if (y > 0 && y < GH - 1 && x > 0 && x < GW - 1 && g[y][x] !== FLOOR) {
+      g[y][x] = FLOOR; corridor.push([x, y]);
+    }
+  };
+  for (const [a, b] of edges) {
+    let x = rooms[a].cx, y = rooms[a].cy;
+    const tx = rooms[b].cx, ty = rooms[b].cy;
+    const goX = () => { while (x !== tx) { carve(x, y); x += tx > x ? 1 : -1; } };
+    const goY = () => { while (y !== ty) { carve(x, y); y += ty > y ? 1 : -1; } };
+    if (chance(0.5)) { goX(); goY(); } else { goY(); goX(); }
+    carve(x, y);
+  }
+
+  /* 3) 벽 = 바닥에 8방향 인접한 빈 칸 */
+  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+    if (g[j][i] !== VOID) continue;
+    let touch = false;
+    for (let dj = -1; dj <= 1 && !touch; dj++) for (let di = -1; di <= 1; di++) {
+      const nj = j + dj, ni = i + di;
+      if (nj >= 0 && nj < GH && ni >= 0 && ni < GW && g[nj][ni] === FLOOR) { touch = true; break; }
+    }
+    if (touch) g[j][i] = WALL;
+  }
+
+  /* 4) 방 역할 — 입구 / 보스 / 나머지는 종류를 골고루 */
+  if (rooms.length) {
+    let far = 0, fd = -1;
+    for (let k = 1; k < rooms.length; k++) {
+      const d = Math.abs(rooms[k].cx - rooms[0].cx) + Math.abs(rooms[k].cy - rooms[0].cy);
+      if (d > fd) { fd = d; far = k; }
+    }
+    rooms[0].kind = 'entrance';
+    if (far > 0) rooms[far].kind = 'boss';
+    const bag = [];
+    for (const r of rooms) if (!r.kind) {
+      if (!bag.length) bag.push(...shuffled(ROOM_KINDS));   // 다 쓰면 다시 채운다 → 편중 방지
+      r.kind = bag.pop();
+    }
+  }
+  return {kind:'dungeon', g, GW, GH, rooms, corridor};
+}
+
+/* 벽 타일 고르기 — 어느 방향에 바닥이 붙어 있는지로 결정 */
+function wallTile(w, i, j) {
+  const {g, GW, GH} = w;
+  const F = (x, y) => x >= 0 && x < GW && y >= 0 && y < GH && g[y][x] === FLOOR;
+  const N = F(i, j-1), S = F(i, j+1), E = F(i+1, j), W_ = F(i-1, j);
+  if (S && !(E || W_)) return pick(DT.WALL_N);
+  if (N && !(E || W_)) return pick(DT.WALL_S);
+  if (E && !(N || S))  return F(i+1, j+1) ? pick(DT.WALL_W) : DT.WALL_W_BOT;
+  if (W_ && !(N || S)) return F(i-1, j+1) ? pick(DT.WALL_E) : DT.WALL_E_BOT;
+  if (S && E)  return DT.NW;
+  if (S && W_) return DT.NE;
+  if (N && E)  return DT.SW;
+  if (N && W_) return DT.SE;
+  if (F(i+1, j+1)) return DT.NW;
+  if (F(i-1, j+1)) return DT.NE;
+  if (F(i+1, j-1)) return DT.SW;
+  if (F(i-1, j-1)) return DT.SE;
+  return pick(DT.WALL_N);
+}
+
+/* 던전 장식 — 방 종류마다 다른 소품을 놓는다 */
+function decorateDungeon(w, cfg) {
+  const {g, GW, GH} = w;
+  const dens = cfg.c / 10;
+  const stat = [], anim = [];
+  const isFloor = (x, y) => x >= 0 && x < GW && y >= 0 && y < GH && g[y][x] === FLOOR;
+  const used = new Set();
+  const free = (x, y) => isFloor(x, y) && !used.has(y * GW + x);
+  const take = (x, y) => used.add(y * GW + x);
+
+  /* 방 안의 빈 바닥 칸을 섞어서 반환 — 벽에서 한 칸 떨어진 안쪽만 */
+  const spots = (r, inset) => {
+    const out = [];
+    for (let j = r.y + inset; j < r.y + r.h - inset; j++)
+      for (let i = r.x + inset; i < r.x + r.w - inset; i++) if (free(i, j)) out.push([i, j]);
+    return shuffled(out);
+  };
+  const put = (list, x, y, o) => { take(x, y); list.push(Object.assign({x, y}, o)); };
+
+  for (const r of w.rooms) {
+    /* ── 벽면 장식: 북쪽 벽에 횃불·현수막 ── */
+    for (let i = r.x; i < r.x + r.w; i++) {
+      const wj = r.y - 1;
+      if (wj < 0 || g[wj][i] !== WALL) continue;
+      if (chance(0.30 * dens * 2)) {
+        if (chance(0.5)) stat.push({x:i, y:wj, s:'dtiles', t:pick(DT.TORCHES)});
+        else anim.push({x:i, y:wj, s:'items', a:pick(['torch','side_torch'])});
+      } else if (chance(0.10 * dens * 2)) {
+        stat.push({x:i, y:wj, s:'dtiles', t:pick(DT.BANNER)});
+      }
+    }
+
+    const n = Math.max(1, Math.round(r.w * r.h * 0.055 * dens * 2));
+
+    /* 방 종류마다 다른 표식을 띄운다 — 인터페이스 스프라이트 6종을 전부 쓰게 된다 */
+    const MARK = {entrance:'square_up_down', boss:'arrow', treasure:'square_left_2',
+                  prison:'square_right_2', shrine:'square_left', trap:'square_right'};
+    if (MARK[r.kind]) anim.push({x:r.cx, y:r.y - 1, s:'ui', u:MARK[r.kind]});
+
+    if (r.kind === 'entrance') {
+      const s = spots(r, 1);
+      if (s.length) put(stat, s[0][0], s[0][1], {s:'dtiles', t:DT.LADDER});
+      for (const [x, y] of s.slice(1, 1 + n)) put(stat, x, y, {s:'dtiles', t:pick(DT.CHESTS)});
+
+    } else if (r.kind === 'treasure') {
+      const s = spots(r, 1);
+      const chests = shuffled(['chest','chest_open','mini_chest','mini_chest_open']);
+      const loots  = shuffled(['coin','key_1','key_2','flask_1','flask_2','flask_3','flask_4']);
+      let ci = 0, li = 0;
+      for (const [x, y] of s.slice(0, n + 2)) {
+        take(x, y);
+        if (chance(0.45)) anim.push({x, y, s:'items', a:chests[ci++ % chests.length]});
+        else if (chance(0.5)) anim.push({x, y, s:'items', a:loots[li++ % loots.length]});
+        else stat.push({x, y, s:'dtiles', t:pick(ci % 2 ? DT.CHESTS : DT.LOOT)});
+      }
+      for (const [x, y] of s.slice(n + 2, n + 4)) put(stat, x, y, {s:'dtiles', t:pick(DT.POTIONS)});
+
+    } else if (r.kind === 'prison') {
+      /* 방 안쪽에 창살을 한 줄 세워 감옥칸을 만든다 */
+      const bx = r.x + 1 + ((r.w - 2) >> 1);
+      for (let j = r.y + 1; j < r.y + r.h - 1; j++)
+        if (free(bx, j) && chance(0.75)) put(stat, bx, j, {s:'dtiles', t:pick(DT.BARS)});
+      for (const [x, y] of spots(r, 1).slice(0, n)) put(stat, x, y, {s:'dtiles', t:pick(DT.BONES)});
+
+    } else if (r.kind === 'shrine') {
+      const s = spots(r, 1);
+      const cand = shuffled(['candlestick_1','candlestick_2']);
+      for (const [x, y] of s.slice(0, n + 1)) {
+        take(x, y);
+        if (chance(0.5)) stat.push({x, y, s:'dtiles', t:pick(DT.CANDLES)});
+        else anim.push({x, y, s:'items', a:cand[(x + y) % cand.length]});
+      }
+      for (const [x, y] of s.slice(n + 1, n + 3)) put(stat, x, y, {s:'dtiles', t:pick(DT.BANNER)});
+
+    } else if (r.kind === 'trap') {
+      const s = spots(r, 1);
+      const traps = shuffled(['peaks','peaks','flamethrower_v','flamethrower_h','arrow']);
+      let k = 0;
+      for (const [x, y] of s.slice(0, n + 2)) {
+        take(x, y);
+        anim.push({x, y, s:'items', a:traps[k++ % traps.length]});
+      }
+      for (const [x, y] of s.slice(n + 2, n + 4)) put(stat, x, y, {s:'dtiles', t:pick(DT.WEAPON)});
+      const j = s[s.length - 1];
+      if (j) put(stat, j[0], j[1], {s:'items', a:'just_arrow', still:1});
+
+    } else if (r.kind === 'storage') {
+      const s = spots(r, 1);
+      /* 나무 바닥을 깔아 창고 느낌을 낸다 */
+      for (const [x, y] of s.slice(0, Math.min(6, s.length))) stat.push({x, y, s:'dtiles', t:DT.WOOD, floor:1});
+      const boxes = shuffled(['box_1','box_2','mini_box_1','mini_box_2']);
+      let k = 0;
+      for (const [x, y] of s.slice(0, n + 2)) {
+        take(x, y);
+        if (chance(0.5)) anim.push({x, y, s:'items', a:boxes[k++ % boxes.length]});
+        else stat.push({x, y, s:'dtiles', t:pick(chance(0.5) ? DT.BARREL : DT.CHESTS)});
+      }
+      for (const [x, y] of s.slice(n + 2, n + 4)) put(stat, x, y, {s:'dtiles', t:pick(DT.TABLE)});
+
+    } else if (r.kind === 'armory') {
+      const s = spots(r, 1);
+      for (const [x, y] of s.slice(0, n)) put(stat, x, y, {s:'dtiles', t:pick(DT.WEAPON)});
+      for (const [x, y] of s.slice(n, n + 2)) put(stat, x, y, {s:'dtiles', t:pick(DT.TABLE)});
+      const f = s[s.length - 1];
+      if (f) { take(f[0], f[1]); anim.push({x:f[0], y:f[1], s:'items', a:'flag'}); }
+
+    } else if (r.kind === 'boss') {
+      const bx = r.x + (r.w >> 1) - 1, by = r.y + (r.h >> 1) - 1;
+      const who = pick(Object.keys(ATLAS.BOSS.anim));
+      anim.push({x:bx, y:by, s:'boss', who, big:1});
+      for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) take(bx + dx, by + dy);
+      for (const [x, y] of spots(r, 1).slice(0, n)) put(stat, x, y, {s:'dtiles', t:pick(DT.BONES)});
+      stat.push({x:r.x + r.w - 2, y:r.y, s:'dtiles', t:DT.DOOR});   /* 출구 */
+    }
+  }
+
+  /* 복도와 방 경계에 문 */
+  for (const [x, y] of w.corridor) {
+    if (!chance(0.06 * dens * 2)) continue;
+    if (used.has(y * GW + x)) continue;
+    const inRoom = w.rooms.some(r => x >= r.x - 1 && x <= r.x + r.w && y >= r.y - 1 && y <= r.y + r.h);
+    if (inRoom) { take(x, y); stat.push({x, y, s:'dtiles', t:DT.DOOR}); }
+  }
+  return {stat, anim};
+}
+
+/* 던전 몬스터·NPC */
+function populateDungeon(w, cfg) {
+  const out = [];
+  const hostiles = ATLAS.MOBS.filter(m => m.hostile);
+  const friends  = ATLAS.MOBS.filter(m => !m.hostile);
+  let hb = [], fb = [];
+  const nextH = () => { if (!hb.length) hb = shuffled(hostiles); return hb.pop(); };
+  const nextF = () => { if (!fb.length) fb = shuffled(friends);  return fb.pop(); };
+
+  for (const r of w.rooms) {
+    if (r.kind === 'entrance') {
+      /* 영웅 3프레임 시트 */
+      out.push({x:r.cx, y:r.cy, s:'dchars', col:ri(0, 6), hero:1});
+      continue;
+    }
+    if (r.kind === 'boss') continue;               // 보스는 장식 쪽에서 처리
+    const n = r.kind === 'prison' ? ri(1, 3) : ri(0, 2);
+    for (let k = 0; k < n; k++) {
+      const x = ri(r.x + 1, r.x + r.w - 2), y = ri(r.y + 1, r.y + r.h - 2);
+      if (r.kind === 'shrine') out.push({x, y, s:'mobs', row:nextF().row});
+      else if (chance(0.65))   out.push({x, y, s:'mobs', row:nextH().row});
+      else                     out.push({x, y, s:'dchars', col:ri(0, 6), hero:0});
+    }
+  }
+  return out;
+}
+
+/* ══════════════════════ 야외 생성 ══════════════════════ */
+function valueNoise(GW, GH, cell) {
+  const gw = Math.ceil(GW / cell) + 2, gh = Math.ceil(GH / cell) + 2;
+  const grid = Array.from({length:gh}, () => Array.from({length:gw}, () => rng()));
+  const sm = t => t * t * (3 - 2 * t);
+  const out = [];
+  for (let j = 0; j < GH; j++) {
+    out.push([]);
+    for (let i = 0; i < GW; i++) {
+      const gx = i / cell, gy = j / cell, x0 = gx | 0, y0 = gy | 0;
+      const fx = sm(gx - x0), fy = sm(gy - y0);
+      out[j].push(grid[y0][x0]*(1-fx)*(1-fy) + grid[y0][x0+1]*fx*(1-fy)
+                + grid[y0+1][x0]*(1-fx)*fy   + grid[y0+1][x0+1]*fx*fy);
+    }
+  }
+  return out;
+}
+
+/* 잔디 8x8 — 위 4행은 순수 잔디(왼쪽4)와 꽃/자갈(오른쪽4), 아래 4행은 잔디에 박힌 포석 */
+const GRASS_PLAIN  = [], GRASS_DETAIL = [], GRASS_SLAB = [];
+for (let j = 0; j < 4; j++) for (let i = 0; i < 8; i++) (i < 4 ? GRASS_PLAIN : GRASS_DETAIL).push([i, j]);
+for (let j = 4; j < 8; j++) for (let i = 0; i < 8; i++) GRASS_SLAB.push([i, j]);
+
+/* 돌바닥 8x8 — 왼쪽 위 4x4 가 블롭 오토타일.
+   길처럼 좁고 구불구불한 곳엔 이음매 없는 GROUND_CORE 만 깔아야 깔끔하고,
+   광장처럼 넓은 곳엔 이음매가 그려진 GROUND_VAR 를 섞어야 포장처럼 보인다. */
+const GROUND_CORE = [[1,1],[2,1],[1,2],[2,2]];
+const GROUND_VAR = [
+  [4,0],[5,0],[6,0],[7,0], [4,1],[5,1],[6,1],[7,1], [4,2],[5,2],[6,2],[7,2],
+  [4,3],[6,3], [5,4],[6,4],[7,4], [0,5],[1,5],[2,5],[6,5],
+  [0,6],[2,6],[4,6],[5,6],[6,6],[7,6], [0,7],[1,7],[2,7],[4,7],[5,7],[6,7],[7,7],
+];
+
+function genField(GW, GH, cfg) {
+  /* 1) 관심 지점(POI) 배치 — 마을 하나 + 주변 명소들, 서로 충분히 떨어뜨린다 */
+  const pois = [];
+  const village = {kind:'village', x:ri(7, GW - 8), y:ri(6, GH - 7)};
+  village.pw = 6 + ri(0, 2); village.ph = 5 + ri(0, 1);
+  pois.push(village);
+  const want = Math.max(2, Math.min(3, Math.round(GW * GH / 320)));
+  const bag = shuffled(['grave', 'ruin', 'rock', 'monu']);
+  for (let k = 0; k < want; k++) {
+    const kind = bag[k % bag.length];
+    for (let t = 0; t < 80; t++) {
+      const x = ri(4, GW - 5), y = ri(4, GH - 5);
+      if (Math.abs(x - village.x) + Math.abs(y - village.y) < 13) continue;
+      if (pois.some(p => Math.abs(p.x - x) < 10 && Math.abs(p.y - y) < 8)) continue;
+      pois.push({kind, x, y});
+      break;
+    }
+  }
+
+  /* 2) 길 — 광장은 직사각형, 연결로는 폭 2. 넓게 칠하면 전부 한 덩어리가 된다 */
+  const road = Array.from({length:GH}, () => new Uint8Array(GW));
+  const plaza = Array.from({length:GH}, () => new Uint8Array(GW));  // 변주 타일을 쓸 넓은 구역
+  const rect = (x0, y0, w, h, isPlaza) => {
+    for (let j = y0; j < y0 + h; j++) for (let i = x0; i < x0 + w; i++)
+      if (i >= 0 && i < GW && j >= 0 && j < GH) { road[j][i] = 1; if (isPlaza) plaza[j][i] = 1; }
+  };
+  rect(village.x - (village.pw >> 1), village.y - (village.ph >> 1), village.pw, village.ph, true);
+  for (let k = 1; k < pois.length; k++) {
+    const p = pois[k];
+    /* 전부 마을에서 뻗어 나가면 격자가 된다 — 이미 이어진 곳 중 가장 가까운 데서 잇는다 */
+    let from = pois[0], fd = 1e9;
+    for (let m = 0; m < k; m++) {
+      const d = Math.abs(pois[m].x - p.x) + Math.abs(pois[m].y - p.y);
+      if (d < fd) { fd = d; from = pois[m]; }
+    }
+    let x = from.x, y = from.y;
+    const stepX = () => { while (x !== p.x) { rect(x, y, 1, 2); x += p.x > x ? 1 : -1; } };
+    const stepY = () => { while (y !== p.y) { rect(x, y, 2, 1); y += p.y > y ? 1 : -1; } };
+    if (chance(0.5)) { stepX(); stepY(); } else { stepY(); stepX(); }
+    rect(x, y, 2, 2);
+    if (p.kind === 'monu') { rect(p.x - 1, p.y - 1, 3, 3, true); }   // 기념비 앞 작은 포장 마당
+    else if (p.kind === 'grave') { rect(p.x - 1, p.y - 3, 2, 7); }   // 묘지 가운데 통로
+  }
+
+  /* 3) 바닥 타일 결정 */
+  const detailN = valueNoise(GW, GH, 5);
+  const stonyN  = valueNoise(GW, GH, 7);
+  const detailT = 1 - cfg.b * 0.055;
+  const base = [], pave = [], slab = [];
+  const rAt = (i, j) => i >= 0 && i < GW && j >= 0 && j < GH && road[j][i];
+  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+    base.push(detailN[j][i] > detailT && chance(0.55) ? pick(GRASS_DETAIL) : pick(GRASS_PLAIN));
+    if (road[j][i]) {
+      const L = rAt(i-1,j), R = rAt(i+1,j), U = rAt(i,j-1), D = rAt(i,j+1);
+      /* 이음매가 그려진 변주 타일은 광장에서도 드물게 — 많이 깔면 금 간 것처럼 보인다 */
+      if (L && R && U && D) pave.push(plaza[j][i] && chance(0.22) ? pick(GROUND_VAR) : pick(GROUND_CORE));
+      else {
+        const col = !L ? 0 : (!R ? 3 : (chance(0.5) ? 1 : 2));
+        const row = !U ? 0 : (!D ? 3 : (chance(0.5) ? 1 : 2));
+        pave.push([col, row]);
+      }
+      slab.push(null);
+    } else {
+      pave.push(null);
+      /* 길가 한 칸은 포석이 흩어진 잔디로 — 회색 사각형이 뚝 끊기지 않게.
+         길에서 먼 곳도 노이즈로 돌밭을 만들어 허허벌판을 깨뜨린다 */
+      const near = rAt(i-1,j) || rAt(i+1,j) || rAt(i,j-1) || rAt(i,j+1) ||
+                   rAt(i-1,j-1) || rAt(i+1,j-1) || rAt(i-1,j+1) || rAt(i+1,j+1);
+      /* 돌밭은 노이즈 덩어리째 깔아야 한다 — 확률로 구멍을 내면 색종이처럼 흩어진다 */
+      const stony = stonyN[j][i] > 0.85;
+      slab.push((near && chance(0.35)) || stony ? pick(GRASS_SLAB) : null);
+    }
+  }
+
+  /* 4) 오브젝트 배치 — 전부 y 정렬해서 그린다 */
+  const objs = [];
+  const occupied = Array.from({length:GH}, () => new Uint8Array(GW));
+  const mark = (x, y, w, h) => {
+    for (let j = y - h + 1; j <= y; j++) for (let i = x - (w >> 1); i <= x + (w >> 1); i++)
+      if (i >= 0 && i < GW && j >= 0 && j < GH) occupied[j][i] = 1;
+  };
+  const canPut = (x, y, w, h, onRoad) => {
+    if (x < 1 || x >= GW - 1 || y < 2 || y >= GH - 1) return false;
+    for (let j = y - h + 1; j <= y; j++) for (let i = x - (w >> 1); i <= x + (w >> 1); i++) {
+      if (i < 0 || i >= GW || j < 0 || j >= GH) return false;
+      if (occupied[j][i]) return false;
+      if (!onRoad && road[j][i]) return false;
+    }
+    return true;
+  };
+  /* 스프라이트를 타일 칸수로 환산 */
+  const cellsOf = spr => [Math.max(1, Math.ceil(spr[2] / 32)), Math.max(1, Math.ceil(spr[3] / 32))];
+
+  const placeProps = (cx, cy, rad, idxList, count, onRoad) => {
+    const bagP = [];
+    for (let k = 0; k < count; k++) {
+      if (!bagP.length) bagP.push(...shuffled(idxList));      // 목록을 다 쓸 때까지 재사용 안 함
+      const idx = bagP.pop();
+      const spr = ATLAS.PROPS[idx];
+      const [cw, chh] = cellsOf(spr);
+      for (let t = 0; t < 40; t++) {
+        const x = cx + ri(-rad, rad), y = cy + ri(-rad, rad);
+        if (!canPut(x, y, cw, chh, onRoad)) continue;
+        mark(x, y, cw, chh);
+        objs.push({s:'props', spr, x, y});
+        break;
+      }
+    }
+  };
+
+  /* 지정한 칸에 스프라이트를 놓아 본다 */
+  const tryPut = (sheet, spr, x, y, onRoad) => {
+    const [cw, chh] = cellsOf(spr);
+    if (!canPut(x, y, cw, chh, onRoad)) return false;
+    mark(x, y, cw, chh);
+    objs.push({s:sheet, spr, x, y});
+    return true;
+  };
+
+  for (const p of pois) {
+    if (p.kind === 'village') {
+      /* 광장 한가운데 제단·우물 */
+      for (const idx of shuffled(PROP_SET.plaza)) {
+        for (let t = 0; t < 30; t++)
+          if (tryPut('props', ATLAS.PROPS[idx], p.x + ri(-1, 1), p.y + ri(0, 1), true)) break;
+      }
+      /* 나머지 살림은 광장 테두리를 따라 — 흩뿌리면 마을로 안 보인다 */
+      const hw = (p.pw >> 1) + 1, hh = (p.ph >> 1) + 1;
+      const ring = [];
+      for (let i = p.x - hw; i <= p.x + hw; i++) { ring.push([i, p.y - hh]); ring.push([i, p.y + hh]); }
+      for (let j = p.y - hh; j <= p.y + hh; j++) { ring.push([p.x - hw, j]); ring.push([p.x + hw, j]); }
+      let vb = [];
+      for (const [x, y] of shuffled(ring)) {
+        if (!vb.length) vb = shuffled(PROP_SET.village);
+        if (tryPut('props', ATLAS.PROPS[vb[vb.length - 1]], x, y, false)) vb.pop();
+      }
+      for (let k = 0; k < 3; k++) {
+        for (let t = 0; t < 30; t++) {
+          const x = p.x + ri(-3, 3), y = p.y + ri(-2, 2);
+          if (!canPut(x, y, 1, 2, true)) continue;
+          mark(x, y, 1, 2); objs.push({s:'player', pose:k, x, y}); break;
+        }
+      }
+
+    } else if (p.kind === 'grave') {
+      /* 묘비는 줄을 맞춰야 묘지로 읽힌다 */
+      let gb = [];
+      for (let row = -2; row <= 2; row++) for (let col = -3; col <= 3; col++) {
+        if (col >= -1 && col <= 0) continue;              // 가운데 통로는 비운다
+        if (!gb.length) gb = shuffled(PROP_SET.grave);
+        const x = p.x + col * 2, y = p.y + row * 2;
+        if (tryPut('props', ATLAS.PROPS[gb[gb.length - 1]], x, y, false)) gb.pop();
+      }
+      for (const idx of shuffled(PROP_SET.monu).slice(0, 2))
+        for (let t = 0; t < 30; t++)
+          if (tryPut('props', ATLAS.PROPS[idx], p.x + ri(-5, 5), p.y + ri(-4, 4), false)) break;
+
+    } else if (p.kind === 'monu') {
+      for (const idx of shuffled(PROP_SET.monu))
+        for (let t = 0; t < 30; t++)
+          if (tryPut('props', ATLAS.PROPS[idx], p.x + ri(-3, 3), p.y + ri(-2, 3), false)) break;
+      placeProps(p.x, p.y, 4, PROP_SET.ruin, 2, false);
+
+    } else if (p.kind === 'rock') {
+      placeProps(p.x, p.y, 5, PROP_SET.rock, 10 + Math.round(cfg.c * 0.7), false);
+
+    } else if (p.kind === 'ruin') {
+      /* 무너진 건물 — 벽면을 가로로 이어 붙여 한 채처럼 보이게 */
+      const bag2 = shuffled(ATLAS.STRUCT.map((_, k) => k));
+      const bx = p.x - 3, by = p.y + ri(-1, 1);
+      let cx = bx;
+      for (let k = 0; k < Math.min(4, bag2.length); k++) {
+        const spr = ATLAS.STRUCT[bag2[k]];
+        const [cw, chh] = cellsOf(spr);
+        if (tryPut('struct', spr, cx + (cw >> 1), by, false)) cx += cw;
+        else cx += 1;
+      }
+      /* 남은 벽면 조각과 담장은 주변에 흩어 놓는다 */
+      for (let k = 4; k < bag2.length && k < 7; k++)
+        for (let t = 0; t < 25; t++)
+          if (tryPut('struct', ATLAS.STRUCT[bag2[k]], p.x + ri(-5, 5), p.y + ri(-3, 4), false)) break;
+      for (const si of shuffled(ATLAS.WALL_STAMPS.map((_, k) => k)).slice(0, 5)) {
+        const st = ATLAS.WALL_STAMPS[si];
+        for (let t = 0; t < 60; t++) {
+          const x = p.x + ri(-6, 6), y = p.y + ri(-4, 4);
+          if (!canPut(x, y, st[2], st[3], false)) continue;
+          mark(x, y, st[2], st[3]);
+          objs.push({s:'wall', stamp:st, x, y});
+          break;
+        }
+      }
+      placeProps(p.x, p.y, 5, PROP_SET.ruin, 3, false);
+    }
+  }
+
+  /* 5) 나무·수풀·풀포기 — 노이즈로 숲을 만들고 나머지에 흩뿌린다 */
+  const treeN = valueNoise(GW, GH, 6);
+  const treeT = 1 - cfg.a * 0.045;
+  const TREE = [0, 1, 2], BUSH = [3, 4, 5, 6, 7, 8];
+  const TUFT = []; for (let k = 9; k < ATLAS.PLANTS.length; k++) TUFT.push(k);
+  let tb = [];
+  for (let j = 2; j < GH; j++) for (let i = 1; i < GW - 1; i++) {
+    if (road[j][i] || treeN[j][i] < treeT || !chance(0.55)) continue;
+    if (!tb.length) tb = shuffled(TREE);
+    const spr = ATLAS.PLANTS[tb.pop()];
+    const [cw, chh] = cellsOf(spr);
+    if (!canPut(i, j, cw, chh, false)) continue;
+    mark(i, j, cw, chh);
+    objs.push({s:'plant', spr, x:i, y:j});
+  }
+  let bb = [];
+  for (let k = 0; k < GW * GH * 0.035 * (0.5 + cfg.a / 14); k++) {
+    if (!bb.length) bb = shuffled(BUSH);
+    const spr = ATLAS.PLANTS[bb.pop()];
+    const x = ri(1, GW - 2), y = ri(2, GH - 1);
+    if (!canPut(x, y, 2, 2, false)) continue;
+    mark(x, y, 2, 2);
+    objs.push({s:'plant', spr, x, y});
+  }
+  let ub = [];
+  for (let k = 0; k < GW * GH * 0.06; k++) {
+    if (!ub.length) ub = shuffled(TUFT);
+    const spr = ATLAS.PLANTS[ub.pop()];
+    const x = ri(0, GW - 1), y = ri(1, GH - 1);
+    if (road[y][x] || occupied[y][x]) continue;
+    objs.push({s:'plant', spr, x, y, small:1});
+  }
+
+  objs.sort((a, b) => a.y - b.y);
+  return {kind:'field', GW, GH, base, pave, slab, objs, pois};
+}
+
+/* ══════════════════════ 총괄 ══════════════════════ */
+function generate(mode, seed, cfg) {
+  rng = mulberry32(xmur3(mode + ':' + seed)());
+  const [GW, GH] = SIZES[mode][cfg.size];
+  let w;
+  if (mode === 'dungeon') {
+    w = genDungeon(GW, GH, cfg);
+    /* 타일 선택을 미리 굳혀 둔다 — 애니 프레임마다 다시 뽑히면 바닥이 깜빡인다 */
+    w.tiles = new Array(GW * GH);
+    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+      const c = w.g[j][i], idx = j * GW + i;
+      if (c === VOID) w.tiles[idx] = DT.VOID;
+      else if (c === WALL) w.tiles[idx] = wallTile(w, i, j);
+      else {
+        const below = j + 1 < GH ? w.g[j+1][i] : VOID;
+        /* 균열 있는 타일은 드물게 — 많이 깔면 바닥이 깨진 것처럼 어지럽다 */
+        w.tiles[idx] = below === WALL ? pick(DT.FLOOR_BASE)
+                     : (chance(0.18) ? pick(DT.FLOOR_TEX) : pick(DT.FLOOR_FLAT));
+      }
+    }
+    const d = decorateDungeon(w, cfg);
+    w.stat = d.stat; w.animDecor = d.anim;
+    w.mobs = populateDungeon(w, cfg);
+  } else {
+    w = genField(GW, GH, cfg);
+  }
+  w.mode = mode;
+  return w;
+}
+
+/* ─── 그리기 명령 만들기 ───
+   op = [sheet, sx, sy, sw, sh, dx, dy]  (dx,dy 는 픽셀) */
+function staticOps(w) {
+  const ops = [];
+  const T = TILE[w.mode];
+  if (w.mode === 'dungeon') {
+    for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
+      const t = w.tiles[j * w.GW + i];
+      ops.push(['dtiles', t[0]*16, t[1]*16, 16, 16, i*16, j*16]);
+    }
+    for (const o of w.stat) {
+      if (o.s === 'dtiles') ops.push(['dtiles', o.t[0]*16, o.t[1]*16, 16, 16, o.x*16, o.y*16]);
+      else if (o.s === 'items') {
+        const it = ATLAS.ITEMS[o.a];
+        ops.push(['items', it.x, it.y, it.w, it.h, o.x*16, o.y*16 - (it.h - 16)]);
+      }
+    }
+  } else {
+    for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
+      const idx = j * w.GW + i, b = w.base[idx];
+      ops.push(['grass', b[0]*32, b[1]*32, 32, 32, i*32, j*32]);
+      const s = w.slab[idx];
+      if (s) ops.push(['grass', s[0]*32, s[1]*32, 32, 32, i*32, j*32]);
+      const p = w.pave[idx];
+      if (p) ops.push(['ground', p[0]*32, p[1]*32, 32, 32, i*32, j*32]);
+    }
+    for (const o of w.objs) {
+      if (o.s === 'wall') {
+        const [cx, cy, cw, ch] = o.stamp;
+        ops.push(['wall', cx*32, cy*32, cw*32, ch*32, (o.x - (cw>>1))*32, (o.y - ch + 1)*32]);
+      } else if (o.s === 'player') {
+        /* 그림자 + 몸통 (3,1 이 그림자 칸) */
+        ops.push(['player', 96, 32, 32, 32, o.x*32, o.y*32]);
+        ops.push(['player', o.pose*32, 0, 32, 64, o.x*32, o.y*32 - 32]);
+      } else {
+        const [sx, sy, sw, sh] = o.spr;
+        ops.push([o.s, sx, sy, sw, sh,
+                  o.x*32 + 16 - (sw >> 1), (o.y + 1)*32 - sh]);
+      }
+    }
+  }
+  return ops;
+}
+
+function animOps(w, frame, showMobs) {
+  const ops = [];
+  if (w.mode !== 'dungeon') return ops;
+  for (const o of w.animDecor) {
+    if (o.s === 'items') {
+      const it = ATLAS.ITEMS[o.a];
+      const f = frame % it.n;
+      const gx = it.grid ? (f % it.grid) : f, gy = it.grid ? Math.floor(f / it.grid) : 0;
+      ops.push(['items', it.x + gx*it.w, it.y + gy*it.h, it.w, it.h,
+                o.x*16, o.y*16 - (it.h - 16)]);
+    } else if (o.s === 'ui') {
+      const base = ATLAS.UI[o.u], k = base + (frame % 4);
+      ops.push(['ui', (k % 6)*16, Math.floor(k / 6)*16, 16, 16, o.x*16, o.y*16]);
+    } else if (o.s === 'boss' && showMobs) {
+      /* 대기 → 이동 → 공격 → 피격 → 사망 을 순환 (death2 가 있는 개체는 그것까지) */
+      const seq = ['idle','move','attack','hurt','death','death2'];
+      const A = ATLAS.BOSS.anim[o.who];
+      let t = frame % seq.reduce((s, k) => s + (A[k] ? A[k].n : 0), 0);
+      for (const k of seq) {
+        if (!A[k]) continue;
+        if (t < A[k].n) {
+          const idx = A[k].s + t;
+          ops.push(['boss', (idx % ATLAS.BOSS.cols)*32, Math.floor(idx / ATLAS.BOSS.cols)*32,
+                    32, 32, o.x*16, o.y*16]);
+          break;
+        }
+        t -= A[k].n;
+      }
+    }
+  }
+  if (showMobs) for (const m of w.mobs) {
+    if (m.s === 'mobs') {
+      const f = (frame + m.x) % 4;
+      ops.push(['mobs', f*16, m.row*16, 16, 16, m.x*16, m.y*16]);
+    } else {
+      const rowSet = m.hero ? [0, 2, 4] : [1, 3, 5];
+      const r = rowSet[(frame + m.x) % 3];
+      ops.push(['dchars', m.col*16, r*16, 16, 16, m.x*16, m.y*16]);
+    }
+  }
+  return ops;
+}
+
+/* 통계 — 실제로 몇 종류의 타일이 쓰였는지 세어 화면에 보여 준다 */
+function tileStats(w) {
+  const set = new Set();
+  for (const op of staticOps(w)) set.add(op[0] + ':' + op[1] + ',' + op[2]);
+  for (let f = 0; f < 24; f++) for (const op of animOps(w, f, true)) set.add(op[0] + ':' + op[1] + ',' + op[2]);
+  return set;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {generate, staticOps, animOps, tileStats, SIZES, TILE, ATLAS, DT, PROP_SET};
+}
+/* ══════════════════════════════════════════════════════════════════
+   GEN CORE END
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ═════════════════════ 이하 브라우저 전용 ═════════════════════ */
 const IMG = {};
 const SOURCES = {
-  dungeon: 'assets/dungeon_tileset.png',
-  chars  : 'assets/dungeon_character.png',
-  grass  : 'assets/grass.png',
-  plant  : 'assets/plant.png',
-  stone  : 'assets/stone.png',
+  dtiles:'assets/dungeon_tiles.png', dchars:'assets/dungeon_chars.png',
+  mobs:'assets/mobs.png', items:'assets/items.png', ui:'assets/ui.png', boss:'assets/boss.png',
+  grass:'assets/grass.png', ground:'assets/ground.png', wall:'assets/wall.png',
+  props:'assets/props.png', struct:'assets/struct.png', plant:'assets/plant.png',
+  player:'assets/player.png',
 };
 let loaded = 0;
 const total = Object.keys(SOURCES).length;
 for (const [k, src] of Object.entries(SOURCES)) {
   IMG[k] = new Image();
-  IMG[k].onload = () => { if (++loaded === total) init(); };
+  IMG[k].onload  = () => { if (++loaded === total) init(); };
+  IMG[k].onerror = () => { document.getElementById('loading').textContent = '타일 로딩 실패: ' + src; };
   IMG[k].src = src;
 }
 
-/* ══════════════ 설정 ══════════════ */
-const cfg = {
-  mode : 'dungeon',      // dungeon | field
-  size : 'm',
-  a : 9,   // 던전: 방 개수  | 초원: 나무 밀도
-  b : 8,   // 던전: 방 크기  | 초원: 꽃 밀도
-  c : 5,   // 던전: 장식 밀도 | 초원: 돌밭 규모
-  monsters : true,
-  seed : '',
-};
-const SIZES = {
-  dungeon: { s: [40, 26], m: [56, 34], l: [76, 46] },
-  field  : { s: [26, 17], m: [36, 23], l: [48, 30] },
-};
+const cfg = {mode:'dungeon', size:'m', a:10, b:8, c:5, monsters:true, seed:''};
 
-/* ══════════════ 캔버스 ══════════════ */
-const wrap    = document.getElementById('canvas-wrap');
-const canvas  = document.getElementById('canvas');
-const ctx     = canvas.getContext('2d');
-const native  = document.createElement('canvas');   // 원본 해상도
-const nctx    = native.getContext('2d');
+const wrap   = document.getElementById('canvas-wrap');
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const native = document.createElement('canvas');
+const nctx   = native.getContext('2d');
+const bg     = document.createElement('canvas');   // 정적 레이어 캐시
+const bctx   = bg.getContext('2d');
 nctx.imageSmoothingEnabled = false;
+bctx.imageSmoothingEnabled = false;
 ctx.imageSmoothingEnabled  = false;
+
+let world = null, animFrame = 0;
 
 function fitCanvas() {
   const fs = document.fullscreenElement === wrap;
-  const maxW = fs ? window.innerWidth  : Math.min(760, window.innerWidth - 30);
+  const maxW = fs ? window.innerWidth  : Math.min(820, window.innerWidth - 30);
   const maxH = fs ? window.innerHeight : Math.min(520, window.innerHeight - 190);
   const scale = Math.max(1, Math.min(maxW / native.width, maxH / native.height));
   canvas.width  = Math.round(native.width  * scale);
@@ -200,310 +965,68 @@ function blit() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(native, 0, 0, canvas.width, canvas.height);
 }
+function run(c, ops) { for (const o of ops) c.drawImage(IMG[o[0]], o[1], o[2], o[3], o[4], o[5], o[6], o[3], o[4]); }
 
-/* ══════════════ 던전 생성 ══════════════ */
-const T = 16;
-const VOID = 0, FLOOR = 1, WALL = 2;
-let world = null;   // 생성 결과
-
-function genDungeon(GW, GH) {
-  const g = Array.from({length: GH}, () => new Uint8Array(GW));
-
-  // 1) 방 배치 (겹침 거부)
-  const rooms = [];
-  const maxR = cfg.a;
-  const rs = cfg.b;   // 방 크기 상한 기준
-  for (let t = 0; t < 300 && rooms.length < maxR; t++) {
-    const w = ri(4, Math.max(5, rs + 2));
-    const h = ri(3, Math.max(4, rs));
-    const x = ri(1, GW - w - 2), y = ri(1, GH - h - 2);
-    if (rooms.some(r => x < r.x + r.w + 2 && r.x < x + w + 2 &&
-                        y < r.y + r.h + 2 && r.y < y + h + 2)) continue;
-    rooms.push({x, y, w, h});
-  }
-  for (const r of rooms)
-    for (let j = r.y; j < r.y + r.h; j++)
-      for (let i = r.x; i < r.x + r.w; i++) g[j][i] = FLOOR;
-
-  // 2) 복도 — 가까운 방끼리 잇기 (프림 MST + L자, 2칸 폭)
-  const cs = rooms.map(r => [r.x + (r.w >> 1), r.y + (r.h >> 1)]);
-  const inTree = new Set([0]);
-  const edges = [];
-  while (inTree.size < cs.length) {
-    let best = null;
-    for (const a of inTree) for (let b = 0; b < cs.length; b++) {
-      if (inTree.has(b)) continue;
-      const d = Math.abs(cs[a][0]-cs[b][0]) + Math.abs(cs[a][1]-cs[b][1]);
-      if (!best || d < best[2]) best = [a, b, d];
-    }
-    inTree.add(best[1]);
-    edges.push(best);
-  }
-  const carve = (x, y) => {
-    if (y >= 0 && y < GH && x >= 0 && x < GW) g[y][x] = FLOOR;
-  };
-  for (const [a, b] of edges) {
-    let [x, y] = cs[a];
-    const [tx, ty] = cs[b];
-    const xFirst = rng() < 0.5;
-    const goX = () => { while (x !== tx) { carve(x, y); carve(x, Math.min(y+1, GH-1)); x += tx > x ? 1 : -1; } };
-    const goY = () => { while (y !== ty) { carve(x, y); carve(Math.min(x+1, GW-1), y); y += ty > y ? 1 : -1; } };
-    xFirst ? (goX(), goY()) : (goY(), goX());
-    carve(x, y);
-  }
-
-  // 3) 벽 — 바닥에 8방향 인접한 빈 칸
-  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-    if (g[j][i] !== VOID) continue;
-    outer:
-    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
-      const nj = j + dj, ni = i + di;
-      if (nj >= 0 && nj < GH && ni >= 0 && ni < GW && g[nj][ni] === FLOOR) {
-        g[j][i] = WALL; break outer;
-      }
-    }
-  }
-
-  // 4) 장식·개체 배치
-  const decos = [];    // {i, j, tiles:[[c,r],..] 애니 프레임}
-  const entities = []; // {i, j, col, row}  chars 시트
-  const density = cfg.c / 10;
-  const items = [[0,8],[1,8],[6,8],[7,8],[9,8],[7,7],[8,8],[4,8]];  // 상자·동전·물약·해골·열쇠
-  for (const r of rooms) {
-    // 벽 장식 — 방 위쪽 벽면에 횃불·문장
-    for (let i = r.x; i < r.x + r.w; i++) {
-      const wj = r.y - 1;
-      if (wj >= 0 && g[wj][i] === WALL && g[wj + 1][i] === FLOOR) {
-        if (rng() < 0.22 * density * 2) decos.push({i, j: wj, anim: [[0,9],[1,9]]});     // 횃불
-        else if (rng() < 0.08 * density * 2) decos.push({i, j: wj, anim: [[4,7],[4,7]]}); // 문장
-      }
-    }
-    // 바닥 아이템
-    const n = Math.round(r.w * r.h * 0.05 * density * 2);
-    for (let k = 0; k < n; k++) {
-      const i = ri(r.x, r.x + r.w - 1), j = ri(r.y, r.y + r.h - 1);
-      decos.push({i, j, anim: [pick(items)]});
-    }
-  }
-  // 용사 — 첫 방, 몬스터 — 나머지 방
-  if (rooms.length) {
-    const r0 = rooms[0];
-    entities.push({i: r0.x + (r0.w >> 1), j: r0.y + (r0.h >> 1), col: ri(0, 6), row: 0});
-    for (let k = 1; k < rooms.length; k++) {
-      const r = rooms[k];
-      const n = ri(0, 2);
-      for (let m = 0; m < n; m++)
-        entities.push({i: ri(r.x, r.x + r.w - 1), j: ri(r.y, r.y + r.h - 1), col: ri(0, 6), row: 1});
-    }
-  }
-  return {kind: 'dungeon', g, GW, GH, rooms, decos, entities};
+function redraw() {
+  if (!world) return;
+  nctx.clearRect(0, 0, native.width, native.height);
+  nctx.drawImage(bg, 0, 0);
+  run(nctx, animOps(world, animFrame, cfg.monsters));
+  blit();
 }
 
-/* 던전 오토타일 — 프로토타입 검증 좌표 그대로 */
-const FLOOR_POOL = [[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3]];
-const VOID_POOL  = [[6,0],[7,0],[8,0],[9,0]];   // 균일한 어두운 배경 타일만
-function dungeonWallTile(w, i, j) {
-  const at = (x, y) => (x >= 0 && x < w.GW && y >= 0 && y < w.GH) ? w.g[y][x] : VOID;
-  const F = (x, y) => at(x, y) === FLOOR;
-  const N = F(i, j-1), S = F(i, j+1), E = F(i+1, j), W_ = F(i-1, j);
-  if (S && !(E || W_)) return pick([[1,0],[2,0],[3,0],[4,0]]);   // 북벽 면
-  if (N && !(E || W_)) return pick([[1,5],[2,5],[3,5],[4,5]]);   // 남벽 면
-  if (E && !(N || S))  return pick([[0,1],[0,2],[0,3]]);         // 서벽
-  if (W_ && !(N || S)) return pick([[5,1],[5,2],[5,3]]);         // 동벽
-  if (S && E)  return [0,0];
-  if (S && W_) return [5,0];
-  if (N && E)  return [0,5];
-  if (N && W_) return [5,5];
-  if (F(i+1, j+1)) return [0,0];
-  if (F(i-1, j+1)) return [5,0];
-  if (F(i+1, j-1)) return [0,5];
-  if (F(i-1, j-1)) return [5,5];
-  return pick(VOID_POOL);
-}
-
-function renderDungeon(w, frame) {
-  native.width = w.GW * T; native.height = w.GH * T;
-  nctx.imageSmoothingEnabled = false;
-  const dt = (c, r, i, j) => nctx.drawImage(IMG.dungeon, c*T, r*T, T, T, i*T, j*T, T, T);
-  for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
-    const cell = w.g[j][i];
-    let t;
-    if (cell === VOID) t = w.voidCache[j*w.GW+i];
-    else if (cell === FLOOR) t = w.floorCache[j*w.GW+i];
-    else t = w.wallCache[j*w.GW+i];
-    dt(t[0], t[1], i, j);
-  }
-  for (const d of w.decos) {
-    const t = d.anim[frame % d.anim.length];
-    dt(t[0], t[1], d.i, d.j);
-  }
-  if (cfg.monsters) {
-    for (const e of w.entities) {
-      const fr = (frame + e.i) % 2;                 // 개체마다 위상 다르게
-      nctx.drawImage(IMG.chars, e.col*T, (e.row + fr*2)*T, T, T, e.i*T, e.j*T, T, T);
-    }
-  }
-}
-
-/* ══════════════ 초원 생성 ══════════════ */
-const GT = 32;
-function valueNoise(GW, GH, cell) {
-  // 격자 랜덤 + 이중선형 보간
-  const gw = Math.ceil(GW / cell) + 2, gh = Math.ceil(GH / cell) + 2;
-  const grid = Array.from({length: gh}, () => Array.from({length: gw}, () => rng()));
-  const sm = t => t * t * (3 - 2 * t);
-  const out = [];
-  for (let j = 0; j < GH; j++) {
-    out.push([]);
-    for (let i = 0; i < GW; i++) {
-      const gx = i / cell, gy = j / cell;
-      const x0 = gx | 0, y0 = gy | 0;
-      const fx = sm(gx - x0), fy = sm(gy - y0);
-      const v = grid[y0][x0]     * (1-fx) * (1-fy) + grid[y0][x0+1]   * fx * (1-fy)
-              + grid[y0+1][x0]   * (1-fx) * fy     + grid[y0+1][x0+1] * fx * fy;
-      out[j].push(v);
-    }
-  }
-  return out;
-}
-
-const GRASS_PLAIN  = [[0,0],[1,0],[2,0],[3,0],[0,1],[1,1],[2,1],[3,1],[0,2],[1,2],[2,2],[3,2],[0,3],[1,3],[2,3],[3,3]];
-const GRASS_FLOWER = [[4,0],[5,0],[6,0],[7,0],[4,1],[5,1],[6,1],[7,1],[4,2],[5,2],[6,2],[7,2],[4,3],[5,3],[6,3],[7,3]];
-const TREES  = [[32,0,112,152],[160,0,112,152],[288,0,96,152]];   // [sx,sy,sw,sh]
-const BUSHES = [[32,184,32,40],[64,184,32,40],[160,184,32,40],[224,184,32,40]];
-
-function genField(GW, GH) {
-  const stoneN  = valueNoise(GW, GH, 8);
-  const flowerN = valueNoise(GW, GH, 5);
-  const treeN   = valueNoise(GW, GH, 6);
-  const stoneT  = 1 - cfg.c * 0.033;         // 돌밭 규모
-  const flowerT = 1 - cfg.b * 0.05;          // 꽃 밀도
-  let stone = Array.from({length: GH}, (_, j) =>
-    Array.from({length: GW}, (_, i) => stoneN[j][i] > stoneT));
-  // 침식 — 외로운 돌 제거 (2패스, 블롭이 2×2 이상 유지되게)
-  for (let p = 0; p < 2; p++) {
-    const nxt = Array.from({length: GH}, () => new Array(GW).fill(false));
-    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-      if (!stone[j][i]) continue;
-      let n = 0;
-      for (const [di, dj] of [[0,-1],[0,1],[1,0],[-1,0]]) {
-        const x = i+di, y = j+dj;
-        if (x >= 0 && x < GW && y >= 0 && y < GH && stone[y][x]) n++;
-      }
-      nxt[j][i] = n >= 2;
-    }
-    stone = nxt;
-  }
-  const sAt = (i, j) => i >= 0 && i < GW && j >= 0 && j < GH && stone[j][i];
-
-  const base = [];    // 잔디 바닥 캐시
-  const paving = [];  // 돌 포장 캐시 (null = 없음) — 블롭 오토타일
-  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-    base.push(flowerN[j][i] > flowerT && rng() < 0.5 ? pick(GRASS_FLOWER) : pick(GRASS_PLAIN));
-    if (stone[j][i]) {
-      const L = sAt(i-1,j), R = sAt(i+1,j), U = sAt(i,j-1), D = sAt(i,j+1);
-      let col = !L ? 0 : (!R ? 3 : pick([1,2]));
-      let row = !U ? 0 : (!D ? 3 : pick([1,2]));
-      if (col >= 1 && col <= 2 && row >= 1 && row <= 2 && rng() < 0.25) {
-        col = pick([5,6]); row = pick([1,2]);   // 자갈 박힌 내부 변주
-      }
-      paving.push([col, row]);
-    } else paving.push(null);
-  }
-
-  // 나무·수풀 — 노이즈 봉우리 + 최소 간격
-  const trees = [];
-  const treeT = 1 - cfg.a * 0.04;
-  for (let j = 1; j < GH - 1; j++) for (let i = 1; i < GW; i++) {
-    if (stone[j][i] || treeN[j][i] < treeT || rng() > 0.5) continue;
-    if (trees.some(t => Math.abs(t.i - i) < 3 && Math.abs(t.j - j) < 3)) continue;
-    trees.push({i, j, spr: pick(TREES)});
-  }
-  const bushes = [];
-  for (let k = 0; k < GW * GH * 0.02 * (cfg.a / 8); k++) {
-    const i = ri(0, GW - 1), j = ri(1, GH - 1);
-    if (stone[j][i]) continue;
-    if (trees.some(t => Math.abs(t.i - i) < 2 && Math.abs(t.j - j) < 2)) continue;
-    bushes.push({i, j, spr: pick(BUSHES)});
-  }
-  return {kind: 'field', GW, GH, base, paving, trees, bushes};
-}
-
-function renderField(w) {
-  native.width = w.GW * GT; native.height = w.GH * GT;
-  nctx.imageSmoothingEnabled = false;
-  for (let j = 0; j < w.GH; j++) for (let i = 0; i < w.GW; i++) {
-    const t = w.base[j * w.GW + i];
-    nctx.drawImage(IMG.grass, t[0]*GT, t[1]*GT, GT, GT, i*GT, j*GT, GT, GT);
-    const p = w.paving[j * w.GW + i];
-    if (p) nctx.drawImage(IMG.stone, p[0]*GT, p[1]*GT, GT, GT, i*GT, j*GT, GT, GT);
-  }
-  // 수풀 → 나무 순서로 (painter's algorithm: y 정렬)
-  for (const b of w.bushes)
-    nctx.drawImage(IMG.plant, b.spr[0], b.spr[1], b.spr[2], b.spr[3],
-                   b.i*GT, b.j*GT - (b.spr[3] - GT), b.spr[2], b.spr[3]);
-  const sorted = [...w.trees].sort((a, b) => a.j - b.j);
-  for (const t of sorted) {
-    const [sx, sy, sw, sh] = t.spr;
-    nctx.drawImage(IMG.plant, sx, sy, sw, sh,
-                   t.i*GT - (sw >> 1) + (GT >> 1), (t.j+1)*GT - sh, sw, sh);
-  }
-}
-
-/* ══════════════ 생성·그리기 총괄 ══════════════ */
-let animFrame = 0;
-
-function generate(newSeed) {
+function generateMap(newSeed) {
   if (newSeed || !cfg.seed) cfg.seed = Math.random().toString(36).slice(2, 8);
   document.getElementById('seed-input').value = cfg.seed;
-  rng = mulberry32(xmur3(cfg.mode + ':' + cfg.seed)());
 
-  const [GW, GH] = SIZES[cfg.mode][cfg.size];
-  if (cfg.mode === 'dungeon') {
-    world = genDungeon(GW, GH);
-    // 타일 선택 결과 캐시 (애니 리렌더 시 재추첨 방지)
-    world.voidCache = [], world.floorCache = [], world.wallCache = [];
-    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-      const idx = j * GW + i;
-      world.voidCache[idx]  = pick(VOID_POOL);
-      world.floorCache[idx] = world.g[j][i] === FLOOR && world.g[Math.min(j+1,GH-1)][i] === WALL
-        ? pick([[1,4],[2,4],[3,4],[4,4]]) : pick(FLOOR_POOL);
-      world.wallCache[idx]  = dungeonWallTile(world, i, j);
-    }
-  } else {
-    world = genField(GW, GH);
-  }
+  world = generate(cfg.mode, cfg.seed, cfg);
+  const T = TILE[cfg.mode];
+  native.width = bg.width = world.GW * T;
+  native.height = bg.height = world.GH * T;
+  nctx.imageSmoothingEnabled = false;
+  bctx.imageSmoothingEnabled = false;
+  bctx.clearRect(0, 0, bg.width, bg.height);
+  if (cfg.mode === 'dungeon') { bctx.fillStyle = '#25131a'; bctx.fillRect(0, 0, bg.width, bg.height); }
+  run(bctx, staticOps(world));
+
   redraw();
   fitCanvas();
   updateStats();
 }
 
-function redraw() {
-  if (!world) return;
-  if (world.kind === 'dungeon') renderDungeon(world, animFrame);
-  else renderField(world);
-  blit();
-}
-
 function updateStats() {
   const s = document.getElementById('stats');
-  if (world.kind === 'dungeon')
-    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 방 ${world.rooms.length} · 몬스터 ${world.entities.length - 1}`;
-  else
-    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 나무 ${world.trees.length} · 수풀 ${world.bushes.length}`;
+  const L = document.getElementById('legend');
+  const kinds = tileStats(world).size;
+  if (world.mode === 'dungeon') {
+    const byKind = {};
+    for (const r of world.rooms) byKind[r.kind] = (byKind[r.kind] || 0) + 1;
+    const KO = {entrance:'입구', boss:'보스', treasure:'보물', prison:'감옥',
+                shrine:'제단', trap:'함정', storage:'창고', armory:'무기고'};
+    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 방 ${world.rooms.length} · 몬스터 ${world.mobs.length}`;
+    L.innerHTML = Object.entries(byKind).map(([k, v]) => `${KO[k] || k} ${v}`).join(' · ')
+                + `<br>사용 타일 ${kinds}종`;
+  } else {
+    const KO = {village:'마을', grave:'묘지', ruin:'폐허', rock:'바위지대', monu:'기념비'};
+    s.textContent = `seed ${cfg.seed} · ${world.GW}×${world.GH} · 오브젝트 ${world.objs.length}`;
+    L.innerHTML = world.pois.map(p => KO[p.kind] || p.kind).join(' · ') + `<br>사용 타일 ${kinds}종`;
+  }
 }
 
-// 횃불·캐릭터 2프레임 애니메이션
 setInterval(() => {
   animFrame++;
-  if (world && world.kind === 'dungeon') redraw();
-}, 350);
+  if (world && world.mode === 'dungeon') redraw();
+}, 190);
 
-/* ══════════════ 컨트롤 ══════════════ */
+/* ─── 컨트롤 ─── */
 const $ = id => document.getElementById(id);
 const MODE_LABELS = {
   dungeon: ['방 개수', '방 크기', '장식 밀도'],
-  field  : ['나무 밀도', '꽃 밀도', '돌밭 규모'],
+  field  : ['나무 밀도', '들꽃 밀도', '시설 규모'],
+};
+const MODE_RANGE = {
+  dungeon: [[5, 18, 10], [4, 12, 8], [0, 10, 5]],
+  field  : [[1, 14, 8],  [1, 12, 6], [0, 10, 5]],
 };
 
 function setMode(m) {
@@ -513,41 +1036,40 @@ function setMode(m) {
   $('btn-mon').style.display = m === 'dungeon' ? '' : 'none';
   const [la, lb, lc] = MODE_LABELS[m];
   $('lb-a').textContent = la; $('lb-b').textContent = lb; $('lb-c').textContent = lc;
-  generate(false);
+  const R = MODE_RANGE[m], keys = ['a', 'b', 'c'], ids = ['sl-a', 'sl-b', 'sl-c'], vs = ['v-a', 'v-b', 'v-c'];
+  R.forEach((r, k) => {
+    const el = $(ids[k]);
+    el.min = r[0]; el.max = r[1]; el.value = r[2];
+    cfg[keys[k]] = r[2]; $(vs[k]).textContent = r[2];
+  });
+  generateMap(false);
 }
 $('btn-dungeon').addEventListener('click', () => setMode('dungeon'));
 $('btn-field').addEventListener('click', () => setMode('field'));
-
-$('btn-new').addEventListener('click', () => generate(true));
-canvas.addEventListener('click', () => generate(true));
+$('btn-new').addEventListener('click', () => generateMap(true));
+canvas.addEventListener('click', () => generateMap(true));
 
 $('seed-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    cfg.seed = e.target.value.trim() || cfg.seed;
-    generate(false);
-  }
+  if (e.key === 'Enter') { cfg.seed = e.target.value.trim() || cfg.seed; generateMap(false); }
 });
-
 $('btn-mon').addEventListener('click', () => {
   cfg.monsters = !cfg.monsters;
   $('btn-mon').classList.toggle('on', cfg.monsters);
   redraw();
 });
-
 document.querySelectorAll('[data-size]').forEach(b => {
   b.addEventListener('click', () => {
     document.querySelectorAll('[data-size]').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
     cfg.size = b.dataset.size;
-    generate(false);
+    generateMap(false);
   });
 });
-
 function bindSlider(id, valId, key) {
   $(id).addEventListener('input', e => {
     cfg[key] = +e.target.value;
     $(valId).textContent = e.target.value;
-    generate(false);
+    generateMap(false);
   });
 }
 bindSlider('sl-a', 'v-a', 'a');
@@ -560,7 +1082,6 @@ $('btn-save').addEventListener('click', () => {
   a.href = native.toDataURL('image/png');
   a.click();
 });
-
 $('btn-fs').addEventListener('click', () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else wrap.requestFullscreen();
@@ -568,10 +1089,9 @@ $('btn-fs').addEventListener('click', () => {
 document.addEventListener('fullscreenchange', fitCanvas);
 window.addEventListener('resize', fitCanvas);
 
-/* ══════════════ 시작 ══════════════ */
 function init() {
   document.getElementById('loading').style.display = 'none';
-  generate(true);
+  generateMap(true);
 }
 </script>
 </body>

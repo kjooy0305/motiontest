@@ -313,7 +313,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     </div>
   </div>
 
-  <div class="place-grid">
+  <div class="place-grid" data-nav="아홉 세계">
     <div class="place-card p-heaven">
       <div class="p-name" style="color:var(--lapis2);">🌌 하늘 (An)</div>
       <div class="p-sub" style="color:var(--lapis);">아누·신·이슈타르의 영역</div>
@@ -584,13 +584,13 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
 <script>
 const SIDEBAR_ITEMS = {
-  gods:     [{l:'최고 3신 (안·엔릴·엔키)'},{l:'천체 3신 (달·태양·금성)'},{l:'전쟁·폭풍·저승의 신들'},{l:'대지·창조·치유의 신들'},{l:'원초 신들'}],
+  gods:     [{l:'최고 3신 (안·엔릴·엔키)',q:'최고 3신'},{l:'천체 3신 (달·태양·금성)',q:'천체 3신'},{l:'전쟁·폭풍·저승의 신들'},{l:'대지·창조·치유의 신들'},{l:'원초 신들'}],
   demons:   [{l:'주요 악마들'},{l:'티아마트의 11괴물'}],
-  weapons:  [{l:'운명의 서판'},{l:'신들의 무기'},{l:'Me — 문명의 법칙'},{l:'신들의 능력·속성'}],
-  places:   [{l:'우주 구조 3층'},{l:'아홉 세계'},{l:'저승 7개의 문'},{l:'성스러운 도시와 신전'}],
-  myths:    [{l:'에누마 엘리시'},{l:'길가메시 서사시'},{l:'이난나의 저승 하강'},{l:'아트라하시스·홍수'},{l:'아다파 신화'},{l:'딜문·엔키·닌후르사그'},{l:'에타나 신화'}],
-  creatures:[{l:'수호 존재들'},{l:'혼합 생명체'},{l:'저승·악마 존재들'},{l:'신들의 수호 동물'}],
-  concepts: [{l:'아누나키·이기기'},{l:'홍수 신화 비교'},{l:'문명 핵심 키워드'},{l:'시대 구분'},{l:'현대적 영향'}],
+  weapons:  [{l:'운명의 서판'},{l:'신들의 무기'},{l:'Me — 문명의 법칙',q:'Me — 문명'},{l:'신들의 능력·속성',q:'능력·속성'}],
+  places:   [{l:'우주 구조 3층',q:'우주 구조'},{l:'아홉 세계'},{l:'저승 7개의 문',q:'저승 — 7'},{l:'성스러운 도시와 신전'}],
+  myths:    [{l:'에누마 엘리시'},{l:'길가메시 서사시'},{l:'이난나의 저승 하강'},{l:'아트라하시스·홍수',q:'아트라하시스'},{l:'아다파 신화'},{l:'딜문·엔키·닌후르사그',q:'엔키와 닌후르사그'},{l:'에타나 신화'}],
+  creatures:[{l:'수호 존재들'},{l:'혼합 생명체'},{l:'저승·악마 존재들'},{l:'신들의 수호 동물',q:'수호 동물'}],
+  concepts: [{l:'아누나키·이기기',q:'아누나키'},{l:'홍수 신화 비교'},{l:'문명 핵심 키워드'},{l:'시대 구분'},{l:'현대적 영향'}],
 };
 
 let current = 'gods';
@@ -607,6 +607,22 @@ function showPanel(id) {
   document.querySelectorAll('mark').forEach(m => { m.outerHTML = m.textContent; });
 }
 
+function findSection(panel, q) {
+  const navEl = panel.querySelector('[data-nav="' + q + '"]');
+  if (navEl) return navEl;
+  for (const el of panel.querySelectorAll('.card-head')) {
+    if (el.textContent.includes(q)) return el.closest('.card') || el;
+  }
+  for (const el of panel.querySelectorAll('.story-title')) {
+    if (el.textContent.includes(q)) return el.closest('.story-card') || el;
+  }
+  for (const el of panel.querySelectorAll('.story-num')) {
+    const t = el.textContent.trim();
+    if (t && q.includes(t)) return el.closest('.story-card') || el;
+  }
+  return null;
+}
+
 function buildSidebar(id) {
   const sb = document.getElementById('sidebar');
   sb.innerHTML = '';
@@ -614,6 +630,16 @@ function buildSidebar(id) {
     const btn = document.createElement('button');
     btn.className = 'sb-item';
     btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 62;
+        window.scrollTo({top, behavior: 'smooth'});
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
     sb.appendChild(btn);
   });
 }

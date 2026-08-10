@@ -330,7 +330,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     </div>
   </div>
 
-  <div class="world-grid">
+  <div class="world-grid" data-nav="아홉 세계">
     <div class="world-card w-asgard">
       <div class="w-name" style="color:var(--gold2);">🏔 아스가르드 <small>Ásgarðr</small></div>
       <div class="w-sub" style="color:var(--gold);">아사신족의 세계</div>
@@ -682,11 +682,11 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 const SIDEBAR_ITEMS = {
   gods:     [{l:'아사신족'},{l:'바니르신족'},{l:'기타 신적 존재'}],
   enemies:  [{l:'원초 거인'},{l:'화염 거인'},{l:'주요 요툰'},{l:'로키의 자녀들'}],
-  weapons:  [{l:'신들의 무기'},{l:'마법 유물·장신구'},{l:'전설의 탈것'}],
-  worlds:   [{l:'이그드라실'},{l:'아홉 세계'},{l:'아스가르드 건물·장소'},{l:'기타 장소'}],
-  myths:    [{l:'창세'},{l:'오딘의 희생'},{l:'아스가르드 건설'},{l:'묠니르 도난'},{l:'이둔 납치'},{l:'발두르의 죽음'},{l:'로키의 처벌'},{l:'시구르드·파프니르'},{l:'라그나로크'}],
-  creatures:[{l:'신들의 동물'},{l:'이그드라실 생명체'},{l:'세계의 위협'},{l:'기타 종족'},{l:'용·뱀류'}],
-  concepts: [{l:'핵심 개념'},{l:'주요 사건'},{l:'룬 문자 24자'},{l:'요일·신화'},{l:'원전 문헌'},{l:'현대 문화'}],
+  weapons:  [{l:'신들의 무기'},{l:'마법 유물·장신구',q:'마법 유물'},{l:'전설의 탈것'}],
+  worlds:   [{l:'이그드라실'},{l:'아홉 세계'},{l:'아스가르드 건물·장소',q:'아스가르드의 주요'},{l:'기타 장소',q:'기타 주요'}],
+  myths:    [{l:'창세'},{l:'오딘의 희생'},{l:'아스가르드 건설',q:'아스가르드 성벽'},{l:'묠니르 도난'},{l:'이둔 납치',q:'이둔의 납치'},{l:'발두르의 죽음'},{l:'로키의 처벌'},{l:'시구르드·파프니르',q:'시구르드와'},{l:'라그나로크'}],
+  creatures:[{l:'신들의 동물'},{l:'이그드라실 생명체',q:'이그드라실의 생명체'},{l:'세계의 위협',q:'세계를 위협'},{l:'기타 종족'},{l:'용·뱀류'}],
+  concepts: [{l:'핵심 개념'},{l:'주요 사건'},{l:'룬 문자 24자',q:'룬 문자'},{l:'요일·신화',q:'요일에'},{l:'원전 문헌'},{l:'현대 문화'}],
 };
 
 let current = 'gods';
@@ -705,14 +705,39 @@ function showPanel(id) {
   });
 }
 
+function findSection(panel, q) {
+  const navEl = panel.querySelector('[data-nav="' + q + '"]');
+  if (navEl) return navEl;
+  for (const el of panel.querySelectorAll('.card-head')) {
+    if (el.textContent.includes(q)) return el.closest('.card') || el;
+  }
+  for (const el of panel.querySelectorAll('.story-title')) {
+    if (el.textContent.includes(q)) return el.closest('.story-card') || el;
+  }
+  for (const el of panel.querySelectorAll('.story-num')) {
+    const t = el.textContent.trim();
+    if (t && q.includes(t)) return el.closest('.story-card') || el;
+  }
+  return null;
+}
+
 function buildSidebar(id) {
   const sb = document.getElementById('sidebar');
   sb.innerHTML = '';
-  const items = SIDEBAR_ITEMS[id] || [];
-  items.forEach(it => {
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
     const btn = document.createElement('button');
     btn.className = 'sb-item';
     btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 62;
+        window.scrollTo({top, behavior: 'smooth'});
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
     sb.appendChild(btn);
   });
 }

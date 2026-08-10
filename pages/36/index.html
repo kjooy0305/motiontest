@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>북유럽 신화 완전 정복</title>
+<style>
+:root{
+  --bg:#0a0d14;--bg2:#0f1420;--bg3:#141b2a;--bg4:#1a2338;
+  --border:#1e2d48;--border2:#2a4070;
+  --txt:#d8e4f0;--txt2:#8ba4c0;--txt3:#4a6080;
+  --gold:#c8a84b;--gold2:#e8c86a;--ice:#6ab4e8;--ice2:#9ad0f8;
+  --red:#e05050;--green:#50c878;--purple:#a07fd0;--orange:#e09040;
+  --rune:#7090c0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--gold);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--gold2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:360px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,168,75,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 11px;border-radius:4px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(200,168,75,.15);color:var(--gold2);border:1px solid rgba(200,168,75,.3);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:190px;min-width:190px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(200,168,75,.08);color:var(--gold2);border-left-color:var(--gold);}
+.main{flex:1;padding:20px 24px;max-width:1040px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--gold2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:10px 14px;}
+
+/* ENTITY TABLE */
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:8px 10px;vertical-align:top;font-size:13px;}
+.e-name{color:var(--gold2);font-weight:600;white-space:nowrap;width:130px;}
+.e-orig{color:var(--txt3);font-size:11px;display:block;font-weight:400;}
+.e-desc{color:var(--txt2);}
+.e-tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.tag-aesir{background:rgba(200,168,75,.18);color:var(--gold2);}
+.tag-vanir{background:rgba(106,180,232,.18);color:var(--ice2);}
+.tag-jotunn{background:rgba(224,80,80,.18);color:#f08080;}
+.tag-other{background:rgba(160,127,208,.18);color:var(--purple);}
+.tag-weapon{background:rgba(224,144,64,.18);color:var(--orange);}
+.tag-artifact{background:rgba(80,200,120,.18);color:var(--green);}
+
+/* RUNE CARD */
+.rune-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.rune-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;}
+.rune-sym{font-size:26px;color:var(--rune);margin-bottom:4px;font-family:serif;}
+.rune-name{font-size:12px;font-weight:700;color:var(--gold2);}
+.rune-mean{font-size:11px;color:var(--txt2);}
+
+/* STORY CARD */
+.story-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;}
+.story-head{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.story-num{background:rgba(200,168,75,.2);color:var(--gold2);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.story-title{font-size:14px;font-weight:700;color:var(--txt);}
+.story-body{padding:12px 16px;color:var(--txt2);font-size:13px;line-height:1.75;}
+.story-body b{color:var(--gold2);}
+.story-body i{color:var(--ice2);}
+
+/* WORLD MAP */
+.world-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:14px;}
+.world-card{border-radius:8px;padding:12px 14px;border:1px solid;}
+.w-asgard{background:rgba(200,168,75,.07);border-color:rgba(200,168,75,.3);}
+.w-midgard{background:rgba(80,200,120,.07);border-color:rgba(80,200,120,.3);}
+.w-jotun{background:rgba(224,80,80,.07);border-color:rgba(224,80,80,.3);}
+.w-vana{background:rgba(106,180,232,.07);border-color:rgba(106,180,232,.3);}
+.w-alf{background:rgba(232,200,106,.07);border-color:rgba(232,200,106,.3);}
+.w-sval{background:rgba(160,127,208,.07);border-color:rgba(160,127,208,.3);}
+.w-hel{background:rgba(60,60,90,.3);border-color:rgba(90,90,140,.3);}
+.w-musp{background:rgba(224,100,50,.07);border-color:rgba(224,100,50,.3);}
+.w-nifl{background:rgba(106,160,200,.07);border-color:rgba(106,160,200,.3);}
+.w-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.w-sub{font-size:11px;margin-bottom:6px;opacity:.7;}
+.w-desc{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+/* CREATURE */
+.creature-list{display:flex;flex-direction:column;gap:8px;}
+.creature{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;display:flex;gap:12px;align-items:flex-start;}
+.c-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;}
+.c-name{font-size:13px;font-weight:700;color:var(--ice2);}
+.c-orig{font-size:11px;color:var(--txt3);}
+.c-desc{font-size:12px;color:var(--txt2);margin-top:3px;line-height:1.55;}
+
+/* HIGHLIGHT */
+.hl-gold{color:var(--gold2);}
+.hl-ice{color:var(--ice2);}
+.hl-red{color:var(--red);}
+.hl-green{color:var(--green);}
+.hl-purple{color:var(--purple);}
+
+/* RAGNAROK TIMELINE */
+.timeline{position:relative;padding-left:24px;margin-bottom:8px;}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:rgba(200,168,75,.25);}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-21px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg2);}
+.tl-dot.red{background:var(--red);}
+.tl-dot.ice{background:var(--ice);}
+.tl-head{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.tl-body{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+/* NO RESULT */
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px;font-size:14px;}
+.highlight{background:rgba(200,168,75,.3);border-radius:2px;padding:0 1px;}
+
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .grid,.grid-3,.world-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="logo-icon">⚡</span>북유럽 신화 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="신·무기·장소·신화 검색…" type="text"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('gods')">신들</button>
+    <button class="tab" onclick="showPanel('enemies')">거인·적대존재</button>
+    <button class="tab" onclick="showPanel('weapons')">무기·유물</button>
+    <button class="tab" onclick="showPanel('worlds')">세계·장소</button>
+    <button class="tab" onclick="showPanel('myths')">신화·이야기</button>
+    <button class="tab" onclick="showPanel('creatures')">생명체</button>
+    <button class="tab" onclick="showPanel('concepts')">개념·기타</button>
+  </div>
+</div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+<div id="no-result">검색 결과가 없습니다.</div>
+
+<!-- ═══════════════════ 신들 ═══════════════════ -->
+<section class="panel active" id="panel-gods">
+  <div class="sec-title">⚡ 신들 (Gods)</div>
+  <div class="sec-sub">북유럽 신화의 신족 — 아사신족(Æsir)과 바니르신족(Vanir)으로 구분됨</div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head"><span class="ico">🏔</span>아사신족 (Æsir) — 아스가르드의 주신들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">오딘<span class="e-orig">Odin / Óðinn</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>전쟁·지혜·마법·죽음·시의 신. 만신의 아버지(Allfather). 한쪽 눈을 바쳐 미미르의 샘에서 지혜를 얻음. 창 군그니르, 8발 말 슬레이프니르, 까마귀 후긴·무닌, 늑대 게리·프레키.</td></tr>
+        <tr><td class="e-name">토르<span class="e-orig">Thor / Þórr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>천둥·힘·보호의 신. 오딘의 아들. 망치 묠니르, 허리띠 메긴요르드, 철장갑 야른그레이퍼르. 인류의 수호자이자 거인족의 천적.</td></tr>
+        <tr><td class="e-name">로키<span class="e-orig">Loki</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>책략·변신·혼돈의 신. 거인의 혈통. 신들의 협력자이기도 하지만 결국 배신자. 슬레이프니르·펜리르·요르문간드·헬의 아버지. 발두르를 죽게 만든 뒤 묶임.</td></tr>
+        <tr><td class="e-name">발두르<span class="e-orig">Baldr / Balðr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>빛·아름다움·순수의 신. 오딘과 프리그의 아들. 겨우살이를 제외한 모든 것에서 불사를 부여받음. 로키의 책략으로 호드르에 의해 죽음. 라그나로크 이후 재림.</td></tr>
+        <tr><td class="e-name">프리그<span class="e-orig">Frigg</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>아스가르드의 여왕. 결혼·모성·운명 예지의 신. 오딘의 아내. 미래를 알지만 말하지 않음. 아들 발두르를 잃고 슬픔에 잠김.</td></tr>
+        <tr><td class="e-name">티르<span class="e-orig">Tyr / Týr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>전쟁·정의·법의 신. 펜리르를 묶기 위해 오른손을 희생. 화요일(Tuesday)의 어원.</td></tr>
+        <tr><td class="e-name">헤임달<span class="e-orig">Heimdall</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>아스가르드의 파수꾼. 비프로스트를 지킴. 빛을 발하며 잠을 거의 자지 않음. 뿔피리 걀라르호른. 라그나로크 때 로키와 서로 죽임.</td></tr>
+        <tr><td class="e-name">이둔<span class="e-orig">Iðunn</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>청춘의 여신. 신들에게 영생을 주는 황금사과를 관리. 로키에 의해 거인에게 납치되었다가 구출됨.</td></tr>
+        <tr><td class="e-name">브라기<span class="e-orig">Bragi</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>시·음악·수사의 신. 이둔의 남편. 혀에 룬이 새겨져 있음. 죽은 전사들을 발할라에서 환영.</td></tr>
+        <tr><td class="e-name">호드르<span class="e-orig">Höðr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>어둠·겨울의 맹인 신. 발두르의 쌍둥이 형제. 로키에게 속아 겨우살이 화살로 발두르를 쏴 죽임. 훗날 발리에게 죽임을 당함.</td></tr>
+        <tr><td class="e-name">발리<span class="e-orig">Váli</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>복수·궁술의 신. 오딘이 발두르의 복수를 위해 낳음. 호드르를 죽임. 라그나로크 이후 생존.</td></tr>
+        <tr><td class="e-name">비다르<span class="e-orig">Víðarr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>침묵·복수의 신. 오딘의 아들. 라그나로크 때 펜리르를 죽여 오딘의 죽음을 복수. 두꺼운 신발로 펜리르의 아래턱을 밟아 죽임.</td></tr>
+        <tr><td class="e-name">울르<span class="e-orig">Ullr</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>사냥·스키·겨울·결투의 신. 활과 스키의 달인. 시프의 아들(오딘의 양자).</td></tr>
+        <tr><td class="e-name">포르세티<span class="e-orig">Forseti</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>정의·화해의 신. 발두르와 난나의 아들. 황금의 홀 글리트니르에 앉아 분쟁을 조정.</td></tr>
+        <tr><td class="e-name">미미르<span class="e-orig">Mímir</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>지혜의 신. 지식의 샘 미미르의 샘을 지킴. 바니르 전쟁 때 목이 잘렸으나 오딘이 머리에 룬을 걸어 말을 걸 수 있게 함.</td></tr>
+        <tr><td class="e-name">시프<span class="e-orig">Sif</span></td><td class="e-desc"><span class="e-tag tag-aesir">아사</span>대지·곡물·풍요의 여신. 토르의 아내. 황금빛 머리카락이 유명. 로키가 머리카락을 잘랐고 드베르그(난쟁이)들이 황금으로 대체 제작.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head"><span class="ico">🌊</span>바니르신족 (Vanir) — 풍요와 자연의 신들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">프레이야<span class="e-orig">Freyja</span></td><td class="e-desc"><span class="e-tag tag-vanir">바니르</span>사랑·아름다움·전쟁·마법의 여신. 바니르신족 최고. 세이드르(seiðr) 마법의 창시자. 고양이가 끄는 전차, 브리싱가멘 목걸이, 팔콘 깃털 망토 소유. 전사의 절반을 폴크방으로 데려감.</td></tr>
+        <tr><td class="e-name">프레이르<span class="e-orig">Freyr</span></td><td class="e-desc"><span class="e-tag tag-vanir">바니르</span>햇빛·비·풍요·다산의 신. 프레이야의 쌍둥이 오빠. 황금멧돼지 굴린부르스티, 마법 배 스키드블라드니르, 마법 검 소유(거인 게르드를 얻으려 양보). 라그나로크 때 뿔 하나로 수르트와 싸우다 죽음.</td></tr>
+        <tr><td class="e-name">뇨르드<span class="e-orig">Njörðr</span></td><td class="e-desc"><span class="e-tag tag-vanir">바니르</span>바다·바람·낚시·항해의 신. 프레이야·프레이르의 아버지. 아사-바니르 전쟁 후 아스가르드에 인질로 옴. 산신 스카디와 결혼했으나 바다vs산 충돌로 별거.</td></tr>
+        <tr><td class="e-name">스카디<span class="e-orig">Skaði</span></td><td class="e-desc"><span class="e-tag tag-vanir">바니르</span>겨울·사냥·스키의 여신. 거인 트야지의 딸. 아버지의 복수를 위해 아스가르드에 왔다가 신들과 타협 후 뇨르드와 결혼. 로키의 벌 집행에 참여.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌑</span>기타 신적 존재</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">솔·마니<span class="e-orig">Sól / Máni</span></td><td class="e-desc"><span class="e-tag tag-other">기타</span>태양 여신 솔, 달 신 마니. 늑대 스쾰(솔 추격)과 하티(마니 추격)에게 쫓김. 라그나로크 때 잡아먹힘.</td></tr>
+        <tr><td class="e-name">노른 세 자매<span class="e-orig">Norns — Urðr·Verðandi·Skuld</span></td><td class="e-desc"><span class="e-tag tag-other">기타</span>운명을 짜는 세 여신. 우르드(과거)·베르단디(현재)·스쿨드(미래). 이그드라실 아래 우르드의 샘 옆에 거주. 신과 인간 모두의 운명을 실로 짬.</td></tr>
+        <tr><td class="e-name">발키리<span class="e-orig">Valkyries</span></td><td class="e-desc"><span class="e-tag tag-other">기타</span>전장의 선택자. 오딘의 하녀들로 전사한 영웅을 발할라로 안내. 힐드·브륀힐드·시그룬·군르 등. 브륀힐드는 인간 세계로 추방된 전설적 발키리.</td></tr>
+        <tr><td class="e-name">헬<span class="e-orig">Hel</span></td><td class="e-desc"><span class="e-tag tag-other">기타</span>죽음의 여신. 로키와 앙그르보다의 딸. 몸의 절반은 산 자 색깔, 절반은 죽은 자 색깔. 헬헤임(헬의 세계)을 다스림. 전투에서 죽지 않은 자들의 왕국.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 거인·적대존재 ═══════════════════ -->
+<section class="panel" id="panel-enemies">
+  <div class="sec-title">🔥 거인·적대존재</div>
+  <div class="sec-sub">요툰(Jötunn/Giants) — 신들의 숙적이자 세계를 위협하는 존재들</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="ico">❄️</span>원초 거인</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">이미르<span class="e-orig">Ymir</span></td><td class="e-desc">최초의 서리 거인. 빙하의 얼음이 녹아 태어남. 오딘·빌리·베가 그를 죽여 시체로 세계를 창조 — 살→땅, 피→바다, 뼈→산, 두개골→하늘.</td></tr>
+          <tr><td class="e-name">아우둠라<span class="e-orig">Auðumbla</span></td><td class="e-desc">원초의 암소. 이미르에게 젖을 먹임. 소금 얼음을 핥아 부리(Búri, 신들의 조상)를 만들어냄.</td></tr>
+          <tr><td class="e-name">베르겔미르<span class="e-orig">Bergelmir</span></td><td class="e-desc">이미르의 손자. 이미르의 피에 익사하지 않고 배를 타고 살아남아 서리 거인족의 조상이 됨.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="ico">🌋</span>화염 거인</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">수르트<span class="e-orig">Surtr</span></td><td class="e-desc">무스펠헤임의 화염 거인 왕. 불타는 검 소유. 라그나로크 때 신들을 향해 진군, 프레이르를 죽이고 세계를 불태워 바다에 가라앉힘.</td></tr>
+          <tr><td class="e-name">신모라<span class="e-orig">Sinmara</span></td><td class="e-desc">수르트의 아내(일부 전승). 무스펠헤임의 여주인으로 비밀 무기 레바테인을 보관.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head"><span class="ico">⛰️</span>주요 요툰(서리 거인)들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">트림<span class="e-orig">Þrymr</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>묠니르를 훔친 거인왕. 프레이야를 아내로 요구. 토르가 신부 변장으로 잠입해 망치를 되찾고 트림 일족을 몰살.</td></tr>
+        <tr><td class="e-name">흐룽니르<span class="e-orig">Hrungnir</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>가장 강한 거인. 오딘과 말 경주로 아스가르드에 들어옴. 거만하게 굴다가 토르와 결투, 돌 무기로 공격받은 토르도 이마에 숫돌 파편이 박혔으나 승리.</td></tr>
+        <tr><td class="e-name">우타르드-로키<span class="e-orig">Útgarða-Loki</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>우타르드의 왕. 토르 일행의 도전을 마법으로 속임 — 요르문간드를 고양이로, 바다를 술잔으로, 노년을 할머니로 변장. 사실이 밝혀지자 도시를 사라지게 함.</td></tr>
+        <tr><td class="e-name">트야지<span class="e-orig">Þjazi</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>독수리로 변신하는 거인. 로키를 협박해 이둔을 납치. 신들의 청춘이 사라지자 로키가 이둔을 구해오고, 트야지는 아스가르드에서 불타 죽음. 딸 스카디가 복수하러 옴.</td></tr>
+        <tr><td class="e-name">앙그르보다<span class="e-orig">Angrboða</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>철의 숲의 거인 여인. 로키의 연인. 펜리르·요르문간드·헬의 어머니.</td></tr>
+        <tr><td class="e-name">게르드<span class="e-orig">Gerðr</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>빛나는 아름다움의 서리 거인 여인. 프레이르가 첫눈에 반해 마법 검을 포기하고 구애. 하인 스키르니르를 통해 결혼 성사.</td></tr>
+        <tr><td class="e-name">스뤼스<span class="e-orig">Þrívaldi</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>아홉 개 머리를 가진 거인. 토르에게 처치됨.</td></tr>
+        <tr><td class="e-name">갸르드<span class="e-orig">Gymir</span></td><td class="e-desc"><span class="e-tag tag-jotunn">요툰</span>게르드의 아버지. 거인 중 하나로 프레이르의 구애를 처음 거부.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🐍</span>로키의 자녀들 (세계의 위협)</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">펜리르<span class="e-orig">Fenrir</span></td><td class="e-desc">거대한 늑대. 로키와 앙그르보다의 아들. 신들을 두려워하게 만들자 티르의 손을 물어 글레이프니르 사슬에 묶임. 라그나로크 때 풀려나 오딘을 삼킴. 비다르에게 죽음.</td></tr>
+        <tr><td class="e-name">요르문간드<span class="e-orig">Jörmungandr</span></td><td class="e-desc">세계 뱀(미드가르드 뱀). 로키와 앙그르보다의 아들. 미드가르드 바다 밑에서 자신의 꼬리를 물고 감음. 라그나로크 때 토르와 싸우다 둘 다 죽음 — 토르는 9걸음 걷다 뱀독으로 사망.</td></tr>
+        <tr><td class="e-name">헬<span class="e-orig">Hel</span></td><td class="e-desc">로키와 앙그르보다의 딸. 죽음의 왕국 헬헤임 통치. 발두르가 죽자 그의 영혼을 억류. 라그나로크 때 죽은 자들의 배 나글파르를 보냄.</td></tr>
+        <tr><td class="e-name">슬레이프니르<span class="e-orig">Sleipnir</span></td><td class="e-desc">여덟 발 말. 로키가 암말로 변신해 낳음 (아버지는 건축가 거인의 말 스바딜파리). 오딘의 말로, 하늘과 땅을 달리며 헬헤임도 통행 가능. 세상에서 가장 빠른 말.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 무기·유물 ═══════════════════ -->
+<section class="panel" id="panel-weapons">
+  <div class="sec-title">⚔️ 무기·유물</div>
+  <div class="sec-sub">북유럽 신화 속 전설적 무기·마법 도구·유물 총정리</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🔨</span>신들의 무기</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">묠니르<span class="e-orig">Mjölnir</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>토르의 망치. 드베르그 형제 신드리·브로크가 제작. 손잡이가 짧음(로키가 방해). 번개를 일으키며 던지면 돌아옴. 사용 시 메긴요르드(힘의 허리띠)와 야른그레이퍼르(철장갑) 필요. 북유럽 신화 최강의 무기.</td></tr>
+        <tr><td class="e-name">군그니르<span class="e-orig">Gungnir</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>오딘의 창. 드베르그 이발디의 아들들이 제작. 던지면 반드시 목표에 맞음. 빗나가거나 오딘의 의지에 반해 움직이지 않음. 라그나로크 때 오딘이 펜리르에게 던짐.</td></tr>
+        <tr><td class="e-name">호프드<span class="e-orig">Höfuð</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>헤임달의 검. 라그나로크 때 로키를 죽임(동시에 로키에게도 죽음).</td></tr>
+        <tr><td class="e-name">그람<span class="e-orig">Gramr</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>시구르드의 검. 오딘이 세계수에 꽂은 것을 볼숭 가문만이 뽑음. 부러진 뒤 재련. 용 파프니르를 죽이는 데 사용. 유럽의 엑스칼리버 신화와 동일한 구조.</td></tr>
+        <tr><td class="e-name">티르핑<span class="e-orig">Tyrfing</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>드베르그 드발린·두린이 만든 저주받은 검. 한 번 뽑으면 피를 보기 전에는 집도에 들어가지 않음. 세 번의 불의한 살인을 할 운명. 헤르보르 일가의 대대로 내려오는 비극의 원천.</td></tr>
+        <tr><td class="e-name">다인슬레이프<span class="e-orig">Dáinsleif</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>덴마크 왕 호그니의 검. 한 번 뽑으면 사람을 죽이기 전까지 집어넣을 수 없음. 치명상이 치유되지 않음.</td></tr>
+        <tr><td class="e-name">레바테인<span class="e-orig">Lævateinn</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>로키가 만든 마법 무기(또는 지팡이). 신들의 문 앞에서 제작. 신모라가 뱀 상자에 보관. 정확한 성질은 불명.</td></tr>
+        <tr><td class="e-name">스쿠프닝<span class="e-orig">Skofnung</span></td><td class="e-desc"><span class="e-tag tag-weapon">무기</span>덴마크 전설의 왕 흐롤프 크라키의 검. 영웅의 혼이 깃든 전설의 검. 태양 아래 꺼내지 못하고, 여성이 보지 못하며, 상처는 스쿠프닝 돌로만 치유 가능.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">💎</span>마법 유물 · 장신구</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">브리싱가멘<span class="e-orig">Brísingamen</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>프레이야의 황금 목걸이. 드베르그 4인(알프리그·드발린·베를링·그레르)이 제작. 프레이야가 사흘씩 함께 있는 대가로 획득. 세상에서 가장 아름다운 장신구.</td></tr>
+        <tr><td class="e-name">드라우프니르<span class="e-orig">Draupnir</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>오딘의 황금 팔찌. 신드리·브로크 제작. 9일마다 같은 무게의 팔찌 8개를 만들어냄. 발두르의 장례 때 오딘이 함께 태움. 발두르가 헬에서 되돌려 보냄.</td></tr>
+        <tr><td class="e-name">걀라르호른<span class="e-orig">Gjallarhorn</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>헤임달의 뿔피리. 소리가 온 세계에 울림. 라그나로크 신호로 사용. 일부 전승에서 미미르의 샘 옆에 보관.</td></tr>
+        <tr><td class="e-name">스키드블라드니르<span class="e-orig">Skíðblaðnir</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>프레이르의 마법 배. 이발디의 아들들이 제작. 모든 신들이 탈 수 있는 최대 크기지만 사용 후 손수건처럼 접어 주머니에 넣을 수 있음. 항상 순풍이 붂.</td></tr>
+        <tr><td class="e-name">굴린부르스티<span class="e-orig">Gullinbursti</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>프레이르의 황금멧돼지. 신드리·브로크가 금실로 제작. 달리는 것보다 빠르며 어둠 속에서도 빛을 냄.</td></tr>
+        <tr><td class="e-name">메긴요르드<span class="e-orig">Megingjörð</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>토르의 힘의 허리띠. 착용 시 신의 힘이 두 배가 됨. 묠니르와 야른그레이퍼르와 함께 사용.</td></tr>
+        <tr><td class="e-name">야른그레이퍼르<span class="e-orig">Járngreipr</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>토르의 철장갑. 묠니르를 다루기 위해 필수. 손잡이가 짧은 묠니르를 제대로 잡을 수 있게 함.</td></tr>
+        <tr><td class="e-name">글레이프니르<span class="e-orig">Gleipnir</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>펜리르를 묶은 마법 사슬. 드베르그가 6가지 존재하지 않는 것(고양이 발소리·여자 수염·산의 뿌리·곰의 힘줄·물고기 숨소리·새의 침)으로 제작. 비단처럼 부드럽지만 끊을 수 없음.</td></tr>
+        <tr><td class="e-name">안드바라나우트<span class="e-orig">Andvaranaut</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>드베르그 안드바리의 저주받은 반지. 황금을 만들어낸다고 함. 로키에게 강탈당하고 저주가 걸림. 이후 파프니르·시구르드·구드룬 등에게 전해져 볼숭 가문의 비극을 야기.</td></tr>
+        <tr><td class="e-name">팔콘 깃털 망토<span class="e-orig">Fjaðrhamr</span></td><td class="e-desc"><span class="e-tag tag-artifact">유물</span>프레이야의 매 깃털 망토. 착용자가 독수리·매로 변신. 로키가 자주 빌려 쓰며 이둔 구출 등에 사용.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🐎</span>전설의 탈것</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">슬레이프니르<span class="e-orig">Sleipnir</span></td><td class="e-desc">오딘의 8발 회색 말. 로키가 암말로 변신해 낳음. 공중과 물, 헬헤임도 달릴 수 있는 세상 최고의 말.</td></tr>
+        <tr><td class="e-name">탕그니오스트르·탕그리스니르<span class="e-orig">Tanngnjóstr·Tanngrisnir</span></td><td class="e-desc">토르의 두 마리 염소. 먹고 자면 뼈만 남아도 망치로 되살릴 수 있음. 여행 중 식량 역할.</td></tr>
+        <tr><td class="e-name">블로두구호피<span class="e-orig">Blóðughófi</span></td><td class="e-desc">프레이르의 말. 말 스스로 싸울 수 있는 지능을 가짐.</td></tr>
+        <tr><td class="e-name">비프로스트<span class="e-orig">Bifröst</span></td><td class="e-desc">무지개 다리. 아스가르드와 미드가르드를 연결. 불타는 적색 부분이 토르의 축복으로 구성. 서리 거인과 산의 거인은 건너지 못함. 헤임달이 수호. 라그나로크 때 수르트의 군대가 건너면서 붕괴.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 세계·장소 ═══════════════════ -->
+<section class="panel" id="panel-worlds">
+  <div class="sec-title">🌍 세계·장소</div>
+  <div class="sec-sub">이그드라실이 떠받치는 아홉 세계(Nine Worlds)와 주요 장소들</div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head"><span class="ico">🌳</span>이그드라실 (Yggdrasil) — 세계수</div>
+    <div class="card-body" style="font-size:13px;color:var(--txt2);line-height:1.75;">
+      우주의 중심을 이루는 거대한 물푸레나무. 세 개의 뿌리가 세 개의 샘 — <b class="hl-gold">우르드의 샘</b>(운명), <b class="hl-ice">미미르의 샘</b>(지혜), <b class="hl-red">흐베르겔미르</b>(니플헤임 안개)에 닿음.
+      가지에는 <b>독수리</b>와 <b>베드르폴니르(매)</b>, 뿌리에는 뱀 <b>니드호그</b>. 다람쥐 <b>라타토스크</b>가 독수리와 뱀 사이를 오가며 험담을 전달. 아홉 세계 모두 이 나무에 연결.
+    </div>
+  </div>
+
+  <div class="world-grid">
+    <div class="world-card w-asgard">
+      <div class="w-name" style="color:var(--gold2);">🏔 아스가르드 <small>Ásgarðr</small></div>
+      <div class="w-sub" style="color:var(--gold);">아사신족의 세계</div>
+      <div class="w-desc">신들이 거주. 비프로스트로 미드가르드와 연결. 발할라·글라즈헤임·발라스카야프 등 위치. 12개의 주요 신전.</div>
+    </div>
+    <div class="world-card w-midgard">
+      <div class="w-name" style="color:var(--green);">🌎 미드가르드 <small>Miðgarðr</small></div>
+      <div class="w-sub" style="color:#50a060;">인간의 세계</div>
+      <div class="w-desc">이미르의 눈썹으로 만든 담장이 인간 세계를 거인으로부터 보호. 비프로스트가 아스가르드와 연결.</div>
+    </div>
+    <div class="world-card w-jotun">
+      <div class="w-name" style="color:#f08080;">❄️ 요툰헤임 <small>Jötunheimr</small></div>
+      <div class="w-sub" style="color:var(--red);">서리 거인의 세계</div>
+      <div class="w-desc">거인들의 왕국. 우타르드 성 위치. 미드가르드 주변의 황무지. 철의 숲(이아른비드) 포함.</div>
+    </div>
+    <div class="world-card w-vana">
+      <div class="w-name" style="color:var(--ice2);">🌊 바나헤임 <small>Vanaheimr</small></div>
+      <div class="w-sub" style="color:var(--ice);">바니르신족의 세계</div>
+      <div class="w-desc">풍요와 자연의 신 바니르가 거주. 아사-바니르 전쟁 후 일부 신 교환. 정확한 위치는 불명.</div>
+    </div>
+    <div class="world-card w-alf">
+      <div class="w-name" style="color:#e8e040;">✨ 알프헤임 <small>Álfheimr</small></div>
+      <div class="w-sub" style="color:#c0b030;">빛의 요정 세계</div>
+      <div class="w-desc">류사알파르(빛의 요정)가 거주. 태양보다 밝다고 묘사. 프레이르가 이 세계를 선물로 받음.</div>
+    </div>
+    <div class="world-card w-sval">
+      <div class="w-name" style="color:var(--purple);">⛏️ 스바르탈프헤임 <small>Svartálfaheimr</small></div>
+      <div class="w-sub" style="color:#8060b0;">어둠 요정·드베르그 세계</div>
+      <div class="w-desc">묄니르·군그니르·드라우프니르·브리싱가멘 등 대부분의 마법 유물 제작. 니다발리르라고도 함.</div>
+    </div>
+    <div class="world-card w-hel">
+      <div class="w-name" style="color:#a0a0c0;">💀 헬헤임 <small>Hel</small></div>
+      <div class="w-sub" style="color:#7070a0;">죽은 자의 세계</div>
+      <div class="w-desc">전투 외 원인으로 죽은 자들이 가는 곳. 헬이 통치. 니플헤임 안에 위치. 나슈트론드(범죄자 구역)도 포함.</div>
+    </div>
+    <div class="world-card w-musp">
+      <div class="w-name" style="color:var(--orange);">🔥 무스펠헤임 <small>Múspellsheim</small></div>
+      <div class="w-sub" style="color:#c07020;">화염의 세계</div>
+      <div class="w-desc">불과 화염의 세계. 수르트와 화염 거인이 거주. 라그나로크 때 신들을 향해 불꽃 군대를 내보냄.</div>
+    </div>
+    <div class="world-card w-nifl">
+      <div class="w-name" style="color:var(--ice);">🌫️ 니플헤임 <small>Niflheimr</small></div>
+      <div class="w-sub" style="color:#5090b0;">얼음·안개의 세계</div>
+      <div class="w-desc">태초의 어둠과 얼음의 세계. 샘 흐베르겔미르에서 11개 강 에리브사가 흐름. 창세 당시 무스펠헤임의 열과 충돌로 이미르 탄생.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🏛️</span>아스가르드의 주요 건물·장소</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">발할라<span class="e-orig">Valhöll</span></td><td class="e-desc">오딘의 전사 궁전. 전투에서 명예롭게 죽은 자들이 발키리에 이끌려 도착. 에인헤랴르(전사들)가 매일 싸우다 죽고 되살아나 연회. 지붕은 방패, 기둥은 창. 540개 문, 문마다 800명 통과.</td></tr>
+        <tr><td class="e-name">글라즈헤임<span class="e-orig">Glaðsheimr</span></td><td class="e-desc">신들의 의회 홀. 12개의 보좌가 있으며 오딘이 주재. 신들이 모여 판결과 논쟁 진행.</td></tr>
+        <tr><td class="e-name">발라스캬르프<span class="e-orig">Valaskjálf</span></td><td class="e-desc">오딘의 은빛 궁전. 흐리드스캬르프(히드스캬르프) 높은 보좌에 앉아 온 세계를 내려다봄.</td></tr>
+        <tr><td class="e-name">빌스키르니르<span class="e-orig">Bilskirnir</span></td><td class="e-desc">토르의 궁전. 540개의 방. 세상에서 가장 큰 건물.</td></tr>
+        <tr><td class="e-name">폴크방<span class="e-orig">Fólkvangr</span></td><td class="e-desc">프레이야의 전사 영역. 전투에서 죽은 자 절반이 오딘 대신 여기로 옴. 세스룸니르(프레이야의 홀) 위치.</td></tr>
+        <tr><td class="e-name">우르드의 샘<span class="e-orig">Urðarbrunnr</span></td><td class="e-desc">이그드라실 뿌리 아래. 노른 세 자매가 거주. 신들이 매일 여기서 재판. 신성한 흰 흙과 물로 이그드라실을 돌봄.</td></tr>
+        <tr><td class="e-name">미미르의 샘<span class="e-orig">Mímisbrunnr</span></td><td class="e-desc">지혜의 샘. 이그드라실 두 번째 뿌리 아래. 오딘이 한쪽 눈을 댓가로 바쳐 한 모금 마심 — 세상 모든 지식 습득. 미미르가 수호.</td></tr>
+        <tr><td class="e-name">흐베르겔미르<span class="e-orig">Hvergelmir</span></td><td class="e-desc">니플헤임의 샘. 이그드라실 세 번째 뿌리 아래. 11개의 강 에리브사가 발원. 니드호그와 무수한 뱀이 이그드라실 뿌리를 갉아먹음.</td></tr>
+        <tr><td class="e-name">글리트니르<span class="e-orig">Glitnir</span></td><td class="e-desc">포르세티의 황금·은빛 홀. 세상 모든 분쟁이 해결되는 정의의 공간.</td></tr>
+        <tr><td class="e-name">힘민비요르그<span class="e-orig">Himinbjörg</span></td><td class="e-desc">헤임달의 홀. 비프로스트 끝에 위치. 하늘의 산이라는 뜻으로 하늘과 맞닿음.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>기타 주요 장소</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">우타르드<span class="e-orig">Útgarðr</span></td><td class="e-desc">요툰헤임 안 거대한 성. 우타르드-로키가 통치. 토르 일행이 도전했다가 마법으로 속은 곳.</td></tr>
+        <tr><td class="e-name">나스트론드<span class="e-orig">Náströnd</span></td><td class="e-desc">헬헤임 안의 범죄자 구역. 살인자·위증자·불륜자가 가는 곳. 니드호그가 그들의 시체를 씹어먹음.</td></tr>
+        <tr><td class="e-name">깅갈가프<span class="e-orig">Ginnungagap</span></td><td class="e-desc">태초의 공허. 니플헤임과 무스펠헤임 사이의 공간. 불과 얼음이 만나 이미르와 아우둠라 탄생.</td></tr>
+        <tr><td class="e-name">이아른비드<span class="e-orig">Járnviðr</span></td><td class="e-desc">철의 숲. 요툰헤임 동쪽에 위치. 마녀 앙그르보다가 사는 곳. 늑대 형태의 트롤이 무수히 삼. 라그나로크 때 하티와 스쾰의 어미가 여기서 옴.</td></tr>
+        <tr><td class="e-name">기믈레<span class="e-orig">Gimlé</span></td><td class="e-desc">라그나로크 이후의 세계. 인간과 신의 낙원. 황금빛 지붕. 라그나로크를 살아남은 발두르·호드르·비다르·발리·마그니·모디 등이 거주.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 신화·이야기 ═══════════════════ -->
+<section class="panel" id="panel-myths">
+  <div class="sec-title">📖 신화·이야기</div>
+  <div class="sec-sub">북유럽 신화의 주요 이야기들 — 창세부터 라그나로크까지</div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">창세</span><span class="story-title">세계의 창조 — 이미르의 죽음</span></div>
+    <div class="story-body">
+      태초의 공허 <b>깅갈가프</b>에서 남쪽 무스펠헤임의 불꽃과 북쪽 니플헤임의 얼음이 만나 녹으며 원초의 서리 거인 <b>이미르</b>와 암소 <b>아우둠라</b>가 탄생. 아우둠라가 이미르에게 젖을 먹이고 소금 얼음을 핥아 <b>부리</b>를 드러냄. 부리의 손자가 오딘·빌리·베.
+      세 신은 이미르를 죽이고 그 시체로 세계를 창조 — <i>살은 땅, 피는 바다와 강, 뼈는 산, 두개골은 하늘</i>(4명의 난쟁이가 귀퉁이를 받침), 뇌는 구름, 눈썹은 미드가르드 성벽.
+      이미르의 겨드랑이 땀과 두 다리 사이에서 거인들이 탄생, 대홍수에서 살아남은 <b>베르겔미르</b>가 서리 거인족을 잇게 됨. 오딘·빌리·베가 물푸레나무와 느릅나무로 첫 인간 <b>아스크르</b>와 <b>엠블라</b>를 만들고 생명·의식·외모를 불어넣음.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">희생</span><span class="story-title">오딘의 자기 희생 — 이그드라실에서 룬을 얻다</span></div>
+    <div class="story-body">
+      오딘이 스스로를 창에 꿰어 이그드라실에 9일 9야를 매달림. 물도 음식도 없이 아래를 내려다보며 룬 문자를 발견. 고통을 통해 룬의 비밀과 힘을 깨달음. 이 희생은 <b>지식을 위한 자기 헌신</b>으로 해석되며 오딘이 세상에서 가장 지혜로운 존재가 된 이유.
+      또한 오딘은 미미르의 샘에서 한 모금의 지혜를 얻기 위해 <i>한쪽 눈을 뽑아 댓가로 지불</i>, 한쪽 눈을 가진 노인의 형상이 됨.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">건축</span><span class="story-title">아스가르드 성벽 건설 — 거인의 협상</span></div>
+    <div class="story-body">
+      익명의 거인 건축가가 아스가르드 성벽을 3년 안에 완성하면 <b>프레이야, 해, 달</b>을 달라고 제안. 신들은 6개월 안에 완성하는 조건을 붙여 수락 (불가능하리라 여김).
+      거인은 말 스바딜파리의 도움으로 놀라운 속도로 진척. 기한 3일 전 거의 완성되자 신들이 경악해 <b>로키</b>에게 해결 요구. 로키가 암말로 변신해 스바딜파리를 유혹해 공사 방해 → 건축가는 분노로 정체가 드러나고 토르가 묠니르로 처치.
+      <i>이 사건으로 로키가 임신해 8발 말 슬레이프니르를 낳음.</i>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">도난</span><span class="story-title">묠니르 도난 사건 — 토르의 신부 변장</span></div>
+    <div class="story-body">
+      거인왕 <b>트림</b>이 잠든 토르의 묠니르를 훔쳐 땅 속 깊이 숨기고 <b>프레이야</b>를 아내로 요구. 프레이야 격노. 로키와 헤임달이 토르를 신부로 변장시키는 계획 제안.
+      토르가 신부 드레스를 입고 로키가 시녀로 동행. 트림이 의심하자 "<i>프레이야가 오딘 뵙는 기대에 8일을 굶어 눈이 빛난다</i>" 식으로 로키가 즉흥 해명. 묠니르가 의식을 위해 신부 무릎에 놓이는 순간 — 토르가 잡아 트림 일족 전멸.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">청춘</span><span class="story-title">이둔의 납치 — 노화하는 신들</span></div>
+    <div class="story-body">
+      독수리 형상의 거인 <b>트야지</b>가 로키를 붙잡고 이둔과 황금사과를 넘기라 협박. 로키가 프레이야의 매 망토를 빌려 이둔을 유인해 트야지에게 넘김.
+      황금사과 없이 신들이 점점 노화하자 오딘이 로키를 추궁. 로키가 다시 매 망토로 이둔을 견과로 변신시켜 데려옴. 뒤쫓는 트야지는 아스가르드 화염에 불타 죽음.
+      <i>트야지의 딸 스카디가 복수를 위해 찾아오고, 협상 끝에 아사 신족 중 하나를 남편으로 맞이 → 눈을 보고 선택해 뇨르드를 고름.</i>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">죽음</span><span class="story-title">발두르의 죽음 — 로키의 배신</span></div>
+    <div class="story-body">
+      발두르가 죽는 악몽을 꾸자 프리그가 세상 모든 것에서 맹세를 받아냄. 다만 <b>겨우살이</b>는 너무 어리다고 건너뜀. 신들이 발두르에게 온갖 것을 던지는 놀이를 즐김.
+      로키가 여인으로 변장해 프리그에게 겨우살이 예외를 알아냄. 맹인 호드르에게 다가가 겨우살이를 주며 발두르를 향해 던지라고 안내 → 발두르 즉사.
+      헤르모드가 슬레이프니르를 타고 헬헤임에 가 헬에게 발두르 복귀를 청원. 헬은 "온 세상이 발두르를 위해 울면 돌려보내겠다"고 함. 모든 존재가 울었으나 로키가 변장한 할머니 <b>퇴크</b>만이 거부 → 발두르는 라그나로크까지 헬헤임에 머묶.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">응징</span><span class="story-title">로키의 처벌 — 영원한 속박</span></div>
+    <div class="story-body">
+      발두르의 죽음 이후 신들의 연회에서 로키가 신들을 조롱하다(로카센나) 결국 붙잡힘. 자신의 아들 발리를 늑대로 변하게 해 또 다른 아들 나리를 죽이게 만들고, 나리의 창자로 로키를 동굴 바위에 묶음.
+      뱀이 독을 로키의 얼굴에 떨어뜨리도록 매달아 놓음. 아내 <b>시귄</b>이 그릇으로 독을 받아내지만 그릇이 차면 독이 떨어지고 — <i>로키가 몸부림치는 것이 지진의 원인</i>. 라그나로크 때까지 이 상태 지속.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">영웅</span><span class="story-title">시구르드와 파프니르 — 용사냥</span></div>
+    <div class="story-body">
+      영웅 <b>시구르드(지크프리트)</b>는 볼숭 가문의 마지막 영웅. 대장장이 레긴이 형 파프니르가 저주받은 황금(안드바라나우트)을 독점하고 용으로 변했다고 복수를 의뢰.
+      오딘의 도움으로 아버지의 부러진 검 <b>그람</b>을 재련. 파프니르의 굴 앞 도랑을 파고 숨어 지나가는 파프니르 아랫배를 찔러 처치.
+      파프니르의 피가 묻은 손가락을 핥자 새의 말이 들리게 됨 → 레긴의 배신 계획을 알고 레긴도 죽임. 이후 브륀힐드를 불꽃 너머에서 깨움. <i>반지 안드바라나우트의 저주로 결국 비극적 결말.</i>
+    </div>
+  </div>
+
+  <div class="story-card" style="border-color:rgba(224,80,80,.4);">
+    <div class="story-head"><span class="story-num" style="background:rgba(224,80,80,.2);color:#f08080;">라그나로크</span><span class="story-title">신들의 황혼 — 세계의 종말과 재생</span></div>
+    <div class="story-body">
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot ice"></div><div class="tl-head">핌불베트르 (Fimbulvetr)</div><div class="tl-body">3년간의 겨울. 여름 없이 3번의 겨울이 이어짐. 세계가 추위와 전쟁으로 가득 참.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">속박에서 풀려남</div><div class="tl-body">로키가 사슬을 끊고 자유로워짐. 펜리르가 글레이프니르를 끊음. 요르문간드가 바다에서 나옴.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">나글파르 출항</div><div class="tl-body">죽은 자들의 손발톱으로 만든 배 나글파르가 헬헤임에서 출항. 로키가 선장.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">수르트의 진군</div><div class="tl-body">화염 거인 수르트가 무스펠헤임 군대를 이끌고 비프로스트를 건너옴 → 다리 붕괴.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">걀라르호른</div><div class="tl-body">헤임달이 뿔피리를 울려 신들을 소집. 오딘이 미미르의 머리에 마지막 조언을 구함.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">비그리드 평원의 전투</div><div class="tl-body">에인헤랴르가 발할라를 나와 신들과 함께 싸움. <b>오딘 vs 펜리르</b> — 오딘이 삼킴, 비다르가 복수. <b>토르 vs 요르문간드</b> — 서로 죽음(토르 9보). <b>프레이르 vs 수르트</b> — 프레이르 패배. <b>티르 vs 가름</b> — 서로 죽음. <b>헤임달 vs 로키</b> — 서로 죽음.</div></div>
+        <div class="tl-item"><div class="tl-dot ice"></div><div class="tl-head">세계의 불꽃과 재생</div><div class="tl-body">수르트가 세계를 불태워 바다 속으로 가라앉힘. 이후 땅이 다시 솟아오르고 녹색으로 덮임. 발두르와 호드르가 헬에서 돌아오고 비다르·발리·마그니·모디가 살아남아 기믈레에서 새 세계를 시작.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 생명체 ═══════════════════ -->
+<section class="panel" id="panel-creatures">
+  <div class="sec-title">🐉 생명체</div>
+  <div class="sec-sub">북유럽 신화에 등장하는 신화적 생명체들</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="ico">🐦</span>신들의 동물</div>
+      <div class="card-body">
+        <div class="creature-list">
+          <div class="creature"><div class="c-icon">🐦‍⬛</div><div><div class="c-name">후긴·무닌 <span class="c-orig">Huginn·Muninn</span></div><div class="c-desc">오딘의 까마귀. 후긴은 "생각", 무닌은 "기억". 매일 세계를 날아 정보를 수집해 오딘에게 보고. 오딘이 무닌이 돌아오지 않을까 더 걱정한다고 함.</div></div></div>
+          <div class="creature"><div class="c-icon">🐺</div><div><div class="c-name">게리·프레키 <span class="c-orig">Geri·Freki</span></div><div class="c-desc">오딘의 두 늑대. 게리는 "탐욕스러운", 프레키는 "게걸스러운". 발할라에서 오딘은 음식을 이들에게 주고 자신은 술만 마심.</div></div></div>
+          <div class="creature"><div class="c-icon">🐗</div><div><div class="c-name">굴린부르스티 <span class="c-orig">Gullinbursti</span></div><div class="c-desc">프레이르의 황금멧돼지. 드베르그가 제작. 공중과 물 위를 달리며 어둠 속에서도 빛을 발함.</div></div></div>
+          <div class="creature"><div class="c-icon">🐈</div><div><div class="c-name">비가드르·트롤카트 <span class="c-orig">Freyja's cats</span></div><div class="c-desc">프레이야의 전차를 끄는 두 고양이. 이름은 비가드르(전투)·트롤카트(마법고양이)로 추정. 신화 원전엔 이름 미기재.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🌳</span>이그드라실의 생명체</div>
+      <div class="card-body">
+        <div class="creature-list">
+          <div class="creature"><div class="c-icon">🐿️</div><div><div class="c-name">라타토스크 <span class="c-orig">Ratatoskr</span></div><div class="c-desc">이그드라실을 오르내리는 다람쥐. 꼭대기의 독수리와 뿌리의 니드호그 사이를 오가며 험담을 전달해 사이를 벌림. 세계 갈등의 촉매 역할.</div></div></div>
+          <div class="creature"><div class="c-icon">🦅</div><div><div class="c-name">이그드라실 독수리 <span class="c-orig">Unnamed Eagle</span></div><div class="c-desc">이그드라실 꼭대기에 앉은 독수리. 이마 사이에 매 베드르폴니르가 앉음. 니드호그와 원수.</div></div></div>
+          <div class="creature"><div class="c-icon">🐍</div><div><div class="c-name">니드호그 <span class="c-orig">Níðhöggr</span></div><div class="c-desc">이그드라실 뿌리를 씹는 거대한 용. 흐베르겔미르 아래에 거주. 무수한 뱀과 함께 뿌리를 갉아 세계수를 약화시킴. 라그나로크 후에도 시체를 씹으며 살아남음.</div></div></div>
+          <div class="creature"><div class="c-icon">🦎</div><div><div class="c-name">이그드라실의 뱀들 <span class="c-orig">Níðhöggr's kin</span></div><div class="c-desc">고인(Góinn)·모인(Móinn)·그라바크르 등. 이그드라실 세 번째 뿌리를 끊임없이 갉음.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🐺</span>세계를 위협하는 존재들</div>
+    <div class="card-body">
+      <div class="creature-list">
+        <div class="creature"><div class="c-icon">🐍</div><div><div class="c-name">요르문간드 <span class="c-orig">Jörmungandr — 미드가르드 뱀</span></div><div class="c-desc">오딘이 바다에 던진 뒤 계속 자라 자신의 꼬리를 물고 온 세계를 감쌀 만큼 거대해짐. 토르의 숙적 — 두 번 만났고 라그나로크 때 서로 죽음. 꼬리를 놓는 순간이 라그나로크 시작 신호.</div></div></div>
+        <div class="creature"><div class="c-icon">🐺</div><div><div class="c-name">펜리르 <span class="c-orig">Fenrir — 신들의 공포</span></div><div class="c-desc">아스가르드에서 자라다 너무 커져 글레이프니르 사슬에 속박됨. 티르의 손을 담보로 받아 묶임에 동의. 매일 먹이를 받으며 수천 년 대기. 라그나로크 때 오딘을 삼키고 비다르에게 아래위턱이 찢겨 죽음.</div></div></div>
+        <div class="creature"><div class="c-icon">🌕</div><div><div class="c-name">하티·스쾰 <span class="c-orig">Hati·Sköll</span></div><div class="c-desc">태양(솔)과 달(마니)을 쫓는 두 마리 늑대. 철의 숲 앙그르보다 출신. 라그나로크 때 마침내 따라잡아 삼킴. 하티는 달, 스쾰은 태양을 추격(또는 반대 — 전승에 따라 다름).</div></div></div>
+        <div class="creature"><div class="c-icon">🐕</div><div><div class="c-name">가름 <span class="c-orig">Garmr</span></div><div class="c-desc">헬헤임 입구를 지키는 개. 흉포한 피투성이 개. 라그나로크 때 묶임을 끊고 티르와 싸우다 서로 죽음. 케르베로스의 북유럽 대응.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🧝</span>기타 종족</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">드베르그<span class="e-orig">Dvergr — 난쟁이</span></td><td class="e-desc">이미르의 시체에서 구더기처럼 태어남. 뛰어난 장인족. 묠니르·군그니르·드라우프니르·브리싱가멘·글레이프니르 등 전설의 유물을 제작. 돌 안에 살며 빛을 받으면 돌이 됨(일부 전승).</td></tr>
+        <tr><td class="e-name">류사알파르<span class="e-orig">Ljósálfar — 빛의 요정</span></td><td class="e-desc">알프헤임에 거주. 태양보다 밝게 묘사. 신들보다 선하다고 일컬어짐. 구체적 이야기는 적음.</td></tr>
+        <tr><td class="e-name">도칼파르<span class="e-orig">Dökkálfar — 어둠의 요정</span></td><td class="e-desc">스바르탈프헤임 거주. 드베르그와 동일시되기도 함. 빛의 요정과 대비되는 어두운 존재.</td></tr>
+        <tr><td class="e-name">후르드<span class="e-orig">Huldufólk</span></td><td class="e-desc">숨겨진 민족. 북유럽·아이슬란드 민간신앙의 숨겨진 사람들. 바위·언덕에 거주하며 인간과 가끔 교류.</td></tr>
+        <tr><td class="e-name">드라우가르<span class="e-orig">Draugar</span></td><td class="e-desc">북유럽 신화의 언데드. 무덤에서 부활한 강력한 시체. 초인적 힘과 변신 능력, 독가스를 방출. 영역을 침범하는 자를 살해.</td></tr>
+        <tr><td class="e-name">닉스·넥<span class="e-orig">Nøkk</span></td><td class="e-desc">물의 정령. 아름다운 인간이나 말로 변신해 물로 유인. 강·호수·폭포 거주. 바이올린 연주로 상대를 홀림.</td></tr>
+        <tr><td class="e-name">트롤<span class="e-orig">Troll</span></td><td class="e-desc">산·숲에 사는 거대한 괴물. 인간을 잡아먹으며 햇빛에 돌로 굳음. 요툰과 유사하지만 별개 개념.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🐉</span>용·뱀류</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">파프니르<span class="e-orig">Fáfnir</span></td><td class="e-desc">원래 드베르그. 저주받은 황금(안드바리나우트)을 탐내다 용으로 변신. 황금 위에 똬리를 틀고 자. 시구르드에 의해 죽임. 피를 마시면 새의 말을 알아들을 수 있음.</td></tr>
+        <tr><td class="e-name">요르문간드<span class="e-orig">Jörmungandr</span></td><td class="e-desc">세계 뱀. (생명체 항목 상세 설명 참조)</td></tr>
+        <tr><td class="e-name">니드호그<span class="e-orig">Níðhöggr</span></td><td class="e-desc">이그드라실 뿌리 용. (이그드라실 항목 상세 설명 참조)</td></tr>
+        <tr><td class="e-name">린드베름<span class="e-orig">Lindworm</span></td><td class="e-desc">날개 없는 유럽 용. 북유럽 민간전설. 저주받은 왕자가 뱀 형태로 변한 경우 多.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 개념·기타 ═══════════════════ -->
+<section class="panel" id="panel-concepts">
+  <div class="sec-title">📚 개념·기타</div>
+  <div class="sec-sub">북유럽 신화의 핵심 개념, 룬 문자, 마법, 영향 등</div>
+
+  <div class="grid" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-head"><span class="ico">☯️</span>핵심 개념</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">에인헤랴르<span class="e-orig">Einherjar</span></td><td class="e-desc">발할라의 전사들. 전투 중 명예롭게 죽은 자들. 매일 낮에 싸우고 죽으며 저녁에 되살아나 연회. 라그나로크 때 신들과 함께 싸우도록 선발.</td></tr>
+          <tr><td class="e-name">세이드르<span class="e-orig">Seiðr</span></td><td class="e-desc">운명을 조작하는 마법. 프레이야가 오딘에게 전수. 예언·변신·조종에 사용. 여성적인 마법으로 간주되어 남성이 시전하면 금기(에르기). 오딘이 이를 감수하고 익힘.</td></tr>
+          <tr><td class="e-name">갈드르<span class="e-orig">Galdr</span></td><td class="e-desc">룬 주문을 노래하는 마법. 남성적인 마법. 룬을 새기고 부르는 방식. 오딘이 주요 사용자.</td></tr>
+          <tr><td class="e-name">에르기<span class="e-orig">Ergi</span></td><td class="e-desc">북유럽 사회의 가장 큰 모욕 중 하나. "여성스러움·비겁함". 세이드르를 행하는 남성에게 붙는 낙인. 오딘조차 이 비판을 받음.</td></tr>
+          <tr><td class="e-name">노아이드<span class="e-orig">Noaidi</span></td><td class="e-desc">사미족의 샤먼. 드럼으로 영혼 세계를 여행. 북유럽 신화의 오딘 샤머니즘과 유사 구조.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">⚖️</span>아사-바니르 전쟁 & 주요 사건</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">아사-바니르 전쟁<span class="e-orig">Æsir–Vanir War</span></td><td class="e-desc">아사신족과 바니르신족 간의 전쟁. 마녀 궤이베르(프레이야의 다른 이름?)가 아스가르드에 와 황금에 대한 욕망을 심었다고도 함. 교착 상태로 종료 → 인질 교환. 아사: 헤임달·호에니르·미미르 → 바나헤임. 바니르: 뇨르드·프레이르·프레이야 → 아스가르드.</td></tr>
+          <tr><td class="e-name">로카센나<span class="e-orig">Lokasenna</span></td><td class="e-desc">로키의 비방. 아이기르의 연회에서 로키가 모든 신들의 치부를 조롱. 오딘의 에르기·프리그의 간통·시프의 불륜 등. 이 사건이 로키 처벌의 직접 원인.</td></tr>
+          <tr><td class="e-name">므스펠의 아들들<span class="e-orig">Múspellsmegir</span></td><td class="e-desc">라그나로크 때 수르트를 따라 아스가르드를 향해 오는 화염 거인 군대.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head"><span class="ico">ᚱ</span>룬 문자 (Elder Futhark 24자)</div>
+    <div class="card-body">
+      <div class="rune-grid">
+        <div class="rune-card"><div class="rune-sym">ᚠ</div><div class="rune-name">Fehu</div><div class="rune-mean">가축·부·행운</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚢ</div><div class="rune-name">Uruz</div><div class="rune-mean">야생소·힘·체력</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚦ</div><div class="rune-name">Thurisaz</div><div class="rune-mean">거인·가시·토르</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚨ</div><div class="rune-name">Ansuz</div><div class="rune-mean">신·오딘·언어</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚱ</div><div class="rune-name">Raidho</div><div class="rune-mean">여행·길·마차</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚲ</div><div class="rune-name">Kenaz</div><div class="rune-mean">횃불·지식·불</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚷ</div><div class="rune-name">Gebo</div><div class="rune-mean">선물·교환·관계</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚹ</div><div class="rune-name">Wunjo</div><div class="rune-mean">기쁨·조화·행복</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚺ</div><div class="rune-name">Hagalaz</div><div class="rune-mean">우박·파괴·변화</div></div>
+        <div class="rune-card"><div class="rune-sym">ᚾ</div><div class="rune-name">Nauthiz</div><div class="rune-mean">필요·역경·제약</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛁ</div><div class="rune-name">Isa</div><div class="rune-mean">얼음·정체·고요</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛃ</div><div class="rune-name">Jera</div><div class="rune-mean">수확·1년·순환</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛇ</div><div class="rune-name">Eihwaz</div><div class="rune-mean">주목나무·죽음·재생</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛈ</div><div class="rune-name">Perthro</div><div class="rune-mean">운명·비밀·주사위</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛉ</div><div class="rune-name">Algiz</div><div class="rune-mean">엘크·보호·방어</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛊ</div><div class="rune-name">Sowilo</div><div class="rune-mean">태양·승리·생명력</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛏ</div><div class="rune-name">Tiwaz</div><div class="rune-mean">티르·정의·희생</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛒ</div><div class="rune-name">Berkana</div><div class="rune-mean">자작나무·탄생·성장</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛖ</div><div class="rune-name">Ehwaz</div><div class="rune-mean">말·여행·협력</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛗ</div><div class="rune-name">Mannaz</div><div class="rune-mean">인간·자아·공동체</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛚ</div><div class="rune-name">Laguz</div><div class="rune-mean">물·호수·흐름</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛜ</div><div class="rune-name">Ingwaz</div><div class="rune-mean">프레이르·다산·완성</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛞ</div><div class="rune-name">Dagaz</div><div class="rune-mean">낮·새벽·전환점</div></div>
+        <div class="rune-card"><div class="rune-sym">ᛟ</div><div class="rune-name">Othala</div><div class="rune-mean">유산·고향·혈통</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="ico">📅</span>요일에 남은 신들의 이름</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">화요일 (Tuesday)</td><td class="e-desc">티르(Tyr)의 날 — Tyr's day</td></tr>
+          <tr><td class="e-name">수요일 (Wednesday)</td><td class="e-desc">오딘(Woden/Óðinn)의 날 — Woden's day</td></tr>
+          <tr><td class="e-name">목요일 (Thursday)</td><td class="e-desc">토르(Thor)의 날 — Thor's day</td></tr>
+          <tr><td class="e-name">금요일 (Friday)</td><td class="e-desc">프리그/프레이야(Frigg/Freyja)의 날</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">📜</span>주요 원전 문헌</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">산문 에다<span class="e-orig">Prose Edda</span></td><td class="e-desc">스노리 스투를루손(c.1220) 저술. 신화 백과사전. 귈파긴닝·스칼즈카파르말·하타탈 3부작. 현대 북유럽 신화 지식의 주요 출처.</td></tr>
+          <tr><td class="e-name">시 에다<span class="e-orig">Poetic Edda</span></td><td class="e-desc">13세기 아이슬란드 사본 코덱스 레기우스. 볼루스파·하바말 등 고대 시편 모음. 오딘의 자기 희생, 라그나로크 묘사.</td></tr>
+          <tr><td class="e-name">볼숭 사가<span class="e-orig">Völsunga saga</span></td><td class="e-desc">시구르드·파프니르·브륀힐드 등 볼숭 가문 서사시. 니벨룽의 노래와 동일한 이야기 기반.</td></tr>
+          <tr><td class="e-name">하바말<span class="e-orig">Hávamál</span></td><td class="e-desc">오딘의 잠언 모음. 세상을 살아가는 지혜, 룬 지식, 이그드라실 희생 이야기 포함.</td></tr>
+          <tr><td class="e-name">볼루스파<span class="e-orig">Völuspá</span></td><td class="e-desc">무녀의 예언. 세계 창조부터 라그나로크까지 전체 우주 역사를 예언 형식으로 서술. 에다의 첫 번째 시.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-head"><span class="ico">🎮</span>현대 문화 속 북유럽 신화</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name" style="width:160px;">마블 MCU</td><td class="e-desc">토르·오딘·로키·헤임달·프리가·발키리·아스가르드·비프로스트 등 — 신화 기반이지만 자유롭게 각색</td></tr>
+        <tr><td class="e-name">갓 오브 워<span class="e-orig">God of War</span></td><td class="e-desc">크라토스가 북유럽 신화 세계를 무대로 활동 (2018, 2022). 오딘·토르·프레이야·발두르 등 등장. 비교적 신화에 충실한 편.</td></tr>
+        <tr><td class="e-name">아싸신 크리드<span class="e-orig">Assassin's Creed Valhalla</span></td><td class="e-desc">바이킹 시대 배경. 오딘·에이 봐르 설정. 아스가르드·요툰헤임 등 방문 가능.</td></tr>
+        <tr><td class="e-name">반지의 제왕</td><td class="e-desc">톨킨이 북유럽 신화에서 엘프·드워프·오딘(간달프)·루나 문자(키르스) 등을 차용해 미들어스 세계관 구성.</td></tr>
+        <tr><td class="e-name">헤임달 → 스캐너</td><td class="e-desc">리눅스 보안 도구 Heimdall, 헤임달 항공 검색엔진 등 현대 제품 네이밍에 활용.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const SIDEBAR_ITEMS = {
+  gods:     [{l:'아사신족'},{l:'바니르신족'},{l:'기타 신적 존재'}],
+  enemies:  [{l:'원초 거인'},{l:'화염 거인'},{l:'주요 요툰'},{l:'로키의 자녀들'}],
+  weapons:  [{l:'신들의 무기'},{l:'마법 유물·장신구'},{l:'전설의 탈것'}],
+  worlds:   [{l:'이그드라실'},{l:'아홉 세계'},{l:'아스가르드 건물·장소'},{l:'기타 장소'}],
+  myths:    [{l:'창세'},{l:'오딘의 희생'},{l:'아스가르드 건설'},{l:'묠니르 도난'},{l:'이둔 납치'},{l:'발두르의 죽음'},{l:'로키의 처벌'},{l:'시구르드·파프니르'},{l:'라그나로크'}],
+  creatures:[{l:'신들의 동물'},{l:'이그드라실 생명체'},{l:'세계의 위협'},{l:'기타 종족'},{l:'용·뱀류'}],
+  concepts: [{l:'핵심 개념'},{l:'주요 사건'},{l:'룬 문자 24자'},{l:'요일·신화'},{l:'원전 문헌'},{l:'현대 문화'}],
+};
+
+let current = 'gods';
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => { if(t.getAttribute('onclick') === `showPanel('${id}')`) t.classList.add('active'); });
+  current = id;
+  buildSidebar(id);
+  document.getElementById('search').value = '';
+  document.getElementById('no-result').style.display = 'none';
+  document.querySelectorAll('.highlight-remove').forEach(el => {
+    el.outerHTML = el.textContent;
+  });
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  const items = SIDEBAR_ITEMS[id] || [];
+  items.forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    sb.appendChild(btn);
+  });
+}
+
+// Search
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const panel = document.getElementById('panel-' + current);
+
+  // clear highlights
+  panel.querySelectorAll('mark').forEach(m => {
+    const t = document.createTextNode(m.textContent);
+    m.parentNode.replaceChild(t, m);
+  });
+
+  if (!q) { document.getElementById('no-result').style.display = 'none'; return; }
+
+  let found = 0;
+  function walk(node) {
+    if (node.nodeType === 3) {
+      const idx = node.textContent.toLowerCase().indexOf(q);
+      if (idx >= 0) {
+        const span = document.createElement('mark');
+        span.style.cssText = 'background:rgba(200,168,75,.35);border-radius:2px;padding:0 1px;color:inherit;';
+        const before = document.createTextNode(node.textContent.slice(0, idx));
+        span.textContent = node.textContent.slice(idx, idx + q.length);
+        const after = document.createTextNode(node.textContent.slice(idx + q.length));
+        const frag = document.createDocumentFragment();
+        frag.appendChild(before); frag.appendChild(span); frag.appendChild(after);
+        node.parentNode.replaceChild(frag, node);
+        found++;
+      }
+    } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+      Array.from(node.childNodes).forEach(walk);
+    }
+  }
+  walk(panel);
+  document.getElementById('no-result').style.display = found === 0 ? 'block' : 'none';
+});
+
+buildSidebar('gods');
+</script>
+</body>
+</html>

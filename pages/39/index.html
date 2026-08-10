@@ -238,14 +238,16 @@ varying float vFoam;
 #define TAU 6.28318530718
 
 // ── Sine wave sum ──────────────────────────────────
+// p = (x, z) 평면 좌표. vec2 이므로 .y 가 곧 z 축이다.
 float sineH(vec2 p){
   float t=uTime, h=0.0;
-  h += 0.80 * sin(0.090*p.x                    - 0.80*t);
-  h += 0.55 * sin(0.120*p.x*0.77+0.120*p.z*0.64- 1.10*t + 1.1);
-  h += 0.35 * sin(0.160*p.z                    - 1.40*t + 2.3);
-  h += 0.20 * sin(0.220*p.x*0.50-0.220*p.z*0.87- 1.80*t + 0.7);
-  h += 0.10 * sin(0.380*p.x                    - 2.40*t + 3.5);
-  h += 0.06 * sin(0.600*p.z*0.60+0.600*p.x*0.80- 3.20*t + 1.8);
+  float x=p.x, z=p.y;
+  h += 0.80 * sin(0.090*x                  - 0.80*t);
+  h += 0.55 * sin(0.120*x*0.77+0.120*z*0.64- 1.10*t + 1.1);
+  h += 0.35 * sin(0.160*z                  - 1.40*t + 2.3);
+  h += 0.20 * sin(0.220*x*0.50-0.220*z*0.87- 1.80*t + 0.7);
+  h += 0.10 * sin(0.380*x                  - 2.40*t + 3.5);
+  h += 0.06 * sin(0.600*z*0.60+0.600*x*0.80- 3.20*t + 1.8);
   return h;
 }
 
@@ -286,13 +288,20 @@ float rogueH(vec2 p){
   // rogue wave travels in +X, period 20 sec
   float cx = -160.0 + mod(t*9.0,520.0);
   float dx = p.x - cx;
-  float dz = p.z;
+  float dz = p.y;
   float env = exp(-(dx*dx*0.0006 + dz*dz*0.0004));
   float rogue = 6.5 * env * sin(0.28*dx - 2.0*t);
   return bg + rogue;
 }
 
 // ── Tsunami / KdV soliton ─────────────────────────
+// sech(x)^2 — overflow 방지를 위해 지수 인자를 제한한다
+float sech2(float x){
+  float e = exp(-min(abs(x), 20.0));
+  float s = 2.0*e/(1.0+e*e);   // sech(x)
+  return s*s;
+}
+
 float tsunamiH(vec2 p){
   float t=uTime;
   float bg = sineH(p)*0.12;
@@ -301,8 +310,7 @@ float tsunamiH(vec2 p){
   float cx1=-200.0+mod(t*13.0,640.0);
   float cx2=-320.0+mod(t*10.0,640.0);
   float k=0.065;
-  float s1=cosh(k*(p.x-cx1)); float s2=cosh(k*(p.x-cx2));
-  return bg + 7.0/(s1*s1) + 4.5/(s2*s2);
+  return bg + 7.0*sech2(k*(p.x-cx1)) + 4.5*sech2(k*(p.x-cx2));
 }
 
 // ── Unified height + normal via FD ────────────────
@@ -852,27 +860,50 @@ slTime.addEventListener('input',()=>{
   simAngle=minutesToAngle(manualMin);
 });
 
+/* ── UI 표시/숨김 ── */
+const uiEl   = document.getElementById('ui');
+const hintEl = document.getElementById('hint');
+const btnFs  = document.getElementById('btn-fs');
+
+function isFullscreen(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+}
+
+function setUiVisible(v){
+  uiVisible = v;
+  uiEl.classList.toggle('hide', !v);
+  hintEl.style.opacity = v ? '0.5' : '0.2';
+  hintEl.textContent = isFullscreen()
+    ? (v ? 'H: UI 숨기기 · ESC: 전체화면 종료' : 'H: UI 표시 · ESC: 전체화면 종료')
+    : (v ? 'H: UI 숨기기' : 'H: UI 표시');
+}
+
 // Fullscreen
-document.getElementById('btn-fs').addEventListener('click',()=>{
+btnFs.addEventListener('click',()=>{
   const el=document.documentElement;
-  if(!document.fullscreenElement){
-    el.requestFullscreen?.()
-      || el.webkitRequestFullscreen?.()
-      || el.mozRequestFullScreen?.();
-    document.getElementById('btn-fs').textContent='✕ 전체화면 종료';
+  if(!isFullscreen()){
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+    Promise.resolve(req?.call(el)).catch(()=>{});
   } else {
-    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen)?.call(document);
-    document.getElementById('btn-fs').textContent='⛶ 전체화면';
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    Promise.resolve(exit?.call(document)).catch(()=>{});
   }
 });
 
+// 전체화면 진입 시 하단 설정창 자동 숨김 (해제하면 다시 표시)
+function onFsChange(){
+  const fs = isFullscreen();
+  btnFs.textContent = fs ? '✕ 전체화면 종료' : '⛶ 전체화면';
+  setUiVisible(!fs);
+  onResize();
+}
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
+document.addEventListener('mozfullscreenchange', onFsChange);
+
 // H key — toggle UI
 document.addEventListener('keydown',e=>{
-  if(e.key==='h'||e.key==='H'){
-    uiVisible=!uiVisible;
-    document.getElementById('ui').classList.toggle('hide',!uiVisible);
-    document.getElementById('hint').style.opacity=uiVisible?'0.5':'0.2';
-  }
+  if(e.key==='h'||e.key==='H') setUiVisible(!uiVisible);
 });
 
 // Resize observer

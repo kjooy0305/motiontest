@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>이모지 & 특수문자 복사</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0d0d14;--bg2:#141420;--bg3:#1c1c2c;--bg4:#242438;
+  --border:#2a2a42;--text:#e0dff5;--muted:#7070a0;
+  --gold:#e8c87a;--green:#68d898;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overscroll-behavior:none;}
+
+#header{
+  background:linear-gradient(135deg,#0d0d20,#1a102a);
+  border-bottom:1px solid var(--border);
+  padding:12px 14px 10px;
+  position:sticky;top:0;z-index:200;
+}
+#header h1{font-size:16px;font-weight:700;color:var(--gold);margin-bottom:8px;}
+#search{
+  width:100%;padding:9px 14px;
+  border-radius:10px;background:var(--bg3);
+  border:1px solid var(--border);color:var(--text);
+  font-size:15px;outline:none;
+}
+#search:focus{border-color:var(--gold);}
+
+#tabs{
+  display:flex;gap:4px;padding:8px 12px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:69px;z-index:190;
+}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{
+  padding:7px 14px;border-radius:8px;border:1px solid transparent;
+  font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap;background:none;
+  transition:all .15s;flex-shrink:0;
+}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{background:var(--bg4);border-color:var(--border);color:var(--gold);}
+
+#main{padding:12px 10px 100px;}
+.section{display:none;}.section.active{display:block;}
+
+.cat-label{
+  font-size:11px;font-weight:700;color:var(--muted);
+  padding:10px 2px 5px;letter-spacing:.5px;
+  border-bottom:1px solid var(--border);margin-bottom:8px;
+}
+
+/* emoji grid — big enough for thumbs */
+.emoji-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(52px,1fr));
+  gap:5px;margin-bottom:14px;
+}
+.e-btn{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;
+  font-size:28px;line-height:1;
+  width:100%;aspect-ratio:1/1;
+  transition:background .1s,border-color .1s,transform .1s;
+  user-select:none;touch-action:manipulation;
+}
+.e-btn:active{background:var(--bg4);transform:scale(.88);border-color:var(--gold);}
+.e-btn.ok{border-color:var(--green);background:rgba(104,216,152,.15);}
+
+/* kaomoji grid */
+.kao-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:6px;margin-bottom:14px;
+}
+.k-btn{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;
+  font-size:13px;padding:12px 8px;
+  text-align:center;line-height:1.4;
+  transition:background .1s,border-color .1s,transform .1s;
+  user-select:none;color:var(--text);min-height:50px;
+  touch-action:manipulation;
+}
+.k-btn:active{background:var(--bg4);transform:scale(.95);border-color:var(--gold);}
+.k-btn.ok{border-color:var(--green);background:rgba(104,216,152,.15);}
+
+/* symbol grid */
+.sym-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(48px,1fr));
+  gap:5px;margin-bottom:14px;
+}
+.s-btn{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;
+  font-size:19px;
+  width:100%;aspect-ratio:1/1;
+  transition:background .1s,border-color .1s,transform .1s;
+  user-select:none;color:var(--text);
+  touch-action:manipulation;
+}
+.s-btn:active{background:var(--bg4);transform:scale(.88);border-color:var(--gold);}
+.s-btn.ok{border-color:var(--green);background:rgba(104,216,152,.15);}
+
+/* toast */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:rgba(104,216,152,.97);color:#061a0e;
+  padding:11px 26px;border-radius:28px;
+  font-size:15px;font-weight:800;
+  z-index:999;pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+#no-result{display:none;color:var(--muted);text-align:center;padding:60px 20px;font-size:14px;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>😊 이모지 &amp; 특수문자 — 터치하면 복사</h1>
+  <input id="search" type="text" placeholder="🔍 검색..." oninput="doSearch(this.value)"
+    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="sw('face',this)">😀 표정</button>
+  <button class="tab" onclick="sw('hand',this)">👋 손·몸</button>
+  <button class="tab" onclick="sw('people',this)">👤 사람</button>
+  <button class="tab" onclick="sw('animal',this)">🐶 동물</button>
+  <button class="tab" onclick="sw('nature',this)">🌿 자연</button>
+  <button class="tab" onclick="sw('food',this)">🍎 음식</button>
+  <button class="tab" onclick="sw('travel',this)">🚗 이동·장소</button>
+  <button class="tab" onclick="sw('activity',this)">⚽ 활동</button>
+  <button class="tab" onclick="sw('object',this)">💡 물건</button>
+  <button class="tab" onclick="sw('symbol',this)">❤️ 기호</button>
+  <button class="tab" onclick="sw('kaomoji',this)">(◕‿◕) 카오모지</button>
+  <button class="tab" onclick="sw('special',this)">★ 특수문자</button>
+</div>
+
+<div id="main">
+
+<!-- ── 표정 ── -->
+<div id="tab-face" class="section active">
+  <div class="cat-label">😄 행복·웃음</div>
+  <div class="emoji-grid" id="g-face-happy"></div>
+  <div class="cat-label">😔 슬픔·걱정</div>
+  <div class="emoji-grid" id="g-face-sad"></div>
+  <div class="cat-label">😡 화남·부정</div>
+  <div class="emoji-grid" id="g-face-angry"></div>
+  <div class="cat-label">😷 기타 표정</div>
+  <div class="emoji-grid" id="g-face-etc"></div>
+  <div class="cat-label">🐱 동물 얼굴</div>
+  <div class="emoji-grid" id="g-face-ani"></div>
+</div>
+
+<!-- ── 손·몸 ── -->
+<div id="tab-hand" class="section">
+  <div class="cat-label">👋 손 제스처</div>
+  <div class="emoji-grid" id="g-hand-gest"></div>
+  <div class="cat-label">🫀 신체 부위</div>
+  <div class="emoji-grid" id="g-hand-body"></div>
+</div>
+
+<!-- ── 사람 ── -->
+<div id="tab-people" class="section">
+  <div class="cat-label">👶 연령대</div>
+  <div class="emoji-grid" id="g-people-age"></div>
+  <div class="cat-label">👔 직업·역할</div>
+  <div class="emoji-grid" id="g-people-job"></div>
+  <div class="cat-label">🧙 판타지·캐릭터</div>
+  <div class="emoji-grid" id="g-people-fantasy"></div>
+</div>
+
+<!-- ── 동물 ── -->
+<div id="tab-animal" class="section">
+  <div class="cat-label">🐶 포유류</div>
+  <div class="emoji-grid" id="g-animal-mammal"></div>
+  <div class="cat-label">🐦 조류</div>
+  <div class="emoji-grid" id="g-animal-bird"></div>
+  <div class="cat-label">🐍 파충류·해양·양서류</div>
+  <div class="emoji-grid" id="g-animal-reptile"></div>
+  <div class="cat-label">🐛 곤충·기타</div>
+  <div class="emoji-grid" id="g-animal-insect"></div>
+</div>
+
+<!-- ── 자연 ── -->
+<div id="tab-nature" class="section">
+  <div class="cat-label">🌱 식물·꽃</div>
+  <div class="emoji-grid" id="g-nature-plant"></div>
+  <div class="cat-label">🌙 하늘·날씨·우주</div>
+  <div class="emoji-grid" id="g-nature-sky"></div>
+</div>
+
+<!-- ── 음식 ── -->
+<div id="tab-food" class="section">
+  <div class="cat-label">🍎 과일·채소</div>
+  <div class="emoji-grid" id="g-food-fruit"></div>
+  <div class="cat-label">🍔 요리·패스트푸드</div>
+  <div class="emoji-grid" id="g-food-cook"></div>
+  <div class="cat-label">🍰 디저트·간식</div>
+  <div class="emoji-grid" id="g-food-sweet"></div>
+  <div class="cat-label">☕ 음료</div>
+  <div class="emoji-grid" id="g-food-drink"></div>
+</div>
+
+<!-- ── 이동·장소 ── -->
+<div id="tab-travel" class="section">
+  <div class="cat-label">🚗 육상 교통</div>
+  <div class="emoji-grid" id="g-travel-land"></div>
+  <div class="cat-label">✈️ 항공·해상</div>
+  <div class="emoji-grid" id="g-travel-air"></div>
+  <div class="cat-label">🏠 건물·장소</div>
+  <div class="emoji-grid" id="g-travel-place"></div>
+  <div class="cat-label">🌏 지형·풍경</div>
+  <div class="emoji-grid" id="g-travel-geo"></div>
+</div>
+
+<!-- ── 활동 ── -->
+<div id="tab-activity" class="section">
+  <div class="cat-label">⚽ 스포츠</div>
+  <div class="emoji-grid" id="g-act-sport"></div>
+  <div class="cat-label">🎮 게임·취미</div>
+  <div class="emoji-grid" id="g-act-game"></div>
+  <div class="cat-label">🎭 예술·공연</div>
+  <div class="emoji-grid" id="g-act-art"></div>
+</div>
+
+<!-- ── 물건 ── -->
+<div id="tab-object" class="section">
+  <div class="cat-label">📱 전자기기</div>
+  <div class="emoji-grid" id="g-obj-tech"></div>
+  <div class="cat-label">📚 문구·사무</div>
+  <div class="emoji-grid" id="g-obj-office"></div>
+  <div class="cat-label">👗 의류·패션</div>
+  <div class="emoji-grid" id="g-obj-fashion"></div>
+  <div class="cat-label">🔧 도구·기타</div>
+  <div class="emoji-grid" id="g-obj-tool"></div>
+</div>
+
+<!-- ── 기호 ── -->
+<div id="tab-symbol" class="section">
+  <div class="cat-label">❤️ 하트</div>
+  <div class="emoji-grid" id="g-sym-heart"></div>
+  <div class="cat-label">🔴 도형·색</div>
+  <div class="emoji-grid" id="g-sym-shape"></div>
+  <div class="cat-label">⚠️ 표지·버튼</div>
+  <div class="emoji-grid" id="g-sym-sign"></div>
+  <div class="cat-label">☪️ 종교·별자리</div>
+  <div class="emoji-grid" id="g-sym-religion"></div>
+</div>
+
+<!-- ── 카오모지 ── -->
+<div id="tab-kaomoji" class="section">
+  <div class="cat-label">(◕‿◕) 기쁨·웃음</div>
+  <div class="kao-grid" id="g-kao-happy"></div>
+  <div class="cat-label">(T▽T) 슬픔·눈물</div>
+  <div class="kao-grid" id="g-kao-sad"></div>
+  <div class="cat-label">(╯°□°）╯ 화남·황당</div>
+  <div class="kao-grid" id="g-kao-angry"></div>
+  <div class="cat-label">(///▽///) 수줍·사랑</div>
+  <div class="kao-grid" id="g-kao-love"></div>
+  <div class="cat-label">¯\_(ツ)_/¯ 기타·유명</div>
+  <div class="kao-grid" id="g-kao-etc"></div>
+  <div class="cat-label">( ͡° ͜ʖ ͡°) 특수 표정</div>
+  <div class="kao-grid" id="g-kao-special"></div>
+</div>
+
+<!-- ── 특수문자 ── -->
+<div id="tab-special" class="section">
+  <div class="cat-label">→ 방향 화살표</div>
+  <div class="sym-grid" id="g-sp-arrow"></div>
+  <div class="cat-label">♩ 음악 기호</div>
+  <div class="sym-grid" id="g-sp-music"></div>
+  <div class="cat-label">★ 도형·별</div>
+  <div class="sym-grid" id="g-sp-star"></div>
+  <div class="cat-label">© 법적·단위 기호</div>
+  <div class="sym-grid" id="g-sp-legal"></div>
+  <div class="cat-label">¥ 통화 기호</div>
+  <div class="sym-grid" id="g-sp-money"></div>
+  <div class="cat-label">π 수학 기호</div>
+  <div class="sym-grid" id="g-sp-math"></div>
+  <div class="cat-label">α 그리스 문자</div>
+  <div class="sym-grid" id="g-sp-greek"></div>
+  <div class="cat-label">♠ 카드·주사위</div>
+  <div class="sym-grid" id="g-sp-card"></div>
+  <div class="cat-label">… 문장 기호</div>
+  <div class="sym-grid" id="g-sp-punct"></div>
+</div>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</div>
+
+<div id="toast">복사됨! ✓</div>
+
+<script>
+const DATA = {
+  'g-face-happy':['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','😌','😎','🤓','🧐','🥳','🥸','🤠','😺','😸','😹','😻'],
+  'g-face-sad':  ['😔','😪','🤤','😴','😓','😩','😫','🥺','😢','😭','😞','😟','🙁','☹️','😮','😯','😲','😳','😦','😧','😨','😰','😥','😱','😖','😣','🥱','😒','🙄','😬'],
+  'g-face-angry':['😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖'],
+  'g-face-etc':  ['😶','😑','😐','🤨','😏','🤥','😌','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','💫','🤯'],
+  'g-face-ani':  ['🙈','🙉','🙊','😺','😸','😹','😻','😼','😽','🙀','😿','😾'],
+
+  'g-hand-gest': ['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','🫵','🤙','👌','🤌','🤏','✌️','🤞','🤟','🤘','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','🤝','👏','🙌','🫶','👐','🤲','🙏','✍️','💅','🤳','🫰'],
+  'g-hand-body': ['💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🫀','🫁','🧠','🦷','👀','👁️','👅','👄','🫦','💋'],
+
+  'g-people-age':['👶','🧒','👦','👧','🧑','👱','👨','🧔','👩','🧓','👴','👵'],
+  'g-people-job':['🧑‍⚕️','👨‍⚕️','👩‍⚕️','🧑‍🎓','👨‍🎓','👩‍🎓','🧑‍🍳','👨‍🍳','👩‍🍳','🧑‍🌾','👨‍🌾','👩‍🌾','🧑‍🔧','👨‍🔧','👩‍🔧','🧑‍💻','👨‍💻','👩‍💻','🧑‍🎨','👨‍🎨','👩‍🎨','🧑‍🚀','👨‍🚀','👩‍🚀','🧑‍✈️','👨‍✈️','👩‍✈️','💂','👮','🕵️','👷','🤴','👸','🎅','🤶'],
+  'g-people-fantasy':['🦸','🦹','🧙','🧝','🧛','🧟','🧞','🧜','🧚','🧌','👼','🥷'],
+
+  'g-animal-mammal':['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐗','🐴','🦄','🐺','🐻‍❄️','🦝','🦡','🦦','🦥','🐿️','🦔','🐇','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦒','🦘','🦬','🐘','🦣','🦛','🦏','🐪','🐫','🐆','🐅','🦓','🦍','🦧'],
+  'g-animal-bird': ['🐦','🦅','🦆','🦉','🦇','🐧','🐔','🐤','🦚','🦜','🦢','🦩','🕊️','🐓','🦃','🦤','🦋'],
+  'g-animal-reptile':['🐢','🐍','🦎','🦖','🦕','🐊','🐸','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈'],
+  'g-animal-insect':['🐛','🦋','🐌','🐞','🐜','🦟','🦗','🕷️','🦂','🐝','🪲','🪳','🦠'],
+
+  'g-nature-plant':['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹','🥀','🌺','🌸','🌼','🌻','🪷','🪻','🌰','🥜','🫘'],
+  'g-nature-sky':  ['🌞','🌝','🌛','🌜','🌚','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🌙','🌟','⭐','💫','✨','⚡','🌈','☀️','🌤️','⛅','🌥️','☁️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','☃️','⛄','🌊','💧','💦','🫧','🌬️','🌀','🌫️','🌪️','🌅','🌄','🌠','🎇','🎆','🌌','🪐','☄️','🌃','🌉'],
+
+  'g-food-fruit':  ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🧄','🧅','🥔','🍠','🌰','🥜','🫘'],
+  'g-food-cook':   ['🍔','🍟','🍕','🌭','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥣','🍲','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍣','🍤','🍥','🥮','🍡','🥟','🥠','🥡','🍳','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🦪'],
+  'g-food-sweet':  ['🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍡','🍨','🍧','🍦'],
+  'g-food-drink':  ['🍼','🥛','☕','🫖','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','🫗'],
+
+  'g-travel-land': ['🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🛺','🚲','🛴','🛹','🛼','🚏','⛽','🚧','🚦','🚥','🛑','🚨'],
+  'g-travel-air':  ['✈️','🛫','🛬','🛩️','💺','🚀','🛸','🚁','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🪝','🚂','🚃','🚄','🚅','🚆','🚇','🚊','🚉'],
+  'g-travel-place':['🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏩','🏪','🏫','🏬','🏭','🏯','🏰','🗼','🗽','⛩️','🕌','🛕','⛪','🕍','🏗️','🏘️','🏚️','⛲','🎡','🎢','🎠','🎭','🎪'],
+  'g-travel-geo':  ['🗺️','🌐','🧭','🏔️','⛰️','🌋','🗻','🏕️','🏖️','🏜️','🏝️','🏞️','🌅','🌄','🌠','🎇','🎆','🌃','🏙️','🌉','🌌','🌁','🗾'],
+
+  'g-act-sport':   ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🏓','🏸','🏒','🥍','🏑','🏏','🥅','⛳','🏹','🎣','🤿','🥊','🥋','🛹','🛷','⛸️','🏋️','🤼','🤸','⛹️','🤺','🏇','🏊','🚵','🚴','🏄','🤾','🏌️','🧗','🤽','🧘','🏃','🚶'],
+  'g-act-game':    ['🎮','🕹️','🎲','🎯','🎳','🎰','🃏','🀄','🎴','♟️','🧩','🔮','🎪'],
+  'g-act-art':     ['🎻','🎸','🎷','🎺','🥁','🪘','🎹','🎵','🎶','🎤','🎧','🎼','🎙️','🎭','🎨','🖌️','🖼️','🎬','📽️','🎞️','📹','📷','🎥','🔭','🧪','🧬','🔬'],
+
+  'g-obj-tech':    ['📱','💻','🖥️','🖨️','⌨️','🖱️','🖲️','💾','💿','📀','📺','📻','📠','☎️','📞','📟','🔋','🔌','💡','🔦','🕯️','📡','🔭','🔬','📸'],
+  'g-obj-office':  ['📚','📖','📝','📒','📓','📔','📕','📗','📘','📙','📃','📄','📑','📊','📈','📉','🗒️','🗓️','📅','📆','🗑️','📌','📍','✂️','🖊️','🖋️','✒️','📏','📐','🗃️','🗂️','🗄️','📬','📭','📮','📣','📢','🔔','🔕'],
+  'g-obj-fashion': ['👔','👕','👖','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳','👙','👚','👛','👜','👝','🎒','🧳','👒','🎩','🧢','⛑️','👟','👠','👡','👢','👞','🥾','🥿','👑','💍','💎','👓','🕶️','🥽','🌂','☂️'],
+  'g-obj-tool':    ['🔧','🪛','🔩','⚙️','🗜️','🔗','🪝','🧲','🪜','🪞','🔨','⛏️','🪓','⚒️','🛠️','🗡️','⚔️','🛡️','🪚','🔫','🪃','🏹','🪤','🪣','🔮','💊','💉','🩺','🩹','🌡️','🧰'],
+
+  'g-sym-heart':   ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','❤️‍🔥','❤️‍🩹','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️'],
+  'g-sym-shape':   ['🔴','🟠','🟡','🟢','🔵','🟣','⚫','⚪','🟤','🔶','🔷','🔸','🔹','🔺','🔻','💠','🔲','🔳','▪️','▫️','◾','◽','◼️','◻️','🟥','🟧','🟨','🟩','🟦','🟪','⬛','⬜'],
+  'g-sym-sign':    ['⚠️','🚫','🔞','📵','🔇','❌','⭕','✅','☑️','✔️','❎','🆕','🆓','🆒','🆙','🆗','🆖','🅰️','🅱️','🆎','🆑','🅾️','🆘','⛔','📛','🔰','♻️','🔱','⚜️','🔅','🔆','📶','🎵','🎶','🔔','💯','🔐','🔏','🔒','🔓','🔑','🗝️','🔍','🔎'],
+  'g-sym-religion':['☮️','✝️','☪️','🕉️','☸️','✡️','🔯','🕎','☯️','☦️','🛐','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'],
+
+  'g-kao-happy':   ['(◕‿◕)','(´• ω •`)','(≧◡≦)','(✿◠‿◠)','╰(*°▽°*)╯','(ᵔ᷅ꇴᵔ᷄)','ヽ(´▽`)/ ','٩(◕‿◕)۶','(≧∀≦)','(*^▽^*)','(●\'◡\'●)','(＾▽＾)','(^ω^)','(＾Ｕ＾)','(●ˇ∀ˇ●)','(✧ω✧)','(●´ω｀●)','( ´ ▽ ` )','(*≧ω≦)','(ﾉ◕ヮ◕)ﾉ:･ﾟ✧','꒰˶• ༝ •˶꒱','(⌒‿⌒)','UwU','OwU',':3','^w^','(*˘︶˘*)','(｡◕‿◕｡)','(✪ω✪)','d(^_^o)','(☆▽☆)','(¬‿¬)'],
+  'g-kao-sad':     ['(T▽T)','(T_T)','(╥_╥)','(╯︵╰,)','( ´•̥̥̥ω•̥̥̥` )','(っ˘̩╭╮˘̩)っ','(；一_一)','(ノд-。)','σ(TεT;)','(｡•́︿•̀｡)','( ˃̣̣̥⌓˂̣̣̥)','(っ- ‸ - ς)','(◞‸◟；)','(´；ω；`)','(p_q)','( ;∀;)','(っ °Д °;)っ','(ノ_<。)','(υ´•ω•`)','(｡•́‸•̀｡)'],
+  'g-kao-angry':   ['(╯°□°）╯︵ ┻━┻','┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻','(ノ`Д´)ノ','(ʘᗩʘ\')','(ーー；)','(ー_ー)!!','凸(-_-)凸','ヽ(ˊДˋ)ノ','(눈_눈)','(°ロ°)☝','( ゜д゜)','(°益°)','(｀Д´)','٩(๏̯͡๏)۶','(ᗒᗕᗒ)','(╬ ಠ益ಠ)','(ง •̀_•́)ง','(ง\'̀-\'́)ง'],
+  'g-kao-love':    ['(♡ >ω< ♡)','(灬º‿º灬)♡','(´∀｀)♡','♡(˃͈ દ ˂͈ ༶ )','(づ｡◕‿‿◕｡)づ','(/ω\\)','(>///<)','(´ω｀)','(♡˙︶˙♡)','(。♥‿♥。)','(*˘︶˘*)','(◍•ᴗ•◍)❤','(ɔˆ ³(ˆ⌣ˆc)','♥(ˆ⌣ˆԅ)','(*ˊ˘ˋ*)♡','(●♡∀♡)','(´• ω •`)♡','💕(◡‿◡✿)','(˘ε˘)'],
+  'g-kao-etc':     ['¯\\_(ツ)_/¯','ᕙ(⇀‸↼‶)ᕗ','(งツ)ว','⊂(◉‿◉)つ','(∩｀-´)⊃━☆ﾟ.*･｡ﾟ','(｀_´)ゞ','m(_ _)m','(＞人＜;)','(*꒦ິ꒳꒦ີ)','o(TヘTo)','(=_=)','(-_-)zzz','(ー_ーゞ','(￣▽￣)','(─‿─)','(≖‿≖)','ᕦ(ò_óˇ)ᕤ','┬─┬ノ( º _ ºノ)','(•_•) ( •_•)>⌐■-■ (⌐■_■)','( ͡• ͜ʖ ͡•)','ʕ•ᴥ•ʔ'],
+  'g-kao-special': ['( ͡° ͜ʖ ͡°)','( ͡~ ͜ʖ ͡°)','(ง ͠° ͟ل͜ ͡°)ง','(=^･ω･^=)','(=^･ｪ･^=)','(ΦωΦ)','(^._.^)ﾉ','(⊃｡•́‿•̀｡)⊃','( ⊙ω⊙ )','(⊙_⊙)','OwO','>w<','uwu','(•ω•)','(>ω<)','ヾ(^▽^*)))','( ˘ω˘ )','ヾ(๑╹◡╹)ﾉ"','(ˊᗜˋ*)'],
+
+  'g-sp-arrow':  ['→','←','↑','↓','↗','↘','↙','↖','↔','↕','⇒','⇐','⇑','⇓','⇔','⇕','➡','⬅','⬆','⬇','⬈','⬉','⬊','⬋','↩','↪','↻','↺','⟵','⟶','⟷','⟹','⟸','⟺','➤','➥','➦','➧','➨','▶','◀','▲','▼','◁','▷','△','▽','⇧','⇩','⇦','⇨'],
+  'g-sp-music':  ['♩','♪','♫','♬','♭','♮','♯'],
+  'g-sp-star':   ['★','☆','✦','✧','✪','✫','✬','✭','✮','✯','✰','✴','✳','❋','❊','❉','❈','❇','❆','❅','❄','✼','✻','✺','✹','✸','✷','✶','✵','✲','✱','✾','❀','❁','✿','⚝','🌟','💫','✨'],
+  'g-sp-legal':  ['©','®','™','℠','℗','℃','℉','℔','№','℅','‰','‱','§','¶','†','‡','‼','⁉','⁈','※','°','′','″','‴','℃','℉','㎞','㎝','㎜','㎡','㎢','㎣','㎤','㎥'],
+  'g-sp-money':  ['¥','€','£','¢','$','₩','₪','₫','₭','₮','₱','₴','₵','₸','₹','₺','₼','₽','₾','₿','¤'],
+  'g-sp-math':   ['∞','π','≈','≠','≤','≥','÷','×','±','√','∑','∫','∂','Δ','∇','∏','∈','∉','⊂','⊃','⊆','⊇','∩','∪','∅','∀','∃','∄','⊕','⊗','∧','∨','¬','⊥','∥','∟','≡','≢','≃','≅','½','¼','¾','¹','²','³','⁴','ⁿ','₁','₂','₃','₄'],
+  'g-sp-greek':  ['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω','Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω'],
+  'g-sp-card':   ['♠','♥','♦','♣','♡','♢','♤','♧','⚀','⚁','⚂','⚃','⚄','⚅'],
+  'g-sp-punct':  ['…','‥','·','•','‣','⁃','–','—','―','|','¦','‖','「','」','『','』','【','】','〖','〗','〈','〉','《','》','〔','〕','〘','〙','〃','〒','〓','〜','～','※','＊','＃','＠','＆','＋','＝','？','！','：','；','，','。','·','•','◦'],
+};
+
+const KAO = new Set(['g-kao-happy','g-kao-sad','g-kao-angry','g-kao-love','g-kao-etc','g-kao-special']);
+const SYM = new Set(['g-sp-arrow','g-sp-music','g-sp-star','g-sp-legal','g-sp-money','g-sp-math','g-sp-greek','g-sp-card','g-sp-punct']);
+
+// build all grids
+Object.entries(DATA).forEach(([id, items])=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  const cls = KAO.has(id) ? 'k-btn' : SYM.has(id) ? 's-btn' : 'e-btn';
+  el.innerHTML = items.map(v=>`<button class="${cls}" data-v="${encodeURIComponent(v)}" onclick="cp(this)">${v}</button>`).join('');
+});
+
+// copy
+let tid;
+function cp(btn){
+  const text = decodeURIComponent(btn.dataset.v);
+  const done = ()=>{ flash(btn); };
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done));
+  } else { fallback(text,done); }
+}
+function fallback(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta); cb();
+}
+function flash(btn){
+  const t=document.getElementById('toast');
+  t.classList.add('show'); btn.classList.add('ok');
+  clearTimeout(tid);
+  tid=setTimeout(()=>{ t.classList.remove('show'); btn.classList.remove('ok'); },1100);
+}
+
+// tab switch
+const TABS=['face','hand','people','animal','nature','food','travel','activity','object','symbol','kaomoji','special'];
+function sw(name,el){
+  TABS.forEach(t=>{ const s=document.getElementById('tab-'+t); if(s){s.classList.remove('active');s.style.display='';} });
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  clearSearch();
+}
+
+// search
+function clearSearch(){
+  document.getElementById('search').value='';
+  document.getElementById('no-result').style.display='none';
+  document.querySelectorAll('.e-btn,.k-btn,.s-btn').forEach(b=>b.style.display='');
+  document.querySelectorAll('.emoji-grid,.kao-grid,.sym-grid,.cat-label').forEach(g=>g.style.display='');
+}
+function doSearch(q){
+  q=q.trim();
+  if(!q){ clearSearch(); return; }
+  // show all sections for search
+  TABS.forEach(t=>{ const s=document.getElementById('tab-'+t); if(s){s.classList.add('active');s.style.display='block';} });
+  let any=false;
+  document.querySelectorAll('.e-btn,.k-btn,.s-btn').forEach(btn=>{
+    const v=decodeURIComponent(btn.dataset.v||'');
+    const show=v.includes(q)||btn.textContent.includes(q);
+    btn.style.display=show?'':'none';
+    if(show) any=true;
+  });
+  document.querySelectorAll('.emoji-grid,.kao-grid,.sym-grid').forEach(grid=>{
+    const vis=[...grid.children].some(c=>c.style.display!=='none');
+    grid.style.display=vis?'':'none';
+    const prev=grid.previousElementSibling;
+    if(prev&&prev.classList.contains('cat-label')) prev.style.display=vis?'':'none';
+  });
+  document.getElementById('no-result').style.display=any?'none':'block';
+}
+</script>
+</body>
+</html>

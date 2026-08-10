@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메소포타미아 신화 완전 정복</title>
+<style>
+:root{
+  --bg:#0d0a06;--bg2:#14100a;--bg3:#1c1610;--bg4:#241e14;
+  --border:#2e2416;--border2:#4a3820;
+  --txt:#e8d9bc;--txt2:#a08860;--txt3:#5a4428;
+  --sand:#d4a84b;--sand2:#f0c870;--clay:#c87840;--lapis:#4878c0;--lapis2:#78a8e8;
+  --red:#c84848;--green:#60a870;--purple:#8060b0;--teal:#40a090;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--sand);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--sand2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:360px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--sand);box-shadow:0 0 0 2px rgba(212,168,75,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;}
+.tab{padding:6px 11px;border-radius:4px;border:none;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(212,168,75,.15);color:var(--sand2);border:1px solid rgba(212,168,75,.3);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:190px;min-width:190px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-label{padding:8px 14px 3px;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(212,168,75,.08);color:var(--sand2);border-left-color:var(--sand);}
+.main{flex:1;padding:20px 24px;max-width:1040px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--sand2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:16px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:10px 14px;}
+
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:8px 10px;vertical-align:top;font-size:13px;}
+.e-name{color:var(--sand2);font-weight:600;white-space:nowrap;width:150px;}
+.e-orig{color:var(--txt3);font-size:11px;display:block;font-weight:400;}
+.e-desc{color:var(--txt2);}
+
+.e-tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.tag-sumer{background:rgba(212,168,75,.18);color:var(--sand2);}
+.tag-akkad{background:rgba(200,120,64,.18);color:var(--clay);}
+.tag-babylon{background:rgba(72,120,192,.18);color:var(--lapis2);}
+.tag-assyr{background:rgba(96,168,112,.18);color:var(--green);}
+.tag-demon{background:rgba(200,72,72,.18);color:#e08080;}
+.tag-hero{background:rgba(128,96,176,.18);color:var(--purple);}
+
+.story-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;}
+.story-head{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.story-num{background:rgba(212,168,75,.2);color:var(--sand2);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.story-title{font-size:14px;font-weight:700;color:var(--txt);}
+.story-body{padding:12px 16px;color:var(--txt2);font-size:13px;line-height:1.75;}
+.story-body b{color:var(--sand2);}
+.story-body i{color:var(--lapis2);}
+
+.creature-list{display:flex;flex-direction:column;gap:8px;}
+.creature{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;display:flex;gap:12px;align-items:flex-start;}
+.c-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;}
+.c-name{font-size:13px;font-weight:700;color:var(--lapis2);}
+.c-orig{font-size:11px;color:var(--txt3);}
+.c-desc{font-size:12px;color:var(--txt2);margin-top:3px;line-height:1.55;}
+
+.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:14px;}
+.place-card{border-radius:8px;padding:12px 14px;border:1px solid;}
+.p-heaven{background:rgba(72,120,192,.07);border-color:rgba(72,120,192,.3);}
+.p-earth{background:rgba(212,168,75,.07);border-color:rgba(212,168,75,.3);}
+.p-under{background:rgba(60,50,40,.4);border-color:rgba(100,80,60,.3);}
+.p-sacred{background:rgba(96,168,112,.07);border-color:rgba(96,168,112,.3);}
+.p-other{background:rgba(128,96,176,.07);border-color:rgba(128,96,176,.3);}
+.p-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.p-sub{font-size:11px;margin-bottom:6px;opacity:.7;}
+.p-desc{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+.me-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:14px;}
+.me-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px;}
+.me-name{font-size:12px;font-weight:700;color:var(--sand2);margin-bottom:3px;}
+.me-desc{font-size:11px;color:var(--txt2);}
+
+.timeline{position:relative;padding-left:24px;margin-bottom:8px;}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:rgba(212,168,75,.25);}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-21px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--sand);border:2px solid var(--bg2);}
+.tl-dot.red{background:var(--red);}
+.tl-dot.blue{background:var(--lapis);}
+.tl-head{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.tl-body{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px;font-size:14px;}
+
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .grid,.place-grid,.me-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span class="logo-icon">🏺</span>메소포타미아 신화 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="신·무기·신화·장소 검색…" type="text"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('gods')">신들</button>
+    <button class="tab" onclick="showPanel('demons')">악마·적대존재</button>
+    <button class="tab" onclick="showPanel('weapons')">무기·유물·능력</button>
+    <button class="tab" onclick="showPanel('places')">장소·세계</button>
+    <button class="tab" onclick="showPanel('myths')">신화·서사시</button>
+    <button class="tab" onclick="showPanel('creatures')">생명체·종족</button>
+    <button class="tab" onclick="showPanel('concepts')">개념·문명·기타</button>
+  </div>
+</div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+<div id="no-result">검색 결과가 없습니다.</div>
+
+<!-- ═══════════════════ 신들 ═══════════════════ -->
+<section class="panel active" id="panel-gods">
+  <div class="sec-title">🌟 신들 (Gods)</div>
+  <div class="sec-sub">수메르·아카드·바빌로니아·아시리아 신화의 신들 — 문명에 따라 이름이 다르며 동일 신격이 많음</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🌌</span>최고 3신 — 안·엔릴·엔키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">안 / 아누<span class="e-orig">An (수메르) / Anu (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span><span class="e-tag tag-akkad">아카드</span>하늘의 신. 신들의 왕. 아누나키(위대한 신들)의 아버지. 운명의 서판(Tablet of Destinies) 원소유자. 신들 중 가장 높은 권위를 지니나 신화에서 직접 행동하는 경우는 적음. 별이 그의 군대. 황소가 상징.</td></tr>
+        <tr><td class="e-name">엔릴<span class="e-orig">Enlil</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>바람·공기·폭풍·대지의 신. 실질적 신들의 왕. 니푸르의 에쿠르 신전 거주. 인류를 창조했지만 소음에 격노해 대홍수를 일으킴(아트라하시스 서사시). 운명의 서판을 소유. 아누나키와 이기기 신들의 왕. 산과 바람이 상징.</td></tr>
+        <tr><td class="e-name">엔키 / 에아<span class="e-orig">Enki (수메르) / Ea (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span><span class="e-tag tag-akkad">아카드</span>지혜·물·마법·창조의 신. 압수(민물) 아래 에압수 신전 거주. 마기(Me, 문명의 법칙)를 관장. 인류에게 가장 우호적인 신 — 홍수 전 아트라하시스에게 경고, 아다파를 보호. 물고기와 숫양이 상징. 주술·의술·공예·언어를 창조.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">⭐</span>천체 3신 — 달·태양·금성</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">난나 / 신<span class="e-orig">Nanna (수메르) / Sin (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>달의 신. 시간과 달력을 관장. 우르의 수호신. 엔릴과 닌릴의 아들. 배를 타고 하늘을 건넘. 황소 뿔이 달 모양과 연결. 아버지 격으로 샤마시(우투)와 이슈타르(이난나)의 아버지.</td></tr>
+        <tr><td class="e-name">우투 / 샤마시<span class="e-orig">Utu (수메르) / Shamash (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>태양·정의·진실의 신. 매일 아침 산 사이에서 솟아올라 전차를 몰아 하늘을 가로지름. 법과 도덕의 수호자. 함무라비 법전 비석에 왕에게 법을 전수하는 신으로 묘사. 시피르(광선의 톱날)를 지님. 길가메시의 동반자·후원자.</td></tr>
+        <tr><td class="e-name">이난나 / 이슈타르<span class="e-orig">Inanna (수메르) / Ishtar (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span><span class="e-tag tag-akkad">아카드</span>사랑·전쟁·다산·금성의 여신. 모순적 존재 — 삶과 죽음, 사랑과 파괴를 동시에 상징. 사자와 갈대 묶음이 상징. 엔키로부터 Me를 술로 빼앗음. 저승으로 내려가 에레쉬키갈과 대결. 길가메시에게 구애했다 거절당해 황소 구구알란나 소환. 바빌론의 여신 중 최고 숭배대상.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">⚡</span>전쟁·폭풍·저승의 신들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">마르두크<span class="e-orig">Marduk</span></td><td class="e-desc"><span class="e-tag tag-babylon">바빌론</span>바빌론의 주신. 에누마 엘리시에서 티아마트를 무찌르고 신들의 왕이 됨. 50개의 이름을 부여받음. 천둥·뇌우·식물·마법·심판을 관장. 마르두크의 창 이무기누, 북풍, 그물, 불꽃, 폭풍을 무기로 사용. 에사길라 신전 거주. 아들 나부가 서기신.</td></tr>
+        <tr><td class="e-name">아수르<span class="e-orig">Aššur</span></td><td class="e-desc"><span class="e-tag tag-assyr">아시리아</span>아시리아 제국의 주신. 마르두크와 유사한 역할. 날개 달린 태양 원반이 상징. 전쟁의 신으로서 아시리아 왕들에게 정복 권한을 부여.</td></tr>
+        <tr><td class="e-name">니누르타<span class="e-orig">Ninurta</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>전쟁·농업·폭풍의 신. 엔릴의 아들. 안주 새를 죽이고 운명의 서판을 되찾음. 어리 샥카(Sharur)라는 말하는 메이스 소유. 괴물 연합체(킨가루, 파부틸, 우트말룰루 등)를 정복한 영웅.</td></tr>
+        <tr><td class="e-name">네르갈<span class="e-orig">Nergal</span></td><td class="e-desc"><span class="e-tag tag-akkad">아카드</span>죽음·역병·저승의 남성 왕. 에레쉬키갈의 남편. 원래 하늘 신이었으나 저승에 내려가 에레쉬키갈과 사랑에 빠져 저승왕이 됨. 역병·전쟁의 파괴적 측면. 사자가 상징.</td></tr>
+        <tr><td class="e-name">아다드 / 이슈쿠르<span class="e-orig">Adad (아카드) / Ishkur (수메르)</span></td><td class="e-desc"><span class="e-tag tag-akkad">아카드</span>폭풍·비·뇌우의 신. 홍수와 폭풍을 일으킴. 아트라하시스 홍수 때 폭풍 담당. 황소와 번개가 상징. 농업에 필수적인 비를 내려줌.</td></tr>
+        <tr><td class="e-name">나부<span class="e-orig">Nabû</span></td><td class="e-desc"><span class="e-tag tag-babylon">바빌론</span>지혜·문자·예언의 신. 마르두크의 아들. 운명의 서판에 인류의 운명을 기록. 서기와 학자의 수호신. 보르시파 신전 에지다 거주. 손에 서판과 첨필(stylus)을 들고 있는 형상.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🌺</span>대지·창조·치유의 신들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">닌후르사그 / 키<span class="e-orig">Ninhursag / Ki</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>대지·어머니·출산의 여신. 위대한 신들 중 하나. 생명을 창조하는 신성한 자궁. 인류를 흙으로 빚는 데 관여. 닌마(Ninmah)라고도 불림. 엔키와의 갈등·화해 신화(딜문 신화)의 주역. 오메가 기호와 사자가 상징.</td></tr>
+        <tr><td class="e-name">닌릴<span class="e-orig">Ninlil</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>바람·대기·곡식의 여신. 엔릴의 아내. 달 신 난나의 어머니. 엔릴에게 강제로 임신되어 저승에 내려가는 신화(엔릴과 닌릴). 닌릴을 따라 엔릴도 저승에 내려가 저승 신들을 낳음.</td></tr>
+        <tr><td class="e-name">굴라<span class="e-orig">Gula</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>치유·의술의 여신. 개가 상징(개가 상처를 핥아 치유하는 것에서 유래). 니네베의 이슈타르와도 연결. 의사들의 수호여신.</td></tr>
+        <tr><td class="e-name">닌기쉬지다<span class="e-orig">Ningišzida</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>초목·저승의 신. 두 마리 뱀이 얽힌 형상(카두케우스의 원형). 아다파 신화에서 저승의 문지기. 저승으로 가는 길을 안내.</td></tr>
+        <tr><td class="e-name">두무지 / 탐무즈<span class="e-orig">Dumuzi (수메르) / Tammuz (아카드)</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>목축·초목·풍요의 신. 이난나의 남편. 이난나가 저승에서 돌아올 때 대신 저승으로 보내짐 → 6개월은 저승, 6개월은 지상에 — 계절의 순환 설명. 그의 죽음을 슬퍼하는 의례가 매년 거행됨.</td></tr>
+        <tr><td class="e-name">이슈쿠르 / 아다드<span class="e-orig">Ninsun</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>닌순 — 야생소의 여신. 길가메시의 어머니. 길가메시의 꿈을 해석. 샤마시에게 아들을 보호해달라 기도.</td></tr>
+        <tr><td class="e-name">닌갈<span class="e-orig">Ningal</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>달빛·갈대의 여신. 달 신 난나의 아내. 우르 멸망의 비탄시(Lament for Urim)에서 도시 파괴를 막으려 신들에게 호소하는 모습으로 등장.</td></tr>
+        <tr><td class="e-name">닌이신나 / 이슈타란<span class="e-orig">Ninisina / Ishtar of Isin</span></td><td class="e-desc"><span class="e-tag tag-sumer">수메르</span>이신의 수호여신. 치유·의술·사랑을 관장. 굴라와 동일시되기도 함.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌊</span>원초 신들 — 창세 이전의 존재들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">티아마트<span class="e-orig">Tiamat</span></td><td class="e-desc">원초의 혼돈·소금바다의 여신. 압수와 결합해 첫 신들을 낳음. 에누마 엘리시에서 아들들에게 배신당한 뒤 마르두크와 대결. 패배 후 몸이 나뉘어 하늘과 땅이 됨. 용 또는 뱀 형상으로 묘사. 11종류의 괴물 군대를 만들어냄.</td></tr>
+        <tr><td class="e-name">압수<span class="e-orig">Apsû</span></td><td class="e-desc">원초의 민물 심연. 티아마트의 남편. 후손 신들의 소음에 격노해 제거하려 했으나 엔키에게 먼저 잠들게 되어 살해됨. 그 시체 위에 엔키의 신전 에압수가 세워짐.</td></tr>
+        <tr><td class="e-name">킨구<span class="e-orig">Kingu</span></td><td class="e-desc">티아마트의 새 남편이자 사령관. 티아마트가 운명의 서판을 킨구에게 걸어줌. 마르두크와의 전투에서 포획 후 처형 — 그 피로 인류를 창조.</td></tr>
+        <tr><td class="e-name">남무<span class="e-orig">Nammu</span></td><td class="e-desc">수메르 최초의 원초 여신. 바다·창조의 원천. 안과 키(하늘과 대지)의 어머니. 엔키의 어머니. 인류 창조를 엔키에게 요청.</td></tr>
+        <tr><td class="e-name">라흐무·라하무<span class="e-orig">Lahmu / Lahamu</span></td><td class="e-desc">에누마 엘리시의 첫 번째 신들. 압수와 티아마트 사이에서 태어난 한 쌍. 진흙과 물에 연관. 우주 질서의 이행 단계 신.</td></tr>
+        <tr><td class="e-name">안샤르·키샤르<span class="e-orig">Anšar / Kišar</span></td><td class="e-desc">라흐무·라하무의 자녀. 하늘 전체(안샤르)와 대지 전체(키샤르). 아누의 부모.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 악마·적대존재 ═══════════════════ -->
+<section class="panel" id="panel-demons">
+  <div class="sec-title">👹 악마·적대존재</div>
+  <div class="sec-sub">메소포타미아 신화의 악마·괴물·적대적 신격들</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">😈</span>주요 악마들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">파주주<span class="e-orig">Pazuzu</span></td><td class="e-desc"><span class="e-tag tag-demon">악마</span>서남풍의 악마왕. 인간의 몸+독수리 날개+개 머리+뱀 음경. 역병·가뭄·메뚜기 떼의 신. 역설적으로 임산부와 영아를 수호하는 기능도 가짐(더 강한 악마가 약한 악마를 쫓기 때문). 라마슈투를 쫓는 수호 역할.</td></tr>
+        <tr><td class="e-name">라마슈투<span class="e-orig">Lamaštu</span></td><td class="e-desc"><span class="e-tag tag-demon">악마</span>신들의 딸 중 악한 존재. 영아·산모를 공격. 사자 머리·당나귀 귀·독수리 발·개 젖꼭지. 아이들을 납치해 갉아먹음. 파주주를 이용해 쫓음. 페스트와 열병 관련. 메소포타미아 악마 중 가장 공포스러운 존재.</td></tr>
+        <tr><td class="e-name">릴리투 / 아르다트 릴리<span class="e-orig">Lilitu / Ardat Lili</span></td><td class="e-desc"><span class="e-tag tag-demon">악마</span>밤의 여성 악마. 바람·폭풍·질병 관련. 히브리 릴리스(Lilith)의 기원. 성적 악마로서 잠자는 남성을 공격. 날개 달린 아름다운 여성으로 묘사.</td></tr>
+        <tr><td class="e-name">아사쿠<span class="e-orig">Asag</span></td><td class="e-desc"><span class="e-tag tag-demon">악마</span>극도로 추악한 악마. 역병의 원천. 산악과 연관. 니누르타에 의해 정복됨. 아사쿠의 자녀들이 돌산들. 접근만 해도 물고기가 삶아질 만큼 고열을 방출.</td></tr>
+        <tr><td class="e-name">후바바 / 훔바바<span class="e-orig">Huwawa / Humbaba</span></td><td class="e-desc"><span class="e-tag tag-demon">수호괴물</span>삼나무 숲의 수호자. 엔릴이 임명. 거대하고 끔찍한 얼굴(창자를 닮은 피부 묘사). 길가메시와 엔키두가 삼나무 숲에 가서 대결 후 처치. 그 죽음은 엔릴의 노여움을 삼.</td></tr>
+        <tr><td class="e-name">안주<span class="e-orig">Anzû</span></td><td class="e-desc"><span class="e-tag tag-demon">괴물</span>사자 머리+독수리 몸의 거대한 새. 운명의 서판을 훔쳐 권력을 장악. 엔릴의 목욕탕을 지키다 서판 강탈. 니누르타가 전투 끝에 처치하고 서판 회수.</td></tr>
+        <tr><td class="e-name">우가루<span class="e-orig">Ugallu</span></td><td class="e-desc"><span class="e-tag tag-demon">악마</span>사자 머리 악마. 폭풍·홍수 관련. 티아마트의 11괴물 중 하나. 수호 의례에서 부적으로도 사용됨.</td></tr>
+        <tr><td class="e-name">갈루<span class="e-orig">Gallû</span></td><td class="e-desc"><span class="e-tag tag-demon">저승</span>저승의 7악마. 저승 법을 집행. 이난나가 저승에서 올라올 때 동반. 이난나의 대리자를 찾아 두무지를 끌고 내려감. 아무것도 먹지 않고 마시지 않으며 밀가루·물을 받지 않고 선물도 받지 않음.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🐉</span>티아마트의 11괴물</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">무슈슈<span class="e-orig">Mušḫuššu — 뱀-용</span></td><td class="e-desc">마르두크의 상징 동물이 된 뱀 용. 전갈 꼬리+사자 앞발+독수리 뒷발+뱀 머리. 원래 티아마트의 괴물이었으나 마르두크가 지배. 바빌론의 이슈타르 문 장식.</td></tr>
+        <tr><td class="e-name">구구알란나<span class="e-orig">Gugalanna — 하늘의 황소</span></td><td class="e-desc">에레쉬키갈의 남편이자 저승의 황소. 이난나가 길가메시에 거절당하자 아누에게 요청해 내보냄. 우루크를 파괴하다 길가메시·엔키두에 처치됨.</td></tr>
+        <tr><td class="e-name">티아마트의 나머지 9괴물<span class="e-orig">11 Monsters</span></td><td class="e-desc">우가루(사자 악마)·바세르투(악령)·우리딤무(거대한 사나운 개)·기르타블룰루(전갈-인간)·쿨릴루(물고기-인간)·쿠사리쿠(들소-인간)·라흐무(털북숭이 영웅?) 등. 에누마 엘리시에 열거. 마르두크에게 포획 후 조각상·부적으로 변환.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 무기·유물·능력 ═══════════════════ -->
+<section class="panel" id="panel-weapons">
+  <div class="sec-title">⚔️ 무기·유물·신성한 능력</div>
+  <div class="sec-sub">메소포타미아 신화 속 전설적 무기·마법 도구·신의 고유 능력</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">📜</span>운명의 서판 — Dup Shimati</div>
+    <div class="card-body" style="font-size:13px;color:var(--txt2);line-height:1.75;padding:12px 14px;">
+      <b style="color:var(--sand2);">운명의 서판(Dup Shimati / Tablet of Destinies)</b>은 메소포타미아 신화 최고의 힘의 원천. 소유자에게 <b style="color:var(--sand2);">우주를 통치할 절대 권위</b>가 부여됨. 원래 엔릴(또는 아누)이 소유 → 안주 새가 탈취 → 니누르타가 탈환. 에누마 엘리시에서 킨구가 티아마트에게 받았다가 마르두크에게 빼앗김. 단순한 물리적 무기가 아닌 <i>우주 질서 자체를 쓴 서판</i>.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">⚔️</span>신들의 무기</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">샤루르<span class="e-orig">Šarur</span></td><td class="e-desc">니누르타의 마법 메이스. 말을 하고 날아다니며 전장을 정찰, 주인에게 보고. 신들의 무기 중 가장 지능적인 존재. 안주 토벌 작전에서 핵심 역할.</td></tr>
+        <tr><td class="e-name">마르두크의 무기들<span class="e-orig">Marduk's Arsenal</span></td><td class="e-desc">에누마 엘리시에서 마르두크가 티아마트와 싸울 때 사용한 무기들: <b>이무기누(Imhullu, 사악한 바람)</b> — 티아마트 입에 밀어 넣어 몸을 부풀림, <b>번개</b>, <b>불꽃</b>, <b>그물</b>(아누·엔릴·엔키의 도움으로 제작), <b>북풍·남풍·동풍·서풍·회오리</b>, <b>트라이던트(삼지창)</b>.</td></tr>
+        <tr><td class="e-name">우투의 시피르<span class="e-orig">Shamash's Rays — Šibbiru</span></td><td class="e-desc">태양 신 샤마시(우투)의 광선 무기. 산 너머에서 솟아오를 때 펼쳐지는 톱날 같은 빛. 길가메시에 대한 지원으로 후바바 토벌 때 사용.</td></tr>
+        <tr><td class="e-name">이난나의 무기들<span class="e-orig">Inanna's Battle Gear</span></td><td class="e-desc">이난나의 '저승 하강' 신화에서 7개 문에서 벗겨지는 의례 장신구들: ①왕관(슈그라 왕관) ②지팡이 ③귀걸이 ④가슴의 돌(피석) ⑤황금 반지 ⑥흉패 ⑦왕의 예복. 각각 7문을 통과할 때 하나씩 벗어야 함.</td></tr>
+        <tr><td class="e-name">닌기르수의 신성한 새<span class="e-orig">Anzu bird of Ningirsu</span></td><td class="e-desc">라가시의 신 닌기르수(니누르타의 다른 이름)의 안주 새 형상 무기. 앗수르 탑재 독수리 문양. 전쟁 시 앞에 세워 적을 압도.</td></tr>
+        <tr><td class="e-name">길가메시의 무기<span class="e-orig">Gilgamesh's Weapons</span></td><td class="e-desc">길가메시가 후바바 토벌 때 사용한 무기: 300셰켈 무게의 도끼, 활·화살, 단검. 엔키두와 함께 레바논 삼나무 숲 원정.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">✨</span>Me — 문명의 신성한 법칙</div>
+    <div class="card-body" style="font-size:13px;color:var(--txt2);line-height:1.6;padding:12px 14px;margin-bottom:10px;">
+      <b style="color:var(--sand2);">Me(메)</b>는 수메르 신화의 핵심 개념. 신들이 관장하는 <b style="color:var(--sand2);">우주의 법칙·문명의 요소</b>들. 엔키가 에리두의 에압수에 보관. 이난나가 엔키를 술에 취하게 해 100가지 이상의 Me를 빼앗아 우루크로 가져감.
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div class="me-grid">
+        <div class="me-card"><div class="me-name">왕권·신권</div><div class="me-desc">왕좌·왕홀·왕관·왕의 인장</div></div>
+        <div class="me-card"><div class="me-name">전쟁·무기</div><div class="me-desc">방패·화살·창·활 기술</div></div>
+        <div class="me-card"><div class="me-name">사제 직분</div><div class="me-desc">의례·신전 운영·주술</div></div>
+        <div class="me-card"><div class="me-name">신탁·진실</div><div class="me-desc">예언·거짓말·중상모략</div></div>
+        <div class="me-card"><div class="me-name">음악</div><div class="me-desc">하프·피리·악기 연주</div></div>
+        <div class="me-card"><div class="me-name">글쓰기</div><div class="me-desc">서기술·문자·문서 보관</div></div>
+        <div class="me-card"><div class="me-name">혼인·출산</div><div class="me-desc">성행위·매춘·생식</div></div>
+        <div class="me-card"><div class="me-name">감정</div><div class="me-desc">기쁨·슬픔·두려움·피로</div></div>
+        <div class="me-card"><div class="me-name">수공예</div><div class="me-desc">목공·금속·직물 기술</div></div>
+        <div class="me-card"><div class="me-name">권력 기관</div><div class="me-desc">신전·서원·왕궁</div></div>
+        <div class="me-card"><div class="me-name">지식</div><div class="me-desc">현자의 지혜·박식</div></div>
+        <div class="me-card"><div class="me-name">신성한 하강</div><div class="me-desc">저승 방문·귀환 능력</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌟</span>신들의 주요 능력·속성</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">엔키의 주술<span class="e-orig">Enki's Magic (Abgal)</span></td><td class="e-desc">엔키는 아파칼루(현인·마법사)들을 창조해 인류에게 문명을 전수. 물과 언어로 정화·치유. 홍수 이전 7명의 압갈루(아파칼루)를 보내 문명의 기초를 가르침.</td></tr>
+        <tr><td class="e-name">이난나의 변신<span class="e-orig">Inanna's Transformations</span></td><td class="e-desc">이난나/이슈타르는 전쟁 중 전투의 신으로, 평화 시 사랑의 신으로 변환. 성별 바꾸기, 전사를 겁쟁이로·겁쟁이를 전사로 만드는 능력. 사자와 호랑이를 손으로 쥐는 형상으로 묘사.</td></tr>
+        <tr><td class="e-name">우투/샤마시의 정의<span class="e-orig">Shamash's Justice</span></td><td class="e-desc">모든 것을 빛으로 비추어 거짓을 드러냄. 함무라비 법전에서 법을 왕에게 전수. 악인을 벌하고 억압받는 자를 돌봄. 예언과 점술의 신.</td></tr>
+        <tr><td class="e-name">마르두크의 50가지 이름<span class="e-orig">50 Names of Marduk</span></td><td class="e-desc">에누마 엘리시 마지막 부분에 열거. 각 이름이 하나의 신성한 능력을 나타냄. 마르두크가 기존 신들의 권능을 흡수했음을 상징.</td></tr>
+        <tr><td class="e-name">엔릴의 율령<span class="e-orig">Enlil's Decree (Nam-Tar)</span></td><td class="e-desc">엔릴의 말은 우주적 결정력을 가짐. 그의 숨결이 바람이 되고 그의 명령(nam-tar)이 운명을 결정. 거스를 수 없는 신의 의지.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 장소·세계 ═══════════════════ -->
+<section class="panel" id="panel-places">
+  <div class="sec-title">🌍 장소·세계</div>
+  <div class="sec-sub">메소포타미아 신화의 우주 구조, 저승, 성스러운 도시와 신전</div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🌌</span>우주 구조 — 3층 세계</div>
+    <div class="card-body" style="font-size:13px;color:var(--txt2);line-height:1.75;padding:12px 14px;">
+      메소포타미아 우주는 크게 <b style="color:var(--sand2);">하늘(상계)</b> — <b style="color:var(--sand2);">대지(중계)</b> — <b style="color:var(--sand2);">저승/지하수(하계)</b>의 3층으로 구성. 하늘은 아누가, 대지는 엔릴이, 하계 물과 지혜는 엔키가 분할 통치. 별자리는 신들의 군대·양 떼. 대지는 거대한 원반 형태, 주변이 소금바다로 둘러싸임. 소금바다 바깥에 삶도 죽음도 아닌 영역.
+    </div>
+  </div>
+
+  <div class="place-grid">
+    <div class="place-card p-heaven">
+      <div class="p-name" style="color:var(--lapis2);">🌌 하늘 (An)</div>
+      <div class="p-sub" style="color:var(--lapis);">아누·신·이슈타르의 영역</div>
+      <div class="p-desc">3단계로 구분: 별의 하늘(아누·이기기 거주), 행성의 하늘(7행성 이동), 최상의 하늘(순수한 빛). 태양은 산의 문을 통해 매일 입출.</div>
+    </div>
+    <div class="place-card p-earth">
+      <div class="p-name" style="color:var(--sand2);">🌎 대지 (Ki)</div>
+      <div class="p-sub" style="color:var(--sand);">엔릴·인류의 영역</div>
+      <div class="p-desc">원반형 대지. 중심은 니푸르(엔릴의 신전 에쿠르 위치). 강·산·초목이 가득. 주변은 소금바다(마라투) — 사실상 세계의 끝.</div>
+    </div>
+    <div class="place-card p-under">
+      <div class="p-name" style="color:#c0b090;">💀 쿠르 / 이르칼라 (저승)</div>
+      <div class="p-sub" style="color:#806040;">에레쉬키갈의 왕국</div>
+      <div class="p-desc">돌아올 수 없는 나라. 7개 문을 통과해야 도착. 죽은 자들이 진흙을 먹고 먼지를 마심. 빛이 없으며 새처럼 날개 달린 망자들이 거주.</div>
+    </div>
+    <div class="place-card p-earth">
+      <div class="p-name" style="color:var(--sand2);">🌊 압수 / 에압수</div>
+      <div class="p-sub" style="color:var(--sand);">엔키의 거주지</div>
+      <div class="p-desc">대지 아래 거대한 민물 바다. 엔키가 압수를 잠재우고 그 위에 신전 에압수 건설. 지혜와 마법의 원천. 샘·강이 여기서 솟아오름.</div>
+    </div>
+    <div class="place-card p-sacred">
+      <div class="p-name" style="color:var(--green);">🌺 딜문 (Dilmun)</div>
+      <div class="p-sub" style="color:#508060;">수메르 낙원</div>
+      <div class="p-desc">순수하고 빛나는 땅. 병과 죽음이 없음. 수메르 판 에덴. 엔키와 닌후르사그의 신화 무대. 현재 바레인과 동일시되기도 함.</div>
+    </div>
+    <div class="place-card p-other">
+      <div class="p-name" style="color:var(--purple);">🏔 마슈 산 (Māšu)</div>
+      <div class="p-sub" style="color:#706090;">태양이 뜨고 지는 쌍봉 산</div>
+      <div class="p-desc">길가메시 서사시 등장. 전갈-인간이 지키는 두 봉우리. 태양이 이 산을 통해 지하를 이동. 길가메시가 영생의 꽃을 찾아 통과.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">⛩️</span>저승 — 7개의 문</div>
+    <div class="card-body" style="font-size:13px;color:var(--txt2);line-height:1.75;padding:12px 14px;">
+      이난나의 저승 하강 신화에 등장. 이난나가 각 문을 통과할 때 <b style="color:var(--sand2);">하나의 신성한 장신구를 벗어야 함</b>. 쿠르 법이 어떤 예외도 없음을 보여주는 의식. 7문은 <i>점차적인 권력 박탈과 인간화를 상징</i>. 각 문을 지키는 문지기(네티, 저승 수석 문지기)가 확인. 최종 도착 시 이난나는 알몸·무력 상태로 에레쉬키갈 앞에 섬.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🏛️</span>성스러운 도시와 신전</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">에리두·에압수<span class="e-orig">Eridu / E-abzu</span></td><td class="e-desc">수메르 최초의 도시이자 문명의 발원지. 엔키의 신전 에압수(압수의 집) 위치. 신화상 왕권이 처음 하강한 곳.</td></tr>
+        <tr><td class="e-name">니푸르·에쿠르<span class="e-orig">Nippur / E-kur</span></td><td class="e-desc">수메르 종교 중심지. 엔릴의 신전 에쿠르(산의 집). 정치적 패권과 무관하게 모든 도시국가가 공인한 성지. 아누나키 의회가 소집되던 장소.</td></tr>
+        <tr><td class="e-name">우루크·에안나<span class="e-orig">Uruk / E-anna</span></td><td class="e-desc">이난나/이슈타르의 신전 에안나(하늘의 집). 길가메시가 통치. 수메르 문명 최절정기 도시. 성스러운 성혼(Sacred Marriage) 의례 거행.</td></tr>
+        <tr><td class="e-name">바빌론·에사길라<span class="e-orig">Babylon / Esagila</span></td><td class="e-desc">마르두크의 신전 에사길라(높이 솟은 집). 에테메난키 지구라트(바벨탑 전설의 기원). 바빌로니아 제국 종교의 중심.</td></tr>
+        <tr><td class="e-name">우르·에기샤누갈<span class="e-orig">Ur / Egisnugal</span></td><td class="e-desc">달의 신 난나(신)의 신전. 우르 3왕조 시기 수메르 패권 도시. 아브라함의 고향으로 알려진 성지.</td></tr>
+        <tr><td class="e-name">라르사·에바바르<span class="e-orig">Larsa / E-babbar</span></td><td class="e-desc">태양 신 우투(샤마시)의 신전. 흰 집(e-babbar)이라는 뜻. 시파르에도 동명의 태양 신전 존재.</td></tr>
+        <tr><td class="e-name">니네베·이슈타르 신전<span class="e-orig">Nineveh</span></td><td class="e-desc">아시리아 수도. 니네베의 이슈타르 신전이 국제적 명성. 아슈르바니팔 도서관 — 길가메시 서사시 원판 발견지.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 신화·서사시 ═══════════════════ -->
+<section class="panel" id="panel-myths">
+  <div class="sec-title">📖 신화·서사시</div>
+  <div class="sec-sub">메소포타미아 신화의 주요 이야기들 — 점토판에 새겨진 인류 최고(最古)의 서사</div>
+
+  <div class="story-card" style="border-color:rgba(212,168,75,.4);">
+    <div class="story-head"><span class="story-num">창세</span><span class="story-title">에누마 엘리시 (Enuma Elish) — 바빌론 창세 서사시</span></div>
+    <div class="story-body">
+      "높은 하늘이 아직 이름 붙여지지 않았을 때…" — 기원전 18~16세기 추정. 7개 점토판. 매년 바빌론 신년 축제(아키투)에서 낭송됨.
+      <br><br>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot blue"></div><div class="tl-head">태초 — 압수와 티아마트</div><div class="tl-body">원초의 민물 <b>압수</b>와 소금 바다 <b>티아마트</b>가 뒤섞여 첫 신들 라흐무·라하무, 안샤르·키샤르, 그리고 아누를 낳음.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">압수의 계획</div><div class="tl-body">젊은 신들의 소음에 격노한 압수가 그들을 죽이려 함. 엔키가 먼저 압수를 잠들게 하여 살해, 그 위에 에압수 신전 건설.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">티아마트의 반격</div><div class="tl-body">새 남편 <b>킨구</b>를 사령관으로, 11마리 괴물 군대를 편성. 킨구에게 운명의 서판 수여. 아누·엔릴·엔키 모두 대항에 실패.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">마르두크 선발</div><div class="tl-body">신들이 <b>마르두크</b>를 구원자로 선발. 마르두크는 승리 시 신들의 왕이 될 것을 조건으로 수락. 신들이 동의 — 이것이 마르두크가 바빌론 최고신이 된 이유.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">티아마트 격파</div><div class="tl-body">마르두크가 그물·바람·번개·창으로 티아마트를 포획. 이무기누(사악한 바람)를 입에 넣어 팽창시킨 뒤 화살로 심장을 꿰뚫음. 킨구 포획 후 처형.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">세계 창조</div><div class="tl-body">티아마트의 몸을 반으로 갈라 <i>위쪽 절반 → 하늘</i>, <i>아래쪽 절반 → 대지</i>. 티아마트의 눈에서 티그리스·유프라테스강이 흐름. 별자리를 배치하고 달에게 역할을 부여.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">인류 창조</div><div class="tl-body">킨구의 피를 흙과 섞어 인류를 만들어 신들의 노동을 대신하게 함. 에사길라 신전 건설. 마르두크의 50개 이름 제창으로 마무리.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-card" style="border-color:rgba(72,120,192,.4);">
+    <div class="story-head"><span class="story-num">영웅</span><span class="story-title">길가메시 서사시 (Epic of Gilgamesh) — 인류 최초의 서사시</span></div>
+    <div class="story-body">
+      기원전 18세기 수메르 시편이 기원. 기원전 12세기 아카드어 표준판 완성(신-레케-운니니 편집). 12개 점토판. 아슈르바니팔 도서관에서 1853년 발견.
+      <br><br>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">길가메시와 엔키두</div><div class="tl-body">우루크의 왕 <b>길가메시</b>(3분의 2 신, 3분의 1 인간). 폭압적 통치. 신들이 야인 <b>엔키두</b>를 창조해 대항자로 보냄. 신전 창기 샴하트가 엔키두를 문명화. 처음엔 싸우지만 곧 절친한 친구가 됨.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">삼나무 숲 원정</div><div class="tl-body">불멸의 명성을 얻으려 레바논 삼나무 숲으로 원정. 샤마시의 지원을 받아 수호자 <b>후바바</b>를 처치. 삼나무를 벌목해 우루크의 문을 만듦.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">이슈타르의 거절</div><div class="tl-body">이슈타르가 길가메시에게 구애. 길가메시가 거절 — 이슈타르의 전 연인들의 비극적 결말 열거. 격노한 이슈타르가 아누에게 <b>하늘의 황소</b>를 요청. 황소가 우루크를 공격하지만 길가메시·엔키두가 처치.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">엔키두의 죽음</div><div class="tl-body">신들이 후바바와 황소를 죽인 죄로 벌로 엔키두의 죽음을 결정. 엔키두가 저주와 병으로 12일간 앓다 사망. 길가메시의 첫 번째 죽음 대면.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">영생 추구</div><div class="tl-body">죽음에 공황 상태가 된 길가메시가 홍수를 살아남은 불사신 <b>우트나피쉬팀</b>을 찾아 떠남. 마슈 산의 전갈-인간 관문, 어둠의 터널, 죽음의 바다를 건너 도착.</div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">영생의 실패</div><div class="tl-body">우트나피쉬팀이 6일 7야 안 자는 시험 제시 → 실패(바로 잠듦). 위로로 바다 밑 <b>불사의 꽃</b>을 가르쳐줌. 길가메시가 채취하지만 돌아오는 길에 뱀이 훔쳐 탈피. 결국 빈손으로 우루크 귀환 — <i>죽음의 불가피성 수용</i>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">저승</span><span class="story-title">이난나의 저승 하강 (Descent of Inanna)</span></div>
+    <div class="story-body">
+      이난나가 "저승의 법을 배우기 위해" 또는 에레쉬키갈의 남편 상례 참석으로 쿠르(저승)로 내려감. 하인 닌슈부르에게 3일 후에도 안 돌아오면 신들에게 구해달라고 지시.
+      <br><br>7개 문을 통과할 때마다 장신구를 하나씩 벗겨짐. 최종 도착 시 에레쉬키갈의 죽음의 시선(Eye of Death)에 의해 죽어 고기 쪽처럼 걸림.
+      <br><br>닌슈부르가 엔릴·난나에게 호소했으나 거절. <b>엔키</b>가 손톱 먼지와 손가락 먼지로 쿠르갈라와 갈라투르라는 성별 없는 존재를 만들어 보냄. 그들이 에레쉬키갈의 고통에 공감을 표하고 생명의 음식·물을 이난나에게 줘 부활.
+      <br><br>이난나가 올라올 때 갈루(저승 악마)들이 동행 — 저승 법에 따라 <i>대리자를 데려와야 함</i>. 두무지가 이난나의 왕좌에 편하게 앉아있다 갈루에게 끌려감 → 두무지는 6개월씩 저승과 지상을 오고 감 — <b>계절의 기원</b>.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">홍수</span><span class="story-title">아트라하시스 서사시 (Atrahasis Epic) — 대홍수의 기원</span></div>
+    <div class="story-body">
+      인류 창조 이전 이기기(하급 신들)가 노동 부담에 반란. <b>엔키</b>가 킨구(또는 We-ila, 반역 신)의 피와 흙으로 인류를 창조해 신들의 노동을 대신하게 함.
+      <br><br>인류가 급증하며 소음이 커지자 <b>엔릴</b>이 분노. 역병·가뭄·기근으로 인구를 줄이려 함. 매번 엔키가 아트라하시스에게 귀띔해 막음.
+      <br><br>결국 엔릴이 대홍수 결정. 엔키가 직접 말할 수 없어 갈대 벽에 속삭임 — "갈대 집이여 들어라, 벽이여 들어라" — 아트라하시스가 엿듣고 배를 지음. 7일 7야 홍수 후 생존. 이후 엔릴이 분노했으나 신들이 제물 향기를 그리워한다는 것을 이용해 협상. 불사 대신 유아 사망률·불임을 도입해 인구 조절.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">지혜</span><span class="story-title">아다파 신화 — 영생을 놓친 현자</span></div>
+    <div class="story-body">
+      에리두의 현자 <b>아다파</b>(엔키의 피조물). 낚시 중 남풍이 배를 뒤집자 남풍의 날개를 꺾어버림. 하늘 신 <b>아누</b>가 소환. 엔키가 미리 조언: "아누가 빵과 물을 주어도 먹지 마라 — 죽음의 빵과 물이니." 그런데 아누는 사실 영생의 빵과 물을 준비해 시험. 아다파가 거절 → <i>영생의 기회를 놓침</i>. 엔키의 보호가 역설적으로 아다파의 불사를 막음. 인류가 왜 필멸적인가에 대한 또 하나의 설명.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">창조</span><span class="story-title">엔키와 닌후르사그 — 딜문 낙원 신화</span></div>
+    <div class="story-body">
+      성스럽고 순수한 땅 <b>딜문</b>. 병·노화·맹수가 없는 낙원. 닌후르사그가 8가지 식물을 창조. 엔키가 그것을 몰래 먹어버림 → 닌후르사그가 격노해 엔키에게 죽음의 저주를 걸고 사라짐.
+      <br><br>여우의 간청으로 닌후르사그가 돌아와 엔키의 8가지 병든 신체 부위 각각을 치유하는 신을 창조. <b>닌티</b>(갈비뼈로 창조된 여신, "갈비뼈의 여신"이자 "삶을 주는 여신") — 히브리어 성경 이브(Eve·생명)와 갈비뼈 창조 신화의 원형.
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-head"><span class="story-num">영웅</span><span class="story-title">에타나 신화 (Etana Myth) — 하늘을 향한 비행</span></div>
+    <div class="story-body">
+      키시의 왕 <b>에타나</b>. 왕위를 물려받을 아들이 없어 출산의 풀을 구하려 함. 독수리와 뱀이 나무 아래 우정의 맹세를 하지만 독수리가 뱀의 새끼를 먹음. 뱀이 샤마시에게 고발 → 독수리가 구덩이에 빠져 갇힘. 에타나가 독수리를 구해 친구가 됨. 에타나가 독수리 등에 타고 아누의 하늘까지 올라가 출산의 풀을 얻으려 함. (결말 점토판 소실로 불완전.)
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 생명체·종족 ═══════════════════ -->
+<section class="panel" id="panel-creatures">
+  <div class="sec-title">🦁 생명체·종족</div>
+  <div class="sec-sub">메소포타미아 신화와 예술에 등장하는 신화적 존재들</div>
+
+  <div class="grid" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-head"><span class="ico">🦅</span>수호 존재들</div>
+      <div class="card-body">
+        <div class="creature-list">
+          <div class="creature"><div class="c-icon">🦬</div><div><div class="c-name">라마수 <span class="c-orig">Lamassu / Shedu</span></div><div class="c-desc">인간 머리+황소(또는 사자) 몸+독수리 날개. 궁전·신전 입구를 수호. 앞에서 보면 4발로 서 있고, 옆에서 보면 걷는 것처럼 보이도록 5개 발로 조각. 사람의 지혜+황소의 힘+독수리의 날개를 결합한 이상적 존재.</div></div></div>
+          <div class="creature"><div class="c-icon">👼</div><div><div class="c-name">아파칼루 (압갈루) <span class="c-orig">Apkallu / Abgal</span></div><div class="c-desc">7명의 원초 현자. 엔키가 홍수 이전에 인류에게 보내 문명을 가르침. 물고기 옷을 입은 인간으로 묘사(어민·제사장 형상). 또는 독수리 머리+인간 몸으로도 표현. 마법·의학·예언·건축 전수. 마르두크의 아들 아살루히와 연결.</div></div></div>
+          <div class="creature"><div class="c-icon">🧎</div><div><div class="c-name">라마 (수호 여신) <span class="c-orig">Lamma / Lamassu (여성형)</span></div><div class="c-desc">개인을 지키는 작은 수호 여신. 팔을 올린 채 기도하는 자세. 신과 인간 사이에서 중재. 개인 인장과 부적에 자주 등장.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🐲</span>혼합 생명체</div>
+      <div class="card-body">
+        <div class="creature-list">
+          <div class="creature"><div class="c-icon">🐉</div><div><div class="c-name">무슈슈 <span class="c-orig">Mušḫuššu — 뱀-용</span></div><div class="c-desc">뱀 머리+비늘 몸+독수리 뒷발+전갈 꼬리+사자 앞발. 마르두크·나부의 수호 동물. 이슈타르 문 장식으로 유명. 원래 티아마트의 괴물 → 마르두크가 지배권 획득.</div></div></div>
+          <div class="creature"><div class="c-icon">🦂</div><div><div class="c-name">기르타블룰루 <span class="c-orig">Girtablilu — 전갈-인간</span></div><div class="c-desc">허리 위 인간+허리 아래 전갈. 마슈 산 관문을 지키는 수호자. 태양 신 우투를 호위. 길가메시가 영생을 찾아 통과할 때 만남. 티아마트의 11괴물 중 하나.</div></div></div>
+          <div class="creature"><div class="c-icon">🐟</div><div><div class="c-name">쿨릴루 <span class="c-orig">Kulilu — 물고기-인간</span></div><div class="c-desc">어부 또는 물고기 상반신+인간 하반신. 아파칼루의 물고기 복장과 연관. 엔키의 수행자. 티아마트의 11괴물 중 하나. 민물의 지식을 상징.</div></div></div>
+          <div class="creature"><div class="c-icon">🦅</div><div><div class="c-name">안주 새 <span class="c-orig">Anzû — 사자독수리</span></div><div class="c-desc">사자 머리+독수리 날개+몸. 운명의 서판을 훔친 신화적 새. 날갯짓으로 폭풍과 홍수를 일으킴. 니누르타에 의해 화살로 처치됨. 라가시의 닌기르수 신전 장식으로도 등장.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">👻</span>저승·악마 존재들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">에테무<span class="e-orig">Etemmu</span></td><td class="e-desc">죽은 자의 영혼·망령. 올바른 장례를 치르지 않으면 이승을 떠돌며 산 자를 괴롭힘. 메소포타미아 장례 의례가 중요했던 이유. 음식과 물을 가져다주면 위무됨.</td></tr>
+        <tr><td class="e-name">우투크쿠<span class="e-orig">Utukku</span></td><td class="e-desc">악한 영(善·惡 양면). 우투크 레무투(나쁜 우투크)는 병과 불운을 가져오는 악마. 주술 의례 마클루(Maqlû) 시리즈에서 쫓아내는 대상.</td></tr>
+        <tr><td class="e-name">아무르루 / 알루<span class="e-orig">Alu</span></td><td class="e-desc">얼굴 없고 귀가 없고 입 없는 악마. 자는 사람을 덮쳐 가위눌림을 일으킴. 악몽의 원인.</td></tr>
+        <tr><td class="e-name">남타르<span class="e-orig">Namtar</span></td><td class="e-desc">운명의 악마. 에레쉬키갈의 시종. 죽음의 때를 결정하는 역병 악마. 60가지 병을 일으킬 수 있음. "운명을 자르는 자".</td></tr>
+        <tr><td class="e-name">아사쿠<span class="e-orig">Asag</span></td><td class="e-desc">추악한 질병 악마. 산의 아들. 고열을 방출해 강물을 끓임. 니누르타에게 정복됨. 그 자녀들이 바위 언덕들.</div></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🦁</span>신들의 수호 동물 · 상징</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">황소 (Bull)</td><td class="e-desc">안·엔릴·아다드·난나(달 뿔=초승달)의 상징. 힘과 하늘의 권능.</td></tr>
+        <tr><td class="e-name">사자 (Lion)</td><td class="e-desc">이난나/이슈타르·네르갈의 상징. 여신이 사자 위에 서 있는 형상(이슈타르 부조). 왕권·전쟁·용기.</td></tr>
+        <tr><td class="e-name">독수리 (Eagle)</td><td class="e-desc">니누르타·아수르의 상징. 날개 달린 태양 원반. 하늘 권력.</td></tr>
+        <tr><td class="e-name">뱀·용 (Snake/Dragon)</td><td class="e-desc">엔키·티아마트·닌기쉬지다의 상징. 지혜·물·재생. 의료 상징 카두케우스의 기원(닌기쉬지다의 두 뱀).</td></tr>
+        <tr><td class="e-name">개 (Dog)</td><td class="e-desc">굴라(치유 여신)의 상징. 개가 상처를 핥아 치유한다는 관찰에서 유래.</td></tr>
+        <tr><td class="e-name">별·금성 (Star)</td><td class="e-desc">이난나/이슈타르 — 8각 별이 금성 상징. 새벽별·저녁별의 정체가 같음을 고대부터 인지.</td></tr>
+        <tr><td class="e-name">첨필·서판 (Stylus)</td><td class="e-desc">나부(지혜·문자 신)의 상징. 서기 직분과 지식의 신성함을 표현.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 개념·문명·기타 ═══════════════════ -->
+<section class="panel" id="panel-concepts">
+  <div class="sec-title">📚 개념·문명·기타</div>
+  <div class="sec-sub">메소포타미아 신화를 이해하는 핵심 개념, 문명, 현대적 영향</div>
+
+  <div class="grid" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-head"><span class="ico">🏛️</span>신들의 의회 — 아누나키 vs 이기기</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">아누나키<span class="e-orig">Anunnaki</span></td><td class="e-desc">위대한 신들 전체. "하늘과 땅의 군주들". 주요 신들이 모여 운명을 결정하는 의회 구성. 숫자는 최대 600명. 엔릴·에쿠르에서 회의.</td></tr>
+          <tr><td class="e-name">이기기<span class="e-orig">Igigi</span></td><td class="e-desc">하급 신들(또는 하늘 신들 총칭). 아트라하시스에서 노동에 반란을 일으킨 주체. 아누나키보다 낮은 지위. 6×600=3600명 또는 300명.</td></tr>
+          <tr><td class="e-name">수카르<span class="e-orig">Sukkal</span></td><td class="e-desc">신들의 시종·사자(使者). 이난나의 수카르는 닌슈부르. 마르두크의 수카르는 나부. 신들의 명령을 집행하고 인간의 청원을 전달.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🌊</span>메소포타미아 홍수 신화 비교</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">우트나피쉬팀<span class="e-orig">수메르·바빌론</span></td><td class="e-desc">길가메시 서사시. 엔키의 경고로 배 건조. 홍수 후 새 방류(비둘기·제비·까마귀). 신들의 선물로 영생 획득. 딜문에 거주.</td></tr>
+          <tr><td class="e-name">아트라하시스<span class="e-orig">아카드</span></td><td class="e-desc">아트라하시스 서사시. 동일한 구조. 엔키가 갈대 벽에 속삭임. 이후 인구 조절 장치(유아 사망·불임) 도입.</td></tr>
+          <tr><td class="e-name">지우수드라<span class="e-orig">수메르</span></td><td class="e-desc">가장 오래된 홍수 신화(수메르어 원본). 에리두 왕. 신들의 회의에서 홍수 결정을 엿듣고 배 건조. 7일 홍수.</td></tr>
+          <tr><td class="e-name">노아<span class="e-orig">성경·히브리</span></td><td class="e-desc">메소포타미아 홍수 신화의 직접적 영향. 비둘기·까마귀 방류, 제물 향기, 산에 정박 등 세부 묘사 일치.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">📐</span>메소포타미아 문명 핵심 키워드</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">지구라트<span class="e-orig">Ziggurat</span></td><td class="e-desc">신전 탑. 흙벽돌로 쌓은 계단식 피라미드. 꼭대기에 신의 거처(신전). 신이 하늘에서 내려오는 통로. 바빌론 에테메난키 = 바벨탑 원형. 우르 지구라트(우르-남무 건설, 기원전 21세기)가 가장 잘 보존.</td></tr>
+        <tr><td class="e-name">쐐기 문자<span class="e-orig">Cuneiform</span></td><td class="e-desc">세계 최초의 문자 체계(기원전 3400년경). 점토판에 갈대 첨필로 압인. 수메르어→아카드어→다양한 언어에 적용. 행정·신화·법률·의학·천문학 기록. 1850년대 조지 스미스 해독으로 길가메시 서사시 발견.</td></tr>
+        <tr><td class="e-name">함무라비 법전<span class="e-orig">Code of Hammurabi</span></td><td class="e-desc">기원전 1754년. 태양 신 샤마시로부터 왕이 법을 받는 장면이 비석에 조각. 282개 법조항. "눈에는 눈" 원칙. 세계 최초의 성문법 중 하나.</td></tr>
+        <tr><td class="e-name">성혼 의례<span class="e-orig">Sacred Marriage / Hieros Gamos</span></td><td class="e-desc">이난나와 왕(두무지 역할)의 신성한 결혼. 매년 봄 신년 축제에 거행. 풍요와 왕권의 신성화. 실제로 왕이 이난나 여사제와 의례적 결합을 했는지는 논란.</td></tr>
+        <tr><td class="e-name">라멘투<span class="e-orig">Lamentation Texts</span></td><td class="e-desc">도시 멸망을 애도하는 문학 장르. 우르 멸망의 비탄시·니푸르·에리두 등. 신이 도시를 버리고 떠나는 것이 멸망의 원인으로 해석.</td></tr>
+        <tr><td class="e-name">점술·천문학<span class="e-orig">Divination / Astronomy</span></td><td class="e-desc">별·달·간·새·기름 등으로 미래 예언. 바빌론 천문학이 현대 별자리의 기원. 황도 12궁은 바빌론에서 완성. 천문 관측이 수학과 연결 → 60진법(시간·각도에 현재도 사용).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-head"><span class="ico">🗺️</span>수메르·아카드·바빌론·아시리아 시대 구분</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name" style="width:180px;">수메르<span class="e-orig">~기원전 2000년</span></td><td class="e-desc">세계 최초 문명. 에리두·우루크·우르·라가시·니푸르 도시국가. 수메르어 신화 원본 — 이난나·엔키·엔릴 신화들. 지구라트·쐐기문자 창안.</td></tr>
+        <tr><td class="e-name">아카드 제국<span class="e-orig">기원전 2334~2154년</span></td><td class="e-desc">사르곤 대왕이 수메르 통일. 수메르 신들을 아카드어로 흡수(이난나→이슈타르, 우투→샤마시 등). 아카드어가 수천 년간 국제 외교 언어.</td></tr>
+        <tr><td class="e-name">바빌로니아<span class="e-orig">기원전 1894~539년</span></td><td class="e-desc">함무라비 법전, 에누마 엘리시, 길가메시 표준판. 마르두크를 최고신으로 격상. 천문학·수학·의학 최고 발전.</td></tr>
+        <tr><td class="e-name">아시리아<span class="e-orig">기원전 2500~609년</span></td><td class="e-desc">북메소포타미아 패권. 아수르 신을 최고신으로. 아슈르바니팔 도서관(니네베)에 3만 점토판 수집 — 현대 학자들이 메소포타미아 신화를 복원한 원천.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌍</span>메소포타미아 신화의 현대적 영향</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">성경·히브리 신화</td><td class="e-desc">에덴 동산(딜문), 노아 홍수(우트나피쉬팀·아트라하시스), 이브와 갈비뼈(닌티), 바벨탑(에테메난키), 릴리스(릴리투) 등 직접적 영향.</td></tr>
+        <tr><td class="e-name">그리스 신화</td><td class="e-desc">티아마트→티탄 전쟁 유사 구조, 오디세이아와 길가메시 서사시 모티프 유사(낙원·영생 추구), 프로메테우스(엔키의 인류 창조).</td></tr>
+        <tr><td class="e-name">점성술·별자리</td><td class="e-desc">황도 12궁(황소자리·전갈자리 등)이 바빌로니아 천문학에서 기원. 현재도 사용하는 별자리 이름과 점성술.</td></tr>
+        <tr><td class="e-name">60진법</td><td class="e-desc">수메르·바빌로니아에서 기원. 1시간=60분, 1분=60초, 원=360도. 현대 시간·각도 체계의 기반.</td></tr>
+        <tr><td class="e-name">현대 대중문화</td><td class="e-desc">파주주 → 영화 "엑소시스트" 악마. 이슈타르·아난나 → 네오-페이건 여신 숭배. 안주나키 → 음모론 외계인 전설. 길가메시 → 무수한 문학·게임 캐릭터. 라마수 → 루브르 박물관 상징.</td></tr>
+        <tr><td class="e-name">의학·카두케우스</td><td class="e-desc">닌기쉬지다의 두 뱀 얽힘 문양이 의학 상징 카두케우스의 원형. 굴라 여신의 개가 치유 상징. 현대 의학 심볼의 고대 기원.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const SIDEBAR_ITEMS = {
+  gods:     [{l:'최고 3신 (안·엔릴·엔키)'},{l:'천체 3신 (달·태양·금성)'},{l:'전쟁·폭풍·저승의 신들'},{l:'대지·창조·치유의 신들'},{l:'원초 신들'}],
+  demons:   [{l:'주요 악마들'},{l:'티아마트의 11괴물'}],
+  weapons:  [{l:'운명의 서판'},{l:'신들의 무기'},{l:'Me — 문명의 법칙'},{l:'신들의 능력·속성'}],
+  places:   [{l:'우주 구조 3층'},{l:'아홉 세계'},{l:'저승 7개의 문'},{l:'성스러운 도시와 신전'}],
+  myths:    [{l:'에누마 엘리시'},{l:'길가메시 서사시'},{l:'이난나의 저승 하강'},{l:'아트라하시스·홍수'},{l:'아다파 신화'},{l:'딜문·엔키·닌후르사그'},{l:'에타나 신화'}],
+  creatures:[{l:'수호 존재들'},{l:'혼합 생명체'},{l:'저승·악마 존재들'},{l:'신들의 수호 동물'}],
+  concepts: [{l:'아누나키·이기기'},{l:'홍수 신화 비교'},{l:'문명 핵심 키워드'},{l:'시대 구분'},{l:'현대적 영향'}],
+};
+
+let current = 'gods';
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => { if(t.getAttribute('onclick') === `showPanel('${id}')`) t.classList.add('active'); });
+  current = id;
+  buildSidebar(id);
+  document.getElementById('search').value = '';
+  document.getElementById('no-result').style.display = 'none';
+  document.querySelectorAll('mark').forEach(m => { m.outerHTML = m.textContent; });
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    sb.appendChild(btn);
+  });
+}
+
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const panel = document.getElementById('panel-' + current);
+  panel.querySelectorAll('mark').forEach(m => { const t = document.createTextNode(m.textContent); m.parentNode.replaceChild(t, m); });
+  if (!q) { document.getElementById('no-result').style.display = 'none'; return; }
+  let found = 0;
+  function walk(node) {
+    if (node.nodeType === 3) {
+      const idx = node.textContent.toLowerCase().indexOf(q);
+      if (idx >= 0) {
+        const m = document.createElement('mark');
+        m.style.cssText = 'background:rgba(212,168,75,.35);border-radius:2px;padding:0 1px;color:inherit;';
+        const before = document.createTextNode(node.textContent.slice(0, idx));
+        m.textContent = node.textContent.slice(idx, idx + q.length);
+        const after = document.createTextNode(node.textContent.slice(idx + q.length));
+        const f = document.createDocumentFragment();
+        f.appendChild(before); f.appendChild(m); f.appendChild(after);
+        node.parentNode.replaceChild(f, node);
+        found++;
+      }
+    } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+      Array.from(node.childNodes).forEach(walk);
+    }
+  }
+  walk(panel);
+  document.getElementById('no-result').style.display = found === 0 ? 'block' : 'none';
+});
+
+buildSidebar('gods');
+</script>
+</body>
+</html>

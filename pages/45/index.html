@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDEngine 완전 정복</title>
+<style>
+:root {
+  --blue:#4a90d9; --blue2:#6db8f0; --teal:#3ab8b0; --teal2:#5cd8d0;
+  --bg:#080d14; --bg2:#0d1520; --bg3:#121e2c; --bg4:#182636;
+  --txt:#c8ddf0; --txt2:#8ab0d0; --muted:#4a6a88;
+  --border:#1a3050; --border2:#254470;
+  --header-h:56px; --sb-w:192px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── header ── */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  height:var(--header-h);background:var(--bg2);border-bottom:2px solid var(--blue);
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+}
+.site-header h1{font-size:17px;color:var(--blue2);white-space:nowrap;letter-spacing:.5px;}
+.site-header h1 span{font-size:11px;color:var(--muted);margin-left:8px;font-weight:400;}
+.search-box{
+  flex:1;max-width:320px;padding:6px 12px;border-radius:6px;
+  border:1px solid var(--border2);background:var(--bg3);
+  color:var(--txt);font-size:13px;outline:none;
+}
+.search-box:focus{border-color:var(--blue);}
+.tab-bar{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;}
+.tab-btn{
+  padding:5px 11px;border-radius:5px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--txt2);font-size:11px;cursor:pointer;
+  transition:.15s;white-space:nowrap;
+}
+.tab-btn:hover{background:var(--bg4);border-color:var(--blue);}
+.tab-btn.active{background:var(--blue);color:#080d14;border-color:var(--blue);font-weight:700;}
+
+/* ── layout ── */
+.layout{display:flex;min-height:calc(100vh - var(--header-h));}
+.sidebar{
+  width:var(--sb-w);flex-shrink:0;background:var(--bg2);
+  border-right:1px solid var(--border);padding:12px 8px;
+  position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;
+}
+.sb-item{
+  display:block;width:100%;text-align:left;
+  padding:7px 10px;border-radius:5px;border:none;
+  background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:.12s;
+}
+.sb-item:hover{background:var(--bg4);color:var(--blue2);}
+.sb-item.active{background:var(--border2);color:var(--blue2);font-weight:600;}
+.main{flex:1;padding:24px 26px;max-width:1100px;}
+
+/* ── panels ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── section title ── */
+.sec{
+  font-size:19px;font-weight:700;color:var(--blue2);
+  border-left:4px solid var(--blue);padding-left:12px;
+  margin:32px 0 16px;
+}
+.sec:first-child{margin-top:0;}
+
+/* ── card grid ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;margin-bottom:26px;}
+.card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:15px;transition:.15s;
+}
+.card:hover{border-color:var(--blue);background:var(--bg4);}
+.card-head{font-size:13px;font-weight:700;color:var(--blue2);margin-bottom:5px;}
+.card-desc{font-size:12px;color:var(--txt2);margin-bottom:8px;line-height:1.55;}
+.note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;}
+
+/* ── shortcut rows ── */
+.kb-list{margin-top:4px;}
+.kb-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);}
+.kb-row:last-child{border-bottom:none;}
+.kb-keys{display:flex;gap:4px;flex-shrink:0;min-width:130px;}
+.key{
+  display:inline-block;padding:2px 7px;border-radius:4px;
+  border:1px solid var(--border2);background:var(--bg4);
+  color:var(--blue2);font-size:11px;font-family:'Courier New',monospace;font-weight:600;
+  white-space:nowrap;
+}
+.key.wide{min-width:54px;text-align:center;}
+.kb-desc{font-size:12px;color:var(--txt2);}
+
+/* ── tag ── */
+.tag{
+  display:inline-block;padding:1px 7px;border-radius:3px;
+  font-size:10px;font-weight:600;margin:0 3px 3px 0;
+}
+.t-model{background:#102030;color:#4a90d9;}
+.t-anim{background:#102820;color:#3ab870;}
+.t-new{background:#201028;color:#b040e0;}
+.t-cam{background:#201810;color:#d09040;}
+.t-export{background:#201010;color:#d05050;}
+
+/* ── info callout ── */
+.callout{
+  background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--teal);
+  border-radius:6px;padding:10px 14px;margin-bottom:20px;
+  font-size:12px;color:var(--txt2);line-height:1.6;
+}
+.callout b{color:var(--teal2);}
+
+/* ── step list ── */
+.steps{counter-reset:step;margin-bottom:20px;}
+.step{
+  display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--txt2);
+}
+.step:last-child{border-bottom:none;}
+.step::before{
+  counter-increment:step;content:counter(step);
+  min-width:24px;height:24px;border-radius:50%;
+  background:var(--blue);color:#080d14;font-weight:700;font-size:12px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* ── search highlight ── */
+.hl{background:#254470;border-radius:2px;padding:0 2px;}
+
+/* ── wide card ── */
+.card.wide{grid-column:1/-1;}
+
+/* ── scrollbar ── */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>BDEngine 완전 정복 <span>Minecraft Display Entity Editor</span></h1>
+  <input class="search-box" id="search" placeholder="기능·단축키 검색..." type="text">
+  <div class="tab-bar" id="tab-bar"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content">
+
+    <!-- ═══════════════════════════════ 패널 0: 개요·UI ═══════════════════════════════ -->
+    <div class="panel active" id="panel-0">
+
+      <div class="callout">
+        <b>BDEngine</b>은 마인크래프트 <b>Display Entity</b>(1.19.4+)를 웹 브라우저에서 3D로 모델링·애니메이션하는 온라인 에디터입니다.
+        모드·리소스팩 없이 Block Display · Item Display · Text Display를 제작하고 <b>/summon 명령어</b> 또는 <b>데이터팩</b>으로 내보낼 수 있습니다.
+      </div>
+
+      <div class="sec" data-nav="화면구성">화면 구성 개요</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🖥 Main Dock (메인 독)</div>
+          <div class="card-desc">화면 중앙 상단에 위치한 주요 도구 모음. 오브젝트 추가·변환·그룹화 등 핵심 기능 버튼이 모여 있음.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔘 Dock Buttons (독 버튼)</div>
+          <div class="card-desc">독 옆·아래에 배치된 보조 버튼. Asset Library 열기, 모드 전환, 설정, 내보내기 등 빠른 접근 제공.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 Context Menu (우클릭 메뉴)</div>
+          <div class="card-desc">오브젝트나 씬을 우클릭하면 나타나는 상황별 메뉴. 복사·붙여넣기·삭제·그룹화 등 상황에 맞는 옵션 제공.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">⬇ Bottom Panel (하단 패널)</div>
+          <div class="card-desc">씬 하단에 위치. 애니메이터 타임라인 접근, 오브젝트 속성(위치·회전·스케일 수치) 직접 입력.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📚 Asset Library (에셋 라이브러리)</div>
+          <div class="card-desc">모든 블록·아이템·텍스트를 아이콘 형태로 표시. 검색창으로 원하는 블록을 빠르게 찾아 씬에 배치. 커스텀 헤드도 포함.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">▶ Side Panel (사이드 패널)</div>
+          <div class="card-desc">우측 패널. 선택한 오브젝트의 속성(Transform, NBT, 이름 등) 표시 및 편집. 모든 사이드 패널은 접기(collapse) 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">⏱ Timeline (타임라인)</div>
+          <div class="card-desc">애니메이터 모드에서 표시. 키프레임 생성·편집, 재생·정지, 루프 제어, 그룹 헤더로 구간 분리, 중첩 그룹 접기 지원.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🌐 Viewport (뷰포트)</div>
+          <div class="card-desc">3D 작업 공간. 중앙에 위치하며 마우스로 카메라 조작. 오브젝트 클릭·드래그로 선택 및 변환 기즈모 조작.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="카메라조작">뷰포트 카메라 조작</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🖱 마우스 기본 조작</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">우클릭</span> <span class="key">드래그</span></div><span class="kb-desc">카메라 시점 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">휠</span> <span class="key">스크롤</span></div><span class="kb-desc">줌 인/아웃</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">휠 클릭</span> <span class="key">드래그</span></div><span class="kb-desc">카메라 이동 (패닝)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span></div><span class="kb-desc">오브젝트 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span> <span class="key">드래그</span></div><span class="kb-desc">범위 선택 (박스 셀렉트)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">✈ Free Fly 카메라 모드</div>
+          <div class="card-desc">독 버튼에서 Free Fly 모드 활성화 시 키보드로 1인칭 스타일로 씬을 이동.</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="kb-desc">앞·왼쪽·뒤·오른쪽 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Q</span> / <span class="key">E</span></div><span class="kb-desc">위/아래 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">우클릭</span> <span class="key">드래그</span></div><span class="kb-desc">시점 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span></div><span class="kb-desc">빠른 이동 (스프린트)</span></div>
+          </div>
+          <span class="tag t-cam">카메라</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📐 시점 설정</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">숫자 1</span></div><span class="kb-desc">정면 뷰 (Front View)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">숫자 3</span></div><span class="kb-desc">측면 뷰 (Side View)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">숫자 7</span></div><span class="kb-desc">상단 뷰 (Top View)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">숫자 5</span></div><span class="kb-desc">투시/직교 전환</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">숫자 0</span></div><span class="kb-desc">카메라 뷰</span></div>
+          </div>
+          <div class="note">숫자패드(Numpad) 기준. 일반 키보드 상단 숫자와 다를 수 있음.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="에디터모드">에디터 모드 종류</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🧱 모델링 모드 (기본)</div>
+          <div class="card-desc">기본 편집 상태. 블록·아이템·텍스트를 배치하고 이동·회전·스케일 조작.</div>
+          <span class="tag t-model">기본</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎬 애니메이터 모드</div>
+          <div class="card-desc">하단 패널에 타임라인 표시. 키프레임·베지어 곡선으로 오브젝트/카메라 움직임 제작.</div>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🕶 몰입형 모드 (Immersion Mode)</div>
+          <div class="card-desc">마인크래프트 1인칭 스타일로 씬 내부에서 모델링. 실제 게임 느낌으로 작업.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📦 히트박스 모드 (Hitbox Mode)</div>
+          <div class="card-desc">모델의 충돌 히트박스를 별도로 제작하는 전용 모드.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⚙ 함수 모드 (Functions Mode)</div>
+          <div class="card-desc">데이터팩 함수(.mcfunction)를 직접 작성. 문법 힌트 내장.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔊 사운드 편집 모드</div>
+          <div class="card-desc">애니메이션과 함께 재생될 사운드를 타임라인에서 배치·편집.</div>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ 패널 1: 모델링 ═══════════════════════════════ -->
+    <div class="panel" id="panel-1">
+
+      <div class="sec" data-nav="오브젝트추가">오브젝트 추가</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🧱 Block Display 추가</div>
+          <div class="card-desc">Asset Library에서 원하는 블록 아이콘 클릭 → 씬에 블록 배치. 검색창에 이름 입력으로 빠른 검색.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🗡 Item Display 추가</div>
+          <div class="card-desc">Asset Library의 아이템 탭에서 선택. 검, 도구, 갑옷 등 모든 아이템 지원.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔤 Text Display 추가</div>
+          <div class="card-desc">Text 탭에서 텍스트 추가. 폰트 색상·배경·투명도·정렬·라인 너비 설정 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">👤 Custom Head 추가</div>
+          <div class="card-head" style="margin-top:4px;font-size:11px;color:var(--muted);">HeadCreator 패널</div>
+          <div class="card-desc">플레이어 닉네임 입력 → 해당 스킨의 머리 추가. 또는 직접 픽셀 그림을 그려 커스텀 텍스처로 사용.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 모델 가져오기 (Import)</div>
+          <div class="card-desc">다른 곳에서 복사한 /summon 명령어를 에디터에서 Ctrl+V로 붙여넣기 → 자동으로 모델 로드.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">V</span></div><span class="kb-desc">명령어 붙여넣기로 모델 가져오기</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">📂 카탈로그에서 열기</div>
+          <div class="card-desc">BDModels 카탈로그의 공개 모델을 에디터에서 바로 불러와 수정·합치기 가능.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="변환조작">이동 · 회전 · 스케일</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">↔ 이동 (Move / Grab)</div>
+          <div class="card-desc">오브젝트 선택 후 기즈모(화살표)를 드래그하거나 Side Panel의 좌표 수치를 직접 입력.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span></div><span class="kb-desc">이동 모드 전환 (Grab)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span>→<span class="key">X</span></div><span class="kb-desc">X축으로만 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span>→<span class="key">Y</span></div><span class="kb-desc">Y축으로만 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span>→<span class="key">Z</span></div><span class="kb-desc">Z축으로만 이동</span></div>
+          </div>
+          <span class="tag t-model">모델링</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔄 회전 (Rotate)</div>
+          <div class="card-desc">기즈모 원형 핸들 드래그 또는 Side Panel 각도 입력. 피벗 포인트 기준으로 회전.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">R</span></div><span class="kb-desc">회전 모드 전환 (Rotate)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">R</span>→<span class="key">X</span></div><span class="kb-desc">X축으로만 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">R</span>→<span class="key">Y</span></div><span class="kb-desc">Y축으로만 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">R</span>→<span class="key">Z</span></div><span class="kb-desc">Z축으로만 회전</span></div>
+          </div>
+          <span class="tag t-model">모델링</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⤡ 스케일 (Scale)</div>
+          <div class="card-desc">기즈모 큐브 핸들 드래그 또는 Side Panel 스케일 수치 입력.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">S</span></div><span class="kb-desc">스케일 모드 전환 (Scale)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">S</span>→<span class="key">X</span></div><span class="kb-desc">X축으로만 스케일</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">S</span>→<span class="key">Y</span></div><span class="kb-desc">Y축으로만 스케일</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">S</span>→<span class="key">Z</span></div><span class="kb-desc">Z축으로만 스케일</span></div>
+          </div>
+          <span class="tag t-model">모델링</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔢 정밀 입력</div>
+          <div class="card-desc">이동/회전/스케일 모드 활성화 후 숫자 키를 누르면 값을 직접 입력 가능. 예: R → Y → 90 → Enter → Y축 90° 회전.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span></div><span class="kb-desc">정밀 이동 (스냅 간격 축소)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span></div><span class="kb-desc">스냅 이동 (그리드에 맞춤)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🪞 미러 (Mirror)</div>
+          <div class="card-desc">선택 오브젝트를 X/Y/Z 축 기준으로 반전 복사. 좌우 대칭 모델 제작에 유용.</div>
+          <div class="note">Main Dock 또는 Context Menu의 Mirror 옵션 사용</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="그룹피벗">그룹화 · 피벗 포인트</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">📦 그룹화 (Group)</div>
+          <div class="card-desc">여러 오브젝트를 하나의 그룹으로 묶어 함께 이동·회전·스케일. 애니메이션은 그룹 단위로만 적용 가능.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">A</span></div><span class="kb-desc">전체 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span></div><span class="kb-desc">선택 오브젝트 그룹화</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span>+<span class="key">좌클릭</span></div><span class="kb-desc">그룹 선택 시 그룹 내 전체 교체</span></div>
+          </div>
+          <span class="tag t-model">모델링</span>
+          <span class="tag t-anim">애니메이션 필수</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎯 피벗 포인트 (Pivot Point)</div>
+          <div class="card-desc">회전·스케일의 기준점. 기본은 오브젝트 중심이지만 어깨 위치 등 원하는 곳으로 변경 가능. 팔이 어깨 기준으로 회전하는 것처럼 활용.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Alt</span>+<span class="key">드래그</span></div><span class="kb-desc">피벗 포인트 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span> 추가</div><span class="kb-desc">피벗 정밀 이동</span></div>
+          </div>
+          <span class="tag t-model">모델링</span>
+        </div>
+        <div class="card">
+          <div class="card-head">✏ 이름 지정</div>
+          <div class="card-desc">그룹·오브젝트에 이름을 설정. 애니메이터에서 타임라인 식별 및 함수 모드에서 참조에 사용.</div>
+          <div class="note">Side Panel 상단 이름 입력란에서 설정</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="편집작업">선택 · 복사 · 삭제</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🖱 선택 방법</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span></div><span class="kb-desc">단일 오브젝트 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span>+<span class="key">클릭</span></div><span class="kb-desc">추가 선택 (다중 선택)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">A</span></div><span class="kb-desc">전체 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">드래그</span></div><span class="kb-desc">박스 영역 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Esc</span></div><span class="kb-desc">선택 해제</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 복사 · 붙여넣기 · 복제</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">C</span></div><span class="kb-desc">복사</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">V</span></div><span class="kb-desc">붙여넣기 / 모델 가져오기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">D</span></div><span class="kb-desc">선택 오브젝트 복제 (Duplicate)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">↩ 실행 취소 · 되돌리기</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Z</span></div><span class="kb-desc">실행 취소 (Undo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">Z</span></div><span class="kb-desc">다시 실행 (Redo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Y</span></div><span class="kb-desc">다시 실행 (Redo 대체)</span></div>
+          </div>
+          <div class="note">전문 3D 소프트웨어 수준의 Undo/Redo 지원</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🗑 삭제 · 숨기기</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Del</span></div><span class="kb-desc">선택 오브젝트 삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">H</span></div><span class="kb-desc">선택 오브젝트 숨기기 (Hide)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Alt</span>+<span class="key">H</span></div><span class="kb-desc">숨긴 오브젝트 표시 (Unhide All)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">💾 저장</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">S</span></div><span class="kb-desc">프로젝트 저장</span></div>
+          </div>
+          <div class="card-desc" style="margin-top:8px;">자동 저장(Auto Save) 기능도 있으며, 최근 100회 저장 히스토리 유지. 원하는 시점으로 롤백 가능.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ 패널 2: 단축키 ═══════════════════════════════ -->
+    <div class="panel" id="panel-2">
+
+      <div class="callout">
+        BDEngine은 전문 3D 소프트웨어 수준의 단축키를 브라우저에서 지원합니다. 브라우저 기본 단축키는 에디터에서 무효화(override)됩니다.
+      </div>
+
+      <div class="sec" data-nav="전체단축키">전체 단축키 목록</div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🖐 선택 (Selection)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span></div><span class="kb-desc">단일 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span>+<span class="key">클릭</span></div><span class="kb-desc">다중 선택 추가</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">A</span></div><span class="kb-desc">전체 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">드래그</span></div><span class="kb-desc">박스 범위 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Esc</span></div><span class="kb-desc">선택 해제</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">✂ 편집 (Edit)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Z</span></div><span class="kb-desc">실행 취소 (Undo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Y</span></div><span class="kb-desc">다시 실행 (Redo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">C</span></div><span class="kb-desc">복사</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">V</span></div><span class="kb-desc">붙여넣기 / 명령어 Import</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">D</span></div><span class="kb-desc">복제 (Duplicate)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Del</span></div><span class="kb-desc">삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">S</span></div><span class="kb-desc">저장</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">↔ 변환 (Transform)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span></div><span class="kb-desc">이동 모드 (Grab/Move)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">R</span></div><span class="kb-desc">회전 모드 (Rotate)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">S</span></div><span class="kb-desc">스케일 모드 (Scale)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">X</span> / <span class="key">Y</span> / <span class="key">Z</span></div><span class="kb-desc">변환 후 축 고정</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span></div><span class="kb-desc">정밀 이동 (미세 조정)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span></div><span class="kb-desc">그리드 스냅 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Enter</span> / <span class="key">LMB</span></div><span class="kb-desc">변환 확정</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">우클릭</span> / <span class="key">Esc</span></div><span class="kb-desc">변환 취소</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">📦 그룹 (Group)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">G</span></div><span class="kb-desc">선택 오브젝트 그룹화</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">G</span></div><span class="kb-desc">그룹 해제 (Ungroup)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🎯 피벗 (Pivot)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Alt</span>+<span class="key">드래그</span></div><span class="kb-desc">피벗 포인트 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Alt</span>+<span class="key">Shift</span>+<span class="key">드래그</span></div><span class="kb-desc">피벗 정밀 이동</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">👁 보기 (View)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">H</span></div><span class="kb-desc">선택 오브젝트 숨기기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Alt</span>+<span class="key">H</span></div><span class="kb-desc">모든 숨김 해제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">F</span></div><span class="kb-desc">선택 오브젝트 포커스 (Frame)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">✈ 카메라 (Camera / Free Fly)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="kb-desc">앞뒤좌우 이동 (Free Fly)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Q</span> / <span class="key">E</span></div><span class="kb-desc">아래/위 이동 (Free Fly)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span></div><span class="kb-desc">빠른 이동 (Free Fly)</span></div>
+          </div>
+          <span class="tag t-cam">Free Fly 모드</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⏱ 타임라인 (Timeline)</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Space</span></div><span class="kb-desc">재생 / 일시정지</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">←</span> / <span class="key">→</span></div><span class="kb-desc">프레임 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">드래그</span></div><span class="kb-desc">카메라 애니메이션 중 일반 재생 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">I</span></div><span class="kb-desc">키프레임 삽입 (Insert Keyframe)</span></div>
+          </div>
+          <span class="tag t-anim">애니메이터</span>
+        </div>
+        <div class="card wide">
+          <div class="card-head">⌨ 단축키 요약표</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+Z</span></div><span class="kb-desc">실행 취소</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+Y</span></div><span class="kb-desc">다시 실행</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+A</span></div><span class="kb-desc">전체 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+C</span></div><span class="kb-desc">복사</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+V</span></div><span class="kb-desc">붙여넣기/Import</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+D</span></div><span class="kb-desc">복제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+S</span></div><span class="kb-desc">저장</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Ctrl+G</span></div><span class="kb-desc">그룹 해제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">G</span></div><span class="kb-desc">이동/그룹화</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">R</span></div><span class="kb-desc">회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">S</span></div><span class="kb-desc">스케일</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">X/Y/Z</span></div><span class="kb-desc">축 고정</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Del</span></div><span class="kb-desc">삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">H</span></div><span class="kb-desc">숨기기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">F</span></div><span class="kb-desc">포커스</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Space</span></div><span class="kb-desc">재생/정지</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">I</span></div><span class="kb-desc">키프레임 삽입</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Esc</span></div><span class="kb-desc">취소/해제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">Alt+드래그</span></div><span class="kb-desc">피벗 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key wide">W/A/S/D</span></div><span class="kb-desc">Free Fly 이동</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ 패널 3: 애니메이션 ═══════════════════════════════ -->
+    <div class="panel" id="panel-3">
+
+      <div class="callout">
+        애니메이션은 <b>그룹(Group) 단위로만</b> 적용됩니다. 애니메이션하려는 파트를 먼저 그룹으로 묶고 이름을 지정한 후 Animator 모드로 전환하세요.
+      </div>
+
+      <div class="sec" data-nav="애니메이션기초">애니메이터 기초</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🎬 시작 순서</div>
+          <div class="card-desc" style="margin-bottom:0;">
+            <div class="steps">
+              <div class="step">애니메이션할 오브젝트를 선택 후 그룹화 (G 키 또는 메뉴)</div>
+              <div class="step">그룹에 이름 부여 (Side Panel 상단)</div>
+              <div class="step">독 버튼에서 <b>Animator 모드</b>로 전환</div>
+              <div class="step">타임라인에서 현재 프레임 설정 후 <b>I</b> 키로 키프레임 삽입</div>
+              <div class="step">다른 프레임으로 이동 후 오브젝트 변환 → 자동 키프레임</div>
+              <div class="step">Space 재생으로 결과 확인</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">⏱ 타임라인 조작</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Space</span></div><span class="kb-desc">재생 / 일시정지</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">I</span></div><span class="kb-desc">현재 프레임에 키프레임 삽입</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">←</span> / <span class="key">→</span></div><span class="kb-desc">프레임 단위 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Shift</span>+<span class="key">←/→</span></div><span class="kb-desc">큰 단위 프레임 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Home</span></div><span class="kb-desc">처음 프레임으로 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">End</span></div><span class="kb-desc">마지막 프레임으로 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">드래그</span></div><span class="kb-desc">카메라 애니메이션 일반 이동 모드</span></div>
+          </div>
+          <span class="tag t-anim">타임라인</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔑 키프레임 (Keyframe)</div>
+          <div class="card-desc">특정 프레임에서 오브젝트의 위치·회전·스케일 상태를 저장. 두 키프레임 사이를 자동 보간(interpolation)하여 부드러운 움직임 생성.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">I</span></div><span class="kb-desc">키프레임 삽입</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Del</span></div><span class="kb-desc">선택된 키프레임 삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">C/V</span></div><span class="kb-desc">키프레임 복사/붙여넣기</span></div>
+          </div>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+        <div class="card">
+          <div class="card-head">〰 베지어 곡선 (Bezier Curve)</div>
+          <div class="card-desc">키프레임 사이의 보간 방식을 세밀하게 제어. 가속·감속·바운스 등 다양한 이징(Easing) 효과 구현 가능. 타임라인의 키프레임 핸들로 조정.</div>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔁 루프 제어</div>
+          <div class="card-desc">타임라인 하단의 루프 버튼으로 애니메이션 반복 재생 설정. Loop Range(루프 구간)를 설정해 특정 프레임 구간만 반복 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📂 타임라인 그룹 분리</div>
+          <div class="card-desc">타임라인을 그룹과 헤더로 분리해 구간별 관리. 중첩 그룹 접기(collapse) 지원으로 복잡한 애니메이션도 깔끔하게 정리.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="카메라애니메이션">카메라 애니메이션 & 컷신</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🎥 카메라 애니메이션</div>
+          <div class="card-desc">플레이어의 카메라를 애니메이션화하여 모드·리소스팩 없이 <b>컷신(Cutscene)</b>을 제작. 단 하나의 명령어로 실행.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📱 Tracking Camera (폰 카메라)</div>
+          <div class="card-desc">WebXR 지원 스마트폰을 가상 카메라로 변환. 폰을 들고 움직이면 카메라 움직임이 실시간으로 녹화됨. 독바 Extra 메뉴에서 접근.</div>
+          <div class="steps" style="margin-top:8px;">
+            <div class="step">독바 Extra 메뉴 → Tracking Camera 활성화</div>
+            <div class="step">스마트폰에서 QR 코드 스캔</div>
+            <div class="step">폰을 움직여 카메라 경로 녹화 시작</div>
+            <div class="step">녹화 중지 후 타임라인에서 구간 재편집 가능</div>
+          </div>
+          <span class="tag t-new">신기능</span>
+          <span class="tag t-cam">카메라</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎞 비디오 참조 (Video Reference)</div>
+          <div class="card-desc">타임라인에 영상 파일을 레퍼런스로 삽입. 영상과 타임라인이 동기화되어 모션 캡처 참고 작업에 유용.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="물리시뮬레이션">물리 시뮬레이션</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">⚙ Physics Simulation</div>
+          <div class="card-desc">물리 시뮬레이션을 실행하고 결과를 애니메이션으로 베이크(Bake). 자연스러운 낙하·충돌·튕김 표현 가능.</div>
+          <div class="card-desc" style="margin-top:6px;">설정 가능 항목:</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys" style="min-width:90px;font-size:11px;color:var(--txt2);">Collision</div><span class="kb-desc">충돌 감지 여부</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:90px;font-size:11px;color:var(--txt2);">Friction</div><span class="kb-desc">마찰력</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:90px;font-size:11px;color:var(--txt2);">Bounce</div><span class="kb-desc">탄성(튕김)</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:90px;font-size:11px;color:var(--txt2);">Kinematic Damping</div><span class="kb-desc">운동 감쇠</span></div>
+          </div>
+          <span class="tag t-new">신기능</span>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ 패널 4: 내보내기 ═══════════════════════════════ -->
+    <div class="panel" id="panel-4">
+
+      <div class="sec" data-nav="내보내기">내보내기 (Export)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🔧 Basic (기본 명령어)</div>
+          <div class="card-desc">모델을 <b>/summon</b> 명령어로 내보내기. 커맨드 블록에 붙여넣기 가능. 가장 기본적인 내보내기 방식.</div>
+          <span class="tag t-export">내보내기</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎬 Animations (애니메이션)</div>
+          <div class="card-desc">애니메이션을 포함한 명령어 또는 데이터팩으로 내보내기. 단 하나의 명령으로 애니메이션 실행.</div>
+          <span class="tag t-export">내보내기</span>
+          <span class="tag t-anim">애니메이션</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔊 Sounds (사운드)</div>
+          <div class="card-desc">사운드 이벤트를 포함한 내보내기. 타임라인에서 설정한 사운드 트리거가 포함된 데이터팩 생성.</div>
+          <span class="tag t-export">내보내기</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⚙ Functions (함수)</div>
+          <div class="card-desc">Functions 모드에서 작성한 커스텀 mcfunction 파일을 포함한 데이터팩 내보내기.</div>
+          <span class="tag t-export">내보내기</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📦 Datapack (데이터팩)</div>
+          <div class="card-desc">전체 프로젝트를 마인크래프트 데이터팩 형식으로 내보내기. 서버에 직접 업로드 가능.</div>
+          <span class="tag t-export">내보내기</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔌 Axiom Mod 지원</div>
+          <div class="card-desc">카탈로그에 모델 게시 시 Axiom 모드용 명령어도 자동 생성. 복잡한 모델을 Axiom으로 단 하나의 명령어로 삽입.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🖥 Minecraft Server Export</div>
+          <div class="card-desc">서버용 내보내기 옵션. 플러그인이 모델 또는 전체 프로젝트에 서버에서 직접 접근 가능하도록 설정.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="클라우드저장">클라우드 저장 & 버전 관리</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">☁ 클라우드 자동 저장</div>
+          <div class="card-desc">인터넷 연결 상태라면 어느 기기에서든 프로젝트 접근 가능. 서버 불안정 시에도 로컬 캐시로 동기화 유지.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🕐 100회 저장 히스토리</div>
+          <div class="card-desc">최근 100번의 저장 내역 보관. 원하는 시점으로 클릭 한 번에 롤백 가능. 실수로 삭제한 작업도 복원 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">💾 Auto Save (자동 저장)</div>
+          <div class="card-desc">작업 중 일정 간격으로 자동 저장. 예기치 않은 브라우저 종료 등에서 데이터 손실 방지.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ 패널 5: 신기능·특수기능 ═══════════════════════════════ -->
+    <div class="panel" id="panel-5">
+
+      <div class="sec" data-nav="특수모드">특수 모드</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🕶 Immersion Mode (몰입형 모드)</div>
+          <div class="card-desc">마인크래프트 1인칭 스타일로 씬 내부에 들어가 모델링. 실제 게임 화면처럼 빌드. 독 버튼에서 활성화.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🤝 Share Party (공유 파티)</div>
+          <div class="card-desc">공개 서버 참여 또는 비공개 룸 생성. BDEngine 내에서 채팅·모델 공유·함께 제작 가능. 실시간 협업 기능.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📦 Hitbox Mode (히트박스 모드)</div>
+          <div class="card-desc">모델의 충돌 히트박스를 전용 레이어에서 제작. 게임·맵에서 실제 충돌 영역 커스터마이징.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⚙ Functions Mode (함수 모드)</div>
+          <div class="card-desc">BDEngine 내에서 .mcfunction 파일을 직접 작성. 문법 힌팅(Syntax Hinting) 내장으로 편리한 코딩.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎵 Sound Edit Mode (사운드 편집)</div>
+          <div class="card-desc">애니메이션 타임라인에 사운드 이벤트 삽입. 특정 프레임에 소리 재생 트리거 설정 가능.</div>
+          <span class="tag t-new">신기능</span>
+        </div>
+        <div class="card">
+          <div class="card-head">✈ Free Fly Camera Mode</div>
+          <div class="card-desc">WASD 키로 씬을 자유롭게 날아다니며 탐색. 마인크래프트 스펙테이터 모드와 유사한 조작감.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="성능설정">성능 & 설정</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">⚡ Mesh Instancing 최적화</div>
+          <div class="card-desc">렌더링 엔진 최적화로 대형 모델 작업 시 성능 최대 90% 향상. 선택·복사·클론·그룹화 등 연산이 수십 초 → 1초 미만으로 단축.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📉 LiteUI Mode</div>
+          <div class="card-desc">UI 블러 및 투명도 효과를 비활성화하여 저사양 기기에서도 부드러운 작업 환경. Settings → LiteUI Mode 에서 토글.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🌐 다국어 지원</div>
+          <div class="card-desc">한국어·영어·러시아어·중국어 등 다국어 인터페이스 지원. Settings에서 언어 변경 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔤 커스텀 헤드 (HeadCreator)</div>
+          <div class="card-desc">닉네임으로 플레이어 머리 추가. 또는 픽셀 아트 도구로 BDEngine 내에서 직접 그려 커스텀 텍스처 제작. 리소스팩 불필요.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="디스플레이엔티티">Display Entity 기본 개념</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🧱 Block Display</div>
+          <div class="card-desc">블록을 엔티티로 표현. 자유로운 위치·회전·스케일 설정. 1.19.4+ 필요. 모드 없이 모든 플레이어에게 보임.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🗡 Item Display</div>
+          <div class="card-desc">아이템(검, 도구, 갑옷 등)을 엔티티로 표현. 아이템 고유 모양과 텍스처 유지.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔤 Text Display</div>
+          <div class="card-desc">텍스트를 3D 공간에 배치하는 엔티티. 색상·배경·투명도·정렬·그림자 설정 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔧 Transform 속성</div>
+          <div class="card-desc">모든 Display 엔티티는 Translation(위치), Left/Right Rotation(회전), Scale(스케일) 변환을 지원. Interpolation(보간) 틱으로 부드러운 전환 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 /summon 명령어 형식</div>
+          <div class="card-desc">BDEngine이 생성하는 기본 명령어 형식:</div>
+          <div style="background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:8px;font-family:'Courier New',monospace;font-size:10px;color:#80c8ff;margin-top:8px;word-break:break-all;">
+            /summon block_display ~ ~ ~ {block_state:{Name:"minecraft:stone"},transformation:{...},brightness:{...}}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔌 Axiom Mod 연동</div>
+          <div class="card-desc">카탈로그에 게시한 모델은 Axiom 모드용 명령어도 생성. 복잡한 구조물을 마인크래프트 내에서 단번에 삽입.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const TABS = [
+  { id:0, label:'UI & 화면구성' },
+  { id:1, label:'모델링' },
+  { id:2, label:'단축키' },
+  { id:3, label:'애니메이션' },
+  { id:4, label:'내보내기' },
+  { id:5, label:'특수기능·신기능' },
+];
+
+const SIDEBAR_ITEMS = {
+  0: [
+    { l:'화면 구성 개요',  q:'화면구성' },
+    { l:'카메라 조작',     q:'카메라조작' },
+    { l:'에디터 모드',     q:'에디터모드' },
+  ],
+  1: [
+    { l:'오브젝트 추가',   q:'오브젝트추가' },
+    { l:'이동·회전·스케일', q:'변환조작' },
+    { l:'그룹화·피벗',     q:'그룹피벗' },
+    { l:'선택·복사·삭제',  q:'편집작업' },
+  ],
+  2: [
+    { l:'전체 단축키 목록', q:'전체단축키' },
+  ],
+  3: [
+    { l:'애니메이터 기초',       q:'애니메이션기초' },
+    { l:'카메라 애니메이션',     q:'카메라애니메이션' },
+    { l:'물리 시뮬레이션',       q:'물리시뮬레이션' },
+  ],
+  4: [
+    { l:'내보내기',        q:'내보내기' },
+    { l:'클라우드 저장',   q:'클라우드저장' },
+  ],
+  5: [
+    { l:'특수 모드',           q:'특수모드' },
+    { l:'성능 & 설정',         q:'성능설정' },
+    { l:'Display Entity 개념', q:'디스플레이엔티티' },
+  ],
+};
+
+let current = 0;
+
+/* ── 탭 생성 ── */
+const tabBar = document.getElementById('tab-bar');
+TABS.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (t.id === 0 ? ' active' : '');
+  btn.textContent = t.label;
+  btn.addEventListener('click', () => switchTab(t.id));
+  tabBar.appendChild(btn);
+});
+
+/* ── 사이드바 ── */
+function findSection(panel, q) {
+  const navEl = panel.querySelector('[data-nav="' + q + '"]');
+  if (navEl) return navEl;
+  for (const el of panel.querySelectorAll('.card-head')) {
+    if (el.textContent.includes(q)) return el.closest('.card') || el;
+  }
+  for (const el of panel.querySelectorAll('.sec')) {
+    if (el.textContent.includes(q)) return el;
+  }
+  return null;
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 62;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    sb.appendChild(btn);
+  });
+}
+
+/* ── 탭 전환 ── */
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === id));
+  current = id;
+  buildSidebar(id);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  clearSearch();
+}
+
+/* ── 검색 ── */
+function clearSearch() {
+  document.getElementById('search').value = '';
+  document.querySelectorAll('.panel').forEach(p =>
+    p.querySelectorAll('.card').forEach(c => { c.style.display = ''; })
+  );
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) { clearSearch(); return; }
+  document.querySelectorAll('.panel').forEach(p =>
+    p.querySelectorAll('.card').forEach(c => {
+      c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
+    })
+  );
+});
+
+/* ── 초기화 ── */
+buildSidebar(0);
+</script>
+</body>
+</html>

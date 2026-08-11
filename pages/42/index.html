@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마크 커멘드 명령어</title>
+<style>
+:root {
+  --green:#5a9e3a; --green2:#7bc655; --dirt:#8b6340; --stone:#6b7280;
+  --bg:#0e1208; --bg2:#141a0a; --bg3:#1c2510; --bg4:#222e13;
+  --txt:#d4e8b0; --txt2:#a8c878; --muted:#6a8a4a;
+  --border:#2a3a18; --border2:#3a5020;
+  --header-h:56px; --sb-w:190px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── HEADER ── */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  height:var(--header-h);background:var(--bg2);border-bottom:2px solid var(--green);
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+}
+.site-header h1{font-size:18px;color:var(--green2);white-space:nowrap;letter-spacing:1px;}
+.search-box{
+  flex:1;max-width:340px;
+  padding:6px 12px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--txt);font-size:13px;outline:none;
+}
+.search-box:focus{border-color:var(--green);}
+.tab-bar{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;}
+.tab-btn{
+  padding:5px 12px;border-radius:5px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--txt2);font-size:12px;cursor:pointer;transition:.2s;white-space:nowrap;
+}
+.tab-btn:hover{background:var(--bg4);border-color:var(--green);}
+.tab-btn.active{background:var(--green);color:#0e1208;border-color:var(--green);font-weight:700;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - var(--header-h));}
+.sidebar{
+  width:var(--sb-w);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:12px 8px;position:sticky;top:var(--header-h);
+  height:calc(100vh - var(--header-h));overflow-y:auto;
+}
+.sb-item{
+  display:block;width:100%;text-align:left;
+  padding:7px 10px;border-radius:5px;border:none;
+  background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:.15s;
+}
+.sb-item:hover{background:var(--bg4);color:var(--green2);}
+.sb-item.active{background:var(--border2);color:var(--green2);font-weight:600;}
+.main{flex:1;padding:24px 28px;max-width:1100px;}
+
+/* ── PANEL ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── CARD ── */
+.section-title{
+  font-size:20px;font-weight:700;color:var(--green2);
+  border-left:4px solid var(--green);padding-left:12px;margin:32px 0 16px;
+}
+.section-title:first-child{margin-top:0;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-bottom:28px;}
+.card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:16px;transition:.2s;
+}
+.card:hover{border-color:var(--green);background:var(--bg4);}
+.card-head{
+  font-size:14px;font-weight:700;color:var(--green2);margin-bottom:6px;
+  font-family:'Courier New',monospace;
+}
+.card-desc{font-size:12px;color:var(--txt2);margin-bottom:8px;}
+.syntax{
+  background:var(--bg);border:1px solid var(--border2);border-radius:4px;
+  padding:6px 10px;font-family:'Courier New',monospace;font-size:11px;
+  color:#b8e090;margin:4px 0;word-break:break-all;
+}
+.arg-list{margin-top:8px;}
+.arg-row{display:flex;gap:6px;font-size:11px;margin:3px 0;}
+.arg-name{color:var(--green);min-width:90px;font-family:'Courier New',monospace;}
+.arg-desc{color:var(--muted);}
+.note{font-size:11px;color:var(--stone);margin-top:6px;font-style:italic;}
+.tag{
+  display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;
+  margin-right:4px;margin-bottom:4px;font-weight:600;
+}
+.tag-op{background:#3a1010;color:#e08080;}
+.tag-all{background:#10302a;color:#60c8a0;}
+.tag-je{background:#102040;color:#60a8e0;}
+.tag-be{background:#2a1840;color:#b080e0;}
+
+/* ── EXECUTE TABLE ── */
+.exec-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:12px;}
+.exec-table th{background:var(--bg4);color:var(--green2);padding:7px 10px;text-align:left;border:1px solid var(--border2);}
+.exec-table td{padding:7px 10px;border:1px solid var(--border);color:var(--txt2);vertical-align:top;}
+.exec-table tr:hover td{background:var(--bg4);}
+.exec-table code{font-family:'Courier New',monospace;color:#b8e090;font-size:11px;}
+
+/* ── SEARCH HIGHLIGHT ── */
+.hl{background:#4a6a10;border-radius:2px;padding:0 2px;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>⛏ 마크 커멘드 명령어</h1>
+  <input class="search-box" id="search" placeholder="명령어 검색..." type="text">
+  <div class="tab-bar" id="tab-bar"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content">
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 0: 기본 명령어 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel active" id="panel-0">
+      <div class="section-title" data-nav="기본 정보">기본 정보 / 서버 관리</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/help [명령어]</div>
+          <div class="card-desc">명령어 목록 또는 특정 명령어 도움말 출력</div>
+          <div class="syntax">/help</div>
+          <div class="syntax">/help give</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/list</div>
+          <div class="card-desc">현재 서버에 접속한 플레이어 목록 표시</div>
+          <div class="syntax">/list</div>
+          <div class="syntax">/list uuids</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/seed</div>
+          <div class="card-desc">현재 월드의 시드 값 표시</div>
+          <div class="syntax">/seed</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/version</div>
+          <div class="card-desc">서버 또는 클라이언트 버전 표시</div>
+          <div class="syntax">/version</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/stop</div>
+          <div class="card-desc">서버를 안전하게 종료 (서버 전용)</div>
+          <div class="syntax">/stop</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/reload</div>
+          <div class="card-desc">데이터팩·함수 파일 재로드 (재시작 불필요)</div>
+          <div class="syntax">/reload</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/save-all [flush]</div>
+          <div class="card-desc">월드 데이터를 즉시 디스크에 저장</div>
+          <div class="syntax">/save-all</div>
+          <div class="syntax">/save-all flush</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/save-on / /save-off</div>
+          <div class="card-desc">자동 저장 켜기/끄기 (save-off로 끄면 save-on으로 다시 켜야 함)</div>
+          <div class="syntax">/save-off</div>
+          <div class="syntax">/save-on</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/debug [start|stop|report|function]</div>
+          <div class="card-desc">성능 프로파일링 세션 시작/종료/분석</div>
+          <div class="syntax">/debug start</div>
+          <div class="syntax">/debug stop</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/perf [start|stop]</div>
+          <div class="card-desc">10초간 서버 성능 측정 리포트 생성</div>
+          <div class="syntax">/perf start</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="시간 날씨">시간 / 날씨</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/time set &lt;값&gt;</div>
+          <div class="card-desc">월드 시간 설정. 숫자(틱) 또는 이름 사용 가능</div>
+          <div class="syntax">/time set day</div>
+          <div class="syntax">/time set night</div>
+          <div class="syntax">/time set noon</div>
+          <div class="syntax">/time set midnight</div>
+          <div class="syntax">/time set 6000</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">day</span><span class="arg-desc">= 1000 (아침)</span></div>
+            <div class="arg-row"><span class="arg-name">noon</span><span class="arg-desc">= 6000 (정오)</span></div>
+            <div class="arg-row"><span class="arg-name">night</span><span class="arg-desc">= 13000 (밤)</span></div>
+            <div class="arg-row"><span class="arg-name">midnight</span><span class="arg-desc">= 18000 (한밤중)</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/time add &lt;틱&gt;</div>
+          <div class="card-desc">현재 시간에 틱을 더함. 1초 = 20틱, 하루 = 24000틱</div>
+          <div class="syntax">/time add 1000</div>
+          <div class="syntax">/time add 24000</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/time query &lt;종류&gt;</div>
+          <div class="card-desc">현재 시간 정보 조회</div>
+          <div class="syntax">/time query daytime</div>
+          <div class="syntax">/time query gametime</div>
+          <div class="syntax">/time query day</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/weather &lt;종류&gt; [초]</div>
+          <div class="card-desc">날씨 변경. 지속 시간(초) 생략 시 기본값 적용</div>
+          <div class="syntax">/weather clear</div>
+          <div class="syntax">/weather rain</div>
+          <div class="syntax">/weather thunder</div>
+          <div class="syntax">/weather clear 3600</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="난이도 게임규칙">난이도 / 게임규칙</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/difficulty &lt;난이도&gt;</div>
+          <div class="card-desc">서버 난이도 변경</div>
+          <div class="syntax">/difficulty peaceful</div>
+          <div class="syntax">/difficulty easy</div>
+          <div class="syntax">/difficulty normal</div>
+          <div class="syntax">/difficulty hard</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/gamerule &lt;규칙&gt; [값]</div>
+          <div class="card-desc">게임 규칙 확인 또는 변경</div>
+          <div class="syntax">/gamerule keepInventory true</div>
+          <div class="syntax">/gamerule doDaylightCycle false</div>
+          <div class="syntax">/gamerule doWeatherCycle false</div>
+          <div class="syntax">/gamerule mobGriefing false</div>
+          <div class="syntax">/gamerule doMobSpawning false</div>
+          <div class="syntax">/gamerule naturalRegeneration true</div>
+          <div class="syntax">/gamerule randomTickSpeed 3</div>
+          <div class="syntax">/gamerule spawnRadius 10</div>
+          <div class="syntax">/gamerule maxEntityCramming 24</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">주요 gamerule 목록</div>
+          <div class="card-desc">자주 쓰는 규칙 빠른 참조</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">announceAdvancements</span><span class="arg-desc">발전 달성 공지</span></div>
+            <div class="arg-row"><span class="arg-name">commandBlockOutput</span><span class="arg-desc">커맨드블록 출력 채팅</span></div>
+            <div class="arg-row"><span class="arg-name">disableRaids</span><span class="arg-desc">습격 비활성화</span></div>
+            <div class="arg-row"><span class="arg-name">doFireTick</span><span class="arg-desc">불 번짐</span></div>
+            <div class="arg-row"><span class="arg-name">doInsomnia</span><span class="arg-desc">잠 못 자면 팬텀 소환</span></div>
+            <div class="arg-row"><span class="arg-name">doLimitedCrafting</span><span class="arg-desc">레시피북 제한 제작</span></div>
+            <div class="arg-row"><span class="arg-name">doPatrolSpawning</span><span class="arg-desc">순찰대 소환</span></div>
+            <div class="arg-row"><span class="arg-name">doTileDrops</span><span class="arg-desc">블록 드롭</span></div>
+            <div class="arg-row"><span class="arg-name">drowningDamage</span><span class="arg-desc">익사 데미지</span></div>
+            <div class="arg-row"><span class="arg-name">fallDamage</span><span class="arg-desc">낙하 데미지</span></div>
+            <div class="arg-row"><span class="arg-name">fireDamage</span><span class="arg-desc">화염 데미지</span></div>
+            <div class="arg-row"><span class="arg-name">freezeDamage</span><span class="arg-desc">동결 데미지</span></div>
+            <div class="arg-row"><span class="arg-name">lootMultiplier</span><span class="arg-desc">아이템 드롭 배율(1.21.2+)</span></div>
+            <div class="arg-row"><span class="arg-name">pvp</span><span class="arg-desc">플레이어간 전투(서버.properties)</span></div>
+            <div class="arg-row"><span class="arg-name">sendCommandFeedback</span><span class="arg-desc">명령어 피드백 메시지</span></div>
+            <div class="arg-row"><span class="arg-name">showDeathMessages</span><span class="arg-desc">사망 메시지 표시</span></div>
+            <div class="arg-row"><span class="arg-name">universalAnger</span><span class="arg-desc">중립 몹 플레이어 공격</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 1: 엔티티·효과 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-1">
+      <div class="section-title" data-nav="소환 제거">소환 / 제거</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/summon &lt;엔티티&gt; [위치] [NBT]</div>
+          <div class="card-desc">엔티티를 지정 위치에 소환</div>
+          <div class="syntax">/summon minecraft:zombie</div>
+          <div class="syntax">/summon creeper ~ ~1 ~</div>
+          <div class="syntax">/summon armor_stand ~ ~ ~ {NoGravity:1b}</div>
+          <div class="syntax">/summon lightning_bolt ~ ~ ~</div>
+          <div class="syntax">/summon item ~ ~ ~ {Item:{id:"diamond",Count:1}}</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/kill [대상]</div>
+          <div class="card-desc">대상 엔티티를 즉시 제거. 대상 생략 시 자신</div>
+          <div class="syntax">/kill</div>
+          <div class="syntax">/kill @e[type=zombie]</div>
+          <div class="syntax">/kill @e[type=!player]</div>
+          <div class="syntax">/kill @e[type=item]</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/ride &lt;대상&gt; mount|dismount</div>
+          <div class="card-desc">엔티티를 탑승/하차시킴 (1.20+)</div>
+          <div class="syntax">/ride @p mount @e[type=horse,limit=1]</div>
+          <div class="syntax">/ride @p dismount</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="효과">효과 (Effect)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/effect give &lt;대상&gt; &lt;효과&gt; [초] [레벨] [입자]</div>
+          <div class="card-desc">포션 효과 부여. 레벨은 0부터 시작(0=레벨1)</div>
+          <div class="syntax">/effect give @p speed 30 1</div>
+          <div class="syntax">/effect give @a night_vision 999999 0 true</div>
+          <div class="syntax">/effect give @s strength 60 4</div>
+          <div class="syntax">/effect give @p regeneration 10 0 false</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/effect clear [대상] [효과]</div>
+          <div class="card-desc">효과 제거. 효과 생략 시 전체 제거</div>
+          <div class="syntax">/effect clear @p</div>
+          <div class="syntax">/effect clear @a</div>
+          <div class="syntax">/effect clear @p speed</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">주요 효과 ID 목록</div>
+          <div class="card-desc">자주 사용하는 상태 효과 ID</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">speed</span><span class="arg-desc">이동 속도 증가</span></div>
+            <div class="arg-row"><span class="arg-name">slowness</span><span class="arg-desc">이동 속도 감소</span></div>
+            <div class="arg-row"><span class="arg-name">haste</span><span class="arg-desc">채굴 속도 증가</span></div>
+            <div class="arg-row"><span class="arg-name">mining_fatigue</span><span class="arg-desc">채굴 속도 감소</span></div>
+            <div class="arg-row"><span class="arg-name">strength</span><span class="arg-desc">공격력 증가</span></div>
+            <div class="arg-row"><span class="arg-name">instant_health</span><span class="arg-desc">즉시 회복</span></div>
+            <div class="arg-row"><span class="arg-name">instant_damage</span><span class="arg-desc">즉시 피해</span></div>
+            <div class="arg-row"><span class="arg-name">jump_boost</span><span class="arg-desc">점프력 증가</span></div>
+            <div class="arg-row"><span class="arg-name">nausea</span><span class="arg-desc">멀미</span></div>
+            <div class="arg-row"><span class="arg-name">regeneration</span><span class="arg-desc">체력 재생</span></div>
+            <div class="arg-row"><span class="arg-name">resistance</span><span class="arg-desc">피해 저항</span></div>
+            <div class="arg-row"><span class="arg-name">fire_resistance</span><span class="arg-desc">화염 저항</span></div>
+            <div class="arg-row"><span class="arg-name">water_breathing</span><span class="arg-desc">수중 호흡</span></div>
+            <div class="arg-row"><span class="arg-name">invisibility</span><span class="arg-desc">투명화</span></div>
+            <div class="arg-row"><span class="arg-name">blindness</span><span class="arg-desc">실명</span></div>
+            <div class="arg-row"><span class="arg-name">night_vision</span><span class="arg-desc">야간 투시</span></div>
+            <div class="arg-row"><span class="arg-name">hunger</span><span class="arg-desc">허기</span></div>
+            <div class="arg-row"><span class="arg-name">weakness</span><span class="arg-desc">공격력 감소</span></div>
+            <div class="arg-row"><span class="arg-name">poison</span><span class="arg-desc">독</span></div>
+            <div class="arg-row"><span class="arg-name">wither</span><span class="arg-desc">시듦</span></div>
+            <div class="arg-row"><span class="arg-name">health_boost</span><span class="arg-desc">최대 체력 증가</span></div>
+            <div class="arg-row"><span class="arg-name">absorption</span><span class="arg-desc">흡수</span></div>
+            <div class="arg-row"><span class="arg-name">saturation</span><span class="arg-desc">포화</span></div>
+            <div class="arg-row"><span class="arg-name">glowing</span><span class="arg-desc">빛남(윤곽선)</span></div>
+            <div class="arg-row"><span class="arg-name">levitation</span><span class="arg-desc">부양</span></div>
+            <div class="arg-row"><span class="arg-name">luck</span><span class="arg-desc">행운</span></div>
+            <div class="arg-row"><span class="arg-name">bad_luck</span><span class="arg-desc">불운</span></div>
+            <div class="arg-row"><span class="arg-name">slow_falling</span><span class="arg-desc">천천히 낙하</span></div>
+            <div class="arg-row"><span class="arg-name">conduit_power</span><span class="arg-desc">도관 힘</span></div>
+            <div class="arg-row"><span class="arg-name">dolphins_grace</span><span class="arg-desc">돌고래의 은총</span></div>
+            <div class="arg-row"><span class="arg-name">hero_of_the_village</span><span class="arg-desc">마을 영웅</span></div>
+            <div class="arg-row"><span class="arg-name">darkness</span><span class="arg-desc">어둠(고대 도시)</span></div>
+            <div class="arg-row"><span class="arg-name">trial_omen</span><span class="arg-desc">시험의 전조(1.21+)</span></div>
+            <div class="arg-row"><span class="arg-name">raid_omen</span><span class="arg-desc">습격의 전조(1.21+)</span></div>
+            <div class="arg-row"><span class="arg-name">wind_charged</span><span class="arg-desc">바람 충전(1.21+)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">/attribute &lt;대상&gt; &lt;속성&gt; &lt;get|base|modifier&gt;</div>
+          <div class="card-desc">엔티티 속성값 조회 및 수정</div>
+          <div class="syntax">/attribute @p minecraft:generic.max_health get</div>
+          <div class="syntax">/attribute @p minecraft:generic.max_health base set 40</div>
+          <div class="syntax">/attribute @p minecraft:generic.movement_speed base set 0.2</div>
+          <div class="syntax">/attribute @p minecraft:generic.attack_damage base set 10</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">generic.max_health</span><span class="arg-desc">최대 체력</span></div>
+            <div class="arg-row"><span class="arg-name">generic.movement_speed</span><span class="arg-desc">이동 속도</span></div>
+            <div class="arg-row"><span class="arg-name">generic.attack_damage</span><span class="arg-desc">공격력</span></div>
+            <div class="arg-row"><span class="arg-name">generic.armor</span><span class="arg-desc">방어력</span></div>
+            <div class="arg-row"><span class="arg-name">generic.luck</span><span class="arg-desc">행운</span></div>
+            <div class="arg-row"><span class="arg-name">player.block_break_speed</span><span class="arg-desc">채굴 속도 배율</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 2: 아이템·인벤토리 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-2">
+      <div class="section-title" data-nav="아이템 지급">아이템 지급 / 제거</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/give &lt;대상&gt; &lt;아이템&gt; [수량] [NBT]</div>
+          <div class="card-desc">대상 인벤토리에 아이템 지급</div>
+          <div class="syntax">/give @p diamond 64</div>
+          <div class="syntax">/give @p netherite_sword</div>
+          <div class="syntax">/give @a golden_apple 1</div>
+          <div class="syntax">/give @p diamond_sword{Enchantments:[{id:sharpness,lvl:5}]}</div>
+          <div class="syntax">/give @p written_book{title:"테스트",author:"Steve",pages:['["텍스트"]']}</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/clear [대상] [아이템] [최대수]</div>
+          <div class="card-desc">인벤토리에서 아이템 제거. 전부 생략 시 전체 비움</div>
+          <div class="syntax">/clear @p</div>
+          <div class="syntax">/clear @p dirt</div>
+          <div class="syntax">/clear @p sand 32</div>
+          <div class="note">수량만 확인: /clear @p diamond 0 → 채팅에 개수만 출력</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/item modify|replace|copy</div>
+          <div class="card-desc">슬롯 단위 아이템 조작 (1.17+)</div>
+          <div class="syntax">/item replace entity @p weapon.mainhand with diamond_sword</div>
+          <div class="syntax">/item replace entity @p armor.head with diamond_helmet</div>
+          <div class="syntax">/item replace block 0 0 0 container.0 with stone 32</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">weapon.mainhand</span><span class="arg-desc">주 손</span></div>
+            <div class="arg-row"><span class="arg-name">weapon.offhand</span><span class="arg-desc">보조 손</span></div>
+            <div class="arg-row"><span class="arg-name">armor.head</span><span class="arg-desc">투구 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">armor.chest</span><span class="arg-desc">흉갑 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">armor.legs</span><span class="arg-desc">레깅스 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">armor.feet</span><span class="arg-desc">부츠 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">container.N</span><span class="arg-desc">컨테이너 N번 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">hotbar.N</span><span class="arg-desc">핫바 N번 슬롯</span></div>
+            <div class="arg-row"><span class="arg-name">inventory.N</span><span class="arg-desc">인벤토리 N번 슬롯</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/loot give|insert|spawn|replace</div>
+          <div class="card-desc">루트 테이블을 사용해 아이템 지급/배치</div>
+          <div class="syntax">/loot give @p loot minecraft:chests/simple_dungeon</div>
+          <div class="syntax">/loot give @p fish minecraft:gameplay/fishing ~ ~ ~</div>
+          <div class="syntax">/loot spawn ~ ~ ~ loot minecraft:blocks/diamond_ore</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="인챈트">인챈트 / 수리</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/enchant &lt;대상&gt; &lt;인챈트&gt; [레벨]</div>
+          <div class="card-desc">들고 있는 아이템에 인챈트 적용 (책 불가, 최대 레벨 제한 있음)</div>
+          <div class="syntax">/enchant @p sharpness 5</div>
+          <div class="syntax">/enchant @p protection 4</div>
+          <div class="syntax">/enchant @p mending 1</div>
+          <div class="syntax">/enchant @p efficiency 5</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">sharpness</span><span class="arg-desc">날카로움</span></div>
+            <div class="arg-row"><span class="arg-name">smite</span><span class="arg-desc">강타</span></div>
+            <div class="arg-row"><span class="arg-name">bane_of_arthropods</span><span class="arg-desc">절지동물 특효</span></div>
+            <div class="arg-row"><span class="arg-name">knockback</span><span class="arg-desc">넉백</span></div>
+            <div class="arg-row"><span class="arg-name">fire_aspect</span><span class="arg-desc">화염 속성</span></div>
+            <div class="arg-row"><span class="arg-name">looting</span><span class="arg-desc">약탈</span></div>
+            <div class="arg-row"><span class="arg-name">sweeping_edge</span><span class="arg-desc">휩쓸기</span></div>
+            <div class="arg-row"><span class="arg-name">efficiency</span><span class="arg-desc">효율</span></div>
+            <div class="arg-row"><span class="arg-name">silk_touch</span><span class="arg-desc">섬세한 손길</span></div>
+            <div class="arg-row"><span class="arg-name">unbreaking</span><span class="arg-desc">내구성</span></div>
+            <div class="arg-row"><span class="arg-name">fortune</span><span class="arg-desc">행운</span></div>
+            <div class="arg-row"><span class="arg-name">protection</span><span class="arg-desc">보호</span></div>
+            <div class="arg-row"><span class="arg-name">feather_falling</span><span class="arg-desc">가벼운 착지</span></div>
+            <div class="arg-row"><span class="arg-name">blast_protection</span><span class="arg-desc">폭발 보호</span></div>
+            <div class="arg-row"><span class="arg-name">projectile_protection</span><span class="arg-desc">발사체 보호</span></div>
+            <div class="arg-row"><span class="arg-name">respiration</span><span class="arg-desc">수중 호흡</span></div>
+            <div class="arg-row"><span class="arg-name">aqua_affinity</span><span class="arg-desc">수중 친화</span></div>
+            <div class="arg-row"><span class="arg-name">thorns</span><span class="arg-desc">가시</span></div>
+            <div class="arg-row"><span class="arg-name">depth_strider</span><span class="arg-desc">수중 이동</span></div>
+            <div class="arg-row"><span class="arg-name">frost_walker</span><span class="arg-desc">서리 걷기</span></div>
+            <div class="arg-row"><span class="arg-name">curse_of_binding</span><span class="arg-desc">속박의 저주</span></div>
+            <div class="arg-row"><span class="arg-name">soul_speed</span><span class="arg-desc">영혼 속도</span></div>
+            <div class="arg-row"><span class="arg-name">swift_sneak</span><span class="arg-desc">빠른 잠행</span></div>
+            <div class="arg-row"><span class="arg-name">power</span><span class="arg-desc">강함(활)</span></div>
+            <div class="arg-row"><span class="arg-name">punch</span><span class="arg-desc">밀치기(활)</span></div>
+            <div class="arg-row"><span class="arg-name">flame</span><span class="arg-desc">화염(활)</span></div>
+            <div class="arg-row"><span class="arg-name">infinity</span><span class="arg-desc">무한(활)</span></div>
+            <div class="arg-row"><span class="arg-name">mending</span><span class="arg-desc">수선</span></div>
+            <div class="arg-row"><span class="arg-name">curse_of_vanishing</span><span class="arg-desc">소멸의 저주</span></div>
+            <div class="arg-row"><span class="arg-name">channeling</span><span class="arg-desc">충전(삼지창)</span></div>
+            <div class="arg-row"><span class="arg-name">riptide</span><span class="arg-desc">역류(삼지창)</span></div>
+            <div class="arg-row"><span class="arg-name">loyalty</span><span class="arg-desc">충성(삼지창)</span></div>
+            <div class="arg-row"><span class="arg-name">impaling</span><span class="arg-desc">관통(삼지창)</span></div>
+            <div class="arg-row"><span class="arg-name">multishot</span><span class="arg-desc">연사(쇠뇌)</span></div>
+            <div class="arg-row"><span class="arg-name">quick_charge</span><span class="arg-desc">빠른 장전(쇠뇌)</span></div>
+            <div class="arg-row"><span class="arg-name">piercing</span><span class="arg-desc">관통(쇠뇌)</span></div>
+            <div class="arg-row"><span class="arg-name">wind_burst</span><span class="arg-desc">바람 폭발(1.21+)</span></div>
+            <div class="arg-row"><span class="arg-name">breach</span><span class="arg-desc">방어 무력화(1.21+)</span></div>
+            <div class="arg-row"><span class="arg-name">density</span><span class="arg-desc">밀도(1.21+)</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="경험치">경험치</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/experience add|set|query</div>
+          <div class="card-desc">경험치(XP) 추가, 설정, 조회</div>
+          <div class="syntax">/experience add @p 100</div>
+          <div class="syntax">/experience add @p 5 levels</div>
+          <div class="syntax">/experience set @p 0 levels</div>
+          <div class="syntax">/experience query @p levels</div>
+          <div class="syntax">/experience query @p points</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/xp (단축)</div>
+          <div class="card-desc">/experience 명령어 단축형</div>
+          <div class="syntax">/xp add @p 30 levels</div>
+          <div class="syntax">/xp set @p 100</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 3: 월드·블록 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-3">
+      <div class="section-title" data-nav="블록 배치">블록 배치 / 채우기</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/setblock &lt;위치&gt; &lt;블록&gt; [모드]</div>
+          <div class="card-desc">지정 위치에 블록 1개 배치</div>
+          <div class="syntax">/setblock ~ ~ ~ stone</div>
+          <div class="syntax">/setblock ~ ~-1 ~ grass_block</div>
+          <div class="syntax">/setblock 0 64 0 chest{Items:[{Slot:0b,id:diamond,Count:32}]}</div>
+          <div class="syntax">/setblock ~ ~ ~ air destroy</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">replace</span><span class="arg-desc">기존 블록 교체 (기본)</span></div>
+            <div class="arg-row"><span class="arg-name">destroy</span><span class="arg-desc">기존 블록 파괴 후 배치</span></div>
+            <div class="arg-row"><span class="arg-name">keep</span><span class="arg-desc">공기인 경우에만 배치</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/fill &lt;시작&gt; &lt;끝&gt; &lt;블록&gt; [모드]</div>
+          <div class="card-desc">두 좌표 사이 공간을 블록으로 채움 (최대 32768개)</div>
+          <div class="syntax">/fill ~-5 ~-1 ~-5 ~5 ~-1 ~5 stone</div>
+          <div class="syntax">/fill 0 60 0 10 70 10 air</div>
+          <div class="syntax">/fill ~-3 ~ ~-3 ~3 ~5 ~3 glass hollow</div>
+          <div class="syntax">/fill ~-3 ~ ~-3 ~3 ~5 ~3 oak_planks outline</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">replace</span><span class="arg-desc">모두 교체</span></div>
+            <div class="arg-row"><span class="arg-name">destroy</span><span class="arg-desc">파괴 후 채움</span></div>
+            <div class="arg-row"><span class="arg-name">keep</span><span class="arg-desc">공기만 채움</span></div>
+            <div class="arg-row"><span class="arg-name">hollow</span><span class="arg-desc">내부 공기, 외벽만</span></div>
+            <div class="arg-row"><span class="arg-name">outline</span><span class="arg-desc">외벽만 채움</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/fill replace 필터</div>
+          <div class="card-desc">특정 블록만 골라 교체 (1.19.4+에서 분리)</div>
+          <div class="syntax">/fill ~ ~ ~ ~10 ~5 ~10 stone replace grass_block</div>
+          <div class="syntax">/fill ~-5 ~ ~-5 ~5 ~3 ~5 air replace water</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/clone &lt;시작&gt; &lt;끝&gt; &lt;대상&gt; [마스크] [모드]</div>
+          <div class="card-desc">영역을 복사해 다른 위치에 붙여넣기</div>
+          <div class="syntax">/clone 0 60 0 10 70 10 20 60 0</div>
+          <div class="syntax">/clone ~ ~ ~ ~10 ~5 ~10 ~15 ~ ~ replace move</div>
+          <div class="syntax">/clone ~ ~ ~ ~5 ~5 ~5 ~10 ~ ~ masked</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">replace</span><span class="arg-desc">모든 블록 복사</span></div>
+            <div class="arg-row"><span class="arg-name">masked</span><span class="arg-desc">공기 제외 복사</span></div>
+            <div class="arg-row"><span class="arg-name">filtered</span><span class="arg-desc">특정 블록만 복사</span></div>
+            <div class="arg-row"><span class="arg-name">normal</span><span class="arg-desc">일반 복사</span></div>
+            <div class="arg-row"><span class="arg-name">force</span><span class="arg-desc">영역 겹침 허용</span></div>
+            <div class="arg-row"><span class="arg-name">move</span><span class="arg-desc">복사 후 원본 삭제</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/place &lt;feature|jigsaw|structure|template&gt;</div>
+          <div class="card-desc">구조물 / 피처 강제 생성 (1.19+)</div>
+          <div class="syntax">/place feature minecraft:desert_well ~ ~ ~</div>
+          <div class="syntax">/place structure minecraft:stronghold ~ ~ ~</div>
+          <div class="syntax">/place structure minecraft:village/plains ~ ~ ~</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="청크 월드">청크 / 월드 경계</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/forceload add|remove|query</div>
+          <div class="card-desc">청크를 항상 로드 상태로 유지</div>
+          <div class="syntax">/forceload add ~ ~</div>
+          <div class="syntax">/forceload add 0 0 16 16</div>
+          <div class="syntax">/forceload remove ~ ~</div>
+          <div class="syntax">/forceload query ~ ~</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/worldborder &lt;add|center|damage|get|set|warning&gt;</div>
+          <div class="card-desc">월드 경계(보더) 크기·중심·피해 설정</div>
+          <div class="syntax">/worldborder get</div>
+          <div class="syntax">/worldborder set 1000</div>
+          <div class="syntax">/worldborder add 500 30</div>
+          <div class="syntax">/worldborder center 0 0</div>
+          <div class="syntax">/worldborder damage amount 0.5</div>
+          <div class="syntax">/worldborder warning distance 5</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/locate structure|biome|poi</div>
+          <div class="card-desc">가장 가까운 구조물·바이옴·관심 지점 좌표 탐색</div>
+          <div class="syntax">/locate structure minecraft:stronghold</div>
+          <div class="syntax">/locate structure minecraft:village</div>
+          <div class="syntax">/locate structure minecraft:ancient_city</div>
+          <div class="syntax">/locate structure minecraft:trial_chambers</div>
+          <div class="syntax">/locate biome minecraft:mushroom_fields</div>
+          <div class="syntax">/locate poi minecraft:lodestone</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="스폰">스폰 포인트</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/spawnpoint [대상] [위치] [각도]</div>
+          <div class="card-desc">플레이어 개인 리스폰 위치 설정</div>
+          <div class="syntax">/spawnpoint @p ~ ~ ~</div>
+          <div class="syntax">/spawnpoint @p 0 64 0</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/setworldspawn [위치] [각도]</div>
+          <div class="card-desc">월드 전체 기본 스폰 위치 설정</div>
+          <div class="syntax">/setworldspawn 0 64 0</div>
+          <div class="syntax">/setworldspawn ~ ~ ~</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/spreadplayers &lt;x&gt; &lt;z&gt; &lt;간격&gt; &lt;최대거리&gt; [팀여부] &lt;대상&gt;</div>
+          <div class="card-desc">플레이어를 지정 범위에 분산 배치</div>
+          <div class="syntax">/spreadplayers 0 0 5 100 false @a</div>
+          <div class="syntax">/spreadplayers 0 0 10 200 true @a</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 4: 플레이어·권한 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-4">
+      <div class="section-title" data-nav="게임모드 이동">게임모드 / 이동</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/gamemode &lt;모드&gt; [대상]</div>
+          <div class="card-desc">플레이어 게임모드 변경</div>
+          <div class="syntax">/gamemode survival @p</div>
+          <div class="syntax">/gamemode creative @a</div>
+          <div class="syntax">/gamemode adventure @p</div>
+          <div class="syntax">/gamemode spectator @p</div>
+          <div class="note">단축: /gamemode s|c|a|sp</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/defaultgamemode &lt;모드&gt;</div>
+          <div class="card-desc">새로 접속하는 플레이어의 기본 게임모드 설정</div>
+          <div class="syntax">/defaultgamemode survival</div>
+          <div class="syntax">/defaultgamemode creative</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/tp [대상] &lt;위치|엔티티&gt; [회전]</div>
+          <div class="card-desc">대상을 위치 또는 다른 엔티티 위치로 텔레포트</div>
+          <div class="syntax">/tp @p 0 64 0</div>
+          <div class="syntax">/tp @p @e[type=horse,limit=1]</div>
+          <div class="syntax">/tp @a 0 100 0 facing 10 64 10</div>
+          <div class="syntax">/tp @p ~ ~5 ~ 90 0</div>
+          <div class="note">각도: yaw(좌우 -180~180) pitch(상하 -90~90)</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/teleport (별칭 /tp)</div>
+          <div class="card-desc">/tp와 동일. 1.20부터 /tp로 통합</div>
+          <div class="syntax">/teleport Steve Alex</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="권한 관리">권한 관리</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/op &lt;플레이어&gt;</div>
+          <div class="card-desc">플레이어에게 OP(관리자) 권한 부여</div>
+          <div class="syntax">/op Steve</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/deop &lt;플레이어&gt;</div>
+          <div class="card-desc">플레이어의 OP 권한 제거</div>
+          <div class="syntax">/deop Steve</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/whitelist &lt;add|remove|list|on|off|reload&gt;</div>
+          <div class="card-desc">화이트리스트 관리 (서버 접속 허용 목록)</div>
+          <div class="syntax">/whitelist on</div>
+          <div class="syntax">/whitelist add Steve</div>
+          <div class="syntax">/whitelist remove Steve</div>
+          <div class="syntax">/whitelist list</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/ban &lt;플레이어&gt; [이유]</div>
+          <div class="card-desc">플레이어 영구 차단</div>
+          <div class="syntax">/ban griefer 규칙 위반</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/ban-ip &lt;IP&gt; [이유]</div>
+          <div class="card-desc">IP 주소 차단</div>
+          <div class="syntax">/ban-ip 192.168.0.1 VPN 우회</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/pardon &lt;플레이어&gt; / /pardon-ip</div>
+          <div class="card-desc">차단 해제</div>
+          <div class="syntax">/pardon Steve</div>
+          <div class="syntax">/pardon-ip 192.168.0.1</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/kick &lt;플레이어&gt; [이유]</div>
+          <div class="card-desc">플레이어를 서버에서 퇴장</div>
+          <div class="syntax">/kick griefer 잠시 후 돌아오세요</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/banlist [players|ips]</div>
+          <div class="card-desc">차단 목록 표시</div>
+          <div class="syntax">/banlist</div>
+          <div class="syntax">/banlist ips</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="체력 배고픔">체력 / 배고픔</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/heal (바닐라에는 없음)</div>
+          <div class="card-desc">바닐라에는 /heal 없음. 대신 /effect로 regeneration 또는 instant_health 사용</div>
+          <div class="syntax">/effect give @p instant_health 1 100</div>
+          <div class="syntax">/effect give @p regeneration 10 4</div>
+          <div class="syntax">/effect give @p saturation 5 0</div>
+          <span class="tag tag-je">JE</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/food (1.21.2+)</div>
+          <div class="card-desc">허기 및 포화도 관리 (실험적 기능)</div>
+          <div class="syntax">/food set @p hunger 20</div>
+          <div class="syntax">/food set @p saturation 20</div>
+          <span class="tag tag-je">JE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 5: 점수판·NBT -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-5">
+      <div class="section-title" data-nav="점수판">점수판 (Scoreboard)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/scoreboard objectives</div>
+          <div class="card-desc">점수판 항목 생성·제거·표시 관리</div>
+          <div class="syntax">/scoreboard objectives add kills dummy 킬 수</div>
+          <div class="syntax">/scoreboard objectives add deaths minecraft.custom:minecraft.deaths</div>
+          <div class="syntax">/scoreboard objectives add damage minecraft.custom:minecraft.damage_dealt</div>
+          <div class="syntax">/scoreboard objectives setdisplay sidebar kills</div>
+          <div class="syntax">/scoreboard objectives setdisplay list kills</div>
+          <div class="syntax">/scoreboard objectives setdisplay belowname kills</div>
+          <div class="syntax">/scoreboard objectives remove kills</div>
+          <div class="syntax">/scoreboard objectives list</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">dummy</span><span class="arg-desc">수동 설정 기준</span></div>
+            <div class="arg-row"><span class="arg-name">trigger</span><span class="arg-desc">플레이어 트리거 가능</span></div>
+            <div class="arg-row"><span class="arg-name">deathCount</span><span class="arg-desc">사망 횟수</span></div>
+            <div class="arg-row"><span class="arg-name">playerKillCount</span><span class="arg-desc">플레이어 킬</span></div>
+            <div class="arg-row"><span class="arg-name">totalKillCount</span><span class="arg-desc">전체 킬</span></div>
+            <div class="arg-row"><span class="arg-name">health</span><span class="arg-desc">체력 값</span></div>
+            <div class="arg-row"><span class="arg-name">food</span><span class="arg-desc">허기 값</span></div>
+            <div class="arg-row"><span class="arg-name">xp</span><span class="arg-desc">경험치 레벨</span></div>
+            <div class="arg-row"><span class="arg-name">level</span><span class="arg-desc">경험치 레벨</span></div>
+            <div class="arg-row"><span class="arg-name">air</span><span class="arg-desc">수중 호흡량</span></div>
+            <div class="arg-row"><span class="arg-name">armor</span><span class="arg-desc">방어력</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/scoreboard players</div>
+          <div class="card-desc">특정 플레이어/엔티티 점수 조작</div>
+          <div class="syntax">/scoreboard players get @p kills</div>
+          <div class="syntax">/scoreboard players set @p kills 0</div>
+          <div class="syntax">/scoreboard players add @p kills 1</div>
+          <div class="syntax">/scoreboard players remove @p kills 1</div>
+          <div class="syntax">/scoreboard players reset @p kills</div>
+          <div class="syntax">/scoreboard players operation @p kills = @e[type=zombie,limit=1] kills</div>
+          <div class="syntax">/scoreboard players operation @p coins += @p bonus</div>
+          <div class="syntax">/scoreboard players list @p</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/tag &lt;대상&gt; add|remove|list</div>
+          <div class="card-desc">엔티티에 커스텀 태그 추가·제거·목록 조회. @e[tag=] 선택자와 함께 사용</div>
+          <div class="syntax">/tag @p add boss</div>
+          <div class="syntax">/tag @e[type=zombie] add undead</div>
+          <div class="syntax">/tag @p remove boss</div>
+          <div class="syntax">/tag @p list</div>
+          <div class="syntax">/kill @e[tag=undead]</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/team &lt;...&gt;</div>
+          <div class="card-desc">팀 생성·설정·관리</div>
+          <div class="syntax">/team add red 빨간팀</div>
+          <div class="syntax">/team join red @p</div>
+          <div class="syntax">/team leave @p</div>
+          <div class="syntax">/team option red friendlyFire false</div>
+          <div class="syntax">/team option red color red</div>
+          <div class="syntax">/team option red collisionRule never</div>
+          <div class="syntax">/team option red nametagVisibility never</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/trigger &lt;항목&gt; [add|set] [값]</div>
+          <div class="card-desc">플레이어가 직접 실행 가능한 trigger 기준 점수 변경</div>
+          <div class="syntax">/trigger vote add 1</div>
+          <div class="syntax">/trigger menu set 1</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="NBT 데이터">NBT / 데이터 저장소</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/data get|merge|modify|remove</div>
+          <div class="card-desc">엔티티·블록·저장소의 NBT 데이터 조회 및 수정</div>
+          <div class="syntax">/data get entity @p</div>
+          <div class="syntax">/data get entity @p Inventory</div>
+          <div class="syntax">/data get block ~ ~ ~ Items</div>
+          <div class="syntax">/data merge entity @e[type=zombie,limit=1] {IsBaby:1b}</div>
+          <div class="syntax">/data merge block ~ ~ ~ {CustomName:'"상자"'}</div>
+          <div class="syntax">/data modify storage mypack:vars set value 100</div>
+          <div class="syntax">/data modify entity @p Motion set value [0.0,1.0,0.0]</div>
+          <div class="syntax">/data remove entity @p SelectedItem.tag.display</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/storage get|set|modify (data storage)</div>
+          <div class="card-desc">/data storage 명령어로 전역 변수 저장소 사용</div>
+          <div class="syntax">/data get storage mypack:vars counter</div>
+          <div class="syntax">/data modify storage mypack:vars counter set value 0</div>
+          <div class="syntax">/data modify storage mypack:vars list append value "item"</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="execute">execute (실행 흐름)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/execute — 기본 구조</div>
+          <div class="card-desc">컨텍스트 변경 후 명령어 실행. 데이터팩 핵심 명령어</div>
+          <div class="syntax">/execute as @a run say 안녕!</div>
+          <div class="syntax">/execute at @p run setblock ~ ~-1 ~ stone</div>
+          <div class="syntax">/execute as @a at @s run kill @e[type=arrow,distance=..2]</div>
+          <div class="syntax">/execute if block ~ ~-1 ~ grass_block run say 잔디 위에 있음</div>
+          <div class="syntax">/execute unless entity @e[tag=boss] run say 보스 없음</div>
+          <div class="syntax">/execute if score @p kills matches 10.. run say 10킬 달성!</div>
+          <div class="syntax">/execute store result score @p result run data get entity @p Health</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">execute 서브 커맨드 목록</div>
+          <div class="card-desc">체이닝 가능한 모든 서브 커맨드</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">as &lt;대상&gt;</span><span class="arg-desc">실행 주체 변경</span></div>
+            <div class="arg-row"><span class="arg-name">at &lt;대상&gt;</span><span class="arg-desc">실행 위치·방향 변경</span></div>
+            <div class="arg-row"><span class="arg-name">in &lt;차원&gt;</span><span class="arg-desc">실행 차원 변경</span></div>
+            <div class="arg-row"><span class="arg-name">positioned &lt;위치&gt;</span><span class="arg-desc">위치 지정</span></div>
+            <div class="arg-row"><span class="arg-name">positioned as &lt;대상&gt;</span><span class="arg-desc">대상 위치 사용</span></div>
+            <div class="arg-row"><span class="arg-name">rotated &lt;각도&gt;</span><span class="arg-desc">방향 변경</span></div>
+            <div class="arg-row"><span class="arg-name">rotated as &lt;대상&gt;</span><span class="arg-desc">대상 방향 사용</span></div>
+            <div class="arg-row"><span class="arg-name">facing &lt;위치|entity&gt;</span><span class="arg-desc">특정 위치 바라보기</span></div>
+            <div class="arg-row"><span class="arg-name">align &lt;axes&gt;</span><span class="arg-desc">좌표 정수 정렬</span></div>
+            <div class="arg-row"><span class="arg-name">anchored &lt;eyes|feet&gt;</span><span class="arg-desc">눈/발 기준 설정</span></div>
+            <div class="arg-row"><span class="arg-name">if block</span><span class="arg-desc">블록 조건</span></div>
+            <div class="arg-row"><span class="arg-name">if blocks</span><span class="arg-desc">영역 블록 비교</span></div>
+            <div class="arg-row"><span class="arg-name">if entity</span><span class="arg-desc">엔티티 존재 조건</span></div>
+            <div class="arg-row"><span class="arg-name">if score</span><span class="arg-desc">점수판 조건</span></div>
+            <div class="arg-row"><span class="arg-name">if data</span><span class="arg-desc">NBT 경로 존재 조건</span></div>
+            <div class="arg-row"><span class="arg-name">if predicate</span><span class="arg-desc">조건 파일 사용</span></div>
+            <div class="arg-row"><span class="arg-name">unless ...</span><span class="arg-desc">반대 조건 (if의 반전)</span></div>
+            <div class="arg-row"><span class="arg-name">store result/success</span><span class="arg-desc">결과값 저장</span></div>
+            <div class="arg-row"><span class="arg-name">on &lt;관계&gt;</span><span class="arg-desc">탑승자·탑재·팀원 등 (1.20.2+)</span></div>
+            <div class="arg-row"><span class="arg-name">summon &lt;엔티티&gt;</span><span class="arg-desc">소환 후 as로 전환 (1.20.2+)</span></div>
+            <div class="arg-row"><span class="arg-name">run &lt;명령어&gt;</span><span class="arg-desc">최종 명령어 실행</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- 패널 6: 기타·서버 -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="panel" id="panel-6">
+      <div class="section-title" data-nav="메시지 출력">메시지 출력</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/say &lt;메시지&gt;</div>
+          <div class="card-desc">전체 채팅에 [이름] 형식으로 메시지 전송</div>
+          <div class="syntax">/say 안녕하세요!</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/msg &lt;대상&gt; &lt;메시지&gt;</div>
+          <div class="card-desc">특정 플레이어에게 귓속말</div>
+          <div class="syntax">/msg Steve 안녕!</div>
+          <div class="syntax">/w Alex 비밀</div>
+          <div class="syntax">/tell @a 모두에게 귓속말</div>
+          <div class="note">/w, /tell 모두 /msg의 별칭</div>
+          <span class="tag tag-all">전체</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/tellraw &lt;대상&gt; &lt;JSON&gt;</div>
+          <div class="card-desc">색상·클릭·호버 이벤트가 담긴 JSON 텍스트 출력</div>
+          <div class="syntax">/tellraw @a {"text":"안녕!","color":"gold"}</div>
+          <div class="syntax">/tellraw @p [{"text":"클릭","clickEvent":{"action":"run_command","value":"/say 클릭됨"},"color":"yellow"}]</div>
+          <div class="syntax">/tellraw @a {"text":"호버","hoverEvent":{"action":"show_text","contents":"설명"}}</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/title &lt;대상&gt; &lt;종류&gt; &lt;내용&gt;</div>
+          <div class="card-desc">화면 중앙에 큰 텍스트(타이틀) 표시</div>
+          <div class="syntax">/title @a title {"text":"라운드 시작","color":"red"}</div>
+          <div class="syntax">/title @a subtitle {"text":"3, 2, 1..."}</div>
+          <div class="syntax">/title @a actionbar {"text":"체력 10"}</div>
+          <div class="syntax">/title @a times 10 70 20</div>
+          <div class="syntax">/title @a clear</div>
+          <div class="syntax">/title @a reset</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">title</span><span class="arg-desc">큰 제목</span></div>
+            <div class="arg-row"><span class="arg-name">subtitle</span><span class="arg-desc">부제목</span></div>
+            <div class="arg-row"><span class="arg-name">actionbar</span><span class="arg-desc">핫바 위 텍스트</span></div>
+            <div class="arg-row"><span class="arg-name">times F I O</span><span class="arg-desc">페이드인·지속·페이드아웃(틱)</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="사운드 파티클">사운드 / 파티클</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/playsound &lt;소리&gt; &lt;채널&gt; &lt;대상&gt; [위치] [음량] [피치] [최소음량]</div>
+          <div class="card-desc">소리 재생. 채널: master/music/record/weather/block/hostile/neutral/player/ambient/voice</div>
+          <div class="syntax">/playsound minecraft:entity.player.levelup master @a</div>
+          <div class="syntax">/playsound minecraft:block.note_block.bell master @a ~ ~ ~ 1 1</div>
+          <div class="syntax">/playsound minecraft:ui.button.click master @p ~ ~ ~ 1 1 1</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/stopsound &lt;대상&gt; [채널] [소리]</div>
+          <div class="card-desc">재생 중인 소리 중지</div>
+          <div class="syntax">/stopsound @a</div>
+          <div class="syntax">/stopsound @a music</div>
+          <div class="syntax">/stopsound @p * minecraft:entity.player.levelup</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/particle &lt;이름&gt; [위치] [크기X Y Z] [속도] [수] [모드] [대상]</div>
+          <div class="card-desc">파티클 효과 생성</div>
+          <div class="syntax">/particle minecraft:flame ~ ~ ~ 0.5 0.5 0.5 0 30</div>
+          <div class="syntax">/particle minecraft:heart ~ ~2 ~ 0 0 0 0 5</div>
+          <div class="syntax">/particle minecraft:explosion ~ ~ ~ 0 0 0 0 1</div>
+          <div class="syntax">/particle minecraft:end_rod ~ ~ ~ 1 1 1 0.05 100</div>
+          <div class="syntax">/particle minecraft:dust 1 0 0 1 ~ ~ ~ 0.5 0.5 0.5 0 20</div>
+          <div class="note">dust: R G B 크기 형식 추가. R/G/B는 0~1 소수</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="보스바 함수">보스바 / 함수 / 스케줄</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">/bossbar add|set|get|remove|list</div>
+          <div class="card-desc">화면 상단 보스 체력바 생성·관리</div>
+          <div class="syntax">/bossbar add mypack:boss {"text":"대장 몬스터"}</div>
+          <div class="syntax">/bossbar set mypack:boss value 50</div>
+          <div class="syntax">/bossbar set mypack:boss max 100</div>
+          <div class="syntax">/bossbar set mypack:boss players @a</div>
+          <div class="syntax">/bossbar set mypack:boss color red</div>
+          <div class="syntax">/bossbar set mypack:boss style notched_10</div>
+          <div class="syntax">/bossbar set mypack:boss visible true</div>
+          <div class="syntax">/bossbar remove mypack:boss</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/function &lt;네임스페이스:경로&gt;</div>
+          <div class="card-desc">데이터팩 함수 파일 실행 (.mcfunction)</div>
+          <div class="syntax">/function mypack:setup</div>
+          <div class="syntax">/function mypack:events/on_death</div>
+          <div class="syntax">/execute as @a run function mypack:tick_player</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/schedule function &lt;함수&gt; &lt;시간&gt; [append|replace]</div>
+          <div class="card-desc">지연 후 함수 실행 예약</div>
+          <div class="syntax">/schedule function mypack:reset 100t</div>
+          <div class="syntax">/schedule function mypack:tick 20t append</div>
+          <div class="syntax">/schedule clear mypack:tick</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">20t</span><span class="arg-desc">20틱 = 1초</span></div>
+            <div class="arg-row"><span class="arg-name">5s</span><span class="arg-desc">5초</span></div>
+            <div class="arg-row"><span class="arg-name">1d</span><span class="arg-desc">1게임일 = 24000틱</span></div>
+          </div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/return &lt;값&gt; (1.20+)</div>
+          <div class="card-desc">함수 조기 종료 + 반환값 설정. execute store result와 함께 사용</div>
+          <div class="syntax">/return 1</div>
+          <div class="syntax">/return 0</div>
+          <div class="syntax">/return fail</div>
+          <div class="note">함수 파일(.mcfunction) 내부에서만 사용 가능</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+        <div class="card">
+          <div class="card-head">/random value|roll|reset</div>
+          <div class="card-desc">무작위 숫자 생성 또는 시드 초기화 (1.20.2+)</div>
+          <div class="syntax">/random value 1..6</div>
+          <div class="syntax">/random roll 1..100</div>
+          <div class="syntax">/random reset * 12345 true true</div>
+          <span class="tag tag-op">OP</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-nav="선택자">선택자 (@a @p @e @r @s)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">기본 선택자</div>
+          <div class="card-desc">대상 지정 특수 문자</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">@p</span><span class="arg-desc">가장 가까운 플레이어</span></div>
+            <div class="arg-row"><span class="arg-name">@a</span><span class="arg-desc">모든 플레이어</span></div>
+            <div class="arg-row"><span class="arg-name">@e</span><span class="arg-desc">모든 엔티티</span></div>
+            <div class="arg-row"><span class="arg-name">@r</span><span class="arg-desc">무작위 플레이어</span></div>
+            <div class="arg-row"><span class="arg-name">@s</span><span class="arg-desc">명령어 실행 주체</span></div>
+            <div class="arg-row"><span class="arg-name">@n</span><span class="arg-desc">가장 가까운 엔티티(1.21.4+)</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">선택자 인수 목록</div>
+          <div class="card-desc">[ ] 안에 조건 입력, 쉼표로 AND 결합</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">type=zombie</span><span class="arg-desc">엔티티 종류</span></div>
+            <div class="arg-row"><span class="arg-name">type=!player</span><span class="arg-desc">종류 제외</span></div>
+            <div class="arg-row"><span class="arg-name">name="이름"</span><span class="arg-desc">이름 일치</span></div>
+            <div class="arg-row"><span class="arg-name">distance=..5</span><span class="arg-desc">5블록 이내</span></div>
+            <div class="arg-row"><span class="arg-name">distance=5..10</span><span class="arg-desc">5~10블록</span></div>
+            <div class="arg-row"><span class="arg-name">limit=1</span><span class="arg-desc">최대 1개</span></div>
+            <div class="arg-row"><span class="arg-name">sort=nearest</span><span class="arg-desc">가까운 순</span></div>
+            <div class="arg-row"><span class="arg-name">sort=farthest</span><span class="arg-desc">먼 순</span></div>
+            <div class="arg-row"><span class="arg-name">sort=random</span><span class="arg-desc">무작위 순</span></div>
+            <div class="arg-row"><span class="arg-name">sort=arbitrary</span><span class="arg-desc">임의 순서</span></div>
+            <div class="arg-row"><span class="arg-name">x= y= z=</span><span class="arg-desc">중심 좌표</span></div>
+            <div class="arg-row"><span class="arg-name">dx= dy= dz=</span><span class="arg-desc">범위 크기</span></div>
+            <div class="arg-row"><span class="arg-name">gamemode=creative</span><span class="arg-desc">게임모드</span></div>
+            <div class="arg-row"><span class="arg-name">level=10..20</span><span class="arg-desc">경험치 레벨 범위</span></div>
+            <div class="arg-row"><span class="arg-name">tag=tagname</span><span class="arg-desc">태그 보유</span></div>
+            <div class="arg-row"><span class="arg-name">tag=!tagname</span><span class="arg-desc">태그 미보유</span></div>
+            <div class="arg-row"><span class="arg-name">team=red</span><span class="arg-desc">팀 소속</span></div>
+            <div class="arg-row"><span class="arg-name">scores={kills=10..}</span><span class="arg-desc">점수판 조건</span></div>
+            <div class="arg-row"><span class="arg-name">nbt={IsBaby:1b}</span><span class="arg-desc">NBT 조건</span></div>
+            <div class="arg-row"><span class="arg-name">predicate=...</span><span class="arg-desc">조건 파일</span></div>
+            <div class="arg-row"><span class="arg-name">advancements={...}</span><span class="arg-desc">발전 달성 여부</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">좌표 표기법</div>
+          <div class="card-desc">명령어에서 위치를 지정하는 방법</div>
+          <div class="arg-list">
+            <div class="arg-row"><span class="arg-name">~ ~ ~</span><span class="arg-desc">실행자 상대 좌표</span></div>
+            <div class="arg-row"><span class="arg-name">~5 ~1 ~-3</span><span class="arg-desc">상대 오프셋</span></div>
+            <div class="arg-row"><span class="arg-name">^ ^ ^</span><span class="arg-desc">실행자 시선 기준 로컬 좌표</span></div>
+            <div class="arg-row"><span class="arg-name">^1 ^ ^</span><span class="arg-desc">오른쪽 1블록</span></div>
+            <div class="arg-row"><span class="arg-name">^ ^1 ^</span><span class="arg-desc">위 1블록</span></div>
+            <div class="arg-row"><span class="arg-name">^ ^ ^1</span><span class="arg-desc">앞 1블록</span></div>
+            <div class="arg-row"><span class="arg-name">10 64 -5</span><span class="arg-desc">절대 좌표</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const TABS = [
+  { id: 0, label: '기본 명령어' },
+  { id: 1, label: '엔티티·효과' },
+  { id: 2, label: '아이템·인벤토리' },
+  { id: 3, label: '월드·블록' },
+  { id: 4, label: '플레이어·권한' },
+  { id: 5, label: '점수판·NBT' },
+  { id: 6, label: '기타·서버' },
+];
+
+const SIDEBAR_ITEMS = {
+  0: [
+    { l: '기본 정보 / 서버', q: '기본 정보' },
+    { l: '시간 / 날씨',      q: '시간 날씨' },
+    { l: '난이도 / 게임규칙', q: '난이도 게임규칙' },
+  ],
+  1: [
+    { l: '소환 / 제거', q: '소환 제거' },
+    { l: '효과 (Effect)', q: '효과' },
+  ],
+  2: [
+    { l: '아이템 지급', q: '아이템 지급' },
+    { l: '인챈트 / 수리', q: '인챈트' },
+    { l: '경험치', q: '경험치' },
+  ],
+  3: [
+    { l: '블록 배치 / 채우기', q: '블록 배치' },
+    { l: '청크 / 월드 경계', q: '청크 월드' },
+    { l: '스폰 포인트',       q: '스폰' },
+  ],
+  4: [
+    { l: '게임모드 / 이동', q: '게임모드 이동' },
+    { l: '권한 관리',       q: '권한 관리' },
+    { l: '체력 / 배고픔',   q: '체력 배고픔' },
+  ],
+  5: [
+    { l: '점수판',     q: '점수판' },
+    { l: 'NBT / 저장소', q: 'NBT 데이터' },
+    { l: 'execute',    q: 'execute' },
+  ],
+  6: [
+    { l: '메시지 출력',    q: '메시지 출력' },
+    { l: '사운드 / 파티클', q: '사운드 파티클' },
+    { l: '보스바 / 함수',  q: '보스바 함수' },
+    { l: '선택자',         q: '선택자' },
+  ],
+};
+
+let current = 0;
+
+/* ── 탭 생성 ── */
+const tabBar = document.getElementById('tab-bar');
+TABS.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (t.id === 0 ? ' active' : '');
+  btn.textContent = t.label;
+  btn.addEventListener('click', () => switchTab(t.id));
+  tabBar.appendChild(btn);
+});
+
+/* ── 사이드바 ── */
+function findSection(panel, q) {
+  const navEl = panel.querySelector('[data-nav="' + q + '"]');
+  if (navEl) return navEl;
+  for (const el of panel.querySelectorAll('.card-head')) {
+    if (el.textContent.includes(q)) return el.closest('.card') || el;
+  }
+  for (const el of panel.querySelectorAll('.section-title')) {
+    if (el.textContent.includes(q)) return el;
+  }
+  return null;
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 62;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    sb.appendChild(btn);
+  });
+}
+
+/* ── 탭 전환 ── */
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === id));
+  current = id;
+  buildSidebar(id);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  clearSearch();
+}
+
+/* ── 검색 ── */
+function clearSearch() {
+  document.getElementById('search').value = '';
+  document.querySelectorAll('.panel').forEach(p => {
+    p.querySelectorAll('.card').forEach(c => {
+      c.style.display = '';
+      c.querySelectorAll('.hl').forEach(h => {
+        h.outerHTML = h.textContent;
+      });
+    });
+  });
+}
+
+function doSearch(q) {
+  if (!q) { clearSearch(); return; }
+  const lq = q.toLowerCase();
+  document.querySelectorAll('.panel').forEach(panel => {
+    panel.querySelectorAll('.card').forEach(card => {
+      const txt = card.textContent.toLowerCase();
+      card.style.display = txt.includes(lq) ? '' : 'none';
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  doSearch(e.target.value.trim());
+});
+
+/* ── 초기화 ── */
+buildSidebar(0);
+</script>
+</body>
+</html>

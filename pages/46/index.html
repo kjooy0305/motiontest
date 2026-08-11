@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axiom 완전 정복</title>
+<style>
+:root {
+  --amber:#e8a030; --amber2:#f0c060; --rust:#c85020; --green:#58a840;
+  --bg:#0a0a06; --bg2:#12120c; --bg3:#1a1a10; --bg4:#222218;
+  --txt:#e8dcc0; --txt2:#b0a880; --muted:#6a6040;
+  --border:#2a2818; --border2:#3a3820;
+  --header-h:56px; --sb-w:196px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── header ── */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  height:var(--header-h);background:var(--bg2);border-bottom:2px solid var(--amber);
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+}
+.site-header h1{font-size:17px;color:var(--amber2);white-space:nowrap;letter-spacing:.5px;}
+.site-header h1 span{font-size:11px;color:var(--muted);margin-left:8px;font-weight:400;}
+.search-box{
+  flex:1;max-width:320px;padding:6px 12px;border-radius:6px;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--txt);
+  font-size:13px;outline:none;
+}
+.search-box:focus{border-color:var(--amber);}
+.tab-bar{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;}
+.tab-btn{
+  padding:5px 11px;border-radius:5px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--txt2);font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.tab-btn:hover{background:var(--bg4);border-color:var(--amber);}
+.tab-btn.active{background:var(--amber);color:#0a0a06;border-color:var(--amber);font-weight:700;}
+
+/* ── layout ── */
+.layout{display:flex;min-height:calc(100vh - var(--header-h));}
+.sidebar{
+  width:var(--sb-w);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  padding:12px 8px;position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;
+}
+.sb-item{
+  display:block;width:100%;text-align:left;
+  padding:7px 10px;border-radius:5px;border:none;
+  background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:.12s;
+}
+.sb-item:hover{background:var(--bg4);color:var(--amber2);}
+.sb-item.active{background:var(--border2);color:var(--amber2);font-weight:600;}
+.main{flex:1;padding:24px 26px;max-width:1100px;}
+
+/* ── panels ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── section title ── */
+.sec{
+  font-size:19px;font-weight:700;color:var(--amber2);
+  border-left:4px solid var(--amber);padding-left:12px;
+  margin:32px 0 16px;
+}
+.sec:first-child{margin-top:0;}
+
+/* ── card grid ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;margin-bottom:26px;}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:15px;transition:.15s;}
+.card:hover{border-color:var(--amber);background:var(--bg4);}
+.card.wide{grid-column:1/-1;}
+.card-head{font-size:13px;font-weight:700;color:var(--amber2);margin-bottom:6px;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.55;}
+
+/* ── shortcut rows ── */
+.kb-list{margin-top:6px;}
+.kb-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);}
+.kb-row:last-child{border-bottom:none;}
+.kb-keys{display:flex;gap:3px;flex-shrink:0;min-width:130px;flex-wrap:wrap;}
+.key{
+  display:inline-block;padding:2px 7px;border-radius:4px;
+  border:1px solid var(--border2);background:var(--bg4);
+  color:var(--amber2);font-size:11px;font-family:'Courier New',monospace;font-weight:600;white-space:nowrap;
+}
+.key.w{min-width:60px;text-align:center;}
+.kb-desc{font-size:12px;color:var(--txt2);}
+
+/* ── tags ── */
+.tag{
+  display:inline-block;padding:1px 7px;border-radius:3px;
+  font-size:10px;font-weight:600;margin:0 3px 3px 0;
+}
+.t-b{background:#1a1500;color:#d09020;border:1px solid #3a3000;}
+.t-e{background:#1a0000;color:#e04040;border:1px solid #3a0000;}
+.t-both{background:#001a10;color:#40c060;border:1px solid #003a20;}
+.t-tip{background:#0a0a1a;color:#6090e0;border:1px solid #102040;}
+.t-adv{background:#10001a;color:#c060e0;border:1px solid #2a0040;}
+
+/* ── callout ── */
+.callout{
+  background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--amber);
+  border-radius:6px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--txt2);line-height:1.6;
+}
+.callout b{color:var(--amber2);}
+
+/* ── mode badge ── */
+.mode-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:12px;
+}
+.mode-builder{background:#2a1e00;color:#f0a020;border:1px solid #4a3000;}
+.mode-editor{background:#200000;color:#e04040;border:1px solid #3a0000;}
+
+/* ── step ── */
+.steps{counter-reset:step;margin-bottom:16px;}
+.step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--txt2);}
+.step:last-child{border-bottom:none;}
+.step::before{
+  counter-increment:step;content:counter(step);
+  min-width:22px;height:22px;border-radius:50%;
+  background:var(--amber);color:#0a0a06;font-weight:700;font-size:11px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* ── tool grid ── */
+.tool-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.tool-row:last-child{border-bottom:none;}
+.tool-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+.tool-name{font-size:12px;font-weight:700;color:var(--amber2);min-width:100px;flex-shrink:0;}
+.tool-desc{font-size:11px;color:var(--txt2);line-height:1.5;}
+
+/* ── comparison table ── */
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
+.cmp-table th{background:var(--bg4);color:var(--amber2);padding:8px 12px;text-align:left;border:1px solid var(--border2);}
+.cmp-table td{padding:7px 12px;border:1px solid var(--border);color:var(--txt2);vertical-align:top;}
+.cmp-table tr:hover td{background:var(--bg4);}
+
+/* ── application card ── */
+.app-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:15px;margin-bottom:14px;
+}
+.app-card h4{font-size:13px;font-weight:700;color:var(--amber2);margin-bottom:8px;}
+.app-card .scenario{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:6px;}
+.app-card ol{padding-left:16px;font-size:12px;color:var(--txt2);}
+.app-card ol li{margin-bottom:3px;}
+
+/* ── scrollbar ── */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>⛏ Axiom 완전 정복 <span>Minecraft World Editor Mod by Moulberry</span></h1>
+  <input class="search-box" id="search" placeholder="기능·단축키·도구 검색..." type="text">
+  <div class="tab-bar" id="tab-bar"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content">
+
+    <!-- ══════════════════════ 패널 0: 개요 & 빌더 모드 ══════════════════════ -->
+    <div class="panel active" id="panel-0">
+
+      <div class="callout">
+        <b>Axiom</b>은 Moulberry가 제작한 마인크래프트 Java Edition용 <b>올인원 월드 편집 모드</b>입니다.
+        전문 3D 소프트웨어 수준의 도구를 브라우저 없이 게임 안에서 실시간으로 사용합니다.
+        <b>Fabric</b> 모드로더 전용이며 1.20.4 ~ 1.21.x를 지원합니다.
+      </div>
+
+      <div class="sec" data-nav="모드개요">모드 개요</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🎮 두 가지 모드</div>
+          <div class="card-desc">
+            <div class="mode-badge mode-builder">🟡 빌더 모드 (Builder Mode)</div><br>
+            크리에이티브 기본 기능을 강화한 모드. 직관적 도구로 구조물·소규모 건축에 최적화. <b>Left Alt</b>로 접근.<br><br>
+            <div class="mode-badge mode-editor">🔴 에디터 모드 (Editor Mode)</div><br>
+            대규모 지형 조각·페인팅·선택·조작을 위한 고급 모드. <b>Right Shift</b>로 접근.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">📥 설치 요구사항</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;color:var(--txt2);">모드로더</div><span class="kb-desc">Fabric (필수)</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;color:var(--txt2);">버전</div><span class="kb-desc">1.20.4 ~ 1.21.x</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;color:var(--txt2);">게임모드</div><span class="kb-desc">크리에이티브 (필수)</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;color:var(--txt2);">다운로드</div><span class="kb-desc">CurseForge / Modrinth</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">💎 상업용 라이선스 추가 기능</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;font-size:11px;color:var(--txt2);">멀티플레이어</div><span class="kb-desc">비공개 서버에서 협업 가능</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;font-size:11px;color:var(--txt2);">서버 API</div><span class="kb-desc">서버 측 커스텀 블록 활용</span></div>
+            <div class="kb-row"><div class="kb-keys" style="min-width:80px;font-size:11px;color:var(--txt2);">히스토리 백업</div><span class="kb-desc">편집 내역 자동 영구 저장</span></div>
+          </div>
+          <div class="card-desc" style="margin-top:8px;">무상업용은 싱글플레이어, 로컬호스트, Builders Refuge·The Bakery 등 플롯 서버에서 제한 없이 사용 가능.</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="빌더모드진입">빌더 모드 진입 & 조작</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">⌨ 빌더 모드 접근</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Left Alt</span> 홀드</div><span class="kb-desc">컨텍스트 메뉴 열기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">0</span> 키</div><span class="kb-desc">10번 슬롯(빌더 슬롯) 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Left Alt</span>+<span class="key">스크롤</span></div><span class="kb-desc">빌더 도구 전환</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span> / <span class="key">우클릭</span></div><span class="kb-desc">코너 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">중간클릭</span></div><span class="kb-desc">면(Face) 선택 / 선택 영역 확장</span></div>
+          </div>
+          <span class="tag t-b">빌더 모드</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🧰 빌더 컨텍스트 메뉴 기능</div>
+          <div class="card-desc">Left Alt 홀드 시 나타나는 메뉴:</div>
+          <div class="tool-row"><span class="tool-icon">🔧</span><span class="tool-name">Tinker</span><span class="tool-desc">블록 속성을 세밀하게 조정</span></div>
+          <div class="tool-row"><span class="tool-icon">🚫</span><span class="tool-name">No Updates</span><span class="tool-desc">블록 업데이트 없이 배치 (레드스톤 등 작동 방지)</span></div>
+          <div class="tool-row"><span class="tool-icon">💪</span><span class="tool-name">Force Place</span><span class="tool-desc">일반적으로 배치 불가능한 위치에 강제 배치</span></div>
+          <div class="tool-row"><span class="tool-icon">🔄</span><span class="tool-name">Replace Mode</span><span class="tool-desc">기존 블록을 교체하며 배치 (빈 공간 무시)</span></div>
+          <div class="tool-row"><span class="tool-icon">🚜</span><span class="tool-name">Bulldozer</span><span class="tool-desc">블록을 밀어내며 배치</span></div>
+          <div class="tool-row"><span class="tool-icon">🖼</span><span class="tool-name">Display Entities</span><span class="tool-desc">Display 엔티티 편집 (BDEngine 연동)</span></div>
+          <span class="tag t-b">빌더 모드</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⚡ 편의 기능</div>
+          <div class="tool-row"><span class="tool-icon">💾</span><span class="tool-name">Saved Hotbars</span><span class="tool-desc">커스텀 핫바 무제한 저장·불러오기</span></div>
+          <div class="tool-row"><span class="tool-icon">✈</span><span class="tool-name">Flight Speed</span><span class="tool-desc">비행 속도 슬라이더 (최대 10배)</span></div>
+          <div class="tool-row"><span class="tool-icon">👻</span><span class="tool-name">No Clip</span><span class="tool-desc">블록을 통과하여 비행</span></div>
+          <div class="tool-row"><span class="tool-icon">📐</span><span class="tool-name">Angel Placement</span><span class="tool-desc">불가능한 각도에서 블록 배치</span></div>
+          <div class="tool-row"><span class="tool-icon">⚡</span><span class="tool-name">Fast Place</span><span class="tool-desc">배치 쿨다운 없이 연속 배치</span></div>
+          <div class="tool-row"><span class="tool-icon">🔁</span><span class="tool-name">Hotbar Swapper</span><span class="tool-desc">여러 핫바 세트 간 빠른 전환</span></div>
+          <span class="tag t-b">빌더 모드</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="빌더도구7종">빌더 도구 7종 상세</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">↔ Move (이동)</div>
+          <div class="card-desc">좌클릭으로 영역 선택 후 드래그로 이동. 중간 마우스로 선택 영역 동적 확장. 구조물을 그 자리에서 바로 이동.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span>+<span class="key">드래그</span></div><span class="kb-desc">영역 선택 후 이동</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">중간클릭</span></div><span class="kb-desc">선택 영역 확장</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Z</span></div><span class="kb-desc">이동 취소</span></div>
+          </div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 Clone (복제)</div>
+          <div class="card-desc">선택한 블록/구조물을 복제하여 다른 위치에 배치. 원본은 유지. 같은 파트 반복 배치에 최적.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span>+<span class="key">드래그</span></div><span class="kb-desc">영역 선택 후 복제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">중간클릭</span></div><span class="kb-desc">선택 영역 확장</span></div>
+          </div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📚 Stack (쌓기)</div>
+          <div class="card-desc">선택한 블록을 특정 축 방향으로 반복 배치. 타워·담장·계단형 구조물을 한 번에 생성.</div>
+          <div class="card-desc" style="margin-top:6px;">방향: 상하·좌우·앞뒤 전방향 지원</div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎨 Smear (번지기)</div>
+          <div class="card-desc">블록을 공간 위에서 드래그하면 자연스러운 전환이나 유기적 형태 생성. 지형을 부드럽게 '칠하는' 느낌. 절벽 표면 처리에 유용.</div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔨 Extrude (밀어내기)</div>
+          <div class="card-desc">구조물의 면(Face)을 선택해 밀어내거나 당겨 확장. 벽·지붕·돌출부 빠르게 생성.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span></div><span class="kb-desc">면 선택 → 드래그로 확장</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">우클릭</span></div><span class="kb-desc">반대 방향으로 축소</span></div>
+          </div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🗑 Erase (지우기)</div>
+          <div class="card-desc">블록을 빠르게 제거. 좌/우클릭으로 다른 동작 수행.</div>
+          <div class="kb-list" style="margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key">좌클릭</span></div><span class="kb-desc">개별 블록 하나씩 삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">우클릭</span></div><span class="kb-desc">같은 종류 연결 블록 전체 삭제</span></div>
+          </div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🪞 Setup Symmetry (대칭 설정)</div>
+          <div class="card-desc">중심점 기준으로 빌드를 미러링·회전. 90도 단위 회전 대칭 설정. 좌우 대칭 건축물이나 성, 탑 제작에 필수.</div>
+          <span class="tag t-b">빌더 도구</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ 패널 1: 에디터 도구 ══════════════════════ -->
+    <div class="panel" id="panel-1">
+
+      <div class="callout">
+        에디터 모드는 <b>Right Shift</b>로 열립니다. 상단 메인 메뉴바와 하단 상태바가 나타나며 모든 도구는 상단 <b>Tool 창</b>에서 선택합니다.
+      </div>
+
+      <div class="sec" data-nav="선택도구">선택 도구 (Selection Tools)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">📦 Box Selection (박스 선택)</div>
+          <div class="card-desc">두 꼭짓점을 지정해 직육면체 영역 선택. 가장 기본적인 선택 도구.</div>
+          <span class="tag t-e">에디터 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">✏ Freehand Selection (자유형 선택)</div>
+          <div class="card-desc">마우스로 자유롭게 드래그하여 불규칙한 형태 선택.</div>
+          <span class="tag t-e">에디터 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🪄 Magic Selection (매직 선택)</div>
+          <div class="card-desc">클릭한 블록과 연결된 동일 종류 블록을 자동 선택. 특정 지형 부위 한 번에 선택할 때 유용.</div>
+          <span class="tag t-e">에디터 도구</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔗 Lasso Selection (올가미 선택)</div>
+          <div class="card-desc">자유형 경로로 영역의 윤곽을 그려 내부 선택.</div>
+          <span class="tag t-e">에디터 도구</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="드로잉도구">드로잉·조각 도구 (Drawing / Sculpt Tools)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">✏ Freehand Draw (자유 드로우)</div>
+          <div class="card-desc">브러시로 자유롭게 블록을 배치. 브러시 크기·모양 조절 가능.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🗿 Sculpt Draw (조각)</div>
+          <div class="card-desc">지형을 점토처럼 조각. 볼륨 추가/제거로 유기적 형태 제작. 산·언덕·절벽 등 자연 지형에 핵심 도구.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🪨 Rock Tool (바위)</div>
+          <div class="card-desc">지형 표면에 울퉁불퉁한 바위 질감 추가. 자연스러운 암벽·절벽 표현.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔗 Weld Tool (용접)</div>
+          <div class="card-desc">새로운 형태를 기존 지형에 틈새 없이 자연스럽게 합체.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🫠 Melt Tool (녹임)</div>
+          <div class="card-desc">블록을 녹이듯 부드럽게 제거하거나 깎아냄. Sculpt와 반대 방향으로 지형 가공.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🖼 Stamp Tool (스탬프)</div>
+          <div class="card-desc">저장된 블루프린트를 브러시처럼 반복 스탬핑. 회전·스케일 옵션 포함. 나무·바위·장식물 반복 배치에 최적.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔤 Text Tool (텍스트)</div>
+          <div class="card-desc">블록으로 텍스트를 렌더링. 폰트·크기·방향 설정 가능. 대형 간판, 맵 제목 제작.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🔷 Shape / Geometry (도형)</div>
+          <div class="card-desc">구·원기둥·원환체(토러스) 등 기하학적 도형 생성. 크기·재질·방향 설정. 탑·돔·아치 빠른 제작.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">〰 Path Tool (경로)</div>
+          <div class="card-desc">경로를 따라 블록 배치. 강·도로·담장 등 곡선 구조물 제작.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎨 Modeling Tool (모델링)</div>
+          <div class="card-desc">경로를 따라 표면을 생성하는 로프트(Loft) 방식. 차량·건축물 등 복잡한 형태 제작에 활용.</div>
+          <span class="tag t-e">드로잉</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="페인팅도구">페인팅 도구 (Painting Tools)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🖌 Painter (페인터)</div>
+          <div class="card-desc">현재 선택 블록 또는 클립보드 패턴으로 블록을 페인팅. 실시간 미리보기 제공.</div>
+          <span class="tag t-e">페인팅</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🌊 Noise Painter (노이즈 페인터)</div>
+          <div class="card-desc">펄린 노이즈 등 절차적 노이즈를 적용해 자연스러운 패턴 생성. 자연 지형의 블록 다양성 표현.</div>
+          <span class="tag t-e">페인팅</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🌿 Biome Painter (바이옴 페인터)</div>
+          <div class="card-desc">3D 공간에 바이옴을 직접 페인팅. 특정 영역의 식물·날씨·하늘 색상 변경.</div>
+          <span class="tag t-e">페인팅</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📜 Script Brush (스크립트 브러시)</div>
+          <div class="card-desc">LIS(Lightweight Interactive Scripting) 코드로 완전 커스텀 브러시 제작. 루프·조건문·블록 조작으로 고급 패턴 생성.</div>
+          <div style="background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:6px 8px;font-family:'Courier New',monospace;font-size:10px;color:#80d080;margin-top:8px;">
+            place_block(x, y, z, "stone")<br>
+            place_block(x, y+1, z, "grass_block")
+          </div>
+          <span class="tag t-e">페인팅</span>
+          <span class="tag t-adv">고급</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🌈 Gradient Painter (그래디언트)</div>
+          <div class="card-desc">두 블록 유형 사이를 거리·높이 기준으로 부드럽게 블렌딩. 자연스러운 지형 색상 전환.</div>
+          <span class="tag t-e">페인팅</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="조작도구">조작·변형 도구 (Manipulation Tools)</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">〰 Smooth (스무스)</div>
+          <div class="card-desc">거친 지형을 부드럽게 평활화. 산·언덕 제작 후 마무리 작업에 필수. 브러시 크기·강도 조절.</div>
+          <span class="tag t-e">조작</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🌀 Distort (왜곡)</div>
+          <div class="card-desc">지형을 임의적으로 왜곡·비틀기. 의도적인 불규칙성 표현.</div>
+          <span class="tag t-e">조작</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🪨 Roughen (거칠게)</div>
+          <div class="card-desc">지형 표면을 거칠게 만들어 자연스러운 질감 추가. Smooth의 반대 효과.</div>
+          <span class="tag t-e">조작</span>
+        </div>
+        <div class="card">
+          <div class="card-head">💥 Shatter / Crack (산산조각)</div>
+          <div class="card-desc">표면에 균열·파편 효과 생성. 폐허·전쟁터 등 파괴된 느낌 표현.</div>
+          <span class="tag t-e">조작</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🏔 Heightmap Tools (높이맵)</div>
+          <div class="card-desc">World Machine·World Painter 방식처럼 2D 높이맵으로 지형 올리기/낮추기. Height 브러시와 Slope(경사) 도구 포함.</div>
+          <span class="tag t-e">조작</span>
+        </div>
+        <div class="card">
+          <div class="card-head">💧 Flood Fill / Fluid Ball</div>
+          <div class="card-desc"><b>Flood Fill</b>: 물·용암의 유체 물리 시뮬레이션으로 영역 채우기.<br><b>Fluid Ball</b>: 구형 유체 소스 생성, 확산 범위 조절 가능.</div>
+          <span class="tag t-e">유체</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="기타도구">기타 도구</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">📏 Ruler Tool (자)</div>
+          <div class="card-desc">두 점 사이 거리 측정. 중점(Midpoint) 자동 계산. 건축 비율 맞추기에 활용.</div>
+          <span class="tag t-both">공통</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📌 Annotation Tool (주석)</div>
+          <div class="card-desc">월드 내에 그림·텍스트·이미지 참조 배치. 협업 시 위치 메모, 설계 레퍼런스 표시.</div>
+          <span class="tag t-both">공통</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎯 Gizmo (기즈모)</div>
+          <div class="card-desc">선택 영역이나 클립보드 오브젝트를 3D 핸들로 이동·회전·스케일. 정밀 배치에 활용.</div>
+          <span class="tag t-e">에디터</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ 패널 2: 단축키 총정리 ══════════════════════ -->
+    <div class="panel" id="panel-2">
+
+      <div class="callout">
+        모든 단축키는 <b>Help → Keybinds</b> 또는 마인크래프트 <b>설정 → 컨트롤 → Axiom 섹션</b>에서 자유롭게 변경 가능합니다.
+      </div>
+
+      <div class="sec" data-nav="모드전환단축키">모드 전환</div>
+      <div class="card-grid">
+        <div class="card wide">
+          <div class="card-head">🔑 핵심 전환 키</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px;margin-top:8px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Right Shift</span></div><span class="kb-desc">에디터 모드 열기/닫기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Left Alt</span> 홀드</div><span class="kb-desc">빌더 컨텍스트 메뉴 열기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">0</span></div><span class="kb-desc">10번 슬롯(빌더 도구) 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Left Alt</span>+<span class="key">스크롤</span></div><span class="kb-desc">빌더 도구 전환</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="에디터단축키">에디터 모드 단축키</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">✂ 편집 기본</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Z</span></div><span class="kb-desc">실행 취소 (Undo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">Y</span></div><span class="kb-desc">다시 실행 (Redo)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">X</span></div><span class="kb-desc">잘라내기 (Cut)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">C</span></div><span class="kb-desc">복사 (Copy)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">V</span></div><span class="kb-desc">붙여넣기 (Paste)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Del</span> / <span class="key">Backspace</span></div><span class="kb-desc">삭제</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔄 선택·조작</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">F</span></div><span class="kb-desc">선택 영역 채우기 (Fill)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">R</span></div><span class="kb-desc">블록 교체 (Replace)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">B</span></div><span class="kb-desc">블루프린트 뷰 토글</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Enter</span></div><span class="kb-desc">작업 확인</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🔄 배치·회전</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">R</span></div><span class="kb-desc">선택/클립보드 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">F</span></div><span class="kb-desc">뒤집기 (Flip)</span></div>
+          </div>
+          <div class="card-desc" style="margin-top:8px;font-size:11px;">※ Fill/Flip vs Replace/Rotate는 컨텍스트에 따라 작동 방식이 다름</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🖱 슬라이더 특수 조작</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">클릭</span></div><span class="kb-desc">슬라이더 수치 직접 입력 (한계 초과 가능)</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">마우스 드래그</span></div><span class="kb-desc">슬라이더 값 조절</span></div>
+          </div>
+          <div class="card-desc" style="margin-top:6px;">텍스트 박스에 수식도 입력 가능. 예: 100*2, sin(45)</div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="빌더단축키">빌더 모드 단축키</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🧰 빌더 조작</div>
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-keys"><span class="key">Left Alt</span> 홀드</div><span class="kb-desc">컨텍스트 메뉴 열기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">0</span></div><span class="kb-desc">빌더 슬롯 선택</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Left Alt</span>+<span class="key">스크롤</span></div><span class="kb-desc">빌더 도구 전환</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Ctrl</span>+<span class="key">C</span></div><span class="kb-desc">블록 NBT 상태 복사</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">Enter</span></div><span class="kb-desc">검색 결과 첫 블록을 핫바 슬롯에 추가</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key">중간클릭</span></div><span class="kb-desc">면 선택 / 선택 영역 확장</span></div>
+          </div>
+          <span class="tag t-b">빌더 모드</span>
+        </div>
+        <div class="card wide">
+          <div class="card-head">📋 전체 단축키 요약표</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;margin-top:10px;">
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Right Shift</span></div><span class="kb-desc">에디터 모드 토글</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Left Alt</span></div><span class="kb-desc">빌더 메뉴 열기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">0</span></div><span class="kb-desc">빌더 슬롯</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+Z</span></div><span class="kb-desc">실행 취소</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+Y</span></div><span class="kb-desc">다시 실행</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+X</span></div><span class="kb-desc">잘라내기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+C</span></div><span class="kb-desc">복사</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+V</span></div><span class="kb-desc">붙여넣기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+F</span></div><span class="kb-desc">채우기 / 뒤집기</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+R</span></div><span class="kb-desc">교체 / 회전</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+B</span></div><span class="kb-desc">블루프린트 뷰</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Enter</span></div><span class="kb-desc">확인</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Del</span></div><span class="kb-desc">삭제</span></div>
+            <div class="kb-row"><div class="kb-keys"><span class="key w">Ctrl+클릭</span></div><span class="kb-desc">슬라이더 직접 입력</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ 패널 3: 윈도우 & 기능 ══════════════════════ -->
+    <div class="panel" id="panel-3">
+
+      <div class="sec" data-nav="에디터UI">에디터 모드 UI 구성</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">🔝 메인 메뉴바 (상단)</div>
+          <div class="tool-row"><span class="tool-icon">📁</span><span class="tool-name">File</span><span class="tool-desc">파일 관련 (불러오기·저장)</span></div>
+          <div class="tool-row"><span class="tool-icon">👁</span><span class="tool-name">View</span><span class="tool-desc">시점·렌더링 설정</span></div>
+          <div class="tool-row"><span class="tool-icon">⚙</span><span class="tool-name">Operations</span><span class="tool-desc">Fill·Replace 등 대량 작업</span></div>
+          <div class="tool-row"><span class="tool-icon">🪟</span><span class="tool-name">Windows</span><span class="tool-desc">각종 패널 창 열기/닫기</span></div>
+          <div class="tool-row"><span class="tool-icon">❓</span><span class="tool-name">Help</span><span class="tool-desc">단축키 설정, 도움말</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head">⬇ 하단 상태바</div>
+          <div class="card-desc">
+            <b>왼쪽</b>: 현재 활성화된 단축키 힌트 표시. 활성 선택 영역이 있으면 맨 마지막에 표시.<br><br>
+            <b>오른쪽</b>: 비행 속도 슬라이더 (드래그로 조절)
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="윈도우패널">윈도우 패널 종류</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">📜 History (히스토리)</div>
+          <div class="card-desc">편집 내역 목록 표시. Undo/Redo 이력 시각화. 특정 시점으로 직접 이동 가능.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">📋 Clipboard (클립보드)</div>
+          <div class="card-desc">복사한 블록 데이터 관리. 블루프린트 브라우저 열기 버튼 포함. 회전·뒤집기 옵션.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🗂 Blueprint Browser (블루프린트)</div>
+          <div class="card-desc">저장된 블루프린트를 썸네일 미리보기로 관리. 이름·작성자·태그 검색, 폴더 내 재귀 검색 지원. 선택 시 클립보드에 로드 → Ctrl+V로 배치.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎭 Tool Masks (도구 마스크)</div>
+          <div class="card-desc">특정 블록에만 도구가 적용되도록 필터링. Lua 스크립팅으로 복잡한 마스크 조건 작성 가능. ※마스크 사용 후 해제 불가</div>
+          <span class="tag t-e">윈도우</span>
+          <span class="tag t-adv">고급</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🎯 Target Info (타겟 정보)</div>
+          <div class="card-desc">마우스 커서 아래 블록/엔티티 상세 정보 표시. 좌표·블록 종류·NBT 데이터 확인.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🌍 World Properties (월드 속성)</div>
+          <div class="card-desc">게임 규칙, 날씨, 시간 등 월드 전역 속성 조정.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">⌨ Keybinds (키바인드)</div>
+          <div class="card-desc">모든 에디터 단축키 목록 표시 및 변경. Help → Keybinds 메뉴로 접근.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">🛠 Tool Options (도구 옵션)</div>
+          <div class="card-desc">현재 선택 도구의 세부 설정. Shape(브러시 모양), Size(크기), Strength(강도) 등. Ctrl+클릭으로 슬라이더 한계 초과 입력 가능.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+        <div class="card">
+          <div class="card-head">💾 Tool Presets (도구 프리셋)</div>
+          <div class="card-desc">자주 쓰는 도구 설정 저장·불러오기. .minecraft/config/axiom/tool_presets에 NBT 형식으로 저장.</div>
+          <span class="tag t-e">윈도우</span>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="블루프린트">블루프린트 시스템</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">💾 블루프린트 저장</div>
+          <div class="card-desc">선택 영역을 클립보드에 복사 후 Blueprint Browser에서 저장. .bp 파일로 로컬 저장.</div>
+          <div class="steps" style="margin-top:8px;">
+            <div class="step">영역 선택 → Ctrl+C</div>
+            <div class="step">Blueprint Browser 열기 (Windows → Blueprint Browser)</div>
+            <div class="step">'Save' 버튼으로 .bp 파일로 저장</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">📥 블루프린트 불러오기 & 배치</div>
+          <div class="card-desc">썸네일 클릭 → 클립보드 로드 → Ctrl+V로 배치. 기즈모로 회전·이동 후 Enter로 확정.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🤝 블루프린트 공유</div>
+          <div class="card-desc">.bp 파일을 다른 사용자와 공유. 상대방의 .minecraft/config/axiom/blueprints 폴더에 배치하면 즉시 사용 가능.</div>
+        </div>
+        <div class="card">
+          <div class="card-head">🎨 BDEngine 연동</div>
+          <div class="card-desc">BDEngine에서 제작한 Display Entity 모델을 Axiom 명령어로 붙여넣기 가능. BDEngine 카탈로그에서 Axiom용 명령어 복사 → 마인크래프트에서 Ctrl+V.</div>
+          <span class="tag t-tip">팁</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ 패널 4: 응용 방법 ══════════════════════ -->
+    <div class="panel" id="panel-4">
+
+      <div class="sec" data-nav="지형제작응용">지형·테라포밍 응용</div>
+
+      <div class="app-card">
+        <h4>🏔 자연 산악 지형 제작</h4>
+        <div class="scenario">목표: 마인크래프트 느낌의 거친 암산 제작</div>
+        <ol>
+          <li>에디터 모드(Right Shift) 진입</li>
+          <li><b>Sculpt Draw</b>로 기본 산 형태 구성 (볼륨 추가/제거)</li>
+          <li><b>Rock Tool</b>로 절벽면에 바위 질감 추가</li>
+          <li><b>Smooth</b>로 지나치게 거친 부분 부드럽게 처리</li>
+          <li><b>Roughen</b>으로 산 능선에 자연스러운 불규칙성 추가</li>
+          <li><b>Noise Painter</b>로 돌·흙·잔디 블록 자연스럽게 혼합</li>
+        </ol>
+      </div>
+
+      <div class="app-card">
+        <h4>🌊 강 & 호수 지형 제작</h4>
+        <div class="scenario">목표: 자연스러운 강줄기와 호수</div>
+        <ol>
+          <li><b>Path Tool</b>로 강줄기 경로 설정</li>
+          <li><b>Sculpt Draw</b>로 강바닥 파기</li>
+          <li><b>Smooth</b>로 강 경계 자연스럽게 처리</li>
+          <li><b>Flood Fill</b>로 물 채우기</li>
+          <li><b>Biome Painter</b>로 강 주변 바이옴 설정</li>
+        </ol>
+      </div>
+
+      <div class="app-card">
+        <h4>🌿 자연 식생 분산</h4>
+        <div class="scenario">목표: 나무·바위·식물을 자연스럽게 분산</div>
+        <ol>
+          <li>나무 구조물을 블루프린트로 저장</li>
+          <li><b>Stamp Tool</b>에 나무 블루프린트 로드</li>
+          <li><b>Noise Painter</b>와 조합해 무작위 위치에 나무 스탬핑</li>
+          <li><b>Tool Mask</b>로 잔디 블록 위에만 적용되도록 필터</li>
+        </ol>
+      </div>
+
+      <div class="sec" data-nav="건축응용">건축·구조물 응용</div>
+
+      <div class="app-card">
+        <h4>🏰 대칭 성 제작</h4>
+        <div class="scenario">목표: 좌우 완전 대칭 성 효율적으로 건축</div>
+        <ol>
+          <li>빌더 모드에서 <b>Setup Symmetry</b> 도구로 중심점 설정</li>
+          <li>한쪽만 건축하면 반대쪽 자동 미러링</li>
+          <li>탑·망루는 <b>Shape Tool</b>(원기둥)으로 빠르게 생성</li>
+          <li><b>Extrude</b>로 성벽 두께 조절</li>
+          <li>완성된 탑을 블루프린트 저장 후 <b>Stamp</b>로 반복 배치</li>
+        </ol>
+      </div>
+
+      <div class="app-card">
+        <h4>🏙 대형 도시 건설</h4>
+        <div class="scenario">목표: 블록 수백만 규모의 도시</div>
+        <ol>
+          <li>건물 유닛 제작 후 블루프린트 저장</li>
+          <li><b>Stack Tool</b>로 건물 층수 빠르게 쌓기</li>
+          <li><b>Clone Tool</b>로 동일 건물 여러 위치에 배치</li>
+          <li>도로는 <b>Path Tool</b>로 생성</li>
+          <li><b>Ctrl+F</b>로 대규모 지면 정리</li>
+        </ol>
+      </div>
+
+      <div class="app-card">
+        <h4>🎨 블록 아트 & 픽셀 아트</h4>
+        <div class="scenario">목표: 대형 벽면 블록 아트 제작</div>
+        <ol>
+          <li><b>Text Tool</b>로 텍스트 레이아웃 확인</li>
+          <li><b>Gradient Painter</b>로 색상 전환 표현</li>
+          <li><b>Noise Painter</b>로 질감 다양화</li>
+          <li>블루프린트로 저장해 다른 맵에서 재사용</li>
+        </ol>
+      </div>
+
+      <div class="sec" data-nav="고급응용">고급 응용</div>
+
+      <div class="app-card">
+        <h4>📜 Script Brush 응용 (LIS 스크립팅)</h4>
+        <div class="scenario">목표: 반복 패턴을 코드로 자동 생성</div>
+        <ol>
+          <li>Tool Options → Script Brush 선택</li>
+          <li>Lua 코드 에디터에 규칙 작성</li>
+          <li>예: 3블록마다 다른 재질 배치, 높이에 따른 블록 변경</li>
+          <li>미리보기 확인 후 적용</li>
+        </ol>
+        <div style="background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:8px;font-family:'Courier New',monospace;font-size:10px;color:#80d080;margin-top:8px;">
+          -- 높이에 따라 다른 블록 배치<br>
+          if y &lt; 60 then<br>
+          &nbsp;&nbsp;place_block(x, y, z, "stone")<br>
+          elseif y &lt; 70 then<br>
+          &nbsp;&nbsp;place_block(x, y, z, "dirt")<br>
+          else<br>
+          &nbsp;&nbsp;place_block(x, y, z, "grass_block")<br>
+          end
+        </div>
+        <span class="tag t-adv">고급</span>
+      </div>
+
+      <div class="app-card">
+        <h4>🎭 Tool Mask 활용</h4>
+        <div class="scenario">목표: 특정 블록에만 선택적으로 도구 적용</div>
+        <ol>
+          <li>Windows → Tool Masks 패널 열기</li>
+          <li>적용할 블록 종류 또는 조건 설정</li>
+          <li>예: 잔디 블록 위에만 나무 스탬프 배치</li>
+          <li>예: Y=60 이하 블록에만 페인터 적용</li>
+          <li>복잡한 조건은 Lua 스크립트로 작성</li>
+        </ol>
+        <span class="tag t-adv">고급</span>
+      </div>
+
+      <div class="app-card">
+        <h4>🤝 BDEngine + Axiom 연동</h4>
+        <div class="scenario">목표: BDEngine 모델을 맵에 빠르게 삽입</div>
+        <ol>
+          <li>BDEngine(bdengine.app)에서 Display Entity 모델 제작</li>
+          <li>카탈로그에 게시 또는 직접 Export → Axiom 명령어 복사</li>
+          <li>마인크래프트에서 에디터 모드 진입</li>
+          <li>Ctrl+V로 붙여넣기 → 기즈모로 위치 조정</li>
+          <li>Enter로 확정</li>
+        </ol>
+        <span class="tag t-tip">연동</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ 패널 5: 팁 & 비교 ══════════════════════ -->
+    <div class="panel" id="panel-5">
+
+      <div class="sec" data-nav="필수팁">필수 팁 & 트릭</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head">⚡ 생산성 팁</div>
+          <div class="tool-row"><span class="tool-icon">💡</span><span class="tool-name">슬라이더 Ctrl+클릭</span><span class="tool-desc">제한 수치 초과해서 입력 가능. 브러시 크기 수백 블록으로 키울 수 있음</span></div>
+          <div class="tool-row"><span class="tool-icon">💡</span><span class="tool-name">Tool Presets</span><span class="tool-desc">자주 쓰는 도구 세팅을 프리셋으로 저장. 세팅마다 이름 부여 가능</span></div>
+          <div class="tool-row"><span class="tool-icon">💡</span><span class="tool-name">블록 이름 타이핑</span><span class="tool-desc">핫바 검색창에 블록 이름 타이핑 후 Enter → 즉시 핫바에 추가</span></div>
+          <div class="tool-row"><span class="tool-icon">💡</span><span class="tool-name">비행 속도</span><span class="tool-desc">하단 슬라이더로 즉시 조절. 대형 맵에서 10배 속도로 빠른 이동</span></div>
+          <div class="tool-row"><span class="tool-icon">💡</span><span class="tool-name">텍스트 박스 수식</span><span class="tool-desc">좌표 입력란에 sin(45)*100 같은 수식 계산 입력 가능</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head">🎯 지형 제작 팁</div>
+          <div class="tool-row"><span class="tool-icon">🏔</span><span class="tool-name">Sculpt → Smooth</span><span class="tool-desc">먼저 Sculpt로 대략적인 형태 잡고, Smooth로 마무리하는 게 자연스러움</span></div>
+          <div class="tool-row"><span class="tool-icon">🪨</span><span class="tool-name">Rock 마무리</span><span class="tool-desc">절벽·암벽에 Rock Tool 마지막에 살짝 적용하면 현실감 급상승</span></div>
+          <div class="tool-row"><span class="tool-icon">🌊</span><span class="tool-name">Heightmap 활용</span><span class="tool-desc">World Painter에서 내보낸 높이맵 이미지를 Axiom Heightmap Tool로 불러올 수 있음</span></div>
+          <div class="tool-row"><span class="tool-icon">🎨</span><span class="tool-name">Noise 레이어링</span><span class="tool-desc">Noise Painter를 여러 번 겹쳐 적용하면 더 복잡한 자연 패턴 생성</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head">⚠ 주의사항</div>
+          <div class="tool-row"><span class="tool-icon">⚠</span><span class="tool-name">마스크 불가역</span><span class="tool-desc">Tool Mask 적용 후 일부 작업은 Undo 불가. 사전에 백업 권장</span></div>
+          <div class="tool-row"><span class="tool-icon">⚠</span><span class="tool-name">Replace Mode</span><span class="tool-desc">빌더 모드의 Replace Mode는 Undo/Redo 불가</span></div>
+          <div class="tool-row"><span class="tool-icon">⚠</span><span class="tool-name">Display Entity 삭제</span><span class="tool-desc">Display Entity 삭제도 Undo 불가</span></div>
+          <div class="tool-row"><span class="tool-icon">⚠</span><span class="tool-name">크리에이티브 전용</span><span class="tool-desc">서바이벌 모드에서는 도구 사용 불가</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head">🚀 워크플로 추천 순서</div>
+          <div class="steps">
+            <div class="step">블루프린트로 작업 전 백업</div>
+            <div class="step">Box Selection으로 작업 영역 확정</div>
+            <div class="step">Sculpt Draw로 대형 형태 작업</div>
+            <div class="step">Manipulation 도구로 세부 마감</div>
+            <div class="step">Painting 도구로 블록 다양성 추가</div>
+            <div class="step">Tool Preset 저장 후 다음 작업</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" data-nav="WorldEdit비교">Axiom vs WorldEdit 비교</div>
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>Axiom</th>
+            <th>WorldEdit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>인터페이스</td><td>GUI 기반, 마우스 커서 중심</td><td>텍스트 명령어 기반</td></tr>
+          <tr><td>지형 조각</td><td>★★★★★ 브러시 실시간 조각</td><td>★★☆☆☆ 제한적</td></tr>
+          <tr><td>정밀 수치 작업</td><td>★★★☆☆ 슬라이더+입력</td><td>★★★★★ 명령어로 정확</td></tr>
+          <tr><td>대량 블록 교체</td><td>Ctrl+R (GUI)</td><td>//replace 명령어</td></tr>
+          <tr><td>선택 방식</td><td>마우스 드래그, 매직 완드 등</td><td>//wand + 두 꼭짓점</td></tr>
+          <tr><td>학습 곡선</td><td>직관적, 쉬운 입문</td><td>명령어 암기 필요</td></tr>
+          <tr><td>스크립팅</td><td>LIS (Lua 기반)</td><td>WECTL / JS 스크립팅</td></tr>
+          <tr><td>멀티플레이어</td><td>상업 라이선스 필요</td><td>서버 플러그인으로 무료</td></tr>
+          <tr><td>모드로더</td><td>Fabric 전용</td><td>Forge/Fabric 양쪽</td></tr>
+          <tr><td>실시간 미리보기</td><td>✅ 완전 지원</td><td>❌ 없음</td></tr>
+        </tbody>
+      </table>
+
+      <div class="sec" data-nav="시작가이드">빠른 시작 가이드</div>
+      <div class="card-grid">
+        <div class="card wide">
+          <div class="card-head">🚀 처음 시작하는 분을 위한 3단계</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:12px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--amber2);margin-bottom:8px;">1단계: 빌더 모드 익히기</div>
+              <div class="steps">
+                <div class="step">크리에이티브 월드 생성</div>
+                <div class="step">Left Alt 홀드 → 메뉴 탐색</div>
+                <div class="step">0키 → Move 도구 사용해보기</div>
+                <div class="step">7가지 빌더 도구 순서대로 사용</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--amber2);margin-bottom:8px;">2단계: 에디터 모드 입문</div>
+              <div class="steps">
+                <div class="step">Right Shift → 에디터 모드 진입</div>
+                <div class="step">Box Selection으로 영역 선택</div>
+                <div class="step">Ctrl+F로 채우기 테스트</div>
+                <div class="step">Sculpt Draw로 지형 조각 시도</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--amber2);margin-bottom:8px;">3단계: 고급 기능 탐색</div>
+              <div class="steps">
+                <div class="step">블루프린트 저장/불러오기</div>
+                <div class="step">Tool Masks로 선택적 편집</div>
+                <div class="step">Script Brush 기초 LIS 코드</div>
+                <div class="step">BDEngine 모델 연동</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const TABS = [
+  { id:0, label:'빌더 모드' },
+  { id:1, label:'에디터 도구' },
+  { id:2, label:'단축키' },
+  { id:3, label:'윈도우 & 패널' },
+  { id:4, label:'응용 방법' },
+  { id:5, label:'팁 & 비교' },
+];
+
+const SIDEBAR_ITEMS = {
+  0: [
+    { l:'모드 개요',           q:'모드개요' },
+    { l:'빌더 모드 진입',      q:'빌더모드진입' },
+    { l:'빌더 도구 7종',       q:'빌더도구7종' },
+  ],
+  1: [
+    { l:'선택 도구',          q:'선택도구' },
+    { l:'드로잉·조각 도구',    q:'드로잉도구' },
+    { l:'페인팅 도구',        q:'페인팅도구' },
+    { l:'조작·변형 도구',      q:'조작도구' },
+    { l:'기타 도구',          q:'기타도구' },
+  ],
+  2: [
+    { l:'모드 전환 단축키',    q:'모드전환단축키' },
+    { l:'에디터 단축키',       q:'에디터단축키' },
+    { l:'빌더 단축키',         q:'빌더단축키' },
+  ],
+  3: [
+    { l:'에디터 UI 구성',      q:'에디터UI' },
+    { l:'윈도우 패널 종류',    q:'윈도우패널' },
+    { l:'블루프린트 시스템',   q:'블루프린트' },
+  ],
+  4: [
+    { l:'지형·테라포밍',       q:'지형제작응용' },
+    { l:'건축·구조물',         q:'건축응용' },
+    { l:'고급 응용',           q:'고급응용' },
+  ],
+  5: [
+    { l:'필수 팁 & 트릭',      q:'필수팁' },
+    { l:'Axiom vs WorldEdit',  q:'WorldEdit비교' },
+    { l:'빠른 시작 가이드',    q:'시작가이드' },
+  ],
+};
+
+let current = 0;
+
+const tabBar = document.getElementById('tab-bar');
+TABS.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (t.id === 0 ? ' active' : '');
+  btn.textContent = t.label;
+  btn.addEventListener('click', () => switchTab(t.id));
+  tabBar.appendChild(btn);
+});
+
+function findSection(panel, q) {
+  const el = panel.querySelector('[data-nav="' + q + '"]');
+  if (el) return el;
+  for (const h of panel.querySelectorAll('.card-head, .sec, h4')) {
+    if (h.textContent.includes(q)) return h.closest('.card, .app-card') || h;
+  }
+  return null;
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 62;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    sb.appendChild(btn);
+  });
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === id));
+  current = id;
+  buildSidebar(id);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.getElementById('search').value = '';
+  document.querySelectorAll('.card, .app-card').forEach(c => c.style.display = '');
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.card, .app-card').forEach(c => c.style.display = '');
+    return;
+  }
+  document.querySelectorAll('.card, .app-card').forEach(c => {
+    c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+buildSidebar(0);
+</script>
+</body>
+</html>

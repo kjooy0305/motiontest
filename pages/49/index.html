@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suno 음악 생성 완전 정복</title>
+<style>
+:root{
+  --bg:#08060e;--bg2:#0f0c1a;--bg3:#171226;--bg4:#211a33;
+  --border:#2a2140;--border2:#3d3159;
+  --txt:#e6e0f5;--txt2:#9e93bd;--txt3:#5f5580;
+  --pur:#a97bf5;--pur2:#c9a8ff;--cyan:#4fd8e8;--cyan2:#8ff0fa;
+  --pink:#f56ba8;--green:#5fd68a;--amber:#f0b24a;--red:#f2666a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--pur);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;min-height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--pur2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:340px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--pur);box-shadow:0 0 0 2px rgba(169,123,245,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;padding:6px 0;}
+.tab{padding:6px 11px;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;font-family:inherit;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(169,123,245,.15);color:var(--pur2);border-color:rgba(169,123,245,.35);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;line-height:1.45;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(169,123,245,.08);color:var(--pur2);border-left-color:var(--pur);}
+.main{flex:1;padding:20px 24px;max-width:1060px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--pur2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:12px 14px;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:8px 10px;vertical-align:top;font-size:13px;}
+.e-table th{padding:7px 10px;text-align:left;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:700;}
+.e-name{color:var(--cyan2);font-weight:600;white-space:nowrap;width:170px;font-family:Consolas,Menlo,monospace;font-size:12px;}
+.e-desc{color:var(--txt2);}
+.e-desc b{color:var(--txt);font-weight:600;}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.t-must{background:rgba(95,214,138,.16);color:var(--green);}
+.t-opt{background:rgba(240,178,74,.16);color:var(--amber);}
+.t-warn{background:rgba(242,102,106,.16);color:var(--red);}
+.t-pro{background:rgba(169,123,245,.18);color:var(--pur2);}
+.t-free{background:rgba(79,216,232,.14);color:var(--cyan);}
+
+code{font-family:Consolas,Menlo,monospace;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:12px;color:var(--cyan2);}
+
+.tpl{position:relative;background:#0b0916;border:1px solid var(--border2);border-radius:6px;margin:8px 0;}
+.tpl-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--txt3);font-weight:700;letter-spacing:.4px;}
+.tpl pre{padding:10px 12px;font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.65;color:var(--txt);white-space:pre-wrap;word-break:break-word;overflow-x:auto;}
+.copy{background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);border-radius:4px;padding:2px 9px;font-size:11px;cursor:pointer;font-family:inherit;transition:.12s;}
+.copy:hover{background:var(--pur);color:#120a20;border-color:var(--pur);}
+.copy.done{background:var(--green);color:#062012;border-color:var(--green);}
+
+.good{border-left:3px solid var(--green);background:rgba(95,214,138,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.bad{border-left:3px solid var(--red);background:rgba(242,102,106,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.note{border-left:3px solid var(--cyan);background:rgba(79,216,232,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.good b,.bad b,.note b{color:var(--txt);}
+
+ul.li{margin:4px 0 4px 16px;color:var(--txt2);font-size:13px;}
+ul.li li{margin-bottom:4px;}
+ul.li li b{color:var(--txt);font-weight:600;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0;}
+.chip{background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;font-size:11.5px;color:var(--cyan2);font-family:Consolas,Menlo,monospace;cursor:pointer;transition:.1s;}
+.chip:hover{background:var(--pur);color:#120a20;border-color:var(--pur);}
+
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px 0;font-size:13px;}
+.foot{color:var(--txt3);font-size:11px;padding:18px 0 40px;line-height:1.8;border-top:1px solid var(--border);margin-top:20px;}
+.foot a{color:var(--txt2);}
+
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .main{padding:14px;}
+  .e-name{width:auto;white-space:normal;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span class="logo-icon">🎧</span>Suno 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="현재 탭에서 검색 (예: 코러스, BPM, 트로트)"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('basic')">기초</button>
+    <button class="tab" onclick="showPanel('style')">스타일 프롬프트</button>
+    <button class="tab" onclick="showPanel('tags')">메타태그</button>
+    <button class="tab" onclick="showPanel('lyrics')">가사</button>
+    <button class="tab" onclick="showPanel('recipe')">장르 레시피</button>
+    <button class="tab" onclick="showPanel('tools')">도구·워크플로</button>
+    <button class="tab" onclick="showPanel('fix')">문제 해결</button>
+    <button class="tab" onclick="showPanel('plan')">모델·요금·권리</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+
+<!-- ══════════════════ 기초 ══════════════════ -->
+<section class="panel active" id="panel-basic">
+  <div class="sec-title">🎛️ 기초 — 어디에 무엇을 쓰는가</div>
+  <div class="sec-sub">Suno에서 결과가 나쁜 이유의 태반은 <b>지시를 엉뚱한 칸에 적었기 때문</b>입니다. 칸의 역할부터 확실히 나누면 나머지 팁이 전부 잘 듣습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🧭</span>세 개의 입력칸 — 역할 분담이 전부다</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">Style of Music<br><span style="color:var(--txt3);font-size:11px;">스타일</span></td>
+            <td class="e-desc"><b>“어떤 소리인가”만</b> 적는 칸. 장르·무드·보컬 성격·핵심 악기·프로덕션 질감·BPM. 여기에 가사나 구조를 적으면 안 됩니다.</td></tr>
+        <tr><td class="e-name">Lyrics<br><span style="color:var(--txt3);font-size:11px;">가사</span></td>
+            <td class="e-desc"><b>“무엇을 부르는가 + 곡의 구조”</b>를 적는 칸. 실제 가사, <code>[Verse]</code> 같은 구조 태그, 애드립, 특정 지점의 연주 지시가 전부 여기 들어갑니다.</td></tr>
+        <tr><td class="e-name">Exclude Styles<br><span style="color:var(--txt3);font-size:11px;">고급 옵션</span></td>
+            <td class="e-desc">빼고 싶은 요소를 적는 전용 칸. 스타일칸에 “no drums”라고 쓰면 오히려 드럼이 나옵니다. <span class="tag t-must">중요</span></td></tr>
+      </table>
+      <div class="note"><b>한 줄 원칙</b> — 소리는 스타일칸, 말과 구조는 가사칸, 제외는 제외칸. 증상이 생기면 “이 지시가 지금 맞는 칸에 있나?”부터 확인하세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔀</span>간단 모드 vs 직접 작성 모드</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">Simple / 간단</td><td class="e-desc">문장 하나로 설명하면 Suno가 스타일과 가사를 알아서 만듭니다. 아이디어 탐색용. 통제력은 거의 없습니다.</td></tr>
+        <tr><td class="e-name">Custom / 직접 작성</td><td class="e-desc"><b>실전은 무조건 이쪽.</b> 스타일·가사를 따로 넣고 구조 태그를 쓸 수 있습니다. 이 문서의 팁 대부분은 이 모드 기준입니다.</td></tr>
+        <tr><td class="e-name">Instrumental 토글</td><td class="e-desc">켜면 보컬 없는 연주곡. 보컬이 빠진 만큼 <b>스타일칸을 더 자세히</b> 써야 허전해지지 않습니다.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚙️</span>알아 두면 시간 아끼는 기본 동작</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>1회 생성 = 2곡.</b> 같은 프롬프트라도 두 결과가 꽤 다릅니다. 마음에 안 들면 프롬프트를 고치기 전에 <b>먼저 두세 번 재생성</b>해 보세요. 프롬프트 문제가 아니라 뽑기 문제인 경우가 많습니다.</li>
+        <li><b>결과는 확률적입니다.</b> 태그는 명령이 아니라 힌트라서, 같은 입력이라도 매번 다르게 나오고 가끔 무시됩니다. “한 번 안 먹혔다 = 안 되는 기능”이 아닙니다.</li>
+        <li><b>한 번에 하나만 바꾸세요.</b> 프롬프트 다섯 군데를 동시에 고치면 무엇이 효과였는지 영영 알 수 없습니다.</li>
+        <li><b>프롬프트는 영어가 안정적입니다.</b> 학습 데이터가 영어 중심이라 장르·악기·프로덕션 용어는 영어가 훨씬 잘 먹습니다. <b>가사는 한국어로 써도 됩니다.</b></li>
+        <li><b>마음에 드는 결과는 즉시 저장·다운로드.</b> 같은 시드로 똑같이 재현하는 기능이 없습니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🚀</span>가장 빠른 첫 곡 — 이대로 복사</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE 칸</span><button class="copy">복사</button></div>
+<pre>indie pop, warm nostalgic mood, female vocal, soft airy tone,
+acoustic guitar, analog synth pad, gentle drums, 92 BPM, tape warmth</pre></div>
+      <div class="tpl"><div class="tpl-head"><span>LYRICS 칸</span><button class="copy">복사</button></div>
+<pre>[Intro]
+
+[Verse]
+창문 너머 번지는 저녁 빛
+오래된 노래가 흘러나와
+
+[Pre-Chorus]
+조금씩 느려지는 하루
+
+[Chorus]
+괜찮아 천천히 가도 돼
+우리는 아직 여기 있어
+괜찮아 천천히 가도 돼
+
+[Verse]
+식어버린 커피잔 옆에
+접어둔 편지를 다시 펴
+
+[Chorus]
+괜찮아 천천히 가도 돼
+우리는 아직 여기 있어
+
+[Bridge]
+(천천히) (천천히)
+
+[Outro]
+[Fade Out]</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 스타일 프롬프트 ══════════════════ -->
+<section class="panel" id="panel-style">
+  <div class="sec-title">🎨 스타일 프롬프트</div>
+  <div class="sec-sub">스타일칸은 짧습니다. 형용사를 늘어놓지 말고 <b>정해진 항목을 채우는 방식</b>으로 쓰면 적은 글자로 훨씬 정확해집니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📐</span>7칸 공식 — 이 순서대로 채우세요</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">1. 장르</td><td class="e-desc">가장 먼저. <code>city pop</code>, <code>drum and bass</code>, <code>gospel</code>. 앞쪽 단어일수록 영향이 큽니다.</td></tr>
+        <tr><td class="e-name">2. 하위장르·시대</td><td class="e-desc"><code>80s</code>, <code>90s boom bap</code>, <code>modern</code>, <code>lo-fi</code>. 시대 지정은 사운드를 통째로 바꾸는 가장 강력한 한 단어입니다.</td></tr>
+        <tr><td class="e-name">3. 무드</td><td class="e-desc"><code>melancholic</code>, <code>triumphant</code>, <code>eerie</code>, <code>playful</code>. 2개까지만.</td></tr>
+        <tr><td class="e-name">4. 보컬</td><td class="e-desc">성별·음역·질감. <code>female vocal, breathy, low register</code>. 연주곡이면 생략.</td></tr>
+        <tr><td class="e-name">5. 핵심 악기</td><td class="e-desc">2~4개만. <code>fretless bass, rhodes piano, brushed drums</code>. 많이 적을수록 각각이 흐려집니다.</td></tr>
+        <tr><td class="e-name">6. 프로덕션·질감</td><td class="e-desc"><code>tape saturation</code>, <code>wide reverb</code>, <code>dry punchy mix</code>, <code>vinyl crackle</code>. 아마추어와 프로 결과를 가르는 항목입니다.</td></tr>
+        <tr><td class="e-name">7. 템포·조성</td><td class="e-desc"><code>124 BPM</code>, <code>minor key</code>, <code>half-time feel</code>. BPM은 대체로 잘 듣습니다.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚖️</span>좋은 예 / 나쁜 예</div>
+    <div class="card-body">
+      <div class="bad"><b>나쁜 예</b><br>“슬프고 감동적이고 아름다운 발라드인데 목소리가 좋고 피아노랑 현악기가 나오면서 후렴이 웅장했으면 좋겠어요”<br><span style="color:var(--txt3)">→ 형용사만 많고 정보가 없음. 한국어. 구조 지시가 스타일칸에 섞임.</span></div>
+      <div class="good"><b>좋은 예</b><br><code>korean ballad, 2000s, melancholic, male vocal with strained high notes, grand piano, string section, sparse verse into wide chorus, 68 BPM, cinematic reverb</code><br><span style="color:var(--txt3)">→ 항목이 구분되고, 편성 변화까지 소리로 설명함.</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📌</span>스타일칸 규칙</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>쉼표로 끊으세요.</b> Suno는 서술형 문장보다 쉼표로 나열된 키워드를 훨씬 잘 해석합니다.</li>
+        <li><b>앞 20~30단어가 제일 중요합니다.</b> 뒤로 갈수록 영향이 급격히 줍니다. 핵심을 맨 앞에.</li>
+        <li><b>글자 수 제한이 있습니다.</b> 모델·버전에 따라 다르지만(대략 200자대에서 최신 모델은 1000자까지) 어차피 길게 쓴다고 좋아지지 않습니다. 밀도를 높이세요.</li>
+        <li><b>실존 아티스트 이름은 차단됩니다.</b> “아이유처럼” 대신 <code>clear light female vocal, delicate vibrato, soft mid-range</code>처럼 <b>소리를 묘사</b>하세요.</li>
+        <li><b>부정문은 스타일칸에 쓰지 마세요.</b> “no drums”라고 쓰면 ‘drums’라는 단어에 반응합니다. 반드시 <b>Exclude 칸</b>을 쓰세요.</li>
+        <li><b>모순되는 지시를 피하세요.</b> <code>aggressive metal, calm and relaxing</code>처럼 충돌하면 둘 다 흐려집니다.</li>
+        <li><b>악기는 4개 이하.</b> 10개를 적으면 아무것도 또렷하게 안 들립니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔤</span>자주 쓰는 프로덕션 어휘</div>
+    <div class="card-body">
+      <div style="color:var(--txt3);font-size:11px;margin-bottom:4px;">질감 (클릭하면 복사)</div>
+      <div class="chips">
+        <span class="chip">tape saturation</span><span class="chip">vinyl crackle</span><span class="chip">lo-fi texture</span>
+        <span class="chip">analog warmth</span><span class="chip">crisp digital</span><span class="chip">gritty distortion</span>
+        <span class="chip">glossy pop production</span><span class="chip">raw garage recording</span>
+      </div>
+      <div style="color:var(--txt3);font-size:11px;margin:8px 0 4px;">공간</div>
+      <div class="chips">
+        <span class="chip">wide stereo reverb</span><span class="chip">dry punchy mix</span><span class="chip">cathedral reverb</span>
+        <span class="chip">close intimate mic</span><span class="chip">stadium ambience</span><span class="chip">bedroom recording</span>
+      </div>
+      <div style="color:var(--txt3);font-size:11px;margin:8px 0 4px;">리듬·전개</div>
+      <div class="chips">
+        <span class="chip">half-time feel</span><span class="chip">driving four on the floor</span><span class="chip">syncopated groove</span>
+        <span class="chip">swung 16ths</span><span class="chip">sparse verse into wide chorus</span><span class="chip">building intensity</span>
+      </div>
+      <div style="color:var(--txt3);font-size:11px;margin:8px 0 4px;">보컬 질감</div>
+      <div class="chips">
+        <span class="chip">breathy</span><span class="chip">raspy</span><span class="chip">airy falsetto</span><span class="chip">belting</span>
+        <span class="chip">deep resonant</span><span class="chip">nasal bright</span><span class="chip">whispered</span><span class="chip">layered harmonies</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 메타태그 ══════════════════ -->
+<section class="panel" id="panel-tags">
+  <div class="sec-title">🏷️ 메타태그</div>
+  <div class="sec-sub">가사칸에 <code>[대괄호]</code>로 넣는 지시문입니다. 노래로 불리지 않고 연출 지시로만 쓰입니다. <b>명령이 아니라 확률적 힌트</b>라는 점을 항상 염두에 두세요.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📏</span>태그 사용 규칙</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>대괄호, 독립된 줄, 영어.</b> 영향을 줄 가사 <b>바로 앞줄</b>에 놓습니다.</li>
+        <li><b>1~3단어로 짧게.</b> 길어질수록 무시될 확률이 올라갑니다.</li>
+        <li><b>구조 태그를 먼저 깔고</b> 나머지를 얹으세요. 구조가 없으면 Suno가 제멋대로 진행합니다.</li>
+        <li><b>남발 금지.</b> 줄마다 태그를 붙이면 전부 희석됩니다. 섹션이 바뀌는 지점에 집중하세요.</li>
+        <li><b>길이 조절용이 아닙니다.</b> 태그로 “30초짜리 솔로”를 만들 수 없습니다. 길이는 Extend·편집 기능으로 해결하세요.</li>
+        <li><b>가사를 대괄호 안에 넣지 마세요.</b> 불리지 않고 사라집니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="ico">🧱</span>구조 태그 <span class="tag t-must">필수</span></div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Intro]</span><span class="chip">[Verse]</span><span class="chip">[Pre-Chorus]</span>
+          <span class="chip">[Chorus]</span><span class="chip">[Post-Chorus]</span><span class="chip">[Hook]</span>
+          <span class="chip">[Refrain]</span><span class="chip">[Bridge]</span><span class="chip">[Break]</span>
+          <span class="chip">[Breakdown]</span><span class="chip">[Drop]</span><span class="chip">[Interlude]</span>
+          <span class="chip">[Instrumental]</span><span class="chip">[Instrumental Break]</span><span class="chip">[Solo]</span>
+          <span class="chip">[Outro]</span><span class="chip">[Fade Out]</span><span class="chip">[End]</span>
+        </div>
+        <div class="note"><code>[Intro]</code>는 유독 잘 무시됩니다. 도입부를 확실히 원하면 스타일칸에 <code>short instrumental intro</code>를 넣는 편이 잘 먹습니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🎤</span>보컬 태그</div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Male Vocal]</span><span class="chip">[Female Vocal]</span><span class="chip">[Duet]</span>
+          <span class="chip">[Choir]</span><span class="chip">[Gospel Choir]</span><span class="chip">[Harmonies]</span>
+          <span class="chip">[Layered Vocals]</span><span class="chip">[Whispered]</span><span class="chip">[Spoken Word]</span>
+          <span class="chip">[Rap Verse]</span><span class="chip">[Falsetto]</span><span class="chip">[Belting]</span>
+          <span class="chip">[Vibrato]</span><span class="chip">[Ad-libs]</span><span class="chip">[Call and Response]</span>
+          <span class="chip">[Vocoder]</span><span class="chip">[Autotune]</span><span class="chip">[Scream]</span><span class="chip">[Growl]</span>
+        </div>
+        <div class="note">듀엣은 <code>[Male Vocal]</code>/<code>[Female Vocal]</code>을 <b>주고받는 줄마다</b> 번갈아 넣어야 갈립니다. 한 번만 넣으면 곧 원래대로 돌아갑니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🎸</span>악기·연주 태그</div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Guitar Solo]</span><span class="chip">[Piano Solo]</span><span class="chip">[Sax Solo]</span>
+          <span class="chip">[Violin Solo]</span><span class="chip">[Drum Fill]</span><span class="chip">[Bass Drop]</span>
+          <span class="chip">[808 Bass]</span><span class="chip">[Synth Lead]</span><span class="chip">[Strings]</span>
+          <span class="chip">[Brass Section]</span><span class="chip">[Organ]</span><span class="chip">[Acoustic Guitar]</span>
+          <span class="chip">[Harmonica]</span><span class="chip">[Banjo]</span><span class="chip">[Sitar]</span>
+          <span class="chip">[Gayageum]</span><span class="chip">[Erhu]</span><span class="chip">[Handclaps]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">📈</span>다이내믹·전개 태그</div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Build Up]</span><span class="chip">[Crescendo]</span><span class="chip">[Quiet]</span>
+          <span class="chip">[Soft]</span><span class="chip">[Loud]</span><span class="chip">[Half-Time]</span>
+          <span class="chip">[Double Time]</span><span class="chip">[Tempo Up]</span><span class="chip">[Key Change]</span>
+          <span class="chip">[Silence]</span><span class="chip">[Stutter]</span><span class="chip">[Big Finish]</span>
+          <span class="chip">[Abrupt End]</span>
+        </div>
+        <div class="note"><code>[Key Change]</code>는 마지막 후렴 직전에 넣으면 성공률이 가장 높습니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🌫️</span>분위기·믹스 태그</div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Emotional Bridge]</span><span class="chip">[Epic]</span><span class="chip">[Intimate]</span>
+          <span class="chip">[Dreamy]</span><span class="chip">[Aggressive]</span><span class="chip">[Distorted]</span>
+          <span class="chip">[Lo-fi]</span><span class="chip">[Reverb Heavy]</span><span class="chip">[Dry Mix]</span>
+          <span class="chip">[Muffled]</span><span class="chip">[Telephone Filter]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔊</span>효과음·환경 태그</div>
+      <div class="card-body">
+        <div class="chips">
+          <span class="chip">[Applause]</span><span class="chip">[Crowd Cheering]</span><span class="chip">[Vinyl Crackle]</span>
+          <span class="chip">[Rain]</span><span class="chip">[Thunder]</span><span class="chip">[Ocean Waves]</span>
+          <span class="chip">[Birds Chirping]</span><span class="chip">[Radio Static]</span><span class="chip">[Phone Ringing]</span>
+          <span class="chip">[Footsteps]</span><span class="chip">[Wind]</span>
+        </div>
+        <div class="note">효과음 태그는 성공률이 낮은 편입니다. 꼭 필요하면 편집 단계에서 얹는 편이 확실합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 가사 ══════════════════ -->
+<section class="panel" id="panel-lyrics">
+  <div class="sec-title">✍️ 가사 작성</div>
+  <div class="sec-sub">가사칸은 단순한 텍스트 입력창이 아니라 <b>곡의 설계도</b>입니다. 구조·호흡·발음을 여기서 통제합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🏗️</span>기본 구조 — 3분 곡의 표준형</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>표준 팝 구조</span><button class="copy">복사</button></div>
+<pre>[Intro]
+[Verse]
+[Pre-Chorus]
+[Chorus]
+[Verse]
+[Pre-Chorus]
+[Chorus]
+[Bridge]
+[Chorus]
+[Outro]
+[Fade Out]</pre></div>
+      <ul class="li">
+        <li><b>후렴은 최소 3번.</b> 사람이 기억하는 곡은 예외 없이 후렴이 반복됩니다.</li>
+        <li><b>후렴 가사는 매번 똑같이.</b> 조금씩 바꾸면 Suno가 멜로디도 매번 다르게 만들어 후렴이 후렴처럼 안 들립니다.</li>
+        <li><b>벌스와 후렴의 줄 길이를 다르게.</b> 벌스는 길고 촘촘하게, 후렴은 짧고 시원하게 쓰면 대비가 생깁니다.</li>
+        <li><b>한 줄은 8~12음절.</b> 한 줄이 곧 한 호흡입니다. 너무 길면 뭉개서 부르고, 너무 짧으면 늘어집니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🇰🇷</span>한국어 가사 전용 팁</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">받침 뭉개짐</td><td class="e-desc">복잡한 받침(ㄻ, ㄼ, ㄶ)은 자주 뭉갭니다. <b>소리 나는 대로</b> 적으세요. “삶이” → <code>살미</code>, “않아” → <code>아나</code>.</td></tr>
+        <tr><td class="e-name">연음 처리</td><td class="e-desc">“맑은” → <code>말근</code>, “꽃이” → <code>꼬치</code>. 발음 표기로 바꾸면 정확도가 눈에 띄게 올라갑니다.</td></tr>
+        <tr><td class="e-name">영어 단어</td><td class="e-desc">한국어 가사 중간의 영어는 <b>한글로 표기</b>하면 억양이 자연스러워집니다. “Love” → <code>러브</code>. 반대로 영어 발음을 살리고 싶으면 영어 그대로 두세요.</td></tr>
+        <tr><td class="e-name">음절 늘이기</td><td class="e-desc">길게 끄는 음은 모음을 반복. “가~” → <code>가아아</code>.</td></tr>
+        <tr><td class="e-name">끊어 부르기</td><td class="e-desc">하이픈으로 음절을 분리. <code>기-다-릴-게</code>.</td></tr>
+        <tr><td class="e-name">숫자·기호</td><td class="e-desc">숫자는 한글로. “1000일” → <code>천일</code>. 기호(&amp;, %, *)는 읽지 못하거나 이상하게 읽습니다.</td></tr>
+        <tr><td class="e-name">스타일칸 언어 지정</td><td class="e-desc">한국어로 부르게 하려면 스타일칸에 <code>korean lyrics</code> 또는 <code>sung in korean</code>을 넣어 두세요. 안 넣으면 영어로 바꿔 부르는 일이 있습니다. <span class="tag t-must">중요</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎙️</span>애드립·연출</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>애드립은 소괄호.</b> 가사 줄 안에 <code>(oh yeah)</code>, <code>(하나 둘)</code>처럼 인라인으로 넣습니다. 대괄호가 아닙니다.</li>
+        <li><b>백보컬</b>은 줄 끝에 괄호로 받아치면 콜앤리스폰스가 됩니다. <code>기다릴게 (기다릴게)</code></li>
+        <li><b>말하듯 부르기</b>는 <code>[Spoken Word]</code>를 해당 줄 앞에.</li>
+        <li><b>간주</b>는 가사 없이 <code>[Instrumental Break]</code>만 한 줄.</li>
+        <li><b>별표·따옴표·이모지는 넣지 마세요.</b> 읽어버리거나 발음이 깨집니다.</li>
+      </ul>
+      <div class="bad"><b>하지 말 것</b> — <code>[슬프게 부르며 피아노가 잔잔하게 깔린다]</code> 같은 한국어 서술형 지시. 길고 한국어라 무시되기 쉽고, 최악의 경우 그대로 불러버립니다.</div>
+      <div class="good"><b>대신</b> — <code>[Soft]</code> + <code>[Piano Solo]</code> 처럼 짧은 영어 태그 두 개로 나누세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⏱️</span>길이 조절</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>섹션 수가 곧 길이입니다.</b> 대략 벌스 2 + 후렴 3 + 브릿지 1 ≈ 3분.</li>
+        <li>가사를 다 안 쓰고 남겨두면 <b>곡이 갑자기 끝납니다.</b> <code>[Outro]</code>와 <code>[Fade Out]</code>을 꼭 넣으세요.</li>
+        <li>더 긴 곡은 가사를 늘리기보다 <b>Extend 기능</b>으로 이어 붙이는 편이 안정적입니다.</li>
+        <li>짧은 곡(30초 광고 등)은 <code>[Intro] [Hook] [Outro]</code>만 두고 스타일칸에 <code>short jingle</code>을 넣으세요.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚠️</span>차단되는 것들</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>실존 아티스트·밴드 이름</b> — 스타일칸·가사칸 모두 차단됩니다.</li>
+        <li><b>기존 곡 가사</b> — 저작권 필터에 걸립니다.</li>
+        <li><b>유명인 실명</b>, 혐오·성적 표현 등 정책 위반 표현.</li>
+        <li>차단되면 오류 메시지 없이 <b>그냥 이상한 결과</b>가 나오는 경우도 있습니다. 갑자기 품질이 무너지면 금지어를 의심해 보세요.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 장르 레시피 ══════════════════ -->
+<section class="panel" id="panel-recipe">
+  <div class="sec-title">🍳 장르 레시피</div>
+  <div class="sec-sub">스타일칸에 그대로 붙여 넣고 무드·BPM만 바꾸면 됩니다. 각 항목의 추천 태그는 가사칸에 넣으세요.</div>
+
+  <div class="grid2">
+    <div class="card"><div class="card-head"><span class="ico">🇰🇷</span>K-pop</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>k-pop, modern, energetic and confident, female group vocals,
+punchy synth bass, trap hi-hats, brass stabs, sung in korean,
+120 BPM, glossy polished production, wide chorus</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Rap Verse] [Pre-Chorus] [Post-Chorus] [Ad-libs] [Key Change]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🌆</span>시티팝</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>city pop, 80s japanese, nostalgic and breezy, female vocal with
+soft vibrato, fretless bass, rhodes piano, chorus-drenched guitar,
+gated reverb drums, 105 BPM, analog tape warmth</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Sax Solo] [Instrumental Break] [Harmonies]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">📻</span>로파이 힙합</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>lo-fi hip hop, calm and hazy, instrumental, dusty drum loop,
+jazzy rhodes chords, upright bass, vinyl crackle, 78 BPM,
+muffled low-pass texture, bedroom recording</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">Instrumental 토글 ON · 추천 태그: [Vinyl Crackle] [Rain] [Quiet]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">💔</span>한국 발라드</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>korean ballad, 2000s, melancholic and sincere, male vocal with
+strained high notes, grand piano, string section, sung in korean,
+68 BPM, sparse verse into wide chorus, cinematic reverb</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Emotional Bridge] [Key Change] [Belting] [Strings]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🎺</span>트로트</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>korean trot, retro and cheerful, female vocal with strong vibrato
+and bending notes, electric organ, brass section, shuffle drums,
+sung in korean, 128 BPM, bright live band feel</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Vibrato] [Brass Section] [Handclaps] [Call and Response]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🪕</span>인디 포크</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>indie folk, intimate and wistful, soft male vocal close-miked,
+fingerpicked acoustic guitar, upright bass, brushed drums,
+subtle strings, 84 BPM, warm room ambience</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Intimate] [Harmonies] [Quiet] [Build Up]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🤘</span>하드록 · 메탈</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>heavy metal, aggressive and driving, male vocal with raspy edge,
+palm-muted distorted guitars, double kick drums, growling bass,
+160 BPM, tight dry mix, thick guitar wall</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Guitar Solo] [Breakdown] [Scream] [Double Time]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🎆</span>EDM (페스티벌)</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>festival edm, euphoric and massive, female topline vocal,
+supersaw lead, sidechained pads, driving four on the floor,
+128 BPM, huge stadium reverb, punchy club mastering</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Build Up] [Drop] [Breakdown] [Vocoder]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🎷</span>재즈</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>jazz quartet, smoky late-night mood, sultry female vocal,
+upright bass walking line, brushed drums, muted trumpet,
+swung 16ths, 92 BPM, close intimate mic, live club ambience</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Sax Solo] [Piano Solo] [Interlude] [Spoken Word]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🎻</span>오케스트라 · 시네마틱</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>cinematic orchestral, triumphant and sweeping, instrumental,
+full string section, french horns, timpani, choir swells,
+90 BPM, wide concert hall reverb, epic film score</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">Instrumental ON · 추천 태그: [Build Up] [Crescendo] [Choir] [Big Finish]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🌙</span>앰비언트 · 명상</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>ambient, serene and weightless, instrumental, evolving synth pads,
+soft felt piano, distant field recording, no percussion,
+60 BPM, endless cathedral reverb</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">Instrumental ON · Exclude 칸: drums, percussion</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🎮</span>게임 BGM</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>retro chiptune, adventurous and looping, instrumental,
+8-bit square lead, punchy noise drums, arpeggiated bass,
+150 BPM, clean crisp digital, seamless loop feel</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">Instrumental ON · 추천 태그: [Interlude] [Tempo Up]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🥁</span>R&amp;B · 네오소울</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>neo soul, warm and sensual, breathy female vocal with runs,
+rhodes piano, thick sub bass, laid-back drums behind the beat,
+72 BPM, half-time feel, lush layered harmonies</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Layered Vocals] [Ad-libs] [Falsetto] [Half-Time]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🪘</span>국악 퓨전</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>korean traditional fusion, dramatic and ceremonial,
+powerful female vocal with pansori grain, gayageum, daegeum,
+janggu percussion, modern sub bass, sung in korean, 96 BPM</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">추천 태그: [Gayageum] [Build Up] [Call and Response]</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">📣</span>광고 징글 (30초)</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>upbeat commercial jingle, bright and friendly, short jingle,
+cheerful female vocal, ukulele, handclaps, whistling,
+118 BPM, clean modern pop production</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">가사는 [Intro] [Hook] [Outro] 만. 브랜드명을 훅에 3번 반복.</div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><span class="ico">🌃</span>신스웨이브</div><div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>STYLE</span><button class="copy">복사</button></div>
+<pre>synthwave, nostalgic and cinematic, instrumental,
+analog saw lead, gated reverb drums, arpeggiated bassline,
+110 BPM, neon retro 80s production, wide stereo chorus</pre></div>
+      <div style="color:var(--txt3);font-size:11px;">Instrumental ON · 추천 태그: [Synth Lead] [Build Up] [Drop]</div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ══════════════════ 도구·워크플로 ══════════════════ -->
+<section class="panel" id="panel-tools">
+  <div class="sec-title">🧰 도구 · 워크플로</div>
+  <div class="sec-sub">Suno의 진짜 힘은 “한 번에 완벽한 곡 뽑기”가 아니라 <b>생성 → 고르기 → 고치기 → 확장</b>의 반복에 있습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔁</span>편집·확장 기능</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:150px;">기능</th><th>쓰는 법과 요령</th></tr>
+        <tr><td class="e-name">Extend</td><td class="e-desc">기존 곡의 특정 지점부터 <b>이어서 생성</b>. 곡을 길게 만드는 가장 안정적인 방법. 이어붙일 지점을 후렴 끝 등 <b>구획이 끊기는 곳</b>으로 잡아야 자연스럽습니다.</td></tr>
+        <tr><td class="e-name">Get Whole Song</td><td class="e-desc">여러 번 Extend한 조각들을 하나의 완성곡으로 합칩니다.</td></tr>
+        <tr><td class="e-name">Cover</td><td class="e-desc"><b>가사·멜로디는 두고 스타일만</b> 갈아끼웁니다. 발라드를 메탈로 바꾸는 식. 마음에 드는 가사가 나왔을 때 장르 실험용으로 최고.</td></tr>
+        <tr><td class="e-name">Remix / Remaster</td><td class="e-desc">기존 결과를 최신 모델 품질로 다시 렌더링하거나 편곡을 바꿉니다. 예전 버전으로 만든 곡을 살릴 때 유용.</td></tr>
+        <tr><td class="e-name">Replace / Add Section</td><td class="e-desc">곡 전체를 다시 뽑지 않고 <b>마음에 안 드는 구간만</b> 교체·추가. 후렴 하나만 어긋났을 때 쓰세요.</td></tr>
+        <tr><td class="e-name">Crop · Fade</td><td class="e-desc">앞뒤 잘라내기와 페이드. 도입부가 너무 길 때 가장 빠른 해결책.</td></tr>
+        <tr><td class="e-name">Stem 분리</td><td class="e-desc">완성곡을 보컬·드럼·베이스 등 <b>여러 트랙으로 분리</b>. 최신 모델은 최대 12트랙까지. 유료 전용. <span class="tag t-pro">Pro+</span></td></tr>
+        <tr><td class="e-name">Audio Upload</td><td class="e-desc">내가 가진 음원을 올려 이어 만들거나 스타일을 참조. 무료는 8분, 유료는 30분까지.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎭</span>일관성 유지 기능 — 앨범을 만들 때</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">Persona</td><td class="e-desc">특정 곡의 <b>보컬 음색·분위기를 고정</b>해 다른 곡에 재사용. 여러 곡을 같은 “가수”로 통일할 때 필수. <span class="tag t-pro">Pro+</span></td></tr>
+        <tr><td class="e-name">Custom Models</td><td class="e-desc">본인이 <b>권리를 가진 곡 6개 이상</b>을 올려 나만의 모델을 학습(2~5분 소요). 코드 진행·프로덕션 습관·보컬 전달까지 학습합니다. 최대 3개까지. <span class="tag t-pro">Pro+</span></td></tr>
+        <tr><td class="e-name">Voices</td><td class="e-desc"><b>내 실제 노래 목소리</b>를 등록해 어떤 장르로든 부르게 합니다. 15초~4분 샘플 + 무작위 문구를 읽는 본인 확인 절차. <span class="tag t-pro">Pro+</span></td></tr>
+        <tr><td class="e-name">My Taste</td><td class="e-desc">내 취향을 학습해 추천·생성에 반영. 무료 포함 전체 사용 가능. <span class="tag t-free">무료</span></td></tr>
+        <tr><td class="e-name">Suno Studio</td><td class="e-desc">브라우저 DAW. 멀티트랙 편집, 스템 재생성, MIDI 내보내기. <span class="tag t-pro">Premier 전용</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗺️</span>실전 워크플로 — 완성곡 한 곡 만들기</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>1. 스타일 탐색</b> — 가사는 대충 두고 스타일칸만 바꿔가며 5~10회 생성. 사운드의 방향을 먼저 확정합니다.</li>
+        <li><b>2. 보컬 확정</b> — 목소리가 마음에 드는 결과를 <b>Persona로 저장</b>. 이후 모든 시도에서 음색이 유지됩니다.</li>
+        <li><b>3. 가사 확정</b> — 구조 태그를 제대로 갖춘 가사를 넣고 다시 생성. 여기서부터 스타일칸은 건드리지 않습니다.</li>
+        <li><b>4. 부분 수리</b> — 어긋난 구간만 Replace Section으로 교체. 전체 재생성은 최후의 수단.</li>
+        <li><b>5. 길이 정리</b> — Extend로 늘리고 Crop·Fade로 앞뒤를 다듬습니다.</li>
+        <li><b>6. 후반 작업</b> — Stem으로 분리해 DAW에서 믹스하거나 효과음을 얹습니다.</li>
+      </ul>
+      <div class="note"><b>가장 흔한 실수</b> — 3번 단계에서 결과가 안 좋다고 스타일칸까지 같이 고치는 것. 그러면 1·2단계에서 쌓은 게 전부 날아갑니다. <b>한 번에 한 층씩만</b> 고치세요.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 문제 해결 ══════════════════ -->
+<section class="panel" id="panel-fix">
+  <div class="sec-title">🩺 문제 해결</div>
+  <div class="sec-sub">증상 → 원인 → 처방. 위에서부터 순서대로 시도하세요. <b>한 번에 하나씩만</b> 바꿔야 원인을 특정할 수 있습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🚫</span>태그를 무시한다</div>
+    <div class="card-body"><ul class="li">
+      <li>태그가 <b>너무 길지</b> 않은지 — 1~3단어로 줄이세요.</li>
+      <li>태그가 <b>독립된 줄</b>에 있는지, 영향을 줄 가사 <b>바로 앞</b>인지 확인.</li>
+      <li>태그를 <b>너무 많이</b> 쓰지 않았는지 — 줄마다 붙이면 전부 희석됩니다.</li>
+      <li>한국어 태그는 잘 안 먹습니다. <b>영어로</b> 바꾸세요.</li>
+      <li>그래도 안 되면 그냥 <b>재생성</b>. 확률적이라 두세 번 만에 먹히는 경우가 흔합니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⏳</span>인트로가 30초씩 길다</div>
+    <div class="card-body"><ul class="li">
+      <li>가사칸 <b>맨 위의 빈 줄과 <code>[Intro]</code>를 지우고</b> 곧바로 <code>[Verse]</code>로 시작.</li>
+      <li>스타일칸에 <code>starts immediately with vocals</code> 또는 <code>no intro</code> 추가.</li>
+      <li>가장 확실한 방법은 <b>Crop으로 잘라내기</b>입니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">✂️</span>곡이 갑자기 뚝 끊긴다</div>
+    <div class="card-body"><ul class="li">
+      <li>가사 마지막에 <code>[Outro]</code> + <code>[Fade Out]</code>을 넣었는지 확인.</li>
+      <li>가사가 너무 길어 <b>시간 안에 다 못 부른</b> 경우입니다. 섹션을 줄이거나 Extend로 이어 붙이세요.</li>
+      <li>마지막 가사 뒤에 <b>빈 줄 하나</b>를 두면 마무리가 조금 나아집니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗣️</span>한국어 발음이 뭉개진다</div>
+    <div class="card-body"><ul class="li">
+      <li>문제가 되는 단어를 <b>소리 나는 대로</b> 다시 쓰세요. “앉아” → <code>안자</code>.</li>
+      <li>한 줄이 너무 길지 않은지 — <b>8~12음절</b>로 끊으세요.</li>
+      <li>스타일칸에 <code>clear diction</code>, <code>sung in korean</code> 추가.</li>
+      <li>빠른 BPM일수록 뭉갭니다. 템포를 낮춰 보세요.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎭</span>목소리가 중간에 바뀐다</div>
+    <div class="card-body"><ul class="li">
+      <li><b>Persona</b>를 지정하는 것이 가장 확실합니다.</li>
+      <li>스타일칸에 성별·음역을 명시: <code>single female vocal throughout</code>.</li>
+      <li>가사에 <code>[Choir]</code>나 <code>[Duet]</code>이 섞여 있지 않은지 확인.</li>
+      <li>곡이 길수록 잘 흔들립니다. 짧게 만들고 Extend로 잇는 편이 안정적입니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎯</span>장르가 엉뚱하게 나온다</div>
+    <div class="card-body"><ul class="li">
+      <li>장르를 <b>맨 앞</b>에 놓았는지 확인. 뒤에 있으면 영향이 약합니다.</li>
+      <li><b>모순되는 단어</b>가 섞이지 않았는지 — <code>metal</code>과 <code>relaxing</code>이 함께 있으면 둘 다 흐려집니다.</li>
+      <li>악기를 너무 많이 적으면 장르가 밀려납니다. <b>4개 이하</b>로.</li>
+      <li>차단된 아티스트 이름이 들어가 프롬프트 전체가 무시됐을 수 있습니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔉</span>지정한 악기가 안 들린다</div>
+    <div class="card-body"><ul class="li">
+      <li>가사칸에 <code>[Guitar Solo]</code>처럼 <b>구간을 지정</b>해 전면에 내세우세요.</li>
+      <li>스타일칸에서 그 악기를 <b>앞쪽으로</b> 옮기고 <code>prominent</code>를 붙이세요.</li>
+      <li>경쟁하는 악기를 Exclude 칸으로 빼면 남은 악기가 또렷해집니다.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔂</span>후렴이 후렴처럼 안 들린다</div>
+    <div class="card-body"><ul class="li">
+      <li>후렴 가사를 <b>글자 하나까지 똑같이</b> 반복했는지 확인. 다르면 멜로디도 달라집니다.</li>
+      <li>벌스는 길게, 후렴은 짧게 — <b>줄 길이 대비</b>를 만드세요.</li>
+      <li>스타일칸에 <code>sparse verse into wide chorus</code> 추가.</li>
+      <li>후렴 앞에 <code>[Pre-Chorus]</code>와 <code>[Build Up]</code>을 넣으면 도착점이 분명해집니다.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ══════════════════ 모델·요금·권리 ══════════════════ -->
+<section class="panel" id="panel-plan">
+  <div class="sec-title">💳 모델 · 요금 · 권리</div>
+  <div class="sec-sub">2026년 8월 기준으로 정리했습니다. <b>Suno는 요금과 기능이 자주 바뀌므로</b> 결제 전에는 반드시 공식 요금 페이지를 확인하세요.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🧬</span>모델 버전</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:110px;">버전</th><th>특징</th></tr>
+        <tr><td class="e-name">v3.5</td><td class="e-desc">구세대. 4분 길이, 구조가 자주 무너짐. 지금은 특유의 거친 질감을 노릴 때 정도.</td></tr>
+        <tr><td class="e-name">v4</td><td class="e-desc">음질과 보컬 선명도가 크게 향상된 첫 세대.</td></tr>
+        <tr><td class="e-name">v4.5 / v4.5+</td><td class="e-desc">장르 표현력과 프롬프트 반응이 좋아짐. 스타일칸 입력 한도도 늘어남. <b>무료 요금제는 v4.5-all</b>을 씁니다.</td></tr>
+        <tr><td class="e-name">v5</td><td class="e-desc">믹스 완성도가 크게 올라간 세대. 8분 이상 길이 지원.</td></tr>
+        <tr><td class="e-name">v5.5 <span class="tag t-must">현재 최신</span></td><td class="e-desc">2026년 3월 공개. <b>Voices</b>(내 목소리), <b>Custom Models</b>(내 곡으로 학습), <b>My Taste</b>가 핵심. 스템 분리 확장.</td></tr>
+      </table>
+      <div class="note">최신이 항상 정답은 아닙니다. 로파이·거친 질감은 오히려 구버전이 나은 경우가 있으니, <b>같은 프롬프트를 여러 버전으로 돌려보고</b> 고르세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💰</span>요금제</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:110px;">플랜</th><th>가격</th><th>핵심 차이</th></tr>
+        <tr><td class="e-name">Free</td><td class="e-desc">$0</td>
+            <td class="e-desc">하루 50크레딧(대략 10곡). v4.5-all 모델. 공용 대기열. 스템 분리 없음. <b>상업적 사용 불가.</b></td></tr>
+        <tr><td class="e-name">Pro</td><td class="e-desc">월 $10<br><span style="color:var(--txt3);font-size:11px;">연간 결제 시 월 $8</span></td>
+            <td class="e-desc">월 2,500크레딧(대략 500곡). v5.5. <b>상업적 사용 권리</b>. 우선 대기열(동시 10곡). 스템 분리. Persona·Custom Models·Voices.</td></tr>
+        <tr><td class="e-name">Premier</td><td class="e-desc">월 $30<br><span style="color:var(--txt3);font-size:11px;">연간 결제 시 월 $24</span></td>
+            <td class="e-desc">월 10,000크레딧(대략 2,000곡). <b>Suno Studio</b> DAW 접근. 스템 분리 옵션 추가.</td></tr>
+      </table>
+      <div class="note"><b>어느 것을 고를까</b> — 상업권과 v5.5가 필요하면 Pro면 충분합니다. <b>Premier가 사는 것은 용량과 도구지 더 넓은 법적 권리가 아닙니다.</b> Suno Studio를 실제로 쓰거나 월 수백 곡을 뽑는 게 아니라면 Pro를 권합니다. 1곡 생성에 보통 5크레딧이 듭니다.</div>
+      <div class="note">최근 공식 요금 페이지에는 <b>월 다운로드 횟수 제한</b>(Pro 20곡·Premier 60곡)이 표기되어 있습니다. 생성 가능 곡 수와는 별개 항목이니, 대량으로 파일을 받아야 한다면 결제 전에 직접 확인하세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚖️</span>저작권 · 상업적 이용 <span class="tag t-warn">주의</span></div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>무료 요금제로 만든 곡은 상업적으로 쓸 수 없습니다.</b> 나중에 유료로 올려도 <b>소급 적용되지 않습니다.</b> 수익화할 생각이 조금이라도 있으면 처음부터 유료로 만드세요.</li>
+        <li><b>유료 구독 중 만든 곡의 권리는 해지 후에도 유지</b>됩니다.</li>
+        <li><b>유튜브 Content ID 등록은 불가</b>합니다. 완전 AI 생성 오디오는 대상이 아닙니다. 내 영상에 써서 수익화하는 것과는 별개 문제입니다.</li>
+        <li><b>“내가 저작권자”가 아닐 수 있습니다.</b> 2025년 이후 약관 변경으로 이용 권리와 저작권 귀속은 다르게 취급됩니다. 음원 유통·방송·광고 등 계약이 걸린 용도라면 약관 원문을 직접 확인하세요.</li>
+        <li><b>소송이 진행 중입니다.</b> Warner Music Group은 2025년 11월 합의·제휴로 돌아섰지만, Universal·Sony 측 소송은 이후에도 이어졌습니다. 라이선스 모델 도입에 따라 <b>기존 모델이 향후 종료될 수 있다</b>는 언급도 있었습니다.</li>
+        <li>상업적으로 쓸 곡이라면 <b>생성 시점의 약관과 요금제 상태를 캡처해 보관</b>해 두는 편이 안전합니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot">
+    출처 및 추가 자료 —
+    <a href="https://suno.com/pricing" target="_blank" rel="noopener">Suno 공식 요금제</a> ·
+    <a href="https://jackrighteous.com/en-us/pages/suno-ai-meta-tags-guide" target="_blank" rel="noopener">Jack Righteous 메타태그 가이드</a> ·
+    <a href="https://howtopromptsuno.com/making-music" target="_blank" rel="noopener">howtopromptsuno.com</a> ·
+    <a href="https://blakecrosley.com/guides/suno" target="_blank" rel="noopener">Blake Crosley v5.5 가이드</a> ·
+    <a href="https://sunometatagcreator.com/metatags-guide" target="_blank" rel="noopener">Suno Meta Tag Creator</a><br>
+    2026년 8월 조사 기준. Suno는 모델·요금·약관이 자주 바뀌므로 중요한 결정 전에는 공식 문서를 확인하세요.
+  </div>
+</section>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</main>
+</div>
+
+<script>
+const SIDEBAR_ITEMS = {
+  basic:  [{l:'세 개의 입력칸',q:'세 개의 입력칸'},{l:'간단 vs 직접 작성',q:'간단 모드'},
+           {l:'기본 동작',q:'시간 아끼는'},{l:'첫 곡 템플릿',q:'가장 빠른 첫 곡'}],
+  style:  [{l:'7칸 공식',q:'7칸 공식'},{l:'좋은 예 / 나쁜 예',q:'좋은 예'},
+           {l:'스타일칸 규칙',q:'스타일칸 규칙'},{l:'프로덕션 어휘',q:'프로덕션 어휘'}],
+  tags:   [{l:'태그 사용 규칙',q:'태그 사용 규칙'},{l:'구조 태그',q:'구조 태그'},{l:'보컬 태그',q:'보컬 태그'},
+           {l:'악기·연주 태그',q:'악기·연주 태그'},{l:'다이내믹·전개',q:'다이내믹·전개'},
+           {l:'분위기·믹스',q:'분위기·믹스'},{l:'효과음·환경',q:'효과음·환경'}],
+  lyrics: [{l:'기본 구조',q:'기본 구조'},{l:'한국어 전용 팁',q:'한국어 가사 전용'},
+           {l:'애드립·연출',q:'애드립·연출'},{l:'길이 조절',q:'길이 조절'},{l:'차단되는 것들',q:'차단되는 것들'}],
+  recipe: [{l:'K-pop'},{l:'시티팝'},{l:'로파이 힙합'},{l:'한국 발라드'},{l:'트로트'},{l:'인디 포크'},
+           {l:'하드록 · 메탈',q:'하드록'},{l:'EDM (페스티벌)',q:'EDM'},{l:'재즈'},
+           {l:'오케스트라 · 시네마틱',q:'오케스트라'},{l:'앰비언트 · 명상',q:'앰비언트'},
+           {l:'게임 BGM'},{l:'R&B · 네오소울',q:'네오소울'},{l:'국악 퓨전'},
+           {l:'광고 징글'},{l:'신스웨이브'}],
+  tools:  [{l:'편집·확장 기능',q:'편집·확장'},{l:'일관성 유지 기능',q:'일관성 유지'},
+           {l:'실전 워크플로',q:'실전 워크플로'}],
+  fix:    [{l:'태그를 무시한다',q:'태그를 무시'},{l:'인트로가 길다',q:'인트로가'},
+           {l:'곡이 뚝 끊긴다',q:'갑자기 뚝'},{l:'한국어 발음 뭉개짐',q:'한국어 발음'},
+           {l:'목소리가 바뀐다',q:'목소리가 중간에'},{l:'장르가 엉뚱하다',q:'장르가 엉뚱'},
+           {l:'악기가 안 들린다',q:'악기가 안 들린다'},{l:'후렴이 약하다',q:'후렴처럼 안'}],
+  plan:   [{l:'모델 버전',q:'모델 버전'},{l:'요금제',q:'요금제'},{l:'저작권·상업적 이용',q:'저작권'}],
+};
+
+let current = 'basic';
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick') === `showPanel('${id}')`) t.classList.add('active');
+  });
+  current = id;
+  buildSidebar(id);
+  document.getElementById('search').value = '';
+  document.getElementById('no-result').style.display = 'none';
+  clearMarks(document.getElementById('panel-' + id));
+  window.scrollTo({top: 0});
+}
+
+function findSection(panel, q) {
+  for (const el of panel.querySelectorAll('.card-head')) {
+    if (el.textContent.includes(q)) return el.closest('.card') || el;
+  }
+  for (const el of panel.querySelectorAll('.sec-title')) {
+    if (el.textContent.includes(q)) return el;
+  }
+  return null;
+}
+
+function buildSidebar(id) {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  (SIDEBAR_ITEMS[id] || []).forEach(it => {
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = it.l;
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById('panel-' + current);
+      const target = findSection(panel, it.q || it.l);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 70;
+        window.scrollTo({top, behavior: 'smooth'});
+      }
+      document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    sb.appendChild(btn);
+  });
+}
+
+/* ─── 복사 버튼 · 칩 클릭 복사 ─── */
+function copyText(text, el, label) {
+  const done = () => {
+    const old = el.textContent;
+    el.textContent = label || '복사됨';
+    el.classList.add('done');
+    setTimeout(() => { el.textContent = old; el.classList.remove('done'); }, 1100);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallback(text, done));
+  } else fallback(text, done);
+}
+function fallback(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-1000px;opacity:0;';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+document.querySelectorAll('.tpl .copy').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const pre = btn.closest('.tpl').querySelector('pre');
+    copyText(pre.textContent, btn);
+  });
+});
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const t = chip.textContent;
+    copyText(t, chip, '복사됨 ✓');
+  });
+});
+
+/* ─── 검색 ─── */
+function clearMarks(root) {
+  root.querySelectorAll('mark').forEach(m => {
+    const t = document.createTextNode(m.textContent);
+    m.parentNode.replaceChild(t, m);
+  });
+  root.normalize();
+}
+document.getElementById('search').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  const panel = document.getElementById('panel-' + current);
+  clearMarks(panel);
+  if (!q) { document.getElementById('no-result').style.display = 'none'; return; }
+  let found = 0;
+  function walk(node) {
+    if (node.nodeType === 3) {
+      const idx = node.textContent.toLowerCase().indexOf(q);
+      if (idx >= 0) {
+        const m = document.createElement('mark');
+        m.style.cssText = 'background:rgba(169,123,245,.4);border-radius:2px;padding:0 1px;color:inherit;';
+        const before = document.createTextNode(node.textContent.slice(0, idx));
+        m.textContent = node.textContent.slice(idx, idx + q.length);
+        const after = document.createTextNode(node.textContent.slice(idx + q.length));
+        const f = document.createDocumentFragment();
+        f.appendChild(before); f.appendChild(m); f.appendChild(after);
+        node.parentNode.replaceChild(f, node);
+        found++;
+      }
+    } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE' && node.nodeName !== 'MARK') {
+      Array.from(node.childNodes).forEach(walk);
+    }
+  }
+  walk(panel);
+  document.getElementById('no-result').style.display = found === 0 ? 'block' : 'none';
+});
+
+buildSidebar('basic');
+</script>
+</body>
+</html>

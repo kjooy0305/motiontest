@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 이미지 생성 완전 정복</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0d0d14;--bg2:#141420;--bg3:#1c1c2c;--bg4:#242438;
+  --border:#2a2a42;--text:#e0dff5;--muted:#7070a0;
+  --gold:#e8c87a;--blue:#78b4f0;--green:#68d898;
+  --red:#f07070;--purple:#c88af0;--orange:#f0a860;--cyan:#60d8e8;--pink:#f080c0;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.6;}
+
+#header{background:linear-gradient(135deg,#0d0d20,#1a0d2a);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+#header h1{font-size:19px;font-weight:700;color:var(--pink);letter-spacing:1px;text-shadow:0 0 20px rgba(240,128,192,.3);}
+#search{flex:1;min-width:200px;max-width:380px;padding:7px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;outline:none;}
+#search:focus{border-color:var(--pink);}
+#count{font-size:12px;color:var(--muted);}
+
+#tabs{display:flex;gap:4px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 14px;border-radius:6px;border:1px solid transparent;font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap;background:none;transition:all .15s;}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{background:var(--bg4);border-color:var(--border);color:var(--pink);}
+
+#main{padding:18px 20px;max-width:1200px;margin:0 auto;}
+.section{display:none;}.section.active{display:block;}
+.sec-title{font-size:16px;font-weight:700;color:var(--pink);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.sub-sec{font-size:13px;font-weight:700;color:var(--muted);margin:18px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:20px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:15px 17px;transition:border-color .15s;}
+.card:hover{border-color:rgba(240,128,192,.3);}
+.card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.card-icon{font-size:26px;line-height:1;flex-shrink:0;}
+.card-names{flex:1;}
+.gname{font-size:15px;font-weight:700;color:var(--gold);}
+.rname{font-size:12px;color:var(--muted);margin-top:1px;}
+.domain-tag{display:inline-block;background:rgba(240,128,192,.12);border:1px solid rgba(240,128,192,.25);color:var(--pink);font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:8px;}
+.row{display:grid;grid-template-columns:90px 1fr;gap:4px;font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.row:last-child{border-bottom:none;}
+.row-key{color:var(--muted);font-weight:600;}
+.row-val{color:var(--text);}
+.row-val b{color:var(--gold);}
+.row-val code{background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:11px;color:var(--cyan);}
+
+/* keyword chip — clickable copy */
+.kw-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.kw{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:12px;cursor:pointer;user-select:none;transition:all .12s;border:1px solid transparent;touch-action:manipulation;}
+.kw:active{transform:scale(.93);}
+.kw.ok{filter:brightness(1.4);}
+/* color variants */
+.kw-blue{background:rgba(120,180,240,.15);color:var(--blue);border-color:rgba(120,180,240,.25);}
+.kw-purple{background:rgba(200,138,240,.15);color:var(--purple);border-color:rgba(200,138,240,.25);}
+.kw-green{background:rgba(104,216,152,.15);color:var(--green);border-color:rgba(104,216,152,.25);}
+.kw-orange{background:rgba(240,168,96,.15);color:var(--orange);border-color:rgba(240,168,96,.25);}
+.kw-cyan{background:rgba(96,216,232,.15);color:var(--cyan);border-color:rgba(96,216,232,.25);}
+.kw-pink{background:rgba(240,128,192,.15);color:var(--pink);border-color:rgba(240,128,192,.25);}
+.kw-red{background:rgba(240,112,112,.15);color:var(--red);border-color:rgba(240,112,112,.25);}
+.kw-gold{background:rgba(232,200,122,.15);color:var(--gold);border-color:rgba(232,200,122,.25);}
+
+/* info box */
+.info-box{background:rgba(120,180,240,.07);border-left:3px solid var(--blue);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#a0c8f0;line-height:1.7;}
+.info-box b{color:var(--gold);}
+.info-box code{background:var(--bg3);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--cyan);}
+
+/* prompt template box */
+.prompt-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 15px;margin-bottom:12px;font-size:12.5px;line-height:1.8;color:#c8d0f0;}
+.prompt-box .pl{color:var(--pink);font-weight:700;}
+.prompt-box .ps{color:var(--cyan);}
+.prompt-box .pq{color:var(--green);}
+.prompt-box .pc{color:var(--orange);}
+.prompt-box .pm{color:var(--purple);}
+.prompt-box .pn{color:var(--gold);}
+
+/* param table */
+.ptable{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px;}
+.ptable th{background:var(--bg3);color:var(--muted);font-weight:700;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.ptable td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.ptable td:first-child{color:var(--gold);font-weight:600;white-space:nowrap;}
+.ptable td:nth-child(2){color:var(--cyan);white-space:nowrap;}
+.ptable td:nth-child(3){color:var(--text);}
+.ptable tr:last-child td{border-bottom:none;}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(240,128,192,.95);color:#1a0010;padding:10px 22px;border-radius:24px;font-size:14px;font-weight:700;z-index:999;transition:transform .2s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+#no-result{display:none;color:var(--muted);text-align:center;padding:50px;font-size:14px;}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>🎨 AI 이미지 생성 완전 정복</h1>
+  <input id="search" type="text" placeholder="🔍 키워드·용어 검색…" oninput="doSearch(this.value)">
+  <span id="count"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="sw('prompt',this)">📝 프롬프트 작성법</button>
+  <button class="tab" onclick="sw('style',this)">🎨 스타일 키워드</button>
+  <button class="tab" onclick="sw('camera',this)">📷 구도·카메라</button>
+  <button class="tab" onclick="sw('light',this)">💡 조명·색감</button>
+  <button class="tab" onclick="sw('quality',this)">⭐ 품질 태그</button>
+  <button class="tab" onclick="sw('negative',this)">🚫 네거티브 프롬프트</button>
+  <button class="tab" onclick="sw('params',this)">⚙️ 파라미터</button>
+  <button class="tab" onclick="sw('models',this)">🤖 모델·도구</button>
+  <button class="tab" onclick="sw('glossary',this)">📚 용어 사전</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════ 프롬프트 작성법 ══════════ -->
+<div id="tab-prompt" class="section active">
+<div class="sec-title">📝 프롬프트 작성법 — 기초부터 고급까지</div>
+
+<div class="info-box">
+  💡 <b>프롬프트(Prompt)</b>란 AI에게 전달하는 텍스트 지시문입니다. <b>앞쪽에 위치한 단어일수록 강하게 반영</b>됩니다. 기본적으로 <b>영어</b>로 작성하고, 쉼표(,)로 키워드를 구분합니다.
+</div>
+
+<div class="sub-sec">기본 구조</div>
+<div class="card" style="margin-bottom:14px;">
+  <div class="gname" style="margin-bottom:10px;">프롬프트 구성 순서 (권장)</div>
+  <div class="prompt-box">
+    <span class="pl">[주체/피사체]</span>, <span class="ps">[스타일/미디엄]</span>, <span class="pq">[품질 태그]</span>, <span class="pc">[구도/카메라]</span>, <span class="pm">[조명/분위기]</span>, <span class="pn">[배경/환경]</span>
+  </div>
+  <div class="prompt-box">
+    예시: <span class="pl">a beautiful woman with long hair</span>, <span class="ps">oil painting, impressionist style</span>, <span class="pq">masterpiece, best quality, highly detailed</span>, <span class="pc">portrait, close-up</span>, <span class="pm">soft golden light, warm atmosphere</span>, <span class="pn">garden background, blurred background</span>
+  </div>
+</div>
+
+<div class="sub-sec">가중치(Weight) 표현법</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚖️</span><div class="card-names"><div class="gname">Stable Diffusion / ComfyUI</div><div class="rname">괄호로 가중치 조절</div></div></div>
+  <div class="row"><span class="row-key">(keyword)</span><span class="row-val">가중치 ×1.1 (기본보다 약간 강조)</span></div>
+  <div class="row"><span class="row-key">((keyword))</span><span class="row-val">가중치 ×1.21 (2번 중첩 = 더 강조)</span></div>
+  <div class="row"><span class="row-key">(keyword:1.5)</span><span class="row-val">가중치를 정확히 1.5로 지정 (추천)</span></div>
+  <div class="row"><span class="row-key">[keyword]</span><span class="row-val">가중치 ×0.9 (약화)</span></div>
+  <div class="row"><span class="row-key">(keyword:0.7)</span><span class="row-val">가중치를 0.7로 약화</span></div>
+  <div class="row"><span class="row-key">주의</span><span class="row-val">1.3~1.5 이상은 품질 저하 위험. 보통 1.1~1.3 권장</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎯</span><div class="card-names"><div class="gname">Midjourney</div><div class="rname">::로 가중치 조절</div></div></div>
+  <div class="row"><span class="row-key">word::2</span><span class="row-val">해당 단어의 가중치를 2로 설정</span></div>
+  <div class="row"><span class="row-key">word::0</span><span class="row-val">해당 요소 완전 제거 (::0은 음수 가중치)</span></div>
+  <div class="row"><span class="row-key">--no X</span><span class="row-val">X 요소 제외 (네거티브 프롬프트)</span></div>
+  <div class="row"><span class="row-key">예시</span><span class="row-val"><code>forest::2 castle::1 --no people</code></span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔀</span><div class="card-names"><div class="gname">프롬프트 스케줄링 (SD)</div><div class="rname">단계별로 다른 키워드 적용</div></div></div>
+  <div class="row"><span class="row-key">[A|B]</span><span class="row-val">A와 B를 번갈아가며 적용 (교체)</span></div>
+  <div class="row"><span class="row-key">[A:B:0.5]</span><span class="row-val">전체 스텝의 50% 시점에서 A→B로 전환</span></div>
+  <div class="row"><span class="row-key">[A:0.3]</span><span class="row-val">30% 이후부터 A 적용 (후반부 강조)</span></div>
+  <div class="row"><span class="row-key">[:B:0.7]</span><span class="row-val">70% 이후 B 적용</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">초반 구조 잡고 후반에 디테일 추가할 때 유용</span></div>
+</div>
+</div>
+
+<div class="sub-sec">실전 팁</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">✏️</span><div class="card-names"><div class="gname">좋은 프롬프트의 조건</div></div></div>
+  <div class="row"><span class="row-key">구체적으로</span><span class="row-val">"woman"보다 "young woman with blue eyes, freckles, curly red hair"</span></div>
+  <div class="row"><span class="row-key">스타일 명시</span><span class="row-val">원하는 화풍·미디엄·아티스트를 정확히 지정</span></div>
+  <div class="row"><span class="row-key">품질 태그</span><span class="row-val">앞부분에 masterpiece, best quality 등 배치</span></div>
+  <div class="row"><span class="row-key">짧고 명확</span><span class="row-val">불필요한 단어보다 핵심 키워드 위주로</span></div>
+  <div class="row"><span class="row-key">실험</span><span class="row-val">같은 프롬프트에 seed 고정 후 하나씩 변경해가며 효과 확인</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚠️</span><div class="card-names"><div class="gname">흔한 실수</div></div></div>
+  <div class="row"><span class="row-key">모순 표현</span><span class="row-val">"빨간 파란 옷" 같은 모순된 지시는 AI가 무시하거나 혼합</span></div>
+  <div class="row"><span class="row-key">과도한 가중치</span><span class="row-val">(keyword:2.0) 이상은 아티팩트·왜곡 발생 가능</span></div>
+  <div class="row"><span class="row-key">너무 많은 요소</span><span class="row-val">한 이미지에 요소가 너무 많으면 하나도 제대로 안 나옴</span></div>
+  <div class="row"><span class="row-key">한국어 혼용</span><span class="row-val">일부 모델 제외하면 영어 프롬프트가 훨씬 효과적</span></div>
+  <div class="row"><span class="row-key">네거티브 누락</span><span class="row-val">기본 네거티브 프롬프트 없이 쓰면 품질 크게 저하</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🧩</span><div class="card-names"><div class="gname">아티스트 스타일 참조</div></div></div>
+  <div class="row"><span class="row-key">방법</span><span class="row-val">"in the style of [artist name]" 또는 "by [artist name]"</span></div>
+  <div class="row"><span class="row-key">유명 예시</span><span class="row-val">Greg Rutkowski, Artgerm, Wlop, Ilya Kuvshinov, Studio Ghibli</span></div>
+  <div class="row"><span class="row-key">Artstation</span><span class="row-val">"trending on ArtStation" 추가 시 전문적 느낌 강화</span></div>
+  <div class="row"><span class="row-key">주의</span><span class="row-val">일부 아티스트는 AI 학습 반대 의사 표명 — 윤리적 고려 필요</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔁</span><div class="card-names"><div class="gname">img2img 프롬프팅</div></div></div>
+  <div class="row"><span class="row-key">개념</span><span class="row-val">원본 이미지 + 프롬프트로 변형된 이미지 생성</span></div>
+  <div class="row"><span class="row-key">Denoising</span><span class="row-val">0.3~0.5 = 원본 유지 / 0.7~1.0 = 대폭 변경</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">스케치→완성본, 사진→애니메이션, 구도 유지하며 스타일 변경</span></div>
+  <div class="row"><span class="row-key">인페인팅</span><span class="row-val">마스크 영역만 변경 — 특정 부분 수정에 최적</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ 스타일 키워드 ══════════ -->
+<div id="tab-style" class="section">
+<div class="sec-title">🎨 스타일 키워드 — 클릭하면 복사</div>
+<div class="info-box">아래 키워드를 클릭/터치하면 클립보드에 복사됩니다. 쉼표(,) 앞뒤 공백 포함해서 복사되니 프롬프트에 바로 붙여넣기 하세요.</div>
+
+<div class="sub-sec">📸 사진·현실적</div>
+<div class="kw-wrap" id="kw-photo"></div>
+
+<div class="sub-sec">🖌️ 디지털 아트·일러스트</div>
+<div class="kw-wrap" id="kw-digital"></div>
+
+<div class="sub-sec">🎌 애니메이션·만화</div>
+<div class="kw-wrap" id="kw-anime"></div>
+
+<div class="sub-sec">🖼️ 전통 회화</div>
+<div class="kw-wrap" id="kw-painting"></div>
+
+<div class="sub-sec">✏️ 드로잉·스케치</div>
+<div class="kw-wrap" id="kw-sketch"></div>
+
+<div class="sub-sec">🎮 3D·렌더링</div>
+<div class="kw-wrap" id="kw-3d"></div>
+
+<div class="sub-sec">🕹️ 레트로·픽셀</div>
+<div class="kw-wrap" id="kw-retro"></div>
+
+<div class="sub-sec">🌀 장르·분위기</div>
+<div class="kw-wrap" id="kw-genre"></div>
+
+<div class="sub-sec">🎭 기타 표현</div>
+<div class="kw-wrap" id="kw-other-style"></div>
+</div>
+
+<!-- ══════════ 구도·카메라 ══════════ -->
+<div id="tab-camera" class="section">
+<div class="sec-title">📷 구도·카메라 키워드</div>
+
+<div class="sub-sec">📐 샷 크기 (Shot Size)</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">📷</span><div class="card-names"><div class="gname">샷 크기 종류</div><div class="rname">피사체를 얼마나 담느냐</div></div></div>
+  <div class="row"><span class="row-key">extreme close-up</span><span class="row-val">눈·입술 등 극단적 클로즈업 (ECU)</span></div>
+  <div class="row"><span class="row-key">close-up</span><span class="row-val">얼굴~어깨 (CU) — 인물 표정 중심</span></div>
+  <div class="row"><span class="row-key">medium close-up</span><span class="row-val">가슴 위까지 (MCU)</span></div>
+  <div class="row"><span class="row-key">medium shot</span><span class="row-val">허리 위까지 (MS)</span></div>
+  <div class="row"><span class="row-key">medium full shot</span><span class="row-val">무릎 위까지 (MFS)</span></div>
+  <div class="row"><span class="row-key">full body</span><span class="row-val">전신 (FS) — 전체 모습</span></div>
+  <div class="row"><span class="row-key">wide shot</span><span class="row-val">인물+배경 넓게 담음 (WS)</span></div>
+  <div class="row"><span class="row-key">establishing shot</span><span class="row-val">장소 전체를 보여주는 극광각</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-shot"></div>
+
+<div class="sub-sec">🎬 카메라 앵글 (Camera Angle)</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎬</span><div class="card-names"><div class="gname">카메라 앵글 종류</div></div></div>
+  <div class="row"><span class="row-key">eye level</span><span class="row-val">눈높이 — 가장 자연스럽고 중립적</span></div>
+  <div class="row"><span class="row-key">low angle</span><span class="row-val">아래에서 위로 — 피사체가 웅장·강력하게 보임</span></div>
+  <div class="row"><span class="row-key">high angle</span><span class="row-val">위에서 아래로 — 피사체가 작고 약하게 보임</span></div>
+  <div class="row"><span class="row-key">bird's eye view</span><span class="row-val">수직 위에서 아래 (탑뷰/평면도)</span></div>
+  <div class="row"><span class="row-key">worm's eye view</span><span class="row-val">수직 아래에서 위 (극저각)</span></div>
+  <div class="row"><span class="row-key">dutch angle</span><span class="row-val">카메라 기울임 — 긴장·불안감 연출</span></div>
+  <div class="row"><span class="row-key">over the shoulder</span><span class="row-val">인물 어깨 너머 시점 (대화 장면)</span></div>
+  <div class="row"><span class="row-key">POV</span><span class="row-val">주인공 1인칭 시점</span></div>
+  <div class="row"><span class="row-key">isometric view</span><span class="row-val">등각 투영 뷰 (게임 아이소메트릭)</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-angle"></div>
+
+<div class="sub-sec">🔭 렌즈 효과</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔭</span><div class="card-names"><div class="gname">렌즈·초점 효과</div></div></div>
+  <div class="row"><span class="row-key">bokeh</span><span class="row-val">배경 흐림 효과 (아웃포커스) — 인물 강조</span></div>
+  <div class="row"><span class="row-key">depth of field</span><span class="row-val">피사계 심도 — 특정 거리만 선명</span></div>
+  <div class="row"><span class="row-key">shallow DOF</span><span class="row-val">얕은 심도 = 배경 크게 흐림</span></div>
+  <div class="row"><span class="row-key">wide angle lens</span><span class="row-val">광각 렌즈 — 넓은 화각, 왜곡 있음</span></div>
+  <div class="row"><span class="row-key">telephoto lens</span><span class="row-val">망원 렌즈 — 압축 효과, 배경 붕괴</span></div>
+  <div class="row"><span class="row-key">fisheye lens</span><span class="row-val">어안 렌즈 — 극단적 왜곡, 구형 효과</span></div>
+  <div class="row"><span class="row-key">macro</span><span class="row-val">접사 — 작은 것을 크게, 극도의 디테일</span></div>
+  <div class="row"><span class="row-key">tilt-shift</span><span class="row-val">틸트시프트 — 미니어처처럼 보이는 효과</span></div>
+  <div class="row"><span class="row-key">35mm / 50mm / 85mm</span><span class="row-val">렌즈 초점거리 명시 — 인물: 85mm 추천</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-lens"></div>
+
+<div class="sub-sec">📐 구도법</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">📐</span><div class="card-names"><div class="gname">구도·프레이밍</div></div></div>
+  <div class="row"><span class="row-key">rule of thirds</span><span class="row-val">삼분할 구도 — 피사체를 1/3 지점에 배치</span></div>
+  <div class="row"><span class="row-key">golden ratio</span><span class="row-val">황금비율 구도 — 자연스럽고 균형 잡힌 배치</span></div>
+  <div class="row"><span class="row-key">symmetrical</span><span class="row-val">좌우 대칭 구도 — 웅장·정적인 느낌</span></div>
+  <div class="row"><span class="row-key">centered composition</span><span class="row-val">중앙 구도 — 강렬하고 직접적</span></div>
+  <div class="row"><span class="row-key">leading lines</span><span class="row-val">시선을 유도하는 선 활용</span></div>
+  <div class="row"><span class="row-key">negative space</span><span class="row-val">여백을 활용한 구도 — 고독·미니멀</span></div>
+  <div class="row"><span class="row-key">framing</span><span class="row-val">자연 요소로 피사체를 액자처럼 둘러쌈</span></div>
+  <div class="row"><span class="row-key">dynamic composition</span><span class="row-val">역동적 구도 — 사선·움직임 강조</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-composition"></div>
+</div>
+
+<!-- ══════════ 조명·색감 ══════════ -->
+<div id="tab-light" class="section">
+<div class="sec-title">💡 조명·색감 키워드</div>
+
+<div class="sub-sec">☀️ 자연 조명</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">☀️</span><div class="card-names"><div class="gname">자연광 종류</div></div></div>
+  <div class="row"><span class="row-key">golden hour</span><span class="row-val">일출·일몰 전후 황금빛 시간대 — 따뜻하고 낭만적</span></div>
+  <div class="row"><span class="row-key">blue hour</span><span class="row-val">일출 직전·일몰 직후 — 차갑고 서정적인 파란빛</span></div>
+  <div class="row"><span class="row-key">midday sun</span><span class="row-val">정오 햇빛 — 강한 그림자, 선명한 명암</span></div>
+  <div class="row"><span class="row-key">overcast light</span><span class="row-val">흐린 날 빛 — 부드럽고 그림자 없음. 인물 사진에 좋음</span></div>
+  <div class="row"><span class="row-key">sunrise / sunset</span><span class="row-val">일출/일몰 명시</span></div>
+  <div class="row"><span class="row-key">moonlight</span><span class="row-val">달빛 — 차갑고 신비로운 야경</span></div>
+  <div class="row"><span class="row-key">dappled light</span><span class="row-val">나뭇잎 사이로 들어오는 얼룩덜룩한 빛</span></div>
+  <div class="row"><span class="row-key">god rays</span><span class="row-val">구름/나무 사이로 내리쬐는 빛줄기 (광선)</span></div>
+  <div class="row"><span class="row-key">sunbeam</span><span class="row-val">햇살 줄기</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-natural-light"></div>
+
+<div class="sub-sec">💡 인공 조명·스튜디오</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">💡</span><div class="card-names"><div class="gname">인공·스튜디오 조명</div></div></div>
+  <div class="row"><span class="row-key">studio lighting</span><span class="row-val">스튜디오 조명 — 전문적이고 깔끔한 느낌</span></div>
+  <div class="row"><span class="row-key">cinematic lighting</span><span class="row-val">영화적 조명 — 드라마틱한 명암과 색감</span></div>
+  <div class="row"><span class="row-key">dramatic lighting</span><span class="row-val">강렬한 명암 대비</span></div>
+  <div class="row"><span class="row-key">rim light</span><span class="row-val">피사체 윤곽에 빛 — 배경과 분리감, 입체감</span></div>
+  <div class="row"><span class="row-key">backlit</span><span class="row-val">역광 — 피사체 실루엣, 테두리에 빛</span></div>
+  <div class="row"><span class="row-key">side lighting</span><span class="row-val">측면 조명 — 입체적 그림자, 드라마틱</span></div>
+  <div class="row"><span class="row-key">soft light</span><span class="row-val">부드러운 빛 — 그림자 경계 부드러움</span></div>
+  <div class="row"><span class="row-key">hard light</span><span class="row-val">강한 빛 — 선명하고 날카로운 그림자</span></div>
+  <div class="row"><span class="row-key">volumetric lighting</span><span class="row-val">안개·연기 속에 빛이 퍼지는 효과 (신비로운 느낌)</span></div>
+  <div class="row"><span class="row-key">ambient light</span><span class="row-val">주변광 — 그림자 없는 균일한 조명</span></div>
+  <div class="row"><span class="row-key">chiaroscuro</span><span class="row-val">키아로스쿠로 — 강한 명암 대비 (렘브란트 스타일)</span></div>
+  <div class="row"><span class="row-key">neon lights</span><span class="row-val">네온사인 조명 — 사이버펑크, 도시 야경</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-artificial-light"></div>
+
+<div class="sub-sec">🎨 색감·톤</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎨</span><div class="card-names"><div class="gname">색감·분위기 조절</div></div></div>
+  <div class="row"><span class="row-key">warm tones</span><span class="row-val">따뜻한 색조 (빨강·주황·노랑 계열)</span></div>
+  <div class="row"><span class="row-key">cool tones</span><span class="row-val">차가운 색조 (파랑·청록·보라 계열)</span></div>
+  <div class="row"><span class="row-key">muted colors</span><span class="row-val">채도 낮은 차분한 색감 — 세련되고 고급스러운</span></div>
+  <div class="row"><span class="row-key">vibrant colors</span><span class="row-val">선명하고 강렬한 색감</span></div>
+  <div class="row"><span class="row-key">pastel colors</span><span class="row-val">파스텔톤 — 부드럽고 포근한 느낌</span></div>
+  <div class="row"><span class="row-key">monochromatic</span><span class="row-val">단색 조화 — 한 색상의 다양한 명도</span></div>
+  <div class="row"><span class="row-key">high contrast</span><span class="row-val">높은 대비 — 흑백·선명한 색 차이</span></div>
+  <div class="row"><span class="row-key">desaturated</span><span class="row-val">채도 낮춤 — 탈색된 느낌, 우울하거나 복고풍</span></div>
+  <div class="row"><span class="row-key">color grading</span><span class="row-val">영화적 색 보정 느낌</span></div>
+  <div class="row"><span class="row-key">black and white</span><span class="row-val">흑백</span></div>
+  <div class="row"><span class="row-key">sepia</span><span class="row-val">세피아톤 — 복고·오래된 사진 느낌</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-color"></div>
+
+<div class="sub-sec">✨ 특수 빛 효과</div>
+<div class="kw-wrap" id="kw-special-light"></div>
+</div>
+
+<!-- ══════════ 품질 태그 ══════════ -->
+<div id="tab-quality" class="section">
+<div class="sec-title">⭐ 품질 태그 — 이미지 품질을 높이는 키워드</div>
+
+<div class="info-box">품질 태그는 보통 <b>프롬프트 앞부분</b>에 배치합니다. 모델마다 효과가 다르며, 특히 Stable Diffusion 계열에서 중요합니다.</div>
+
+<div class="sub-sec">🏆 최상위 품질 태그</div>
+<div class="kw-wrap" id="kw-top-quality"></div>
+
+<div class="sub-sec">📸 사진·현실성 품질</div>
+<div class="kw-wrap" id="kw-photo-quality"></div>
+
+<div class="sub-sec">🖌️ 아트·일러스트 품질</div>
+<div class="kw-wrap" id="kw-art-quality"></div>
+
+<div class="sub-sec">🔍 디테일 강화</div>
+<div class="kw-wrap" id="kw-detail"></div>
+
+<div class="sub-sec">💡 효과·완성도</div>
+<div class="kw-wrap" id="kw-effect-quality"></div>
+
+<div class="sub-sec">📐 해상도·포맷</div>
+<div class="grid">
+<div class="card" style="margin-bottom:12px;">
+  <div class="card-head"><span class="card-icon">📐</span><div class="card-names"><div class="gname">해상도 관련 태그</div><div class="rname">실제 해상도가 바뀌진 않지만 디테일에 영향</div></div></div>
+  <div class="row"><span class="row-key">8K resolution</span><span class="row-val">8K 품질 암시 — 디테일 강화에 효과적</span></div>
+  <div class="row"><span class="row-key">4K / UHD</span><span class="row-val">4K/초고화질</span></div>
+  <div class="row"><span class="row-key">HDR</span><span class="row-val">High Dynamic Range — 밝은 부분과 어두운 부분 둘 다 풍부</span></div>
+  <div class="row"><span class="row-key">sharp focus</span><span class="row-val">선명한 초점</span></div>
+  <div class="row"><span class="row-key">in focus</span><span class="row-val">초점이 맞음</span></div>
+  <div class="row"><span class="row-key">high resolution</span><span class="row-val">고해상도</span></div>
+</div>
+</div>
+<div class="kw-wrap" id="kw-resolution"></div>
+</div>
+
+<!-- ══════════ 네거티브 프롬프트 ══════════ -->
+<div id="tab-negative" class="section">
+<div class="sec-title">🚫 네거티브 프롬프트 — 원하지 않는 요소 제거</div>
+
+<div class="info-box">
+  네거티브 프롬프트(Negative Prompt)는 <b>생성에서 제외할 요소</b>를 지정합니다. 품질 저하 요소를 제거해 결과물이 크게 좋아집니다. <b>항상 기본 네거티브를 포함시키세요.</b>
+</div>
+
+<div class="sub-sec">🔰 기본 네거티브 (항상 포함 권장)</div>
+<div class="card" style="margin-bottom:14px;">
+  <div class="gname" style="margin-bottom:8px;">복사해서 바로 사용 가능한 기본 네거티브 세트</div>
+  <div class="prompt-box" style="cursor:pointer;border:1px solid var(--border);" onclick="copyText(this,'ugly, deformed, noisy, blurry, distorted, out of focus, bad anatomy, extra limbs, poorly drawn face, poorly drawn hands, missing fingers, extra fingers, fused fingers, too many fingers, long neck, mutation, mutated, malformed, duplicate, morbid, cloned face, text, watermark, signature, logo, username, cropped, cut off, jpeg artifacts, worst quality, low quality, normal quality, lowres')">
+    ugly, deformed, noisy, blurry, distorted, out of focus, bad anatomy, extra limbs, poorly drawn face, poorly drawn hands, missing fingers, extra fingers, fused fingers, too many fingers, long neck, mutation, mutated, malformed, duplicate, morbid, cloned face, text, watermark, signature, logo, username, cropped, cut off, jpeg artifacts, worst quality, low quality, normal quality, lowres
+    <div style="text-align:right;font-size:11px;color:var(--muted);margin-top:6px;">👆 클릭하면 전체 복사</div>
+  </div>
+</div>
+
+<div class="sub-sec">👤 인물 특화 네거티브</div>
+<div class="kw-wrap" id="kw-neg-person"></div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">👋</span><div class="card-names"><div class="gname">손·발 문제 해결 네거티브</div><div class="rname">AI가 가장 자주 실패하는 부위</div></div></div>
+  <div class="row"><span class="row-key">문제</span><span class="row-val">손가락 6개, 뒤틀린 손, 녹아내린 발가락</span></div>
+  <div class="row"><span class="row-key">네거티브</span><span class="row-val">bad hands, extra fingers, missing fingers, poorly drawn hands, deformed hands, mutated hands, fused fingers, too many fingers, bad feet, extra toes</span></div>
+  <div class="row"><span class="row-key">추가 팁</span><span class="row-val">ControlNet HandRefiner 또는 Inpainting으로 손 부분만 재생성하면 효과적</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">👁️</span><div class="card-names"><div class="gname">얼굴·눈 문제 해결 네거티브</div></div></div>
+  <div class="row"><span class="row-key">문제</span><span class="row-val">눈 크기 불일치, 눈동자 없음, 좌우 다른 눈</span></div>
+  <div class="row"><span class="row-key">네거티브</span><span class="row-val">bad eyes, asymmetric eyes, heterochromia, cross-eyed, blurry eyes, uneven eyes, bad face, poorly drawn face, deformed face, asymmetric face</span></div>
+  <div class="row"><span class="row-key">추가 팁</span><span class="row-val">ADetailer 확장으로 얼굴 자동 보정 가능</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🖼️ 화질·아티팩트 제거</div>
+<div class="kw-wrap" id="kw-neg-quality"></div>
+
+<div class="sub-sec">📝 텍스트·워터마크 제거</div>
+<div class="kw-wrap" id="kw-neg-text"></div>
+
+<div class="sub-sec">🎨 스타일별 권장 네거티브</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎌</span><div class="card-names"><div class="gname">애니메이션 스타일 네거티브</div></div></div>
+  <div class="row"><span class="row-key">기본 추가</span><span class="row-val">realistic, photo, 3D render, ugly, old, fat, gross</span></div>
+  <div class="row"><span class="row-key">CLIP skip</span><span class="row-val">애니메이션 모델은 CLIP skip=2 권장</span></div>
+  <div class="row"><span class="row-key">추천 모델</span><span class="row-val">Anything V5, CounterfeitXL, BluMix</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">📸</span><div class="card-names"><div class="gname">현실 인물 사진 네거티브</div></div></div>
+  <div class="row"><span class="row-key">기본 추가</span><span class="row-val">anime, cartoon, illustration, painting, drawing, render, 3D, CGI</span></div>
+  <div class="row"><span class="row-key">추천 모델</span><span class="row-val">Realistic Vision, ChilloutMix, epiCRealism</span></div>
+  <div class="row"><span class="row-key">VAE</span><span class="row-val">vae-ft-mse-840000 사용 시 피부색 개선</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ 파라미터 ══════════ -->
+<div id="tab-params" class="section">
+<div class="sec-title">⚙️ 파라미터 완전 정복</div>
+
+<div class="sub-sec">🎛️ 핵심 파라미터</div>
+<table class="ptable">
+  <tr><th>파라미터</th><th>범위/기본값</th><th>설명</th></tr>
+  <tr><td>CFG Scale</td><td>1~30 / 권장 7~12</td><td>프롬프트 충실도. 낮을수록 창의적, 높을수록 프롬프트에 종속. <b>7~9</b>가 품질과 창의성 균형. 15 이상은 과포화 발생</td></tr>
+  <tr><td>Steps</td><td>1~150 / 권장 20~50</td><td>샘플링 반복 횟수. 많을수록 디테일↑ 속도↓. DPM++ 2M Karras는 20~30도 충분. 50 이상은 효과 미미</td></tr>
+  <tr><td>Seed</td><td>-1~2³²</td><td>-1은 랜덤. 동일 시드+동일 설정=동일 이미지. 마음에 드는 결과가 나오면 시드를 고정하고 프롬프트만 변경하며 실험</td></tr>
+  <tr><td>Width / Height</td><td>512~2048</td><td>SD 1.5는 512×512 기본, SDXL은 1024×1024. 세로형은 512×768, 가로형은 768×512. 비율 유지 중요</td></tr>
+  <tr><td>Batch Size</td><td>1~8</td><td>한 번에 생성할 이미지 수. VRAM 비례 소비</td></tr>
+  <tr><td>Batch Count</td><td>1~100</td><td>반복 횟수 (순차적으로 실행)</td></tr>
+  <tr><td>CLIP Skip</td><td>1~12 / 기본 1</td><td>CLIP 텍스트 인코더 레이어를 몇 개 건너뛸지. 애니메이션 모델은 2 권장, 사진 모델은 1</td></tr>
+  <tr><td>Denoising</td><td>0~1</td><td>img2img·인페인팅에서 원본 변형 정도. 0=원본 그대로, 1=완전 새 이미지. 0.4~0.6 권장</td></tr>
+  <tr><td>Hires. fix</td><td>배율 1~4</td><td>저해상도로 생성 후 업스케일. 구조 유지하며 디테일↑. Denoising 0.4~0.7</td></tr>
+  <tr><td>Restore Faces</td><td>on/off</td><td>GFPGAN·CodeFormer로 얼굴 자동 보정. 사실적 인물에서 효과적</td></tr>
+  <tr><td>Tiling</td><td>on/off</td><td>타일링 가능한 패턴 생성 (텍스처 제작용)</td></tr>
+</table>
+
+<div class="sub-sec">🧪 샘플러(Sampler) 비교</div>
+<table class="ptable">
+  <tr><th>샘플러</th><th>특징</th><th>추천 Steps</th></tr>
+  <tr><td>DPM++ 2M Karras</td><td>가장 범용적 추천. 품질·속도 균형 최고. 대부분의 경우 첫 번째 선택</td><td>20~30</td></tr>
+  <tr><td>DPM++ SDE Karras</td><td>조금 더 다양성 있고 부드러운 결과. 약간 느림</td><td>25~35</td></tr>
+  <tr><td>Euler a</td><td>빠르고 창의적. 스텝마다 결과가 달라짐. 탐색에 좋음</td><td>20~40</td></tr>
+  <tr><td>Euler</td><td>Euler a보다 안정적. 스텝 증가에 따라 일관성↑</td><td>25~40</td></tr>
+  <tr><td>DDIM</td><td>오래된 샘플러. 빠르나 품질 낮음. img2img·인페인팅에서 유용</td><td>30~50</td></tr>
+  <tr><td>PLMS</td><td>DDIM 개선판. 안정적이나 현재는 DPM++에 밀림</td><td>30~50</td></tr>
+  <tr><td>UniPC</td><td>빠른 수렴. 적은 스텝에서도 품질 좋음</td><td>15~25</td></tr>
+  <tr><td>LCM</td><td>초고속 (1~8스텝). Turbo 모델용. 품질은 다소 낮음</td><td>4~8</td></tr>
+</table>
+
+<div class="sub-sec">🔧 Midjourney 파라미터</div>
+<table class="ptable">
+  <tr><th>파라미터</th><th>예시</th><th>설명</th></tr>
+  <tr><td>--ar</td><td>--ar 16:9</td><td>종횡비 지정 (16:9, 4:3, 1:1, 9:16 등)</td></tr>
+  <tr><td>--v</td><td>--v 6.1</td><td>버전 지정 (최신: v6.1, 애니: niji 6)</td></tr>
+  <tr><td>--q</td><td>--q 2</td><td>품질. 0.25·0.5·1·2. 높을수록 시간↑ 디테일↑</td></tr>
+  <tr><td>--s</td><td>--s 750</td><td>Stylize (0~1000). 높을수록 MJ 특유 스타일 강조</td></tr>
+  <tr><td>--chaos</td><td>--chaos 50</td><td>다양성 (0~100). 높을수록 예측 불가 결과</td></tr>
+  <tr><td>--seed</td><td>--seed 1234</td><td>시드 고정으로 재현 가능</td></tr>
+  <tr><td>--no</td><td>--no text, hands</td><td>네거티브 (해당 요소 제외)</td></tr>
+  <tr><td>--style</td><td>--style raw</td><td>raw: 덜 가공된 자연스러운 결과</td></tr>
+  <tr><td>--tile</td><td>--tile</td><td>타일링 패턴 생성</td></tr>
+  <tr><td>--iw</td><td>--iw 2</td><td>이미지 가중치 (img2img 시 0~2)</td></tr>
+  <tr><td>--weird</td><td>--weird 1000</td><td>독특하고 실험적인 결과 (0~3000)</td></tr>
+</table>
+
+<div class="sub-sec">📊 DALL-E 3 파라미터</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🤖</span><div class="card-names"><div class="gname">DALL-E 3 특징</div></div></div>
+  <div class="row"><span class="row-key">크기</span><span class="row-val">1024×1024, 1024×1792, 1792×1024</span></div>
+  <div class="row"><span class="row-key">품질</span><span class="row-val">standard / hd (hd가 더 디테일)</span></div>
+  <div class="row"><span class="row-key">스타일</span><span class="row-val">vivid (선명) / natural (자연스러운)</span></div>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">텍스트 렌더링 능력 우수 · 긴 자연어 프롬프트에 강함 · 가중치 표현 불필요</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ 모델·도구 ══════════ -->
+<div id="tab-models" class="section">
+<div class="sec-title">🤖 AI 이미지 생성 모델 & 도구</div>
+
+<div class="sub-sec">🌐 주요 서비스형 모델</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎨</span><div class="card-names"><div class="gname">Midjourney</div><div class="rname">midjourney.com · 유료 구독</div></div></div>
+  <span class="domain-tag">예술성·완성도 최고</span>
+  <div class="row"><span class="row-key">강점</span><span class="row-val">아름다운 기본 품질 · 다양한 스타일 · 커뮤니티 활성화</span></div>
+  <div class="row"><span class="row-key">약점</span><span class="row-val">세부 제어 어려움 · 유료 · Discord 기반</span></div>
+  <div class="row"><span class="row-key">최신 버전</span><span class="row-val">v6.1 (사진 품질), Niji 6 (애니메이션)</span></div>
+  <div class="row"><span class="row-key">사용법</span><span class="row-val">/imagine prompt: [내용] --v 6.1 --ar 16:9</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🖼️</span><div class="card-names"><div class="gname">DALL-E 3</div><div class="rname">OpenAI · ChatGPT 통합</div></div></div>
+  <span class="domain-tag">텍스트 렌더링 최강</span>
+  <div class="row"><span class="row-key">강점</span><span class="row-val">이미지 내 텍스트 생성 우수 · 자연어 이해 탁월 · ChatGPT에서 쉽게 접근</span></div>
+  <div class="row"><span class="row-key">약점</span><span class="row-val">세부 스타일 제어 제한 · 안전 필터 강함</span></div>
+  <div class="row"><span class="row-key">API</span><span class="row-val">OpenAI API로 통합 가능 · gpt-image-1이 최신</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔥</span><div class="card-names"><div class="gname">Adobe Firefly</div><div class="rname">Adobe · 상업 이용 안전</div></div></div>
+  <span class="domain-tag">상업용 이미지 최적</span>
+  <div class="row"><span class="row-key">강점</span><span class="row-val">Adobe Stock 학습 → 상업적 이용 안전 · Photoshop 통합 · 생성 채우기</span></div>
+  <div class="row"><span class="row-key">약점</span><span class="row-val">창의적 표현은 MJ·SD보다 제한적</span></div>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">Generative Fill로 사진 일부 AI 편집 가능</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌊</span><div class="card-names"><div class="gname">Stable Diffusion (SD)</div><div class="rname">Stability AI · 오픈소스</div></div></div>
+  <span class="domain-tag">로컬 실행·완전한 자유</span>
+  <div class="row"><span class="row-key">버전</span><span class="row-val">SD 1.5 (범용) · SDXL (고품질) · SD 3.5 (최신)</span></div>
+  <div class="row"><span class="row-key">강점</span><span class="row-val">무료·오픈소스 · LoRA·ControlNet 등 확장 · 로컬 실행 · 검열 없음</span></div>
+  <div class="row"><span class="row-key">약점</span><span class="row-val">GPU 필요 · 초기 셋업 복잡</span></div>
+  <div class="row"><span class="row-key">권장 GPU</span><span class="row-val">VRAM 6GB 이상 (SD 1.5) · 8GB 이상 (SDXL)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚡</span><div class="card-names"><div class="gname">Flux</div><div class="rname">Black Forest Labs · 오픈소스</div></div></div>
+  <span class="domain-tag">SD 대체 차세대 모델</span>
+  <div class="row"><span class="row-key">버전</span><span class="row-val">Flux.1-dev (고품질) · Flux.1-schnell (빠름) · Flux.1-pro</span></div>
+  <div class="row"><span class="row-key">강점</span><span class="row-val">텍스트 생성 매우 우수 · 사실적 사진 품질 · 다양성</span></div>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">Transformer 기반 (Diffusion Transformer) · SD보다 VRAM 더 필요</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎭</span><div class="card-names"><div class="gname">기타 서비스</div></div></div>
+  <div class="row"><span class="row-key">Leonardo.ai</span><span class="row-val">Stable Diffusion 기반 · 커스텀 모델 · 무료 플랜</span></div>
+  <div class="row"><span class="row-key">Playground AI</span><span class="row-val">SD 기반 · 하루 500장 무료</span></div>
+  <div class="row"><span class="row-key">Civitai</span><span class="row-val">커스텀 SD 모델·LoRA 공유 커뮤니티</span></div>
+  <div class="row"><span class="row-key">Seaart.ai</span><span class="row-val">애니메이션 특화 · 무료 플랜</span></div>
+  <div class="row"><span class="row-key">Ideogram</span><span class="row-val">텍스트 렌더링 강함 · 무료 플랜</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🖥️ 로컬 실행 UI·도구</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🖥️</span><div class="card-names"><div class="gname">AUTOMATIC1111 (WebUI)</div><div class="rname">가장 대중적인 SD UI</div></div></div>
+  <span class="domain-tag">입문자 추천</span>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">확장 플러그인 풍부 · ControlNet·ADetailer 등 · 직관적 UI</span></div>
+  <div class="row"><span class="row-key">단점</span><span class="row-val">속도 느림 · 메모리 관리 비효율</span></div>
+  <div class="row"><span class="row-key">주요 확장</span><span class="row-val">ControlNet, ADetailer, Ultimate SD Upscale, Deforum</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔮</span><div class="card-names"><div class="gname">ComfyUI</div><div class="rname">노드 기반 워크플로우</div></div></div>
+  <span class="domain-tag">고급자 추천</span>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">노드(블록)를 연결하는 시각적 워크플로우 · 빠름 · VRAM 효율적</span></div>
+  <div class="row"><span class="row-key">단점</span><span class="row-val">초보자에게 진입 장벽 높음</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">복잡한 파이프라인 구성, Flux 모델 활용에 특히 좋음</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎯</span><div class="card-names"><div class="gname">Fooocus</div><div class="rname">간단하고 빠른 SDXL UI</div></div></div>
+  <span class="domain-tag">SDXL 입문 추천</span>
+  <div class="row"><span class="row-key">특징</span><span class="row-val">설치 후 바로 사용 · 파라미터 자동 최적화 · 미니멀 UI</span></div>
+  <div class="row"><span class="row-key">적합</span><span class="row-val">SDXL 빠른 실험에 최적</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🧩 주요 SD 확장·기능</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🕹️</span><div class="card-names"><div class="gname">ControlNet</div><div class="rname">구조·포즈 제어</div></div></div>
+  <span class="domain-tag">구도·포즈 정밀 제어</span>
+  <div class="row"><span class="row-key">OpenPose</span><span class="row-val">사람 포즈 스켈레톤으로 자세 제어</span></div>
+  <div class="row"><span class="row-key">Canny / Lineart</span><span class="row-val">엣지 감지 — 원본 구조 유지하며 스타일 변경</span></div>
+  <div class="row"><span class="row-key">Depth</span><span class="row-val">깊이 맵으로 원근감·공간 제어</span></div>
+  <div class="row"><span class="row-key">Normal Map</span><span class="row-val">표면 방향으로 입체 질감 제어</span></div>
+  <div class="row"><span class="row-key">Scribble</span><span class="row-val">낙서(대략적 스케치)를 완성 이미지로</span></div>
+  <div class="row"><span class="row-key">Tile</span><span class="row-val">고해상도 디테일 추가 (Upscale에 활용)</span></div>
+  <div class="row"><span class="row-key">IP-Adapter</span><span class="row-val">참조 이미지의 스타일·외모를 다른 이미지에 이식</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔬</span><div class="card-names"><div class="gname">LoRA (Low-Rank Adaptation)</div><div class="rname">경량 추가 학습 모델</div></div></div>
+  <span class="domain-tag">특정 스타일·캐릭터 학습</span>
+  <div class="row"><span class="row-key">용도</span><span class="row-val">특정 캐릭터, 화풍, 물체를 추가 학습시킨 소형 모델</span></div>
+  <div class="row"><span class="row-key">사용법</span><span class="row-val"><code>&lt;lora:filename:0.8&gt;</code> 형태로 프롬프트에 추가 (0.6~1.0 권장)</span></div>
+  <div class="row"><span class="row-key">다운로드</span><span class="row-val">Civitai.com에서 원하는 LoRA 검색·다운로드</span></div>
+  <div class="row"><span class="row-key">여러 개</span><span class="row-val">여러 LoRA 동시 사용 가능 (가중치 합이 1.5 이하 권장)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🧠</span><div class="card-names"><div class="gname">Textual Inversion (Embedding)</div><div class="rname">텍스트 임베딩 학습</div></div></div>
+  <span class="domain-tag">키워드 재정의</span>
+  <div class="row"><span class="row-key">용도</span><span class="row-val">특정 단어를 특정 스타일/캐릭터에 매핑</span></div>
+  <div class="row"><span class="row-key">사용법</span><span class="row-val">Embeddings 폴더에 넣고 프롬프트에 파일명 입력</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">네거티브 임베딩(EasyNegative 등)으로 품질 향상</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔆</span><div class="card-names"><div class="gname">업스케일러</div><div class="rname">해상도 확대</div></div></div>
+  <span class="domain-tag">이미지 고해상도화</span>
+  <div class="row"><span class="row-key">ESRGAN</span><span class="row-val">범용 업스케일러. 선명하고 디테일 추가</span></div>
+  <div class="row"><span class="row-key">R-ESRGAN 4x+</span><span class="row-val">실사 사진에 좋음</span></div>
+  <div class="row"><span class="row-key">R-ESRGAN 4x+ Anime6B</span><span class="row-val">애니메이션에 최적</span></div>
+  <div class="row"><span class="row-key">LDSR</span><span class="row-val">느리지만 고품질 (SD 기반)</span></div>
+  <div class="row"><span class="row-key">SwinIR</span><span class="row-val">노이즈 제거·선명화에 강함</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ 용어 사전 ══════════ -->
+<div id="tab-glossary" class="section">
+<div class="sec-title">📚 AI 이미지 생성 용어 사전</div>
+
+<div class="sub-sec">🔤 핵심 기술 용어</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌊</span><div class="card-names"><div class="gname">Diffusion Model (확산 모델)</div><div class="rname">현재 AI 이미지 생성의 주류 기술</div></div></div>
+  <div class="row"><span class="row-key">원리</span><span class="row-val">이미지에 노이즈를 점진적으로 추가한 후, 반대로 노이즈를 제거하는 과정을 학습 → 프롬프트에 맞게 노이즈에서 이미지 복원</span></div>
+  <div class="row"><span class="row-key">대표 모델</span><span class="row-val">Stable Diffusion, Midjourney, DALL-E 3, Flux</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🗃️</span><div class="card-names"><div class="gname">Latent Space (잠재 공간)</div><div class="rname">이미지의 압축된 표현 공간</div></div></div>
+  <div class="row"><span class="row-key">개념</span><span class="row-val">이미지를 고차원 픽셀 대신 저차원 잠재 벡터로 표현하는 공간. Stable Diffusion은 여기서 작업해 속도↑</span></div>
+  <div class="row"><span class="row-key">관련</span><span class="row-val">VAE(변분 오토인코더)가 이미지↔잠재 공간 변환 담당</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🏋️</span><div class="card-names"><div class="gname">Checkpoint (체크포인트)</div><div class="rname">.safetensors / .ckpt 파일</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">학습이 완료된 모델 가중치 파일. Civitai 등에서 다운로드. 모델의 핵심</span></div>
+  <div class="row"><span class="row-key">크기</span><span class="row-val">SD 1.5: 약 2GB, SDXL: 약 6GB</span></div>
+  <div class="row"><span class="row-key">형식</span><span class="row-val">.safetensors (안전, 추천) / .ckpt (구형, 악성코드 위험)</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">📷</span><div class="card-names"><div class="gname">VAE (Variational Autoencoder)</div><div class="rname">가변 오토인코더</div></div></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">잠재 공간 ↔ 실제 이미지 픽셀 변환. 최종 이미지 색상·선명도에 큰 영향</span></div>
+  <div class="row"><span class="row-key">교체 효과</span><span class="row-val">vae-ft-mse-840000: 피부색·전반적 색감 개선</span></div>
+  <div class="row"><span class="row-key">주의</span><span class="row-val">VAE 없이 구동하면 채도 낮고 회색빛 이미지 발생 가능</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔗</span><div class="card-names"><div class="gname">CLIP (Contrastive Language–Image Pre-training)</div><div class="rname">OpenAI의 텍스트-이미지 연결 모델</div></div></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">프롬프트 텍스트를 이미지와 연결되는 벡터로 변환 → U-Net에 조건 제공</span></div>
+  <div class="row"><span class="row-key">CLIP Skip</span><span class="row-val">마지막 N개 레이어를 건너뜀. 2로 설정 시 더 창의적이나 덜 정확</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🧱</span><div class="card-names"><div class="gname">U-Net</div><div class="rname">Stable Diffusion의 핵심 신경망</div></div></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">잠재 공간에서 노이즈 제거 과정을 수행. CLIP 조건을 받아 프롬프트에 맞게 노이즈 제거</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">⚡</span><div class="card-names"><div class="gname">CFG Scale (Classifier Free Guidance)</div><div class="rname">프롬프트 충실도</div></div></div>
+  <div class="row"><span class="row-key">낮음 (1~5)</span><span class="row-val">프롬프트 무시, 매우 창의적·랜덤</span></div>
+  <div class="row"><span class="row-key">중간 (7~12)</span><span class="row-val">균형. 대부분의 경우 권장</span></div>
+  <div class="row"><span class="row-key">높음 (15+)</span><span class="row-val">프롬프트에 지나치게 충실 → 과포화·아티팩트</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌱</span><div class="card-names"><div class="gname">Seed (시드)</div><div class="rname">랜덤 초기값</div></div></div>
+  <div class="row"><span class="row-key">역할</span><span class="row-val">노이즈 생성의 시작점. 동일 시드+동일 설정=동일 이미지 보장</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">마음에 드는 구도 발견 → 시드 고정 → 프롬프트만 바꿔가며 실험</span></div>
+</div>
+</div>
+
+<div class="sub-sec">🎨 생성 기법 용어</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🖼️</span><div class="card-names"><div class="gname">txt2img / img2img</div></div></div>
+  <div class="row"><span class="row-key">txt2img</span><span class="row-val">텍스트 프롬프트만으로 이미지 생성</span></div>
+  <div class="row"><span class="row-key">img2img</span><span class="row-val">기존 이미지 + 프롬프트로 변형 이미지 생성. Denoising으로 변형 정도 조절</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔧</span><div class="card-names"><div class="gname">Inpainting / Outpainting</div></div></div>
+  <div class="row"><span class="row-key">Inpainting</span><span class="row-val">이미지 일부를 마스크로 지정해 해당 부분만 재생성 (수정·보정)</span></div>
+  <div class="row"><span class="row-key">Outpainting</span><span class="row-val">이미지 바깥쪽을 자연스럽게 확장 생성</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔬</span><div class="card-names"><div class="gname">LoRA (Low-Rank Adaptation)</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">기존 모델을 소규모 추가 데이터로 경량 파인튜닝한 모델 (수십~수백 MB)</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">특정 캐릭터, 화풍, 의상, 물체 등을 학습시켜 일관성↑</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🧠</span><div class="card-names"><div class="gname">Textual Inversion / Embedding</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">특정 개념을 나타내는 새로운 토큰(단어)을 학습시키는 기법. 파일 크기가 매우 작음 (KB 단위)</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">EasyNegative 같은 네거티브 임베딩으로 품질 향상</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎮</span><div class="card-names"><div class="gname">ControlNet</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">추가 조건(포즈, 엣지, 깊이 등)을 이미지 생성에 주입해 구조·포즈를 정밀 제어하는 확장</span></div>
+  <div class="row"><span class="row-key">활용</span><span class="row-val">사진 → 애니메이션 (구조 유지), 스케치 → 완성본, 포즈 고정</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔆</span><div class="card-names"><div class="gname">Hires. fix / 업스케일</div></div></div>
+  <div class="row"><span class="row-key">Hires. fix</span><span class="row-val">저해상도로 구조 생성 후 업스케일러로 확대 → img2img 재생성. 고해상도에서 구조 붕괴 방지</span></div>
+  <div class="row"><span class="row-key">4x 업스케일</span><span class="row-val">512×512 → 2048×2048. ESRGAN 등 신경망 업스케일러 사용</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎭</span><div class="card-names"><div class="gname">ADetailer</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">얼굴·손을 자동 감지해 인페인팅으로 보정하는 AUTOMATIC1111 확장</span></div>
+  <div class="row"><span class="row-key">효과</span><span class="row-val">흐릿한 얼굴, 이상한 손을 자동으로 높은 품질로 재생성</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🎯</span><div class="card-names"><div class="gname">Fine-tuning (파인튜닝)</div></div></div>
+  <div class="row"><span class="row-key">DreamBooth</span><span class="row-val">특정 인물·물체의 사진 10~20장으로 전체 모델 파인튜닝. 고품질이나 많은 VRAM 필요</span></div>
+  <div class="row"><span class="row-key">LoRA 학습</span><span class="row-val">DreamBooth보다 가볍고 빠른 파인튜닝. 결과도 우수해 현재 주류</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🌀</span><div class="card-names"><div class="gname">아티팩트 (Artifact)</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">생성 과정에서 발생하는 의도치 않은 결함 — 뭉개짐, 이상한 패턴, 경계 오류 등</span></div>
+  <div class="row"><span class="row-key">원인</span><span class="row-val">CFG Scale 너무 높음 / 해상도 불일치 / 부적합한 샘플러·스텝</span></div>
+</div>
+</div>
+
+<div class="sub-sec">📊 모델 구조 용어</div>
+<div class="grid">
+<div class="card">
+  <div class="card-head"><span class="card-icon">🤖</span><div class="card-names"><div class="gname">GAN (Generative Adversarial Network)</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">생성자(Generator)와 판별자(Discriminator)가 경쟁하며 학습. 확산 모델 이전 주류</span></div>
+  <div class="row"><span class="row-key">현황</span><span class="row-val">StyleGAN 등 일부 특수 용도 유지. 전반적으로 Diffusion에 대체됨</span></div>
+</div>
+<div class="card">
+  <div class="card-head"><span class="card-icon">🔄</span><div class="card-names"><div class="gname">DiT (Diffusion Transformer)</div></div></div>
+  <div class="row"><span class="row-key">정의</span><span class="row-val">U-Net 대신 Transformer를 사용한 확산 모델. 확장성↑ 품질↑</span></div>
+  <div class="row"><span class="row-key">대표</span><span class="row-val">Flux, DALL-E 3, Stable Diffusion 3</span></div>
+</div>
+</div>
+</div>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</div><!-- /main -->
+
+<div id="toast">복사됨! ✓</div>
+
+<script>
+// ─── 키워드 데이터 ────────────────────────────────────────
+const KW = {
+  'kw-photo':       {c:'kw-blue',  items:['photorealistic','hyperrealistic','ultra realistic','RAW photo','DSLR photo','film photography','analog photo','Kodachrome','Polaroid','35mm film','medium format','Hasselblad','shot on iPhone','documentary photo','editorial photo','portrait photography']},
+  'kw-digital':     {c:'kw-purple',items:['digital art','digital illustration','digital painting','concept art','character design','2D digital art','semi-realistic','painterly','detailed illustration','fantasy art','sci-fi art','game art','artstation','deviantart']},
+  'kw-anime':       {c:'kw-pink',  items:['anime','manga','anime style','webtoon','manhwa','chibi','kawaii','ghibli style','makoto shinkai style','kyoto animation style','cel shading','flat anime style','niji style','anime key visual','bishoujo','bishonen','moe']},
+  'kw-painting':    {c:'kw-gold',  items:['oil painting','watercolor','gouache','acrylic painting','impressionism','expressionism','baroque','renaissance','romanticism','classical painting','portrait painting','landscape painting','Rembrandt style','Van Gogh style','Monet style','Gustav Klimt style']},
+  'kw-sketch':      {c:'kw-orange',items:['pencil sketch','charcoal drawing','ink drawing','line art','cross-hatching','monochrome sketch','rough sketch','technical drawing','blueprint','pen and ink','ballpoint pen drawing','comic book style','manga lineart']},
+  'kw-3d':          {c:'kw-cyan',  items:['3D render','CGI','Blender render','Octane render','Cinema 4D','Unreal Engine','ray tracing','physically based rendering','subsurface scattering','3D character','low poly','isometric 3D','voxel art','claymation','stop motion']},
+  'kw-retro':       {c:'kw-green', items:['pixel art','8-bit','16-bit','voxel','retro','vintage','80s style','90s style','vaporwave','synthwave','lo-fi','cassette futurism','retrowave','outrun','neon noir','Y2K aesthetic']},
+  'kw-genre':       {c:'kw-purple',items:['surrealism','abstract','minimalist','maximalist','dark fantasy','high fantasy','steampunk','cyberpunk','dieselpunk','solarpunk','cottagecore','dark academia','gothic','horror','mythology','fairytale']},
+  'kw-other-style': {c:'kw-blue',  items:['ukiyo-e','Chinese ink painting','Islamic art','Art Nouveau','Art Deco','Bauhaus','pop art','street art','graffiti','stained glass','mosaic','embroidery','textile','origami','papercut','flat design','material design']},
+
+  'kw-shot':        {c:'kw-blue',  items:['extreme close-up','close-up','medium close-up','medium shot','medium full shot','full body','full shot','wide shot','extreme wide shot','establishing shot','portrait','bust shot']},
+  'kw-angle':       {c:'kw-purple',items:['eye level','low angle','high angle','bird\'s eye view','worm\'s eye view','dutch angle','over the shoulder shot','POV','first person view','isometric view','top view','front view','side view','three-quarter view','back view']},
+  'kw-lens':        {c:'kw-cyan',  items:['bokeh','depth of field','shallow depth of field','wide angle lens','telephoto lens','fisheye lens','macro lens','tilt-shift','35mm','50mm','85mm','105mm','anamorphic lens','lens flare','vignette','chromatic aberration']},
+  'kw-composition': {c:'kw-gold',  items:['rule of thirds','golden ratio','symmetrical composition','centered composition','leading lines','negative space','framing','foreground','background','midground','layered composition','dynamic composition','S-curve composition']},
+
+  'kw-natural-light':    {c:'kw-gold',  items:['golden hour','blue hour','midday sun','overcast light','sunrise','sunset','moonlight','starlight','dappled light','god rays','sunbeam','natural light','window light','sunlight','twilight']},
+  'kw-artificial-light': {c:'kw-yellow',items:['studio lighting','cinematic lighting','dramatic lighting','rim light','backlit','side lighting','soft light','hard light','volumetric lighting','ambient light','chiaroscuro','neon lights','fire light','candle light','Rembrandt lighting','butterfly lighting','split lighting']},
+  'kw-color':            {c:'kw-pink',  items:['warm tones','cool tones','muted colors','vibrant colors','pastel colors','monochromatic','high contrast','low contrast','desaturated','sepia','color grading','cinematic color','black and white','golden tones','earth tones','neon colors']},
+  'kw-special-light':    {c:'kw-cyan',  items:['bioluminescent','glowing','luminous','radiant','iridescent','holographic','aurora','galaxy','nebula','stardust','sparkle','shimmer','glow effect','lens flare','light particles','fireflies']},
+
+  'kw-top-quality':    {c:'kw-gold',  items:['masterpiece','best quality','ultra-detailed','highly detailed','ultra high res','(masterpiece:1.2)','(best quality:1.2)','professional','award winning','stunning','beautiful','breathtaking','exceptional']},
+  'kw-photo-quality':  {c:'kw-blue',  items:['RAW photo','(RAW photo:1.2)','photorealistic','realistic','lifelike','natural skin texture','skin pores','subsurface scattering','detailed skin','realistic eyes','realistic hair']},
+  'kw-art-quality':    {c:'kw-purple',items:['trending on ArtStation','featured on ArtStation','artstation HQ','deviantart','pixiv masterpiece','official art','professional illustration','concept art quality','polished illustration']},
+  'kw-detail':         {c:'kw-cyan',  items:['intricate details','hyper detailed','fine details','ultra sharp','extremely detailed','rich details','complex details','intricate','highly detailed face','highly detailed background','fine linework']},
+  'kw-effect-quality': {c:'kw-green', items:['sharp focus','in focus','perfect focus','HDR','HDR photography','high dynamic range','vivid','high saturation','rich colors','professional color grading','perfect composition']},
+  'kw-resolution':     {c:'kw-orange',items:['8K','8K resolution','4K','UHD','high resolution','fullHD','HDR','sharp','crisp','high quality render']},
+
+  'kw-neg-person':     {c:'kw-red',   items:['bad anatomy','extra limbs','missing limbs','deformed','mutated','ugly','bad proportions','malformed limbs','fused limbs','extra arms','extra legs','cloned face','long neck','mutation','poorly drawn face']},
+  'kw-neg-quality':    {c:'kw-red',   items:['worst quality','low quality','normal quality','jpeg artifacts','compression artifacts','blurry','noisy','grainy','pixelated','out of focus','overexposed','underexposed','washed out','oversaturated']},
+  'kw-neg-text':       {c:'kw-red',   items:['text','watermark','signature','logo','username','brand','copyright','caption','label','banner','stamp','overlay text']},
+};
+
+// 버튼 빌드
+Object.entries(KW).forEach(([id, {c, items}])=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = items.map(v=>`<button class="kw ${c}" data-v="${encodeURIComponent(v)}" onclick="cpKw(this)">${v}</button>`).join('');
+});
+
+// copy
+let tid;
+function cpKw(btn){
+  const text = decodeURIComponent(btn.dataset.v);
+  docp(text, btn);
+}
+function copyText(el, text){
+  docp(text, el);
+}
+function docp(text, el){
+  const done=()=>flash(el);
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(done).catch(()=>fb(text,done)); }
+  else { fb(text,done); }
+}
+function fb(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta); cb();
+}
+function flash(el){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  if(el) el.classList.add('ok');
+  clearTimeout(tid);
+  tid=setTimeout(()=>{ t.classList.remove('show'); if(el) el.classList.remove('ok'); },1100);
+}
+
+// tab
+const TABS=['prompt','style','camera','light','quality','negative','params','models','glossary'];
+function sw(name,el){
+  TABS.forEach(t=>{ const s=document.getElementById('tab-'+t); if(s){s.classList.remove('active');} });
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  doSearch('');
+}
+
+// search
+function doSearch(q){
+  const sq=document.getElementById('search');
+  if(sq && sq.value !== q && q==='') sq.value='';
+  q=q.trim().toLowerCase();
+  if(!q){
+    document.getElementById('no-result').style.display='none';
+    document.querySelectorAll('.kw,.card,.ptable tr').forEach(el=>el.style.display='');
+    document.querySelectorAll('.kw-wrap,.grid,.sub-sec,.ptable,.info-box,.prompt-box').forEach(el=>el.style.display='');
+    return;
+  }
+  // show all
+  TABS.forEach(t=>{ const s=document.getElementById('tab-'+t); if(s) s.classList.add('active'); });
+
+  let any=false;
+  // cards
+  document.querySelectorAll('.card').forEach(card=>{
+    const txt=(card.textContent||'').toLowerCase();
+    const show=txt.includes(q);
+    card.style.display=show?'':'none';
+    if(show) any=true;
+  });
+  // kw buttons
+  document.querySelectorAll('.kw').forEach(btn=>{
+    const v=decodeURIComponent(btn.dataset.v||'').toLowerCase();
+    const show=v.includes(q)||btn.textContent.toLowerCase().includes(q);
+    btn.style.display=show?'':'none';
+    if(show) any=true;
+  });
+  // kw-wrap visibility
+  document.querySelectorAll('.kw-wrap').forEach(wrap=>{
+    const vis=[...wrap.children].some(c=>c.style.display!=='none');
+    wrap.style.display=vis?'':'none';
+  });
+  // grid visibility
+  document.querySelectorAll('.grid').forEach(g=>{
+    const vis=[...g.children].some(c=>c.style.display!=='none');
+    g.style.display=vis?'':'none';
+  });
+  // table rows
+  document.querySelectorAll('.ptable tbody tr, .ptable tr').forEach(tr=>{
+    if(tr.closest('thead')) return;
+    const txt=(tr.textContent||'').toLowerCase();
+    tr.style.display=txt.includes(q)?'':'none';
+    if(txt.includes(q)) any=true;
+  });
+  // sub-sec visibility
+  document.querySelectorAll('.sub-sec').forEach(ss=>{
+    let next=ss.nextElementSibling;
+    let vis=false;
+    while(next && !next.classList.contains('sub-sec') && !next.classList.contains('sec-title')){
+      if(next.style.display!=='none'){
+        const hasCont=[...next.querySelectorAll('.kw,.card,.ptable tr')].some(c=>c.style.display!=='none');
+        if(hasCont||next.classList.contains('info-box')||next.classList.contains('prompt-box')) vis=true;
+      }
+      next=next.nextElementSibling;
+    }
+    ss.style.display=vis?'':'none';
+  });
+  document.getElementById('no-result').style.display=any?'none':'block';
+  // update count
+  const cnt=document.querySelectorAll('.kw[style=""], .kw:not([style]),.card[style=""],.card:not([style])').length;
+  const el=document.getElementById('count');
+  if(el) el.textContent='';
+}
+</script>
+</body>
+</html>

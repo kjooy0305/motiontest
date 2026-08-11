@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>복셀 입체 게임 — 테스트 43</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:#070b12;
+  font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#e8eef7;
+  user-select:none;-webkit-tap-highlight-color:transparent;}
+canvas{display:block;}
+
+/* ─── 시작 화면 ─── */
+#sel{position:absolute;inset:0;z-index:100;overflow-y:auto;padding:24px 16px 40px;
+  display:flex;flex-direction:column;align-items:center;
+  background:radial-gradient(ellipse at 50% 30%,#16233d 0%,#070b12 70%);
+  transition:opacity .5s,transform .5s;}
+#sel.hide{opacity:0;transform:scale(1.05);pointer-events:none;}
+#sel h1{margin-top:18px;font-size:clamp(21px,5.2vw,34px);font-weight:800;letter-spacing:.5px;
+  background:linear-gradient(135deg,#a5f3fc,#38bdf8,#818cf8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#sel .sub{margin-top:9px;font-size:13px;color:#7c8ba5;text-align:center;line-height:1.7;max-width:560px;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:12px;
+  width:100%;max-width:620px;margin-top:26px;}
+.card{border:2px solid #22344f;border-radius:14px;padding:16px 15px;background:#0e1725;
+  cursor:pointer;transition:border-color .2s,background .2s,transform .15s;}
+.card:hover{transform:translateY(-2px);}
+.card.on{border-color:#38bdf8;background:#132437;box-shadow:0 0 0 3px rgba(56,189,248,.14);}
+.card .ttl{font-size:15px;font-weight:700;color:#dbeafe;}
+.card .dsc{margin-top:7px;font-size:12px;color:#7c8ba5;line-height:1.65;}
+
+.row{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center;}
+.row label{font-size:12.5px;color:#93a4bd;}
+input[type=text]{width:130px;padding:8px 11px;border-radius:9px;border:1px solid #24354e;
+  background:#0c1521;color:#dbeafe;font-size:13px;font-family:inherit;}
+input[type=text]:focus{outline:none;border-color:#38bdf8;}
+
+#go{margin-top:26px;padding:13px 46px;border:none;border-radius:11px;cursor:pointer;
+  font-size:15px;font-weight:800;font-family:inherit;color:#03121f;
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8);transition:transform .15s,filter .2s;}
+#go:hover{transform:translateY(-2px);filter:brightness(1.08);}
+
+.legend{margin-top:30px;width:100%;max-width:620px;}
+.legend h2{font-size:13px;color:#93a4bd;font-weight:700;margin-bottom:9px;letter-spacing:.4px;}
+.legend ul{list-style:none;display:grid;gap:6px;}
+.legend li{font-size:12px;color:#8296b1;line-height:1.6;padding-left:15px;position:relative;}
+.legend li::before{content:'▸';position:absolute;left:0;color:#38bdf8;}
+.legend b{color:#cfe3fb;font-weight:700;}
+
+/* ─── HUD ─── */
+#hud{position:absolute;inset:0;pointer-events:none;z-index:20;display:none;}
+#hud.on{display:block;}
+
+#stats{position:absolute;top:10px;left:10px;padding:9px 12px;border-radius:10px;
+  background:rgba(8,13,22,.76);border:1px solid #1d2c42;font-size:11.5px;line-height:1.75;
+  font-variant-numeric:tabular-nums;color:#b9cbe4;backdrop-filter:blur(6px);}
+#stats b{color:#7dd3fc;font-weight:700;}
+#stats .warn{color:#fbbf24;}
+
+#panel{position:absolute;top:10px;right:10px;width:216px;max-height:calc(100% - 20px);
+  overflow-y:auto;padding:11px;border-radius:11px;pointer-events:auto;
+  background:rgba(8,13,22,.82);border:1px solid #1d2c42;backdrop-filter:blur(6px);}
+#panel h3{font-size:11px;color:#6f83a0;letter-spacing:.6px;margin:9px 0 6px;font-weight:700;}
+#panel h3:first-child{margin-top:0;}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:6px 8px;border-radius:8px;cursor:pointer;font-size:12px;color:#a9bcd6;
+  transition:background .15s;}
+.tg:hover{background:#131f31;}
+.tg .sw{width:30px;height:17px;border-radius:9px;background:#243449;position:relative;
+  flex-shrink:0;transition:background .2s;}
+.tg .sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;
+  border-radius:50%;background:#6b7f9b;transition:transform .2s,background .2s;}
+.tg.on{color:#dbeafe;}
+.tg.on .sw{background:#0e7490;}
+.tg.on .sw::after{transform:translateX(13px);background:#7dd3fc;}
+.tg small{display:block;font-size:10px;color:#5f7a9c;}
+
+#pity{margin-top:4px;padding:8px;border-radius:9px;background:#0c1521;border:1px solid #1c2b40;}
+#pity .lbl{font-size:10.5px;color:#6f83a0;}
+#pity .bar{height:6px;border-radius:3px;background:#1a2740;margin:5px 0 6px;overflow:hidden;}
+#pity .bar i{display:block;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,#0ea5e9,#a78bfa);transition:width .2s;}
+#pity .hist{display:flex;gap:2px;flex-wrap:wrap;margin-top:6px;}
+#pity .hist i{width:7px;height:7px;border-radius:2px;background:#25354d;}
+#pity .hist i.hit{background:#a78bfa;box-shadow:0 0 5px #a78bfa;}
+
+#hint{position:absolute;left:10px;bottom:10px;padding:8px 11px;border-radius:9px;
+  background:rgba(8,13,22,.72);border:1px solid #1d2c42;font-size:11px;color:#8296b1;
+  line-height:1.7;backdrop-filter:blur(6px);}
+#hint b{color:#b9cbe4;}
+
+#cross{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;}
+#cross::before,#cross::after{content:'';position:absolute;background:rgba(233,242,255,.8);}
+#cross::before{left:8px;top:0;width:2px;height:18px;}
+#cross::after{top:8px;left:0;height:2px;width:18px;}
+
+#toast{position:absolute;left:50%;top:22%;transform:translateX(-50%);
+  padding:9px 17px;border-radius:10px;font-size:13px;font-weight:700;
+  background:rgba(167,139,250,.16);border:1px solid #a78bfa;color:#ddd6fe;
+  opacity:0;transition:opacity .3s,transform .3s;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+#lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(7,11,18,.62);font-size:14px;color:#b9cbe4;pointer-events:auto;cursor:pointer;
+  backdrop-filter:blur(3px);z-index:30;text-align:center;padding:20px;line-height:1.8;}
+#lock.hide{display:none;}
+
+/* ─── 모바일 조작 ─── */
+#touch{position:absolute;inset:0;z-index:25;display:none;pointer-events:none;}
+#touch.on{display:block;}
+#stick{position:absolute;left:20px;bottom:20px;width:118px;height:118px;border-radius:50%;
+  background:rgba(20,32,50,.5);border:2px solid #2b405e;pointer-events:auto;}
+#stick i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;
+  border-radius:50%;background:rgba(125,211,252,.5);border:2px solid #7dd3fc;}
+.tbtn{position:absolute;width:62px;height:62px;border-radius:50%;pointer-events:auto;
+  background:rgba(20,32,50,.55);border:2px solid #2b405e;color:#cfe3fb;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.tbtn:active{background:rgba(56,189,248,.3);}
+#bJump{right:22px;bottom:26px;}
+#bDig{right:96px;bottom:60px;}
+#bPut{right:22px;bottom:100px;}
+</style>
+</head>
+<body>
+
+<!-- ══ 시작 화면 ══ -->
+<div id="sel">
+  <h1>복셀 입체 게임</h1>
+  <p class="sub">
+    펄린 노이즈로 만든 밀도장(density field) 하나를 두 가지 방식으로 표면화합니다.<br>
+    같은 지형을 <b>블록</b>과 <b>듀얼 컨투어링</b>으로 번갈아 보며 차이를 확인할 수 있습니다.
+  </p>
+
+  <div class="cards">
+    <div class="card on" data-mode="blocky">
+      <div class="ttl">블록 (Blocky)</div>
+      <div class="dsc">셀 단위로 채움/빔을 정하고 드러난 면만 그립니다. 큐브가 그대로 보이고
+        모서리 그늘(AO)로 입체감을 냅니다.</div>
+    </div>
+    <div class="card" data-mode="dc">
+      <div class="ttl">듀얼 컨투어링 (Dual Contouring)</div>
+      <div class="dsc">밀도가 0을 넘는 모서리에서 교점과 법선을 뽑아 셀마다 꼭짓점 하나를
+        QEF로 배치합니다. 매끄러우면서 각진 곳은 각지게 남습니다.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <label for="seed">시드</label>
+    <input type="text" id="seed" value="43">
+    <label for="wsize">지형</label>
+    <select id="wsize" style="padding:8px 10px;border-radius:9px;border:1px solid #24354e;background:#0c1521;color:#dbeafe;font-size:13px;font-family:inherit;">
+      <option value="0">언덕 + 동굴</option>
+      <option value="1">협곡</option>
+      <option value="2">떠 있는 섬</option>
+    </select>
+  </div>
+
+  <button id="go">시작하기</button>
+
+  <div class="legend">
+    <h2>이 페이지에 구현된 것</h2>
+    <ul>
+      <li><b>펄린 노이즈</b> — 개선된 펄린(2002) + fBm. 지형 높이와 3D 동굴을 함께 만듭니다.</li>
+      <li><b>블록 메싱</b> — 가려진 면 제거 + 코너 앰비언트 오클루전.</li>
+      <li><b>듀얼 컨투어링</b> — 에르미트 데이터(교점·법선) 수집 후 QEF를 반복법으로 풀어 셀 꼭짓점 배치.</li>
+      <li><b>레이캐스팅</b> — Amanatides &amp; Woo DDA. 블록 조준·파괴·설치와 적의 시야 판정에 씁니다.</li>
+      <li><b>다익스트라</b> — 이진 힙 우선순위 큐. 추격자 한 명이 매번 최단 경로를 다시 계산합니다.</li>
+      <li><b>플로우 필드</b> — 플레이어를 향한 거리장을 한 번 풀고 방향만 저장. 무리 전체가 공유합니다.</li>
+      <li><b>코너 보정</b> — 모서리에 걸렸을 때 살짝 밀어 넣거나 한 칸 올라타게 합니다. 끄고 켜서 비교하세요.</li>
+      <li><b>Pity 타이머</b> — 블록을 부술 때 정수 드랍. 실패가 쌓이면 확률이 오르고 결국 확정됩니다.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ HUD ══ -->
+<div id="hud">
+  <div id="cross"></div>
+  <div id="stats"></div>
+  <div id="hint">
+    <b>WASD</b> 이동 · <b>Space</b> 점프 · <b>Shift</b> 달리기<br>
+    <b>좌클릭</b> 파괴 · <b>우클릭</b> 설치 · <b>Q</b> 표면화 전환 · <b>H</b> 패널
+  </div>
+  <div id="panel"></div>
+  <div id="toast"></div>
+  <div id="lock">화면을 클릭하면 시점이 잠깁니다<br><span style="font-size:12px;color:#6f83a0">ESC 로 해제</span></div>
+</div>
+
+<div id="touch">
+  <div id="stick"><i></i></div>
+  <div class="tbtn" id="bJump">점프</div>
+  <div class="tbtn" id="bDig">파괴</div>
+  <div class="tbtn" id="bPut">설치</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+/* ══════════════════════════════════════════════════════════════
+   1. 펄린 노이즈 (Improved Perlin, Ken Perlin 2002)
+   ──────────────────────────────────────────────────────────────
+   격자점마다 정해진 기울기 벡터를 두고, 격자 안 임의의 점에서
+   각 모서리까지의 거리와 기울기의 내적을 보간한다.
+   값 노이즈와 달리 격자 자국이 덜 남는다.
+══════════════════════════════════════════════════════════════ */
+
+/** 시드에서 재현 가능한 난수열. 같은 시드는 늘 같은 지형을 만든다. */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+class Perlin {
+  constructor(seed) {
+    const rnd = mulberry32(seed);
+    const p = new Uint8Array(256);
+    for (let i = 0; i < 256; i++) p[i] = i;
+    // Fisher–Yates. 순열표를 두 번 이어 붙여 인덱스 & 255 로 감싼다.
+    for (let i = 255; i > 0; i--) {
+      const j = (rnd() * (i + 1)) | 0;
+      const t = p[i]; p[i] = p[j]; p[j] = t;
+    }
+    this.perm = new Uint8Array(512);
+    for (let i = 0; i < 512; i++) this.perm[i] = p[i & 255];
+  }
+
+  /** 5차 페이드. 1·2차 도함수가 격자점에서 0이라 이음매가 매끄럽다. */
+  static fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+
+  /** 해시 하위 4비트로 12방향 기울기 중 하나를 골라 내적한다. */
+  static grad(h, x, y, z) {
+    switch (h & 15) {
+      case 0:  return  x + y;  case 1:  return -x + y;
+      case 2:  return  x - y;  case 3:  return -x - y;
+      case 4:  return  x + z;  case 5:  return -x + z;
+      case 6:  return  x - z;  case 7:  return -x - z;
+      case 8:  return  y + z;  case 9:  return -y + z;
+      case 10: return  y - z;  case 11: return -y - z;
+      case 12: return  x + y;  case 13: return -y + z;
+      case 14: return -x + y;  default: return -y - z;
+    }
+  }
+
+  noise3(x, y, z) {
+    const p = this.perm;
+    const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+    x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+    const u = Perlin.fade(x), v = Perlin.fade(y), w = Perlin.fade(z);
+
+    const A  = p[X] + Y,     AA = p[A] + Z,  AB = p[A + 1] + Z;
+    const B  = p[X + 1] + Y, BA = p[B] + Z,  BB = p[B + 1] + Z;
+    const G = Perlin.grad, L = (t, a, b) => a + t * (b - a);
+
+    return L(w,
+      L(v, L(u, G(p[AA],     x,     y,     z),
+                G(p[BA],     x - 1, y,     z)),
+           L(u, G(p[AB],     x,     y - 1, z),
+                G(p[BB],     x - 1, y - 1, z))),
+      L(v, L(u, G(p[AA + 1], x,     y,     z - 1),
+                G(p[BA + 1], x - 1, y,     z - 1)),
+           L(u, G(p[AB + 1], x,     y - 1, z - 1),
+                G(p[BB + 1], x - 1, y - 1, z - 1))));
+  }
+
+  /** 옥타브를 겹쳐 큰 굴곡과 잔결을 함께 만든다. */
+  fbm(x, y, z, octaves = 4, lacunarity = 2, gain = 0.5) {
+    let sum = 0, amp = 1, freq = 1, norm = 0;
+    for (let i = 0; i < octaves; i++) {
+      sum  += amp * this.noise3(x * freq, y * freq, z * freq);
+      norm += amp;
+      amp  *= gain;
+      freq *= lacunarity;
+    }
+    return sum / norm;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. 월드 — 밀도장 (density field)
+   ──────────────────────────────────────────────────────────────
+   격자 "코너"마다 실수 하나를 둔다. 음수면 속(고체), 양수면 밖(공기),
+   0 이 표면이다. 블록 메싱과 듀얼 컨투어링이 같은 이 배열을 읽는다.
+   그래서 두 방식이 정확히 같은 지형을 다르게 그리는 것이 된다.
+══════════════════════════════════════════════════════════════ */
+
+const WX = 64, WY = 30, WZ = 64;          // 셀 개수
+const NX = WX + 1, NY = WY + 1, NZ = WZ + 1; // 코너 개수
+
+const world = {
+  dens : new Float32Array(NX * NY * NZ),
+  solid: new Uint8Array(WX * WY * WZ),   // 셀 채움 여부 (블록 메싱·충돌·길찾기용)
+};
+
+const cIdx = (x, y, z) => (y * NZ + z) * NX + x;          // 코너
+const vIdx = (x, y, z) => (y * WZ + z) * WX + x;          // 셀
+const inCell = (x, y, z) => x >= 0 && y >= 0 && z >= 0 && x < WX && y < WY && z < WZ;
+const isSolid = (x, y, z) => inCell(x, y, z) && world.solid[vIdx(x, y, z)] === 1;
+
+/** 코너 밀도 → 셀 채움. 8 코너 평균이 음수면 채운 셀로 본다. */
+function refreshSolid(x0, y0, z0, x1, y1, z1) {
+  x0 = Math.max(0, x0); y0 = Math.max(0, y0); z0 = Math.max(0, z0);
+  x1 = Math.min(WX - 1, x1); y1 = Math.min(WY - 1, y1); z1 = Math.min(WZ - 1, z1);
+  const d = world.dens;
+  for (let y = y0; y <= y1; y++)
+    for (let z = z0; z <= z1; z++)
+      for (let x = x0; x <= x1; x++) {
+        const s = d[cIdx(x, y, z)]         + d[cIdx(x + 1, y, z)]
+                + d[cIdx(x, y + 1, z)]     + d[cIdx(x + 1, y + 1, z)]
+                + d[cIdx(x, y, z + 1)]     + d[cIdx(x + 1, y, z + 1)]
+                + d[cIdx(x, y + 1, z + 1)] + d[cIdx(x + 1, y + 1, z + 1)];
+        world.solid[vIdx(x, y, z)] = s < 0 ? 1 : 0;
+      }
+}
+
+/** 지형 생성. 세 가지 프리셋 모두 같은 노이즈에서 파생된다. */
+function generate(seed, preset) {
+  const p = new Perlin(seed);
+  const d = world.dens;
+
+  for (let y = 0; y < NY; y++)
+    for (let z = 0; z < NZ; z++)
+      for (let x = 0; x < NX; x++) {
+        let v;
+
+        if (preset === 2) {
+          // 떠 있는 섬 — 위아래로 잘린 3D 노이즈 덩어리
+          const blob = p.fbm(x * 0.045, y * 0.06, z * 0.045, 4);
+          const band = 1 - Math.abs((y - WY * 0.5) / (WY * 0.42)); // 가운데 층만 남긴다
+          v = -(blob * 0.9 + band * 0.9) + 0.35;
+        } else {
+          // 높이장 기반. (y - 지면높이) 는 대략 부호 있는 거리라 DC 가 안정적이다.
+          const s = preset === 1 ? 0.028 : 0.020;
+          let h = WY * 0.40 + p.fbm(x * s, 0, z * s, 5) * WY * 0.40;
+          if (preset === 1) {
+            // 협곡 — 능선 노이즈(|n| 반전)로 골을 판다
+            const ridge = 1 - Math.abs(p.fbm(x * 0.014, 7.3, z * 0.014, 3));
+            h -= Math.pow(ridge, 5) * WY * 0.45;
+          }
+          v = (y - h) * 0.55;
+          // 3D 노이즈를 더해 동굴과 오버행을 만든다
+          v += p.fbm(x * 0.075, y * 0.09, z * 0.075, 3) * 1.9;
+        }
+
+        // 바닥과 천장은 확실히 막아 둔다 (밖으로 떨어지지 않게)
+        if (y === 0) v = -1;
+        if (y >= NY - 2) v = Math.max(v, 0.6);
+        d[cIdx(x, y, z)] = v;
+      }
+
+  refreshSolid(0, 0, 0, WX - 1, WY - 1, WZ - 1);
+}
+
+/** 코너 밀도의 삼선형 보간. DC 의 법선 계산에 쓴다. */
+function sampleDensity(x, y, z) {
+  x = Math.min(Math.max(x, 0), WX); y = Math.min(Math.max(y, 0), WY); z = Math.min(Math.max(z, 0), WZ);
+  const xi = Math.min(Math.floor(x), WX - 1), yi = Math.min(Math.floor(y), WY - 1), zi = Math.min(Math.floor(z), WZ - 1);
+  const fx = x - xi, fy = y - yi, fz = z - zi, d = world.dens;
+  const c000 = d[cIdx(xi, yi, zi)],         c100 = d[cIdx(xi + 1, yi, zi)];
+  const c010 = d[cIdx(xi, yi + 1, zi)],     c110 = d[cIdx(xi + 1, yi + 1, zi)];
+  const c001 = d[cIdx(xi, yi, zi + 1)],     c101 = d[cIdx(xi + 1, yi, zi + 1)];
+  const c011 = d[cIdx(xi, yi + 1, zi + 1)], c111 = d[cIdx(xi + 1, yi + 1, zi + 1)];
+  const x00 = c000 + (c100 - c000) * fx, x10 = c010 + (c110 - c010) * fx;
+  const x01 = c001 + (c101 - c001) * fx, x11 = c011 + (c111 - c011) * fx;
+  const y0 = x00 + (x10 - x00) * fy,     y1 = x01 + (x11 - x01) * fy;
+  return y0 + (y1 - y0) * fz;
+}
+
+/** 밀도장의 기울기 = 표면 법선. 중앙차분으로 구한다. */
+function densityNormal(x, y, z, out) {
+  const h = 0.35;
+  out.set(
+    sampleDensity(x + h, y, z) - sampleDensity(x - h, y, z),
+    sampleDensity(x, y + h, z) - sampleDensity(x, y - h, z),
+    sampleDensity(x, y, z + h) - sampleDensity(x, y, z - h),
+  );
+  const len = out.length();
+  if (len > 1e-6) out.multiplyScalar(1 / len); else out.set(0, 1, 0);
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. 색
+══════════════════════════════════════════════════════════════ */
+
+const PAL = [
+  [0.38, 0.55, 0.26], // 잔디
+  [0.47, 0.38, 0.26], // 흙
+  [0.44, 0.45, 0.48], // 돌
+  [0.72, 0.70, 0.62], // 노출된 바위
+];
+
+/** 높이와 위쪽이 뚫렸는지로 재질을 고른다. */
+function colorAt(x, y, z, up) {
+  const rel = y / WY;
+  let c;
+  if (up && rel > 0.30) c = PAL[0];
+  else if (rel > 0.55)  c = PAL[3];
+  else if (rel > 0.28)  c = PAL[1];
+  else                  c = PAL[2];
+  // 같은 재질도 조금씩 달라 보이게 (격자 티가 덜 난다)
+  const j = 0.92 + ((x * 73 + y * 151 + z * 31) % 17) / 100;
+  return [c[0] * j, c[1] * j, c[2] * j];
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4-A. 블록 메싱 — 가려진 면 제거 + 코너 AO
+   ──────────────────────────────────────────────────────────────
+   채운 셀의 여섯 면 중 "바깥이 빈 면"만 삼각형으로 낸다.
+   면 하나당 네 꼭짓점의 밝기를 이웃 세 칸으로 계산해(AO)
+   모서리에 그늘을 넣는다. 이게 없으면 큐브가 평평해 보인다.
+══════════════════════════════════════════════════════════════ */
+
+const FACES = [
+  { n: [ 1, 0, 0], v: [[1,0,0],[1,1,0],[1,1,1],[1,0,1]], t: [0,1,2], b: [0,0,1] },
+  { n: [-1, 0, 0], v: [[0,0,1],[0,1,1],[0,1,0],[0,0,0]], t: [0,1,2], b: [0,0,1] },
+  { n: [ 0, 1, 0], v: [[0,1,0],[0,1,1],[1,1,1],[1,1,0]], t: [1,0,2], b: [1,0,0] },
+  { n: [ 0,-1, 0], v: [[0,0,1],[0,0,0],[1,0,0],[1,0,1]], t: [1,0,2], b: [1,0,0] },
+  { n: [ 0, 0, 1], v: [[1,0,1],[1,1,1],[0,1,1],[0,0,1]], t: [2,1,0], b: [1,0,0] },
+  { n: [ 0, 0,-1], v: [[0,0,0],[0,1,0],[1,1,0],[1,0,0]], t: [2,1,0], b: [1,0,0] },
+];
+
+/** 이웃 세 칸(변 둘 + 대각 하나)이 막힌 정도로 꼭짓점 밝기를 정한다. */
+function vertexAO(side1, side2, corner) {
+  if (side1 && side2) return 0;        // 두 변이 다 막히면 가장 어둡다
+  return 3 - (side1 + side2 + corner);
+}
+
+function buildBlockyGeometry(x0 = 0, x1 = WX, z0 = 0, z1 = WZ) {
+  const pos = [], nrm = [], col = [], idx = [];
+  const AO = [0.46, 0.66, 0.83, 1.0];
+
+  for (let y = 0; y < WY; y++)
+    for (let z = z0; z < z1; z++)
+      for (let x = x0; x < x1; x++) {
+        if (!isSolid(x, y, z)) continue;
+
+        for (const f of FACES) {
+          const nx = x + f.n[0], ny = y + f.n[1], nz = z + f.n[2];
+          if (isSolid(nx, ny, nz)) continue;                 // 가려진 면은 그리지 않는다
+          if (!inCell(nx, ny, nz) && f.n[1] !== 1) continue; // 월드 옆·아래 벽면은 생략
+
+          const rgb = colorAt(x, y, z, !isSolid(x, y + 1, z));
+          const base = pos.length / 3;
+          const ao = [];
+
+          for (let i = 0; i < 4; i++) {
+            const vx = x + f.v[i][0], vy = y + f.v[i][1], vz = z + f.v[i][2];
+            pos.push(vx, vy, vz);
+            nrm.push(f.n[0], f.n[1], f.n[2]);
+
+            // 면의 법선 축을 뺀 두 축 방향으로 이웃을 본다
+            const du = [f.v[i][0] * 2 - 1, f.v[i][1] * 2 - 1, f.v[i][2] * 2 - 1];
+            const ax = f.n[0] !== 0 ? 1 : 0, az = f.n[2] !== 0 ? 1 : 2;
+            const a = [0, 0, 0], b = [0, 0, 0];
+            a[ax] = du[ax]; b[az === 1 ? 1 : 2] = du[az === 1 ? 1 : 2];
+
+            const s1 = isSolid(nx + a[0], ny + a[1], nz + a[2]) ? 1 : 0;
+            const s2 = isSolid(nx + b[0], ny + b[1], nz + b[2]) ? 1 : 0;
+            const cn = isSolid(nx + a[0] + b[0], ny + a[1] + b[1], nz + a[2] + b[2]) ? 1 : 0;
+            const k = AO[vertexAO(s1, s2, cn)];
+            ao.push(k);
+            col.push(rgb[0] * k, rgb[1] * k, rgb[2] * k);
+          }
+
+          // AO 가 대각으로 어긋나면 사각형을 반대로 갈라야 이음매가 자연스럽다
+          if (ao[0] + ao[2] > ao[1] + ao[3]) {
+            idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+          } else {
+            idx.push(base + 1, base + 2, base + 3, base + 1, base + 3, base);
+          }
+        }
+      }
+
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal',   new THREE.Float32BufferAttribute(nrm, 3));
+  g.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx);
+  return { geom: g, tris: idx.length / 3 };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4-B. 듀얼 컨투어링
+   ──────────────────────────────────────────────────────────────
+   1) 밀도 부호가 바뀌는 모서리마다 교점과 그 지점의 법선을 모은다
+      (= 에르미트 데이터).
+   2) 셀 하나에 꼭짓점 하나를 두되, 모인 평면들과의 거리 제곱합
+      (QEF)이 최소가 되는 자리에 놓는다. 여기서는 SVD 대신
+      질량중심에서 시작해 각 평면으로 조금씩 끌어당기는 반복법
+      (Schmitz 입자법)으로 푼다. 코드가 짧고 충분히 안정적이다.
+   3) 부호가 바뀌는 모서리를 공유하는 네 셀의 꼭짓점을 사각형으로 잇는다.
+   결과적으로 표면은 매끄럽지만, 각진 곳은 각진 채로 남는다.
+   (마칭 큐브가 모서리를 뭉개는 것과 다른 점)
+══════════════════════════════════════════════════════════════ */
+
+// 셀 안 12개 모서리: 코너 A→B (코너 0..7, 비트 = x,y,z)
+// 안쪽 루프가 122k 번 돌기 때문에 배열 구조분해나 객체 생성을 두지 않는다.
+const CORNER_X = new Uint8Array([0,1,0,1,0,1,0,1]);
+const CORNER_Y = new Uint8Array([0,0,1,1,0,0,1,1]);
+const CORNER_Z = new Uint8Array([0,0,0,0,1,1,1,1]);
+const EDGE_A = new Uint8Array([0,2,4,6, 0,1,4,5, 0,1,2,3]);
+const EDGE_B = new Uint8Array([1,3,5,7, 2,3,6,7, 4,5,6,7]);
+
+/**
+ * gx0..gx1, gz0..gz1 = 이 조각이 "책임지는" 격자점 범위.
+ * 사각형을 만들려면 격자점 주변 네 셀이 필요하므로 셀은 한 칸 더 넓게 만든다.
+ * 이렇게 나눠야 조각 경계에 구멍이나 겹침이 생기지 않는다.
+ */
+function buildDCGeometry(gx0 = 0, gx1 = NX, gz0 = 0, gz1 = NZ) {
+  const d = world.dens;
+  const cellVert = new Int32Array(WX * WY * WZ).fill(-1);
+  const cx0 = Math.max(0, gx0 - 1), cx1 = Math.min(WX, gx1);
+  const cz0 = Math.max(0, gz0 - 1), cz1 = Math.min(WZ, gz1);
+  const pos = [], nrm = [], col = [], idx = [];
+
+  const nv = new THREE.Vector3();
+  // 안쪽 루프에서 새 배열을 만들지 않도록 미리 잡아 둔다 (셀마다 12모서리가 최대)
+  const c = new Float64Array(8);
+  const planeP = new Float64Array(36), planeN = new Float64Array(36);
+
+  // ── 1·2단계: 셀마다 꼭짓점 하나 ──
+  for (let y = 0; y < WY; y++)
+    for (let z = cz0; z < cz1; z++)
+      for (let x = cx0; x < cx1; x++) {
+        // 여덟 코너의 부호를 비트로 모은다. 전부 같으면 표면이 지나지 않으므로
+        // 모서리를 볼 것도 없이 건너뛴다. 대부분의 셀이 여기서 걸러진다.
+        let mask = 0;
+        for (let i = 0; i < 8; i++) {
+          const v = d[cIdx(x + CORNER_X[i], y + CORNER_Y[i], z + CORNER_Z[i])];
+          c[i] = v;
+          if (v < 0) mask |= (1 << i);
+        }
+        if (mask === 0 || mask === 255) continue;
+
+        let n = 0, mx = 0, my = 0, mz = 0;
+
+        for (let e = 0; e < 12; e++) {
+          const a = EDGE_A[e], b = EDGE_B[e];
+          const da = c[a], db = c[b];
+          if ((da < 0) === (db < 0)) continue;             // 부호가 같으면 표면이 지나지 않는다
+          const t = da / (da - db);                        // 선형 보간으로 교점 위치
+          const px = x + CORNER_X[a] + (CORNER_X[b] - CORNER_X[a]) * t;
+          const py = y + CORNER_Y[a] + (CORNER_Y[b] - CORNER_Y[a]) * t;
+          const pz = z + CORNER_Z[a] + (CORNER_Z[b] - CORNER_Z[a]) * t;
+          densityNormal(px, py, pz, nv);
+          planeP[n*3] = px; planeP[n*3+1] = py; planeP[n*3+2] = pz;
+          planeN[n*3] = nv.x; planeN[n*3+1] = nv.y; planeN[n*3+2] = nv.z;
+          mx += px; my += py; mz += pz;
+          n++;
+        }
+
+        if (n === 0) continue;
+
+        // 질량중심에서 출발해 각 평면 쪽으로 조금씩 당긴다 (QEF 근사해).
+        // 반복은 8번이면 충분하다 — 더 돌려도 눈에 보이는 차이가 없다.
+        mx /= n; my /= n; mz /= n;
+        let vx = mx, vy = my, vz = mz;
+        for (let it = 0; it < 8; it++) {
+          const step = 0.55 / n;
+          for (let i = 0; i < n; i++) {
+            const px = planeP[i*3], py = planeP[i*3+1], pz = planeP[i*3+2];
+            const nx = planeN[i*3], ny = planeN[i*3+1], nz = planeN[i*3+2];
+            const dist = (vx - px) * nx + (vy - py) * ny + (vz - pz) * nz;
+            vx -= nx * dist * step; vy -= ny * dist * step; vz -= nz * dist * step;
+          }
+        }
+        // 자기 셀 밖으로 나가면 표면이 뒤집힌다. 셀 안으로 가둔다.
+        vx = Math.min(Math.max(vx, x + 0.02), x + 0.98);
+        vy = Math.min(Math.max(vy, y + 0.02), y + 0.98);
+        vz = Math.min(Math.max(vz, z + 0.02), z + 0.98);
+
+        // 법선은 모은 평면들의 평균 (부드러운 음영)
+        let ax = 0, ay = 0, az = 0;
+        for (let i = 0; i < n; i++) { ax += planeN[i*3]; ay += planeN[i*3+1]; az += planeN[i*3+2]; }
+        nv.set(ax, ay, az);
+        if (nv.lengthSq() < 1e-8) nv.set(0, 1, 0); else nv.normalize();
+        // 밀도는 안쪽이 음수라 기울기는 바깥을 향한다
+
+        const rgb = colorAt(x, y, z, nv.y > 0.45);
+        cellVert[vIdx(x, y, z)] = pos.length / 3;
+        pos.push(vx, vy, vz);
+        nrm.push(nv.x, nv.y, nv.z);
+        col.push(rgb[0], rgb[1], rgb[2]);
+      }
+
+  // ── 3단계: 부호 바뀌는 모서리 하나 = 사각형 하나 ──
+  // 모서리를 공유하는 네 셀을 찾아 잇는다. 감는 방향은 기하 법선과
+  // 꼭짓점 법선을 비교해 맞춘다. (감는 순서를 손으로 맞추다 틀리기 쉬워서)
+  const quad = (a, b, c2, d2) => {
+    const ax = pos[a*3], ay = pos[a*3+1], az = pos[a*3+2];
+    const e1x = pos[b*3] - ax, e1y = pos[b*3+1] - ay, e1z = pos[b*3+2] - az;
+    const e2x = pos[c2*3] - ax, e2y = pos[c2*3+1] - ay, e2z = pos[c2*3+2] - az;
+    const gx = e1y * e2z - e1z * e2y, gy = e1z * e2x - e1x * e2z, gz = e1x * e2y - e1y * e2x;
+    const sx = nrm[a*3] + nrm[b*3] + nrm[c2*3] + nrm[d2*3];
+    const sy = nrm[a*3+1] + nrm[b*3+1] + nrm[c2*3+1] + nrm[d2*3+1];
+    const sz = nrm[a*3+2] + nrm[b*3+2] + nrm[c2*3+2] + nrm[d2*3+2];
+    if (gx * sx + gy * sy + gz * sz >= 0) idx.push(a, b, c2, a, c2, d2);
+    else                                  idx.push(a, c2, b, a, d2, c2);
+  };
+
+  const V = (x, y, z) => (inCell(x, y, z) ? cellVert[vIdx(x, y, z)] : -1);
+
+  for (let y = 0; y < NY; y++)
+    for (let z = gz0; z < gz1; z++)
+      for (let x = gx0; x < gx1; x++) {
+        const d0 = d[cIdx(x, y, z)];
+
+        if (x < WX && y > 0 && z > 0) {           // x 방향 모서리
+          if ((d0 < 0) !== (d[cIdx(x + 1, y, z)] < 0)) {
+            const a = V(x, y - 1, z - 1), b = V(x, y - 1, z), c2 = V(x, y, z), d2 = V(x, y, z - 1);
+            if (a >= 0 && b >= 0 && c2 >= 0 && d2 >= 0) quad(a, b, c2, d2);
+          }
+        }
+        if (y < WY && x > 0 && z > 0) {           // y 방향 모서리
+          if ((d0 < 0) !== (d[cIdx(x, y + 1, z)] < 0)) {
+            const a = V(x - 1, y, z - 1), b = V(x, y, z - 1), c2 = V(x, y, z), d2 = V(x - 1, y, z);
+            if (a >= 0 && b >= 0 && c2 >= 0 && d2 >= 0) quad(a, b, c2, d2);
+          }
+        }
+        if (z < WZ && x > 0 && y > 0) {           // z 방향 모서리
+          if ((d0 < 0) !== (d[cIdx(x, y, z + 1)] < 0)) {
+            const a = V(x - 1, y - 1, z), b = V(x, y - 1, z), c2 = V(x, y, z), d2 = V(x - 1, y, z);
+            if (a >= 0 && b >= 0 && c2 >= 0 && d2 >= 0) quad(a, b, c2, d2);
+          }
+        }
+      }
+
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal',   new THREE.Float32BufferAttribute(nrm, 3));
+  g.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx);
+  return { geom: g, tris: idx.length / 3 };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. 레이캐스팅 — Amanatides & Woo 복셀 DDA
+   ──────────────────────────────────────────────────────────────
+   광선을 잘게 쪼개 훑지 않는다. 다음 격자면까지의 거리(tMax)를
+   축마다 들고, 가장 가까운 축으로만 한 칸씩 건너뛴다.
+   지나치는 셀을 빠짐없이, 순서대로, 정확히 한 번씩 방문한다.
+══════════════════════════════════════════════════════════════ */
+
+function raycastVoxel(ox, oy, oz, dx, dy, dz, maxDist) {
+  let x = Math.floor(ox), y = Math.floor(oy), z = Math.floor(oz);
+  const sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, sz = dz > 0 ? 1 : -1;
+
+  // 축 방향 성분이 0이면 그 축으로는 영원히 경계를 못 만난다 → Infinity
+  const tdx = dx !== 0 ? Math.abs(1 / dx) : Infinity;
+  const tdy = dy !== 0 ? Math.abs(1 / dy) : Infinity;
+  const tdz = dz !== 0 ? Math.abs(1 / dz) : Infinity;
+
+  const bound = (o, i, s) => (s > 0 ? i + 1 - o : o - i);
+  let tmx = dx !== 0 ? bound(ox, x, sx) * tdx : Infinity;
+  let tmy = dy !== 0 ? bound(oy, y, sy) * tdy : Infinity;
+  let tmz = dz !== 0 ? bound(oz, z, sz) * tdz : Infinity;
+
+  let nx = 0, ny = 0, nz = 0, t = 0;
+  for (let step = 0; step < 512; step++) {
+    if (isSolid(x, y, z)) return { hit: true, x, y, z, nx, ny, nz, dist: t };
+    if (t > maxDist) break;
+
+    if (tmx < tmy && tmx < tmz)      { t = tmx; x += sx; tmx += tdx; nx = -sx; ny = 0; nz = 0; }
+    else if (tmy < tmz)              { t = tmy; y += sy; tmy += tdy; nx = 0; ny = -sy; nz = 0; }
+    else                             { t = tmz; z += sz; tmz += tdz; nx = 0; ny = 0; nz = -sz; }
+
+    // 월드 밖으로 나가면 더 볼 것이 없다
+    if (x < -1 || y < -1 || z < -1 || x > WX || y > WY || z > WZ) break;
+  }
+  return { hit: false, dist: t };
+}
+
+/** 두 점 사이가 뚫려 있는지. 적의 시야 판정에 쓴다. */
+function hasLineOfSight(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+  const len = Math.hypot(dx, dy, dz);
+  if (len < 1e-4) return true;
+  const r = raycastVoxel(a.x, a.y, a.z, dx / len, dy / len, dz / len, len);
+  return !r.hit || r.dist >= len - 0.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. 길찾기용 격자
+   ──────────────────────────────────────────────────────────────
+   3D 전체를 노드로 쓰면 너무 크다. (x,z) 마다 "설 수 있는 높이"
+   하나만 뽑아 2.5D 격자로 줄인다. 머리 위 두 칸이 비어야 통과.
+══════════════════════════════════════════════════════════════ */
+
+const nav = {
+  top : new Int16Array(WX * WZ),    // 서 있게 되는 y (발밑 블록의 바로 위)
+  ok  : new Uint8Array(WX * WZ),    // 지나갈 수 있는가
+  dist: new Float32Array(WX * WZ),  // 플레이어까지의 비용 (플로우 필드)
+  flow: new Int8Array(WX * WZ * 2), // 그 지점에서 나아갈 방향
+};
+const nIdx = (x, z) => z * WX + x;
+
+function rebuildNav() {
+  for (let z = 0; z < WZ; z++)
+    for (let x = 0; x < WX; x++) {
+      let y = -1;
+      for (let yy = WY - 3; yy >= 1; yy--) {
+        if (isSolid(x, yy, z)) { y = yy; break; }
+      }
+      const i = nIdx(x, z);
+      // 발밑이 있고 머리 위 두 칸이 비어야 선다
+      const stand = y >= 0 && !isSolid(x, y + 1, z) && !isSolid(x, y + 2, z);
+      nav.top[i] = stand ? y + 1 : -1;
+      nav.ok[i]  = stand ? 1 : 0;
+    }
+}
+
+const DIR8 = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+const MAX_STEP = 1;    // 한 번에 오르내릴 수 있는 높이
+
+/** 이동 가능하면 비용, 아니면 -1. 대각선은 양옆이 다 뚫려야 지난다(모서리 뚫기 방지). */
+function stepCost(x, z, dx, dz) {
+  const tx = x + dx, tz = z + dz;
+  if (tx < 0 || tz < 0 || tx >= WX || tz >= WZ) return -1;
+  const a = nIdx(x, z), b = nIdx(tx, tz);
+  if (!nav.ok[a] || !nav.ok[b]) return -1;
+  const dh = nav.top[b] - nav.top[a];
+  if (Math.abs(dh) > MAX_STEP) return -1;
+  if (dx !== 0 && dz !== 0) {
+    if (!nav.ok[nIdx(x + dx, z)] || !nav.ok[nIdx(x, z + dz)]) return -1;
+  }
+  const base = (dx !== 0 && dz !== 0) ? 1.41421 : 1;
+  return base + Math.abs(dh) * 0.9;    // 오르내림에 벌점
+}
+
+/* ── 이진 힙 우선순위 큐 ── */
+class MinHeap {
+  constructor() { this.k = []; this.v = []; }
+  get size() { return this.k.length; }
+  push(key, val) {
+    this.k.push(key); this.v.push(val);
+    let i = this.k.length - 1;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (this.k[p] <= this.k[i]) break;
+      this.swap(p, i); i = p;
+    }
+  }
+  pop() {
+    const top = this.v[0], lastK = this.k.pop(), lastV = this.v.pop();
+    if (this.k.length) {
+      this.k[0] = lastK; this.v[0] = lastV;
+      let i = 0;
+      for (;;) {
+        const l = i * 2 + 1, r = l + 1;
+        let m = i;
+        if (l < this.k.length && this.k[l] < this.k[m]) m = l;
+        if (r < this.k.length && this.k[r] < this.k[m]) m = r;
+        if (m === i) break;
+        this.swap(m, i); i = m;
+      }
+    }
+    return top;
+  }
+  swap(a, b) {
+    let t = this.k[a]; this.k[a] = this.k[b]; this.k[b] = t;
+    t = this.v[a]; this.v[a] = this.v[b]; this.v[b] = t;
+  }
+}
+
+/* ── 다익스트라: 한 지점 → 한 지점 최단 경로 ──
+   음수 비용이 없고 목적지가 하나라 A* 없이도 충분하다.
+   (A* 로 바꾸려면 휴리스틱만 더하면 된다) */
+let dijkstraVisited = 0;
+function dijkstraPath(sx, sz, tx, tz) {
+  const N = WX * WZ;
+  const dist = new Float32Array(N).fill(Infinity);
+  const prev = new Int32Array(N).fill(-1);
+  const done = new Uint8Array(N);
+  const s = nIdx(sx, sz), t = nIdx(tx, tz);
+  if (!nav.ok[s] || !nav.ok[t]) return null;
+
+  const heap = new MinHeap();
+  dist[s] = 0; heap.push(0, s);
+  dijkstraVisited = 0;
+
+  while (heap.size) {
+    const cur = heap.pop();
+    if (done[cur]) continue;
+    done[cur] = 1; dijkstraVisited++;
+    if (cur === t) break;
+
+    const cx = cur % WX, cz = (cur / WX) | 0;
+    for (const [dx, dz] of DIR8) {
+      const c = stepCost(cx, cz, dx, dz);
+      if (c < 0) continue;
+      const nb = nIdx(cx + dx, cz + dz);
+      if (done[nb]) continue;
+      const nd = dist[cur] + c;
+      if (nd < dist[nb]) { dist[nb] = nd; prev[nb] = cur; heap.push(nd, nb); }
+    }
+  }
+
+  if (!isFinite(dist[t])) return null;
+  const path = [];
+  for (let c = t; c !== -1; c = prev[c]) path.push(c);
+  return path.reverse();
+}
+
+/* ── 플로우 필드: 목표 한 곳 → 격자 전체 ──
+   추격자가 늘어나도 계산은 한 번뿐이다. 각 칸은 "어디로 갈지"만 들고 있고,
+   유닛은 자기 칸의 방향을 읽어 따라간다. 다익스트라를 유닛마다 도는 것과
+   결과는 같지만 비용이 유닛 수에 비례하지 않는다. */
+let flowVisited = 0;
+function buildFlowField(tx, tz) {
+  const N = WX * WZ;
+  nav.dist.fill(Infinity);
+  nav.flow.fill(0);
+  const t = nIdx(tx, tz);
+  if (!nav.ok[t]) return false;
+
+  const done = new Uint8Array(N);
+  const heap = new MinHeap();
+  nav.dist[t] = 0; heap.push(0, t);
+  flowVisited = 0;
+
+  while (heap.size) {
+    const cur = heap.pop();
+    if (done[cur]) continue;
+    done[cur] = 1; flowVisited++;
+    const cx = cur % WX, cz = (cur / WX) | 0;
+    for (const [dx, dz] of DIR8) {
+      const c = stepCost(cx, cz, dx, dz);
+      if (c < 0) continue;
+      const nb = nIdx(cx + dx, cz + dz);
+      const nd = nav.dist[cur] + c;
+      if (nd < nav.dist[nb]) {
+        nav.dist[nb] = nd;
+        // 이웃에서 보면 "여기로 오면 된다" = 지금 칸 쪽 방향
+        nav.flow[nb * 2] = -dx; nav.flow[nb * 2 + 1] = -dz;
+        heap.push(nd, nb);
+      }
+    }
+  }
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7. Pity 타이머
+   ──────────────────────────────────────────────────────────────
+   기본 확률은 낮게 두되, 연속 실패가 일정 횟수를 넘으면 확률을
+   가파르게 올리고(소프트 피티), 한계에서는 확정으로 만든다(하드 피티).
+   "운이 없어서 영영 못 얻는" 경우를 없애는 장치다.
+══════════════════════════════════════════════════════════════ */
+
+const pity = {
+  base: 0.02, softStart: 12, ramp: 0.055, hard: 40,
+  fails: 0, total: 0, pulls: 0, hist: [],
+
+  chance() {
+    if (this.fails + 1 >= this.hard) return 1;
+    const over = Math.max(0, this.fails + 1 - this.softStart);
+    return Math.min(1, this.base + over * this.ramp);
+  },
+  roll() {
+    const p = this.chance();
+    this.pulls++;
+    const win = Math.random() < p;
+    this.hist.push(win ? 1 : 0);
+    if (this.hist.length > 28) this.hist.shift();
+    if (win) { this.total++; this.fails = 0; } else { this.fails++; }
+    return win;
+  },
+};
+
+/* ══════════════════════════════════════════════════════════════
+   8. 장면 구성
+══════════════════════════════════════════════════════════════ */
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8fc4e8);
+scene.fog = new THREE.Fog(0x8fc4e8, 46, 108);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.1, 400);
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xd8ecff, 0x4a4438, 1.15));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.5);
+sun.position.set(48, 90, 34);
+scene.add(sun);
+
+const terrainMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+
+// 지형을 가로세로 CH 칸씩 조각내 각각 따로 메시를 만든다.
+// 블록 하나를 부술 때 월드 전체를 다시 만들면 편집이 뚝뚝 끊긴다.
+// 조각이 작을수록 편집이 가벼워지지만 드로우콜과 경계 여유분이 늘어난다. 8이 적당했다.
+const CH = 8;
+const CXN = Math.ceil(WX / CH), CZN = Math.ceil(WZ / CH);
+const blockyGroup = new THREE.Group(), dcGroup = new THREE.Group();
+scene.add(blockyGroup, dcGroup);
+
+const chunks = { blocky: [], dc: [] };
+for (const mode of ['blocky', 'dc']) {
+  const group = mode === 'blocky' ? blockyGroup : dcGroup;
+  for (let i = 0; i < CXN * CZN; i++) {
+    const m = new THREE.Mesh(new THREE.BufferGeometry(), terrainMat);
+    group.add(m);
+    chunks[mode].push(m);
+  }
+}
+// 아직 만들지 않았거나 편집으로 상해버린 조각. 모드를 바꿔도 다시 안 만들어도 되게 따로 센다.
+const dirty = { blocky: new Set(), dc: new Set() };
+const markAllDirty = () => {
+  for (let i = 0; i < CXN * CZN; i++) { dirty.blocky.add(i); dirty.dc.add(i); }
+};
+
+// 조준한 블록 표시
+const hlBox = new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)),
+  new THREE.LineBasicMaterial({ color: 0x0b1220, linewidth: 2 }),
+);
+hlBox.visible = false;
+scene.add(hlBox);
+
+// 다익스트라 경로 선
+const pathLine = new THREE.Line(
+  new THREE.BufferGeometry(),
+  new THREE.LineBasicMaterial({ color: 0xf472b6 }),
+);
+scene.add(pathLine);
+
+// 레이캐스트 시각화
+const rayLine = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+  new THREE.LineBasicMaterial({ color: 0xfbbf24 }),
+);
+rayLine.visible = false;
+scene.add(rayLine);
+
+// 플로우 필드 화살표 (인스턴싱 — 4096칸을 드로우콜 하나로)
+const arrowGeo = new THREE.ConeGeometry(0.13, 0.42, 4);
+arrowGeo.rotateX(Math.PI / 2);
+const flowMesh = new THREE.InstancedMesh(
+  arrowGeo,
+  new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55 }),
+  WX * WZ,
+);
+flowMesh.visible = false;
+flowMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+scene.add(flowMesh);
+
+/* ══════════════════════════════════════════════════════════════
+   9. 플레이어 — 충돌과 코너 보정
+   ──────────────────────────────────────────────────────────────
+   축을 하나씩 나눠 움직이고 부딪히면 되돌린다. 그런데 그것만 하면
+   모서리에 살짝 걸려 멈추는 일이 잦다. 사람 눈에는 "지나갈 수 있어
+   보이는데" 안 가진다. 그래서 두 가지 보정을 넣는다.
+     · 옆으로 살짝 밀기 — 걸린 게 모서리 한 귀퉁이뿐이면 옆으로 비켜준다
+     · 한 칸 올라타기 — 턱 높이가 한 칸이면 자동으로 올라선다
+   패널에서 끄면 차이가 바로 느껴진다.
+══════════════════════════════════════════════════════════════ */
+
+const PR = 0.32, PH = 1.75, EYE = 1.62;   // 반지름 / 키 / 눈높이
+
+const player = {
+  pos: new THREE.Vector3(WX / 2, WY - 4, WZ / 2),
+  vel: new THREE.Vector3(),
+  onGround: false,
+  corrections: 0,
+  cornerAssist: true,
+};
+
+/** 몸통 AABB 가 채운 셀과 겹치는가 */
+function collides(px, py, pz) {
+  const x0 = Math.floor(px - PR), x1 = Math.floor(px + PR);
+  const y0 = Math.floor(py),      y1 = Math.floor(py + PH);
+  const z0 = Math.floor(pz - PR), z1 = Math.floor(pz + PR);
+  for (let y = y0; y <= y1; y++)
+    for (let z = z0; z <= z1; z++)
+      for (let x = x0; x <= x1; x++) {
+        if (x < 0 || z < 0 || x >= WX || z >= WZ) return true;  // 월드 밖은 벽
+        if (y < 0) return true;
+        if (y < WY && isSolid(x, y, z)) return true;
+      }
+  return false;
+}
+
+const NUDGE = [0.10, 0.18, 0.26, 0.34];   // 옆으로 밀어볼 거리
+const STEP_UP = [0.34, 0.62, 0.86, 1.04]; // 올라타 볼 높이
+
+/** 한 축으로 이동. 막히면 (허용 시) 보정을 시도한다. */
+function moveAxis(axis, delta) {
+  if (delta === 0) return;
+  const p = player.pos;
+  const nx = p.x + (axis === 0 ? delta : 0);
+  const ny = p.y + (axis === 1 ? delta : 0);
+  const nz = p.z + (axis === 2 ? delta : 0);
+
+  if (!collides(nx, ny, nz)) { p.set(nx, ny, nz); return; }
+
+  if (axis === 1) {                       // 세로는 보정하지 않는다
+    if (delta < 0) player.onGround = true;
+    player.vel.y = 0;
+    return;
+  }
+  if (!player.cornerAssist) { player.vel[axis === 0 ? 'x' : 'z'] = 0; return; }
+
+  // ① 옆으로 살짝 — 모서리 한 귀퉁이만 걸린 경우를 풀어준다
+  const other = axis === 0 ? 2 : 0;
+  for (const e of NUDGE) {
+    for (const s of [1, -1]) {
+      const ox = other === 0 ? s * e : 0, oz = other === 2 ? s * e : 0;
+      if (!collides(nx + ox, ny, nz + oz)) {
+        p.set(nx + ox, ny, nz + oz);
+        player.corrections++;
+        return;
+      }
+    }
+  }
+  // ② 한 칸 올라타기 — 턱을 만나면 자동으로 올라선다
+  if (player.onGround) {
+    for (const up of STEP_UP) {
+      if (!collides(nx, ny + up, nz)) {
+        p.set(nx, ny + up, nz);
+        player.corrections++;
+        return;
+      }
+    }
+  }
+  player.vel[axis === 0 ? 'x' : 'z'] = 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10. 적
+   ──────────────────────────────────────────────────────────────
+   · 추적자 1 — 다익스트라로 최단 경로를 직접 계산한다. 경로가 보인다.
+   · 무리   N — 플로우 필드만 읽는다. 계산은 전체가 한 번만 한다.
+   시야는 DDA 레이캐스팅으로 판정해, 안 보이면 마지막 목격 지점으로 간다.
+══════════════════════════════════════════════════════════════ */
+
+const hunterMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 });
+const swarmMat  = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+
+const hunter = {
+  mesh: new THREE.Mesh(new THREE.OctahedronGeometry(0.42), hunterMat),
+  pos : new THREE.Vector3(), path: null, step: 0, timer: 0, sees: false,
+};
+scene.add(hunter.mesh);
+
+const SWARM_N = 12;
+const swarm = [];
+for (let i = 0; i < SWARM_N; i++) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.55), swarmMat);
+  scene.add(m);
+  swarm.push({ mesh: m, pos: new THREE.Vector3() });
+}
+
+/** 격자 위에서 설 수 있는 아무 칸 (플레이어에서 멀수록 좋다) */
+function randomStand(awayFrom, minDist) {
+  for (let i = 0; i < 400; i++) {
+    const x = (Math.random() * WX) | 0, z = (Math.random() * WZ) | 0;
+    if (!nav.ok[nIdx(x, z)]) continue;
+    if (awayFrom && Math.hypot(x - awayFrom.x, z - awayFrom.z) < minDist) continue;
+    return new THREE.Vector3(x + 0.5, nav.top[nIdx(x, z)], z + 0.5);
+  }
+  return null;
+}
+
+function placeEnemies() {
+  const h = randomStand(player.pos, 18) || randomStand(null, 0);
+  if (h) hunter.pos.copy(h);
+  for (const s of swarm) {
+    const p = randomStand(player.pos, 12) || randomStand(null, 0);
+    if (p) s.pos.copy(p);
+  }
+}
+
+/** 격자 칸의 지면 높이로 부드럽게 붙인다 */
+function groundY(x, z) {
+  const gx = Math.min(Math.max(Math.floor(x), 0), WX - 1);
+  const gz = Math.min(Math.max(Math.floor(z), 0), WZ - 1);
+  const i = nIdx(gx, gz);
+  return nav.ok[i] ? nav.top[i] : null;
+}
+
+function updateHunter(dt) {
+  hunter.timer -= dt;
+  const px = Math.floor(player.pos.x), pz = Math.floor(player.pos.z);
+  const hx = Math.floor(hunter.pos.x), hz = Math.floor(hunter.pos.z);
+
+  hunter.sees = hasLineOfSight(
+    { x: hunter.pos.x, y: hunter.pos.y + 0.5, z: hunter.pos.z },
+    { x: player.pos.x, y: player.pos.y + 1.0, z: player.pos.z },
+  );
+
+  if (hunter.timer <= 0) {
+    hunter.timer = 0.55;
+    hunter.path = dijkstraPath(hx, hz, px, pz);
+    hunter.step = 1;
+    drawPath(hunter.path);
+  }
+
+  if (hunter.path && hunter.step < hunter.path.length) {
+    const n = hunter.path[hunter.step];
+    const tx = (n % WX) + 0.5, tz = ((n / WX) | 0) + 0.5;
+    const dx = tx - hunter.pos.x, dz = tz - hunter.pos.z;
+    const d = Math.hypot(dx, dz);
+    if (d < 0.18) hunter.step++;
+    else {
+      const sp = (hunter.sees ? 4.4 : 3.0) * dt;
+      hunter.pos.x += (dx / d) * sp;
+      hunter.pos.z += (dz / d) * sp;
+    }
+  }
+  const gy = groundY(hunter.pos.x, hunter.pos.z);
+  if (gy !== null) hunter.pos.y += (gy - hunter.pos.y) * Math.min(1, dt * 9);
+  hunter.mesh.position.copy(hunter.pos).add(new THREE.Vector3(0, 0.42, 0));
+  hunter.mesh.rotation.y += dt * 1.6;
+  hunter.mesh.material.color.setHex(hunter.sees ? 0xf472b6 : 0x9d5f7d);
+}
+
+function updateSwarm(dt) {
+  for (let i = 0; i < swarm.length; i++) {
+    const s = swarm[i];
+    const gx = Math.min(Math.max(Math.floor(s.pos.x), 0), WX - 1);
+    const gz = Math.min(Math.max(Math.floor(s.pos.z), 0), WZ - 1);
+    const n = nIdx(gx, gz);
+    let dx = nav.flow[n * 2], dz = nav.flow[n * 2 + 1];
+
+    if (dx === 0 && dz === 0) {
+      // 방향이 없는 칸(고립 지역). 제자리에서 살짝 흔들기만 한다.
+      dx = Math.sin(performance.now() * 0.001 + i) * 0.2;
+      dz = Math.cos(performance.now() * 0.001 + i) * 0.2;
+    }
+    const len = Math.hypot(dx, dz) || 1;
+
+    // 서로 겹치지 않게 밀어내기
+    let sx = 0, sz = 0;
+    for (let j = 0; j < swarm.length; j++) {
+      if (j === i) continue;
+      const ox = s.pos.x - swarm[j].pos.x, oz = s.pos.z - swarm[j].pos.z;
+      const d2 = ox * ox + oz * oz;
+      if (d2 > 0.001 && d2 < 1.6) { const d = Math.sqrt(d2); sx += ox / d / d; sz += oz / d / d; }
+    }
+
+    const sp = 2.5 * dt;
+    s.pos.x += (dx / len + sx * 0.5) * sp;
+    s.pos.z += (dz / len + sz * 0.5) * sp;
+    s.pos.x = Math.min(Math.max(s.pos.x, 0.5), WX - 0.5);
+    s.pos.z = Math.min(Math.max(s.pos.z, 0.5), WZ - 0.5);
+
+    const gy = groundY(s.pos.x, s.pos.z);
+    if (gy !== null) s.pos.y += (gy - s.pos.y) * Math.min(1, dt * 8);
+    s.mesh.position.copy(s.pos).add(new THREE.Vector3(0, 0.3, 0));
+    s.mesh.rotation.y = Math.atan2(dx, dz);
+  }
+}
+
+function drawPath(path) {
+  if (!path || path.length < 2) { pathLine.visible = false; return; }
+  const pts = path.map((n) => {
+    const x = n % WX, z = (n / WX) | 0;
+    return new THREE.Vector3(x + 0.5, nav.top[n] + 0.35, z + 0.5);
+  });
+  pathLine.geometry.dispose();
+  pathLine.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+  pathLine.visible = show.path;
+}
+
+function updateFlowArrows() {
+  if (!show.flow) { flowMesh.visible = false; return; }
+  flowMesh.visible = true;
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion();
+  const up = new THREE.Vector3(0, 0, 1), dir = new THREE.Vector3();
+  let c = 0;
+  for (let z = 0; z < WZ; z++)
+    for (let x = 0; x < WX; x++) {
+      const i = nIdx(x, z);
+      const dx = nav.flow[i * 2], dz = nav.flow[i * 2 + 1];
+      if (!nav.ok[i] || (dx === 0 && dz === 0)) continue;
+      dir.set(dx, 0, dz).normalize();
+      q.setFromUnitVectors(up, dir);
+      m.compose(new THREE.Vector3(x + 0.5, nav.top[i] + 0.28, z + 0.5), q, new THREE.Vector3(1, 1, 1));
+      flowMesh.setMatrixAt(c++, m);
+    }
+  flowMesh.count = c;
+  flowMesh.instanceMatrix.needsUpdate = true;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   11. 메시 갱신
+══════════════════════════════════════════════════════════════ */
+
+let meshMode = 'blocky';
+let lastTris = 0, lastMeshMs = 0;
+
+/** 조각 하나만 다시 만든다. */
+function buildChunk(mode, ci) {
+  const cx = ci % CXN, cz = (ci / CXN) | 0;
+  const x0 = cx * CH, x1 = Math.min(WX, x0 + CH);
+  const z0 = cz * CH, z1 = Math.min(WZ, z0 + CH);
+
+  const mesh = chunks[mode][ci];
+  mesh.geometry.dispose();
+  // DC 는 격자점 기준으로 담당 범위를 준다 (셀은 안에서 한 칸 더 넓게 잡는다)
+  const r = mode === 'blocky'
+    ? buildBlockyGeometry(x0, x1, z0, z1)
+    : buildDCGeometry(x0, cx === CXN - 1 ? NX : x1, z0, cz === CZN - 1 ? NZ : z1);
+  mesh.geometry = r.geom;
+  return r.tris;
+}
+
+/** 현재 모드에서 아직 안 만든 조각들을 만든다. */
+function rebuildMesh() {
+  const t0 = performance.now();
+  const set = dirty[meshMode];
+  for (const ci of set) buildChunk(meshMode, ci);
+  set.clear();
+  lastMeshMs = performance.now() - t0;
+
+  let tris = 0;
+  for (const m of chunks[meshMode]) {
+    const i = m.geometry.getIndex();
+    if (i) tris += i.count / 3;
+  }
+  lastTris = tris;
+
+  blockyGroup.visible = meshMode === 'blocky';
+  dcGroup.visible     = meshMode === 'dc';
+}
+
+/** 셀 범위가 걸치는 조각을 상한 것으로 표시한다. (경계 한 칸 여유) */
+function markRegionDirty(x0, x1, z0, z1) {
+  const cx0 = Math.max(0, Math.floor((x0 - 1) / CH)), cx1 = Math.min(CXN - 1, Math.floor((x1 + 1) / CH));
+  const cz0 = Math.max(0, Math.floor((z0 - 1) / CH)), cz1 = Math.min(CZN - 1, Math.floor((z1 + 1) / CH));
+  for (let cz = cz0; cz <= cz1; cz++)
+    for (let cx = cx0; cx <= cx1; cx++) {
+      const i = cz * CXN + cx;
+      dirty.blocky.add(i); dirty.dc.add(i);
+    }
+}
+
+/** 밀도장 편집. 반지름 안의 코너를 공기/고체로 밀어 넣는다. */
+function editSphere(cx, cy, cz, radius, makeSolid) {
+  const r2 = radius * radius;
+  const x0 = Math.max(0, Math.floor(cx - radius)), x1 = Math.min(WX, Math.ceil(cx + radius));
+  const y0 = Math.max(0, Math.floor(cy - radius)), y1 = Math.min(WY, Math.ceil(cy + radius));
+  const z0 = Math.max(0, Math.floor(cz - radius)), z1 = Math.min(WZ, Math.ceil(cz + radius));
+  for (let y = y0; y <= y1; y++)
+    for (let z = z0; z <= z1; z++)
+      for (let x = x0; x <= x1; x++) {
+        const dx = x - cx, dy = y - cy, dz = z - cz;
+        const d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 > r2) continue;
+        const i = cIdx(x, y, z);
+        // 구 표면까지의 거리로 채워 넣어야 DC 가 매끈한 자국을 남긴다
+        const sd = Math.sqrt(d2) - radius;
+        world.dens[i] = makeSolid ? Math.min(world.dens[i], sd) : Math.max(world.dens[i], -sd);
+      }
+  refreshSolid(x0 - 1, y0 - 1, z0 - 1, x1 + 1, y1 + 1, z1 + 1);
+  markRegionDirty(x0, x1, z0, z1);
+  rebuildMesh();
+  rebuildNav();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   12. 입력
+══════════════════════════════════════════════════════════════ */
+
+const controls = new PointerLockControls(camera, renderer.domElement);
+scene.add(controls.getObject());
+
+const keys = Object.create(null);
+addEventListener('keydown', (e) => {
+  keys[e.code] = true;
+  if (e.code === 'KeyQ') { toggleMode(); e.preventDefault(); }
+  if (e.code === 'KeyH') { const p = document.getElementById('panel'); p.style.display = p.style.display === 'none' ? '' : 'none'; }
+  if (e.code === 'Space') e.preventDefault();
+});
+addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+const lockEl = document.getElementById('lock');
+lockEl.addEventListener('click', () => controls.lock());
+controls.addEventListener('lock',   () => lockEl.classList.add('hide'));
+controls.addEventListener('unlock', () => lockEl.classList.remove('hide'));
+
+let aim = null;
+
+function dig() {
+  if (!aim || !aim.hit) return;
+  editSphere(aim.x + 0.5, aim.y + 0.5, aim.z + 0.5, meshMode === 'dc' ? 1.7 : 0.87, false);
+  // 부술 때마다 pity 판정
+  if (pity.roll()) toast(`정수 획득!  (${pity.pulls}회째 · 누적 ${pity.total})`);
+}
+function put() {
+  if (!aim || !aim.hit) return;
+  const px = aim.x + aim.nx, py = aim.y + aim.ny, pz = aim.z + aim.nz;
+  // 플레이어 몸 안에 블록을 놓지 않는다
+  const dx = px + 0.5 - player.pos.x, dz = pz + 0.5 - player.pos.z;
+  if (Math.abs(dx) < PR + 0.6 && Math.abs(dz) < PR + 0.6 &&
+      py + 1 > player.pos.y && py < player.pos.y + PH) return;
+  editSphere(px + 0.5, py + 0.5, pz + 0.5, meshMode === 'dc' ? 1.4 : 0.87, true);
+}
+
+renderer.domElement.addEventListener('mousedown', (e) => {
+  if (!controls.isLocked) return;
+  if (e.button === 0) dig();
+  if (e.button === 2) put();
+});
+renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+/* ── 모바일 ── */
+const isTouch = matchMedia('(pointer: coarse)').matches;
+const touchMove = { x: 0, y: 0 };
+if (isTouch) {
+  document.getElementById('touch').classList.add('on');
+  const stick = document.getElementById('stick'), knob = stick.querySelector('i');
+  let sid = null, cx = 0, cy = 0;
+  stick.addEventListener('touchstart', (e) => {
+    const r = stick.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2;
+    sid = e.changedTouches[0].identifier; e.preventDefault();
+  }, { passive: false });
+  addEventListener('touchmove', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== sid) continue;
+      const dx = t.clientX - cx, dy = t.clientY - cy, R = 46;
+      const d = Math.min(Math.hypot(dx, dy), R) || 1;
+      const ux = (dx / (Math.hypot(dx, dy) || 1)) * d, uy = (dy / (Math.hypot(dx, dy) || 1)) * d;
+      knob.style.transform = `translate(${ux}px,${uy}px)`;
+      touchMove.x = ux / R; touchMove.y = uy / R;
+    }
+  }, { passive: false });
+  addEventListener('touchend', (e) => {
+    for (const t of e.changedTouches) if (t.identifier === sid) {
+      sid = null; touchMove.x = touchMove.y = 0; knob.style.transform = '';
+    }
+  });
+
+  // 오른쪽 절반 드래그로 시점 회전
+  let lid = null, lx = 0, ly = 0;
+  renderer.domElement.addEventListener('touchstart', (e) => {
+    const t = e.changedTouches[0];
+    if (t.clientX < innerWidth * 0.42) return;
+    lid = t.identifier; lx = t.clientX; ly = t.clientY;
+  }, { passive: true });
+  renderer.domElement.addEventListener('touchmove', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== lid) continue;
+      const o = controls.getObject();
+      o.rotation.y -= (t.clientX - lx) * 0.005;
+      camera.rotation.x = Math.max(-1.5, Math.min(1.5, camera.rotation.x - (t.clientY - ly) * 0.005));
+      lx = t.clientX; ly = t.clientY;
+    }
+  }, { passive: true });
+  renderer.domElement.addEventListener('touchend', () => { lid = null; });
+
+  const bind = (id, fn) => document.getElementById(id)
+    .addEventListener('touchstart', (e) => { fn(); e.preventDefault(); }, { passive: false });
+  bind('bDig', dig);
+  bind('bPut', put);
+  bind('bJump', () => { if (player.onGround) { player.vel.y = 8.4; player.onGround = false; } });
+  lockEl.classList.add('hide');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   13. HUD
+══════════════════════════════════════════════════════════════ */
+
+const show = { path: true, flow: false, ray: false, arrows: true };
+
+const TOGGLES = [
+  ['cornerAssist', '코너 보정', '모서리 걸림 완화 · 한 칸 올라타기'],
+  ['path',  '다익스트라 경로', '추격자가 계산한 최단 경로'],
+  ['flow',  '플로우 필드',     '무리가 공유하는 방향장'],
+  ['ray',   '레이캐스트 광선', '조준선이 지나는 경로'],
+];
+
+function buildPanel() {
+  const el = document.getElementById('panel');
+  el.innerHTML = '<h3>표시 / 동작</h3>';
+
+  for (const [key, label, desc] of TOGGLES) {
+    const on = key === 'cornerAssist' ? player.cornerAssist : show[key];
+    const div = document.createElement('div');
+    div.className = 'tg' + (on ? ' on' : '');
+    div.innerHTML = `<span>${label}<br><span style="font-size:10px;color:#5f7a9c;opacity:.75">${desc}</span></span><span class="sw"></span>`;
+    div.onclick = () => {
+      if (key === 'cornerAssist') player.cornerAssist = !player.cornerAssist;
+      else show[key] = !show[key];
+      div.classList.toggle('on');
+      pathLine.visible = show.path && !!hunter.path;
+      rayLine.visible = show.ray;
+      if (!show.flow) flowMesh.visible = false;
+    };
+    el.appendChild(div);
+  }
+
+  const modeBtn = document.createElement('div');
+  modeBtn.className = 'tg on';
+  modeBtn.innerHTML = '<span>표면화 방식 <b id="modeName"></b></span><span class="sw"></span>';
+  modeBtn.onclick = toggleMode;
+  el.appendChild(modeBtn);
+
+  el.insertAdjacentHTML('beforeend', `
+    <h3>PITY 타이머</h3>
+    <div id="pity">
+      <div class="lbl">다음 드랍 확률 <b id="pP" style="color:#c4b5fd"></b></div>
+      <div class="bar"><i id="pBar" style="width:0%"></i></div>
+      <div class="lbl">연속 실패 <b id="pF" style="color:#c4b5fd"></b> / 확정 ${pity.hard}회</div>
+      <div class="lbl" style="margin-top:3px">획득 <b id="pT" style="color:#c4b5fd"></b> · 시도 <b id="pN" style="color:#c4b5fd"></b></div>
+      <div class="hist" id="pH"></div>
+    </div>`);
+  updateModeName();
+}
+
+function updateModeName() {
+  const el = document.getElementById('modeName');
+  if (el) el.textContent = meshMode === 'blocky' ? '블록' : '듀얼 컨투어링';
+}
+
+function toggleMode() {
+  meshMode = meshMode === 'blocky' ? 'dc' : 'blocky';
+  rebuildMesh();   // 그 모드에서 아직 안 만든 조각만 만든다
+  updateModeName();
+  toast(meshMode === 'blocky' ? '블록 메싱' : '듀얼 컨투어링');
+}
+
+let toastT = 0;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  toastT = 1.9;
+}
+
+function updatePity() {
+  const p = document.getElementById('pP'); if (!p) return;
+  const c = pity.chance();
+  p.textContent = (c * 100).toFixed(1) + '%';
+  document.getElementById('pBar').style.width = (c * 100) + '%';
+  document.getElementById('pF').textContent = pity.fails;
+  document.getElementById('pT').textContent = pity.total;
+  document.getElementById('pN').textContent = pity.pulls;
+  document.getElementById('pH').innerHTML =
+    pity.hist.map((h) => `<i class="${h ? 'hit' : ''}"></i>`).join('');
+}
+
+let fps = 60, fpsT = 0, frames = 0;
+function updateStats() {
+  const el = document.getElementById('stats');
+  const n = nIdx(
+    Math.min(Math.max(Math.floor(player.pos.x), 0), WX - 1),
+    Math.min(Math.max(Math.floor(player.pos.z), 0), WZ - 1),
+  );
+  el.innerHTML = `
+    <b>${fps.toFixed(0)}</b> fps · 삼각형 <b>${lastTris.toLocaleString()}</b><br>
+    메시 생성 <b>${lastMeshMs.toFixed(1)}</b> ms · ${meshMode === 'blocky' ? '블록' : '듀얼 컨투어링'}<br>
+    위치 <b>${player.pos.x.toFixed(1)} ${player.pos.y.toFixed(1)} ${player.pos.z.toFixed(1)}</b><br>
+    다익스트라 방문 <b>${dijkstraVisited}</b>칸 · 경로 <b>${hunter.path ? hunter.path.length : 0}</b><br>
+    플로우 필드 <b>${flowVisited}</b>칸 · 무리 <b>${SWARM_N}</b><br>
+    코너 보정 <span class="${player.cornerAssist ? '' : 'warn'}">${player.cornerAssist ? `${player.corrections}회` : '꺼짐'}</span>
+      · 추격자 ${hunter.sees ? '<b>시야 확보</b>' : '시야 없음'}<br>
+    조준 ${aim && aim.hit ? `<b>${aim.x},${aim.y},${aim.z}</b> (${aim.dist.toFixed(1)}m)` : '—'}
+      · 거리장 <b>${isFinite(nav.dist[n]) ? nav.dist[n].toFixed(0) : '∞'}</b>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   14. 메인 루프
+══════════════════════════════════════════════════════════════ */
+
+const GRAV = 24, WALK = 5.2, RUN = 8.4, JUMP = 8.4;
+let flowTimer = 0, hudTimer = 0;
+let running = false;
+let prev = performance.now();
+
+function frame() {
+  requestAnimationFrame(frame);
+  if (!running) return;
+
+  const now = performance.now();
+  let dt = (now - prev) / 1000; prev = now;
+  dt = Math.min(dt, 0.05);          // 탭 전환 후 한 번에 튀지 않게
+
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
+
+  /* ── 이동 ── */
+  const fwd = new THREE.Vector3(), right = new THREE.Vector3();
+  camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+  right.crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+
+  let ix = 0, iz = 0;
+  if (keys['KeyW']) iz += 1;
+  if (keys['KeyS']) iz -= 1;
+  if (keys['KeyD']) ix += 1;
+  if (keys['KeyA']) ix -= 1;
+  if (isTouch) { iz -= touchMove.y; ix += touchMove.x; }
+
+  const speed = keys['ShiftLeft'] || keys['ShiftRight'] ? RUN : WALK;
+  const wish = new THREE.Vector3()
+    .addScaledVector(fwd, iz).addScaledVector(right, ix);
+  if (wish.lengthSq() > 1) wish.normalize();
+
+  player.vel.x = wish.x * speed;
+  player.vel.z = wish.z * speed;
+  player.vel.y -= GRAV * dt;
+
+  if (keys['Space'] && player.onGround) { player.vel.y = JUMP; player.onGround = false; }
+
+  player.onGround = false;
+  moveAxis(0, player.vel.x * dt);
+  moveAxis(2, player.vel.z * dt);
+  moveAxis(1, player.vel.y * dt);
+
+  // 어딘가로 빠지면 되살린다
+  if (player.pos.y < -4) {
+    const s = randomStand(null, 0);
+    if (s) { player.pos.copy(s).add(new THREE.Vector3(0, 1, 0)); player.vel.set(0, 0, 0); }
+  }
+  controls.getObject().position.set(player.pos.x, player.pos.y + EYE, player.pos.z);
+
+  /* ── 조준 (레이캐스팅) ── */
+  const org = controls.getObject().position;
+  const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
+  aim = raycastVoxel(org.x, org.y, org.z, dir.x, dir.y, dir.z, 7.5);
+  if (aim.hit) {
+    hlBox.visible = true;
+    hlBox.position.set(aim.x + 0.5, aim.y + 0.5, aim.z + 0.5);
+  } else hlBox.visible = false;
+
+  if (show.ray) {
+    const end = aim.hit
+      ? new THREE.Vector3(org.x + dir.x * aim.dist, org.y + dir.y * aim.dist, org.z + dir.z * aim.dist)
+      : new THREE.Vector3(org.x + dir.x * 7.5, org.y + dir.y * 7.5, org.z + dir.z * 7.5);
+    rayLine.geometry.setFromPoints([org.clone().addScaledVector(dir, 0.35), end]);
+    rayLine.visible = true;
+  } else rayLine.visible = false;
+
+  /* ── 길찾기 ── */
+  flowTimer -= dt;
+  if (flowTimer <= 0) {
+    flowTimer = 0.35;
+    buildFlowField(
+      Math.min(Math.max(Math.floor(player.pos.x), 0), WX - 1),
+      Math.min(Math.max(Math.floor(player.pos.z), 0), WZ - 1),
+    );
+    updateFlowArrows();
+  }
+  updateHunter(dt);
+  updateSwarm(dt);
+  pathLine.visible = show.path && !!hunter.path;
+
+  /* ── HUD ── */
+  if (toastT > 0) { toastT -= dt; if (toastT <= 0) document.getElementById('toast').classList.remove('show'); }
+  // HUD 는 innerHTML 을 새로 쓰기 때문에 매 프레임 갱신할 이유가 없다. 초당 6번이면 충분하다.
+  hudTimer -= dt;
+  if (hudTimer <= 0) { hudTimer = 0.16; updateStats(); updatePity(); }
+
+  renderer.render(scene, camera);
+}
+frame();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ══════════════════════════════════════════════════════════════
+   15. 시작
+══════════════════════════════════════════════════════════════ */
+
+document.querySelectorAll('.card').forEach((c) => {
+  c.onclick = () => {
+    document.querySelectorAll('.card').forEach((o) => o.classList.remove('on'));
+    c.classList.add('on');
+    meshMode = c.dataset.mode;
+  };
+});
+
+document.getElementById('go').onclick = () => {
+  const seedRaw = document.getElementById('seed').value.trim() || '43';
+  // 문자열도 시드로 쓸 수 있게 해시한다
+  let seed = 0;
+  for (let i = 0; i < seedRaw.length; i++) seed = (seed * 31 + seedRaw.charCodeAt(i)) | 0;
+  const preset = parseInt(document.getElementById('wsize').value, 10);
+
+  generate(seed >>> 0, preset);
+  rebuildNav();
+  markAllDirty();
+  rebuildMesh();
+
+  // 설 수 있는 자리에서 시작
+  const s = randomStand(null, 0);
+  if (s) player.pos.copy(s).add(new THREE.Vector3(0, 0.2, 0));
+  // 하늘만 보고 시작하지 않도록 월드 가운데를 향해 선다
+  controls.getObject().rotation.y = Math.atan2(WX / 2 - player.pos.x, WZ / 2 - player.pos.z);
+  camera.rotation.x = -0.16;
+  placeEnemies();
+  buildFlowField(Math.floor(player.pos.x), Math.floor(player.pos.z));
+  updateFlowArrows();
+
+  buildPanel();
+  document.getElementById('sel').classList.add('hide');
+  document.getElementById('hud').classList.add('on');
+  running = true;
+  prev = performance.now();
+  if (!isTouch) controls.lock();
+};
+
+// 디버그·자동 검증용으로 내부를 열어 둔다
+window.__voxel = {
+  Perlin, world, generate, rebuildNav, rebuildMesh,
+  buildBlockyGeometry, buildDCGeometry, raycastVoxel, hasLineOfSight,
+  buildChunk, markRegionDirty, markAllDirty, chunks, dirty, CH, CXN, CZN, editSphere,
+  dijkstraPath, buildFlowField, nav, pity, player, moveAxis, collides,
+  isSolid, sampleDensity, WX, WY, WZ, nIdx,
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incredibox 완전 정복</title>
+<style>
+:root{
+  --bg:#0e0a06;--bg2:#16100a;--bg3:#1e1610;--bg4:#2a1e12;
+  --border:#3a2a18;--border2:#5a4028;
+  --txt:#f5e8d0;--txt2:#c4a070;--txt3:#7a5a30;
+  --org:#f09030;--org2:#ffc060;--yel:#ffe090;
+  --cyan:#4fd8e8;--cyan2:#8ff0fa;--grn:#5fd68a;--red:#f2666a;--pur:#c09af5;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--org);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;min-height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--org2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:340px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--org);box-shadow:0 0 0 2px rgba(240,144,48,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;padding:6px 0;}
+.tab{padding:6px 11px;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;font-family:inherit;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(240,144,48,.15);color:var(--org2);border-color:rgba(240,144,48,.35);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;line-height:1.45;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(240,144,48,.08);color:var(--org2);border-left-color:var(--org);}
+.main{flex:1;padding:20px 24px;max-width:1060px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--org2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:12px 14px;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:8px 10px;vertical-align:top;font-size:13px;}
+.e-table th{padding:7px 10px;text-align:left;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:700;}
+.e-name{color:var(--org2);font-weight:600;white-space:nowrap;width:160px;font-size:12.5px;}
+.e-desc{color:var(--txt2);}
+.e-desc b{color:var(--txt);font-weight:600;}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.t-must{background:rgba(95,214,138,.16);color:var(--grn);}
+.t-opt{background:rgba(240,178,74,.16);color:var(--yel);}
+.t-warn{background:rgba(242,102,106,.16);color:var(--red);}
+.t-hot{background:rgba(240,144,48,.18);color:var(--org2);}
+.t-mod{background:rgba(192,154,245,.16);color:var(--pur);}
+
+code{font-family:Consolas,Menlo,monospace;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:12px;color:var(--org2);}
+
+.note{border-left:3px solid var(--cyan);background:rgba(79,216,232,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.good{border-left:3px solid var(--grn);background:rgba(95,214,138,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.warn{border-left:3px solid var(--org);background:rgba(240,144,48,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.bad{border-left:3px solid var(--red);background:rgba(242,102,106,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.note b,.good b,.warn b,.bad b{color:var(--txt);}
+
+ul.li{margin:4px 0 4px 16px;color:var(--txt2);font-size:13px;}
+ul.li li{margin-bottom:4px;}
+ul.li li b{color:var(--txt);font-weight:600;}
+
+/* 사운드 타입 배지 */
+.sound-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:8px 0;}
+.sound-card{border-radius:6px;padding:10px 12px;text-align:center;border:1px solid;}
+.s-beat{background:rgba(242,102,106,.12);border-color:rgba(242,102,106,.3);color:#f2666a;}
+.s-effect{background:rgba(240,144,48,.12);border-color:rgba(240,144,48,.3);color:var(--org2);}
+.s-melody{background:rgba(79,216,232,.12);border-color:rgba(79,216,232,.3);color:var(--cyan);}
+.s-voice{background:rgba(95,214,138,.12);border-color:rgba(95,214,138,.3);color:var(--grn);}
+.s-chorus{background:rgba(192,154,245,.12);border-color:rgba(192,154,245,.3);color:var(--pur);}
+.sound-card .s-label{font-size:13px;font-weight:700;margin-bottom:3px;}
+.sound-card .s-desc{font-size:11px;opacity:.75;}
+
+/* 버전 카드 */
+.vol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.vol-card{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;}
+.vol-num{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.5px;margin-bottom:3px;}
+.vol-name{font-size:15px;font-weight:700;color:var(--org2);margin-bottom:6px;}
+.vol-theme{font-size:12px;color:var(--txt2);margin-bottom:6px;}
+.vol-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.vol-tag{font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;}
+
+/* 보너스 콤보 테이블 */
+.combo-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap;}
+.combo-row:last-child{border-bottom:none;}
+.combo-icons{display:flex;gap:4px;}
+.ci{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid rgba(255,255,255,.1);}
+.combo-arr{color:var(--txt3);}
+.combo-desc{color:var(--txt2);font-size:12.5px;flex:1;}
+
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px 0;font-size:13px;}
+.foot{color:var(--txt3);font-size:11px;padding:18px 0 40px;line-height:1.8;border-top:1px solid var(--border);margin-top:20px;}
+.foot a{color:var(--txt2);}
+
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .main{padding:14px;}
+  .e-name{width:auto;white-space:normal;}
+  .vol-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span class="logo-icon">🎵</span>Incredibox 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="검색 (예: 보너스, Beat, Sprunki)"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('intro')">게임 소개</button>
+    <button class="tab" onclick="showPanel('how')">플레이 방법</button>
+    <button class="tab" onclick="showPanel('volumes')">버전·앨범</button>
+    <button class="tab" onclick="showPanel('tips')">보너스·팁</button>
+    <button class="tab" onclick="showPanel('sprunki')">Sprunki</button>
+    <button class="tab" onclick="showPanel('community')">커뮤니티</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+
+<!-- ══════════════════ 게임 소개 ══════════════════ -->
+<section class="panel active" id="panel-intro">
+  <div class="sec-title">🎵 Incredibox — 소리로 만드는 애니메이션</div>
+  <div class="sec-sub">캐릭터에 아이콘을 입혀 비트·이펙트·멜로디·보이스·코러스를 쌓으면 음악이 만들어집니다. 조합이 맞으면 <b>보너스 애니메이션</b>이 터집니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📖</span>Incredibox가 뭔가요?</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">장르</td><td class="e-desc">인터랙티브 음악 믹싱 / 캐주얼 게임</td></tr>
+        <tr><td class="e-name">개발사</td><td class="e-desc"><b>So Far So Good</b> — 프랑스 낭트 소재 소규모 스튜디오. 아티스트 Allan Durand가 2009년 혼자 시작한 프로젝트.</td></tr>
+        <tr><td class="e-name">출시 이력</td><td class="e-desc">2009 웹 브라우저 → 2016 iOS·Android → 2023 Steam 정식 출시</td></tr>
+        <tr><td class="e-name">플랫폼</td><td class="e-desc">Steam, iOS, Android, 웹(incredibox.com)</td></tr>
+        <tr><td class="e-name">가격</td><td class="e-desc">Steam: 유료(₩8,500 내외). 웹·모바일: 일부 무료 체험 가능</td></tr>
+        <tr><td class="e-name">언어 지원</td><td class="e-desc">UI가 거의 없어서 언어 장벽 없음. 전 세계 누구나 바로 플레이.</td></tr>
+        <tr><td class="e-name">Steam 수상</td><td class="e-desc">App Store 수상작 다수. 교육·창의력 부문에서 자주 언급.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎮</span>게임의 핵심 구조</div>
+    <div class="card-body">
+      <div class="note"><b>드래그 앤 드롭 하나로 끝.</b> 소리 아이콘을 캐릭터에 올리면 음악이 시작되고, 빼면 멈춥니다. 악기를 다룰 줄 몰라도 됩니다.</div>
+      <ul class="li">
+        <li>화면에 <b>7명의 캐릭터</b>가 서 있고, 각각 하나의 악기/사운드를 담당합니다.</li>
+        <li>상단에 아이콘 팔레트가 있고, 아이콘마다 소리가 지정되어 있습니다.</li>
+        <li>아이콘을 캐릭터 위로 드래그하면 해당 캐릭터가 소리를 냅니다.</li>
+        <li>모든 소리는 <b>자동으로 박자에 맞게 루프</b>됩니다 — 타이밍 신경 쓸 필요 없음.</li>
+        <li>특정 조합이 맞으면 캐릭터들이 갑자기 <b>보너스 애니메이션</b>을 수행합니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🏆</span>왜 이 게임이 유명한가</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>진입 장벽 제로.</b> 클릭 한 번으로 바로 그럴듯한 음악이 만들어집니다.</li>
+        <li><b>숨겨진 보너스 시스템.</b> 조합을 발견하는 재미가 중독적입니다.</li>
+        <li><b>공유·랭킹.</b> 만든 믹스를 저장하고 URL로 공유할 수 있습니다. 사이트에서 다른 사람 믹스를 듣고 평가할 수 있습니다.</li>
+        <li><b>팬 창작물 폭발.</b> Sprunki를 비롯한 수십 개의 팬메이드 버전이 생겨 2024년에 다시 폭발적으로 화제가 됐습니다.</li>
+        <li><b>음악 교육 도구로 활용.</b> 세계 각지 학교에서 리듬·화음 교육에 사용합니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🆚</span>웹 vs 모바일 vs Steam — 뭐가 다른가</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:110px;">플랫폼</th><th>차이</th></tr>
+        <tr><td class="e-name">웹 (무료)</td><td class="e-desc">incredibox.com에서 체험. <b>v1 Alpha만 무료</b>. 나머지는 잠금. 회원가입 없이 바로 시작.</td></tr>
+        <tr><td class="e-name">모바일 앱</td><td class="e-desc">유료 앱. 터치로 드래그. 여러 버전 선택 가능. 개인 취향에 따라 PC보다 조작감 좋을 수도.</td></tr>
+        <tr><td class="e-name">Steam <span class="tag t-hot">권장</span></td><td class="e-desc">한 번 구매로 <b>모든 버전 포함</b>. 마우스 조작이 제일 편함. 스팀 도전과제 있음. 업데이트 자동.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 플레이 방법 ══════════════════ -->
+<section class="panel" id="panel-how">
+  <div class="sec-title">🕹️ 플레이 방법</div>
+  <div class="sec-sub">조작은 간단하지만, <b>5가지 사운드 타입의 역할을 알면</b> 훨씬 풍성한 음악을 만들 수 있습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎛️</span>5가지 사운드 타입</div>
+    <div class="card-body">
+      <div class="sound-grid">
+        <div class="sound-card s-beat">
+          <div class="s-label">🥁 Beat</div>
+          <div class="s-desc">리듬·드럼·베이스<br>음악의 뼈대</div>
+        </div>
+        <div class="sound-card s-effect">
+          <div class="s-label">⚡ Effect</div>
+          <div class="s-desc">효과음·타악기<br>텍스처 추가</div>
+        </div>
+        <div class="sound-card s-melody">
+          <div class="s-label">🎹 Melody</div>
+          <div class="s-desc">악기 선율<br>화음·리프</div>
+        </div>
+        <div class="sound-card s-voice">
+          <div class="s-label">🎤 Voice</div>
+          <div class="s-desc">보컬·스캣<br>인간 목소리</div>
+        </div>
+        <div class="sound-card s-chorus">
+          <div class="s-label">🎶 Chorus</div>
+          <div class="s-desc">코러스·합창<br>음악의 절정</div>
+        </div>
+      </div>
+      <div class="note"><b>색상으로 구분됩니다.</b> 버전마다 색이 약간 다르지만 위 5가지 타입은 공통입니다. 보통 Beat → Effect → Melody → Voice → Chorus 순으로 쌓아가면 자연스럽습니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🖱️</span>기본 조작법</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">아이콘 올리기</td><td class="e-desc">상단 팔레트에서 아이콘을 <b>드래그해 캐릭터 위로</b> 끌어놓으면 해당 소리 활성화.</td></tr>
+        <tr><td class="e-name">아이콘 빼기</td><td class="e-desc">캐릭터를 클릭하거나 아이콘을 <b>팔레트로 다시 드래그</b>하면 소리 제거.</td></tr>
+        <tr><td class="e-name">믹스 저장</td><td class="e-desc">화면 하단 <b>Save/Record 버튼</b>. 링크·코드가 생성되어 공유 가능.</td></tr>
+        <tr><td class="e-name">다른 믹스 듣기</td><td class="e-desc">Community/Chart 탭에서 다른 사용자 믹스 감상 및 좋아요.</td></tr>
+        <tr><td class="e-name">버전 변경</td><td class="e-desc">메인 메뉴에서 원하는 앨범 선택. 사운드 세트가 완전히 교체됩니다.</td></tr>
+        <tr><td class="e-name">녹음</td><td class="e-desc">Record 버튼으로 오디오 녹음 후 MP3로 내보내기 가능 (버전별로 다름).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💡</span>보기 좋은 믹스를 만드는 순서</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>1단계 — Beat 먼저.</b> 드럼·베이스 리듬 1~2개를 올려 박자를 잡습니다.</li>
+        <li><b>2단계 — Effect 추가.</b> 리듬에 타악기 텍스처를 더합니다. 너무 많으면 복잡해집니다.</li>
+        <li><b>3단계 — Melody 올리기.</b> 악기 선율을 하나 올립니다. 두 개 이상은 화음이 충돌할 수 있습니다.</li>
+        <li><b>4단계 — Voice / Chorus.</b> 보컬을 마지막에 올리면 자연스럽게 클라이맥스가 됩니다.</li>
+        <li><b>7명 모두 채울 필요 없습니다.</b> 4~5명 정도가 오히려 더 깔끔하게 들리는 경우가 많습니다.</li>
+        <li><b>보너스가 터지면 잠깐 기다리세요.</b> 애니메이션 중에도 루프는 계속 돌고 있습니다.</li>
+      </ul>
+      <div class="warn"><b>흔한 실수</b> — 7명 전부 Beat로 채우기. 소리가 뭉개져서 박자를 알아들을 수 없게 됩니다. <b>타입을 골고루</b> 섞어야 풍성해집니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎯</span>보너스 애니메이션 발동 조건</div>
+    <div class="card-body">
+      <ul class="li">
+        <li>각 버전마다 <b>숨겨진 조합</b>이 3~5개 있습니다. 특정 아이콘들을 동시에 활성화하면 발동합니다.</li>
+        <li>보너스는 <b>에픽·중간·소소</b> 등 규모가 다릅니다. 대형 보너스는 캐릭터 전체가 군무를 춥니다.</li>
+        <li>조합을 직접 발견하는 재미가 핵심 — <b>처음에는 힌트 없이 이것저것 올려보는 게 좋습니다.</b></li>
+        <li>공식 사이트·팬 위키에 조합표가 공개되어 있습니다. 스포일러 주의.</li>
+        <li>보너스는 아이콘이 정해진 <b>슬롯(캐릭터)에 상관없이</b> 종류만 맞으면 발동합니다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 버전·앨범 ══════════════════ -->
+<section class="panel" id="panel-volumes">
+  <div class="sec-title">📀 버전 · 앨범 목록</div>
+  <div class="sec-sub">각 버전(Volume)은 완전히 독립된 사운드 세트와 캐릭터 디자인을 가집니다. <b>Steam 구매 시 아래 버전이 모두 포함</b>됩니다.</div>
+
+  <div class="vol-grid">
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 1</div>
+      <div class="vol-name">Alpha</div>
+      <div class="vol-theme">🟤 힙합 · 비트박스 · 그루브</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>최초 버전. 웹에서 무료 체험 가능한 유일한 버전.</li>
+        <li>힙합 기반의 묵직한 비트. 캐릭터들이 모자 쓴 거리 음악가 스타일.</li>
+        <li>보너스 3개. 조합이 단순해 처음 하기 좋음.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 2</div>
+      <div class="vol-name">Little Miss</div>
+      <div class="vol-theme">🩷 팝 · 달콤함 · 여성 보컬</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>밝고 달달한 팝 사운드. 여성 보컬 비중이 높음.</li>
+        <li>캐릭터 디자인이 귀엽고 화사함.</li>
+        <li>보너스 애니메이션 중 가장 인기 있는 것들 포함.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 3</div>
+      <div class="vol-name">Sunrise</div>
+      <div class="vol-theme">🌅 일렉트로닉 · 업리프팅 · 댄스</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>EDM·하우스 분위기. 신스 사운드 중심.</li>
+        <li>에너지 넘치는 업리프팅 트랙을 만들기 좋음.</li>
+        <li>보너스 애니메이션이 가장 화려한 버전 중 하나.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 4</div>
+      <div class="vol-name">The Love</div>
+      <div class="vol-theme">💜 R&amp;B · 소울 · 로맨틱</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>부드럽고 감성적인 R&amp;B·소울 사운드.</li>
+        <li>고급스러운 무드. 배경이 도시 야경 스타일.</li>
+        <li>보이스·코러스 파트가 특히 풍성함.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 5</div>
+      <div class="vol-name">Mexico</div>
+      <div class="vol-theme">🇲🇽 라틴 · 살사 · 마리아치</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>라틴 리듬과 마리아치 악기 중심.</li>
+        <li>트럼펫·기타·봉고 등 생동감 있는 사운드.</li>
+        <li>캐릭터 의상이 화려한 멕시코 민속 스타일.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 6</div>
+      <div class="vol-name">Alive</div>
+      <div class="vol-theme">🟢 일렉트로 · 칩튠 · 레트로</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>칩튠·8비트 사운드가 섞인 일렉트로닉.</li>
+        <li>로봇·사이버펑크 비주얼 테마.</li>
+        <li>팬들 사이에서 인기 높은 버전.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 7</div>
+      <div class="vol-name">Jeevan</div>
+      <div class="vol-theme">🇮🇳 볼리우드 · 인도 전통 · 퓨전</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>인도 음악과 현대 비트의 퓨전.</li>
+        <li>타블라·시타르 등 인도 전통 악기 사운드.</li>
+        <li>선명한 색감의 볼리우드 풍 비주얼.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 8</div>
+      <div class="vol-name">Brazil</div>
+      <div class="vol-theme">🇧🇷 삼바 · 보사노바 · 카니발</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>삼바 리듬과 보사노바 기타 중심.</li>
+        <li>열대 카니발 분위기. 퍼쿠션 레이어가 풍부.</li>
+        <li>리듬 조합이 가장 복잡하고 다채로운 버전.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 9</div>
+      <div class="vol-name">Dystopia</div>
+      <div class="vol-theme">🔵 다크 · 글리치 · 사이버펑크</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>어두운 분위기의 글리치·다크 일렉트로닉.</li>
+        <li>스파이·디스토피아 느낌의 비주얼.</li>
+        <li>팬 사이에서 "가장 쿨한 버전"으로 꼽힘.</li>
+      </ul>
+    </div>
+
+    <div class="vol-card">
+      <div class="vol-num">VOLUME 10</div>
+      <div class="vol-name">Wekiddy</div>
+      <div class="vol-theme">🟡 동화 · 어린이 · 팝</div>
+      <ul class="li" style="font-size:12px;margin-top:4px;">
+        <li>밝고 장난스러운 어린이 팝 스타일.</li>
+        <li>캐릭터들이 동화 속 느낌으로 디자인됨.</li>
+        <li>보너스 애니메이션이 특히 유쾌함.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-head"><span class="ico">📊</span>버전별 분위기 한눈에 비교</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>버전</th><th>분위기</th><th>추천 대상</th></tr>
+        <tr><td class="e-name">Alpha</td><td class="e-desc">힙합, 그루비</td><td class="e-desc">처음 하는 사람. 웹 무료 체험 가능.</td></tr>
+        <tr><td class="e-name">Little Miss</td><td class="e-desc">달콤한 팝</td><td class="e-desc">귀여운 거 좋아하는 사람.</td></tr>
+        <tr><td class="e-name">Sunrise</td><td class="e-desc">업리프팅 EDM</td><td class="e-desc">에너지 넘치는 음악 원하는 사람.</td></tr>
+        <tr><td class="e-name">Dystopia</td><td class="e-desc">다크, 글리치</td><td class="e-desc">사이버펑크·어두운 분위기 선호.</td></tr>
+        <tr><td class="e-name">Brazil</td><td class="e-desc">삼바, 퍼쿠션</td><td class="e-desc">리듬 실험을 즐기는 사람.</td></tr>
+        <tr><td class="e-name">Jeevan</td><td class="e-desc">인도 퓨전</td><td class="e-desc">이색적인 사운드 원하는 사람.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 보너스·팁 ══════════════════ -->
+<section class="panel" id="panel-tips">
+  <div class="sec-title">🏆 보너스 · 팁</div>
+  <div class="sec-sub">보너스 애니메이션 발동 방법과, 믹스를 더 잘 만드는 실전 팁입니다. <b>조합 스포일러가 포함됩니다.</b></div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚡</span>보너스 발동 기본 원리</div>
+    <div class="card-body">
+      <ul class="li">
+        <li>각 버전에 <b>3~5개의 숨겨진 조합</b>이 있습니다.</li>
+        <li>특정 아이콘 타입들을 동시에 활성화하면 발동. <b>어느 캐릭터에 올리는지는 무관</b>합니다.</li>
+        <li>보너스가 터지면 음악이 잠시 멈추고 <b>특별 애니메이션</b>이 재생된 뒤 원래 믹스로 돌아옵니다.</li>
+        <li><b>여러 보너스를 동시에 활성화</b>하면 중첩되지 않고, 조건이 맞는 것만 순차 발동합니다.</li>
+        <li>보너스를 모두 발견하면 각 버전의 <b>완료 배지</b>를 얻을 수 있습니다.</li>
+      </ul>
+      <div class="note"><b>발견 전략</b> — 아이콘을 3~4개씩 바꿔가며 올려보세요. 보너스가 터지면 어떤 조합이었는지 기억해 두고, 그 아이콘들을 남겨두고 나머지를 바꾸면 됩니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎵</span>Alpha — 보너스 조합 (v1)</div>
+    <div class="card-body">
+      <div class="warn">스포일러 포함. 직접 찾는 재미를 원하면 건너뛰세요.</div>
+      <table class="e-table" style="margin-top:8px;">
+        <tr><th>보너스</th><th>조합 설명</th><th>애니메이션</th></tr>
+        <tr>
+          <td class="e-name">보너스 A</td>
+          <td class="e-desc">Beat 3번 + Voice 1번 (빨간 계열 아이콘 조합)</td>
+          <td class="e-desc">캐릭터들이 하늘로 뛰어오름</td>
+        </tr>
+        <tr>
+          <td class="e-name">보너스 B</td>
+          <td class="e-desc">Effect 3번 + Melody 1번 (주황 계열 위주)</td>
+          <td class="e-desc">비가 내리는 배경 애니메이션</td>
+        </tr>
+        <tr>
+          <td class="e-name">보너스 C</td>
+          <td class="e-desc">Beat + Effect + Melody + Voice + Chorus 각 1개씩 — 5타입 전부</td>
+          <td class="e-desc">가장 화려한 풀 앙상블 퍼레이드</td>
+        </tr>
+      </table>
+      <div class="note">정확한 아이콘 번호는 버전 업데이트로 바뀔 수 있습니다. <b>팬 위키(Incredibox Wiki)</b>에서 최신 조합표를 확인하세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎚️</span>더 좋은 믹스 만드는 팁 10가지</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>Beat를 홀수로.</b> 2개보다 1개 또는 3개가 리듬이 더 선명합니다.</li>
+        <li><b>Melody는 1개만.</b> 2개 이상이면 조성이 충돌해 불협화음이 됩니다.</li>
+        <li><b>빈 슬롯을 두세요.</b> 7명 다 채우는 것보다 5명이 더 깔끔한 경우가 많습니다.</li>
+        <li><b>Effect로 레이어를 쌓으세요.</b> 단순한 Beat 위에 Effect 하나만 추가해도 확 달라집니다.</li>
+        <li><b>Chorus는 마지막에.</b> 음악이 충분히 쌓인 후 올려야 클라이맥스 느낌이 납니다.</li>
+        <li><b>조합을 천천히 바꾸세요.</b> 한 번에 3개 이상 바꾸면 뭐가 바뀐지 모릅니다.</li>
+        <li><b>마음에 드는 조합은 즉시 저장.</b> 공식 사이트에서 믹스 코드로 복원할 수 있습니다.</li>
+        <li><b>헤드폰으로 들으세요.</b> 스피커보다 각 소리의 레이어가 훨씬 잘 들립니다.</li>
+        <li><b>다른 사람 믹스를 들어보세요.</b> 커뮤니티 상위 믹스에서 레이어 구성법을 배울 수 있습니다.</li>
+        <li><b>같은 버전을 여러 번.</b> 같은 버전도 조합을 달리하면 장르가 완전히 바뀝니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗃️</span>장르별 추천 레이어 구성</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>만들고 싶은 느낌</th><th>레이어 전략</th></tr>
+        <tr><td class="e-name">미니멀·차분</td><td class="e-desc">Beat 1 + Melody 1. 나머지 비움. 여백이 핵심.</td></tr>
+        <tr><td class="e-name">그루비·댄서블</td><td class="e-desc">Beat 2 + Effect 1 + Voice 1. 리듬 레이어 중심.</td></tr>
+        <tr><td class="e-name">풀 밴드 사운드</td><td class="e-desc">Beat 1 + Effect 1 + Melody 1 + Voice 1 + Chorus 1. 5타입 균형.</td></tr>
+        <tr><td class="e-name">보너스 노리기</td><td class="e-desc">한 타입을 3개 이상 올리고 나머지 슬롯을 순서대로 교체.</td></tr>
+        <tr><td class="e-name">앰비언트·몽환</td><td class="e-desc">Effect 2 + Melody 1. Beat 없이. 둥둥 떠다니는 느낌.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ Sprunki ══════════════════ -->
+<section class="panel" id="panel-sprunki">
+  <div class="sec-title">🟣 Sprunki — 팬메이드 모드의 혁명</div>
+  <div class="sec-sub">2024년 가장 화제가 된 Incredibox 팬메이드 버전. 원작보다 더 많이 알려졌다는 평가도 나올 정도입니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌟</span>Sprunki가 뭔가요?</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>팬이 만든 Incredibox 모드</b>입니다. 원작 게임 엔진을 기반으로, 다른 팬들이 독창적인 캐릭터·사운드·배경을 집어넣었습니다.</li>
+        <li>수십 가지 파생 버전이 존재하며, 대부분 <b>브라우저에서 무료 플레이</b>가 가능합니다.</li>
+        <li>2024년 하반기 <b>틱톡·유튜브에서 폭발적으로 바이럴</b>되며 Z세대를 중심으로 크게 유행했습니다.</li>
+        <li>공식 게임과는 별개이지만, So Far So Good 측에서 공식적으로 협업하는 방향으로 발전 중입니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🧟</span>Sprunki 호러 모드 — 왜 화제가 됐나</div>
+    <div class="card-body">
+      <div class="note"><b>특정 캐릭터 조합을 발동하면</b> 배경이 갑자기 어두워지고 피가 흐르며 무서운 음악으로 바뀌는 숨겨진 모드가 존재합니다.</div>
+      <ul class="li">
+        <li>달달한 음악 게임인 줄 알고 하다가 <b>갑자기 공포 분위기로 전환</b>되는 반전이 충격적이라 SNS에서 크게 퍼졌습니다.</li>
+        <li>호러 모드 발동 조건은 특정 조합 — 공개된 조합을 검색하면 찾을 수 있습니다.</li>
+        <li>유튜브에 "Sprunki horror mode" 반응 영상이 수백만 뷰를 기록했습니다.</li>
+        <li>이것이 알려지면서 Incredibox 원작까지 다시 주목받는 계기가 됐습니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📋</span>주요 Sprunki 버전들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>버전 이름</th><th>특징</th></tr>
+        <tr><td class="e-name">Sprunki 기본</td><td class="e-desc">오리지널 Sprunki. 귀여운 캐릭터 + 원작과 비슷한 구조. 호러 모드 내장. <span class="tag t-hot">가장 유명</span></td></tr>
+        <tr><td class="e-name">Sprunki Retake</td><td class="e-desc">더 어두운 분위기로 리메이크. 캐릭터 디자인 재작업. 호러 요소 강화.</td></tr>
+        <tr><td class="e-name">Sprunki Phase</td><td class="e-desc">여러 "Phase" 번호로 나뉜 스토리 진행형. 각 Phase마다 다른 분위기. <span class="tag t-mod">팬제작</span></td></tr>
+        <tr><td class="e-name">Sprunkstard</td><td class="e-desc">코믹하고 과장된 캐릭터 패러디 버전.</td></tr>
+        <tr><td class="e-name">Sprunki But Everyone</td><td class="e-desc">모든 캐릭터가 특정 캐릭터로 교체된 개그 버전들. 밈 컬처 반영.</td></tr>
+        <tr><td class="e-name">Incredibox Mustard</td><td class="e-desc">Sprunki 계열 중 서양 팬 커뮤니티에서 특히 인기 있는 변형.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚠️</span>Sprunki 주의사항</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>공식 게임이 아닙니다.</b> So Far So Good의 공식 제품이 아니며 팬이 만든 비공식 파생작입니다.</li>
+        <li><b>브라우저에서 무료</b>이지만, 수상한 광고나 다운로드 유도 사이트를 조심하세요. 공식 플레이 채널은 검색으로 확인하는 것이 안전합니다.</li>
+        <li><b>호러 모드는 연령 제한이 있습니다.</b> 피·공포 요소가 있으므로 어린이 시청에 부적합합니다.</li>
+        <li>버전이 너무 많아 품질 차이가 큽니다. <b>조회수·평점이 높은 것</b>을 먼저 해보세요.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔗</span>원작 vs Sprunki 비교</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:140px;">항목</th><th>Incredibox 원작</th><th>Sprunki</th></tr>
+        <tr><td class="e-name">제작</td><td class="e-desc">So Far So Good (프랑스)</td><td class="e-desc">팬 커뮤니티 (다수)</td></tr>
+        <tr><td class="e-name">가격</td><td class="e-desc">Steam 유료 / 웹 일부 무료</td><td class="e-desc">대부분 브라우저 무료</td></tr>
+        <tr><td class="e-name">사운드 퀄리티</td><td class="e-desc">전문 뮤지션·프로덕션</td><td class="e-desc">버전마다 천차만별</td></tr>
+        <tr><td class="e-name">콘텐츠 양</td><td class="e-desc">10개 공식 버전</td><td class="e-desc">수십~수백 개 파생 버전</td></tr>
+        <tr><td class="e-name">호러 요소</td><td class="e-desc">없음</td><td class="e-desc">일부 버전에 강하게 있음</td></tr>
+        <tr><td class="e-name">업데이트</td><td class="e-desc">정기 공식 업데이트</td><td class="e-desc">팬에 따라 불규칙</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 커뮤니티 ══════════════════ -->
+<section class="panel" id="panel-community">
+  <div class="sec-title">👥 커뮤니티 · 기록 · 공유</div>
+  <div class="sec-sub">혼자 즐기는 게임이지만 <b>공유와 커뮤니티 기능</b>이 잘 갖춰져 있습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📤</span>믹스 공유 방법</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">믹스 저장</td><td class="e-desc">하단 <b>Save 버튼</b>을 누르면 고유 코드가 생성됩니다. 이 코드로 언제든 복원 가능.</td></tr>
+        <tr><td class="e-name">URL 공유</td><td class="e-desc">코드가 포함된 URL을 공유하면 상대방이 내 믹스를 그대로 들을 수 있습니다.</td></tr>
+        <tr><td class="e-name">커뮤니티 게시</td><td class="e-desc">Publish 버튼으로 사이트 차트에 올릴 수 있습니다. 좋아요를 받으면 상위 노출.</td></tr>
+        <tr><td class="e-name">MP3 녹음</td><td class="e-desc">Record 기능으로 믹스를 오디오 파일로 저장. 유튜브·SNS 업로드 가능 (저작권 확인 필요).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>커뮤니티 활동 공간</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">incredibox.com</td><td class="e-desc">공식 사이트. 커뮤니티 차트, 믹스 공유, 팬 아트 섹션 있음.</td></tr>
+        <tr><td class="e-name">Reddit</td><td class="e-desc">r/Incredibox — 믹스 공유, 보너스 조합 공략, 팬아트, Sprunki 관련 논의.</td></tr>
+        <tr><td class="e-name">YouTube</td><td class="e-desc">믹스 영상, 보너스 발동 반응 영상, Sprunki 영상 다수. 검색하면 공략도 나옴.</td></tr>
+        <tr><td class="e-name">Incredibox Wiki</td><td class="e-desc">Fandom Wiki. 버전별 보너스 조합·캐릭터 정보 정리되어 있음. 공략 참고용.</td></tr>
+        <tr><td class="e-name">TikTok</td><td class="e-desc">Sprunki 호러 모드 반응 영상 중심. 2024년 바이럴 진원지.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🏅</span>Steam 도전과제</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>각 버전의 보너스를 전부 발견하면</b> 도전과제가 해제됩니다.</li>
+        <li>커뮤니티 차트에서 좋아요를 일정 수 이상 받으면 달성되는 도전과제도 있습니다.</li>
+        <li>스팀 트레이딩 카드가 있어 배지 제작도 가능합니다.</li>
+        <li>도전과제 완료율이 낮은 것들이 있는데, 대부분 <b>특정 버전 보너스 풀 달성</b>입니다. 위키를 참고하세요.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💬</span>자주 묻는 질문</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">무료로 할 수 있나요?</td><td class="e-desc">incredibox.com에서 <b>v1 Alpha만 무료</b>. 전 버전은 Steam이나 모바일 앱 유료 구매 필요. Sprunki 계열은 브라우저 무료.</td></tr>
+        <tr><td class="e-name">한국어 지원되나요?</td><td class="e-desc">게임 자체에 텍스트가 거의 없어서 <b>언어 장벽 없음</b>. UI는 영어지만 아이콘·드래그만으로 플레이 가능.</td></tr>
+        <tr><td class="e-name">만든 음악을 유튜브에 올려도 되나요?</td><td class="e-desc">원칙적으로 <b>So Far So Good의 음원 저작권</b>이 있습니다. 비상업적·팬 콘텐츠 용도로는 대부분 묵인하지만, 수익화 전에는 공식 정책 확인 권장.</td></tr>
+        <tr><td class="e-name">Sprunki는 공식인가요?</td><td class="e-desc">아닙니다. <b>팬메이드 비공식 모드</b>입니다. 다만 So Far So Good 측에서 협업을 긍정적으로 검토 중.</td></tr>
+        <tr><td class="e-name">새 버전이 나오나요?</td><td class="e-desc">v10 Wekiddy 이후 소식은 아직 공식 발표 없음. 스팀·공식 SNS를 팔로우하면 업데이트 알림을 받을 수 있습니다.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot">
+    참고 자료 —
+    <a href="https://www.incredibox.com" target="_blank" rel="noopener">Incredibox 공식 사이트</a> ·
+    <a href="https://store.steampowered.com/app/1390030/Incredibox/" target="_blank" rel="noopener">Steam 페이지</a> ·
+    <a href="https://incredibox.fandom.com" target="_blank" rel="noopener">Incredibox Wiki (Fandom)</a> ·
+    <a href="https://www.reddit.com/r/Incredibox/" target="_blank" rel="noopener">Reddit r/Incredibox</a>
+  </div>
+</section>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</main>
+</div>
+
+<script>
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  buildSidebar();
+  document.getElementById('no-result').style.display = 'none';
+  document.getElementById('search').value = '';
+}
+
+function buildSidebar() {
+  const panel = document.querySelector('.panel.active');
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  if (!panel) return;
+  panel.querySelectorAll('.card').forEach(card => {
+    const head = card.querySelector('.card-head');
+    if (!head) return;
+    const text = head.textContent.trim().replace(/\s+/g, ' ');
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = text.length > 28 ? text.slice(0, 28) + '…' : text;
+    btn.onclick = () => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sb.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    sb.appendChild(btn);
+  });
+}
+buildSidebar();
+
+document.getElementById('search').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  const panel = document.querySelector('.panel.active');
+  if (!panel) return;
+  const cards = panel.querySelectorAll('.card, .vol-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const match = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('no-result').style.display = (q && visible === 0) ? 'block' : 'none';
+});
+</script>
+</body>
+</html>

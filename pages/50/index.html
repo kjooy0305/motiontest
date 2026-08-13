@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Node.js 완전 정복</title>
+<style>
+:root{
+  --bg:#080e0c;--bg2:#0c1410;--bg3:#121c18;--bg4:#1a2820;
+  --border:#1e3028;--border2:#2e4a3a;
+  --txt:#dff0e8;--txt2:#8bb89e;--txt3:#4d7a60;
+  --grn:#4fd68a;--grn2:#8ff0b8;--cyan:#4fd8e8;--cyan2:#8ff0fa;
+  --pur:#a97bf5;--amber:#f0b24a;--red:#f2666a;--teal:#2ecc8a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--grn);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;min-height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--grn2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:340px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--grn);box-shadow:0 0 0 2px rgba(79,214,138,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;padding:6px 0;}
+.tab{padding:6px 11px;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;font-family:inherit;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(79,214,138,.15);color:var(--grn2);border-color:rgba(79,214,138,.35);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;line-height:1.45;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(79,214,138,.08);color:var(--grn2);border-left-color:var(--grn);}
+.main{flex:1;padding:20px 24px;max-width:1060px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--grn2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:12px 14px;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:8px 10px;vertical-align:top;font-size:13px;}
+.e-table th{padding:7px 10px;text-align:left;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:700;}
+.e-name{color:var(--cyan2);font-weight:600;white-space:nowrap;width:170px;font-family:Consolas,Menlo,monospace;font-size:12px;}
+.e-name.wide{width:200px;}
+.e-desc{color:var(--txt2);}
+.e-desc b{color:var(--txt);font-weight:600;}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.t-must{background:rgba(95,214,138,.16);color:var(--grn);}
+.t-opt{background:rgba(240,178,74,.16);color:var(--amber);}
+.t-warn{background:rgba(242,102,106,.16);color:var(--red);}
+.t-pro{background:rgba(169,123,245,.18);color:var(--pur);}
+.t-new{background:rgba(79,216,232,.14);color:var(--cyan);}
+
+code{font-family:Consolas,Menlo,monospace;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:12px;color:var(--cyan2);}
+
+.tpl{position:relative;background:#060e0a;border:1px solid var(--border2);border-radius:6px;margin:8px 0;}
+.tpl-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--txt3);font-weight:700;letter-spacing:.4px;}
+.tpl pre{padding:10px 12px;font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.65;color:var(--txt);white-space:pre-wrap;word-break:break-word;overflow-x:auto;}
+.copy{background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);border-radius:4px;padding:2px 9px;font-size:11px;cursor:pointer;font-family:inherit;transition:.12s;}
+.copy:hover{background:var(--grn);color:#061a0e;border-color:var(--grn);}
+.copy.done{background:var(--grn);color:#061a0e;border-color:var(--grn);}
+
+.good{border-left:3px solid var(--grn);background:rgba(95,214,138,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.bad{border-left:3px solid var(--red);background:rgba(242,102,106,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.note{border-left:3px solid var(--cyan);background:rgba(79,216,232,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.good b,.bad b,.note b{color:var(--txt);}
+.warn{border-left:3px solid var(--amber);background:rgba(240,178,74,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.warn b{color:var(--txt);}
+
+ul.li{margin:4px 0 4px 16px;color:var(--txt2);font-size:13px;}
+ul.li li{margin-bottom:4px;}
+ul.li li b{color:var(--txt);font-weight:600;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0;}
+.chip{background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;font-size:11.5px;color:var(--cyan2);font-family:Consolas,Menlo,monospace;cursor:pointer;transition:.1s;}
+.chip:hover{background:var(--grn);color:#061a0e;border-color:var(--grn);}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0;}
+.flow-box{background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:5px 10px;font-size:12px;color:var(--grn2);font-weight:600;white-space:nowrap;}
+.flow-arr{color:var(--txt3);font-size:14px;}
+
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px 0;font-size:13px;}
+.foot{color:var(--txt3);font-size:11px;padding:18px 0 40px;line-height:1.8;border-top:1px solid var(--border);margin-top:20px;}
+.foot a{color:var(--txt2);}
+
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .main{padding:14px;}
+  .e-name{width:auto;white-space:normal;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span class="logo-icon">🟩</span>Node.js 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="현재 탭에서 검색 (예: require, fs, npm)"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('intro')">개요</button>
+    <button class="tab" onclick="showPanel('core')">핵심 개념</button>
+    <button class="tab" onclick="showPanel('modules')">내장 모듈</button>
+    <button class="tab" onclick="showPanel('npm')">npm</button>
+    <button class="tab" onclick="showPanel('examples')">실전 예제</button>
+    <button class="tab" onclick="showPanel('ecosystem')">생태계</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+
+<!-- ══════════════════ 개요 ══════════════════ -->
+<section class="panel active" id="panel-intro">
+  <div class="sec-title">🟩 Node.js — 그래서 왜 "노드"야?</div>
+  <div class="sec-sub">이름이 신기한 이유가 있습니다. <b>네트워크 토폴로지에서 '노드(Node)'는 연결 지점을 뜻합니다.</b> Node.js는 서버·클라이언트·피어를 잇는 네트워크의 각 연결 지점이 되는 런타임을 목표로 만들어졌습니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>이름의 유래 — "Node"가 뭔데?</div>
+    <div class="card-body">
+      <div class="note"><b>Node = 네트워크의 점(點)</b><br>그래프·네트워크 이론에서 노드(node)는 엣지(edge, 간선)로 연결된 꼭짓점입니다. 인터넷을 생각하면 서버 한 대, 라우터 하나, 컴퓨터 한 대가 각각 노드입니다.</div>
+      <ul class="li">
+        <li>창시자 <b>라이언 달(Ryan Dahl)</b>이 2009년 발표할 때 내건 개념 — "어떤 디바이스든 네트워크의 노드가 될 수 있도록 가볍고 이벤트 기반으로 만들자".</li>
+        <li>당시 Node.js는 <b>서버 측에서 JavaScript를 실행</b>하는 첫 번째 실용적 환경이었습니다. 브라우저 안에만 갇혀 있던 JS가 서버·CLI·IoT·데스크톱 어디서든 쓸 수 있는 "네트워크 노드"가 됐다는 의미입니다.</li>
+        <li>"<b>.js</b>" 접미사는 JavaScript 런타임임을 명시하는 관례. 이후 수많은 프레임워크가 이 네이밍을 따랐습니다 (Vue.js, Next.js…).</li>
+      </ul>
+      <div class="good"><b>한 줄 요약</b> — Node.js = "JavaScript로 동작하는 네트워크 노드(연결 지점)를 만드는 런타임"</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚙️</span>Node.js가 뭔가요?</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">정의</td><td class="e-desc"><b>Chrome V8 엔진</b> 위에서 동작하는 JavaScript 런타임. 브라우저 없이 서버·터미널에서 JS를 실행합니다.</td></tr>
+        <tr><td class="e-name">출시</td><td class="e-desc">2009년 5월, Ryan Dahl 발표. 2010년 npm 등장으로 생태계 폭발.</td></tr>
+        <tr><td class="e-name">특징</td><td class="e-desc"><b>이벤트 기반 + 논블로킹 I/O + 싱글 스레드.</b> 파일 읽기·네트워크 요청을 기다리는 동안 다른 작업을 처리합니다.</td></tr>
+        <tr><td class="e-name">쓰임새</td><td class="e-desc">웹 서버, REST API, CLI 도구, 실시간 채팅, IoT, 데스크톱 앱(Electron), 빌드 도구(Webpack, Vite) 등</td></tr>
+        <tr><td class="e-name">V8이 뭔가</td><td class="e-desc">Google이 만든 <b>JavaScript 실행 엔진</b>. Chrome 브라우저 안에도 같이 들어 있습니다. Node.js는 이 엔진을 꺼내 서버 환경에 끼워 넣은 것입니다.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🆚</span>브라우저 JS vs Node.js — 뭐가 다른가</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:180px;">항목</th><th>브라우저</th><th>Node.js</th></tr>
+        <tr><td class="e-name">실행 환경</td><td class="e-desc">웹 페이지 안</td><td class="e-desc">서버 / 터미널</td></tr>
+        <tr><td class="e-name">DOM/window</td><td class="e-desc">있음</td><td class="e-desc"><b>없음</b> (document·window 쓰면 에러)</td></tr>
+        <tr><td class="e-name">파일 시스템</td><td class="e-desc">접근 불가</td><td class="e-desc"><b>자유롭게 읽기·쓰기</b> (<code>fs</code> 모듈)</td></tr>
+        <tr><td class="e-name">전역 객체</td><td class="e-desc"><code>window</code></td><td class="e-desc"><code>global</code> (최근엔 <code>globalThis</code>)</td></tr>
+        <tr><td class="e-name">모듈 시스템</td><td class="e-desc">ES Modules (<code>import</code>)</td><td class="e-desc">CommonJS (<code>require</code>) + ES Modules 둘 다</td></tr>
+        <tr><td class="e-name">네트워크</td><td class="e-desc">fetch, XHR (보안 제한 있음)</td><td class="e-desc">무제한 TCP·UDP·HTTP 소켓</td></tr>
+        <tr><td class="e-name">프로세스 제어</td><td class="e-desc">불가</td><td class="e-desc"><code>process</code>, <code>child_process</code></td></tr>
+      </table>
+      <div class="note"><b>핵심 차이</b> — 브라우저 JS는 화면을 다루고, Node.js는 시스템을 다룹니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🚀</span>5분 안에 첫 서버 띄우기</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>server.js</span><button class="copy">복사</button></div>
+<pre>// Node.js 내장 http 모듈 — 설치 필요 없음
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('안녕, Node.js!\n');
+});
+
+server.listen(3000, () => {
+  console.log('서버 실행 중 → http://localhost:3000');
+});</pre></div>
+      <div class="tpl"><div class="tpl-head"><span>실행</span><button class="copy">복사</button></div>
+<pre>node server.js</pre></div>
+      <div class="note">브라우저에서 <code>http://localhost:3000</code> 열면 됩니다. npm 없이, 설치 없이, Node.js만으로 서버가 올라갑니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🕐</span>Node.js 버전 흐름</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:100px;">버전</th><th>특징 / 키워드</th></tr>
+        <tr><td class="e-name">v0.x (2009)</td><td class="e-desc">Ryan Dahl 초기 버전. CommonJS, libuv 도입.</td></tr>
+        <tr><td class="e-name">v4~6 (2015~)</td><td class="e-desc">io.js와 합쳐짐. LTS 개념 시작. ES6 기본 지원.</td></tr>
+        <tr><td class="e-name">v10~12</td><td class="e-desc">Worker Threads, N-API, ESM(실험적) 추가.</td></tr>
+        <tr><td class="e-name">v16~18</td><td class="e-desc">ES Modules 안정화, Fetch API 내장, Corepack.</td></tr>
+        <tr><td class="e-name">v20 (2023)</td><td class="e-desc"><code>.env</code> 파일 내장 로드, 권한 모델, 안정적 Test Runner.</td></tr>
+        <tr><td class="e-name">v22~24 <span class="tag t-new">최신 LTS</span></td><td class="e-desc">require(ESM) 지원, SQLite 내장, WebSocket 클라이언트 내장, 성능 대폭 향상.</td></tr>
+      </table>
+      <div class="note"><b>LTS(Long-Term Support)</b> — 짝수 버전이 LTS입니다. 실무에서는 항상 LTS를 쓰세요. 홀수 버전(예: v21)은 실험적이며 지원 기간이 짧습니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 핵심 개념 ══════════════════ -->
+<section class="panel" id="panel-core">
+  <div class="sec-title">🧠 핵심 개념</div>
+  <div class="sec-sub">Node.js를 처음 배울 때 가장 헷갈리는 세 가지 — <b>이벤트 루프, 논블로킹, 비동기</b>를 먼저 잡으면 나머지가 따라옵니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔄</span>이벤트 루프 (Event Loop) — Node의 심장</div>
+    <div class="card-body">
+      <div class="note"><b>한 줄 개념</b> — 싱글 스레드인데도 수천 개의 요청을 동시에 처리할 수 있는 이유. I/O 작업을 기다리는 동안 다른 콜백을 먼저 실행합니다.</div>
+      <div class="flow">
+        <div class="flow-box">콜 스택</div><span class="flow-arr">→</span>
+        <div class="flow-box">Node API<br><span style="font-size:10px;color:var(--txt3)">(비동기 작업 위임)</span></div><span class="flow-arr">→</span>
+        <div class="flow-box">태스크 큐</div><span class="flow-arr">→</span>
+        <div class="flow-box">이벤트 루프<br><span style="font-size:10px;color:var(--txt3)">(큐 → 스택)</span></div>
+      </div>
+      <ul class="li">
+        <li><b>콜 스택이 비면</b> 이벤트 루프가 태스크 큐에서 다음 콜백을 꺼내 스택에 올립니다.</li>
+        <li>파일 읽기·DB 쿼리·타이머 같은 느린 작업은 <b>Node API(libuv)에 위임</b>하고 메인 스레드는 곧바로 다음 코드를 실행합니다.</li>
+        <li>작업이 끝나면 결과와 콜백이 큐에 들어오고, 루프가 스택에 올려줍니다.</li>
+      </ul>
+      <div class="tpl"><div class="tpl-head"><span>이벤트 루프 동작 예시</span><button class="copy">복사</button></div>
+<pre>console.log('1');            // 즉시 실행
+
+setTimeout(() => {
+  console.log('3');          // 0ms 후 → 사실 큐에서 기다림
+}, 0);
+
+console.log('2');            // 즉시 실행
+
+// 출력: 1 → 2 → 3
+// setTimeout 0이라도 콜 스택이 비운 후에 실행됩니다</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🚫</span>블로킹 vs 논블로킹</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:120px;">구분</th><th>동작</th><th>Node에서</th></tr>
+        <tr><td class="e-name">블로킹</td><td class="e-desc">작업이 끝날 때까지 <b>다른 코드를 실행 못 함</b></td><td class="e-desc"><code>fs.readFileSync</code> 같은 Sync 메서드</td></tr>
+        <tr><td class="e-name">논블로킹</td><td class="e-desc">작업을 위임하고 <b>즉시 다음 코드로</b></td><td class="e-desc"><code>fs.readFile</code> (콜백), Promise, async/await</td></tr>
+      </table>
+      <div class="bad"><b>서버 코드에서 Sync 메서드 금지</b><br><code>readFileSync</code>를 서버 요청 핸들러 안에 쓰면 그 요청 처리 중 다른 모든 요청이 멈춥니다. 스크립트 초기화 시점에만 허용.</div>
+      <div class="tpl"><div class="tpl-head"><span>블로킹 vs 논블로킹 비교</span><button class="copy">복사</button></div>
+<pre>const fs = require('fs');
+
+// ❌ 블로킹 — 파일 읽는 동안 서버 전체 정지
+const data = fs.readFileSync('file.txt', 'utf8');
+console.log(data);
+
+// ✅ 논블로킹 — 읽는 동안 다른 요청 처리 가능
+fs.readFile('file.txt', 'utf8', (err, data) => {
+  if (err) throw err;
+  console.log(data);
+});
+
+// ✅ async/await — 가독성 좋은 현대적 방식
+const { readFile } = require('fs/promises');
+const text = await readFile('file.txt', 'utf8');
+console.log(text);</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📦</span>모듈 시스템 — CommonJS vs ES Modules</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:150px;">항목</th><th>CommonJS (CJS)</th><th>ES Modules (ESM)</th></tr>
+        <tr><td class="e-name">확장자</td><td class="e-desc"><code>.js</code> / <code>.cjs</code></td><td class="e-desc"><code>.mjs</code> / <code>.js</code>(<code>type:module</code>)</td></tr>
+        <tr><td class="e-name">불러오기</td><td class="e-desc"><code>require('모듈')</code></td><td class="e-desc"><code>import x from '모듈'</code></td></tr>
+        <tr><td class="e-name">내보내기</td><td class="e-desc"><code>module.exports = ...</code></td><td class="e-desc"><code>export default ...</code> / <code>export {}</code></td></tr>
+        <tr><td class="e-name">로드 시점</td><td class="e-desc">동기 (런타임)</td><td class="e-desc">정적 분석 (파싱 단계)</td></tr>
+        <tr><td class="e-name">현황</td><td class="e-desc">Node.js 기본값, 오래된 패키지 대부분</td><td class="e-desc">브라우저·최신 패키지 표준. Node v22+에서 require(ESM) 지원 추가됨</td></tr>
+      </table>
+      <div class="tpl"><div class="tpl-head"><span>두 방식 비교</span><button class="copy">복사</button></div>
+<pre>// ── CommonJS (전통적) ──────────────────────
+const path = require('path');
+module.exports = { greet: () => 'hello' };
+
+// ── ES Modules (현대적) ────────────────────
+import path from 'path';
+export const greet = () => 'hello';
+// package.json에 "type": "module" 추가 필요</pre></div>
+      <div class="note">새 프로젝트는 <b>ES Modules</b>를 권장하지만, 기존 생태계(Express 등)는 아직 CommonJS가 많습니다. <b>혼용 시 에러 나기 쉬우니 한 프로젝트에서 하나만</b> 사용하세요.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚡</span>비동기 3단계 진화 — 콜백 → Promise → async/await</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>같은 파일 읽기 — 3가지 방식</span><button class="copy">복사</button></div>
+<pre>const fs = require('fs');
+const { readFile } = require('fs/promises');
+
+// 1️⃣ 콜백 (Node.js 전통 방식) — 깊어지면 "콜백 지옥"
+fs.readFile('a.txt', 'utf8', (err, data) => {
+  if (err) return console.error(err);
+  fs.readFile('b.txt', 'utf8', (err2, data2) => {
+    console.log(data + data2);   // 중첩이 깊어짐
+  });
+});
+
+// 2️⃣ Promise — .then() 체인으로 평탄화
+readFile('a.txt', 'utf8')
+  .then(d1 => readFile('b.txt', 'utf8').then(d2 => d1 + d2))
+  .then(console.log)
+  .catch(console.error);
+
+// 3️⃣ async/await — 동기 코드처럼 읽힘 (현재 권장)
+async function main() {
+  try {
+    const [d1, d2] = await Promise.all([
+      readFile('a.txt', 'utf8'),
+      readFile('b.txt', 'utf8'),
+    ]);
+    console.log(d1 + d2);
+  } catch (err) {
+    console.error(err);
+  }
+}
+main();</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🧵</span>Worker Threads — 진짜 멀티스레드가 필요할 때</div>
+    <div class="card-body">
+      <ul class="li">
+        <li>Node.js는 <b>메인 루프는 싱글 스레드</b>지만, <code>worker_threads</code> 모듈로 실제 OS 스레드를 추가로 쓸 수 있습니다.</li>
+        <li>이미지 변환·암호화·대용량 연산 등 <b>CPU를 오래 점유하는 작업</b>에만 씁니다.</li>
+        <li>일반 I/O 비동기 처리에는 Worker가 필요 없습니다 — libuv 스레드풀이 알아서 처리합니다.</li>
+      </ul>
+      <div class="tpl"><div class="tpl-head"><span>worker_threads 기본 예시</span><button class="copy">복사</button></div>
+<pre>const { Worker, isMainThread, parentPort } = require('worker_threads');
+
+if (isMainThread) {
+  // 메인 스레드
+  const worker = new Worker(__filename);
+  worker.on('message', msg => console.log('결과:', msg));
+} else {
+  // 워커 스레드 — 무거운 계산
+  let sum = 0;
+  for (let i = 0; i < 1e9; i++) sum += i;
+  parentPort.postMessage(sum);
+}</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌍</span>전역 객체와 특수 변수</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:170px;">이름</th><th>설명</th></tr>
+        <tr><td class="e-name">__filename</td><td class="e-desc">현재 파일의 절대 경로 문자열</td></tr>
+        <tr><td class="e-name">__dirname</td><td class="e-desc">현재 파일이 있는 디렉터리의 절대 경로</td></tr>
+        <tr><td class="e-name">process</td><td class="e-desc">현재 Node 프로세스 정보 + 제어. <code>process.env</code>, <code>process.argv</code>, <code>process.exit()</code></td></tr>
+        <tr><td class="e-name">process.env</td><td class="e-desc">환경 변수 객체. <code>process.env.PORT</code>, <code>process.env.NODE_ENV</code></td></tr>
+        <tr><td class="e-name">process.argv</td><td class="e-desc">커맨드라인 인수 배열. <code>node app.js hello</code> → <code>argv[2] = 'hello'</code></td></tr>
+        <tr><td class="e-name">global</td><td class="e-desc">브라우저의 <code>window</code>에 해당하는 전역 객체</td></tr>
+        <tr><td class="e-name">Buffer</td><td class="e-desc">이진 데이터 처리. 파일·네트워크 스트림에서 자주 사용</td></tr>
+      </table>
+      <div class="note">ESM(<code>import</code>) 방식에서는 <code>__filename</code>, <code>__dirname</code>이 없습니다. 대신 <code>import.meta.url</code>과 <code>fileURLToPath</code>를 조합해 씁니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 내장 모듈 ══════════════════ -->
+<section class="panel" id="panel-modules">
+  <div class="sec-title">📦 내장 모듈 (Built-in Modules)</div>
+  <div class="sec-sub">Node.js에 기본으로 내장된 모듈들 — <b>설치 없이 <code>require()</code>만으로 바로 사용</b>가능합니다. 자주 쓰는 것 위주로 정리했습니다.</div>
+
+  <div class="grid2">
+
+    <div class="card">
+      <div class="card-head"><span class="ico">📁</span><code>fs</code> — 파일 시스템</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>fs 기본 사용법</span><button class="copy">복사</button></div>
+<pre>const fs = require('fs');
+const { readFile, writeFile, mkdir } = require('fs/promises');
+
+// 읽기
+const text = await readFile('data.txt', 'utf8');
+
+// 쓰기 (없으면 생성, 있으면 덮어씀)
+await writeFile('out.txt', '내용', 'utf8');
+
+// 디렉터리 생성 (중간 경로도 함께)
+await mkdir('a/b/c', { recursive: true });
+
+// 파일 존재 확인
+const exists = fs.existsSync('file.txt');  // 동기 OK (단순 확인용)</pre></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🛤️</span><code>path</code> — 경로 처리</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>path 기본 사용법</span><button class="copy">복사</button></div>
+<pre>const path = require('path');
+
+path.join('a', 'b', 'c.txt')   // 'a/b/c.txt' (OS 구분자)
+path.resolve('src', 'app.js')  // 절대 경로
+path.basename('/a/b/c.txt')    // 'c.txt'
+path.dirname('/a/b/c.txt')     // '/a/b'
+path.extname('app.js')         // '.js'
+path.parse('/a/b/c.txt')
+// { root:'/', dir:'/a/b', base:'c.txt', ext:'.txt', name:'c' }
+
+// 현재 파일 기준 상대 경로 (필수 패턴)
+path.join(__dirname, 'data', 'file.json')</pre></div>
+        <div class="note">경로를 문자열 더하기(<code>'src/' + name</code>)로 합치면 OS에 따라 슬래시 방향이 틀립니다. 항상 <code>path.join</code>을 쓰세요.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🌐</span><code>http</code> / <code>https</code> — 웹 서버</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>간단한 HTTP 서버</span><button class="copy">복사</button></div>
+<pre>const http = require('http');
+
+http.createServer((req, res) => {
+  const { method, url } = req;
+
+  if (method === 'GET' && url === '/') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+  } else {
+    res.writeHead(404);
+    res.end('Not Found');
+  }
+}).listen(3000);</pre></div>
+        <div class="note">실무에서는 http 모듈을 직접 쓰는 대신 <b>Express</b>나 <b>Fastify</b>를 씁니다. 라우팅·미들웨어 처리가 훨씬 편합니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔗</span><code>url</code> / <code>querystring</code> — URL 파싱</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>URL 파싱</span><button class="copy">복사</button></div>
+<pre>// 현대적 방식 — 전역 URL 클래스 (Node v10+)
+const u = new URL('https://example.com/api?page=2&q=node');
+u.pathname     // '/api'
+u.searchParams.get('page')  // '2'
+u.searchParams.get('q')     // 'node'
+
+// 서버 요청 URL 파싱 시
+const { url } = req;
+const parsed = new URL(url, 'http://localhost');
+const page = parsed.searchParams.get('page');</pre></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔐</span><code>crypto</code> — 암호화</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>해시 / 난수 생성</span><button class="copy">복사</button></div>
+<pre>const crypto = require('crypto');
+
+// SHA-256 해시
+crypto.createHash('sha256').update('비밀').digest('hex');
+
+// 암호학적 안전 난수 (토큰 생성)
+crypto.randomBytes(32).toString('hex');
+
+// UUID v4 (Node v14.17+)
+crypto.randomUUID();  // 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'</pre></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">📡</span><code>events</code> — 이벤트 에미터</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>EventEmitter 기본</span><button class="copy">복사</button></div>
+<pre>const { EventEmitter } = require('events');
+
+const emitter = new EventEmitter();
+
+emitter.on('data', (msg) => {
+  console.log('받음:', msg);
+});
+
+emitter.emit('data', 'hello');  // → '받음: hello'
+
+// once: 한 번만 실행
+emitter.once('close', () => console.log('연결 종료'));</pre></div>
+        <div class="note">fs, http, stream 등 Node.js 내장 모듈 대부분이 EventEmitter를 상속합니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔄</span><code>stream</code> — 스트림</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>파이프로 파일 복사</span><button class="copy">복사</button></div>
+<pre>const fs = require('fs');
+
+// pipe: 읽기 스트림 → 쓰기 스트림
+// 메모리에 파일 전체를 올리지 않고 청크 단위 처리
+fs.createReadStream('big.txt')
+  .pipe(fs.createWriteStream('copy.txt'))
+  .on('finish', () => console.log('완료'));</pre></div>
+        <div class="note">큰 파일(영상·로그 등)은 <code>readFile</code> 대신 스트림으로 읽어야 메모리를 아낍니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🖥️</span><code>child_process</code> — 외부 프로세스</div>
+      <div class="card-body">
+        <div class="tpl"><div class="tpl-head"><span>쉘 명령 실행</span><button class="copy">복사</button></div>
+<pre>const { execSync, exec, spawn } = require('child_process');
+
+// 동기 (스크립트용)
+const out = execSync('ls -la').toString();
+
+// 비동기
+exec('git log --oneline', (err, stdout) => {
+  if (err) return console.error(err);
+  console.log(stdout);
+});
+
+// 긴 출력·실시간 로그는 spawn
+const proc = spawn('node', ['app.js']);
+proc.stdout.on('data', chunk => process.stdout.write(chunk));</pre></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">⏰</span><code>timers</code> — 타이머</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">setTimeout(fn, ms)</td><td class="e-desc">ms 후 fn 한 번 실행</td></tr>
+          <tr><td class="e-name">setInterval(fn, ms)</td><td class="e-desc">ms마다 fn 반복 실행</td></tr>
+          <tr><td class="e-name">setImmediate(fn)</td><td class="e-desc">현재 이벤트 루프 사이클 끝난 직후 실행</td></tr>
+          <tr><td class="e-name">clearTimeout(id)</td><td class="e-desc">setTimeout 취소</td></tr>
+          <tr><td class="e-name">clearInterval(id)</td><td class="e-desc">setInterval 취소</td></tr>
+        </table>
+        <div class="tpl"><div class="tpl-head"><span>Promise 기반 sleep</span><button class="copy">복사</button></div>
+<pre>// timers/promises 모듈 (Node v15+)
+const { setTimeout: sleep } = require('timers/promises');
+await sleep(1000);  // 1초 기다리기</pre></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🗂️</span>기타 자주 쓰는 내장 모듈</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">os</td><td class="e-desc">OS 정보: <code>os.platform()</code>, <code>os.cpus()</code>, <code>os.homedir()</code>, <code>os.freemem()</code></td></tr>
+          <tr><td class="e-name">assert</td><td class="e-desc">테스트·검증: <code>assert.strictEqual(a, b)</code>, <code>assert.throws(fn)</code></td></tr>
+          <tr><td class="e-name">util</td><td class="e-desc"><code>util.promisify(fn)</code> — 콜백 함수를 Promise로 변환. <code>util.inspect(obj)</code></td></tr>
+          <tr><td class="e-name">dns</td><td class="e-desc">DNS 조회: <code>dns.resolve4('example.com', cb)</code></td></tr>
+          <tr><td class="e-name">net</td><td class="e-desc">TCP 소켓 서버/클라이언트</td></tr>
+          <tr><td class="e-name">zlib</td><td class="e-desc">gzip 압축·해제</td></tr>
+          <tr><td class="e-name">sqlite <span class="tag t-new">v22.5+</span></td><td class="e-desc">SQLite DB 내장 지원 (npm 패키지 불필요)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ npm ══════════════════ -->
+<section class="panel" id="panel-npm">
+  <div class="sec-title">📦 npm — 패키지 관리자</div>
+  <div class="sec-sub"><b>npm(Node Package Manager)</b> — Node.js 설치 시 자동으로 함께 설치됩니다. 세계 최대 소프트웨어 레지스트리로 200만 개 이상의 패키지를 보유합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🚀</span>프로젝트 시작부터 실행까지</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>새 프로젝트 초기화</span><button class="copy">복사</button></div>
+<pre>npm init -y          # package.json 기본값으로 생성 (-y: 질문 스킵)
+npm install express  # 패키지 설치 (node_modules/ 생성)
+npm run start        # package.json scripts.start 실행
+node app.js          # 직접 실행</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🛠️</span>자주 쓰는 npm 명령어</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:240px;">명령어</th><th>설명</th></tr>
+        <tr><td class="e-name">npm install</td><td class="e-desc">package.json의 모든 의존성 설치 (node_modules 복원)</td></tr>
+        <tr><td class="e-name">npm install &lt;패키지&gt;</td><td class="e-desc">패키지 설치 + dependencies에 추가</td></tr>
+        <tr><td class="e-name">npm install -D &lt;패키지&gt;</td><td class="e-desc">개발 전용 설치 (devDependencies). eslint, jest 등</td></tr>
+        <tr><td class="e-name">npm install -g &lt;패키지&gt;</td><td class="e-desc">전역 설치 — 어디서든 CLI 명령으로 실행 가능</td></tr>
+        <tr><td class="e-name">npm uninstall &lt;패키지&gt;</td><td class="e-desc">패키지 제거</td></tr>
+        <tr><td class="e-name">npm update</td><td class="e-desc">패키지 버전 업데이트 (package.json 버전 범위 내)</td></tr>
+        <tr><td class="e-name">npm run &lt;스크립트명&gt;</td><td class="e-desc">package.json scripts 항목 실행</td></tr>
+        <tr><td class="e-name">npm list</td><td class="e-desc">설치된 패키지 목록</td></tr>
+        <tr><td class="e-name">npm outdated</td><td class="e-desc">업데이트 가능한 패키지 확인</td></tr>
+        <tr><td class="e-name">npm audit</td><td class="e-desc">보안 취약점 검사</td></tr>
+        <tr><td class="e-name">npm audit fix</td><td class="e-desc">자동으로 취약점 수정</td></tr>
+        <tr><td class="e-name">npx &lt;패키지&gt;</td><td class="e-desc">전역 설치 없이 패키지를 임시 실행</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📄</span>package.json 핵심 필드</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>package.json 예시</span><button class="copy">복사</button></div>
+<pre>{
+  "name": "my-app",
+  "version": "1.0.0",
+  "type": "module",          // "module" → ESM, 없으면 CommonJS
+  "main": "src/index.js",    // require('my-app') 시 진입점
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",  // Node v18+ 내장 watch
+    "test": "node --test"                // Node v18+ 내장 테스트 러너
+  },
+  "dependencies": {
+    "express": "^4.18.0"     // ^ : 마이너·패치 자동 업데이트
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"       // 빌드 시 제외, 개발 도구만
+  },
+  "engines": {
+    "node": ">=20.0.0"       // 최소 Node 버전 명시
+  }
+}</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔒</span>package-lock.json — 버전을 잠그는 파일</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><code>npm install</code>이 처음 실행되면 자동 생성됩니다.</li>
+        <li><b>설치된 패키지의 정확한 버전</b>을 기록 — 다른 환경에서도 완전히 동일한 버전으로 설치됩니다.</li>
+        <li><b>반드시 git에 커밋</b>하세요. <code>.gitignore</code>에 절대 넣지 마세요.</li>
+        <li><code>node_modules/</code> 폴더는 gitignore, lock 파일은 커밋 — 이 반대가 되면 팀원마다 버전이 달라집니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚡</span>대안 패키지 매니저 — pnpm / yarn / bun</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:100px;">도구</th><th>특징</th></tr>
+        <tr><td class="e-name">npm</td><td class="e-desc">Node.js 기본 내장. 가장 호환성 좋음.</td></tr>
+        <tr><td class="e-name">pnpm</td><td class="e-desc"><b>디스크 사용량 대폭 절감</b> (글로벌 저장소 링크 방식). 속도도 빠름. 모노레포에 특히 유리.</td></tr>
+        <tr><td class="e-name">yarn</td><td class="e-desc">Meta(구 Facebook)가 만든 대안. Plug'n'Play로 node_modules 없애는 실험도 함.</td></tr>
+        <tr><td class="e-name">bun</td><td class="e-desc">Zig로 만든 초고속 JS 런타임 + 패키지 매니저. npm보다 10~30배 빠른 설치 속도. Node.js 대부분과 호환.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 실전 예제 ══════════════════ -->
+<section class="panel" id="panel-examples">
+  <div class="sec-title">🛠️ 실전 예제</div>
+  <div class="sec-sub">바로 복사해서 쓸 수 있는 패턴들 — 실무에서 가장 자주 등장하는 상황 위주입니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>Express로 REST API 만들기</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>설치</span><button class="copy">복사</button></div>
+<pre>npm install express</pre></div>
+      <div class="tpl"><div class="tpl-head"><span>app.js — 기본 REST API</span><button class="copy">복사</button></div>
+<pre>const express = require('express');
+const app = express();
+
+app.use(express.json());  // JSON 바디 파싱
+
+const items = [{ id: 1, name: '사과' }, { id: 2, name: '바나나' }];
+
+// GET 목록
+app.get('/items', (req, res) => {
+  res.json(items);
+});
+
+// GET 단건
+app.get('/items/:id', (req, res) => {
+  const item = items.find(i => i.id === Number(req.params.id));
+  if (!item) return res.status(404).json({ error: 'Not found' });
+  res.json(item);
+});
+
+// POST 생성
+app.post('/items', (req, res) => {
+  const item = { id: items.length + 1, ...req.body };
+  items.push(item);
+  res.status(201).json(item);
+});
+
+// DELETE 삭제
+app.delete('/items/:id', (req, res) => {
+  const idx = items.findIndex(i => i.id === Number(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  items.splice(idx, 1);
+  res.status(204).end();
+});
+
+app.listen(3000, () => console.log('http://localhost:3000'));</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📂</span>디렉터리 파일 목록 읽기</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>fs/promises + path</span><button class="copy">복사</button></div>
+<pre>const { readdir, stat } = require('fs/promises');
+const path = require('path');
+
+async function listFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      console.log(`[DIR]  ${full}`);
+    } else {
+      const { size } = await stat(full);
+      console.log(`[FILE] ${full} (${size}B)`);
+    }
+  }
+}
+
+listFiles('./src').catch(console.error);</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌊</span>외부 API 호출 (fetch)</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>내장 fetch (Node v18+)</span><button class="copy">복사</button></div>
+<pre>// Node v18부터 fetch가 내장되어 npm 설치 불필요
+async function getUser(id) {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+const user = await getUser(1);
+console.log(user.name);</pre></div>
+      <div class="note">Node v17 이하에서는 <code>node-fetch</code> 또는 <code>axios</code> 패키지를 설치해야 합니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📝</span>환경 변수 관리 (.env)</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>.env 파일</span><button class="copy">복사</button></div>
+<pre>PORT=3000
+DB_URL=mongodb://localhost:27017/mydb
+SECRET_KEY=super_secret_value</pre></div>
+      <div class="tpl"><div class="tpl-head"><span>로드 방법 (Node v20.6+는 내장)</span><button class="copy">복사</button></div>
+<pre># Node v20.6+ — npm 패키지 불필요
+node --env-file=.env app.js
+
+# 또는 dotenv 패키지 (하위 버전)
+# npm install dotenv
+require('dotenv').config();
+console.log(process.env.PORT);  // '3000'</pre></div>
+      <div class="bad"><b>.env 파일은 절대 git에 올리지 마세요.</b> <code>.gitignore</code>에 추가하고, <code>.env.example</code>에 변수 이름만 남겨 팀원과 공유합니다.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🧪</span>내장 테스트 러너 (Node v18+)</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>test/math.test.js</span><button class="copy">복사</button></div>
+<pre>const { test } = require('node:test');
+const assert = require('assert');
+
+function add(a, b) { return a + b; }
+
+test('더하기 기본', () => {
+  assert.strictEqual(add(1, 2), 3);
+});
+
+test('음수 더하기', () => {
+  assert.strictEqual(add(-1, 1), 0);
+});</pre></div>
+      <div class="tpl"><div class="tpl-head"><span>실행</span><button class="copy">복사</button></div>
+<pre>node --test           # 현재 디렉터리 *.test.js 전체 실행
+node --test test/math.test.js</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔁</span>파일 변경 감지 자동 재시작</div>
+    <div class="card-body">
+      <div class="tpl"><div class="tpl-head"><span>방법 비교</span><button class="copy">복사</button></div>
+<pre># Node v18+ 내장 watch 모드 (실험적 → v21에서 안정화)
+node --watch app.js
+
+# nodemon — 가장 많이 쓰이는 방식
+npm install -D nodemon
+npx nodemon app.js
+
+# package.json scripts에 등록
+# "dev": "nodemon src/app.js"</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 생태계 ══════════════════ -->
+<section class="panel" id="panel-ecosystem">
+  <div class="sec-title">🌍 Node.js 생태계</div>
+  <div class="sec-sub">npm에 올라온 200만 개 이상의 패키지 중, 실무에서 검증된 것들을 카테고리별로 정리했습니다.</div>
+
+  <div class="grid2">
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🌐</span>웹 프레임워크</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">Express</td><td class="e-desc">가장 오래되고 널리 쓰임. 미들웨어 생태계 풍부. 미니멀리스트.</td></tr>
+          <tr><td class="e-name">Fastify</td><td class="e-desc">Express보다 빠름. JSON 스키마 기반 검증 내장. 현재 추세.</td></tr>
+          <tr><td class="e-name">Koa</td><td class="e-desc">Express 팀이 만든 후속작. <code>async/await</code> 기반 미들웨어.</td></tr>
+          <tr><td class="e-name">Hono</td><td class="e-desc">초경량·초고속. Edge 런타임(Cloudflare Workers)도 지원.</td></tr>
+          <tr><td class="e-name">NestJS</td><td class="e-desc">Angular 스타일 데코레이터 기반. 대규모 백엔드에 적합. TypeScript 우선.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🗄️</span>데이터베이스 연동</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">Prisma</td><td class="e-desc">타입 안전 ORM. 스키마 파일로 DB 정의. PostgreSQL·MySQL·SQLite·MongoDB.</td></tr>
+          <tr><td class="e-name">Drizzle</td><td class="e-desc">경량 타입 안전 ORM. SQL에 가까운 문법. 빠름.</td></tr>
+          <tr><td class="e-name">mongoose</td><td class="e-desc">MongoDB ODM. 스키마·검증·훅 내장.</td></tr>
+          <tr><td class="e-name">pg / mysql2</td><td class="e-desc">PostgreSQL·MySQL 로우레벨 드라이버. ORM 없이 SQL 직접.</td></tr>
+          <tr><td class="e-name">redis</td><td class="e-desc">Redis 클라이언트. 캐싱·세션·큐에 사용.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔒</span>인증 · 보안</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">jsonwebtoken</td><td class="e-desc">JWT 생성·검증. API 인증 표준.</td></tr>
+          <tr><td class="e-name">bcrypt</td><td class="e-desc">비밀번호 해싱. 솔트 자동 포함.</td></tr>
+          <tr><td class="e-name">passport</td><td class="e-desc">소셜 로그인(Google·GitHub)·세션 인증 전략 모음.</td></tr>
+          <tr><td class="e-name">helmet</td><td class="e-desc">HTTP 헤더 보안 설정 자동화 (Express 미들웨어).</td></tr>
+          <tr><td class="e-name">express-rate-limit</td><td class="e-desc">API 속도 제한 (DDoS 완화).</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">✅</span>유효성 검사 · 타입</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">zod</td><td class="e-desc">TypeScript-first 스키마 검증. 런타임 타입 체크의 표준.</td></tr>
+          <tr><td class="e-name">joi</td><td class="e-desc">오래된 검증 라이브러리. 풍부한 기능.</td></tr>
+          <tr><td class="e-name">TypeScript</td><td class="e-desc">JS에 정적 타입 추가. 대규모 프로젝트 필수. <code>tsc</code>로 JS로 컴파일.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🧪</span>테스트</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">Jest</td><td class="e-desc">가장 많이 쓰이는 테스트 프레임워크. 목킹·커버리지 내장.</td></tr>
+          <tr><td class="e-name">Vitest</td><td class="e-desc">Vite 기반. Jest 호환 API. 빠름. 최근 급부상.</td></tr>
+          <tr><td class="e-name">node:test</td><td class="e-desc">Node.js v18+ 내장. 외부 패키지 불필요.</td></tr>
+          <tr><td class="e-name">supertest</td><td class="e-desc">HTTP 서버 통합 테스트. Express와 궁합 좋음.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🛠️</span>CLI 도구 개발</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">commander</td><td class="e-desc">CLI 인수 파싱. 서브커맨드·옵션 정의.</td></tr>
+          <tr><td class="e-name">chalk</td><td class="e-desc">터미널 색상 출력.</td></tr>
+          <tr><td class="e-name">inquirer</td><td class="e-desc">인터랙티브 프롬프트 (선택지, 입력, 확인).</td></tr>
+          <tr><td class="e-name">ora</td><td class="e-desc">스피너 (로딩 애니메이션).</td></tr>
+          <tr><td class="e-name">glob</td><td class="e-desc">패턴으로 파일 경로 검색. <code>**/*.js</code> 등.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">📡</span>실시간 · 메시징</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">socket.io</td><td class="e-desc">WebSocket 기반 실시간 통신. 채팅·알림·게임에 사용.</td></tr>
+          <tr><td class="e-name">ws</td><td class="e-desc">경량 WebSocket 라이브러리. socket.io 없이 쓰고 싶을 때.</td></tr>
+          <tr><td class="e-name">bull / bullmq</td><td class="e-desc">Redis 기반 작업 큐. 이메일 발송·이미지 처리 비동기 처리.</td></tr>
+          <tr><td class="e-name">mqtt</td><td class="e-desc">IoT용 경량 메시지 프로토콜 클라이언트.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="ico">🔧</span>유틸리티 · 기타</div>
+      <div class="card-body">
+        <table class="e-table">
+          <tr><td class="e-name">lodash</td><td class="e-desc">배열·객체·문자열 유틸 함수 모음. 현재는 내장 JS로 대체 가능한 것도 많음.</td></tr>
+          <tr><td class="e-name">dayjs / date-fns</td><td class="e-desc">날짜 처리. moment.js의 경량 대안.</td></tr>
+          <tr><td class="e-name">axios</td><td class="e-desc">HTTP 클라이언트. Node v18 이전이나 요청 인터셉터 필요 시.</td></tr>
+          <tr><td class="e-name">dotenv</td><td class="e-desc">.env 파일 로드. Node v20 미만에서 필요.</td></tr>
+          <tr><td class="e-name">sharp</td><td class="e-desc">이미지 리사이징·변환. libvips 바인딩으로 빠름.</td></tr>
+          <tr><td class="e-name">winston / pino</td><td class="e-desc">구조적 로깅. pino가 더 빠름. 프로덕션 서버 필수.</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🆚</span>Node.js vs 경쟁자들</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:120px;">런타임</th><th>특징</th><th>선택 기준</th></tr>
+        <tr><td class="e-name">Node.js</td><td class="e-desc">가장 큰 생태계. 성숙한 LTS. 압도적 npm 패키지.</td><td class="e-desc">기본 선택. 레거시 호환 필요 시.</td></tr>
+        <tr><td class="e-name">Deno</td><td class="e-desc">Ryan Dahl이 Node.js 반성하며 만든 후속작. 보안 모델, TypeScript 내장, npm 호환.</td><td class="e-desc">보안 중시, 신규 프로젝트.</td></tr>
+        <tr><td class="e-name">Bun</td><td class="e-desc">Zig 기반. Node.js 대비 3~10배 빠른 실행 속도. 패키지 관리자 내장.</td><td class="e-desc">성능 극한 최적화, 빌드 도구.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot">
+    참고 자료 —
+    <a href="https://nodejs.org/ko/docs" target="_blank" rel="noopener">Node.js 공식 문서</a> ·
+    <a href="https://nodejs.org/en/learn/getting-started/introduction-to-nodejs" target="_blank" rel="noopener">Node.js 공식 학습 가이드</a> ·
+    <a href="https://npmjs.com" target="_blank" rel="noopener">npmjs.com</a> ·
+    <a href="https://roadmap.sh/nodejs" target="_blank" rel="noopener">Node.js 로드맵 (roadmap.sh)</a>
+  </div>
+</section>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</main>
+</div>
+
+<script>
+// ── 탭 전환 ──────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  buildSidebar();
+  document.getElementById('no-result').style.display = 'none';
+  document.getElementById('search').value = '';
+}
+
+// ── 사이드바 생성 ─────────────────────────
+function buildSidebar() {
+  const panel = document.querySelector('.panel.active');
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  if (!panel) return;
+  panel.querySelectorAll('.card').forEach(card => {
+    const head = card.querySelector('.card-head');
+    if (!head) return;
+    const text = head.textContent.trim().replace(/\s+/g, ' ');
+    const btn = document.createElement('button');
+    btn.className = 'sb-item';
+    btn.textContent = text.length > 28 ? text.slice(0, 28) + '…' : text;
+    btn.onclick = () => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sb.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    sb.appendChild(btn);
+  });
+}
+buildSidebar();
+
+// ── 검색 ─────────────────────────────────
+document.getElementById('search').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  const panel = document.querySelector('.panel.active');
+  if (!panel) return;
+  const cards = panel.querySelectorAll('.card');
+  let visible = 0;
+  cards.forEach(card => {
+    const match = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('no-result').style.display = (q && visible === 0) ? 'block' : 'none';
+});
+
+// ── 복사 버튼 ─────────────────────────────
+document.addEventListener('click', e => {
+  if (!e.target.matches('.copy')) return;
+  const pre = e.target.closest('.tpl').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+    e.target.textContent = '복사됨';
+    e.target.classList.add('done');
+    setTimeout(() => { e.target.textContent = '복사'; e.target.classList.remove('done'); }, 1500);
+  });
+});
+
+// ── chip 클릭 복사 ────────────────────────
+document.addEventListener('click', e => {
+  if (!e.target.matches('.chip')) return;
+  navigator.clipboard.writeText(e.target.textContent.trim());
+});
+</script>
+</body>
+</html>

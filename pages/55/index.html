@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인크레디믹스 — 뮤직 믹서</title>
+<style>
+:root{
+  --bg:#07090f;--s1:#0c1018;--s2:#12181f;--s3:#181f28;--s4:#1e2830;
+  --bd:#1d2b38;--bd2:#253544;
+  --txt:#ccdde8;--txt2:#6a9ab5;--txt3:#3a5a72;
+  --beat:#ff3d55;--bass:#9a3fff;--melo:#18b8ff;--efx:#ff8c1a;--vox:#1af09a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;overflow:hidden;height:100vh;user-select:none;}
+
+/* HEADER */
+.hdr{background:var(--s1);border-bottom:2px solid var(--melo);padding:0 16px;height:54px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.logo{font-size:17px;font-weight:800;color:var(--melo);white-space:nowrap;letter-spacing:-.5px;}
+.logo em{opacity:.6;font-style:normal;font-weight:400;font-size:12px;margin-left:4px;}
+
+.ctrl-group{display:flex;align-items:center;gap:6px;}
+.ctrl-label{color:var(--txt3);font-size:10px;font-weight:700;letter-spacing:.5px;}
+.ctrl-val{color:var(--melo);font-weight:800;font-size:15px;min-width:38px;}
+
+input[type=range].sl{-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bd2);outline:none;cursor:pointer;}
+input[type=range].sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--melo);cursor:pointer;border:2px solid var(--s1);}
+input[type=range].sl:active::-webkit-slider-thumb{background:#fff;}
+
+.sep{width:1px;height:28px;background:var(--bd2);flex-shrink:0;}
+
+.btn{padding:6px 14px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:.12s;outline:none;}
+.btn-play{background:var(--melo);color:#000;min-width:80px;}
+.btn-play:hover{background:#44ccff;}
+.btn-play.on{background:var(--beat);color:#fff;}
+.btn-sm{background:var(--s3);color:var(--txt2);border:1px solid var(--bd2);font-size:11px;padding:5px 10px;}
+.btn-sm:hover{border-color:var(--melo);color:var(--melo);}
+
+.beat-dot{width:8px;height:8px;border-radius:50%;background:var(--txt3);flex-shrink:0;transition:.05s;}
+.beat-dot.on{background:var(--melo);box-shadow:0 0 6px var(--melo);}
+
+canvas#vis{width:110px;height:34px;border-radius:4px;background:var(--s2);flex-shrink:0;margin-left:auto;}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 54px);}
+
+/* PALETTE */
+.pal{width:206px;min-width:206px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:8px 8px 6px;border-bottom:1px solid var(--bd);}
+.cat-tab{padding:4px 8px;border-radius:4px;border:1px solid transparent;font-size:11px;font-weight:700;cursor:pointer;background:transparent;font-family:inherit;color:var(--txt3);transition:.1s;}
+.cat-tab:hover{background:var(--s3);color:var(--txt);}
+.cat-tab.on{border-color:currentColor;}
+
+.snd-list{flex:1;overflow-y:auto;padding:5px;}
+.snd-list::-webkit-scrollbar{width:3px;}
+.snd-list::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+
+.snd-btn{display:flex;align-items:center;gap:7px;width:100%;padding:6px 9px;border-radius:5px;border:1px solid transparent;background:transparent;cursor:pointer;font-family:inherit;color:var(--txt2);font-size:12px;text-align:left;transition:.1s;margin-bottom:1px;}
+.snd-btn:hover{background:var(--s3);color:var(--txt);border-color:var(--bd);}
+.snd-btn.in{background:var(--s2);border-color:var(--bd);}
+.snd-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.snd-ico{font-size:13px;flex-shrink:0;}
+.snd-lbl{flex:1;line-height:1.3;}
+.snd-plus{color:var(--txt3);font-size:13px;font-weight:700;}
+.snd-btn.in .snd-plus{color:var(--beat);font-weight:900;}
+.snd-btn.in .snd-plus::after{content:'−';}
+.snd-btn:not(.in) .snd-plus::after{content:'＋';}
+
+/* STAGE */
+.stage{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* STEP BAR */
+.step-bar{background:var(--s2);border-bottom:1px solid var(--bd);padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.step-lbl{color:var(--txt3);font-size:10px;font-weight:700;min-width:30px;}
+.steps16{display:flex;gap:3px;}
+.step16{width:17px;height:17px;border-radius:3px;background:var(--s4);border:1px solid var(--bd);transition:.04s;}
+.step16.A{background:#fff!important;box-shadow:0 0 7px 2px rgba(255,255,255,.7);border-color:#fff!important;}
+
+.preset-row{margin-left:auto;display:flex;gap:5px;align-items:center;}
+.pslbl{color:var(--txt3);font-size:10px;font-weight:700;}
+
+/* SLOTS */
+.slots-outer{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:7px;}
+.slots-outer::-webkit-scrollbar{width:4px;}
+.slots-outer::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+
+/* EMPTY */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--txt3);text-align:center;gap:10px;pointer-events:none;}
+.empty-ico{font-size:44px;opacity:.35;}
+.empty-t{font-size:14px;}
+.empty-s{font-size:12px;opacity:.7;}
+
+/* SLOT CARD */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:7px;padding:8px 10px;display:flex;align-items:center;gap:8px;transition:border-color .08s,box-shadow .08s;}
+.card:hover{border-color:var(--bd2);}
+.card.fire{animation:cfx .12s ease;}
+@keyframes cfx{0%{box-shadow:0 0 0 0 currentColor;}60%{box-shadow:0 0 14px 3px currentColor;}100%{box-shadow:0 0 0 0 currentColor;}}
+
+.c-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.c-info{display:flex;flex-direction:column;min-width:96px;}
+.c-name{font-size:11px;font-weight:700;line-height:1.3;}
+.c-cat{font-size:9px;color:var(--txt3);font-weight:600;letter-spacing:.4px;}
+
+.c-steps{display:flex;gap:2px;flex:1;min-width:0;}
+.c-step{flex:1;height:24px;border-radius:3px;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:.1s;position:relative;}
+.c-step:nth-child(4n+1){margin-left:2px;}
+.c-step:first-child{margin-left:0;}
+.c-step.ON{border-color:transparent;}
+.c-step.CUR{outline:2px solid rgba(255,255,255,.75);outline-offset:-2px;}
+.c-step.ON.CUR{filter:brightness(1.6);}
+
+.c-vol{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.c-vollbl{font-size:9px;color:var(--txt3);}
+
+.c-mute{width:22px;height:22px;border-radius:4px;background:transparent;border:1px solid var(--bd2);color:var(--txt3);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.1s;font-family:inherit;}
+.c-mute:hover{border-color:var(--vox);color:var(--vox);}
+.c-mute.M{background:rgba(255,61,85,.15);border-color:var(--beat);color:var(--beat);}
+
+.c-del{width:22px;height:22px;border-radius:50%;background:rgba(255,61,85,.1);border:1px solid rgba(255,61,85,.2);color:var(--beat);cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.1s;font-family:inherit;}
+.c-del:hover{background:rgba(255,61,85,.25);}
+
+/* INFO BAR */
+.info-bar{background:var(--s2);border-top:1px solid var(--bd);padding:5px 14px;font-size:10px;color:var(--txt3);display:flex;gap:16px;flex-shrink:0;}
+.info-bar span b{color:var(--melo);}
+
+@media(max-width:680px){
+  .pal{width:150px;min-width:150px;}
+  .c-cat,.c-vol,.c-mute{display:none;}
+  .c-info{min-width:70px;}
+  canvas#vis{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">🎵 인크레디믹스<em>Web Audio Mixer</em></div>
+
+  <div class="sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">BPM</span>
+    <span class="ctrl-val" id="bpmVal">120</span>
+    <input type="range" class="sl" id="bpmSl" min="60" max="200" value="120" style="width:80px" oninput="setBpm(this.value)">
+  </div>
+
+  <div class="sep"></div>
+
+  <button class="btn btn-play" id="playBtn" onclick="togglePlay()">▶ 재생</button>
+  <div class="beat-dot" id="beatDot"></div>
+
+  <div class="sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">볼륨</span>
+    <input type="range" class="sl" id="volSl" min="0" max="100" value="75" style="width:70px" oninput="setMasterVol(this.value)">
+  </div>
+
+  <canvas id="vis"></canvas>
+</header>
+
+<div class="layout">
+  <aside class="pal">
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="snd-list" id="sndList"></div>
+  </aside>
+
+  <div class="stage">
+    <div class="step-bar">
+      <span class="step-lbl">스텝</span>
+      <div class="steps16" id="steps16"></div>
+      <div class="preset-row">
+        <span class="pslbl">프리셋:</span>
+        <button class="btn btn-sm" onclick="preset('hiphop')">힙합</button>
+        <button class="btn btn-sm" onclick="preset('edm')">EDM</button>
+        <button class="btn btn-sm" onclick="preset('jazz')">재즈</button>
+        <button class="btn btn-sm" onclick="preset('latin')">라틴</button>
+        <button class="btn btn-sm" onclick="preset('trap')">트랩</button>
+        <div class="sep" style="margin:0 2px;"></div>
+        <button class="btn btn-sm" onclick="clearAll()">초기화</button>
+      </div>
+    </div>
+
+    <div class="slots-outer" id="slotsOuter">
+      <div class="empty" id="emptyState">
+        <div class="empty-ico">🎛️</div>
+        <div class="empty-t">왼쪽에서 소리를 추가하세요</div>
+        <div class="empty-s">소리는 원하는 만큼 추가할 수 있습니다<br>각 슬롯의 스텝을 클릭해 패턴을 편집하세요</div>
+      </div>
+    </div>
+
+    <div class="info-bar">
+      <span><b id="infoSlots">0</b>개 활성 / 최대 제한 없음</span>
+      <span>스텝: <b id="infoStep">-</b> / 16</span>
+      <span>소리 총 <b>42</b>종</span>
+      <span>클릭: 추가·제거 | 스텝 클릭: 패턴 편집 | M: 뮤트</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════
+const Eng = {
+  ctx:null, master:null, comp:null, ana:null,
+  bpm:120, vol:.75,
+  playing:false, step:0, nextT:0,
+  tid:null, noiseBuf:null,
+  AHEAD:.12, LOOK:22,
+
+  init(){
+    if(this.ctx)return;
+    this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+    this.master=this.ctx.createGain(); this.master.gain.value=this.vol;
+    this.comp=this.ctx.createDynamicsCompressor();
+    this.comp.threshold.value=-6; this.comp.ratio.value=3; this.comp.knee.value=10;
+    this.ana=this.ctx.createAnalyser(); this.ana.fftSize=256;
+    this.master.connect(this.comp);
+    this.comp.connect(this.ana);
+    this.ana.connect(this.ctx.destination);
+    this.noiseBuf=this._mkNoise();
+  },
+  _mkNoise(){
+    const len=this.ctx.sampleRate*2;
+    const b=this.ctx.createBuffer(1,len,this.ctx.sampleRate);
+    const d=b.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+    return b;
+  },
+  sps(){ return(60/this.bpm)/4; },
+  _sched(){
+    while(this.nextT<this.ctx.currentTime+this.AHEAD){
+      this._fire(this.step,this.nextT);
+      this.nextT+=this.sps();
+      this.step=(this.step+1)%16;
+    }
+    this.tid=setTimeout(()=>this._sched(),this.LOOK);
+  },
+  _fire(step,time){
+    slots.forEach(sl=>{
+      if(!sl.mute&&sl.pattern[step]){
+        const s=SND[sl.id];
+        if(s)s.fn(time,this.ctx,this.master,this.noiseBuf,sl.vol,step);
+      }
+    });
+    const d=Math.max(0,(time-this.ctx.currentTime)*1000);
+    setTimeout(()=>onStep(step),d);
+  },
+  start(){
+    this.init();
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    this.playing=true; this.step=0; this.nextT=this.ctx.currentTime+.04;
+    this._sched(); startVis();
+  },
+  stop(){
+    this.playing=false; clearTimeout(this.tid); onStep(-1); stopVis();
+  }
+};
+
+// ═══════════════════════════════════════════════
+// SYNTH HELPERS
+// ═══════════════════════════════════════════════
+function mkOsc(ctx,type,freq){const o=ctx.createOscillator();o.type=type;o.frequency.value=freq;return o;}
+function mkGain(ctx,v){const g=ctx.createGain();g.gain.value=v;return g;}
+function mkFilt(ctx,type,freq,Q=1){const f=ctx.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=Q;return f;}
+
+function sweep(t,ctx,dest,type,f1,f2,vol,dur,swpT){
+  const o=mkOsc(ctx,type,f1),g=mkGain(ctx,0);
+  o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(f2,.01),t+swpT);
+  g.gain.setValueAtTime(vol,t);
+  g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g);g.connect(dest);
+  o.start(t);o.stop(t+dur+.02);
+}
+function poke(t,ctx,dest,type,freq,vol,atk,dec){
+  const o=mkOsc(ctx,type,freq),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(vol,t+atk);
+  g.gain.exponentialRampToValueAtTime(.001,t+atk+dec);
+  o.connect(g);g.connect(dest);
+  o.start(t);o.stop(t+atk+dec+.01);
+}
+function noise(t,ctx,dest,nb,hp,lp,vol,dec){
+  const s=ctx.createBufferSource();s.buffer=nb;
+  const fh=mkFilt(ctx,'highpass',hp),fl=mkFilt(ctx,'lowpass',lp),g=mkGain(ctx,vol);
+  g.gain.exponentialRampToValueAtTime(.001,t+dec);
+  s.connect(fh);fh.connect(fl);fl.connect(g);g.connect(dest);
+  s.start(t);s.stop(t+dec+.01);
+}
+
+// ═══════════════════════════════════════════════
+// SOUND LIBRARY — 42 sounds
+// ═══════════════════════════════════════════════
+const SND={
+/* ───── BEAT ───── */
+kick_hard:{name:'킥 (하드)',cat:'beat',color:'#ff3d55',ico:'🔴',
+def:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',140,28,1.3*v,.45,.1);
+  noise(t,ctx,d,nb,20,180,.25*v,.06);
+}},
+kick_soft:{name:'킥 (소프트)',cat:'beat',color:'#ff6677',ico:'🔴',
+def:[1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',100,38,1.0*v,.55,.14);
+  noise(t,ctx,d,nb,20,120,.12*v,.08);
+}},
+kick_808:{name:'808 킥',cat:'beat',color:'#ff1133',ico:'🔴',
+def:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',60,20,1.5*v,.9,.08);
+}},
+snare:{name:'스네어',cat:'beat',color:'#ff8899',ico:'💥',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,1500,8000,.8*v,.13);
+  poke(t,ctx,d,'triangle',200,.35*v,.001,.09);
+}},
+snare_ghost:{name:'고스트 스네어',cat:'beat',color:'#ffaabb',ico:'👻',
+def:[0,0,1,0,0,1,0,0,0,0,1,0,0,1,0,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,1000,6000,.22*v,.08);
+  poke(t,ctx,d,'triangle',180,.12*v,.001,.06);
+}},
+hihat_cl:{name:'하이햇 (클로즈)',cat:'beat',color:'#ffaa22',ico:'🎩',
+def:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,8000,18000,.38*v,.04);
+}},
+hihat_op:{name:'하이햇 (오픈)',cat:'beat',color:'#ffcc44',ico:'🎩',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,6500,16000,.32*v,.26);
+}},
+clap:{name:'클랩',cat:'beat',color:'#ffe055',ico:'👏',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,1200,9000,.55*v,.08);
+  noise(t+.009,ctx,d,nb,1200,9000,.45*v,.1);
+  noise(t+.018,ctx,d,nb,1200,9000,.3*v,.12);
+}},
+rimshot:{name:'림샷',cat:'beat',color:'#ffdd33',ico:'🎯',
+def:[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+fn(t,ctx,d,nb,v=1){
+  poke(t,ctx,d,'square',400,.38*v,.001,.04);
+  noise(t,ctx,d,nb,500,3000,.28*v,.04);
+}},
+tom_hi:{name:'탐 (하이)',cat:'beat',color:'#ee4466',ico:'🥁',
+def:[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',280,110,.85*v,.32,.07);
+  noise(t,ctx,d,nb,200,2500,.18*v,.05);
+}},
+conga:{name:'콩가',cat:'beat',color:'#cc3355',ico:'🪘',
+def:[0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',420,200,.55*v,.22,.05);
+}},
+cowbell:{name:'카우벨',cat:'beat',color:'#aa1144',ico:'🔔',
+def:[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  poke(t,ctx,d,'square',562,.32*v,.001,.18);
+  poke(t,ctx,d,'square',845,.18*v,.001,.15);
+}},
+
+/* ───── BASS ───── */
+bass_sub:{name:'서브 베이스',cat:'bass',color:'#9a3fff',ico:'〰️',
+def:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  poke(t,ctx,d,'sine',55,1.1*v,.01,.5);
+}},
+bass_deep:{name:'딥 베이스',cat:'bass',color:'#aa55ff',ico:'🔊',
+def:[1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',65),f=mkFilt(ctx,'lowpass',200,2),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(.85*v,t+.02);
+  g.gain.exponentialRampToValueAtTime(.001,t+.32);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.34);
+}},
+bass_walk:{name:'워킹 베이스',cat:'bass',color:'#bb66ff',ico:'🚶',
+def:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[65,73,82,87,73,82,87,98];
+  poke(t,ctx,d,'triangle',n[step%8],.75*v,.01,.18);
+}},
+bass_funk:{name:'펑크 베이스',cat:'bass',color:'#cc77ff',ico:'🎸',
+def:[1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',87),f=mkFilt(ctx,'lowpass',2500,3),g=mkGain(ctx,.001);
+  f.frequency.setValueAtTime(2000,t);
+  f.frequency.exponentialRampToValueAtTime(300,t+.08);
+  g.gain.linearRampToValueAtTime(.75*v,t+.005);
+  g.gain.exponentialRampToValueAtTime(.001,t+.14);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.16);
+}},
+bass_synth:{name:'신스 베이스',cat:'bass',color:'#dd88ff',ico:'🎹',
+def:[1,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'square',110),f=mkFilt(ctx,'lowpass',3500,4),g=mkGain(ctx,.001);
+  f.frequency.setValueAtTime(3500,t);
+  f.frequency.exponentialRampToValueAtTime(500,t+.18);
+  g.gain.linearRampToValueAtTime(.65*v,t+.01);
+  g.gain.exponentialRampToValueAtTime(.001,t+.38);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.4);
+}},
+bass_drop:{name:'베이스 드롭',cat:'bass',color:'#6622ee',ico:'⬇️',
+def:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',180,28,1.2*v,.6,.55);
+}},
+bass_pulse:{name:'베이스 펄스',cat:'bass',color:'#7733ff',ico:'💜',
+def:[1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0],
+fn(t,ctx,d,nb,v=1){
+  poke(t,ctx,d,'sine',82,.85*v,.005,.1);
+}},
+bass_acid:{name:'애시드 베이스',cat:'bass',color:'#8844ee',ico:'🧪',
+def:[1,0,0,1,1,0,0,0,1,0,0,1,1,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',110),f=mkFilt(ctx,'lowpass',4500,12),g=mkGain(ctx,.001);
+  f.frequency.setValueAtTime(4500,t);
+  f.frequency.exponentialRampToValueAtTime(280,t+.12);
+  g.gain.linearRampToValueAtTime(.65*v,t+.01);
+  g.gain.exponentialRampToValueAtTime(.001,t+.22);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.24);
+}},
+
+/* ───── MELODY ───── */
+lead_saw:{name:'리드 (쏘)',cat:'melo',color:'#18b8ff',ico:'🔵',
+def:[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[523,659,784,880,1047,784,659,523];
+  const freq=n[step%8];
+  const o1=mkOsc(ctx,'sawtooth',freq),o2=mkOsc(ctx,'sawtooth',freq*1.006),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(.28*v,t+.008);
+  g.gain.exponentialRampToValueAtTime(.001,t+.28);
+  [o1,o2].forEach(o=>{o.connect(g);o.start(t);o.stop(t+.3);});
+  g.connect(d);
+}},
+lead_sq:{name:'리드 (스퀘어)',cat:'melo',color:'#33ccff',ico:'🔷',
+def:[1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[440,523,659,784,880,659,523,440];
+  const o=mkOsc(ctx,'square',n[step%8]),f=mkFilt(ctx,'lowpass',2000,1),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(.22*v,t+.01);
+  g.gain.exponentialRampToValueAtTime(.001,t+.3);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.32);
+}},
+pad:{name:'패드',cat:'melo',color:'#22aaee',ico:'🌊',
+def:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  [261,329,392,523].forEach((f,i)=>{
+    const o=mkOsc(ctx,'sine',f*(1+i*.002)),g=mkGain(ctx,0);
+    g.gain.linearRampToValueAtTime(.09*v,t+.5);
+    g.gain.setValueAtTime(.09*v,t+1.5);
+    g.gain.linearRampToValueAtTime(.001,t+2.1);
+    o.connect(g);g.connect(d);o.start(t);o.stop(t+2.2);
+  });
+}},
+arp:{name:'아르페지오',cat:'melo',color:'#44ddff',ico:'🎹',
+def:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[523,659,784,1047,880,784,659,523];
+  poke(t,ctx,d,'square',n[step%8],.18*v,.004,.12);
+}},
+piano:{name:'피아노',cat:'melo',color:'#55eeff',ico:'🎹',
+def:[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  [261,329,392].forEach((f,i)=>{
+    const o=mkOsc(ctx,'triangle',f),g=mkGain(ctx,.001);
+    g.gain.linearRampToValueAtTime((.28-i*.07)*v,t+.01);
+    g.gain.exponentialRampToValueAtTime(.001,t+.6+i*.1);
+    o.connect(g);g.connect(d);o.start(t);o.stop(t+.8);
+  });
+}},
+strings:{name:'스트링스',cat:'melo',color:'#1199cc',ico:'🎻',
+def:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  [261,392,523,659].forEach(f=>{
+    const o=mkOsc(ctx,'sawtooth',f);
+    const vib=mkOsc(ctx,'sine',5.5),vg=mkGain(ctx,3.5);
+    vib.connect(vg);vg.connect(o.frequency);
+    const g=mkGain(ctx,0);
+    g.gain.linearRampToValueAtTime(.065*v,t+.35);
+    g.gain.setValueAtTime(.065*v,t+1.5);
+    g.gain.linearRampToValueAtTime(.001,t+2.1);
+    o.connect(g);g.connect(d);
+    vib.start(t);o.start(t);vib.stop(t+2.2);o.stop(t+2.2);
+  });
+}},
+brass:{name:'브라스',cat:'melo',color:'#0099cc',ico:'🎺',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',233),f=mkFilt(ctx,'lowpass',2200,1),g=mkGain(ctx,0);
+  g.gain.linearRampToValueAtTime(.38*v,t+.03);
+  g.gain.setValueAtTime(.28*v,t+.1);
+  g.gain.exponentialRampToValueAtTime(.001,t+.38);
+  o.connect(f);f.connect(g);g.connect(d);o.start(t);o.stop(t+.4);
+}},
+flute:{name:'플루트',cat:'melo',color:'#11ccdd',ico:'🎶',
+def:[1,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[784,880,1047,784,880,698,988,784];
+  const freq=n[step%8];
+  const o=mkOsc(ctx,'sine',freq),g=mkGain(ctx,0);
+  noise(t,ctx,d,nb,5000,14000,.022*v,.3);
+  g.gain.linearRampToValueAtTime(.22*v,t+.05);
+  g.gain.exponentialRampToValueAtTime(.001,t+.38);
+  o.connect(g);g.connect(d);o.start(t);o.stop(t+.4);
+}},
+guitar:{name:'기타',cat:'melo',color:'#0088bb',ico:'🎸',
+def:[1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[196,220,247,261,294,330,196,220];
+  const freq=n[step%8];
+  [1,2,3,4].forEach((h,i)=>{
+    const o=mkOsc(ctx,'triangle',freq*h),g=mkGain(ctx,.001);
+    const vol_=(.22/(h))*v, dec=.7/h;
+    g.gain.linearRampToValueAtTime(vol_,t+.008);
+    g.gain.exponentialRampToValueAtTime(.001,t+dec);
+    o.connect(g);g.connect(d);o.start(t);o.stop(t+dec+.01);
+  });
+  noise(t,ctx,d,nb,200,1200,.08*v,.02);
+}},
+marimba:{name:'마림바',cat:'melo',color:'#0077aa',ico:'🪘',
+def:[1,0,1,0,1,0,0,0,0,1,0,1,0,0,0,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[523,659,784,1047];
+  const freq=n[step%4];
+  [1,4,10].forEach((p,i)=>{
+    const o=mkOsc(ctx,'sine',freq*p),g=mkGain(ctx,.001);
+    const vol_=i===0?.38:i===1?.09:.04;
+    const dec=i===0?.42:i===1?.15:.07;
+    g.gain.linearRampToValueAtTime(vol_*v,t+.005);
+    g.gain.exponentialRampToValueAtTime(.001,t+dec);
+    o.connect(g);g.connect(d);o.start(t);o.stop(t+dec+.01);
+  });
+}},
+bells:{name:'벨',cat:'melo',color:'#0066aa',ico:'🔔',
+def:[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[1047,1319,1568,2093,1319,1047];
+  const freq=n[step%6];
+  [1,2.756,5.404].forEach((r,i)=>{
+    const o=mkOsc(ctx,'sine',freq*r),g=mkGain(ctx,.001);
+    const vol_=i===0?.22:i===1?.1:.05;
+    g.gain.linearRampToValueAtTime(vol_*v,t+.004);
+    g.gain.exponentialRampToValueAtTime(.001,t+1.6-i*.3);
+    o.connect(g);g.connect(d);o.start(t);o.stop(t+1.7);
+  });
+}},
+
+/* ───── EFFECT ───── */
+scratch:{name:'스크래치',cat:'efx',color:'#ff8c1a',ico:'💿',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0],
+fn(t,ctx,d,nb,v=1){
+  const ns=ctx.createBufferSource();ns.buffer=nb;
+  const f=mkFilt(ctx,'bandpass',2800,2.5),g=mkGain(ctx,.55*v);
+  g.gain.linearRampToValueAtTime(0,t+.08);
+  g.gain.linearRampToValueAtTime(.45*v,t+.1);
+  g.gain.exponentialRampToValueAtTime(.001,t+.18);
+  ns.connect(f);f.connect(g);g.connect(d);ns.start(t);ns.stop(t+.2);
+}},
+vinyl:{name:'바이닐 노이즈',cat:'efx',color:'#ff9933',ico:'📀',
+def:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  for(let i=0;i<4;i++){
+    const dt=Math.random()*.1;
+    noise(t+dt,ctx,d,nb,4000,14000,.22*v*Math.random(),.035);
+  }
+}},
+laser:{name:'레이저',cat:'efx',color:'#ffaa44',ico:'⚡',
+def:[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  sweep(t,ctx,d,'sine',1400,70,.55*v,.25,.22);
+}},
+sweep_up:{name:'스윕 업',cat:'efx',color:'#ffbb55',ico:'↗️',
+def:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+fn(t,ctx,d,nb,v=1){
+  const ns=ctx.createBufferSource();ns.buffer=nb;
+  const f=mkFilt(ctx,'bandpass',200,3),g=mkGain(ctx,0);
+  f.frequency.setValueAtTime(200,t);
+  f.frequency.exponentialRampToValueAtTime(9000,t+.5);
+  g.gain.linearRampToValueAtTime(.38*v,t+.3);
+  g.gain.exponentialRampToValueAtTime(.001,t+.52);
+  ns.connect(f);f.connect(g);g.connect(d);ns.start(t);ns.stop(t+.54);
+}},
+glitch:{name:'글리치',cat:'efx',color:'#ffcc66',ico:'👾',
+def:[1,1,0,1,0,1,0,0,1,0,1,0,0,1,1,0],
+fn(t,ctx,d,nb,v=1){
+  const freq=150+Math.random()*2500;
+  poke(t,ctx,d,'square',freq,.28*v,.001,.035);
+  noise(t+.012,ctx,d,nb,freq*.5,freq*4,.18*v,.025);
+}},
+rev_cym:{name:'리버스 심벌',cat:'efx',color:'#ee8800',ico:'🔄',
+def:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+fn(t,ctx,d,nb,v=1){
+  const ns=ctx.createBufferSource();ns.buffer=nb;
+  const f=mkFilt(ctx,'highpass',5000),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(.38*v,t+.42);
+  ns.connect(f);f.connect(g);g.connect(d);ns.start(t);ns.stop(t+.44);
+}},
+
+/* ───── VOICE ───── */
+vox_hey:{name:'"헤이"',cat:'vox',color:'#1af09a',ico:'🗣️',
+def:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',145);
+  const f1=mkFilt(ctx,'bandpass',800,5.5),g1=mkGain(ctx,.001);
+  const f2=mkFilt(ctx,'bandpass',2000,4.5),g2=mkGain(ctx,.001);
+  g1.gain.linearRampToValueAtTime(.28*v,t+.04);
+  g1.gain.exponentialRampToValueAtTime(.001,t+.22);
+  g2.gain.value=.15*v;
+  g2.gain.exponentialRampToValueAtTime(.001,t+.22);
+  o.connect(f1);f1.connect(g1);g1.connect(d);
+  o.connect(f2);f2.connect(g2);g2.connect(d);
+  o.start(t);o.stop(t+.24);
+}},
+vox_yeah:{name:'"예~"',cat:'vox',color:'#33ff99',ico:'🎤',
+def:[0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sawtooth',160);
+  o.frequency.setValueAtTime(175,t);
+  o.frequency.exponentialRampToValueAtTime(138,t+.32);
+  const f1=mkFilt(ctx,'bandpass',700,6),g1=mkGain(ctx,0);
+  const f2=mkFilt(ctx,'bandpass',2200,8),g2=mkGain(ctx,.15*v);
+  g1.gain.linearRampToValueAtTime(.28*v,t+.06);
+  g1.gain.setValueAtTime(.22*v,t+.26);
+  g1.gain.exponentialRampToValueAtTime(.001,t+.42);
+  g2.gain.exponentialRampToValueAtTime(.001,t+.42);
+  o.connect(f1);f1.connect(g1);g1.connect(d);
+  o.connect(f2);f2.connect(g2);g2.connect(d);
+  o.start(t);o.stop(t+.44);
+}},
+scat:{name:'스캣',cat:'vox',color:'#44ffaa',ico:'🎵',
+def:[1,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[220,277,330,220,247,294,330,247];
+  const o=mkOsc(ctx,'sawtooth',n[step%8]),g=mkGain(ctx,.001);
+  g.gain.linearRampToValueAtTime(.18*v,t+.01);
+  g.gain.exponentialRampToValueAtTime(.001,t+.1);
+  o.connect(g);g.connect(d);o.start(t);o.stop(t+.12);
+}},
+breath:{name:'숨소리',cat:'vox',color:'#55ffbb',ico:'💨',
+def:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  noise(t,ctx,d,nb,2000,10000,.22*v,.25);
+  poke(t,ctx,d,'sine',280,.08*v,.05,.2);
+}},
+vox_chop:{name:'보컬 쵸프',cat:'vox',color:'#66ffcc',ico:'✂️',
+def:[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+fn(t,ctx,d,nb,v=1,step=0){
+  const n=[440,523,659,880,1047,880,659,523];
+  poke(t,ctx,d,'sine',n[step%8],.22*v,.002,.07);
+  poke(t,ctx,d,'sine',n[step%8]*3,.07*v,.002,.05);
+}},
+hum:{name:'허밍',cat:'vox',color:'#11ee77',ico:'🎼',
+def:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+fn(t,ctx,d,nb,v=1){
+  const o=mkOsc(ctx,'sine',220);
+  const vib=mkOsc(ctx,'sine',5.2),vg=mkGain(ctx,7);
+  vib.connect(vg);vg.connect(o.frequency);
+  const f=mkFilt(ctx,'bandpass',480,5.5),g=mkGain(ctx,0);
+  g.gain.linearRampToValueAtTime(.18*v,t+.12);
+  g.gain.setValueAtTime(.18*v,t+.75);
+  g.gain.linearRampToValueAtTime(.001,t+1.05);
+  o.connect(f);f.connect(g);g.connect(d);
+  vib.start(t);o.start(t);vib.stop(t+1.1);o.stop(t+1.1);
+}},
+};
+// 총 42종: beat×12, bass×8, melo×10, efx×6, vox×6
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let slots=[];
+let curStep=-1;
+
+const CATS=[
+  {id:'beat',lbl:'비트',color:'#ff3d55'},
+  {id:'bass',lbl:'베이스',color:'#9a3fff'},
+  {id:'melo',lbl:'멜로디',color:'#18b8ff'},
+  {id:'efx',lbl:'이펙트',color:'#ff8c1a'},
+  {id:'vox',lbl:'보이스',color:'#1af09a'},
+];
+let activeCat='beat';
+
+const PRESETS={
+  hiphop:['kick_hard','snare','hihat_cl','hihat_op','bass_deep','lead_saw','vox_hey'],
+  edm:['kick_hard','hihat_cl','hihat_op','clap','bass_synth','arp','pad','sweep_up'],
+  jazz:['kick_soft','snare_ghost','hihat_cl','bass_walk','piano','strings','hum'],
+  latin:['conga','clap','rimshot','bass_sub','bass_funk','marimba','vox_yeah'],
+  trap:['kick_808','snare','hihat_cl','hihat_op','bass_acid','lead_sq','vox_chop'],
+};
+
+// ═══════════════════════════════════════════════
+// UI INIT
+// ═══════════════════════════════════════════════
+function initUI(){
+  const tabs=document.getElementById('catTabs');
+  CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='cat-tab'+(c.id===activeCat?' on':'');
+    b.textContent=c.lbl; b.style.color=c.color;
+    b.onclick=()=>{
+      activeCat=c.id;
+      document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('on'));
+      b.classList.add('on');
+      renderPal();
+    };
+    tabs.appendChild(b);
+  });
+
+  const bar=document.getElementById('steps16');
+  for(let i=0;i<16;i++){
+    const s=document.createElement('div');
+    s.className='step16'; s.id='st'+i; bar.appendChild(s);
+  }
+
+  renderPal(); renderSlots();
+}
+
+function renderPal(){
+  const list=document.getElementById('sndList');
+  list.innerHTML='';
+  Object.entries(SND).filter(([id,s])=>s.cat===activeCat).forEach(([id,s])=>{
+    const inUse=slots.some(sl=>sl.id===id);
+    const b=document.createElement('button');
+    b.className='snd-btn'+(inUse?' in':'');
+    b.innerHTML=`<span class="snd-dot" style="background:${s.color}"></span><span class="snd-ico">${s.ico}</span><span class="snd-lbl">${s.name}</span><span class="snd-plus"></span>`;
+    b.onclick=()=>{ inUse?removeSlot(slots.findIndex(sl=>sl.id===id)):addSlot(id); };
+    list.appendChild(b);
+  });
+}
+
+function renderSlots(){
+  const wrap=document.getElementById('slotsOuter');
+  wrap.querySelectorAll('.card').forEach(c=>c.remove());
+  const empty=document.getElementById('emptyState');
+  empty.style.display=slots.length?'none':'flex';
+  document.getElementById('infoSlots').textContent=slots.length;
+
+  slots.forEach((sl,idx)=>{
+    const s=SND[sl.id];
+    const card=document.createElement('div');
+    card.className='card'; card.id='card'+idx;
+    card.style.borderLeftColor=s.color+'55';
+    card.style.borderLeftWidth='3px';
+    card.style.color=s.color;
+
+    const stepsHTML=sl.pattern.map((on,si)=>`<div class="c-step${on?' ON':''}" id="cs${idx}_${si}" style="${on?'background:'+s.color+'88':''}" onclick="toggleStep(${idx},${si})"></div>`).join('');
+
+    card.innerHTML=`
+      <div class="c-dot" style="background:${s.color}"></div>
+      <div class="c-info">
+        <div class="c-name" style="color:${s.color}">${s.name}</div>
+        <div class="c-cat">${CATS.find(c=>c.id===s.cat).lbl}</div>
+      </div>
+      <div class="c-steps">${stepsHTML}</div>
+      <div class="c-vol">
+        <span class="c-vollbl">VOL</span>
+        <input type="range" class="sl" min="0" max="100" value="${Math.round(sl.vol*100)}" style="width:58px" oninput="slots[${idx}].vol=this.value/100">
+      </div>
+      <button class="c-mute${sl.mute?' M':''}" id="mute${idx}" onclick="toggleMute(${idx})" title="뮤트">M</button>
+      <button class="c-del" onclick="removeSlot(${idx})" title="제거">×</button>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+function addSlot(id){
+  slots.push({id,pattern:[...SND[id].def],vol:1,mute:false});
+  renderSlots(); renderPal();
+}
+function removeSlot(idx){
+  slots.splice(idx,1); renderSlots(); renderPal();
+}
+function toggleStep(idx,si){
+  if(idx>=slots.length)return;
+  const on=!slots[idx].pattern[si];
+  slots[idx].pattern[si]=on?1:0;
+  const el=document.getElementById(`cs${idx}_${si}`);
+  if(!el)return;
+  el.classList.toggle('ON',on);
+  el.style.background=on?SND[slots[idx].id].color+'88':'';
+}
+function toggleMute(idx){
+  slots[idx].mute=!slots[idx].mute;
+  const b=document.getElementById('mute'+idx);
+  if(b)b.classList.toggle('M',slots[idx].mute);
+}
+
+function onStep(step){
+  curStep=step;
+  // beat bar
+  for(let i=0;i<16;i++){
+    const el=document.getElementById('st'+i);
+    if(el)el.classList.toggle('A',i===step);
+  }
+  // beat dot flash
+  const dot=document.getElementById('beatDot');
+  if(step%4===0){dot.classList.add('on');setTimeout(()=>dot.classList.remove('on'),60);}
+
+  // slot step highlight + fire pulse
+  slots.forEach((sl,idx)=>{
+    for(let s=0;s<16;s++){
+      const el=document.getElementById(`cs${idx}_${s}`);
+      if(el)el.classList.toggle('CUR',s===step);
+    }
+    if(step>=0&&sl.pattern[step]&&!sl.mute){
+      const card=document.getElementById('card'+idx);
+      if(card){card.classList.remove('fire');void card.offsetWidth;card.classList.add('fire');}
+    }
+  });
+
+  document.getElementById('infoStep').textContent=step>=0?step+1:'-';
+}
+
+// ═══════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════
+function togglePlay(){
+  if(Eng.playing){
+    Eng.stop();
+    document.getElementById('playBtn').textContent='▶ 재생';
+    document.getElementById('playBtn').classList.remove('on');
+  } else {
+    Eng.start();
+    document.getElementById('playBtn').textContent='⏸ 정지';
+    document.getElementById('playBtn').classList.add('on');
+  }
+}
+function setBpm(v){
+  Eng.bpm=parseInt(v);
+  document.getElementById('bpmVal').textContent=v;
+}
+function setMasterVol(v){
+  Eng.vol=v/100;
+  if(Eng.master)Eng.master.gain.setTargetAtTime(v/100,Eng.ctx?Eng.ctx.currentTime:0,.05);
+}
+function preset(name){
+  slots=[];
+  (PRESETS[name]||[]).forEach(id=>{ if(SND[id])slots.push({id,pattern:[...SND[id].def],vol:1,mute:false}); });
+  renderSlots(); renderPal();
+}
+function clearAll(){
+  if(Eng.playing)togglePlay();
+  slots=[]; renderSlots(); renderPal();
+}
+
+// ═══════════════════════════════════════════════
+// VISUALIZER
+// ═══════════════════════════════════════════════
+let visRaf=null;
+function startVis(){
+  const cv=document.getElementById('vis');
+  const ctx2=cv.getContext('2d');
+  cv.width=110; cv.height=34;
+  function draw(){
+    if(!Eng.ana)return;
+    const data=new Uint8Array(Eng.ana.frequencyBinCount);
+    Eng.ana.getByteFrequencyData(data);
+    ctx2.fillStyle='#0c1018';
+    ctx2.fillRect(0,0,110,34);
+    const bw=110/32;
+    for(let i=0;i<32;i++){
+      const v=data[i*2]/255;
+      const h=v*34;
+      const hue=160+i*2;
+      ctx2.fillStyle=`hsl(${hue},85%,${45+v*30}%)`;
+      ctx2.fillRect(i*bw,34-h,bw-1,h);
+    }
+    visRaf=requestAnimationFrame(draw);
+  }
+  draw();
+}
+function stopVis(){
+  if(visRaf)cancelAnimationFrame(visRaf);
+  const cv=document.getElementById('vis');
+  if(!cv)return;
+  const ctx2=cv.getContext('2d');
+  ctx2.fillStyle='#0c1018';
+  ctx2.fillRect(0,0,110,34);
+}
+
+// ═══════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(e.code==='Space'){e.preventDefault();togglePlay();}
+  if(e.code==='ArrowUp'){const sl=document.getElementById('bpmSl');sl.value=Math.min(200,+sl.value+5);setBpm(sl.value);}
+  if(e.code==='ArrowDown'){const sl=document.getElementById('bpmSl');sl.value=Math.max(60,+sl.value-5);setBpm(sl.value);}
+});
+
+window.addEventListener('load',initUI);
+</script>
+</body>
+</html>

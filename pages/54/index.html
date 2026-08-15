@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>잔혹 동화 & 일반 동화 대백과</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0812;--bg2:#13101c;--bg3:#1a1528;--bg4:#221d35;
+  --border:#2e2748;--border2:#483d6e;
+  --txt:#e8e0f5;--txt2:#a090c0;--txt3:#5a4e7a;
+  --red:#e85060;--red2:#ff7080;--red3:rgba(232,80,96,.12);
+  --pur:#b080f0;--pur2:#d0a0ff;--pur3:rgba(176,128,240,.12);
+  --gold:#e8c060;--gold2:#ffe080;--gold3:rgba(232,192,96,.12);
+  --cyan:#60d0e0;--grn:#70d890;--org:#f09040;
+  --rose:#f07090;--lav:#90a0f0;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#0d0818,#180d28);border-bottom:2px solid var(--red);padding:12px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr h1{font-size:18px;font-weight:700;color:var(--red2);white-space:nowrap;text-shadow:0 0 20px rgba(232,80,96,.4);}
+#search{flex:1;min-width:180px;max-width:360px;padding:6px 12px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;outline:none;}
+#search:focus{border-color:var(--red);}
+#search::placeholder{color:var(--txt3);}
+#cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:3px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 13px;border-radius:5px;border:1px solid transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.active{background:rgba(232,80,96,.15);border-color:rgba(232,80,96,.3);color:var(--red2);}
+
+/* MAIN */
+#main{padding:18px 20px;max-width:1200px;margin:0 auto;}
+.sec{display:none;}.sec.active{display:block;}
+.sec-title{font-size:16px;font-weight:700;color:var(--red2);margin-bottom:4px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);margin-bottom:18px;line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:20px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px;margin-bottom:20px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s;}
+.card:hover{border-color:var(--border2);}
+.card.dark{border-left:3px solid var(--red);}
+.card.light{border-left:3px solid var(--lav);}
+.card.both{border-left:3px solid var(--pur);}
+.card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.card-ico{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px;}
+.card-info{flex:1;}
+.c-title{font-size:15px;font-weight:700;color:var(--gold);line-height:1.3;}
+.c-orig{font-size:11px;color:var(--txt3);margin-top:2px;}
+.c-badges{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0;}
+
+/* BADGE / TAG */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-dark{background:rgba(232,80,96,.18);color:var(--red2);border:1px solid rgba(232,80,96,.3);}
+.b-light{background:rgba(144,160,240,.15);color:var(--lav);border:1px solid rgba(144,160,240,.25);}
+.b-both{background:rgba(176,128,240,.15);color:var(--pur2);border:1px solid rgba(176,128,240,.25);}
+.b-author{background:rgba(232,192,96,.12);color:var(--gold);border:1px solid rgba(232,192,96,.2);}
+.b-country{background:rgba(96,208,224,.12);color:var(--cyan);border:1px solid rgba(96,208,224,.2);}
+.b-role{background:rgba(112,216,144,.12);color:var(--grn);border:1px solid rgba(112,216,144,.2);}
+.b-villain{background:rgba(232,80,96,.12);color:var(--rose);border:1px solid rgba(232,80,96,.2);}
+.b-hero{background:rgba(144,160,240,.12);color:var(--lav);}
+.b-neutral{background:rgba(160,144,192,.1);color:var(--txt2);}
+
+/* ROW TABLE */
+.row{display:grid;grid-template-columns:90px 1fr;gap:4px;font-size:12.5px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.row:last-child{border-bottom:none;}
+.rk{color:var(--txt3);font-weight:600;}
+.rv{color:var(--txt2);}
+.rv b{color:var(--txt);font-weight:600;}
+
+/* STORY BODY */
+.story-body{font-size:12.5px;color:var(--txt2);line-height:1.75;margin-top:8px;}
+.story-body b{color:var(--txt);font-weight:600;}
+.story-body .warn{color:var(--red2);}
+.story-body .orig{color:var(--gold);}
+
+/* COMPARE TABLE */
+.cmp{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;}
+.cmp th{padding:7px 10px;text-align:left;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);font-weight:700;}
+.cmp td{padding:8px 10px;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.04);}
+.cmp tr:last-child td{border-bottom:none;}
+.cmp .c-orig-col{color:var(--red2);}
+.cmp .c-mod-col{color:var(--lav);}
+.cmp .c-label{color:var(--txt3);font-weight:600;width:100px;}
+
+/* SUB SECTION HEADER */
+.sub-hdr{font-size:12px;font-weight:700;color:var(--txt3);margin:20px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.6px;}
+
+/* AUTHOR CARD */
+.author-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.a-name{font-size:15px;font-weight:700;color:var(--pur2);margin-bottom:4px;}
+.a-life{font-size:11px;color:var(--txt3);margin-bottom:8px;}
+.a-works{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+
+/* PLACE CARD */
+.place-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;}
+.p-name{font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:4px;}
+.p-appears{font-size:11px;color:var(--txt3);margin-bottom:6px;}
+
+/* CHARACTER CARD */
+.char-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;}
+.ch-name{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:3px;}
+.ch-story{font-size:11px;color:var(--txt3);margin-bottom:6px;}
+
+/* DARK BOX */
+.dark-box{border-left:3px solid var(--red);background:rgba(232,80,96,.06);padding:8px 12px;border-radius:0 6px 6px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.dark-box b{color:var(--red2);}
+.light-box{border-left:3px solid var(--lav);background:rgba(144,160,240,.06);padding:8px 12px;border-radius:0 6px 6px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.light-box b{color:var(--lav);}
+
+/* NO RESULT */
+#no-result{display:none;color:var(--txt3);text-align:center;padding:60px;font-size:14px;}
+.searchable{transition:.1s;}
+.searchable.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <h1>📖 잔혹 동화 &amp; 일반 동화 대백과</h1>
+  <input id="search" type="text" placeholder="🔍 제목·캐릭터·장소·작가 검색…" oninput="doSearch(this.value)">
+  <span id="cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="sw('stories',this)">📜 스토리 전체</button>
+  <button class="tab" onclick="sw('chars',this)">👤 캐릭터</button>
+  <button class="tab" onclick="sw('places',this)">🏚️ 장소</button>
+  <button class="tab" onclick="sw('compare',this)">⚖️ 원본 vs 현대</button>
+  <button class="tab" onclick="sw('dark',this)">🩸 잔혹 요소 사전</button>
+  <button class="tab" onclick="sw('authors',this)">✍️ 작가·출처</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════ 스토리 전체 ══════════════ -->
+<div id="tab-stories" class="sec active">
+<div class="sec-title">📜 동화 스토리 총정리</div>
+<div class="sec-sub">그림 형제·안데르센·페로·바실레 등 원전부터 현대 버전까지. 🩸 = 잔혹 원본 포함, 🌸 = 일반 동화, 🔀 = 양쪽 존재</div>
+
+<div class="sub-hdr">🇩🇪 그림 형제 (Brüder Grimm)</div>
+<div class="grid">
+
+<div class="card dark searchable" data-s="신데렐라 cinderella 아셴푸텔 그림형제">
+  <div class="card-top">
+    <div class="card-ico">👠</div>
+    <div class="card-info">
+      <div class="c-title">신데렐라 (Aschenputtel)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+        <span class="badge b-country">독일</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 어머니를 잃은 소녀가 계모와 두 의붓언니에게 구박받으며 살다가, 어머니의 무덤에 심은 나뭇가지에서 자란 <b>개암나무</b>와 흰 비둘기의 도움으로 왕자의 무도회에 세 번 나간다. 왕자는 금 신발로 신부를 찾아 나선다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 의붓언니 첫째가 발을 맞추려 <b>발가락을 잘라낸다</b> — 왕자가 신발 속 피를 보고 눈치챔<br>② 둘째 언니는 <b>발뒤꿈치를 잘라낸다</b><br>③ 결혼식 날 <b>비둘기 두 마리가 두 언니의 눈을 쪼아 멀게 만든다</b></div>
+    <b>현대 버전(페로·디즈니):</b> 호박 마차, 요정 대모, 유리 구두(원전은 금 구두). 잔혹 요소 전부 삭제.
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="백설공주 snow white 그림형제 계모">
+  <div class="card-top">
+    <div class="card-ico">🍎</div>
+    <div class="card-info">
+      <div class="c-title">백설공주 (Schneewittchen)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 피부가 눈처럼 희고 입술이 피처럼 붉은 공주. 계모 왕비는 마법 거울이 백설공주를 세상에서 가장 아름답다 하자 공주를 숲에 버리라 명한다. 공주는 일곱 난쟁이 집에 숨지만 계모의 세 번 시도 끝에 독사과로 쓰러진다. 왕자가 관을 운반하다 진동으로 사과가 빠져 깨어난다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 초판(1812)에서 <b>계모는 친어머니</b> — 검열 후 계모로 변경<br>② 왕비가 사냥꾼에게 백설공주의 <b>폐와 간을 가져오라</b>고 명령, 사냥꾼은 멧돼지 것으로 속임<br>③ 계모는 <b>독 빗</b>, <b>조르는 코르셋</b>도 시도<br>④ 결혼식 벌칙: 계모는 <b>달구어진 쇠 신발</b>을 신고 죽을 때까지 춤추게 됨<br>⑤ 왕자는 공주의 시신에 반해 <b>시신을 가져가려</b> 했고, 운반 중 진동으로 소생</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="잠자는숲속의공주 sleeping beauty 가시장미 그림형제 브리나르">
+  <div class="card-top">
+    <div class="card-ico">🌹</div>
+    <div class="card-info">
+      <div class="c-title">잠자는 숲속의 공주 (Dornröschen)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일 (페로 원작 기반)</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제 / 페로</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 공주가 태어날 때 초대받지 못한 마녀의 저주로 15세에 물레 바늘에 찔려 100년간 잠든다. 숲에 가시덤불이 자라고, 왕자가 100년 후 도착해 키스로 깨운다.<br><br>
+    <b class="warn">🩸 바실레 원전 (1634 — 「태세인 오르란도」):</b>
+    <div class="dark-box">① 잠든 공주를 발견한 <b>왕이 자는 동안 겁탈</b>하고 떠남<br>② 공주는 잠든 채 <b>쌍둥이를 낳고</b>, 아기 중 하나가 손가락에서 아마 조각을 빨아내며 깨어남<br>③ 왕의 아내(식인귀 여왕)가 아이들을 요리해 남편에게 먹이려 하나 요리사가 대신 양을 씀<br>④ 여왕은 공주도 불에 태워 죽이려 하지만 왕이 구출, 여왕이 대신 불에 탐</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="라푼젤 rapunzel 그림형제 탑 머리카락">
+  <div class="card-top">
+    <div class="card-ico">🏰</div>
+    <div class="card-info">
+      <div class="c-title">라푼젤 (Rapunzel)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 마녀에게 바쳐진 소녀가 높은 탑에 갇혀 자란다. 왕자가 머리카락을 타고 올라와 사랑에 빠진다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 초판: 라푼젤이 <b>"왕자님이 오면 배가 불러요"</b>라 말해 임신이 드러남 — 검열 후 삭제<br>② 마녀가 라푼젤의 <b>머리카락을 잘라</b> 황야에 버림<br>③ 왕자는 탑에서 밀려 떨어져 <b>가시덤불에 눈이 찔려 실명</b><br>④ 수년간 방랑하다 라푼젤의 눈물이 눈에 닿아 시력 회복</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="헨젤과그레텔 hansel gretel 마녀 오븐 그림형제">
+  <div class="card-top">
+    <div class="card-ico">🍬</div>
+    <div class="card-info">
+      <div class="c-title">헨젤과 그레텔 (Hänsel und Gretel)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 가난한 나무꾼 부부가 남매를 숲에 두 번 버린다. 두 번째에 과자집을 발견, 식인 마녀에게 붙잡힌다. 그레텔이 마녀를 오븐에 밀어 넣어 죽이고 탈출, 아버지와 재회한다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 아이들을 버린 것은 <b>친어머니</b> — 검열 후 계모로 변경<br>② 그레텔이 마녀를 <b>산 채로 오븐에 집어넣어</b> 태워 죽임<br>③ 새어머니는 이 순간 죽음 — 마녀와 계모가 같은 존재임을 암시</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="빨간모자 little red riding hood 늑대 할머니 그림형제 페로">
+  <div class="card-top">
+    <div class="card-ico">🐺</div>
+    <div class="card-info">
+      <div class="c-title">빨간 모자 (Rotkäppchen)</div>
+      <div class="c-orig">페로 1697 / 그림 형제 1812 · 독일·프랑스</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">페로 / 그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 할머니에게 음식을 가져다 주러 가는 소녀가 숲에서 늑대를 만난다. 늑대는 먼저 할머니 집에 도착해 할머니를 잡아먹고 위장한다.<br><br>
+    <b class="warn">🩸 페로 원본 (1697) — 가장 잔혹:</b>
+    <div class="dark-box">① 늑대가 할머니를 잡아먹고, <b>할머니의 피와 살을 소녀에게 권해 먹인다</b><br>② 침대에 들어간 소녀를 <b>늑대가 잡아먹으며 끝</b> — 구원자 없음, 교훈은 "낯선 남자를 조심하라"<br>③ 사냥꾼 구출 없음</div>
+    <div class="light-box">그림 형제 버전: 사냥꾼이 등장해 늑대 배를 갈라 구출, 돌을 채워 넣음</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="룸펠슈틸츠킨 rumpelstiltskin 물레 아기 그림형제">
+  <div class="card-top">
+    <div class="card-ico">🌀</div>
+    <div class="card-info">
+      <div class="c-title">룸펠슈틸츠킨 (Rumpelstiltskin)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 방앗간 딸이 짚을 금실로 잣는다고 거짓말한 아버지 때문에 왕에게 세 번 방을 채워야 한다. 난쟁이 정령이 도와주는 대가로 첫째 날 목걸이, 둘째 날 반지, 셋째 날 <b>첫아이</b>를 요구한다. 왕비가 된 후 이름을 3일 안에 맞히면 포기하기로 한다. 전령이 정령의 이름을 듣고, 왕비가 맞히자...<br><br>
+    <b class="warn">🩸 원본 결말:</b>
+    <div class="dark-box">룸펠슈틸츠킨이 분노해 <b>양발로 땅을 세게 구르다 몸이 반으로 찢어져</b> 죽음 (일부 판본: 땅속으로 빠져 사라짐)</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="노간주나무 juniper tree 그림형제 계모 스튜 식인">
+  <div class="card-top">
+    <div class="card-ico">🌲</div>
+    <div class="card-info">
+      <div class="c-title">노간주나무 (Von dem Machandelboom)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일 (저지독어 방언)</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 첫 아내의 무덤(노간주나무 아래)에서 태어난 아들을 계모가 증오한다. 계모는 의붓딸 마를레네를 편애하며 아들을 죽인다.<br><br>
+    <b class="warn">🩸 잔혹 요소 — 그림 동화 전편 중 가장 잔혹:</b>
+    <div class="dark-box">① 계모가 <b>사과 상자 뚜껑으로 아들의 목을 자른다</b> (사고인 척 위장)<br>② 시신을 <b>스튜로 요리해 아버지에게 먹인다</b> — 아버지는 맛있다며 먹음<br>③ 뼈를 마를레네가 노간주나무 아래에 묻자 새로 환생한 아들이 노래를 부르며 복수<br>④ 새가 계모 머리 위에 <b>맷돌을 떨어뜨려 죽임</b><br>⑤ 소년은 원래 모습으로 부활</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="강도 신랑 robber bridegroom 살인마 그림형제">
+  <div class="card-top">
+    <div class="card-ico">🔪</div>
+    <div class="card-info">
+      <div class="c-title">강도 신랑 (Der Räuberbräutigam)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 방앗간 딸이 부유한 구혼자와 약혼. 숲 속 집을 방문하라는 요청을 받고 찾아가는데, 집에는 노파만 있다. 노파가 경고하며 숨겨준다.<br><br>
+    <b class="warn">🩸 잔혹 요소:</b>
+    <div class="dark-box">① 신랑은 <b>살인 강도단의 두목</b><br>② 소녀는 숨어서 강도들이 <b>다른 소녀를 끌고 와 포도주로 취하게 한 뒤 옷을 벗기고 난도질하는 것</b>을 목격<br>③ 강도들이 <b>손가락을 잘라 반지를 빼낼 때</b> 손가락이 숨어있던 소녀 치마 위로 날아옴<br>④ 소녀가 결혼식 날 이 이야기를 "꿈이야기"로 들려준 후 사실임을 밝혀 신랑은 처형됨</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="개구리왕자 frog prince 그림형제 공주 키스">
+  <div class="card-top">
+    <div class="card-ico">🐸</div>
+    <div class="card-info">
+      <div class="c-title">개구리 왕자 (Der Froschkönig)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 공주가 우물에 금공을 빠뜨리고 개구리가 꺼내주는 대가로 함께 자는 것을 약속한다. 왕이 딸에게 약속을 지키라 명령한다.<br><br>
+    <b class="warn">🩸 원본 변신 방법:</b>
+    <div class="dark-box">공주가 키스로 변신시키는 것이 아니라 — 역겨운 개구리를 <b>벽에 힘껏 던져 버린다</b>. 충격으로 마법이 풀려 왕자가 됨. (일부 판본: 목을 자름)</div>
+  </div>
+</div>
+
+<div class="card light searchable" data-s="엄지동자 thumbling 그림형제 소인">
+  <div class="card-top">
+    <div class="card-ico">👍</div>
+    <div class="card-info">
+      <div class="c-title">엄지동자 (Däumling)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 엄지손가락만 한 작은 소년이 온갖 위험을 지혜로 헤쳐나간다. 여우·늑대·도둑들에게 잡혀갔다가 탈출하며 결국 가족에게 돌아온다. 기지와 용기가 주제인 어드벤처 동화.
+  </div>
+</div>
+
+<div class="card light searchable" data-s="빨간모자와 장미 snow white rose red 그림형제 곰 왕자">
+  <div class="card-top">
+    <div class="card-ico">🌹</div>
+    <div class="card-info">
+      <div class="c-title">백설공주와 빨강장미 (Schneeweißchen und Rosenrot)</div>
+      <div class="c-orig">그림 형제 · 1837년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 상냥한 두 자매(백설공주·빨강장미)가 겨울에 길 잃은 곰을 집에 재워준다. 나쁜 난쟁이를 곰이 죽이자 마법이 풀려 왕자로 변한다. 두 자매가 각각 왕자·왕자 동생과 결혼하는 따뜻한 결말.
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="여섯마리 백조 six swans 그림형제 오빠 침묵">
+  <div class="card-top">
+    <div class="card-ico">🦢</div>
+    <div class="card-info">
+      <div class="c-title">여섯 마리 백조 (Die sechs Schwäne)</div>
+      <div class="c-orig">그림 형제 · 1812년 · 독일</div>
+      <div class="c-badges">
+        <span class="badge b-both">🔀 혼합</span>
+        <span class="badge b-author">그림 형제</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 계모의 마법으로 여섯 오빠가 백조로 변한다. 여동생이 6년간 말도 웃음도 없이 쐐기풀로 셔츠를 짜야 오빠들이 풀린다. 결혼한 왕이 없어진 아이들(실은 계모가 숨김) 때문에 왕비를 마녀로 몰아 화형 직전, 마지막 셔츠를 던져 오빠들이 풀리며 구출.<br><br>
+    <b class="warn">🩸 잔혹 요소:</b>
+    <div class="dark-box">왕비의 <b>갓난아이 세 명이 사라지고</b>(계모가 훔침), 왕비는 6년간 침묵과 고통을 감수. 막내 오빠는 <b>팔 하나가 날개로 남음</b> — 셔츠를 미처 완성 못해.</div>
+  </div>
+</div>
+
+</div><!-- end grid grimm -->
+
+<div class="sub-hdr">🇩🇰 한스 크리스티안 안데르센 (H.C. Andersen)</div>
+<div class="grid">
+
+<div class="card dark searchable" data-s="인어공주 little mermaid 안데르센 거품 왕자">
+  <div class="card-top">
+    <div class="card-ico">🧜</div>
+    <div class="card-info">
+      <div class="c-title">인어공주 (Den lille Havfrue)</div>
+      <div class="c-orig">안데르센 · 1837년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">안데르센</span>
+        <span class="badge b-country">덴마크</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 인어 공주가 인간 왕자를 사랑해 목소리를 마녀에게 팔고 다리를 얻는다. 왕자는 다른 여인과 결혼한다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 목소리를 파는 대가로 <b>혀를 잘려</b> 말을 못하게 됨<br>② 걸을 때마다 <b>칼 위를 걷는 것 같은 고통</b><br>③ 언니들이 마녀에게 <b>아름다운 머리카락을 팔고 칼을 구입</b> — 왕자를 죽이면 다시 인어가 될 수 있다고<br>④ 인어공주는 왕자를 죽이지 않고 <b>바다 거품으로 사라짐</b><br>⑤ 디즈니와 달리 해피엔딩 없음 — 사랑은 보상받지 못함</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="빨간구두 red shoes 안데르센 발목 천사 춤">
+  <div class="card-top">
+    <div class="card-ico">👠</div>
+    <div class="card-info">
+      <div class="c-title">빨간 구두 (De røde sko)</div>
+      <div class="c-orig">안데르센 · 1845년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 고아 소녀 카렌이 아름다운 빨간 구두를 탐내다 천사의 저주를 받는다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 빨간 구두를 신자 <b>멈추지 않고 춤을 추게 됨</b> — 교회에서도, 묘지에서도<br>② 죽은 병사의 유령이 구두에 춤을 추라고 명령<br>③ 멈추기 위해 <b>사형집행인에게 두 발을 잘라달라고 부탁</b> — 발목을 자름<br>④ 잘린 발이 달린 구두가 <b>카렌을 계속 따라다니며 춤을 춤</b><br>⑤ 회개 후 천사가 나타나 심장을 멈춰 구원 — 잔혹한 종교적 도덕극</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="성냥팔이소녀 match girl 안데르센 죽음 추위">
+  <div class="card-top">
+    <div class="card-ico">🕯️</div>
+    <div class="card-info">
+      <div class="c-title">성냥팔이 소녀 (Den lille pige med svovlstikkerne)</div>
+      <div class="c-orig">안데르센 · 1845년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 섣달그믐날 밤, 맨발의 가난한 소녀가 성냥을 팔지 못해 집에 들어가지 못한다. 성냥에 불을 붙일 때마다 따뜻한 환상을 본다 — 난로, 음식, 크리스마스 트리, 할머니.<br><br>
+    <b class="warn">🩸 결말:</b>
+    <div class="dark-box">마지막 성냥이 꺼지고 <b>소녀는 추위에 얼어 죽는다</b>. 다음 날 아침 사람들이 발견하지만 소녀의 얼굴에는 미소가 — 할머니와 함께 천국으로 갔다고 암시. 구원도 따뜻함도 없이 죽음으로 끝나는 가장 슬픈 안데르센 동화.</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="야생백조 wild swans 안데르센 오빠 화형 엘리사">
+  <div class="card-top">
+    <div class="card-ico">🦢</div>
+    <div class="card-info">
+      <div class="c-title">야생 백조 (De vilde svaner)</div>
+      <div class="c-orig">안데르센 · 1838년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-both">🔀 혼합</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 계모에 의해 11명의 오빠가 백조로 변한다. 막내 엘리사가 쐐기풀로 셔츠를 짜 오빠들을 구해야 하며, 그동안 말을 해서는 안 된다.<br><br>
+    <b class="warn">🩸 잔혹 요소:</b>
+    <div class="dark-box">① 엘리사가 마녀로 몰려 <b>화형대에 오름</b> — 마지막 셔츠를 완성하며 구출<br>② 막내 오빠는 <b>팔 하나가 날개로 남음</b><br>③ 쐐기풀로 손이 피투성이가 될 때까지 작업</div>
+  </div>
+</div>
+
+<div class="card light searchable" data-s="엄지공주 thumbelina 안데르센 두꺼비 제비">
+  <div class="card-top">
+    <div class="card-ico">🌷</div>
+    <div class="card-info">
+      <div class="c-title">엄지 공주 (Tommelise)</div>
+      <div class="c-orig">안데르센 · 1835년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 엄지손가락만 한 소녀가 두꺼비에게 납치되었다가 탈출. 쥐와 두더지에게 억지로 결혼하게 될 위기를 겪다가, 자신이 돌봐준 제비에게 구출되어 꽃의 나라로 간다.
+  </div>
+</div>
+
+<div class="card light searchable" data-s="눈의여왕 snow queen 안데르센 게르다 카이 거울">
+  <div class="card-top">
+    <div class="card-ico">❄️</div>
+    <div class="card-info">
+      <div class="c-title">눈의 여왕 (Snedronningen)</div>
+      <div class="c-orig">안데르센 · 1844년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 악마의 거울 조각이 카이의 눈과 심장에 박혀 냉정해진다. 눈의 여왕이 카이를 얼음 궁전으로 데려간다. 게르다가 온갖 모험 끝에 카이를 찾아가 뜨거운 눈물로 거울 조각을 녹이고 구출한다. (겨울왕국의 원작)
+  </div>
+</div>
+
+<div class="card light searchable" data-s="미운오리새끼 ugly duckling 안데르센 백조">
+  <div class="card-top">
+    <div class="card-ico">🐦</div>
+    <div class="card-info">
+      <div class="c-title">미운 오리 새끼 (Den grimme ælling)</div>
+      <div class="c-orig">안데르센 · 1843년 · 덴마크</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">안데르센</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 다른 오리들과 달리 추하게 태어난 새끼 오리가 따돌림과 박해를 받으며 방랑하다 겨울을 홀로 버틴다. 봄이 되어 자신이 아름다운 백조였음을 깨닫는다. 안데르센 자신의 자전적 이야기.
+  </div>
+</div>
+
+</div><!-- end grid andersen -->
+
+<div class="sub-hdr">🇫🇷 샤를 페로 (Charles Perrault)</div>
+<div class="grid">
+
+<div class="card dark searchable" data-s="파란수염 bluebeard 페로 금지된방 전처 칼">
+  <div class="card-top">
+    <div class="card-ico">🗝️</div>
+    <div class="card-info">
+      <div class="c-title">파란 수염 (La Barbe Bleue)</div>
+      <div class="c-orig">페로 · 1697년 · 프랑스</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">페로</span>
+        <span class="badge b-country">프랑스</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 파란 수염의 부유한 귀족이 젊은 여인과 결혼하며 여행을 떠나면서 열쇠 묶음을 주되 작은 방 하나만은 절대 열지 말라 명령한다.<br><br>
+    <b class="warn">🩸 원본 잔혹 요소:</b>
+    <div class="dark-box">① 금지된 방 안에는 <b>피범벅이 된 전처들의 시신이 매달려</b> 있음<br>② 호기심에 문을 연 아내의 손에 <b>피가 묻은 열쇠</b> — 아무리 닦아도 지워지지 않음<br>③ 파란 수염이 돌아와 즉시 눈치채고 <b>칼로 목을 자르겠다고 위협</b><br>④ 기도할 시간을 달라고 애원 — 오빠들이 도착해 파란 수염을 죽이고 구출</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="당나귀가죽 donkeyskin 페로 근친상간 아버지 공주">
+  <div class="card-top">
+    <div class="card-ico">🫏</div>
+    <div class="card-info">
+      <div class="c-title">당나귀 가죽 (Peau d'Âne)</div>
+      <div class="c-orig">페로 · 1694년 · 프랑스</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-author">페로</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 왕이 죽은 왕비와의 약속 때문에 자신의 딸에게 청혼한다. 요정 대모의 조언으로 공주는 당나귀 가죽을 쓰고 도망쳐 하녀로 숨어 살다 왕자와 결혼한다.<br><br>
+    <b class="warn">🩸 핵심 주제:</b>
+    <div class="dark-box"><b>아버지의 근친상간적 요구</b>가 중심 플롯. 페로는 교훈으로 포장했으나 실제로는 성인용 사회 비판 동화. 중세 유럽에 유사 이야기 다수 존재 (그림의 「목매기나무」류).</div>
+  </div>
+</div>
+
+<div class="card light searchable" data-s="장화신은고양이 puss in boots 페로 고양이 귀족">
+  <div class="card-top">
+    <div class="card-ico">🐱</div>
+    <div class="card-info">
+      <div class="c-title">장화 신은 고양이 (Le Chat botté)</div>
+      <div class="c-orig">페로 · 1697년 · 프랑스</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">페로</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 가난한 방앗간 막내아들이 유산으로 고양이만 받는다. 고양이는 장화를 신고 주인을 "카라바 후작"이라 속여가며 왕에게 소개하고, 거인의 성을 차지해 주인을 귀족으로 만든다. 주제: 지혜와 재치가 운명을 바꾼다.
+  </div>
+</div>
+
+<div class="card light searchable" data-s="미녀와야수 beauty beast 페로 마담빌뇌브 장미">
+  <div class="card-top">
+    <div class="card-ico">🌹</div>
+    <div class="card-info">
+      <div class="c-title">미녀와 야수 (La Belle et la Bête)</div>
+      <div class="c-orig">빌뇌브 부인 1740 / 보몽 부인 1756 · 프랑스</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">빌뇌브 / 보몽</span>
+        <span class="badge b-country">프랑스</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 상인이 야수의 장미를 꺾다가 딸을 보내는 조건으로 목숨을 건진다. 벨이 야수의 성에 살며 내면의 선함을 보고 사랑하게 되어 마법을 푼다.<br><br>
+    <b>원본(빌뇌브 1740):</b> 훨씬 길고 복잡. 야수의 과거 이야기, 페리 세계관, 벨의 언니들의 질투 서브플롯 포함. 보몽이 1756년 어린이용으로 대폭 축약.
+  </div>
+</div>
+
+</div><!-- end grid perrault -->
+
+<div class="sub-hdr">🌍 기타 출처 동화</div>
+<div class="grid">
+
+<div class="card dark searchable" data-s="피리부는사나이 pied piper 하멜른 쥐 아이들">
+  <div class="card-top">
+    <div class="card-ico">🎵</div>
+    <div class="card-info">
+      <div class="c-title">하멜른의 피리 부는 사나이</div>
+      <div class="c-orig">독일 민담 · 1284년 실제 사건 추정</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 잔혹 원본</span>
+        <span class="badge b-country">독일</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 쥐떼로 고생하는 하멜른 시에 알록달록한 옷의 남자가 나타나 피리로 쥐를 강에 빠뜨려 없애준다. 시민들이 약속한 보수를 주지 않자 피리 소리로 <b>아이 130명을 산으로 데려가 사라진다</b>.<br><br>
+    <div class="dark-box">1284년 하멜른에서 실제로 130명의 아이가 집단 실종된 기록이 있어 역사적 사건이 동화화된 것으로 추정. 십자군·이주·전염병 등 다양한 학설 존재.</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="알라딘 aladdin 천일야화 요술램프 지니">
+  <div class="card-top">
+    <div class="card-ico">🪔</div>
+    <div class="card-info">
+      <div class="c-title">알라딘 (Aladdin)</div>
+      <div class="c-orig">천일야화(아라비안 나이트) · 18세기 추가</div>
+      <div class="c-badges">
+        <span class="badge b-both">🔀 혼합</span>
+        <span class="badge b-country">중동·프랑스 번역</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 가난한 소년 알라딘이 사악한 마법사에게 이용당해 동굴에서 요술 램프를 얻는다. 지니를 이용해 부자가 되고 공주와 결혼하지만 마법사가 램프를 빼앗는다.<br><br>
+    <b>원본의 차이:</b> 천일야화 원전에서는 무대가 <b>중국</b>. 알라딘은 아랍인이 아닌 중국인. 갈랑(Antoine Galland)이 1704년 추가한 이야기로 원래 천일야화에 없었음 — <b>후대 창작</b>.
+  </div>
+</div>
+
+<div class="card light searchable" data-s="오즈의마법사 wizard of oz 도로시 바움 허수아비">
+  <div class="card-top">
+    <div class="card-ico">🌈</div>
+    <div class="card-info">
+      <div class="c-title">오즈의 마법사 (The Wizard of Oz)</div>
+      <div class="c-orig">L. 프랭크 바움 · 1900년 · 미국</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">L. 프랭크 바움</span>
+        <span class="badge b-country">미국</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 회오리바람에 휩쓸린 도로시가 오즈 나라에 도착해 집으로 돌아가기 위해 에메랄드 시로 향한다. 허수아비(뇌), 양철 나무꾼(심장), 겁쟁이 사자(용기)와 동행.
+  </div>
+</div>
+
+<div class="card light searchable" data-s="이상한나라의앨리스 alice wonderland 루이스캐럴 토끼">
+  <div class="card-top">
+    <div class="card-ico">🐇</div>
+    <div class="card-info">
+      <div class="c-title">이상한 나라의 앨리스 (Alice's Adventures in Wonderland)</div>
+      <div class="c-orig">루이스 캐럴 · 1865년 · 영국</div>
+      <div class="c-badges">
+        <span class="badge b-light">🌸 일반 동화</span>
+        <span class="badge b-author">루이스 캐럴</span>
+        <span class="badge b-country">영국</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 소녀 앨리스가 토끼 굴로 떨어져 이상한 나라를 탐험한다. 크기가 변하는 약, 미친 모자 장수, 하트 여왕("목을 잘라라!"), 체셔 고양이 등 부조리한 세계를 겪는다.
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="오스카와일드 행복한왕자 제비 동상 oscar wilde">
+  <div class="card-top">
+    <div class="card-ico">🕊️</div>
+    <div class="card-info">
+      <div class="c-title">행복한 왕자 (The Happy Prince)</div>
+      <div class="c-orig">오스카 와일드 · 1888년 · 영국·아일랜드</div>
+      <div class="c-badges">
+        <span class="badge b-dark">🩸 슬픈 결말</span>
+        <span class="badge b-author">오스카 와일드</span>
+        <span class="badge b-country">영국</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 황금과 보석으로 장식된 왕자 동상이 제비에게 가난한 이들을 위해 자신의 장식물을 하나씩 나르게 부탁한다. 모두 나눠주고 빈 껍데기만 남는다.<br><br>
+    <div class="dark-box">겨울이 되어 <b>제비는 얼어 죽고</b>, 초라해진 동상은 <b>녹여 없애</b>버려진다. 신이 이 둘을 천국에서 가장 소중한 것으로 택한다는 결말. 희생과 연민의 아름다움을 다루지만 철저히 현세적 보상 없음.</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="이기적인거인 selfish giant 와일드 정원 아이들">
+  <div class="card-top">
+    <div class="card-ico">🌳</div>
+    <div class="card-info">
+      <div class="c-title">이기적인 거인 (The Selfish Giant)</div>
+      <div class="c-orig">오스카 와일드 · 1888년 · 영국</div>
+      <div class="c-badges">
+        <span class="badge b-both">🔀 혼합</span>
+        <span class="badge b-author">오스카 와일드</span>
+      </div>
+    </div>
+  </div>
+  <div class="story-body">
+    <b>줄거리:</b> 거인이 아이들을 쫓아낸 정원에 영원한 겨울이 찾아온다. 아이들이 몰래 들어오자 봄이 오고 거인은 개심한다. 마지막 노년에 손에 못 자국이 있는 아이(예수를 상징)가 나타나 거인을 천국으로 인도한다.
+  </div>
+</div>
+
+</div><!-- end other grid -->
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</div><!-- end sec stories -->
+
+
+<!-- ══════════════ 캐릭터 ══════════════ -->
+<div id="tab-chars" class="sec">
+<div class="sec-title">👤 캐릭터 총정리</div>
+<div class="sec-sub">주인공·악당·조력자·중립 캐릭터. 원본과 현대 버전의 차이 포함.</div>
+
+<div class="sub-hdr">주인공 / 피해자</div>
+<div class="grid-sm">
+
+<div class="char-card searchable" data-s="신데렐라 엘라 아셴푸텔">
+  <div class="ch-name">신데렐라 (Aschenputtel/Ella)</div>
+  <div class="ch-story">그림 형제 · 페로 · 신데렐라</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">인간</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">순종적, 선량함, 인내. 그림판은 어머니 무덤에 기도해 도움 받음. 페로판은 요정 대모 도움.</span></div>
+  <div class="row"><span class="rk">원본 차이</span><span class="rv">그림판: 마술 없이 <b>개암나무 새에게</b> 도움 받음. 페로판: 호박 마차·유리 구두. 디즈니: 페로 기반.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="백설공주 스노우화이트">
+  <div class="ch-name">백설공주 (Schneewittchen)</div>
+  <div class="ch-story">그림 형제 · 백설공주</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">공주</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">피부 희고 입술 붉고 머리 검음. 순수하지만 순진해 계모의 세 가지 속임수에 세 번 다 속음.</span></div>
+  <div class="row"><span class="rk">원본 차이</span><span class="rv">초판에서 <b>계모는 친어머니</b>. 왕자의 키스가 아닌 <b>관 운반 진동</b>으로 소생.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="인어공주 아리엘 안데르센">
+  <div class="ch-name">인어공주 (Den lille Havfrue)</div>
+  <div class="ch-story">안데르센 · 인어공주</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">인어족</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">인간 왕자를 사랑해 혀를 잘리고 다리를 얻음. 매 걸음 칼 위를 걷는 고통.</span></div>
+  <div class="row"><span class="rk">원본 결말</span><span class="rv">왕자와 이어지지 못하고 <b>바다 거품으로 소멸</b>. 디즈니와 정반대.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="라푼젤 탑 머리카락">
+  <div class="ch-name">라푼젤 (Rapunzel)</div>
+  <div class="ch-story">그림 형제 · 라푼젤</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">인간</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">탑 안에서 자란 긴 머리의 소녀. 세상을 모름.</span></div>
+  <div class="row"><span class="rk">원본</span><span class="rv">왕자와의 관계로 <b>임신 사실이 드러남</b>. 황야로 쫓겨나 쌍둥이 출산.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="카렌 빨간구두 안데르센">
+  <div class="ch-name">카렌 (Karen)</div>
+  <div class="ch-story">안데르센 · 빨간 구두</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">고아 소녀</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">허영심 때문에 빨간 구두에 집착하다 저주받음.</span></div>
+  <div class="row"><span class="rk">결말</span><span class="rv">발목을 자르고 회개해 천국으로. 가장 도덕주의적인 안데르센 동화.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="게르다 카이 눈의여왕">
+  <div class="ch-name">게르다 & 카이</div>
+  <div class="ch-story">안데르센 · 눈의 여왕</div>
+  <div class="c-badges"><span class="badge b-hero">주인공/피해자</span></div>
+  <div class="row"><span class="rk">카이</span><span class="rv">악마의 거울 조각에 눈·심장이 찔려 냉담해짐. 눈의 여왕에게 납치.</span></div>
+  <div class="row"><span class="rk">게르다</span><span class="rv">카이를 찾아 긴 여정. 뜨거운 눈물로 조각을 녹여 구출. 겨울왕국 엘사·안나의 원형.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="엘리사 야생백조 오빠">
+  <div class="ch-name">엘리사 (Elisa)</div>
+  <div class="ch-story">안데르센 · 야생 백조</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">공주</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">6년간 침묵을 지키며 쐐기풀 셔츠를 제작. 손에서 피가 흐름.</span></div>
+  <div class="row"><span class="rk">결말</span><span class="rv">화형 직전 오빠 구출 성공. 막내 오빠는 날개 하나가 남음.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="헨젤 그레텔 남매">
+  <div class="ch-name">헨젤 & 그레텔</div>
+  <div class="ch-story">그림 형제 · 헨젤과 그레텔</div>
+  <div class="c-badges"><span class="badge b-hero">주인공</span><span class="badge b-role">남매</span></div>
+  <div class="row"><span class="rk">헨젤</span><span class="rv">기지를 발휘해 자갈·빵 부스러기로 길 표시. 새장에 갇혀 살찌워짐.</span></div>
+  <div class="row"><span class="rk">그레텔</span><span class="rv">마녀를 오븐에 밀어넣는 결정적 행동을 함. 두 남매 중 더 능동적.</span></div>
+</div>
+
+</div><!-- end hero grid -->
+
+<div class="sub-hdr">악당 / 빌런</div>
+<div class="grid-sm">
+
+<div class="char-card searchable" data-s="계모 왕비 백설공주 거울">
+  <div class="ch-name">사악한 왕비 (Evil Queen)</div>
+  <div class="ch-story">그림 형제 · 백설공주</div>
+  <div class="c-badges"><span class="badge b-villain">악당</span><span class="badge b-role">왕비</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">마법 거울에 집착하는 자기애 극단. 초판에서는 <b>친어머니</b>.</span></div>
+  <div class="row"><span class="rk">도구</span><span class="rv">마법 거울, 독 빗, 독 코르셋, 독 사과</span></div>
+  <div class="row"><span class="rk">최후</span><span class="rv">결혼식에서 달구어진 쇠 신발을 신고 춤추다 죽음</span></div>
+</div>
+
+<div class="char-card searchable" data-s="마녀 게르투데 라푼젤 탑">
+  <div class="ch-name">마녀 (Dame Gothel / 게르투데)</div>
+  <div class="ch-story">그림 형제 · 라푼젤</div>
+  <div class="c-badges"><span class="badge b-villain">악당</span><span class="badge b-role">마녀</span></div>
+  <div class="row"><span class="rk">배경</span><span class="rv">라푼젤의 부모가 정원 채소를 훔친 대가로 아이를 넘겨받음.</span></div>
+  <div class="row"><span class="rk">행동</span><span class="rv">라푼젤을 탑에 감금. 왕자 발각 시 라푼젤 머리 잘라 황야로 추방, 왕자를 탑에서 밀어 실명시킴.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="파란수염 전처살인마 페로">
+  <div class="ch-name">파란 수염 (Bluebeard)</div>
+  <div class="ch-story">페로 · 파란 수염</div>
+  <div class="c-badges"><span class="badge b-villain">악당</span><span class="badge b-role">귀족·연쇄살인마</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">파란 수염을 가진 부유한 귀족. 전처들을 모두 죽여 금지된 방에 보관.</span></div>
+  <div class="row"><span class="rk">최후</span><span class="rv">아내의 오빠들에게 죽음</span></div>
+</div>
+
+<div class="char-card searchable" data-s="눈의여왕 스노우퀸 안데르센">
+  <div class="ch-name">눈의 여왕 (Snow Queen)</div>
+  <div class="ch-story">안데르센 · 눈의 여왕</div>
+  <div class="c-badges"><span class="badge b-villain">악역</span><span class="badge b-role">빙설 여왕</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">아름답고 차갑지만 명백한 악의는 없음 — 카이를 완성하지 못한 퍼즐 과제로 붙잡아 둠.</span></div>
+  <div class="row"><span class="rk">현대 해석</span><span class="rv">겨울왕국 한스, 엘사 등으로 재해석. 원작보다 복잡한 악역상.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="식인마녀 과자집 헨젤그레텔">
+  <div class="ch-name">식인 마녀</div>
+  <div class="ch-story">그림 형제 · 헨젤과 그레텔</div>
+  <div class="c-badges"><span class="badge b-villain">악당</span><span class="badge b-role">마녀·식인귀</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">시력이 나빠 헨젤에게 뼈를 내밀게 해 살졌는지 확인. 과자집으로 아이 유인.</span></div>
+  <div class="row"><span class="rk">최후</span><span class="rv">그레텔에게 오븐 속으로 밀려 산 채로 태워짐</span></div>
+</div>
+
+<div class="char-card searchable" data-s="계모 신데렐라 의붓언니">
+  <div class="ch-name">계모 & 의붓언니들</div>
+  <div class="ch-story">그림 형제 · 신데렐라</div>
+  <div class="c-badges"><span class="badge b-villain">악당</span></div>
+  <div class="row"><span class="rk">의붓언니</span><span class="rv">발을 맞추려 각각 발가락·발뒤꿈치를 자름. 결말에 비둘기에게 눈이 쪼임.</span></div>
+  <div class="row"><span class="rk">계모</span><span class="rv">신데렐라에게 재와 콩 고르기 등 불가능한 과제를 부여</span></div>
+</div>
+
+<div class="char-card searchable" data-s="룸펠슈틸츠킨 난쟁이 정령">
+  <div class="ch-name">룸펠슈틸츠킨</div>
+  <div class="ch-story">그림 형제 · 룸펠슈틸츠킨</div>
+  <div class="c-badges"><span class="badge b-villain">악역</span><span class="badge b-role">정령</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">대가 없이 돕지 않음. 아이를 요구하는 계약자.</span></div>
+  <div class="row"><span class="rk">최후</span><span class="rv">이름 발각 후 분노해 몸이 두 쪽으로 찢어짐</span></div>
+</div>
+
+</div><!-- end villain grid -->
+
+<div class="sub-hdr">조력자 / 중립</div>
+<div class="grid-sm">
+
+<div class="char-card searchable" data-s="요정대모 신데렐라 페로 디즈니">
+  <div class="ch-name">요정 대모 (Fairy Godmother)</div>
+  <div class="ch-story">페로 · 신데렐라</div>
+  <div class="c-badges"><span class="badge b-role">조력자</span></div>
+  <div class="row"><span class="rk">역할</span><span class="rv">호박 마차, 드레스, 유리 구두 제공. 자정까지 효력 한정.</span></div>
+  <div class="row"><span class="rk">그림 판</span><span class="rv">존재하지 않음 — 대신 개암나무와 흰 비둘기가 역할 대체</span></div>
+</div>
+
+<div class="char-card searchable" data-s="일곱난쟁이 백설공주 그림형제">
+  <div class="ch-name">일곱 난쟁이</div>
+  <div class="ch-story">그림 형제 · 백설공주</div>
+  <div class="c-badges"><span class="badge b-role">조력자</span></div>
+  <div class="row"><span class="rk">역할</span><span class="rv">백설공주를 재워주고 먹여주는 광부들. 원본에는 이름 없음.</span></div>
+  <div class="row"><span class="rk">디즈니</span><span class="rv">백설공주(1937)에서 이름 부여: 해피·그럼피·도피·배시풀·슬리피·스니지·닥</span></div>
+</div>
+
+<div class="char-card searchable" data-s="제비 행복한왕자 와일드">
+  <div class="ch-name">제비 (Swallow)</div>
+  <div class="ch-story">오스카 와일드 · 행복한 왕자</div>
+  <div class="c-badges"><span class="badge b-role">조력자</span></div>
+  <div class="row"><span class="rk">역할</span><span class="rv">이집트로 떠나야 하지만 왕자 동상을 도와 보석을 나름. 겨울에 얼어 죽음.</span></div>
+</div>
+
+<div class="char-card searchable" data-s="장화신은고양이 페로 조력자">
+  <div class="ch-name">장화 신은 고양이</div>
+  <div class="ch-story">페로 · 장화 신은 고양이</div>
+  <div class="c-badges"><span class="badge b-role">조력자</span></div>
+  <div class="row"><span class="rk">역할</span><span class="rv">주인을 카라바 후작으로 속여 왕의 신임을 얻게 함. 거인을 꾀어 쥐로 만들어 잡아먹음.</span></div>
+</div>
+
+</div>
+</div><!-- end sec chars -->
+
+
+<!-- ══════════════ 장소 ══════════════ -->
+<div id="tab-places" class="sec">
+<div class="sec-title">🏚️ 주요 장소 총정리</div>
+<div class="sec-sub">동화 속 핵심 무대 — 성, 숲, 탑, 마법의 공간 등</div>
+
+<div class="grid">
+
+<div class="place-card searchable" data-s="숲 forest 동화 마법">
+  <div class="p-name">🌲 마법의 숲 (Enchanted Forest)</div>
+  <div class="p-appears">헨젤과 그레텔 · 빨간 모자 · 백설공주 · 잠자는 숲속의 공주 · 여섯 마리 백조 · 강도 신랑</div>
+  <div class="story-body">동화에서 가장 많이 등장하는 장소. <b>문명의 경계</b> 바깥, 위험하고 미지적인 공간. 버려지는 장소이자 변화가 일어나는 곳. 가시덤불, 어둠, 길 잃음이 상징. 심리학적 해석: 무의식, 성인으로의 통과의례 공간.</div>
+</div>
+
+<div class="place-card searchable" data-s="탑 tower 라푼젤 감금">
+  <div class="p-name">🏰 외딴 탑 (Isolated Tower)</div>
+  <div class="p-appears">라푼젤</div>
+  <div class="story-body">문도 계단도 없는 높은 탑. 라푼젤이 유년기 전체를 갇혀 보낸 곳. <b>고립과 통제</b>의 상징. 세상으로부터 단절된 순수함이자 감금. 창문이 유일한 바깥과의 접점.</div>
+</div>
+
+<div class="place-card searchable" data-s="얼음성 눈의여왕 안데르센">
+  <div class="p-name">❄️ 눈의 여왕 얼음 궁전</div>
+  <div class="p-appears">안데르센 · 눈의 여왕</div>
+  <div class="story-body">북쪽 끝에 있는 거대한 얼음 성. 카이가 영원한 퍼즐을 맞추며 사는 곳. <b>이성과 냉철함의 극단</b>, 감정의 소멸을 상징. 거울 조각으로 "영원(Eternity)"을 만들려는 작업이 진행 중.</div>
+</div>
+
+<div class="place-card searchable" data-s="금지된방 파란수염 비밀 전처">
+  <div class="p-name">🗝️ 금지된 방 (Forbidden Chamber)</div>
+  <div class="p-appears">페로 · 파란 수염</div>
+  <div class="story-body">파란 수염 성의 비밀 방. 전처들의 시신이 걸려 있고 바닥이 피로 가득. <b>금기와 호기심의 상징</b>. 열쇠에 피가 묻어 아무리 닦아도 지워지지 않음 — 죄의 흔적은 지울 수 없다는 상징.</div>
+</div>
+
+<div class="place-card searchable" data-s="과자집 마녀 헨젤그레텔">
+  <div class="p-name">🍬 과자집 (Gingerbread House)</div>
+  <div class="p-appears">그림 형제 · 헨젤과 그레텔</div>
+  <div class="story-body">빵과 과자, 사탕으로 만들어진 마녀의 집. 배고픈 아이들을 유혹하는 <b>위험한 유혹의 공간</b>. 아름다운 외관 속에 죽음의 덫. 오늘날 낯선 이의 유혹에 대한 경고로 해석.</div>
+</div>
+
+<div class="place-card searchable" data-s="바다 인어 안데르센 인어왕국">
+  <div class="p-name">🌊 심해 인어 왕국</div>
+  <div class="p-appears">안데르센 · 인어공주</div>
+  <div class="story-body">바다 깊은 곳의 아름다운 궁전. 인어들이 사는 세계. 인어공주에게는 <b>안전하지만 불완전한 곳</b> — 영혼이 없어 사후 거품이 됨. 인간 세계를 동경하는 출발점.</div>
+</div>
+
+<div class="place-card searchable" data-s="왕자 무도회 성 신데렐라">
+  <div class="p-name">💃 왕궁 무도회장</div>
+  <div class="p-appears">신데렐라 · 잠자는 숲속의 공주</div>
+  <div class="story-body">변신이 완성되는 공간. 신분의 역전이 일어나는 마법의 순간. <b>자정</b>이라는 시간 제한이 긴장감을 부여. 신분 사회 속 기회의 공간으로 읽힘.</div>
+</div>
+
+<div class="place-card searchable" data-s="하멜른 피리부는사나이 쥐 아이들">
+  <div class="p-name">🏘️ 하멜른 마을 (Hamelin)</div>
+  <div class="p-appears">하멜른의 피리 부는 사나이</div>
+  <div class="story-body">독일 실존 도시(니더작센 주). 1284년 실제 아동 실종 사건의 무대. 약속을 어긴 공동체가 <b>아이 130명을 잃는 집단 비극</b>의 장소. 쥐의 침입과 피리 소리가 상징하는 외부 위협.</div>
+</div>
+
+<div class="place-card searchable" data-s="오즈 에메랄드시 도로시 바움">
+  <div class="p-name">🌈 오즈 에메랄드 시 (Emerald City)</div>
+  <div class="p-appears">오즈의 마법사 (바움, 1900)</div>
+  <div class="story-body">노란 벽돌 길 끝에 있는 초록빛 도시. 오즈 마법사가 다스리지만 실은 허상. <b>욕망과 환상의 공간</b> — 뇌·심장·용기는 이미 자신 안에 있었다는 메시지.</div>
+</div>
+
+<div class="place-card searchable" data-s="이상한나라 앨리스 토끼굴 체셔">
+  <div class="p-name">🐇 이상한 나라 (Wonderland)</div>
+  <div class="p-appears">루이스 캐럴 · 이상한 나라의 앨리스</div>
+  <div class="story-body">논리와 상식이 뒤집힌 꿈의 세계. 크기가 바뀌고, 시간이 멈추고, 여왕이 이유 없이 처형 명령. <b>어른 세계의 부조리에 대한 어린이 관점 풍자</b>로 해석.</div>
+</div>
+
+<div class="place-card searchable" data-s="노간주나무 무덤 그림형제 부활">
+  <div class="p-name">🌲 노간주나무 아래 무덤</div>
+  <div class="p-appears">그림 형제 · 노간주나무</div>
+  <div class="story-body">첫 번째 어머니의 무덤이 있는 신성한 나무 아래. 아들이 죽은 후 뼈가 이 자리에 묻혀 새로 부활. <b>죽음과 재생의 순환</b> 상징. 그림 동화 전편 중 가장 원시적인 신화적 공간.</div>
+</div>
+
+</div>
+</div><!-- end sec places -->
+
+
+<!-- ══════════════ 원본 vs 현대 ══════════════ -->
+<div id="tab-compare" class="sec">
+<div class="sec-title">⚖️ 원본 vs 현대 버전 비교</div>
+<div class="sec-sub">원전에서 현대 디즈니·아동용으로 오면서 어떤 요소가 바뀌었는지 상세 비교.</div>
+
+<div class="grid-wide">
+
+<div class="card searchable" data-s="신데렐라 원본 현대 비교">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">👠 신데렐라</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">원본 (그림 1812)</th><th class="c-mod-col">현대 (디즈니 1950)</th></tr>
+    <tr><td class="c-label">마법 도우미</td><td class="c-orig-col">어머니 무덤의 개암나무 + 흰 비둘기</td><td class="c-mod-col">요정 대모 (페로 버전 차용)</td></tr>
+    <tr><td class="c-label">구두 소재</td><td class="c-orig-col">금 구두</td><td class="c-mod-col">유리 구두 (페로: verre / vair 논란)</td></tr>
+    <tr><td class="c-label">의붓언니</td><td class="c-orig-col">발가락·발뒤꿈치 절단, 비둘기에 눈 쪼임</td><td class="c-mod-col">단순히 못되게 구는 역할만</td></tr>
+    <tr><td class="c-label">무도회 횟수</td><td class="c-orig-col">3번</td><td class="c-mod-col">1번</td></tr>
+    <tr><td class="c-label">결말 톤</td><td class="c-orig-col">복수와 응보 포함</td><td class="c-mod-col">해피엔딩, 용서 강조</td></tr>
+  </table>
+</div>
+
+<div class="card searchable" data-s="백설공주 원본 현대 비교">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">🍎 백설공주</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">원본 (그림 1812 초판)</th><th class="c-mod-col">현대 (디즈니 1937)</th></tr>
+    <tr><td class="c-label">왕비 정체</td><td class="c-orig-col">친어머니</td><td class="c-mod-col">계모</td></tr>
+    <tr><td class="c-label">왕비 요구</td><td class="c-orig-col">폐와 간을 가져오라</td><td class="c-mod-col">심장만 요구</td></tr>
+    <tr><td class="c-label">공격 횟수</td><td class="c-orig-col">3번 (독 빗·코르셋·사과)</td><td class="c-mod-col">1번 (독 사과만)</td></tr>
+    <tr><td class="c-label">소생 방법</td><td class="c-orig-col">관 운반 진동으로 사과 조각이 빠짐</td><td class="c-mod-col">왕자의 키스</td></tr>
+    <tr><td class="c-label">왕비 최후</td><td class="c-orig-col">달구어진 쇠 신발로 춤추다 사망</td><td class="c-mod-col">낭떠러지에서 추락</td></tr>
+  </table>
+</div>
+
+<div class="card searchable" data-s="잠자는숲속의공주 원본 현대 비교">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">🌹 잠자는 숲속의 공주</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">바실레 원전 (1634)</th><th class="c-mod-col">디즈니 (1959)</th></tr>
+    <tr><td class="c-label">왕의 행동</td><td class="c-orig-col">자는 공주를 겁탈, 임신</td><td class="c-mod-col">진실의 키스로 깨움</td></tr>
+    <tr><td class="c-label">소생 방법</td><td class="c-orig-col">아기가 손가락 빨며 아마 조각 제거</td><td class="c-mod-col">왕자의 키스</td></tr>
+    <tr><td class="c-label">후반부</td><td class="c-orig-col">식인귀 여왕이 아이·공주 살해 시도</td><td class="c-mod-col">악당 말레피센트와의 대결</td></tr>
+    <tr><td class="c-label">결말</td><td class="c-orig-col">식인귀 여왕이 불에 타 죽음</td><td class="c-mod-col">해피엔딩</td></tr>
+  </table>
+</div>
+
+<div class="card searchable" data-s="인어공주 원본 현대 디즈니 비교">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">🧜 인어공주</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">안데르센 원전 (1837)</th><th class="c-mod-col">디즈니 (1989)</th></tr>
+    <tr><td class="c-label">목소리 대가</td><td class="c-orig-col">혀를 잘림</td><td class="c-mod-col">목소리가 조개에 담김</td></tr>
+    <tr><td class="c-label">통증</td><td class="c-orig-col">매 걸음 칼 위를 걷는 고통</td><td class="c-mod-col">언급 없음</td></tr>
+    <tr><td class="c-label">왕자 결말</td><td class="c-orig-col">다른 여인과 결혼</td><td class="c-mod-col">아리엘과 결혼</td></tr>
+    <tr><td class="c-label">인어 결말</td><td class="c-orig-col">왕자를 죽이지 않고 거품이 됨</td><td class="c-mod-col">인간이 되어 해피엔딩</td></tr>
+    <tr><td class="c-label">주제</td><td class="c-orig-col">희생·사랑의 비극성</td><td class="c-mod-col">자기실현·사랑의 승리</td></tr>
+  </table>
+</div>
+
+<div class="card searchable" data-s="빨간모자 원본 현대 비교 페로 그림">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">🐺 빨간 모자</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">페로 원전 (1697)</th><th class="c-mod-col">그림 형제 (1812) / 현대</th></tr>
+    <tr><td class="c-label">할머니 잔혹도</td><td class="c-orig-col">할머니 피와 살을 소녀가 먹음</td><td class="c-mod-col">언급 없음</td></tr>
+    <tr><td class="c-label">구출자</td><td class="c-orig-col">없음 — 소녀가 잡아먹힘으로 끝</td><td class="c-mod-col">사냥꾼이 구출</td></tr>
+    <tr><td class="c-label">교훈</td><td class="c-orig-col">"낯선 남자를 조심하라" (노골적)</td><td class="c-mod-col">어른의 경고를 따르라</td></tr>
+    <tr><td class="c-label">결말</td><td class="c-orig-col">비극</td><td class="c-mod-col">해피엔딩</td></tr>
+  </table>
+</div>
+
+<div class="card searchable" data-s="개구리왕자 원본 현대 비교 키스 벽">
+  <div class="c-title" style="color:var(--gold);margin-bottom:10px;">🐸 개구리 왕자</div>
+  <table class="cmp">
+    <tr><th>항목</th><th class="c-orig-col">그림 형제 원전 (1812)</th><th class="c-mod-col">현대 동화 / 디즈니</th></tr>
+    <tr><td class="c-label">변신 방법</td><td class="c-orig-col">공주가 개구리를 <b>벽에 힘껏 던짐</b></td><td class="c-mod-col">공주의 키스</td></tr>
+    <tr><td class="c-label">공주 태도</td><td class="c-orig-col">혐오감에서 폭력적 행동</td><td class="c-mod-col">친절한 키스</td></tr>
+    <tr><td class="c-label">의미</td><td class="c-orig-col">분노·거부가 역설적으로 해방</td><td class="c-mod-col">사랑이 마법을 품</td></tr>
+  </table>
+</div>
+
+</div>
+</div><!-- end sec compare -->
+
+
+<!-- ══════════════ 잔혹 요소 사전 ══════════════ -->
+<div id="tab-dark" class="sec">
+<div class="sec-title">🩸 잔혹 요소 사전</div>
+<div class="sec-sub">동화 원전에 등장하는 잔혹·어두운 요소들을 유형별로 정리. 글쓰기 참고용.</div>
+
+<div class="sub-hdr">신체적 폭력 / 절단</div>
+<div class="grid">
+<div class="card dark searchable" data-s="신체폭력 절단 잔혹">
+  <div class="c-title" style="margin-bottom:8px;">🔪 신체 절단 & 폭력</div>
+  <div class="story-body">
+    <div class="dark-box"><b>신데렐라</b> — 의붓언니들이 발가락·발뒤꿈치 절단. 비둘기가 눈을 쪼아 실명.</div>
+    <div class="dark-box"><b>노간주나무</b> — 계모가 사과 상자 뚜껑으로 의붓아들 목 절단. 스튜로 요리해 아버지가 먹음.</div>
+    <div class="dark-box"><b>빨간 구두</b> — 카렌이 저주를 끊기 위해 사형집행인에게 두 발목을 잘라달라 요청.</div>
+    <div class="dark-box"><b>강도 신랑</b> — 납치된 소녀를 난도질하고 손가락 잘라 반지 탈취.</div>
+    <div class="dark-box"><b>파란 수염</b> — 전처들의 시신 매달기, 아내에게 칼로 목을 자르겠다 위협.</div>
+    <div class="dark-box"><b>룸펠슈틸츠킨</b> — 발로 땅을 구르다 몸이 두 쪽으로 찢어짐.</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="식인 cannibalism 잔혹 동화">
+  <div class="c-title" style="margin-bottom:8px;">🍖 식인 (Cannibalism)</div>
+  <div class="story-body">
+    <div class="dark-box"><b>노간주나무</b> — 계모가 의붓아들을 스튜로 요리 → 친부가 먹음. 그림 동화 최고 수위.</div>
+    <div class="dark-box"><b>빨간 모자 (페로)</b> — 늑대가 할머니 잡아먹고 피와 살을 소녀에게 제공, 소녀가 모르고 먹음.</div>
+    <div class="dark-box"><b>잠자는 숲속의 공주 (바실레)</b> — 식인귀 여왕이 손자·공주를 요리해 남편에게 먹이려 시도.</div>
+    <div class="dark-box"><b>헨젤과 그레텔</b> — 식인 마녀가 헨젤을 살찌워 잡아먹으려 함.</div>
+  </div>
+</div>
+</div>
+
+<div class="sub-hdr">성적 요소 / 금기</div>
+<div class="grid">
+<div class="card dark searchable" data-s="성적요소 금기 잔혹 원전">
+  <div class="c-title" style="margin-bottom:8px;">⚠️ 성적 요소 & 금기 (원전)</div>
+  <div class="story-body">
+    <div class="dark-box"><b>잠자는 숲속의 공주 (바실레 1634)</b> — 자는 공주를 왕이 겁탈, 깨어나지 않은 채 임신.</div>
+    <div class="dark-box"><b>라푼젤 (그림 초판 1812)</b> — 임신 사실이 "배가 불러요" 발언으로 드러남 → 이후 판본 삭제.</div>
+    <div class="dark-box"><b>당나귀 가죽 (페로)</b> — 아버지가 딸에게 구혼. 근친 결혼 요구.</div>
+    <div class="dark-box"><b>백설공주 (일부 판본)</b> — 왕자가 시신 상태의 공주에게 매료, 관을 가져가려 함.</div>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="죽음 비극 결말 잔혹">
+  <div class="c-title" style="margin-bottom:8px;">💀 비극적 죽음 & 결말</div>
+  <div class="story-body">
+    <div class="dark-box"><b>인어공주 (안데르센)</b> — 해피엔딩 없이 거품으로 사라짐.</div>
+    <div class="dark-box"><b>성냥팔이 소녀 (안데르센)</b> — 섣달그믐 추위 속 얼어 죽음.</div>
+    <div class="dark-box"><b>행복한 왕자 (와일드)</b> — 제비 동사, 동상 해체.</div>
+    <div class="dark-box"><b>빨간 모자 (페로)</b> — 구출자 없이 소녀가 잡아먹힘.</div>
+    <div class="dark-box"><b>빨간 구두 (안데르센)</b> — 발목 절단 후 회개해 사망. 죽음이 구원.</div>
+  </div>
+</div>
+</div>
+
+<div class="sub-hdr">응보 & 처벌</div>
+<div class="grid">
+<div class="card dark searchable" data-s="처벌 응보 결말 악당">
+  <div class="c-title" style="margin-bottom:8px;">⚖️ 악당 처벌 유형</div>
+  <div class="story-body">
+    <table class="cmp">
+      <tr><th>동화</th><th>악당</th><th class="c-orig-col">처벌 방식</th></tr>
+      <tr><td>백설공주</td><td>사악한 왕비</td><td class="c-orig-col">달구어진 쇠 신발 신고 죽을 때까지 춤</td></tr>
+      <tr><td>신데렐라</td><td>의붓언니들</td><td class="c-orig-col">비둘기에게 두 눈을 쪼여 실명</td></tr>
+      <tr><td>헨젤과 그레텔</td><td>식인 마녀</td><td class="c-orig-col">오븐 속에 산 채로 태워짐</td></tr>
+      <tr><td>노간주나무</td><td>계모</td><td class="c-orig-col">새가 맷돌을 머리 위에 떨어뜨림</td></tr>
+      <tr><td>룸펠슈틸츠킨</td><td>정령</td><td class="c-orig-col">분노해 몸이 두 쪽으로 찢어짐</td></tr>
+      <tr><td>파란 수염</td><td>파란 수염</td><td class="c-orig-col">아내의 오빠들에게 살해</td></tr>
+      <tr><td>강도 신랑</td><td>살인마 신랑</td><td class="c-orig-col">공개 처형</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card dark searchable" data-s="부모 자식 버림 학대 원전">
+  <div class="c-title" style="margin-bottom:8px;">👨‍👩‍👧 부모의 학대·버림</div>
+  <div class="story-body">
+    <div class="dark-box"><b>헨젤과 그레텔</b> — 친어머니가 두 번 아이들을 숲에 버림 (초판). 이후 계모로 수정.</div>
+    <div class="dark-box"><b>라푼젤</b> — 아버지가 채소 훔친 대가로 갓난아기를 마녀에게 넘김.</div>
+    <div class="dark-box"><b>야생 백조</b> — 계모의 마법으로 오빠들이 백조로 변함. 아버지는 무기력.</div>
+    <div class="dark-box"><b>당나귀 가죽</b> — 아버지가 딸에게 근친 결혼 요구.</div>
+    <div class="dark-box"><b>백설공주·신데렐라·노간주나무</b> — 계모(혹은 친어머니)의 학대·살해 시도.</div>
+  </div>
+</div>
+</div>
+
+<div class="sub-hdr">심리·상징 해석</div>
+<div class="grid">
+<div class="card searchable" data-s="심리 상징 프로이트 동화 해석">
+  <div class="c-title" style="margin-bottom:8px;">🧠 심리학·상징 해석</div>
+  <div class="story-body">
+    <div class="light-box"><b>브루노 베텔하임 (The Uses of Enchantment, 1976)</b> — 동화의 폭력과 잔혹함이 어린이가 내면의 두려움·욕구를 안전하게 처리하는 기능. 계모 = 나쁜 어머니 상(아이의 분리불안), 숲 = 무의식, 마녀 = 억압된 욕구.</div>
+    <div class="light-box"><b>마법 거울</b> — 자기애(나르시시즘)의 외부화. "세상에서 가장 아름다운 자"를 묻는 욕망.</div>
+    <div class="light-box"><b>금지된 방 (파란 수염)</b> — 호기심과 금기. 판도라 신화의 변형. 지식의 대가.</div>
+    <div class="light-box"><b>개암나무/나무</b> — 죽은 어머니의 영혼이 깃든 장소. 생사 경계의 매개.</div>
+    <div class="light-box"><b>빨간 색</b> — 빨간 모자, 빨간 구두, 사과 — 성숙·위험·욕망의 상징. 성인으로의 진입.</div>
+  </div>
+</div>
+
+<div class="card searchable" data-s="동화 역사 그림형제 검열">
+  <div class="c-title" style="margin-bottom:8px;">📚 그림 형제의 검열 역사</div>
+  <div class="story-body">
+    <div class="light-box"><b>1812년 초판</b> — 가장 잔혹하고 성적인 내용 포함. 학술 목적 민담 수집.</div>
+    <div class="light-box"><b>1819년 2판~1857년 7판</b> — 7번의 개정 거치며 점진적 순화. 친어머니→계모, 성적 요소 삭제, 종교적 도덕 강화.</div>
+    <div class="light-box"><b>주요 삭제/변경</b><br>· 백설공주: 친어머니→계모, 폐·간 요구→심장 요구<br>· 라푼젤: 임신 발각 장면 삭제<br>· 헨젤과 그레텔: 친어머니→계모</div>
+    <div class="light-box"><b>아이러니</b> — 원래 그림 형제는 순수한 "독일 민담"이라 주장했지만, 실제로는 프랑스 출신 중산층 여성들에게 수집한 이야기 다수 포함. 페로 판본과 겹치는 이야기도 많음.</div>
+  </div>
+</div>
+</div>
+
+</div><!-- end sec dark -->
+
+
+<!-- ══════════════ 작가·출처 ══════════════ -->
+<div id="tab-authors" class="sec">
+<div class="sec-title">✍️ 작가 & 출처 총정리</div>
+<div class="sec-sub">동화 문학의 주요 작가, 생몰년, 대표 작품, 특징</div>
+
+<div class="grid">
+
+<div class="author-card searchable" data-s="그림형제 jacob wilhelm grimm 독일 1812">
+  <div class="a-name">야코프 & 빌헬름 그림 (Brüder Grimm)</div>
+  <div class="a-life">🇩🇪 독일 · 야코프 1785–1863 / 빌헬름 1786–1859</div>
+  <div class="row"><span class="rk">직업</span><span class="rv">언어학자·문헌학자. 민담 수집가. 독일어 사전 공동 편찬.</span></div>
+  <div class="row"><span class="rk">대표작</span><span class="rv">어린이와 가정의 민담 (Kinder- und Hausmärchen) 1812~1857 (7판)</span></div>
+  <div class="row"><span class="rk">수록 수</span><span class="rv">초판 86편 → 최종판 200편 이상</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">순수 민담 수집이라 주장했으나 실제론 반복 개정·각색. 프랑스 출신 정보원도 다수. 7판까지 점점 어린이 친화적으로 순화.</span></div>
+  <div class="a-works">
+    <span class="badge b-dark">신데렐라</span><span class="badge b-dark">백설공주</span><span class="badge b-dark">헨젤과 그레텔</span><span class="badge b-dark">라푼젤</span><span class="badge b-dark">빨간 모자</span><span class="badge b-dark">노간주나무</span><span class="badge b-dark">개구리 왕자</span><span class="badge b-dark">룸펠슈틸츠킨</span><span class="badge b-dark">강도 신랑</span><span class="badge b-light">엄지동자</span><span class="badge b-light">여섯 마리 백조</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="안데르센 andersen 덴마크 1835 동화">
+  <div class="a-name">한스 크리스티안 안데르센 (H.C. Andersen)</div>
+  <div class="a-life">🇩🇰 덴마크 · 1805–1875</div>
+  <div class="row"><span class="rk">직업</span><span class="rv">작가·시인. 가난한 구두장이 아들. 발레리나·배우 등 다방면 시도 후 동화 작가로 정착.</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">민담 수집이 아닌 <b>창작 동화</b>. 자전적 요소 강함 — 못생기고 가난했던 자신을 미운 오리 새끼로, 이루어지지 않은 사랑을 인어공주로 표현. 비극과 슬픔을 아름다움으로 승화.</span></div>
+  <div class="row"><span class="rk">작품 수</span><span class="rv">156편 이상</span></div>
+  <div class="a-works">
+    <span class="badge b-dark">인어공주</span><span class="badge b-dark">빨간 구두</span><span class="badge b-dark">성냥팔이 소녀</span><span class="badge b-light">눈의 여왕</span><span class="badge b-light">미운 오리 새끼</span><span class="badge b-light">엄지 공주</span><span class="badge b-both">야생 백조</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="페로 perrault 프랑스 1697 동화">
+  <div class="a-name">샤를 페로 (Charles Perrault)</div>
+  <div class="a-life">🇫🇷 프랑스 · 1628–1703</div>
+  <div class="row"><span class="rk">직업</span><span class="rv">작가·관료. 루이 14세 시대 프랑스 문인.</span></div>
+  <div class="row"><span class="rk">대표작</span><span class="rv">거위 아줌마 이야기 (Histoires ou contes du temps passé) 1697 — 8편 수록</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">그림 형제보다 100년 이른 최초의 체계적 동화집. 신데렐라·빨간 모자 원형 제공. 이미 어린이용으로 정제되었으나 파란 수염·당나귀 가죽 등 성인적 내용 일부 존재. "교훈"을 명시적으로 시로 기술.</span></div>
+  <div class="a-works">
+    <span class="badge b-dark">파란 수염</span><span class="badge b-dark">빨간 모자</span><span class="badge b-dark">당나귀 가죽</span><span class="badge b-light">장화 신은 고양이</span><span class="badge b-light">신데렐라</span><span class="badge b-light">잠자는 공주</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="바실레 basile 이탈리아 펜타메로네 1634">
+  <div class="a-name">조반니 바티스타 바실레 (Giambattista Basile)</div>
+  <div class="a-life">🇮🇹 이탈리아 · 1566–1632</div>
+  <div class="row"><span class="rk">대표작</span><span class="rv">펜타메로네 (Lo cunto de li cunti) 1634 — 세계 최초 서양 동화집 중 하나</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">그림 형제·페로보다 먼저. 신데렐라(체네렌톨라)·잠자는 공주·라푼젤의 가장 오래된 문헌 기록. 나폴리 방언으로 작성. 노골적 폭력·성적 요소 원형 보존.</span></div>
+  <div class="a-works">
+    <span class="badge b-dark">태세인 오르란도 (잠자는 공주 원형)</span><span class="badge b-dark">페르시넬라 (라푼젤 원형)</span><span class="badge b-dark">체네렌톨라 (신데렐라 원형)</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="오스카와일드 oscar wilde 영국 아일랜드 동화">
+  <div class="a-name">오스카 와일드 (Oscar Wilde)</div>
+  <div class="a-life">🇮🇪 아일랜드·영국 · 1854–1900</div>
+  <div class="row"><span class="rk">특징</span><span class="rv">유미주의 작가. 동화를 성인 문학의 형식으로 사용. 희생·아름다움·사회 비판이 주제. 자신의 동성애·탄압 경험이 작품에 반영.</span></div>
+  <div class="a-works">
+    <span class="badge b-dark">행복한 왕자</span><span class="badge b-both">이기적인 거인</span><span class="badge b-both">나이팅게일과 장미</span><span class="badge b-both">놀라운 로켓</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="루이스캐럴 lewis carroll 앨리스 영국 1865">
+  <div class="a-name">루이스 캐럴 (Lewis Carroll)</div>
+  <div class="a-life">🇬🇧 영국 · 1832–1898 (본명: Charles Lutwidge Dodgson)</div>
+  <div class="row"><span class="rk">직업</span><span class="rv">수학자·논리학자·작가·사진가. 옥스퍼드 크라이스트 처치 강사.</span></div>
+  <div class="row"><span class="rk">특징</span><span class="rv">수학·논리의 부조리한 역전을 동화에 적용. 앨리스 리들(실존 인물)을 위해 즉흥으로 만들어준 이야기. 언어유희·넌센스 문학의 선구자.</span></div>
+  <div class="a-works">
+    <span class="badge b-light">이상한 나라의 앨리스 (1865)</span><span class="badge b-light">거울 나라의 앨리스 (1871)</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="바움 baum 오즈 미국 1900 동화">
+  <div class="a-name">L. 프랭크 바움 (L. Frank Baum)</div>
+  <div class="a-life">🇺🇸 미국 · 1856–1919</div>
+  <div class="row"><span class="rk">특징</span><span class="rv">미국 최초의 독자적 동화 세계관 창조. 유럽 동화의 잔혹함·마녀 없는 "미국적 동화"를 목표로 선언. 14편의 오즈 시리즈.</span></div>
+  <div class="a-works">
+    <span class="badge b-light">오즈의 마법사 (1900)</span>
+  </div>
+</div>
+
+<div class="author-card searchable" data-s="천일야화 아라비안나이트 중동 갈랑">
+  <div class="a-name">천일야화 / 아라비안 나이트 (One Thousand and One Nights)</div>
+  <div class="a-life">🌍 중동·인도·페르시아 · 9~14세기 수집</div>
+  <div class="row"><span class="rk">특징</span><span class="rv">샤흐리야르 왕과 세헤라자드의 액자 구조. 살인·복수·요술·사랑이 뒤섞인 성인 이야기. 알라딘·알리바바·신밧드는 후대(18세기 갈랑 번역본) 추가 이야기로 원전에 없음.</span></div>
+  <div class="a-works">
+    <span class="badge b-both">알라딘 (18세기 추가)</span><span class="badge b-both">알리바바 (18세기 추가)</span><span class="badge b-light">신밧드</span>
+  </div>
+</div>
+
+</div>
+</div><!-- end sec authors -->
+
+</div><!-- #main -->
+
+<script>
+function sw(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  doSearch(document.getElementById('search').value);
+}
+
+function doSearch(q){
+  q=q.trim().toLowerCase();
+  const activeSection=document.querySelector('.sec.active');
+  if(!activeSection)return;
+  const cards=activeSection.querySelectorAll('.searchable');
+  let vis=0;
+  cards.forEach(c=>{
+    const txt=(c.dataset.s||'')+(c.innerText||'');
+    const show=!q||txt.toLowerCase().includes(q);
+    c.classList.toggle('hidden',!show);
+    if(show)vis++;
+  });
+  document.getElementById('cnt').textContent=q?`${vis}건 일치`:'';
+  const nr=document.getElementById('no-result');
+  if(nr)nr.style.display=(q&&vis===0)?'block':'none';
+}
+
+document.getElementById('search').addEventListener('input',e=>doSearch(e.target.value));
+</script>
+</body>
+</html>

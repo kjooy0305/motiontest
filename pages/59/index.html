@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>테스트 59 — 将棋 AI 쇼기</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#13131f;color:#e0d5c5;font-family:'Segoe UI',Meiryo,sans-serif}
+
+/* ── screens ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+
+/* ── MENU ── */
+#s-menu{align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse at 50% 30%,#1e1e3a,#0d0d18)}
+.logo{text-align:center;margin-bottom:48px}
+.logo h1{font-size:clamp(2.4rem,8vw,5rem);font-weight:800;letter-spacing:.12em;color:#f0e0b0;text-shadow:0 0 40px #b8860b80}
+.logo .logo-jp{font-size:clamp(1rem,3vw,1.5rem);color:#c8a05a;letter-spacing:.3em;margin-top:6px}
+.logo p{color:#8a7a5a;margin-top:12px;font-size:.95rem}
+.menu-list{display:flex;flex-direction:column;gap:14px;width:100%;max-width:400px}
+.mbtn{padding:16px 24px;border:2px solid #4a3d22;border-radius:12px;background:#1c1a2e;color:#e0d5c5;font-size:1.1rem;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:12px}
+.mbtn:hover{background:#2a2548;border-color:#c8a05a;transform:translateX(4px)}
+.mbtn .icon{font-size:1.5rem;width:36px;text-align:center}
+.mbtn .info{display:flex;flex-direction:column}
+.mbtn .info small{color:#8a7a5a;font-size:.8rem;margin-top:2px}
+
+/* ── DIFFICULTY ── */
+#s-diff{align-items:center;justify-content:center;padding:40px 20px}
+#s-diff h2{font-size:1.8rem;margin-bottom:32px;color:#f0e0b0;text-align:center}
+.diff-grid{display:flex;flex-direction:column;gap:12px;width:100%;max-width:380px}
+.dbtn{padding:14px 20px;border:2px solid #3a3050;border-radius:10px;background:#1c1a2e;color:#e0d5c5;font-size:1rem;cursor:pointer;display:flex;align-items:center;gap:16px;transition:all .2s}
+.dbtn:hover{background:#2a2548;border-color:#c8a05a}
+.dbtn.best{border-color:#c8403080}
+.dbtn.best:hover{border-color:#c84030;background:#2a1518}
+.dbtn .dlv{font-size:1.4rem;font-weight:700;width:42px;text-align:center;color:#f0e0b0}
+.dbtn .dinfo{display:flex;flex-direction:column;text-align:left}
+.dbtn .dinfo small{color:#7a6a4a;font-size:.8rem}
+.back-btn{margin-top:24px;padding:10px 24px;border:1px solid #4a3d22;border-radius:8px;background:transparent;color:#9a8a6a;cursor:pointer;font-size:.95rem;transition:all .2s}
+.back-btn:hover{background:#2a2538;color:#e0d5c5}
+
+/* ── TUTORIAL ── */
+#s-tutorial{padding:0}
+.tutorial-wrap{max-width:800px;margin:0 auto;padding:24px 20px;width:100%}
+.tut-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #2a2538}
+.tut-nav button{padding:8px 18px;border:1px solid #4a3d22;border-radius:8px;background:#1c1a2e;color:#c8a05a;cursor:pointer;font-size:.9rem;transition:all .2s}
+.tut-nav button:hover{background:#2a2548;border-color:#c8a05a}
+#tut-progress{color:#8a7a5a;font-size:.9rem}
+#tut-content h2{font-size:1.5rem;color:#f0e0b0;margin-bottom:16px}
+.tut-body{line-height:1.8;color:#c0b090}
+.tut-body p{margin-bottom:12px}
+.tut-body ul{margin:12px 0 12px 24px}
+.tut-body li{margin-bottom:6px}
+.tut-body strong{color:#f0e0b0}
+
+/* ── MINI BOARD (tutorial diagrams) ── */
+.mini-board{display:inline-grid;grid-template-columns:repeat(5,52px);gap:2px;background:#5a3d18;padding:4px;border-radius:6px;margin:20px 0}
+.mini-row{display:contents}
+.mini-cell{width:52px;height:52px;background:#c8a870;display:flex;align-items:center;justify-content:center;border-radius:2px;position:relative}
+.mini-cell.mini-piece{background:#d4b880}
+.mini-cell.mini-target{background:#6a9a5080}
+.mini-dot{width:18px;height:18px;border-radius:50%;background:#4a8a40;opacity:.85}
+.mini-img{width:44px;height:44px;object-fit:contain}
+
+/* ── QUIZ ── */
+#s-quiz{padding:0;align-items:stretch}
+.quiz-wrap{max-width:900px;margin:0 auto;padding:20px;width:100%;display:flex;flex-direction:column;gap:16px}
+#quiz-header h2{font-size:1.3rem;color:#f0e0b0}
+#quiz-header p{color:#9a8a6a;margin-top:6px;font-size:.95rem}
+#quiz-board-area{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+#quiz-status{min-height:50px;font-size:.95rem;padding:10px 14px;background:#1c1a2e;border-radius:8px;border-left:3px solid #4a3d22}
+.correct{color:#6ab870;font-weight:600}
+.wrong{color:#c86060;font-weight:600}
+.hint{color:#9a8a5a;font-style:italic}
+.explain{color:#b0a080;margin-top:8px;line-height:1.7}
+#quiz-controls{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+#quiz-controls button{padding:8px 16px;border:1px solid #4a3d22;border-radius:8px;background:#1c1a2e;color:#c8a05a;cursor:pointer;font-size:.9rem;transition:all .2s}
+#quiz-controls button:disabled{opacity:.4;cursor:not-allowed}
+#quiz-controls button:not(:disabled):hover{background:#2a2548;border-color:#c8a05a}
+#quiz-counter{color:#8a7a5a;font-size:.9rem}
+
+/* ── GAME SCREEN ── */
+#s-game{flex-direction:row;align-items:stretch}
+.game-layout{display:flex;width:100%;min-height:100vh}
+.game-left{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px;background:#161620}
+.game-right{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:200px;max-width:300px;background:#0f0f1a}
+
+/* ── BOARD ── */
+.board{display:flex;flex-direction:column;gap:0;border:3px solid #5a3d18;border-radius:4px;overflow:hidden;background:#5a3d18}
+.board-col-header{display:flex}
+.lbl-corner{width:28px;height:20px;background:#3a2810}
+.col-lbl{width:56px;height:20px;background:#3a2810;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#8a6a3a}
+.board-row{display:flex}
+.row-lbl{width:28px;height:56px;background:#3a2810;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#8a6a3a}
+.cell{width:56px;height:56px;background:#c8a870;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;border:1px solid #8a6a3a40;transition:background .15s}
+.cell:hover{background:#d4b880}
+.cell.sel{background:#4488ff50;border-color:#4488ff}
+.cell.lastmove{background:#ffdd4440}
+.cell.incheck{background:#ff444450;animation:pulse .7s ease infinite alternate}
+@keyframes pulse{to{background:#ff444480}}
+.target-dot{width:22px;height:22px;border-radius:50%;background:#3a8a3080;pointer-events:none;position:absolute}
+.target-cap{position:absolute;inset:0;border:3px solid #3a8a30a0;border-radius:3px;pointer-events:none}
+.piece-img{width:48px;height:48px;object-fit:contain;pointer-events:none;position:relative;z-index:1}
+
+/* ── HANDS ── */
+.hand-area{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;background:#1c1a2c;border-radius:8px;min-width:200px;min-height:56px;border:1px solid #2a2538}
+.hand-label{width:100%;font-size:.75rem;color:#7a6a4a;margin-bottom:2px}
+.hand-piece{position:relative;width:52px;height:52px;background:#c8a870;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.hand-piece:hover{border-color:#c8a05a}
+.hand-piece.hand-sel{border-color:#4488ff;background:#d4b880}
+.hand-cnt{position:absolute;bottom:1px;right:3px;font-size:.7rem;color:#2a1a08;font-weight:700;background:#f0e0a0;border-radius:3px;padding:0 3px;line-height:1.3}
+.empty-hand{color:#5a4a3a;font-size:.8rem;font-style:italic}
+
+/* ── AI/PLAYER INFO ── */
+.ai-info,.player-info{width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#1c1a2c;border-radius:6px;font-size:.85rem}
+.ai-info{color:#b0a0c0}
+.player-info{color:#a0c0b0}
+#ai-diff-label{color:#7a6a9a;font-size:.75rem}
+
+/* ── STATUS + HISTORY ── */
+#game-status{padding:12px;background:#1c1a2c;border-radius:8px;font-size:1rem;color:#f0e0b0;min-height:50px;border-left:3px solid #4a3d22}
+#move-history{flex:1;overflow-y:auto;padding:10px;background:#13131f;border-radius:8px;max-height:300px;font-size:.78rem}
+.hist-entry{padding:3px 6px;border-radius:4px;margin-bottom:2px}
+.hist-entry.black{color:#b0d0c0}
+.hist-entry.white{color:#c0b0d0;text-align:right}
+.game-btns{display:flex;flex-direction:column;gap:8px}
+.game-btns button{padding:9px 14px;border:1px solid #3a3050;border-radius:8px;background:#1c1a2e;color:#c0b090;cursor:pointer;font-size:.88rem;transition:all .2s}
+.game-btns button:hover{background:#2a2548;border-color:#c8a05a;color:#f0e0b0}
+
+/* ── DIALOGS ── */
+.dialog{position:fixed;inset:0;background:#00000090;display:flex;align-items:center;justify-content:center;z-index:100}
+.dialog.hidden{display:none}
+.dialog-box{background:#1e1c30;border:2px solid #4a3d22;border-radius:16px;padding:28px 36px;text-align:center;max-width:320px}
+.dialog-box p{font-size:1.1rem;color:#f0e0b0;margin-bottom:20px;line-height:1.6}
+.dialog-box button{margin:6px;padding:10px 22px;border:1px solid #4a3d22;border-radius:8px;background:#2a2548;color:#e0d5c5;cursor:pointer;font-size:.95rem;transition:all .2s}
+.dialog-box button:hover{background:#3a3558;border-color:#c8a05a}
+
+/* ── THINKING OVERLAY ── */
+#think-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#00000040;border-radius:4px;font-size:1rem;color:#f0e0b0;pointer-events:none;opacity:0;transition:opacity .2s;z-index:10}
+#think-overlay.visible{opacity:1}
+
+/* ── BOARD WRAPPER (for overlay) ── */
+.board-wrap{position:relative;display:inline-flex;flex-direction:column}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .game-right{max-width:none;flex:1}
+  .game-layout{flex-direction:column}
+  .col-lbl,.row-lbl{font-size:.6rem}
+  .col-lbl{width:40px;height:18px}.row-lbl{width:20px;height:40px}
+  .cell{width:40px;height:40px}.lbl-corner{width:20px;height:18px}
+  .piece-img{width:34px;height:34px}
+  .hand-piece{width:40px;height:40px}
+  .hand-piece .piece-img{width:32px;height:32px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══════════════ MENU ══════════════ -->
+<div id="s-menu" class="screen active">
+  <div class="logo">
+    <h1>将棋</h1>
+    <div class="logo-jp">しょうぎ · 쇼기</div>
+    <p>futamoji 기물로 즐기는 일본 전략 보드게임</p>
+  </div>
+  <div class="menu-list">
+    <button class="mbtn" onclick="openTutorial()">
+      <span class="icon">📖</span>
+      <span class="info"><span>튜토리얼</span><small>기물 이동법부터 규칙까지 단계별 학습</small></span>
+    </button>
+    <button class="mbtn" onclick="openQuiz()">
+      <span class="icon">🎯</span>
+      <span class="info"><span>퀴즈 — 외통수 문제</span><small>詰み(쯔미) 문제로 감각 익히기</small></span>
+    </button>
+    <button class="mbtn" onclick="openDiff()">
+      <span class="icon">⚔️</span>
+      <span class="info"><span>AI 대전</span><small>5단계 난이도 · 선수(선수) vs AI</small></span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ DIFFICULTY ══════════════ -->
+<div id="s-diff" class="screen">
+  <div style="max-width:420px;margin:0 auto;padding:40px 20px;width:100%">
+    <h2 style="font-size:1.8rem;margin-bottom:32px;color:#f0e0b0;text-align:center">난이도 선택</h2>
+    <div class="diff-grid">
+      <button class="dbtn" onclick="startGame('최하')">
+        <span class="dlv">최하</span>
+        <span class="dinfo"><span>입문</span><small>무작위 수 선택</small></span>
+      </button>
+      <button class="dbtn" onclick="startGame('하')">
+        <span class="dlv">하</span>
+        <span class="dinfo"><span>초급</span><small>포획 우선 · 기초 전략</small></span>
+      </button>
+      <button class="dbtn" onclick="startGame('중')">
+        <span class="dlv">중</span>
+        <span class="dinfo"><span>중급</span><small>2수 앞 계산 (미니맥스)</small></span>
+      </button>
+      <button class="dbtn" onclick="startGame('상')">
+        <span class="dlv">상</span>
+        <span class="dinfo"><span>고급</span><small>3수 앞 알파-베타 탐색</small></span>
+      </button>
+      <button class="dbtn best" onclick="startGame('최상')">
+        <span class="dlv">최상</span>
+        <span class="dinfo"><span>최고급</span><small>4수 앞 탐색 + 수 정렬</small></span>
+      </button>
+    </div>
+    <button class="back-btn" onclick="goMenu()">← 메뉴로</button>
+  </div>
+</div>
+
+<!-- ══════════════ TUTORIAL ══════════════ -->
+<div id="s-tutorial" class="screen">
+  <div class="tutorial-wrap">
+    <div class="tut-nav">
+      <button onclick="tutPrev()">◀ 이전</button>
+      <span id="tut-progress">1 / 14</span>
+      <button onclick="tutNext()">다음 ▶</button>
+    </div>
+    <div id="tut-content"></div>
+    <button class="back-btn" onclick="goMenu()">← 메뉴로</button>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ ══════════════ -->
+<div id="s-quiz" class="screen">
+  <div class="quiz-wrap">
+    <div id="quiz-header">
+      <h2 id="quiz-title"></h2>
+      <p id="quiz-desc"></p>
+    </div>
+    <div id="quiz-board-area">
+      <div id="quiz-board" class="board"></div>
+    </div>
+    <div id="quiz-status"></div>
+    <div id="quiz-controls">
+      <button id="quiz-prev-btn" onclick="quizPrev()">◀ 이전</button>
+      <span id="quiz-counter">1 / 5</span>
+      <button id="quiz-next-btn" onclick="quizNext()">다음 ▶</button>
+    </div>
+    <button class="back-btn" onclick="goMenu()">← 메뉴로</button>
+  </div>
+</div>
+
+<!-- ══════════════ GAME ══════════════ -->
+<div id="s-game" class="screen">
+  <div class="game-layout">
+    <div class="game-left">
+      <div class="ai-info">
+        <span>AI (후수 ○)</span>
+        <span id="ai-diff-label"></span>
+      </div>
+      <div id="white-hand" class="hand-area"></div>
+      <div class="board-wrap">
+        <div id="board" class="board"></div>
+        <div id="think-overlay">AI 생각 중...</div>
+      </div>
+      <div id="black-hand" class="hand-area"></div>
+      <div class="player-info"><span>나 (선수 ●)</span></div>
+    </div>
+    <div class="game-right">
+      <div id="game-status">시작을 기다리는 중...</div>
+      <div id="move-history"></div>
+      <div class="game-btns">
+        <button onclick="newGameSame()">↺ 같은 난이도로 다시</button>
+        <button onclick="resignGame()">🏳 기권</button>
+        <button onclick="goMenu()">← 메뉴로</button>
+      </div>
+    </div>
+  </div>
+  <div id="promo-dialog" class="dialog hidden">
+    <div class="dialog-box">
+      <p>승격하시겠습니까?<br><small style="color:#9a8a6a">성(成)은 더 강한 이동을 허용합니다</small></p>
+      <button onclick="confirmPromo(true)">승격 (成)</button>
+      <button onclick="confirmPromo(false)">유지 (不成)</button>
+    </div>
+  </div>
+  <div id="gameover-dialog" class="dialog hidden">
+    <div class="dialog-box">
+      <p id="gameover-msg"></p>
+      <button onclick="newGameSame()">↺ 다시하기</button>
+      <button onclick="goMenu()">← 메뉴로</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════
+const PIECE_JP = {king:'玉',rook:'飛',bishop:'角',gold:'金',silver:'銀',knight:'桂',lance:'香',pawn:'歩'};
+const PIECE_KR = {king:'왕장',rook:'비차',bishop:'각',gold:'금장',silver:'은장',knight:'계마',lance:'향차',pawn:'보병'};
+const PIECE_VAL = {king:100000,rook:1000,bishop:800,gold:600,silver:500,knight:400,lance:350,pawn:100};
+const PIECE_TYPES = ['pawn','lance','knight','silver','gold','bishop','rook'];
+
+// ══════════════════════════════════════
+//  BOARD ENGINE (pure functions)
+// ══════════════════════════════════════
+
+function boardClone(b){return b.map(r=>r.map(c=>c?{...c}:null))}
+function handsClone(h){return{black:{...h.black},white:{...h.white}}}
+
+function createInitialBoard(){
+  const b=Array.from({length:9},()=>Array(9).fill(null));
+  const W=t=>({type:t,side:'white',promoted:false});
+  const B=t=>({type:t,side:'black',promoted:false});
+  b[0]=[W('lance'),W('knight'),W('silver'),W('gold'),W('king'),W('gold'),W('silver'),W('knight'),W('lance')];
+  b[1][1]=W('rook'); b[1][7]=W('bishop');
+  for(let c=0;c<9;c++) b[2][c]=W('pawn');
+  for(let c=0;c<9;c++) b[6][c]=B('pawn');
+  b[7][1]=B('bishop'); b[7][7]=B('rook');
+  b[8]=[B('lance'),B('knight'),B('silver'),B('gold'),B('king'),B('gold'),B('silver'),B('knight'),B('lance')];
+  return b;
+}
+
+function getPseudoMoves(board,r,c){
+  const p=board[r][c]; if(!p) return [];
+  const {type,side,promoted}=p;
+  const dir=side==='black'?-1:1;
+  const moves=[];
+  const ok=(nr,nc)=>nr>=0&&nr<9&&nc>=0&&nc<9;
+  const add=(nr,nc)=>{
+    if(!ok(nr,nc)) return false;
+    if(board[nr][nc]?.side===side) return false;
+    moves.push([nr,nc]);
+    return !board[nr][nc];
+  };
+  const slide=(dr,dc)=>{let nr=r+dr,nc=c+dc;while(ok(nr,nc)){if(!add(nr,nc))break;nr+=dr;nc+=dc;}};
+  const goldMoves=()=>{add(r+dir,c);add(r+dir,c-1);add(r+dir,c+1);add(r,c-1);add(r,c+1);add(r-dir,c);};
+
+  if(promoted&&type!=='bishop'&&type!=='rook'){goldMoves();return moves;}
+
+  switch(type){
+    case 'pawn': add(r+dir,c); break;
+    case 'lance': slide(dir,0); break;
+    case 'knight': add(r+2*dir,c-1); add(r+2*dir,c+1); break;
+    case 'silver':
+      add(r+dir,c);add(r+dir,c-1);add(r+dir,c+1);
+      add(r-dir,c-1);add(r-dir,c+1); break;
+    case 'gold': goldMoves(); break;
+    case 'king':
+      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) if(dr||dc) add(r+dr,c+dc);
+      break;
+    case 'bishop':
+      slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);
+      if(promoted){add(r-1,c);add(r+1,c);add(r,c-1);add(r,c+1);}
+      break;
+    case 'rook':
+      slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);
+      if(promoted){add(r-1,c-1);add(r-1,c+1);add(r+1,c-1);add(r+1,c+1);}
+      break;
+  }
+  return moves;
+}
+
+function isAttacked(board,tr,tc,bySide){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const p=board[r][c];
+    if(!p||p.side!==bySide) continue;
+    if(getPseudoMoves(board,r,c).some(([mr,mc])=>mr===tr&&mc===tc)) return true;
+  }
+  return false;
+}
+
+function findKing(board,side){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++)
+    if(board[r][c]?.type==='king'&&board[r][c]?.side===side) return [r,c];
+  return null;
+}
+
+function isInCheck(board,side){
+  const k=findKing(board,side);
+  if(!k) return false;
+  return isAttacked(board,k[0],k[1],side==='black'?'white':'black');
+}
+
+function getLegalPieceMoves(board,r,c){
+  const p=board[r][c]; if(!p) return [];
+  return getPseudoMoves(board,r,c).filter(([tr,tc])=>{
+    const nb=boardClone(board);
+    nb[tr][tc]={...nb[r][c]};
+    nb[r][c]=null;
+    return !isInCheck(nb,p.side);
+  });
+}
+
+function canPromote(piece,fromRow,toRow){
+  if(piece.promoted||piece.type==='gold'||piece.type==='king') return false;
+  const z=piece.side==='black'?[0,1,2]:[6,7,8];
+  return z.includes(toRow)||z.includes(fromRow);
+}
+
+function mustPromote(piece,toRow){
+  if(piece.promoted) return false;
+  if(piece.side==='black'){
+    if((piece.type==='pawn'||piece.type==='lance')&&toRow===0) return true;
+    if(piece.type==='knight'&&toRow<=1) return true;
+  } else {
+    if((piece.type==='pawn'||piece.type==='lance')&&toRow===8) return true;
+    if(piece.type==='knight'&&toRow>=7) return true;
+  }
+  return false;
+}
+
+// Simplified checkmate (used inside drop validation to avoid infinite recursion)
+function isCheckmateSimple(board,hands,side){
+  if(!isInCheck(board,side)) return false;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++)
+    if(board[r][c]?.side===side&&getLegalPieceMoves(board,r,c).length>0) return false;
+  // Check drops (skip pawn-drop-checkmate inner check)
+  for(const type of PIECE_TYPES){
+    if(!(hands[side]?.[type])) continue;
+    const drops=getDropSquaresRaw(board,hands,side,type,true);
+    if(drops.length>0) return false;
+  }
+  return true;
+}
+
+function getDropSquaresRaw(board,hands,side,type,skipFumizume){
+  if(!(hands[side]?.[type])) return [];
+  const result=[];
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    if(board[r][c]) continue;
+    if((type==='pawn'||type==='lance')&&((side==='black'&&r===0)||(side==='white'&&r===8))) continue;
+    if(type==='knight'&&((side==='black'&&r<=1)||(side==='white'&&r>=7))) continue;
+    if(type==='pawn'){
+      let has2=false;
+      for(let pr=0;pr<9;pr++){const pp=board[pr][c];if(pp&&pp.type==='pawn'&&pp.side===side&&!pp.promoted){has2=true;break;}}
+      if(has2) continue;
+      if(!skipFumizume){
+        const nb=boardClone(board);
+        nb[r][c]={type:'pawn',side,promoted:false};
+        const opp=side==='black'?'white':'black';
+        if(isCheckmateSimple(nb,hands,opp)) continue;
+      }
+    }
+    const nb=boardClone(board);
+    nb[r][c]={type,side,promoted:false};
+    if(!isInCheck(nb,side)) result.push([r,c]);
+  }
+  return result;
+}
+
+function getDropSquares(board,hands,side,type){
+  return getDropSquaresRaw(board,hands,side,type,false);
+}
+
+function isCheckmate(board,hands,side){
+  if(!isInCheck(board,side)) return false;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++)
+    if(board[r][c]?.side===side&&getLegalPieceMoves(board,r,c).length>0) return false;
+  for(const type of PIECE_TYPES){
+    if(!(hands[side]?.[type])) continue;
+    if(getDropSquares(board,hands,side,type).length>0) return false;
+  }
+  return true;
+}
+
+function isStalemate(board,hands,side){
+  if(isInCheck(board,side)) return false;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++)
+    if(board[r][c]?.side===side&&getLegalPieceMoves(board,r,c).length>0) return false;
+  for(const type of PIECE_TYPES){
+    if(!(hands[side]?.[type])) continue;
+    if(getDropSquares(board,hands,side,type).length>0) return false;
+  }
+  return true;
+}
+
+function getAllLegalMoves(board,hands,side){
+  const moves=[];
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const p=board[r][c];
+    if(!p||p.side!==side) continue;
+    for(const [tr,tc] of getLegalPieceMoves(board,r,c)){
+      const mp=mustPromote(p,tr), cp=canPromote(p,r,tr);
+      if(mp) moves.push({type:'move',fr:r,fc:c,tr,tc,promote:true});
+      else if(cp){
+        moves.push({type:'move',fr:r,fc:c,tr,tc,promote:true});
+        moves.push({type:'move',fr:r,fc:c,tr,tc,promote:false});
+      } else moves.push({type:'move',fr:r,fc:c,tr,tc,promote:false});
+    }
+  }
+  for(const type of PIECE_TYPES){
+    if(!(hands[side]?.[type])) continue;
+    for(const [tr,tc] of getDropSquares(board,hands,side,type))
+      moves.push({type:'drop',side,dropType:type,tr,tc});
+  }
+  return moves;
+}
+
+function applyMoveObj(board,hands,move){
+  const nb=boardClone(board), nh=handsClone(hands);
+  if(move.type==='move'){
+    const {fr,fc,tr,tc,promote}=move;
+    const piece=nb[fr][fc], captured=nb[tr][tc];
+    if(captured) nh[piece.side][captured.type]=(nh[piece.side][captured.type]||0)+1;
+    nb[tr][tc]={...piece,promoted:piece.promoted||promote};
+    nb[fr][fc]=null;
+  } else {
+    const {side,dropType,tr,tc}=move;
+    nb[tr][tc]={type:dropType,side,promoted:false};
+    nh[side][dropType]--;
+    if(!nh[side][dropType]) delete nh[side][dropType];
+  }
+  return {board:nb,hands:nh};
+}
+
+// ══════════════════════════════════════
+//  AI ENGINE
+// ══════════════════════════════════════
+
+function pVal(piece){
+  if(!piece) return 0;
+  if(piece.promoted){
+    if(piece.type==='rook') return 1400;
+    if(piece.type==='bishop') return 1200;
+    return 600;
+  }
+  return PIECE_VAL[piece.type]||0;
+}
+
+function evaluate(board,hands,aiSide){
+  let score=0;
+  const pSide=aiSide==='black'?'white':'black';
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const p=board[r][c]; if(!p) continue;
+    score+=(p.side===aiSide?1:-1)*pVal(p);
+  }
+  for(const[t,n]of Object.entries(hands[aiSide]||{})) score+=(PIECE_VAL[t]||0)*(n||0)*0.9;
+  for(const[t,n]of Object.entries(hands[pSide]||{})) score-=(PIECE_VAL[t]||0)*(n||0)*0.9;
+  return score;
+}
+
+function minimax(board,hands,depth,alpha,beta,isMax,aiSide){
+  const side=isMax?aiSide:(aiSide==='black'?'white':'black');
+  if(depth===0) return evaluate(board,hands,aiSide);
+  const moves=getAllLegalMoves(board,hands,side);
+  if(!moves.length) return isMax?-90000:90000;
+  moves.sort((a,b)=>{
+    const av=a.type==='move'&&board[a.tr]?.[a.tc]?pVal(board[a.tr][a.tc]):0;
+    const bv=b.type==='move'&&board[b.tr]?.[b.tc]?pVal(board[b.tr][b.tc]):0;
+    return bv-av;
+  });
+  if(isMax){
+    let val=-Infinity;
+    for(const m of moves){
+      const{board:nb,hands:nh}=applyMoveObj(board,hands,m);
+      val=Math.max(val,minimax(nb,nh,depth-1,alpha,beta,false,aiSide));
+      alpha=Math.max(alpha,val);
+      if(alpha>=beta) break;
+    }
+    return val;
+  } else {
+    let val=Infinity;
+    for(const m of moves){
+      const{board:nb,hands:nh}=applyMoveObj(board,hands,m);
+      val=Math.min(val,minimax(nb,nh,depth-1,alpha,beta,true,aiSide));
+      beta=Math.min(beta,val);
+      if(alpha>=beta) break;
+    }
+    return val;
+  }
+}
+
+function computeBestMove(board,hands,side,diff){
+  const moves=getAllLegalMoves(board,hands,side);
+  if(!moves.length) return null;
+  if(diff==='최하') return moves[Math.floor(Math.random()*moves.length)];
+  if(diff==='하'){
+    let best=null,bestV=-Infinity;
+    for(const m of moves){
+      if(m.type==='move'&&board[m.tr]?.[m.tc]){const v=pVal(board[m.tr][m.tc]);if(v>bestV){bestV=v;best=m;}}
+    }
+    if(best) return best;
+    return moves[Math.floor(Math.random()*moves.length)];
+  }
+  const depth={'중':2,'상':3,'최상':4}[diff]||2;
+  moves.sort((a,b)=>{
+    const av=a.type==='move'&&board[a.tr]?.[a.tc]?pVal(board[a.tr][a.tc]):0;
+    const bv=b.type==='move'&&board[b.tr]?.[b.tc]?pVal(board[b.tr][b.tc]):0;
+    return bv-av;
+  });
+  let bestM=null,bestV=-Infinity;
+  for(const m of moves){
+    const{board:nb,hands:nh}=applyMoveObj(board,hands,m);
+    const v=minimax(nb,nh,depth-1,-Infinity,Infinity,false,side);
+    if(v>bestV){bestV=v;bestM=m;}
+  }
+  return bestM;
+}
+
+// ══════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════
+
+const GS={
+  board:null,hands:null,turn:'black',
+  selected:null,legalTargets:[],
+  diff:'중',gameOver:false,
+  lastMove:null,pendingPromo:null,
+  tutIdx:0,quizIdx:0,
+};
+
+function goMenu(){showScreen('s-menu');}
+function openDiff(){showScreen('s-diff');}
+
+function startGame(diff){
+  GS.diff=diff;
+  GS.board=createInitialBoard();
+  GS.hands={black:{},white:{}};
+  GS.turn='black';
+  GS.selected=null; GS.legalTargets=[];
+  GS.gameOver=false; GS.lastMove=null; GS.pendingPromo=null;
+  document.getElementById('gameover-dialog').classList.add('hidden');
+  document.getElementById('promo-dialog').classList.add('hidden');
+  document.getElementById('move-history').innerHTML='';
+  document.getElementById('ai-diff-label').textContent='난이도: '+diff;
+  showScreen('s-game');
+  renderBoard(); renderHands();
+  updateStatus('선수(●) 차례입니다');
+}
+
+function newGameSame(){startGame(GS.diff);}
+
+function resignGame(){
+  if(GS.gameOver) return;
+  showGameOver('기권했습니다. AI 승리!');
+}
+
+function showGameOver(msg){
+  GS.gameOver=true;
+  document.getElementById('gameover-msg').textContent=msg;
+  document.getElementById('gameover-dialog').classList.remove('hidden');
+}
+
+// ── Click handling ──
+
+function handleCellClick(r,c){
+  if(GS.gameOver||GS.turn!=='black'||GS.pendingPromo) return;
+  const piece=GS.board[r][c];
+  if(GS.legalTargets.some(([tr,tc])=>tr===r&&tc===c)){doPlayerMove(r,c);return;}
+  if(piece&&piece.side==='black'){
+    GS.selected={fromBoard:{r,c}};
+    GS.legalTargets=getLegalPieceMoves(GS.board,r,c);
+    renderBoard(); return;
+  }
+  GS.selected=null; GS.legalTargets=[];
+  renderBoard();
+}
+
+function handleHandClick(type){
+  if(GS.gameOver||GS.turn!=='black'||GS.pendingPromo) return;
+  GS.selected={fromHand:{type}};
+  GS.legalTargets=getDropSquares(GS.board,GS.hands,'black',type);
+  renderBoard(); renderHands();
+}
+
+function doPlayerMove(tr,tc){
+  const sel=GS.selected;
+  if(sel.fromHand){
+    executeMove({type:'drop',side:'black',dropType:sel.fromHand.type,tr,tc});
+  } else {
+    const{r:fr,c:fc}=sel.fromBoard;
+    const piece=GS.board[fr][fc];
+    const mp=mustPromote(piece,tr), cp=canPromote(piece,fr,tr);
+    if(mp) executeMove({type:'move',fr,fc,tr,tc,promote:true});
+    else if(cp){GS.pendingPromo={fr,fc,tr,tc};document.getElementById('promo-dialog').classList.remove('hidden');}
+    else executeMove({type:'move',fr,fc,tr,tc,promote:false});
+  }
+}
+
+function confirmPromo(yes){
+  if(!GS.pendingPromo) return;
+  const{fr,fc,tr,tc}=GS.pendingPromo;
+  GS.pendingPromo=null;
+  document.getElementById('promo-dialog').classList.add('hidden');
+  executeMove({type:'move',fr,fc,tr,tc,promote:yes});
+}
+
+function executeMove(move){
+  GS.selected=null; GS.legalTargets=[];
+  const{board,hands}=applyMoveObj(GS.board,GS.hands,move);
+  GS.board=board; GS.hands=hands; GS.lastMove=move;
+  const side=GS.turn;
+  GS.turn=side==='black'?'white':'black';
+  renderBoard(); renderHands();
+  appendHistory(move,side);
+  const opp=GS.turn;
+  if(isCheckmate(GS.board,GS.hands,opp)){
+    renderBoard();
+    setTimeout(()=>showGameOver(`外通手(외통수)! ${opp==='black'?'AI 승리!':'플레이어 승리!'}`),200);
+    return;
+  }
+  if(isStalemate(GS.board,GS.hands,opp)){
+    setTimeout(()=>showGameOver('수가 없습니다 — 무승부'),200);return;
+  }
+  if(isInCheck(GS.board,opp)) updateStatus(`${opp==='black'?'선수':'후수'} 王手(왕수)!`);
+  else updateStatus(`${opp==='black'?'선수(●) 차례':'AI(○) 생각 중...'}`);
+  if(GS.turn==='white'&&!GS.gameOver){
+    document.getElementById('think-overlay').classList.add('visible');
+    setTimeout(doAiTurn,80);
+  }
+}
+
+function doAiTurn(){
+  if(GS.gameOver||GS.turn!=='white') return;
+  const move=computeBestMove(GS.board,GS.hands,'white',GS.diff);
+  document.getElementById('think-overlay').classList.remove('visible');
+  if(!move){showGameOver('AI 수 없음 — 플레이어 승리!');return;}
+  const{board,hands}=applyMoveObj(GS.board,GS.hands,move);
+  GS.board=board; GS.hands=hands; GS.lastMove=move;
+  GS.turn='black';
+  renderBoard(); renderHands();
+  appendHistory(move,'white');
+  if(isCheckmate(GS.board,GS.hands,'black')){
+    renderBoard();
+    setTimeout(()=>showGameOver('外通手(외통수)! AI 승리!'),200);return;
+  }
+  if(isStalemate(GS.board,GS.hands,'black')){
+    setTimeout(()=>showGameOver('수가 없습니다 — 무승부'),200);return;
+  }
+  if(isInCheck(GS.board,'black')) updateStatus('선수(●) 王手(왕수)! 피하세요!');
+  else updateStatus('선수(●) 차례입니다');
+}
+
+// ══════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════
+
+function getPieceImg(piece){
+  const s=piece.side;
+  let n;
+  if(piece.promoted){
+    switch(piece.type){
+      case 'rook':n='dragon';break; case 'bishop':n='horse';break;
+      case 'silver':n='prom_silver';break; case 'knight':n='prom_knight';break;
+      case 'lance':n='prom_lance';break; case 'pawn':n='prom_pawn';break;
+      default:n=piece.type;
+    }
+  } else n=piece.type;
+  return `img/${s}_${n}.png`;
+}
+
+function buildBoardEl(el,board,legalTargets,selected,lastMove,clickFn){
+  el.innerHTML='';
+  // Column header
+  const hdr=document.createElement('div');
+  hdr.className='board-col-header';
+  hdr.innerHTML='<div class="lbl-corner"></div>';
+  for(let c=0;c<9;c++) hdr.innerHTML+=`<div class="col-lbl">${9-c}</div>`;
+  el.appendChild(hdr);
+  const ht=legalTargets||[];
+  const sp=selected?.fromBoard;
+  const lm=lastMove;
+  for(let r=0;r<9;r++){
+    const rowEl=document.createElement('div');
+    rowEl.className='board-row';
+    const rl=document.createElement('div');
+    rl.className='row-lbl';
+    rl.textContent='abcdefghi'[r];
+    rowEl.appendChild(rl);
+    for(let c=0;c<9;c++){
+      const cell=document.createElement('div');
+      cell.className='cell';
+      const piece=board[r][c];
+      const isT=ht.some(([tr,tc])=>tr===r&&tc===c);
+      const isSel=sp&&sp.r===r&&sp.c===c;
+      const isLM=lm&&((lm.type==='move'&&((lm.fr===r&&lm.fc===c)||(lm.tr===r&&lm.tc===c)))||(lm.type==='drop'&&lm.tr===r&&lm.tc===c));
+      const isChk=piece?.type==='king'&&isInCheck(board,piece.side);
+      if(isSel) cell.classList.add('sel');
+      else if(isChk) cell.classList.add('incheck');
+      else if(isLM) cell.classList.add('lastmove');
+      if(isT){
+        const dot=document.createElement('div');
+        dot.className=piece?'target-cap':'target-dot';
+        cell.appendChild(dot);
+      }
+      if(piece){
+        const img=document.createElement('img');
+        img.src=getPieceImg(piece); img.className='piece-img';
+        img.alt=PIECE_KR[piece.type]||piece.type;
+        cell.appendChild(img);
+      }
+      if(clickFn) cell.addEventListener('click',()=>clickFn(r,c));
+      rowEl.appendChild(cell);
+    }
+    el.appendChild(rowEl);
+  }
+}
+
+function renderBoard(){
+  buildBoardEl(
+    document.getElementById('board'),
+    GS.board, GS.legalTargets, GS.selected, GS.lastMove,
+    handleCellClick
+  );
+}
+
+function renderHands(){
+  renderHandEl('white-hand','white',false);
+  renderHandEl('black-hand','black',true);
+}
+
+function renderHandEl(elId,side,clickable){
+  const el=document.getElementById(elId);
+  el.innerHTML=`<div class="hand-label">${side==='black'?'나의 포획말 (손패)':'AI 포획말'}</div>`;
+  const h=GS.hands[side]||{};
+  const selH=GS.selected?.fromHand;
+  let any=false;
+  for(const type of PIECE_TYPES){
+    const cnt=h[type]||0; if(!cnt) continue;
+    any=true;
+    const pd=document.createElement('div');
+    pd.className='hand-piece';
+    if(selH&&selH.type===type&&side==='black') pd.classList.add('hand-sel');
+    const img=document.createElement('img');
+    img.src=getPieceImg({type,side,promoted:false}); img.className='piece-img';
+    pd.appendChild(img);
+    if(cnt>1){const b=document.createElement('span');b.className='hand-cnt';b.textContent=cnt;pd.appendChild(b);}
+    if(clickable) pd.addEventListener('click',()=>handleHandClick(type));
+    el.appendChild(pd);
+  }
+  if(!any) el.innerHTML+=`<span class="empty-hand">없음</span>`;
+}
+
+function updateStatus(msg){
+  const el=document.getElementById('game-status');
+  if(el) el.textContent=msg;
+}
+
+function appendHistory(move,side){
+  const el=document.getElementById('move-history');
+  if(!el) return;
+  const div=document.createElement('div');
+  div.className=`hist-entry ${side}`;
+  let t=side==='black'?'● ':'○ ';
+  if(move.type==='move') t+=`(${move.fr+1},${move.fc+1})→(${move.tr+1},${move.tc+1})${move.promote?' 成':''}`;
+  else t+=`${PIECE_JP[move.dropType]}打→(${move.tr+1},${move.tc+1})`;
+  div.textContent=t; el.appendChild(div);
+  el.scrollTop=el.scrollHeight;
+}
+
+// ══════════════════════════════════════
+//  TUTORIAL
+// ══════════════════════════════════════
+
+function makePieceDiagram(type,side){
+  const b9=Array.from({length:9},()=>Array(9).fill(null));
+  b9[4][4]={type,side,promoted:false};
+  const m9=getPseudoMoves(b9,4,4);
+  const filt=m9.filter(([r,c])=>r>=2&&r<=6&&c>=2&&c<=6).map(([r,c])=>[r-2,c-2]);
+  let h=`<div class="mini-board">`;
+  for(let r=0;r<5;r++){
+    for(let c=0;c<5;c++){
+      const isCtr=r===2&&c===2;
+      const isMv=filt.some(([mr,mc])=>mr===r&&mc===c);
+      const cls='mini-cell'+(isCtr?' mini-piece':isMv?' mini-target':'');
+      h+=`<div class="${cls}">`;
+      if(isCtr) h+=`<img src="img/${side}_${type}.png" class="mini-img" alt="${type}">`;
+      else if(isMv) h+=`<div class="mini-dot"></div>`;
+      h+=`</div>`;
+    }
+  }
+  h+=`</div>`;
+  return h;
+}
+
+const TUT_LESSONS=[
+  {
+    title:'1. 쇼기(将棋)란?',
+    html:`<p>쇼기는 일본의 전통 전략 보드게임으로 체스와 비슷하지만 한 가지 결정적인 차이가 있습니다.</p>
+    <p><strong>포획한 상대의 말을 자신의 말로 사용(打ち/우치)</strong>할 수 있습니다!</p>
+    <p>두 플레이어가 번갈아 말을 움직여 상대의 <strong>王将(오쇼) — 왕장</strong>을 외통수에 몰면 승리합니다.</p>
+    <ul>
+      <li>9×9 판 (81칸)</li><li>각자 20개의 말</li><li>상대 진영 3열에서 <strong>승격(成り)</strong> 가능</li>
+      <li>포획한 말을 <strong>손패(持ち駒)</strong>로 빈 칸에 두기 가능</li>
+    </ul>
+    <p style="margin-top:16px;color:#9a8a5a">이 게임에서: 선수(●)=플레이어·아래, 후수(○)=AI·위</p>`
+  },
+  {
+    title:'2. 승격 구역과 방향',
+    html:`<p>각 말은 전방으로 이동합니다. <strong>선수(●)</strong>는 위쪽으로, <strong>후수(○)</strong>는 아래쪽으로 전진합니다.</p>
+    <p>상대 진영 3열에 들어가면 <strong>승격(成り)</strong>이 가능합니다:</p>
+    <div style="background:#1c1a2c;border-radius:8px;padding:16px;margin:12px 0;font-family:monospace;font-size:.85rem;line-height:2">
+      <div style="color:#c070c0">[ 후수(AI) 시작 구역 ]<br>───  후수 승격 구역  ───</div>
+      <div style="color:#7a7a9a">──────── 중간 ────────</div>
+      <div style="color:#70a0c0">───  선수 승격 구역  ───<br>[ 선수(나) 시작 구역 ]</div>
+    </div>
+    <p>구역에 들어가거나 구역 안에서 이동할 때 승격을 선택할 수 있습니다.</p>`
+  },
+  {
+    title:'3. 보병 (歩兵 · ふひょう)',
+    html:`<p><strong>앞으로 1칸</strong>만 이동합니다. 가장 수가 많은 말입니다.</p>
+    <p>승격 → <strong>と金(토킨)</strong>: 금장과 같이 움직입니다.</p>
+    <p style="color:#c87060"><strong>二歩(니후) 금지</strong>: 같은 세로줄에 자신의 미승격 보병이 이미 있으면 그 줄에 보병을 둘 수 없습니다.</p>
+    <p style="color:#c87060"><strong>打ち歩詰め 금지</strong>: 보병 타기로 바로 외통수를 만드는 것은 금지입니다.</p>`,
+    diagram:'pawn'
+  },
+  {
+    title:'4. 향차 (香車 · きょうしゃ)',
+    html:`<p><strong>앞으로 몇 칸이든</strong> 이동합니다. 뒤로나 옆으로는 이동 불가합니다.</p>
+    <p>승격 → 금장과 같이 움직입니다.</p>
+    <p style="color:#9a8a5a">마지막 줄(1단)에는 두거나 이동할 수 없습니다.</p>`,
+    diagram:'lance'
+  },
+  {
+    title:'5. 계마 (桂馬 · けいま)',
+    html:`<p>앞으로 2칸 + 옆으로 1칸 <strong>L자형</strong>으로 점프합니다. 중간 말을 뛰어넘을 수 있습니다.</p>
+    <p>승격 → 금장과 같이 움직입니다.</p>
+    <p style="color:#9a8a5a">마지막 2줄에는 이동하거나 둘 수 없습니다.</p>`,
+    diagram:'knight'
+  },
+  {
+    title:'6. 은장 (銀将 · ぎんしょう)',
+    html:`<p>앞쪽 3방향 + 뒤쪽 대각선 2방향 = <strong>5방향</strong>으로 1칸 이동합니다.</p>
+    <p>승격 → 금장과 같이 움직입니다.</p>`,
+    diagram:'silver'
+  },
+  {
+    title:'7. 금장 (金将 · きんしょう)',
+    html:`<p>앞쪽 3방향 + 옆 2방향 + 뒤 1방향 = <strong>6방향</strong>으로 1칸 이동합니다.</p>
+    <p>승격 없음. 쇼기에서 가장 중요한 방어 말입니다.</p>`,
+    diagram:'gold'
+  },
+  {
+    title:'8. 각 (角行 · かくぎょう)',
+    html:`<p><strong>대각선</strong>으로 몇 칸이든 이동합니다. 체스의 비숍과 동일합니다.</p>
+    <p>승격 → <strong>龍馬(류마)</strong>: 대각선 무제한 + 상하좌우 1칸 추가로 이동합니다.</p>`,
+    diagram:'bishop'
+  },
+  {
+    title:'9. 비차 (飛車 · ひしゃ)',
+    html:`<p><strong>상하좌우</strong>로 몇 칸이든 이동합니다. 체스의 룩과 동일합니다.</p>
+    <p>승격 → <strong>龍王(류오)</strong>: 상하좌우 무제한 + 대각선 1칸 추가로 이동합니다.</p>`,
+    diagram:'rook'
+  },
+  {
+    title:'10. 왕장 (玉将/王将)',
+    html:`<p><strong>8방향</strong>으로 1칸씩 이동합니다. 이 말을 잃으면 패배합니다.</p>
+    <p>승격 없음. 절대 공격받는 위치로 이동할 수 없습니다.</p>`,
+    diagram:'king'
+  },
+  {
+    title:'11. 승격(成り) 상세 규칙',
+    html:`<p>다음 중 하나일 때 <strong>선택적으로</strong> 승격할 수 있습니다:</p>
+    <ul><li>말이 상대 진영 3열로 <strong>이동할 때</strong></li><li>상대 진영 안에서 <strong>이동할 때</strong></li></ul>
+    <p><strong>반드시 승격</strong>해야 하는 경우 (더 이상 이동할 수 없는 위치):</p>
+    <ul><li>보병·향차: 마지막 줄 도달 시</li><li>계마: 마지막 2줄 도달 시</li></ul>
+    <p>승격한 말이 포획되면 <strong>미승격 상태</strong>로 상대 손패로 들어갑니다.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+      <div style="text-align:center"><img src="img/black_rook.png" style="width:48px"><br><small>飛車</small></div>
+      <div style="text-align:center;font-size:1.5rem;padding-top:12px">→</div>
+      <div style="text-align:center"><img src="img/black_dragon.png" style="width:48px"><br><small>龍王 (승격)</small></div>
+      <div style="width:24px"></div>
+      <div style="text-align:center"><img src="img/black_bishop.png" style="width:48px"><br><small>角行</small></div>
+      <div style="text-align:center;font-size:1.5rem;padding-top:12px">→</div>
+      <div style="text-align:center"><img src="img/black_horse.png" style="width:48px"><br><small>龍馬 (승격)</small></div>
+    </div>`
+  },
+  {
+    title:'12. 타 수(打ち/우치) — 손패 사용',
+    html:`<p>포획한 상대 말을 자신의 것으로 <strong>빈 칸에</strong> 놓을 수 있습니다!</p>
+    <p>말을 둘 때 규칙:</p>
+    <ul>
+      <li>항상 <strong>미승격 상태</strong>로 둡니다</li>
+      <li><strong>二歩 금지</strong>: 보병은 같은 줄에 이미 자신의 미승격 보병이 있으면 불가</li>
+      <li><strong>타 보병 외통수(打ち歩詰め) 금지</strong></li>
+      <li>보병·향차: 마지막 줄에 두기 불가</li>
+      <li>계마: 마지막 2줄에 두기 불가</li>
+    </ul>
+    <p>손패 사용은 쇼기를 체스보다 훨씬 전략적으로 만드는 핵심 요소입니다!</p>`
+  },
+  {
+    title:'13. 왕수(王手)와 외통수(詰み)',
+    html:`<p><strong>王手(왕수/오테)</strong>: 상대 왕장을 위협하는 수 = 체스의 "체크(Check)"</p>
+    <p><strong>外通手·詰み(외통수/쯔미)</strong>: 왕장을 피할 방법이 없는 상태 = 체스의 "체크메이트" → 게임 종료</p>
+    <p>왕수를 당하면 다음 중 하나로 해결해야 합니다:</p>
+    <ul>
+      <li>왕장 이동</li>
+      <li>공격하는 말 포획</li>
+      <li>공격 경로에 다른 말 배치 (단, 계마·왕 직접 공격은 막기 불가)</li>
+      <li>손패 말을 두어 경로 차단</li>
+    </ul>
+    <p style="color:#c87060">해결 방법이 없으면 외통수! 패배합니다.</p>`
+  },
+  {
+    title:'14. 기본 전략과 마무리',
+    html:`<p><strong>비차와 각</strong>을 우선 활성화하세요 — 가장 강력한 말입니다.</p>
+    <p><strong>왕 보호(囲い/가코이)</strong>: 왕을 금장과 은장으로 에워싸 안전하게 합니다.</p>
+    <p><strong>손패 전략</strong>: 포획한 금장을 결정적인 위치에 타 수하는 것이 매우 강력합니다.</p>
+    <p><strong>보병 전진</strong>: 보병을 천천히 전진시켜 상대 진영을 압박합니다.</p>
+    <p><strong>승격 타이밍</strong>: 비차와 각은 상대 진영에 들어가면 반드시 승격하세요.</p>
+    <div style="margin-top:20px;padding:16px;background:#1c2a1c;border-radius:8px;border-left:3px solid #5a9a5a">
+      <strong style="color:#8aca8a">튜토리얼 완료!</strong><br>
+      <span style="color:#9a8a6a">이제 AI와 대전하거나 퀴즈에 도전해보세요.</span>
+    </div>`
+  }
+];
+
+function openTutorial(){
+  GS.tutIdx=0;
+  showScreen('s-tutorial');
+  renderTutorial();
+}
+
+function renderTutorial(){
+  const l=TUT_LESSONS[GS.tutIdx];
+  document.getElementById('tut-progress').textContent=`${GS.tutIdx+1} / ${TUT_LESSONS.length}`;
+  let html=`<h2>${l.title}</h2><div class="tut-body">${l.html}`;
+  if(l.diagram) html+=makePieceDiagram(l.diagram,'black');
+  html+=`</div>`;
+  document.getElementById('tut-content').innerHTML=html;
+}
+
+function tutPrev(){if(GS.tutIdx>0){GS.tutIdx--;renderTutorial();}}
+function tutNext(){if(GS.tutIdx<TUT_LESSONS.length-1){GS.tutIdx++;renderTutorial();}else goMenu();}
+
+// ══════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════
+
+function mkBoard(pieces){
+  const b=Array.from({length:9},()=>Array(9).fill(null));
+  for(const[r,c,type,side,prom]of pieces) b[r][c]={type,side:side||'black',promoted:!!prom};
+  return b;
+}
+
+const QUIZ_PROBLEMS=[
+  {
+    title:'문제 1 — 1수 외통 (金 타기)',
+    desc:'선수(●) 차례. 손패의 金(금장)을 알맞은 위치에 두어 1수 외통수를 만드세요.',
+    board: mkBoard([
+      [0,0,'king','white'],[8,8,'king','black'],
+      [1,0,'pawn','white'],
+      [1,5,'rook','black'],[4,0,'lance','black'],
+    ]),
+    hands:{black:{gold:1},white:{}},
+    turn:'black',
+    solution:[{type:'drop',dropType:'gold',tr:1,tc:1}],
+    hint:'왕이 좌상단 귀퉁이에 있습니다. 금장을 두면 모든 탈출로를 막을 수 있습니다.',
+    explain:'金을 (b2)에 두면: 왕이 (a2)로 못 감(金이 공격), (b1)로 못 감(金이 공격), 비차가 b열을 지켜 (b2)를 잡을 수도 없어 외통수!'
+  },
+  {
+    title:'문제 2 — 1수 외통 (角 이동)',
+    desc:'선수(●) 차례. 각(角)을 이동해 1수 외통수를 만드세요.',
+    board: mkBoard([
+      [0,8,'king','white'],[8,0,'king','black'],
+      [0,7,'pawn','white'],
+      [3,5,'bishop','black'],[4,8,'rook','black'],
+    ]),
+    hands:{black:{},white:{}},
+    turn:'black',
+    solution:[{type:'move',fr:3,fc:5,tr:1,tc:7,promote:false}],
+    hint:'각은 대각선으로 이동합니다. 비차가 9열을 지키고 있습니다. 각이 왕에게 왕수를 줄 수 있는 위치는?',
+    explain:'角을 (d6)→(b8)으로 이동: 왕에게 왕수! (a8)은 자신의 보병이라 못 가고, (b9)는 비차가 막고, (b8)은 각이 차지 — 외통수!'
+  },
+  {
+    title:'문제 3 — 3수 외통 (飛車·銀 콤보)',
+    desc:'선수(●) 차례. 3수 만에 외통수를 만드세요.',
+    board: mkBoard([
+      [0,1,'king','white'],[8,8,'king','black'],
+      [8,1,'rook','black'],[2,0,'silver','black'],[7,2,'lance','black'],
+    ]),
+    hands:{black:{},white:{}},
+    turn:'black',
+    solution:[
+      {type:'move',fr:8,fc:1,tr:1,tc:1,promote:false},   // 1. 飛→b2 (왕수)
+      {type:'move',fr:0,fc:1,tr:0,tc:0,promote:false},   // 2. 王→a1 (강제)
+      {type:'move',fr:2,fc:0,tr:1,tc:0,promote:false},   // 3. 銀→b1 (외통수)
+    ],
+    hint:'먼저 비차를 b열로 이동해 왕수를 거세요. 향차가 c열을 막고 있어 왕은 a1밖에 갈 수 없습니다.',
+    explain:'1. 飛b2+ (왕수) 2. 王a1 (강제, c1은 향차가 막음) 3. 銀b1# (외통수! 왕이 갈 곳이 없음)'
+  },
+  {
+    title:'문제 4 — 1수 외통 (飛車가 보병 포획)',
+    desc:'선수(●) 차례. 비차(飛車)를 이동해 1수 외통수를 만드세요.',
+    board: mkBoard([
+      [0,4,'king','white'],[8,4,'king','black'],
+      [0,3,'gold','white'],[0,5,'gold','white'],
+      [1,3,'silver','white'],[1,5,'silver','white'],
+      [1,4,'pawn','white'],
+      [2,4,'rook','black'],[7,4,'lance','black'],
+    ]),
+    hands:{black:{},white:{}},
+    turn:'black',
+    solution:[{type:'move',fr:2,fc:4,tr:1,tc:4,promote:false}],
+    hint:'비차가 5열(e열)을 따라 이동합니다. 왕은 자신의 말로 완전히 둘러싸여 있습니다.',
+    explain:'飛가 보병을 잡으며 e2로 이동: 왕수! 왕 주변은 자신의 금장·은장으로 막혀있고 e2는 향차가 보호 중 — 외통수!'
+  },
+  {
+    title:'문제 5 — 1수 외통 (金 타기)',
+    desc:'선수(●) 차례. 손패의 금장을 두어 1수 외통수를 만드세요.',
+    board: mkBoard([
+      [2,0,'king','white'],[8,4,'king','black'],
+      [2,2,'pawn','white'],[3,0,'silver','white'],
+      [2,5,'rook','black'],[5,0,'lance','black'],
+    ]),
+    hands:{black:{gold:1},white:{}},
+    turn:'black',
+    solution:[{type:'drop',dropType:'gold',tr:2,tc:1}],
+    hint:'비차가 c행을 지키고 있습니다. 왕 바로 옆에 무언가를 두면...',
+    explain:'金을 c2에 두면: 왕수! 왕은 (b1)로 못 감(金이 공격), (c1)로 못 감(金이 공격), (c2)는 金 점령, (d1)는 자신의 은장 — 외통수!'
+  }
+];
+
+let QB={board:null,hands:null,turn:'black',sel:null,targets:[],stepIdx:0,solved:false};
+
+function openQuiz(){
+  GS.quizIdx=0;
+  showScreen('s-quiz');
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const p=QUIZ_PROBLEMS[GS.quizIdx];
+  document.getElementById('quiz-title').textContent=p.title;
+  document.getElementById('quiz-desc').textContent=p.desc;
+  document.getElementById('quiz-counter').textContent=`${GS.quizIdx+1} / ${QUIZ_PROBLEMS.length}`;
+  document.getElementById('quiz-prev-btn').disabled=GS.quizIdx===0;
+  document.getElementById('quiz-next-btn').disabled=GS.quizIdx===QUIZ_PROBLEMS.length-1;
+  QB={board:boardClone(p.board),hands:handsClone(p.hands),turn:p.turn,sel:null,targets:[],stepIdx:0,solved:false};
+  renderQuizBoard();
+  renderQuizHand();
+  document.getElementById('quiz-status').innerHTML=`<span class="hint">💡 힌트: ${p.hint}</span>`;
+}
+
+function renderQuizBoard(){
+  const p=QUIZ_PROBLEMS[GS.quizIdx];
+  buildBoardEl(
+    document.getElementById('quiz-board'),
+    QB.board, QB.targets, QB.sel, null,
+    handleQuizCellClick
+  );
+}
+
+function renderQuizHand(){
+  const old=document.getElementById('quiz-hand');
+  if(old) old.remove();
+  const hEl=document.createElement('div');
+  hEl.id='quiz-hand'; hEl.className='hand-area';
+  hEl.innerHTML='<div class="hand-label">손패 (선수)</div>';
+  const h=QB.hands.black||{};
+  let any=false;
+  for(const type of PIECE_TYPES){
+    const cnt=h[type]||0; if(!cnt) continue; any=true;
+    const pd=document.createElement('div'); pd.className='hand-piece';
+    if(QB.sel?.fromHand?.type===type) pd.classList.add('hand-sel');
+    const img=document.createElement('img');
+    img.src=getPieceImg({type,side:'black',promoted:false}); img.className='piece-img';
+    pd.appendChild(img);
+    if(cnt>1){const b=document.createElement('span');b.className='hand-cnt';b.textContent=cnt;pd.appendChild(b);}
+    pd.addEventListener('click',()=>handleQuizHandClick(type));
+    hEl.appendChild(pd);
+  }
+  if(!any) hEl.innerHTML+=`<span class="empty-hand">없음</span>`;
+  document.getElementById('quiz-board-area').appendChild(hEl);
+}
+
+function handleQuizCellClick(r,c){
+  if(QB.solved||QB.turn!=='black') return;
+  const piece=QB.board[r][c];
+  if(QB.targets.some(([tr,tc])=>tr===r&&tc===c)){
+    let move;
+    if(QB.sel.fromHand){
+      move={type:'drop',side:'black',dropType:QB.sel.fromHand.type,tr:r,tc:c};
+    } else {
+      const{r:fr,c:fc}=QB.sel.fromBoard;
+      const p=QB.board[fr][fc];
+      const promote=canPromote(p,fr,r)&&!mustPromote(p,r)?false:mustPromote(p,r);
+      move={type:'move',fr,fc,tr:r,tc:c,promote};
+    }
+    processQuizMove(move); return;
+  }
+  if(piece&&piece.side==='black'){
+    QB.sel={fromBoard:{r,c}}; QB.targets=getLegalPieceMoves(QB.board,r,c);
+    renderQuizBoard(); return;
+  }
+  QB.sel=null; QB.targets=[]; renderQuizBoard();
+}
+
+function handleQuizHandClick(type){
+  if(QB.solved||QB.turn!=='black') return;
+  QB.sel={fromHand:{type}};
+  QB.targets=getDropSquares(QB.board,QB.hands,'black',type);
+  renderQuizBoard(); renderQuizHand();
+}
+
+function movesMatch(m1,m2){
+  if(m1.type!==m2.type) return false;
+  if(m1.type==='move') return m1.fr===m2.fr&&m1.fc===m2.fc&&m1.tr===m2.tr&&m1.tc===m2.tc;
+  if(m1.type==='drop') return m1.dropType===m2.dropType&&m1.tr===m2.tr&&m1.tc===m2.tc;
+  return false;
+}
+
+function processQuizMove(move){
+  const p=QUIZ_PROBLEMS[GS.quizIdx];
+  const expected=p.solution[QB.stepIdx];
+  if(!movesMatch(move,expected)){
+    document.getElementById('quiz-status').innerHTML=`<span class="wrong">❌ 틀렸습니다. 다시 시도하세요.</span><br><span class="hint">💡 힌트: ${p.hint}</span>`;
+    QB.sel=null; QB.targets=[]; renderQuizBoard(); renderQuizHand(); return;
+  }
+  const{board:nb,hands:nh}=applyMoveObj(QB.board,QB.hands,move);
+  QB.board=nb; QB.hands=nh; QB.stepIdx++; QB.turn=QB.turn==='black'?'white':'black';
+  QB.sel=null; QB.targets=[];
+  renderQuizBoard(); renderQuizHand();
+  checkQuizProgress();
+}
+
+function checkQuizProgress(){
+  const p=QUIZ_PROBLEMS[GS.quizIdx];
+  if(QB.stepIdx>=p.solution.length){
+    QB.solved=true;
+    document.getElementById('quiz-status').innerHTML=
+      `<span class="correct">✅ 정답! 외통수 성공!</span><br><p class="explain">${p.explain}</p>`;
+    return;
+  }
+  if(QB.turn==='white'){
+    document.getElementById('quiz-status').innerHTML=`<span class="correct">정답! AI가 응수합니다...</span>`;
+    setTimeout(()=>{
+      const opp=p.solution[QB.stepIdx];
+      const{board:nb,hands:nh}=applyMoveObj(QB.board,QB.hands,opp);
+      QB.board=nb; QB.hands=nh; QB.stepIdx++; QB.turn='black';
+      renderQuizBoard(); renderQuizHand();
+      checkQuizProgress();
+    },700);
+  } else {
+    document.getElementById('quiz-status').innerHTML=`<span class="correct">정답! 계속하세요...</span>`;
+  }
+}
+
+function quizPrev(){if(GS.quizIdx>0){GS.quizIdx--;renderQuiz();}}
+function quizNext(){if(GS.quizIdx<QUIZ_PROBLEMS.length-1){GS.quizIdx++;renderQuiz();}}
+
+// ══════════════════════════════════════
+//  SCREEN MANAGEMENT
+// ══════════════════════════════════════
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+
+(function init(){
+  showScreen('s-menu');
+})();
+</script>
+</body>
+</html>

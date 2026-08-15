@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세계 종교의 악마·천사 대백과</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0d0d14;--bg2:#141420;--bg3:#1c1c2c;--bg4:#242438;
+  --border:#2a2a42;--text:#e0dff5;--muted:#7070a0;
+  --gold:#e8c87a;--blue:#78b4f0;--green:#68d898;
+  --red:#f07070;--purple:#c88af0;--orange:#f0a860;--cyan:#60d8e8;--pink:#f080c0;
+  --angelic:#a0c8ff;--demonic:#ff7070;--divine:#ffd080;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.6;}
+
+#header{background:linear-gradient(135deg,#0a0a18,#1a0828);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+#header h1{font-size:19px;font-weight:700;color:var(--gold);letter-spacing:1px;text-shadow:0 0 20px rgba(232,200,122,.3);}
+#search{flex:1;min-width:200px;max-width:400px;padding:7px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;outline:none;}
+#search:focus{border-color:var(--gold);}
+#count{font-size:12px;color:var(--muted);}
+
+#tabs{display:flex;gap:4px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 14px;border-radius:6px;border:1px solid transparent;font-size:12.5px;cursor:pointer;color:var(--muted);white-space:nowrap;background:none;transition:all .15s;}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{background:var(--bg4);border-color:var(--border);color:var(--gold);}
+
+#main{padding:18px 20px;max-width:1400px;margin:0 auto;}
+.section{display:none;}.section.active{display:block;}
+.sec-title{font-size:16px;font-weight:700;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.sub-title{font-size:13px;font-weight:700;color:var(--muted);margin:20px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:20px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:15px 17px;transition:border-color .15s;}
+.card:hover{border-color:rgba(232,200,122,.3);}
+.card.angel{border-left:3px solid var(--angelic);}
+.card.demon{border-left:3px solid var(--demonic);}
+.card.divine{border-left:3px solid var(--divine);}
+
+.card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.card-icon{font-size:26px;line-height:1;flex-shrink:0;}
+.card-names{flex:1;}
+.cname{font-size:15px;font-weight:700;color:var(--gold);}
+.calt{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;margin-bottom:7px;font-weight:700;}
+.badge-angel{background:rgba(160,200,255,.15);color:var(--angelic);border:1px solid rgba(160,200,255,.25);}
+.badge-demon{background:rgba(255,112,112,.15);color:var(--demonic);border:1px solid rgba(255,112,112,.25);}
+.badge-divine{background:rgba(255,208,128,.15);color:var(--divine);border:1px solid rgba(255,208,128,.25);}
+.badge-fallen{background:rgba(200,138,240,.15);color:var(--purple);border:1px solid rgba(200,138,240,.25);}
+.badge-spirit{background:rgba(104,216,152,.15);color:var(--green);border:1px solid rgba(104,216,152,.25);}
+
+.row{display:grid;grid-template-columns:80px 1fr;gap:4px;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.row:last-child{border-bottom:none;}
+.rk{color:var(--muted);font-weight:600;}
+.rv{color:var(--text);}
+.rv b{color:var(--gold);}
+.rv em{color:var(--cyan);font-style:normal;}
+.rv s{color:var(--red);text-decoration:none;}
+
+.info-box{background:rgba(120,180,240,.07);border-left:3px solid var(--blue);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#a0c8f0;line-height:1.7;}
+.warn-box{background:rgba(240,112,112,.07);border-left:3px solid var(--red);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#f0a0a0;line-height:1.7;}
+
+.rank-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:18px;}
+.rank-table th{background:var(--bg3);color:var(--muted);font-weight:700;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.rank-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.rank-table td:first-child{color:var(--gold);font-weight:600;white-space:nowrap;}
+.rank-table tr:last-child td{border-bottom:none;}
+
+#no-result{display:none;color:var(--muted);text-align:center;padding:60px;font-size:14px;}
+
+.goetia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.gcard{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.gcard-name{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px;}
+.gcard-rank{font-size:11px;color:var(--purple);margin-bottom:6px;}
+.gcard-body{font-size:11.5px;color:var(--text);line-height:1.6;}
+.gcard-body span{color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>👹 세계 종교의 악마·천사 대백과</h1>
+  <input id="search" type="text" placeholder="🔍 이름·능력·무기·장소 검색…" oninput="doSearch(this.value)">
+  <span id="count"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab active" onclick="sw('christian',this)">✝️ 기독교</button>
+  <button class="tab" onclick="sw('jewish',this)">✡️ 유대교·카발라</button>
+  <button class="tab" onclick="sw('goetia',this)">📖 고에티아 72악마</button>
+  <button class="tab" onclick="sw('islam',this)">☪️ 이슬람</button>
+  <button class="tab" onclick="sw('zoroaster',this)">🔥 조로아스터</button>
+  <button class="tab" onclick="sw('hindu',this)">🕉️ 힌두교</button>
+  <button class="tab" onclick="sw('greek',this)">🏛️ 그리스·로마</button>
+  <button class="tab" onclick="sw('meso',this)">🏺 메소포타미아</button>
+  <button class="tab" onclick="sw('egypt',this)">𓂀 이집트</button>
+  <button class="tab" onclick="sw('norse',this)">⚡ 북유럽</button>
+  <button class="tab" onclick="sw('japan',this)">⛩️ 일본</button>
+  <button class="tab" onclick="sw('enoch',this)">📜 에녹서·감시자</button>
+  <button class="tab" onclick="sw('compare',this)">🔗 비교표</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════ 기독교 ══════════ -->
+<div id="tab-christian" class="section active">
+<div class="sec-title">✝️ 기독교 — 천사와 악마</div>
+
+<div class="sub-title">천사 계급 (디오니시우스 위계론)</div>
+<table class="rank-table">
+  <tr><th>계층</th><th>천사단</th><th>역할</th><th>특징</th></tr>
+  <tr><td>제1계층</td><td><b>세라핌 (Seraphim)</b></td><td>신 찬미, 거룩함 수호</td><td>날개 6개, 불꽃 존재. 이사야 6장. 이름 뜻 "불타는 자"</td></tr>
+  <tr><td>제1계층</td><td><b>케루빔 (Cherubim)</b></td><td>신의 지식·지혜 수호, 에덴 입구 경비</td><td>얼굴 4개(사람·사자·소·독수리), 날개 4개. 에스겔 1장</td></tr>
+  <tr><td>제1계층</td><td><b>오파님·왕좌 (Ophanim/Thrones)</b></td><td>신의 공의 실행</td><td>불타는 바퀴 형태, 눈이 가득. "전차(메르카바)" 신학 핵심</td></tr>
+  <tr><td>제2계층</td><td><b>주권 (Dominions)</b></td><td>하위 천사단 통솔</td><td>지팡이·홀(笏) 보유, 빛나는 왕관</td></tr>
+  <tr><td>제2계층</td><td><b>권능 (Virtues)</b></td><td>기적·자연현상 관장</td><td>날개 달린 전사, 은총 분배</td></tr>
+  <tr><td>제2계층</td><td><b>역능 (Powers)</b></td><td>악의 침략 방어, 역사 기록</td><td>갑옷 착용, 검 보유</td></tr>
+  <tr><td>제3계층</td><td><b>공국 (Principalities)</b></td><td>국가·민족 수호</td><td>왕관·홀, 지상 통치 질서 감독</td></tr>
+  <tr><td>제3계층</td><td><b>대천사 (Archangels)</b></td><td>중요 메시지 전달, 인류 수호</td><td>정경 3명(미카엘·가브리엘·라파엘), 외경 4~7명 추가</td></tr>
+  <tr><td>제3계층</td><td><b>천사 (Angels)</b></td><td>개인 수호천사, 일상 사명</td><td>가장 인간에 가까운 존재, 흰 날개·빛</td></tr>
+</table>
+
+<div class="sub-title">대천사 (Archangels) — 상세</div>
+<div class="grid">
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">⚔️</div><div class="card-names">
+      <div class="cname">미카엘 (Michael)</div>
+      <div class="calt">히브리: מִיכָאֵל "누가 하나님 같은가"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 천군 사령관</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불꽃 검</b>, 창, 방패 / 천칭(심판)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">하늘 군대 사령부, 에덴 동쪽 경비</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">용(루시퍼)을 격파, 악마 퇴치, 영혼 수호, 치유, 전쟁 승리 부여</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">전쟁·정의·자비·보호·죽음(영혼 인도)</div></div>
+    <div class="row"><div class="rk">상징</div><div class="rv">청색·금색, 저울, 창에 밟힌 용/사탄</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">다니엘 10장, 유다서 1:9, 요한계시록 12장</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">이슬람의 미카일(Mīkāʾīl), 유대 전승에서 이스라엘 수호천사</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">📯</div><div class="card-names">
+      <div class="cname">가브리엘 (Gabriel)</div>
+      <div class="calt">히브리: גַּבְרִיאֵל "신의 용사/힘"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 신의 전령</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>나팔(트럼펫)</b>, 백합꽃, 빛의 홀</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">신의 보좌 좌편, 에덴 동산</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">예언 전달, 꿈 해석, 수태고지(마리아·엘리사벳), 종말 나팔 취주</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">계시·소통·달·물·임신·예언</div></div>
+    <div class="row"><div class="rk">상징</div><div class="rv">흰색·은색, 나팔, 백합, 초승달</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">다니엘 8–9장, 누가복음 1장</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">이슬람에서 지브릴(Jibrīl) — 무함마드에게 꾸란 계시</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌿</div><div class="card-names">
+      <div class="cname">라파엘 (Raphael)</div>
+      <div class="calt">히브리: רָפָאֵל "신이 치유하신다"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 치유자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>치유 지팡이(카두케우스 원형)</b>, 물고기 쓸개</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">서쪽 하늘, 지상 여행자 동행</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">모든 병 치유, 시각 회복(토비아스 부친), 아자젤을 사막에 묶음, 여행자 보호</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">치유·의학·여행·사랑·태양</div></div>
+    <div class="row"><div class="rk">상징</div><div class="rv">초록색, 지팡이, 물고기</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">토비트서(외경), 에녹1서 10장</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-names">
+      <div class="cname">우리엘 (Uriel)</div>
+      <div class="calt">히브리: אוּרִיאֵל "신의 불/빛"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 빛의 수호자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불꽃 검</b>, 에덴 동쪽 경비창, 번개</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">에덴 동쪽 문, 북쪽 하늘, 지옥 입구</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">지식·예언 부여, 노아에게 홍수 예고, 인류에게 점성술 교육, 지옥 관장</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">지혜·지식·빛·번개·지진·지옥</div></div>
+    <div class="row"><div class="rk">상징</div><div class="rv">보라색, 불꽃, 책</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">에녹1서, 에스라4서(외경)</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">👑</div><div class="card-names">
+      <div class="cname">메타트론 (Metatron)</div>
+      <div class="calt">그리스어 기원 불명, "신의 보좌 옆 자"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 천상의 서기관</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불타는 펜</b>, 신의 인장(印章), 36개 날개</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">신의 보좌 바로 옆, 일곱 하늘의 정점</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">우주 모든 사건 기록, 신의 목소리 대행, 에녹을 천사로 변환, 인간 운명 기록</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">기록·지식·변환·신의 의지 대행</div></div>
+    <div class="row"><div class="rk">상징</div><div class="rv">메타트론의 큐브(성기하학), 불기둥</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">탈무드(하기가), 3에녹서. 본래 인간 에녹이 승천·변신한 존재</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌱</div><div class="card-names">
+      <div class="cname">산달폰 (Sandalphon)</div>
+      <div class="calt">그리스어: "공동-형제" (메타트론의 쌍둥이)</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 기도 수호자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">화환(기도 꽃다발), 신자의 기도를 묶는 끈</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">지구와 하늘의 경계, 지상 가까운 하늘</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">인간 기도를 신에게 전달, 태아 성별 결정(전승), 지상 수호</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">본래 인간 선지자 엘리야. 키가 500년 여정 거리에 달한다고 탈무드에 기록</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">아즈라엘 (Azrael)</div>
+      <div class="calt">히브리: עֲזַרְאֵל "신의 도움"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 죽음의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>죽음의 낫</b>, 인간 수명이 적힌 책</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">4개 날개로 동서남북 걸쳐있음. 하늘과 지상 사이</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">영혼 분리·인도, 죽음 집행, 영혼 기록</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">이슬람의 말라크 알마우트(Malak al-Mawt). 몸에 인류 전체 이름이 새겨짐. 날개 수는 70만~수억</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">💜</div><div class="card-names">
+      <div class="cname">자드키엘 (Zadkiel)</div>
+      <div class="calt">히브리: "신의 의로움"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 자비의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">보라 불꽃, 자유의 횃불</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">기억력 향상, 용서와 자비 부여, 아브라함의 이삭 희생 막음(일부 전승)</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">자비·용서·기억·변화</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌸</div><div class="card-names">
+      <div class="cname">카미엘 (Chamuel)</div>
+      <div class="calt">히브리: "신을 보는 자"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 사랑의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">분홍빛 광선, 장미 향</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">잃어버린 물건 찾기, 관계 치유, 내적 평화 부여, 영적 사랑 강화</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">사랑·관계·평화·용기</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">✨</div><div class="card-names">
+      <div class="cname">요피엘 (Jophiel)</div>
+      <div class="calt">히브리: "신의 아름다움"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 지혜의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">황금빛 광선, 에덴 동산 불꽃 검(경비 역할)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">지혜·지식 부여, 아름다운 생각 심기, 혼돈 정리</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">지혜·아름다움·예술·창의</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🛡️</div><div class="card-names">
+      <div class="cname">라구엘 (Raguel)</div>
+      <div class="calt">히브리: "신의 친구"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 정의의 감시자</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">다른 천사들의 행동 감시·심판, 공정성 수호, 질서 유지</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">정의·조화·관계·복수</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">에녹1서 23장 — "세계와 빛나는 별들을 감시"</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">⚡</div><div class="card-names">
+      <div class="cname">레미엘 (Remiel)</div>
+      <div class="calt">히브리: "신의 천둥"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">희망 부여, 영혼을 하늘로 인도, 환상·환몽 해석</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">희망·영혼 인도·천둥·환시</div></div>
+  </div>
+</div>
+
+<div class="sub-title">타락천사 · 악마 — 상세</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">👿</div><div class="card-names">
+      <div class="cname">루시퍼 / 사탄 (Lucifer/Satan)</div>
+      <div class="calt">라틴: "빛을 나르는 자" / 히브리: "반대자·고발자"<br>별칭: 베엘제불, 디아볼로스, 이블리스, 마귀</div>
+    </div></div>
+    <span class="badge badge-fallen">타락천사 / 지옥의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불꽃의 검</b>, 거짓의 혀, 유혹의 말, 삼지창(중세 도상)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">지옥 최하층(단테: 코키토스 빙하), 공중(에베소서 2:2 "공중의 권세 잡은 자")</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">변신(빛의 천사로), 유혹·거짓·의심 심기, 인간 영혼 고발, 재앙 허가 요청, 기적 모방</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>교만(7대죄의 수장)</b>, 거짓, 죽음, 지옥 통치</div></div>
+    <div class="row"><div class="rk">부하</div><div class="rv">모든 타락천사와 악마. 군대 = "레기온(6,000명)"</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">타락 전: 가장 아름다운 천사, 케루빔. 타락 후: 박쥐 날개·뿔·검은 피부(중세 도상)</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">이사야 14:12, 에스겔 28장, 욥기, 요한계시록 12·20장</div></div>
+    <div class="row"><div class="rk">패인</div><div class="rv">"내가 지존자와 같이 되리라" — 교만으로 하늘에서 추방</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🪰</div><div class="card-names">
+      <div class="cname">베엘제붑 (Beelzebub)</div>
+      <div class="calt">히브리: בַּעַל זְבוּב "파리 왕" (원래 블레셋 신 바알제붑)<br>별칭: 파리 군주, 탐식의 왕</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 지옥의 2인자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>파리 떼</b>, 부패와 오염, 역병</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">오염된 장소, 부패한 음식 주변, 에크론(블레셋 신전 원위치)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">역병 전파, 사제들에게 빙의, 탐욕·폭식 유혹, 거짓 예언</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>탐식(7대죄)</b>, 부패, 역병, 오만</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">거대한 파리, 또는 왕좌에 앉은 뚱뚱한 군주</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">열왕기하 1:2, 마태복음 12:24 (귀신 왕으로 언급)</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-names">
+      <div class="cname">아스모데우스 (Asmodeus)</div>
+      <div class="calt">페르시아: 아에샤마 다에바 "격노의 악마"<br>별칭: 아쉬마다이(Ashmadai), 샤마돈</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 정욕의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>욕망의 불꽃</b>, 독 연기, 결혼 파괴의 저주</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">이집트 상공(라파엘이 묶음), 지옥 도박장</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">정욕·음욕 유혹, 결혼 방해, 투명화, 솔로몬 반지로 제압 가능, 도박 기술 가르침</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>정욕(7대죄)</b>, 분노, 복수, 도박</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">머리 3개(황소·인간·숫양), 뱀 꼬리, 거위 발, 수탉 발, 용을 탄 모습</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">물고기 간 연기(라파엘이 알려줌), 솔로몬의 인장</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">토비트서(외경), 레메게톤(고에티아 32번)</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌊</div><div class="card-names">
+      <div class="cname">레비아탄 (Leviathan)</div>
+      <div class="calt">히브리: לִוְיָתָן "비틀린 자"<br>별칭: 바다 용, 혼돈의 뱀, 베헤모스의 대응</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 질투의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불 뿜는 입</b>, 독 연기, 파도, 바다 전체</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">깊은 바다·심연, 지옥의 바다 문</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">바다 폭풍, 배 침몰, 불과 연기 방출, 영혼 삼킴("지옥의 입")</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>질투(7대죄)</b>, 혼돈, 이단</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">거대 바다 뱀/용, 여러 머리(요한계시록 7머리), 몸에서 불과 연기</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">욥기 41장, 이사야 27:1, 시편 74:14, 요한계시록 12장</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">💰</div><div class="card-names">
+      <div class="cname">맘몬 (Mammon)</div>
+      <div class="calt">아람어: מַמּוֹנָא "재물"<br>별칭: 부의 악마, 황금 우상</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 탐욕의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>황금</b>, 재물 욕망, 빈곤의 저주</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">부 축적 욕망 심기, 돈으로 사람 타락, 물질주의 확산</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>탐욕(7대죄)</b>, 불의한 재물</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">황금 갑옷의 왕, 또는 황금 두꺼비</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">마태복음 6:24 "너희가 하나님과 재물(맘몬)을 함께 섬길 수 없다"</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😴</div><div class="card-names">
+      <div class="cname">벨페고르 (Belphegor)</div>
+      <div class="calt">히브리: בַּעַל פְּעוֹר "브올의 주" (모압 신)<br>별칭: 게으름의 왕</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 나태의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>황금 변기(도상)</b>, 발명품으로 인류 타락</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">화장실, 변기, 변소(배설과 연관된 상징)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">천재적 발명 제안으로 나태 유혹, 지상에 파견된 악마(지옥에서는 미인 여성으로 나타남)</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv"><b>나태(7대죄)</b>, 게으름, 발명·발견 오용</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">지상: 아름다운 여자 / 지옥: 벌린 입의 괴물, 뿔, 날카로운 발톱</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🏹</div><div class="card-names">
+      <div class="cname">아자젤 (Azazel)</div>
+      <div class="calt">히브리: עֲזָאזֵל "강한 신" 또는 "신이 강하게 하다"<br>별칭: 속죄염소의 신, 감시자 천사 지도자</div>
+    </div></div>
+    <span class="badge badge-fallen">타락천사 / 감시자 지도자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>인류에게 전쟁 무기 제조법 가르침</b> — 검·방패·갑옷, 장신구·화장법도 전수</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">두다엘 광야(라파엘이 결박해 던진 사막), 최후심판까지 봉인</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">금속 가공·무기 제조 지식 전수, 여성에게 화장·장신구 유혹 가르침, 속죄염소 의식에 이름 사용</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">전쟁·오염·속죄의 수용자</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">레위기 16장(속죄염소), 에녹1서 8장</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌙</div><div class="card-names">
+      <div class="cname">릴리트 (Lilith)</div>
+      <div class="calt">히브리: לִילִית "밤의 여자"<br>별칭: 아담의 첫 번째 아내, 밤의 마녀</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 밤의 여왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>유아 살해</b>, 성몽(몽마), 남성 정기 흡수, 올빼미·밤 동물 소환</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">황야·사막, 홍해 주변(전승), 밤의 공중</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">남성 유혹·정기 탈취, 신생아 살해, 어머니 죽음 유발, 변신, 비행, 바람 조종</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">밤·성욕·독립·반항·유아 사망</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">아름다운 여성, 날개, 올빼미 발, 뱀과 동행</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">호신부(아무레트), "산이노이·사노이·산만겔로프"라는 천사 이름 세 개</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">이사야 34:14(히브리어 "릴리트"), 알파벳 벤 시라(중세), 조하르</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">☠️</div><div class="card-names">
+      <div class="cname">아바돈 / 아폴리온 (Abaddon)</div>
+      <div class="calt">히브리: "파멸", 그리스: "파괴자"<br>별칭: 무저갱의 천사, 지옥의 왕</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 심연의 지배자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>전갈 꼬리 달린 메뚜기 군단</b>, 열쇠(무저갱 열쇠)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">무저갱(Abyss/아비소스), 지옥의 가장 깊은 곳</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">5개월간 죽지 않는 고통 부여(요한계시록), 메뚜기 군단 지휘, 파멸 선언</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">요한계시록 9:11 — "무저갱의 사자... 히브리 이름은 아바돈이요 헬라어는 아폴루온"</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">사마엘 (Samael)</div>
+      <div class="calt">히브리: סַמָּאֵל "신의 독" 또는 "눈먼 신"<br>별칭: 죽음의 천사(악한 면), 독의 천사</div>
+    </div></div>
+    <span class="badge badge-fallen">타락천사 / 이중적 존재</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>독 검</b>, 죽음의 손길, 에서의 천사로서 야곱과 씨름</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죽음 집행, 독 살포, 에덴의 뱀 조종(릴리트와 연대), 사탄과 동일시하기도</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">독·죽음·악·로마(에서)의 수호천사</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">완전 악마이면서도 신의 집행자 역할 수행. 릴리트의 배우자(조하르)</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">💎</div><div class="card-names">
+      <div class="cname">벨리알 (Belial)</div>
+      <div class="calt">히브리: בְּלִיַּעַל "가치없는 자"<br>별칭: 무가치의 왕자, 소돔의 지배자</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 불법의 군주</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">거짓 예언, 우상숭배 유도, 도덕 부패</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죄악 확산, 사제·예언자 타락, 소돔 주민 타락, 허위기적 수행</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">사해문서(쿰란), 고린도후서 6:15 "그리스도와 벨리알이 무슨 조화가 있으며"</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🤝</div><div class="card-names">
+      <div class="cname">메피스토펠레스 (Mephistopheles)</div>
+      <div class="calt">그리스어 기원설: "빛을 사랑하지 않는 자"<br>별칭: 파우스트의 악마, 계약의 악마</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 계약 악마</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>계약서(혈서)</b>, 지식 제공, 유혹의 말</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">지식·부·쾌락 제공 대가로 영혼 거래, 변신, 예언, 소원 일부 성취</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">중세 파우스트 전설에서 등장. 사탄의 사절·대리인으로 기능</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 유대교·카발라 ══════════ -->
+<div id="tab-jewish" class="section">
+<div class="sec-title">✡️ 유대교·카발라 — 천사와 악령</div>
+
+<div class="sub-title">카발라 생명의 나무 — 세피로트 천사단</div>
+<table class="rank-table">
+  <tr><th>세피라</th><th>이름</th><th>의미</th><th>수호 대천사</th><th>천사단</th></tr>
+  <tr><td>케테르 (왕관)</td><td>Kether</td><td>신의 의지</td><td>메타트론</td><td>하요트 하코데시 (성스러운 생명체)</td></tr>
+  <tr><td>호크마 (지혜)</td><td>Chokmah</td><td>원초적 지혜</td><td>라지엘</td><td>오파님 (바퀴 천사)</td></tr>
+  <tr><td>비나 (이해)</td><td>Binah</td><td>이해·분별</td><td>짜프키엘</td><td>아라림 (용맹한 자들)</td></tr>
+  <tr><td>케세드 (자비)</td><td>Chesed</td><td>사랑·인자</td><td>자드키엘</td><td>하슈말림 (호박빛 존재)</td></tr>
+  <tr><td>게부라 (강함)</td><td>Geburah</td><td>힘·심판</td><td>카마엘</td><td>세라핌 (불타는 자)</td></tr>
+  <tr><td>티파레트 (아름다움)</td><td>Tiphereth</td><td>조화·아름다움</td><td>라파엘</td><td>말라킴 (왕들)</td></tr>
+  <tr><td>네짜흐 (승리)</td><td>Netzach</td><td>승리·영원</td><td>하니엘</td><td>에렐림 (영웅들)</td></tr>
+  <tr><td>호드 (영광)</td><td>Hod</td><td>영광·화려</td><td>미카엘</td><td>베니 엘로힘 (신의 아들들)</td></tr>
+  <tr><td>예소드 (기반)</td><td>Yesod</td><td>토대·생식</td><td>가브리엘</td><td>케루빔</td></tr>
+  <tr><td>말쿠트 (왕국)</td><td>Malkuth</td><td>물질세계</td><td>산달폰</td><td>이심 (인간 영혼들)</td></tr>
+</table>
+
+<div class="sub-title">클리포트 — 어둠의 나무 (악마 대응)</div>
+<table class="rank-table">
+  <tr><th>클리파</th><th>이름</th><th>의미</th><th>지배 악마</th><th>영역</th></tr>
+  <tr><td>타우미엘</td><td>Thaumiel</td><td>신의 쌍둥이</td><td>사탄·몰로크</td><td>이원성·반신론</td></tr>
+  <tr><td>가기엘</td><td>Ghagiel</td><td>방해하는 자</td><td>벨리알·아다드</td><td>혼돈·방해</td></tr>
+  <tr><td>사타리엘</td><td>Satariel</td><td>숨기는 자</td><td>루키푸게 로포칼레</td><td>은폐·망각</td></tr>
+  <tr><td>감치코트</td><td>Gamchicoth</td><td>파괴자들</td><td>아스타로트</td><td>파괴·낭비</td></tr>
+  <tr><td>골라카브</td><td>Golachab</td><td>불타는 자들</td><td>아사모데우스</td><td>분노·폭력</td></tr>
+  <tr><td>타기리온</td><td>Thagirion</td><td>다투는 자들</td><td>벨페고르·솔라드</td><td>갈등·허영</td></tr>
+  <tr><td>아아랍 자라크</td><td>A'arab Zaraq</td><td>까마귀 떼</td><td>바알</td><td>욕망·전쟁</td></tr>
+  <tr><td>사마엘</td><td>Samael</td><td>독의 신</td><td>아드라멜렉</td><td>거짓말·독</td></tr>
+  <tr><td>가말리엘</td><td>Gamaliel</td><td>불결한 자들</td><td>릴리트</td><td>음욕·오염</td></tr>
+  <tr><td>나흘리엘</td><td>Nahliell/Lilith</td><td>밤의 것들</td><td>릴리트·나아마</td><td>밤·악몽·유아 사망</td></tr>
+</table>
+
+<div class="sub-title">유대 전승 특수 천사·악령</div>
+<div class="grid">
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🧿</div><div class="card-names">
+      <div class="cname">라지엘 (Raziel)</div>
+      <div class="calt">히브리: "신의 비밀"</div>
+    </div></div>
+    <span class="badge badge-angel">대천사 / 비밀의 수호자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>라지엘의 서(천사 마법서)</b> — 우주 비밀이 기록된 책</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">우주 모든 비밀 지식, 아담에게 책 전수, 노아에게 방주 설계도 제공</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">신의 보좌 옆에 서서 모든 신의 말씀을 듣고 기록. 다른 천사들이 책을 바다에 던졌다는 전승</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">👹</div><div class="card-names">
+      <div class="cname">악마 4여왕 (Four Demon Queens)</div>
+      <div class="calt">릴리트·나아마·아그라트 바트 마흘라트·에이셰트 제누님</div>
+    </div></div>
+    <span class="badge badge-demon">악마 여왕단</span>
+    <div class="row"><div class="rk">릴리트</div><div class="rv">밤·성욕·유아 사망의 여왕, 사마엘의 배우자</div></div>
+    <div class="row"><div class="rk">나아마</div><div class="rv">쾌락·음악·유혹. 가인의 후손 나아마에서 유래. 악몽 유발</div></div>
+    <div class="row"><div class="rk">아그라트</div><div class="rv">거리의 음녀, 18,000 마귀 이끌고 공중 비행. 수요일·토요일 밤 활동</div></div>
+    <div class="row"><div class="rk">에이셰트</div><div class="rv">간음의 여자, 창녀의 악마, 가정 파괴</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😶</div><div class="card-names">
+      <div class="cname">두마 (Dumah)</div>
+      <div class="calt">히브리: "침묵"</div>
+    </div></div>
+    <span class="badge badge-angel">천사(어두운) / 침묵의 수호자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">불타는 검, 침묵</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죽은 자의 영혼 보호, 지옥에서 죄인 심문, 에돔(로마) 수호천사</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">게헤나(지옥), 죽은 자의 영역</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😠</div><div class="card-names">
+      <div class="cname">마스테마 (Mastema)</div>
+      <div class="calt">히브리: "적대·고발"</div>
+    </div></div>
+    <span class="badge badge-fallen">악천사 / 적대의 군주</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">욥 시험(사탄 역할), 아브라함 시험, 모세를 죽이려 함, 신과 협상하여 악마 10분의1 보유</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">희년서(외경) — 사탄의 또 다른 이름이자 독립된 존재로 등장</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌊</div><div class="card-names">
+      <div class="cname">라하브 (Rahab)</div>
+      <div class="calt">히브리: "오만·거친 자"</div>
+    </div></div>
+    <span class="badge badge-fallen">타락천사 / 바다의 왕자</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">바다 지배, 이집트 편 들다 신에게 살해됨(바다를 가르는 일에 반대)</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">신이 출애굽 시 바다를 가르기 전 라하브를 먼저 처치. 레비아탄과 연관</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 고에티아 72악마 ══════════ -->
+<div id="tab-goetia" class="section">
+<div class="sec-title">📖 레메게톤 고에티아 — 솔로몬의 72악마</div>
+<div class="info-box">솔로몬 왕이 황동 항아리에 봉인했다는 72명의 악마. 각자 고유 계급·능력·소환 방법 보유. 17세기 문서 기반.</div>
+
+<div class="sub-title">왕 (Kings) — 최고위</div>
+<div class="goetia-grid">
+  <div class="gcard"><div class="gcard-name">1. 바엘 (Bael)</div><div class="gcard-rank">동방의 왕 · 66개 군단 지휘</div><div class="gcard-body"><span>능력:</span> 투명화, 지혜 부여, 쉰 목소리<br><span>외모:</span> 고양이·두꺼비·인간·이 세 가지 복합 머리<br><span>관장:</span> 전쟁 승리, 은신</div></div>
+  <div class="gcard"><div class="gcard-name">9. 파이몬 (Paimon)</div><div class="gcard-rank">서방의 왕 · 200개 군단 지휘</div><div class="gcard-body"><span>능력:</span> 예술·과학·비밀 지식, 바람·파도 지배, 각종 소원 성취<br><span>외모:</span> 낙타 탄 왕관 쓴 남성, 여성스러운 얼굴<br><span>관장:</span> 지식·예술·복종</div></div>
+  <div class="gcard"><div class="gcard-name">13. 벨레트 (Beleth)</div><div class="gcard-rank">왕 · 85개 군단 지휘</div><div class="gcard-body"><span>능력:</span> 사랑 유발(남녀 모두), 분노 발산<br><span>외모:</span> 창백한 말 탄 왕, 트럼펫 소리와 함께 등장<br><span>관장:</span> 사랑·욕정</div></div>
+  <div class="gcard"><div class="gcard-name">20. 푸르손 (Purson)</div><div class="gcard-rank">왕 · 22개 군단 지휘</div><div class="gcard-body"><span>능력:</span> 숨겨진 보물 발견, 신성한 비밀 계시, 과거·현재·미래 예언<br><span>외모:</span> 사자 머리·배에 뱀, 곰 탄 남성<br><span>관장:</span> 예언·보물·비밀</div></div>
+  <div class="gcard"><div class="gcard-name">32. 아스모다이 (Asmodai)</div><div class="gcard-rank">왕 · 72개 군단 지휘</div><div class="gcard-body"><span>능력:</span> 수학·천문·공예 지식, 반지로 무적화, 투명화<br><span>외모:</span> 황소·인간·숫양 머리 3개, 뱀 꼬리<br><span>특이:</span> 아스모데우스와 동일시</div></div>
+  <div class="gcard"><div class="gcard-name">45. 비네 (Vine)</div><div class="gcard-rank">왕·백작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 성벽 파괴, 폭풍 유발, 숨겨진 것 발견, 마법사 간파<br><span>외모:</span> 검은 말 탄 사자, 뱀 보유</div></div>
+  <div class="gcard"><div class="gcard-name">51. 발람 (Balam)</div><div class="gcard-rank">왕 · 40개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 지식, 교활함·재치 부여, 투명화<br><span>외모:</span> 황소·인간·숫양 머리 3개, 뱀 꼬리, 불타는 눈</div></div>
+  <div class="gcard"><div class="gcard-name">61. 자간 (Zagan)</div><div class="gcard-rank">왕·대통령 · 33개 군단</div><div class="gcard-body"><span>능력:</span> 물·포도주 변환, 납→금, 어리석음→지혜, 혈액→기름<br><span>외모:</span> 날개 달린 황소 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">68. 벨리알 (Belial)</div><div class="gcard-rank">왕 · 80개 군단</div><div class="gcard-body"><span>능력:</span> 총애와 지위 부여, 총명함 제공, 선물 가져다 줌<br><span>외모:</span> 불수레 탄 아름다운 천사<br><span>특이:</span> 루시퍼 다음으로 창조된 악마</div></div>
+</div>
+
+<div class="sub-title">공작 (Dukes)</div>
+<div class="goetia-grid">
+  <div class="gcard"><div class="gcard-name">2. 아가레스 (Agares)</div><div class="gcard-rank">공작 · 31개 군단</div><div class="gcard-body"><span>능력:</span> 도망자 회수, 언어 교육, 지진 유발, 귀족 지위 박탈<br><span>외모:</span> 악어 탄 노인, 매 보유</div></div>
+  <div class="gcard"><div class="gcard-name">4. 삼이그나 (Samigina)</div><div class="gcard-rank">후작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 죽은 자의 영혼과 대화, 사망 원인 조사<br><span>외모:</span> 작은 말(조랑말) → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">5. 마르바스 (Marbas)</div><div class="gcard-rank">대통령 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 병 치유·유발, 숨겨진 것 발견, 기계 지식, 인간→동물 변신<br><span>외모:</span> 사자 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">6. 발레포르 (Valefor)</div><div class="gcard-rank">공작 · 10개 군단</div><div class="gcard-body"><span>능력:</span> 도적 지휘, 사기·도둑질 교육<br><span>외모:</span> 사자 머리 달린 당나귀, 도둑의 보호자</div></div>
+  <div class="gcard"><div class="gcard-name">7. 아몬 (Amon)</div><div class="gcard-rank">후작 · 40개 군단</div><div class="gcard-body"><span>능력:</span> 과거·미래 예언, 친구 간 화해, 적 사이 분쟁 유발<br><span>외모:</span> 불 뿜는 늑대, 올빼미 꼬리 → 까마귀 머리 인간</div></div>
+  <div class="gcard"><div class="gcard-name">8. 바르바토스 (Barbatos)</div><div class="gcard-rank">공작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 동물·새 말 이해, 보물 발견, 미래 예언, 마법사들과 협력<br><span>외모:</span> 사슴 모양</div></div>
+  <div class="gcard"><div class="gcard-name">11. 구시온 (Gusion)</div><div class="gcard-rank">공작 · 40개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 의문 해결, 명예·존엄 부여<br><span>외모:</span> 제노시퍼스(개코원숭이)</div></div>
+  <div class="gcard"><div class="gcard-name">15. 엘리고스 (Eligos)</div><div class="gcard-rank">기사 · 60개 군단</div><div class="gcard-body"><span>능력:</span> 전쟁 비밀 발견, 군사 전략, 기사들의 총애 획득<br><span>외모:</span> 창·깃발·사문서 든 멋진 기사</div></div>
+  <div class="gcard"><div class="gcard-name">16. 제파르 (Zepar)</div><div class="gcard-rank">공작 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 여성을 남성과 사랑에 빠지게 함, 불임 유발<br><span>외모:</span> 붉은 갑옷 병사</div></div>
+  <div class="gcard"><div class="gcard-name">18. 배틴 (Bathin)</div><div class="gcard-rank">공작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 허브·보석 특성 지식, 순간이동(사람을 나라 간 이동)<br><span>외모:</span> 뱀 꼬리 달린 건장한 남성, 창백한 말 탄 모습</div></div>
+  <div class="gcard"><div class="gcard-name">19. 살로스 (Sallos)</div><div class="gcard-rank">공작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 남녀 간 사랑 유발, 평화로운 성격<br><span>외모:</span> 왕관 쓴 병사, 악어 탄 모습</div></div>
+  <div class="gcard"><div class="gcard-name">23. 아임 (Aim)</div><div class="gcard-rank">공작 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 도시·성채 불태우기, 재치·유머 부여, 비밀 질문 답변<br><span>외모:</span> 뱀 탄 남성, 횃불 3개 보유</div></div>
+  <div class="gcard"><div class="gcard-name">24. 나베리우스 (Naberius)</div><div class="gcard-rank">후작 · 19개 군단</div><div class="gcard-body"><span>능력:</span> 예술·과학 지식, 잃어버린 명예 회복<br><span>외모:</span> 까마귀, 또는 수탉 머리 인간</div></div>
+  <div class="gcard"><div class="gcard-name">25. 글라샤-라볼라스 (Glasya-Labolas)</div><div class="gcard-rank">대통령·백작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 살인 조장, 과거·미래 예언, 투명화, 우정 유발<br><span>외모:</span> 날개 달린 개</div></div>
+  <div class="gcard"><div class="gcard-name">26. 부네 (Bune)</div><div class="gcard-rank">공작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 시체에 악마 집합, 부·명예 부여, 웅변 향상<br><span>외모:</span> 인간·개·그리핀 머리 3개 달린 용</div></div>
+  <div class="gcard"><div class="gcard-name">27. 로노베 (Ronove)</div><div class="gcard-rank">후작·백작 · 19개 군단</div><div class="gcard-body"><span>능력:</span> 언어 교육, 수사학 지식, 가정부·종복 제공<br><span>외모:</span> 괴물 형태</div></div>
+  <div class="gcard"><div class="gcard-name">28. 베리트 (Berith)</div><div class="gcard-rank">공작 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 금속→금 변환, 살인 충동<br><span>외모:</span> 붉은 옷 붉은 말 탄 병사, 금 왕관</div></div>
+  <div class="gcard"><div class="gcard-name">29. 아스타로트 (Astaroth)</div><div class="gcard-rank">공작 · 40개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 자유 예술·과학 지식, 죄 용서 주장, 천사 타락 진상 폭로<br><span>외모:</span> 냄새나는 용 탄 추한 천사, 독사 보유<br><span>특이:</span> 이슈타르/아스타르테 신의 악마화</div></div>
+  <div class="gcard"><div class="gcard-name">30. 포칼로르 (Focalor)</div><div class="gcard-rank">공작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 사람 익사, 함선 침몰, 폭풍 지배<br><span>외모:</span> 그리핀 날개 달린 인간<br><span>특이:</span> 1,000년 후 본래 계급 회복 희망</div></div>
+  <div class="gcard"><div class="gcard-name">42. 베파르 (Vepar)</div><div class="gcard-rank">공작 · 29개 군단</div><div class="gcard-body"><span>능력:</span> 바다 지배, 무기로 상처 유발, 배 항해 지원, 3일간 썩는 상처<br><span>외모:</span> 강한 인어</div></div>
+  <div class="gcard"><div class="gcard-name">44. 샥스 (Shax)</div><div class="gcard-rank">후작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 청각·시각·이해력 빼앗기, 빠른 물건 배달, 거짓 약속<br><span>외모:</span> 황새 목소리의 황새</div></div>
+  <div class="gcard"><div class="gcard-name">54. 뮤르무르 (Murmur)</div><div class="gcard-rank">공작·백작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 철학 지식, 죽은 자 영혼 소환<br><span>외모:</span> 독수리 탄 병사, 왕관, 트럼펫 연주자 수행</div></div>
+  <div class="gcard"><div class="gcard-name">56. 게몰리 (Gremory)</div><div class="gcard-rank">공작 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 여성의 사랑 유발, 보물 발견<br><span>외모:</span> 낙타 탄 왕관 쓴 아름다운 여성</div></div>
+  <div class="gcard"><div class="gcard-name">60. 바풀라 (Vapula)</div><div class="gcard-rank">공작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 모든 수공예·철학·과학 교육<br><span>외모:</span> 날개 달린 사자</div></div>
+</div>
+
+<div class="sub-title">후작 (Marquises) / 왕자 (Princes) / 백작 (Earls) / 기사 (Knights)</div>
+<div class="goetia-grid">
+  <div class="gcard"><div class="gcard-name">12. 시트리 (Sitri)</div><div class="gcard-rank">왕자 · 60개 군단</div><div class="gcard-body"><span>능력:</span> 격렬한 사랑 유발, 남녀 나체 폭로<br><span>외모:</span> 그리핀 날개·표범 얼굴 → 아름다운 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">22. 이포스 (Ipos)</div><div class="gcard-rank">백작·왕자 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 과거·미래 예언, 재치·담력 부여<br><span>외모:</span> 천사 몸에 사자 머리·거위 다리·토끼 꼬리</div></div>
+  <div class="gcard"><div class="gcard-name">33. 가압 (Gaap)</div><div class="gcard-rank">왕자·대통령 · 66개 군단</div><div class="gcard-body"><span>능력:</span> 감정 조종(사랑↔무감각), 철학·자유 예술, 순간이동<br><span>외모:</span> 날개 달린 인간, 4명의 왕 앞에서 걸음</div></div>
+  <div class="gcard"><div class="gcard-name">36. 스톨라스 (Stolas)</div><div class="gcard-rank">왕자 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 천문학·식물·보석 지식<br><span>외모:</span> 왕관 쓴 올빼미 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">70. 세에레 (Seere)</div><div class="gcard-rank">왕자 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 순간이동, 보물 발견, 도둑 간파, 선한 기질<br><span>외모:</span> 날개 달린 말 탄 잘생긴 남성</div></div>
+  <div class="gcard"><div class="gcard-name">35. 말파스 (Malphas)</div><div class="gcard-rank">대통령 · 40개 군단</div><div class="gcard-body"><span>능력:</span> 탑·성채 건설, 적의 의도 간파, 현숙한 가정부 제공<br><span>외모:</span> 까마귀 → 인간 변신, 쉰 목소리</div></div>
+  <div class="gcard"><div class="gcard-name">37. 포라스 (Foras)</div><div class="gcard-rank">대통령 · 29개 군단</div><div class="gcard-body"><span>능력:</span> 허브·보석 특성, 장수·지혜 부여, 잃어버린 물건 발견, 투명화<br><span>외모:</span> 강한 남성</div></div>
+  <div class="gcard"><div class="gcard-name">38. 아스타로트 유사 — 아이니 (Aim)</div><div class="gcard-rank">공작</div><div class="gcard-body">26번 Aim 항목 참조</div></div>
+  <div class="gcard"><div class="gcard-name">40. 라움 (Raum)</div><div class="gcard-rank">백작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 왕의 보물 도둑질, 도시 파괴, 과거·현재·미래 예언, 친구 만들기<br><span>외모:</span> 까마귀 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">41. 푸르푸르 (Furfur)</div><div class="gcard-rank">백작 · 26개 군단</div><div class="gcard-body"><span>능력:</span> 사랑 유발, 천둥·번개·폭풍 유발, 비밀 질문 답변<br><span>외모:</span> 불 뿜는 사슴, 거짓말쟁이(삼각형 안에서만 진실)</div></div>
+  <div class="gcard"><div class="gcard-name">43. 마르코시아스 (Marchosias)</div><div class="gcard-rank">후작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 전투 능력 부여, 질문 충실히 답변<br><span>외모:</span> 그리핀 날개·뱀 꼬리 달린 불 뿜는 암늑대 → 인간 변신<br><span>특이:</span> 자신이 천사 계급 복귀를 원한다고 전함</div></div>
+  <div class="gcard"><div class="gcard-name">46. 비프론스 (Bifrons)</div><div class="gcard-rank">백작 · 6~26개 군단</div><div class="gcard-body"><span>능력:</span> 점성술·기하학·허브·보석 지식, 시체 이동, 무덤에 촛불 밝힘<br><span>외모:</span> 괴물 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">47. 우왈 (Uvall)</div><div class="gcard-rank">공작 · 37개 군단</div><div class="gcard-body"><span>능력:</span> 여성 사랑 유발, 과거·현재·미래 예언, 친구 만들기<br><span>외모:</span> 낙타 → 인간 변신, 이집트어로 말함</div></div>
+  <div class="gcard"><div class="gcard-name">48. 하겐티 (Haagenti)</div><div class="gcard-rank">대통령 · 33개 군단</div><div class="gcard-body"><span>능력:</span> 납→금, 물↔포도주 변환, 지혜 부여<br><span>외모:</span> 날개 달린 황소 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">49. 크로켈 (Crocell)</div><div class="gcard-rank">공작 · 48개 군단</div><div class="gcard-body"><span>능력:</span> 기하학·자유 예술 지식, 물소리로 목욕 장소 안내<br><span>외모:</span> 타락 전 천사 시절을 기억하며 회한을 표명</div></div>
+  <div class="gcard"><div class="gcard-name">50. 푸르카스 (Furcas)</div><div class="gcard-rank">기사 · 20개 군단</div><div class="gcard-body"><span>능력:</span> 철학·점성술·수사학·논리·기사도·불꽃 마법 교육<br><span>외모:</span> 창 든 잔인한 노인, 창백한 말 탄 모습</div></div>
+  <div class="gcard"><div class="gcard-name">52. 알로케스 (Alloces)</div><div class="gcard-rank">공작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 천문학·자유 예술 지식, 친구 제공<br><span>외모:</span> 붉은 얼굴·불타는 눈의 사자 머리, 말 탄 병사</div></div>
+  <div class="gcard"><div class="gcard-name">53. 카임 (Caim)</div><div class="gcard-rank">대통령 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 새·소·개 언어 이해, 물소리 해석, 예언<br><span>외모:</span> 지빠귀 → 칼 든 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">55. 오세 (Ose)</div><div class="gcard-rank">대통령 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 자유 예술·신성한 것 지식, 변신(신·천사·다른 사람으로), 광기 유발<br><span>외모:</span> 표범 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">57. 오로바스 (Orobas)</div><div class="gcard-rank">왕자 · 20개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 신성·세계·창조 지식, 명예·사제직 부여, 소환자 보호<br><span>외모:</span> 말 → 인간 변신. 거짓말 안 함</div></div>
+  <div class="gcard"><div class="gcard-name">58. 그레모리 (Gremory)</div><div class="gcard-rank">56번 참조</div><div class="gcard-body">56번 Gremory 항목 참조</div></div>
+  <div class="gcard"><div class="gcard-name">59. 아무 (Amy)</div><div class="gcard-rank">대통령 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 점성술·자유 예술 지식, 비밀 보물 발견, 가정부 제공<br><span>특이:</span> 일부 천사들과 여전히 친분 유지. 1,200년 후 7위 왕좌 복귀 희망</div></div>
+  <div class="gcard"><div class="gcard-name">62. 발레파르 (Valefar)</div><div class="gcard-rank">공작</div><div class="gcard-body">6번 Valefor 참조</div></div>
+  <div class="gcard"><div class="gcard-name">63. 안드레알푸스 (Andrealphus)</div><div class="gcard-rank">후작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 기하학·측량 지식, 인간→공작새 변신<br><span>외모:</span> 공작새 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">64. 키마리스 (Cimejes)</div><div class="gcard-rank">후작 · 20개 군단</div><div class="gcard-body"><span>능력:</span> 문법·논리·수사학·점성술 지식, 사병 발견<br><span>외모:</span> 검은 말 탄 용감한 전사</div></div>
+  <div class="gcard"><div class="gcard-name">65. 아무두시아스 (Amdusias)</div><div class="gcard-rank">공작 · 29개 군단</div><div class="gcard-body"><span>능력:</span> 악기·트럼펫 소리 제공, 나무 굽히기, 음악·콘서트 지식<br><span>외모:</span> 유니콘 → 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">66. 바란 (Belial)</div><div class="gcard-rank">왕 · 80개 군단</div><div class="gcard-body">68번 Belial 참조</div></div>
+  <div class="gcard"><div class="gcard-name">67. 데카라비아 (Decarabia)</div><div class="gcard-rank">후작 · 30개 군단</div><div class="gcard-body"><span>능력:</span> 새·허브·보석 지식, 새 형태로 나타남<br><span>외모:</span> 별 형태의 오각형 안에 나타남 → 까마귀 변신</div></div>
+  <div class="gcard"><div class="gcard-name">69. 데카라비아 유사 — 단탈리온 (Dantalion)</div><div class="gcard-rank">공작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 모든 인간의 생각 간파, 원격 마음 조종, 꿈 속 공유, 동일 외모 모방<br><span>외모:</span> 남녀 수천 개 얼굴의 인간</div></div>
+  <div class="gcard"><div class="gcard-name">71. 하알로이 (Haures)</div><div class="gcard-rank">공작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 과거·현재·미래 예언, 신성·창조 지식, 적 화형, 악마로부터 보호<br><span>외모:</span> 표범 → 불타는 눈 인간 변신</div></div>
+  <div class="gcard"><div class="gcard-name">72. 안드로마리우스 (Andromalius)</div><div class="gcard-rank">백작 · 36개 군단</div><div class="gcard-body"><span>능력:</span> 도둑 체포, 훔친 물건 회수, 악당 폭로, 보물 발견<br><span>외모:</span> 큰 뱀 든 인간. 마지막 72번째 악마</div></div>
+</div>
+</div>
+
+<!-- ══════════ 이슬람 ══════════ -->
+<div id="tab-islam" class="section">
+<div class="sec-title">☪️ 이슬람 — 말라이카(천사)와 진·이블리스</div>
+
+<div class="sub-title">말라이카 (Malā'ika) — 천사</div>
+<div class="grid">
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">📖</div><div class="card-names">
+      <div class="cname">지브릴 (Jibrīl)</div>
+      <div class="calt">아랍어: جبريل / 히브리 가브리엘 대응<br>별칭: 루흐 알아민(신실한 영)</div>
+    </div></div>
+    <span class="badge badge-angel">최고위 천사 / 계시의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>날개 600개</b>. 날개 하나가 동서를 덮음. 현현 시 지평선을 가득 채움</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">꾸란 계시(무함마드에게 23년간), 예언자들에게 신의 말씀 전달, 변신(다히야 칼비 형태로 나타남)</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">계시·신성한 지식·예언자 보호</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">예언자 무함마드의 심장을 씻고 지혜로 채운 전승. 이스라 미라즈(밤 여행) 동행</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌿</div><div class="card-names">
+      <div class="cname">미카일 (Mīkāʾīl)</div>
+      <div class="calt">아랍어: ميكائيل / 히브리 미카엘 대응</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 자연과 양식의 천사</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">비와 식물 관리, 인간과 동물의 양식 제공, 바람·천둥 관장</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">자연·비·번영·양식</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">사프란빛 몸에 에메랄드 날개. 신자를 위해 눈물을 흘린다는 전승</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🎺</div><div class="card-names">
+      <div class="cname">이스라필 (Isrāfīl)</div>
+      <div class="calt">아랍어: إسرافيل</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 나팔의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>수르(나팔)</b> — 종말의 날 두 번 취주</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">첫 번째 나팔: 모든 생명 사망. 두 번째 나팔: 부활. 신의 보좌에 가장 가깝게 위치</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">태초부터 나팔을 입에 물고 명령 대기. 날개 4개, 발이 지하 세계·머리가 하늘 꼭대기</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">아즈라일 / 말라크 알마우트</div>
+      <div class="calt">아랍어: عزرائيل / ملك الموت "죽음의 천사"</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 죽음의 천사</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">영혼 분리(믿는 자: 부드럽게, 불신자: 격렬하게), 영혼 인도</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">날개 4개, 몸 크기는 동서 거리. 인간의 이름이 몸에 새겨짐(죽을 때 이름이 흐릿해짐)</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">신자의 영혼은 흰 천에, 불신자는 낡은 천에 싼다</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">⚖️</div><div class="card-names">
+      <div class="cname">문카르와 나키르 (Munkar & Nakir)</div>
+      <div class="calt">아랍어: منكر ونكير "낯선 이들"</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 무덤의 심문자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>철제 망치</b>(불신자 처벌용)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">매장 후 영혼 심문 — "당신의 주는 누구인가?", "당신의 종교는?", "당신의 예언자는?"</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">검은 파란 색조, 목소리는 천둥, 눈은 번개</div></div>
+    <div class="row"><div class="rk">결과</div><div class="rv">신자: 무덤이 넓어지고 빛 채워짐. 불신자: 망치로 타격, 무덤이 압착</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🌺</div><div class="card-names">
+      <div class="cname">리드완 (Ridwān)</div>
+      <div class="calt">아랍어: رضوان "만족"</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 천국의 문지기</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">잔나(천국) 문 관리, 신자들을 환대</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">아름답고 자비로운 얼굴, 흰 옷</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-names">
+      <div class="cname">말리크 (Mālik)</div>
+      <div class="calt">아랍어: مالك "소유자/주인"</div>
+    </div></div>
+    <span class="badge badge-angel">천사 / 지옥(자한남)의 문지기</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">지옥 관리, 죄인 처벌 감독</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">꾸란 43:77 — 지옥 거주자들이 말리크에게 죽음을 청하지만 거부됨</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">📝</div><div class="card-names">
+      <div class="cname">라키브와 아티드 (Raqīb & ʿAtīd)</div>
+      <div class="calt">아랍어: رقيب وعتيد "감시자·준비된 자"</div>
+    </div></div>
+    <span class="badge badge-angel">천사쌍 / 기록 천사</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">각 인간의 오른쪽(선행 기록)·왼쪽(악행 기록)에 배치. 모든 말과 행동 실시간 기록</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">꾸란 50:17-18 — "오른쪽과 왼쪽에 앉아 기록"</div></div>
+  </div>
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">✨</div><div class="card-names">
+      <div class="cname">하루트와 마루트 (Hārūt & Mārūt)</div>
+      <div class="calt">아랍어: هاروت وماروت (아베스타어 기원설)</div>
+    </div></div>
+    <span class="badge badge-fallen">타락천사(일부 해석) / 바빌론의 마법 천사</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">마법 교육(특히 부부 불화 마법), 신의 시험으로 지상에 파견</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">바빌론(바벨), 우물 안에 거꾸로 매달려 종말까지 처벌</div></div>
+    <div class="row"><div class="rk">출처</div><div class="rv">꾸란 2:102 — "솔로몬을 비방하는 자들이 바빌론에서 두 천사 하루트·마루트에게 마법을 배움"</div></div>
+  </div>
+</div>
+
+<div class="sub-title">진(Jinn)과 이블리스</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😈</div><div class="card-names">
+      <div class="cname">이블리스 (Iblīs)</div>
+      <div class="calt">아랍어: إبليس / 그리스 "절망"에서 파생설<br>별칭: 샤이탄(Shaytan), 아부 무라</div>
+    </div></div>
+    <span class="badge badge-fallen">타락한 진 / 이슬람의 악마</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">인간 유혹, 거짓 속삭임(와스와사), 피와 함께 인간 몸속 흐름, 자손 샤이탄 무리 거느림</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">지상(심판 날까지 유예 허락받음), 인간 속</div></div>
+    <div class="row"><div class="rk">패인</div><div class="rv">아담에게 절하기를 거부 — "나는 불로, 그는 흙으로 만들어졌다"(꾸란 7:12)</div></div>
+    <div class="row"><div class="rk">목표</div><div class="rv">인류를 지옥으로 이끌어 신에게 복수. 심판 날까지 유예 요청 성공</div></div>
+  </div>
+  <div class="card spirit">
+    <div class="card-head"><div class="card-icon">🌪️</div><div class="card-names">
+      <div class="cname">진의 종류 (Types of Jinn)</div>
+      <div class="calt">진은 인간·천사와 다른 제3의 존재. 불로 창조</div>
+    </div></div>
+    <span class="badge badge-spirit">영적 존재 / 진족</span>
+    <div class="row"><div class="rk">마리드</div><div class="rv"><b>물의 진</b>, 가장 강력하고 교만함. 바다·강 지배. 소원 성취 능력(알라딘 지니의 원형)</div></div>
+    <div class="row"><div class="rk">이프리트</div><div class="rv"><b>불의 진</b>, 강력하고 교활. 지하 세계 거주. 꾸란 27:39 — 솔로몬의 명을 받음</div></div>
+    <div class="row"><div class="rk">시일라</div><div class="rv">변신 진, 주로 여성. 여행자 유혹·혼란</div></div>
+    <div class="row"><div class="rk">구울</div><div class="rv">묘지·사막 거주, 시체 먹음, 여행자 공격. 변신 능력</div></div>
+    <div class="row"><div class="rk">하무</div><div class="rv">일반 진, 인간과 공존, 선·악 혼재</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 조로아스터 ══════════ -->
+<div id="tab-zoroaster" class="section">
+<div class="sec-title">🔥 조로아스터교 — 야자타와 다에바</div>
+<div class="info-box">이원론적 세계관: <b>아후라 마즈다</b>(선의 신)와 <b>앙그라 마이뉴</b>(악의 영)의 우주적 대결. 천사(야자타)와 악마(다에바)가 각각을 보조.</div>
+
+<div class="sub-title">아메샤 스펜타 (Amesha Spenta) — 신성한 불사자들</div>
+<table class="rank-table">
+  <tr><th>이름</th><th>원소/관장</th><th>덕목</th><th>대응 악마(다루즈)</th></tr>
+  <tr><td><b>스펜타 마이뉴</b> (Spenta Mainyu)</td><td>아후라 마즈다의 선한 영</td><td>성스러운 정신</td><td>앙그라 마이뉴</td></tr>
+  <tr><td><b>보후 마나</b> (Vohu Manah)</td><td>소(牛)·동물</td><td>선한 마음</td><td>아카 마나(Aka Manah, 악한 생각)</td></tr>
+  <tr><td><b>아샤 바히쉬타</b> (Asha Vahishta)</td><td>불·의로움</td><td>진리·정의</td><td>인다라(Indra, 사도)</td></tr>
+  <tr><td><b>크샤트라 바이랴</b> (Khshathra Vairya)</td><td>금속·하늘</td><td>신성한 왕국</td><td>사우루(Sauru, 무정부)</td></tr>
+  <tr><td><b>스펜타 아르마이티</b> (Spenta Armaiti)</td><td>땅·여성성</td><td>경건·헌신</td><td>나옹하이티야(Naonhaithya, 불만족)</td></tr>
+  <tr><td><b>하우르바타트</b> (Haurvatat)</td><td>물·건강</td><td>완전함</td><td>타우루(Taurvi, 기근)</td></tr>
+  <tr><td><b>아메레타트</b> (Ameretat)</td><td>식물·불멸</td><td>불멸성</td><td>자이리카(Zairika, 독)</td></tr>
+</table>
+
+<div class="sub-title">야자타 (Yazata) — 숭배받는 자들</div>
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">☀️</div><div class="card-names">
+      <div class="cname">미트라 (Mithra)</div>
+      <div class="calt">아베스타어: "계약·우정"</div>
+    </div></div>
+    <span class="badge badge-divine">야자타 / 계약의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>황금 전쟁 마차</b>, 곤봉·창·화살, 매와 독수리 군단</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">계약 위반자 처벌, 전쟁 승리 부여, 태양빛 관장, 불멸 수여(미트라 밀교)</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">계약·우정·태양·전쟁·빛</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">로마 미트라스 교단의 원형. 황소 도살 의식. 12월 25일 탄생 신화</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💧</div><div class="card-names">
+      <div class="cname">아나히타 (Anahita)</div>
+      <div class="calt">아베스타어: "순결·흠 없는"</div>
+    </div></div>
+    <span class="badge badge-divine">야자타 / 물과 풍요의 여신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">황금 왕관, 별 목걸이, 비버 가죽 외투</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">물 정화, 풍요·출산 부여, 전사에게 힘 제공, 종교 의식 정화</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">물·풍요·전쟁·순결·출산</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌟</div><div class="card-names">
+      <div class="cname">스라오샤 (Sraosha)</div>
+      <div class="calt">아베스타어: "순종·청각"</div>
+    </div></div>
+    <span class="badge badge-divine">야자타 / 복종의 천사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">황금 단검, 철제 몽둥이</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">악마 아에샤마 격퇴, 죽은 자의 영혼 인도, 신의 말씀 전달</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">복종·경청·기도·영혼 인도</div></div>
+  </div>
+</div>
+
+<div class="sub-title">앙그라 마이뉴 (Angra Mainyu) — 파괴적 영</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">앙그라 마이뉴 / 아흐리만 (Angra Mainyu)</div>
+      <div class="calt">아베스타어: "파괴적 정신" / 중세 페르시아: 아흐리만</div>
+    </div></div>
+    <span class="badge badge-demon">악의 원리 / 어둠의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">모든 악·죄·질병·죽음. 아리만의 독이 가브르 신화에서 세계를 오염</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">지하 어둠 세계, 북쪽(악의 방향)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">모든 악 창조(병·악마·죄악·죽음), 가요마르트(최초 인간) 독살, 아후라 마즈다와 12,000년 우주 전쟁</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">아샤(진리)의 불꽃, 선한 생각·말·행동, 기도</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😡</div><div class="card-names">
+      <div class="cname">아에샤마 (Aeshma)</div>
+      <div class="calt">아베스타어: "격노·폭력" — 유대교 아스모데우스 원형</div>
+    </div></div>
+    <span class="badge badge-demon">다에바 / 격노의 악마</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>피 묻은 곤봉</b></div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">전쟁·폭력 조장, 선한 가축 파괴</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">스라오샤(복종의 야자타)에게 대적됨</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">아스토 비다투 (Astō Vīdātu)</div>
+      <div class="calt">아베스타어: "뼈를 흩트리는 자"</div>
+    </div></div>
+    <span class="badge badge-demon">다에바 / 죽음의 악마</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>올가미</b>(죽음의 순간 영혼 잡기)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">모든 인간에게 죽음 가져옴. 올가미로 영혼 포획</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🤥</div><div class="card-names">
+      <div class="cname">드루지 (Druj)</div>
+      <div class="calt">아베스타어: "거짓"</div>
+    </div></div>
+    <span class="badge badge-demon">다에바 원리 / 거짓의 화신</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">거짓·기만·오염 확산. 아샤(진리)의 반대. 모든 악 다에바의 근원 원리</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">나수(시체 오염의 드루지) — 죽은 자 몸에 들어가 살아있는 자를 오염시킴</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 힌두교 ══════════ -->
+<div id="tab-hindu" class="section">
+<div class="sec-title">🕉️ 힌두교 — 데바와 아수라</div>
+
+<div class="sub-title">주요 데바 (Deva) — 신성한 존재</div>
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">⚡</div><div class="card-names">
+      <div class="cname">인드라 (Indra)</div>
+      <div class="calt">산스크리트: "강한 자" — 천신의 왕</div>
+    </div></div>
+    <span class="badge badge-divine">데바 / 신들의 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>바즈라(번개 벼락)</b>, 활, 갈고리, 그물(Varunastra)</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">흰 코끼리 아이라바타, 흰 말 우차이흐슈라바스</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">비·천둥·번개 지배, 브리트라 퇴치, 천상(스와르가) 통치</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">아마라바티(수도), 메루산 스와르가(천상)</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">교만으로 여러 번 저주받음(브라흐마나 살해로 죄)</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌬️</div><div class="card-names">
+      <div class="cname">바유 (Vayu)</div>
+      <div class="calt">산스크리트: "바람"</div>
+    </div></div>
+    <span class="badge badge-divine">데바 / 바람의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">바람 자체, 깃발·창</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">천 마리 말이 끄는 마차</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">바람 지배, 생명의 숨결(프라나) 부여. 하누만의 아버지(또는 한 측면)</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">야마 (Yama)</div>
+      <div class="calt">산스크리트: "쌍둥이·자제" — 최초의 죽은 인간</div>
+    </div></div>
+    <span class="badge badge-divine">데바 / 죽음과 법의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>카라(올가미)</b>, <b>단다(철제 몽둥이)</b></div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">검은 물소</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죽음 집행, 영혼 심판, 업(카르마) 기록 관리, 야마로카(지옥) 통치</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">야마로카(지옥), 남쪽 방향</div></div>
+    <div class="row"><div class="rk">부하</div><div class="rv">치트라굽타(기록관), 야마두타(사자使者), 칼라(시간)</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💰</div><div class="card-names">
+      <div class="cname">쿠베라 (Kubera)</div>
+      <div class="calt">산스크리트: "기형" — 부의 신</div>
+    </div></div>
+    <span class="badge badge-divine">데바 / 부와 야크샤의 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">철퇴, 황금 항아리</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">인간 가마(나라바하나)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">알라카(수도), 메루산 북쪽</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">원래 악마(락샤사) 계통이었으나 고행으로 데바 지위 획득</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🐒</div><div class="card-names">
+      <div class="cname">하누만 (Hanuman)</div>
+      <div class="calt">산스크리트: "턱이 부서진" — 원숭이 신</div>
+    </div></div>
+    <span class="badge badge-divine">반신 / 라마의 종복·최강 전사</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>간다마다나 산(산 통째로 들고 날아감)</b>, 철퇴, 맨손 격투</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">무한 크기 변신, 극소화, 비행, 초강도, 빛의 속도 이동, 불사, 8가지 신통력(아슈타마하싯디)</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">바유의 아들. 불에 타지 않음. 라마나마(라마의 이름) 심장에 새김</div></div>
+  </div>
+</div>
+
+<div class="sub-title">주요 아수라 (Asura) — 강력한 악마들</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐃</div><div class="card-names">
+      <div class="cname">마히샤수라 (Mahishasura)</div>
+      <div class="calt">산스크리트: "물소 악마"</div>
+    </div></div>
+    <span class="badge badge-demon">아수라 / 물소 마왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">철퇴, 창, 물소 형태 돌진</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">물소·인간·코끼리 자유 변신, 신들을 천상에서 추방, 브라흐마의 가호로 남성에게 불사</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv"><b>여성(두르가)에게만 패배 가능</b> — 두르가 여신이 창으로 처치</div></div>
+    <div class="row"><div class="rk">의미</div><div class="rv">두르가 뿌자 축제의 배경. 교만의 상징</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">👑</div><div class="card-names">
+      <div class="cname">라바나 (Ravana)</div>
+      <div class="calt">산스크리트: "우는 자·크게 울부짖는 자"</div>
+    </div></div>
+    <span class="badge badge-demon">락샤사 왕 / 10개 머리의 마왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>찬드라하사(달의 검)</b>, 브라흐마아스트라, 나그나스트라(뱀 무기), 수십 종 디비야아스트라</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">푸슈파카 비마나(자동 비행 전차, 꽃 모양)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">10개 머리(재생), 20개 팔, 브라흐마·시바의 가호로 신·악마·야크샤에게 불사, 베다·마법 지식</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv"><b>인간과 동물에게 취약</b>(가호 요청 시 인간·동물 제외). 배꼽이 약점(암리타 보관)</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">위대한 시바 신봉자. 학자·음악가·전사·통치자. 시타 납치로 라마야나 전쟁 발발</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🦁</div><div class="card-names">
+      <div class="cname">히라냐카시푸 (Hiranyakashipu)</div>
+      <div class="calt">산스크리트: "황금 옷"</div>
+    </div></div>
+    <span class="badge badge-demon">다이티아 왕 / 불사의 마왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">철퇴, 마법 무기</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">브라흐마 고행으로 거의 불사에 가까운 가호 획득</div></div>
+    <div class="row"><div class="rk">가호 조건</div><div class="rv">낮도 밤도 아닌 때, 실내도 실외도 아닌 곳, 신도 인간도 아닌 존재에게, 무기도 맨손도 아닌 것으로만 죽음 가능</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">나라심하(비슈누 반인반사자 화신)가 황혼 시, 문지방 위에서, 무릎 위에 올려 발톱으로 내장 찢어 처치</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌊</div><div class="card-names">
+      <div class="cname">브리트라 (Vritra)</div>
+      <div class="calt">산스크리트: "포위하는 자·방해자"</div>
+    </div></div>
+    <span class="badge badge-demon">아수라 / 가뭄의 용</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">거대 몸체(산을 삼킴), 강력한 마법</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">전 세계의 물을 가두어 가뭄 유발, 인드라와 신들 패배시킴</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">비슈누가 깃든 다디치 선인의 뼈로 만든 <b>바즈라(번개)</b>에 패배</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌙</div><div class="card-names">
+      <div class="cname">타라카수라 (Tarakasura)</div>
+      <div class="calt">산스크리트: "별"</div>
+    </div></div>
+    <span class="badge badge-demon">아수라 / 불사 마왕</span>
+    <div class="row"><div class="rk">가호</div><div class="rv">시바의 아들만이 처치 가능</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">카르티케야(스칸다, 시바의 아들)의 창 <b>샥티</b>에 패배</div></div>
+    <div class="row"><div class="rk">의미</div><div class="rv">파르바티가 시바를 유혹해 카르티케야 낳는 계기. 파르바티의 혼인 동기</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 그리스·로마 ══════════ -->
+<div id="tab-greek" class="section">
+<div class="sec-title">🏛️ 그리스·로마 — 지하 신들과 다이몬</div>
+
+<div class="sub-title">지하 세계 (하데스) 주요 존재</div>
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">하데스 / 플루톤 (Hades/Pluto)</div>
+      <div class="calt">그리스: "보이지 않는 자" / 라틴: "부자"</div>
+    </div></div>
+    <span class="badge badge-divine">올림포스 신 / 지하세계 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>투명 투구(키네에 하이도스)</b>, 두 갈래 창(비덴트)</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">검은 말 4마리 전차</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죽은 자 지배, 투명화, 지상의 모든 금속·보석 소유, 지진(드물게)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">에레보스(지하세계), 엘리시온·타르타로스·아스포델 초원 포함</div></div>
+    <div class="row"><div class="rk">부하</div><div class="rv">케르베로스(3머리 개), 카론(뱃사공), 미노스·라다만토스·아이아코스(심판관)</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌑</div><div class="card-names">
+      <div class="cname">헤카테 (Hecate)</div>
+      <div class="calt">그리스: "멀리서 일하는 자"</div>
+    </div></div>
+    <span class="badge badge-divine">티탄 / 마법·달·지하의 여신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>횃불 2개</b>, 단검, 채찍, 뱀</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">마법 전부, 달 지배(세 단계), 죽은 자 지휘, 삼거리에서 현현, 개·올빼미와 동행</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">세 개 얼굴(삼중여신), 세 방향 동시에 봄</div></div>
+    <div class="row"><div class="rk">관장</div><div class="rv">마법·밤·달·출산·경계·유령·저주</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">😴</div><div class="card-names">
+      <div class="cname">타나토스 / 히프노스 (Thanatos/Hypnos)</div>
+      <div class="calt">그리스: "죽음" / "잠" — 쌍둥이 형제</div>
+    </div></div>
+    <span class="badge badge-divine">다이몬 쌍둥이 / 죽음과 잠</span>
+    <div class="row"><div class="rk">타나토스</div><div class="rv"><b>날개 달린 청년</b>. 역전된 횃불·검. 비폭력적 죽음 관장</div></div>
+    <div class="row"><div class="rk">히프노스</div><div class="rv">양귀비·뿔잔 보유. 레테(망각의 강) 위 동굴 거주. 신도 잠들게 함</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">에리니에스 / 푸리아에 (Erinyes/Furiae)</div>
+      <div class="calt">그리스: "분노자들" / 라틴: "분노" — 알렉토·메가이라·티시포네</div>
+    </div></div>
+    <span class="badge badge-demon">복수의 여신들</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>채찍(불타는)</b>, 횃불, 뱀(머리카락)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">살인·위증·부모 불효자 추적·광기 유발·피부병 전파</div></div>
+    <div class="row"><div class="rk">알렉토</div><div class="rv">"분노 멈추지 않는 자" — 잔인한 처벌</div></div>
+    <div class="row"><div class="rk">메가이라</div><div class="rv">"질투하는 자" — 부당이득 처벌</div></div>
+    <div class="row"><div class="rk">티시포네</div><div class="rv">"살인에 복수하는 자" — 형제 살해자 추적</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">뱀 머리카락, 개 머리, 박쥐 날개, 눈에서 피눈물</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌀</div><div class="card-names">
+      <div class="cname">티폰 (Typhon)</div>
+      <div class="calt">그리스: "소용돌이" — 모든 괴물의 아버지</div>
+    </div></div>
+    <span class="badge badge-demon">원시 거인 / 최강 괴물</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">폭풍·화산 유발, 신들 전부 패배(제우스 포함 일시), 제우스의 힘줄 탈취</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">허벅지 아래 뱀, 100개 뱀/용 머리(불·목소리), 별까지 닿는 키, 날개</div></div>
+    <div class="row"><div class="rk">자녀</div><div class="rv">케르베로스·히드라·키마이라·스핑크스·네메아 사자 (에키드나와의 사이)</div></div>
+    <div class="row"><div class="rk">봉인</div><div class="rv">제우스의 번개에 패배, 에트나 화산 아래 매장 — 화산 폭발은 티폰의 분노</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😱</div><div class="card-names">
+      <div class="cname">데이모스·포보스 (Deimos/Phobos)</div>
+      <div class="calt">그리스: "공포" / "두려움" — 아레스의 아들들</div>
+    </div></div>
+    <span class="badge badge-demon">다이몬 / 공포의 신</span>
+    <div class="row"><div class="rk">데이모스</div><div class="rv">전쟁의 공포·혼란. 아레스의 마차 끌음</div></div>
+    <div class="row"><div class="rk">포보스</div><div class="rv">패주의 공포. 아킬레우스 방패에 묘사. 알렉산더 대왕 숭배</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌑</div><div class="card-names">
+      <div class="cname">에리스 (Eris)</div>
+      <div class="calt">그리스: "불화" — 로마: 디스코르디아</div>
+    </div></div>
+    <span class="badge badge-demon">다이몬 / 불화의 여신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>황금 사과</b>("가장 아름다운 자에게") — 트로이 전쟁 원인</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">분쟁·불화 유발, 고통 확산</div></div>
+    <div class="row"><div class="rk">자녀</div><div class="rv">포노스(노동)·레테(망각)·리모스(기아)·아테(맹목)·호르코스(맹서)</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">메두사와 고르고네스 (Medusa)</div>
+      <div class="calt">그리스: "지배자" — 원래 아테나의 신관</div>
+    </div></div>
+    <span class="badge badge-demon">괴물 / 돌로 만드는 시선</span>
+    <div class="row"><div class="rk">능력</div><div class="rv"><b>시선 접촉 즉시 석화</b>, 뱀 머리카락</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">거울(방패)로 간접 시선. 페르세우스가 아테나 방패에 반사해 참수</div></div>
+    <div class="row"><div class="rk">사후</div><div class="rv">목에서 페가수스·크리사오르 탄생. 피에서 독뱀 생성. 머리는 메두사의 방패 아이기스로 사용</div></div>
+  </div>
+</div>
+
+<div class="sub-title">티탄족 (Titans)</div>
+<table class="rank-table">
+  <tr><th>이름</th><th>관장</th><th>자녀(주요)</th><th>결말</th></tr>
+  <tr><td><b>크로노스/사투르누스</b></td><td>시간·수확·교활함</td><td>제우스·헤라·포세이돈·데메테르·하데스·헤스티아</td><td>티타노마키아 패배, 타르타로스 또는 엘리시온 섬</td></tr>
+  <tr><td><b>히페리온</b></td><td>빛·관찰·동방</td><td>헬리오스·셀레네·에오스</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>이아페토스</b></td><td>서방·죽음</td><td>프로메테우스·에피메테우스·아틀라스·메노이티오스</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>오케아노스</b></td><td>세계 바다·강</td><td>3000 오케아니드·3000 강신</td><td>중립, 감금 피함</td></tr>
+  <tr><td><b>프로메테우스</b></td><td>선견지명·불·인류</td><td>데우칼리온(홍수 생존자)</td><td>코카서스 산에 묶여 독수리에게 간 뜯김(헤라클레스 구출)</td></tr>
+  <tr><td><b>아틀라스</b></td><td>하늘 떠받침·천문학</td><td>플레이아데스·히아데스·헤스페리데스</td><td>하늘을 영원히 떠받치는 형벌</td></tr>
+</table>
+</div>
+
+<!-- ══════════ 메소포타미아 ══════════ -->
+<div id="tab-meso" class="section">
+<div class="sec-title">🏺 메소포타미아 — 아눈나키와 악령들</div>
+
+<div class="sub-title">주요 신격 (아눈나키/이기기)</div>
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌩️</div><div class="card-names">
+      <div class="cname">엔릴 (Enlil)</div>
+      <div class="calt">수메르: EN.ZU "바람의 주" — 신들의 왕(초기)</div>
+    </div></div>
+    <span class="badge badge-divine">아눈나키 / 대기·폭풍의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>폭풍·대홍수</b>, 엔릴의 서판(운명 결정), 안줄루(도끼)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">에쿠르(니푸르 신전 "산의 집"), 하늘과 땅 사이</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">인류 운명 결정, 대홍수 결의, 문명 도구(메) 관리</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌊</div><div class="card-names">
+      <div class="cname">엔키 / 에아 (Enki/Ea)</div>
+      <div class="calt">수메르: EN.KI "땅의 주" — 지혜의 신</div>
+    </div></div>
+    <span class="badge badge-divine">아눈나키 / 지혜·물·마법의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>아비수(압주, 담수 심연)</b>, 메(문명 도구 60가지), 마법 주문</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">에리두(최초 도시), 압주(땅 아래 담수)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">인류 창조(닌후르사그와), 홍수에서 우트나피쉬팀 구함, 온갖 기술·마법·예술 발명</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">두 얼굴 야누스 신화의 원형. 메(문명의 모든 기술) 이난나에게 속아서 넘겨줌</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">⭐</div><div class="card-names">
+      <div class="cname">이난나 / 이슈타르 (Inanna/Ishtar)</div>
+      <div class="calt">수메르: INANNA "하늘의 여주인" / 아카드: 이슈타르</div>
+    </div></div>
+    <span class="badge badge-divine">아눈나키 / 전쟁·사랑·금성의 여신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>사자·전차·활·화살</b>, 사자 위에 서거나 올빼미 날개</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">사랑·전쟁·다산·사망·부활 모두 관장, 지하세계 여행 후 귀환, 왕권 부여</div></div>
+    <div class="row"><div class="rk">지하세계</div><div class="rv">에레슈키갈(언니)의 왕국에 7관문 통과하며 7개 장식 탈취 → 알몸으로 심판, 부활 후 두무지를 대신 보냄</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">아스타르테(페니키아)·아프로디테(그리스)·비너스(로마) 원형</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">에레슈키갈 (Ereshkigal)</div>
+      <div class="calt">수메르: "위대한 땅의 여주인"</div>
+    </div></div>
+    <span class="badge badge-divine">아눈나키 / 지하세계 여왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">갈루(지하세계 악마 군단), 죽음의 시선</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">지하세계 완전 지배, 누구도 산 채로 빠져나올 수 없음, 운명의 서판 보유</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">쿠르(지하세계), 7겹 성벽 안</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌙</div><div class="card-names">
+      <div class="cname">네르갈 (Nergal)</div>
+      <div class="calt">수메르: "지하세계의 큰 주" — 전염병·전쟁의 신</div>
+    </div></div>
+    <span class="badge badge-divine">아눈나키 / 지하세계 공동 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>네르갈의 검(칼투)</b>, 역병, 전쟁의 파괴</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">전염병·폭염 유발, 전쟁 파괴, 에레슈키갈을 정복해 지하세계 공동 왕이 됨</div></div>
+  </div>
+</div>
+
+<div class="sub-title">메소포타미아 악령들</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌪️</div><div class="card-names">
+      <div class="cname">파주주 (Pazuzu)</div>
+      <div class="calt">아카드: "바람 악마의 왕"</div>
+    </div></div>
+    <span class="badge badge-demon">악마 / 서남풍의 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>독풍·역병·메뚜기 떼</b></div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">독수리 날개·발, 전갈 꼬리, 사자 머리, 뱀 페니스, 개 머리, 두 쌍 날개</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">남서풍 지배(가뭄·메뚜기), 산욕열·유아 사망 유발</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">역설적으로 임산부 보호 부적으로도 사용(라마슈투를 물리침). 영화 엑소시스트 원형</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">👶</div><div class="card-names">
+      <div class="cname">라마슈투 (Lamashtu)</div>
+      <div class="calt">아카드: "신의 딸" — 유아 사망의 악마</div>
+    </div></div>
+    <span class="badge badge-demon">악마 여신 / 유아 살해자</span>
+    <div class="row"><div class="rk">외모</div><div class="rv">사자 머리, 당나귀 이빨, 독수리 발, 돼지와 개에게 젖을 먹임</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">임산부 복부 침입, 태아·신생아·유아 살해, 수유 방해, 임산부 열병 유발</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">파주주 부적(역설적 보호), 라마슈투 퇴치 주문</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">😈</div><div class="card-names">
+      <div class="cname">아사쿠 / 갈루 (Asakku/Gallu)</div>
+      <div class="calt">수메르: 갈루 "지하세계 경찰"</div>
+    </div></div>
+    <span class="badge badge-demon">악마 무리 / 지하세계 악령</span>
+    <div class="row"><div class="rk">갈루</div><div class="rv">에레슈키갈의 집행관. 감정 없음, 음식·물 필요 없음, 인간 두려움 모름. 이난나 추적</div></div>
+    <div class="row"><div class="rk">아사쿠</div><div class="rv">질병 악마. 산에서 태어난 산의 악령들. 니누르타가 격퇴</div></div>
+    <div class="row"><div class="rk">우투쿠</div><div class="rv">집에 침입하는 악령, 7종류 (선·악 혼재). 주문으로 퇴치</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🦅</div><div class="card-names">
+      <div class="cname">안주 / 임두구드 (Anzu)</div>
+      <div class="calt">수메르: "폭풍새" — 거대 신성한 괴물새</div>
+    </div></div>
+    <span class="badge badge-demon">괴물 / 운명의 서판 도둑</span>
+    <div class="row"><div class="rk">외모</div><div class="rv">사자 머리 독수리, 엄청난 크기</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">엔릴의 운명 서판 탈취(→우주 지배 가능), 폭풍 유발, 산 지배</div></div>
+    <div class="row"><div class="rk">결말</div><div class="rv">니누르타(전쟁 신)가 화살로 처치, 운명 서판 회수</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 이집트 ══════════ -->
+<div id="tab-egypt" class="section">
+<div class="sec-title">𓂀 이집트 — 신·악령·저승 존재</div>
+
+<div class="sub-title">저승 관련 주요 신격</div>
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🐺</div><div class="card-names">
+      <div class="cname">아누비스 (Anubis)</div>
+      <div class="calt">이집트: 이누푸(Inpu) "왕실 아이" — 자칼 신</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 방부처리·저승 안내</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>아비스(생명 막대기)</b>, 균형 저울, 도리깨·홀</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">방부처리 감독, 영혼 저승 안내, 마아트 깃털 vs 심장 무게 측정, 미라 보호</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">검은 자칼 머리 인간, 검은색(부패·재생 상징)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">두아트(저승), 무덤</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌿</div><div class="card-names">
+      <div class="cname">오시리스 (Osiris)</div>
+      <div class="calt">이집트: 아시리(Asar) "강력한 자·눈 보좌"</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 저승의 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>헤카(도리깨)</b>, 네케크(홀), 아테프(왕관)</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">초록/검은 피부 미라 형태, 흰 왕관, 수염</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">저승 심판, 부활 상징, 농업·다산·홍수 관장, 죽은 자 부활 허가</div></div>
+    <div class="row"><div class="rk">신화</div><div class="rv">세트에게 살해→14조각으로 분해→이시스가 재조립→부활. 매년 나일강 범람 상징</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌪️</div><div class="card-names">
+      <div class="cname">세트 / 세트흐 (Set)</div>
+      <div class="calt">이집트: 수테크(Sutekh) "혼란을 일으키는 자"</div>
+    </div></div>
+    <span class="badge badge-demon">신(악) / 혼돈·사막의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>세트 동물 머리 지팡이</b>, 창, 세트동물(정체 불명 생물)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">폭풍·사막·혼돈·전쟁 지배, 오시리스 살해, 아포피스 격퇴(역설적 수호자 역할), 외래인 보호</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">악신이지만 라의 태양 배에서 아포피스(혼돈 뱀)를 창으로 찌르는 수호자 역할도 담당</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">아포피스 / 아펩 (Apophis/Apep)</div>
+      <div class="calt">이집트: "뱀" — 원초적 혼돈 뱀</div>
+    </div></div>
+    <span class="badge badge-demon">악령 / 혼돈 그 자체</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">라의 태양 배 매일 밤 공격, 일식 발생(삼킬 때), 지진 유발(몸부림)</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">거대 뱀, 길이 수백 규빗. 눈 없음(항상 어둠의 존재)</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">세트의 창, "아포피스를 물리치는 책" 주문. 고양이 바스테트가 새벽에 처치</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">매일 싸우지만 죽지 않음 — 매일 밤 반복되는 우주적 싸움</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🦁</div><div class="card-names">
+      <div class="cname">암무트 (Ammut)</div>
+      <div class="calt">이집트: "뼈를 삼키는 자" — 죽음의 의식에서 심판관</div>
+    </div></div>
+    <span class="badge badge-demon">악령 / 영혼 삼키는 자</span>
+    <div class="row"><div class="rk">외모</div><div class="rv">악어 머리, 사자 앞몸, 하마 뒷몸 — "3대 위험 동물" 혼합</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">마아트 저울에서 죄인의 심장(깃털보다 무거우면) 삼킴 → 2차 사망·영원한 소멸</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">두아트 심판의 홀, 마아트 저울 옆</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">🌙</div><div class="card-names">
+      <div class="cname">토트 (Thoth)</div>
+      <div class="calt">이집트: 제후티(Djehuty) "저울" — 달·지혜의 신</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 지식·마법의 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>서기관 지팡이·서판</b>, 카두케우스(일부 동일시), 헤르메트리스메기스투스 마법서</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">따오기 머리 인간, 또는 개코원숭이</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">저승 심판 기록, 마법 발명, 언어·글자 발명, 달 조각 모아 칸다르(달력) 창조</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">헤르메스(그리스)·메르쿠리우스(로마)와 동일시. 헤르메스 트리스메기스투스(3배 위대한 자)</div></div>
+  </div>
+</div>
+
+<div class="sub-title">두아트(저승)의 42명 심판관 (일부)</div>
+<table class="rank-table">
+  <tr><th>이름</th><th>외모</th><th>심판 항목</th></tr>
+  <tr><td>우사에크네마아트</td><td>황소 머리</td><td>죄 짓지 않았는가</td></tr>
+  <tr><td>헤르트이아빠우</td><td>뱀 머리</td><td>강도질 않았는가</td></tr>
+  <tr><td>세르켓헤라우</td><td>전갈 머리</td><td>다른 이 재물 훔치지 않았는가</td></tr>
+  <tr><td>네브에라우</td><td>뱀 머리</td><td>사람 죽이지 않았는가</td></tr>
+  <tr><td>페트이페트</td><td>악어 머리</td><td>오만·이기심 없었는가</td></tr>
+</table>
+</div>
+
+<!-- ══════════ 북유럽 ══════════ -->
+<div id="tab-norse" class="section">
+<div class="sec-title">⚡ 북유럽 신화 — 신들과 괴물들</div>
+
+<div class="sub-title">발키리와 저승 존재</div>
+<div class="grid">
+  <div class="card angel">
+    <div class="card-head"><div class="card-icon">⚔️</div><div class="card-names">
+      <div class="cname">발키리에 (Valkyrjur)</div>
+      <div class="calt">고대 노르드: "전사자 선택자" — 복수형 발키리</div>
+    </div></div>
+    <span class="badge badge-angel">반신 / 오딘의 전령</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>창·갑옷·방패</b>, 사슬 갑옷에서 빛 발산</div></div>
+    <div class="row"><div class="rk">탈것</div><div class="rv">날개 달린 말(스베이프니르 등)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">전장에서 에인헤랴르(전사자) 선택, 발할라로 인도, 전투 결과 결정, 미드(꿀술) 시중</div></div>
+    <div class="row"><div class="rk">주요 발키리</div><div class="rv">브륀힐드(가장 유명), 시그룬, 군르, 힐드, 로타, 스쿨드, 헤르피오르, 흐리스트</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">노른(운명의 여신)과 유사. 전쟁 시 하늘 말 타고 달리면 무지개 오로라 생성</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌑</div><div class="card-names">
+      <div class="cname">헬 (Hel)</div>
+      <div class="calt">고대 노르드: "숨기는 자·저승" — 로키의 딸</div>
+    </div></div>
+    <span class="badge badge-demon">반신 / 니플헤임 여왕</span>
+    <div class="row"><div class="rk">장소</div><div class="rv">헬헤임(니플헤임 중심부) — 전사하지 않고 병·노령으로 죽은 자의 왕국</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">죽은 자 지배, 오딘의 요청도 거부(발드르 귀환 거부), 라그나로크 시 군함 나글파르 지휘</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">반은 산 사람(살색), 반은 시체(청흑색), 우울하고 험악한 표정</div></div>
+    <div class="row"><div class="rk">부하</div><div class="rv">강렝그리온(살 곳), 콜(굶주림·배고픔 의인화), 코트(병)</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐺</div><div class="card-names">
+      <div class="cname">펜리르 (Fenrir)</div>
+      <div class="calt">고대 노르드: "늪 거주자" — 로키의 아들</div>
+    </div></div>
+    <span class="badge badge-demon">괴물 / 신들의 재앙</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">티르(전쟁신)의 손 먹음, 라그나로크에서 오딘 삼킴, 끊을 수 없는 힘</div></div>
+    <div class="row"><div class="rk">봉인</div><div class="rv">글레이프니르(드워프 제작 마법 끈 — 여성의 수염·산의 뿌리·물고기 숨소리 등 6가지 불가능한 것으로 만들어짐)</div></div>
+    <div class="row"><div class="rk">라그나로크</div><div class="rv">글레이프니르 끊고 자유. 오딘 삼킴 → 오딘의 아들 비다르가 복수</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐍</div><div class="card-names">
+      <div class="cname">요르문간드르 (Jörmungandr)</div>
+      <div class="calt">고대 노르드: "거대한 몽둥이" — 미드가르드 뱀, 로키의 아들</div>
+    </div></div>
+    <span class="badge badge-demon">괴물 / 세계뱀</span>
+    <div class="row"><div class="rk">능력</div><div class="rv">전 세계 바다 두름(자기 꼬리 물기 = 우로보로스), 맹독, 토르의 숙적</div></div>
+    <div class="row"><div class="rk">라그나로크</div><div class="rv">바다에서 올라옴 → 토르와 최후 결전. 토르가 처치하고 9걸음 후 독으로 사망</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-names">
+      <div class="cname">수르트 (Surtr)</div>
+      <div class="calt">고대 노르드: "검은 자" — 무스펠헤임의 왕</div>
+    </div></div>
+    <span class="badge badge-demon">불거인 / 라그나로크의 파괴자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>불타는 검(화염의 대검)</b> — 태양보다 밝은 불꽃</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">무스펠헤임(불의 세계) 남쪽 경계</div></div>
+    <div class="row"><div class="rk">라그나로크</div><div class="rv">무스펠의 아들들 이끌고 비프로스트 건넘. 프레이르(풍요신)를 처치. 이그드라실 불태움</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🐉</div><div class="card-names">
+      <div class="cname">니드호그 (Níðhöggr)</div>
+      <div class="calt">고대 노르드: "악의를 품고 공격하는 자"</div>
+    </div></div>
+    <span class="badge badge-demon">용 / 이그드라실 갉아먹는 자</span>
+    <div class="row"><div class="rk">장소</div><div class="rv">니플헤임, 이그드라실(세계수) 뿌리 아래 흐베르겔미르(원천)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">이그드라실 뿌리 갉아 세계 약화, 나스트론드(죄인의 해안)에서 시체 씹어먹음, 라그나로크 후도 생존</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">다람쥐 라타토스크가 이그드라실 독수리와 니드호그 사이에서 험담 전달해 분쟁 조장</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🔥</div><div class="card-names">
+      <div class="cname">로키 (Loki)</div>
+      <div class="calt">고대 노르드: "끝내는 자·닫는 자" — 요툰족</div>
+    </div></div>
+    <span class="badge badge-demon">요툰 / 트릭스터 신</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">변신·기지, 미스티칼 그물, 독(뱀 독으로 오딘의 아들 발드르 간접 살해)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">무제한 변신(암말→슬레이프니르 출산), 마법, 아스가르드 방어용 마법사 역할도</div></div>
+    <div class="row"><div class="rk">자녀</div><div class="rv">슬레이프니르(8발 말), 펜리르, 요르문간드르, 헬, 나리(죽음), 발리</div></div>
+    <div class="row"><div class="rk">결말</div><div class="rv">발드르 사망 책임으로 동굴에 결박, 뱀 독 떨어짐 → 대지진. 라그나로크에 자유</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 일본 ══════════ -->
+<div id="tab-japan" class="section">
+<div class="sec-title">⛩️ 일본 신화·불교 — 귀신과 신들</div>
+
+<div class="grid">
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">⚡</div><div class="card-names">
+      <div class="cname">라이진·후진 (雷神·風神)</div>
+      <div class="calt">일본: 라이진=천둥신, 후진=바람신</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 자연신 쌍</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>라이진</b>: 북(천둥 발생), 빨간 몸, 도깨비 뿔<br><b>후진</b>: 바람 자루(후대이), 초록 몸</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">라이진: 번개·천둥·비 관장. 후진: 바람 관장. 쌍으로 항상 함께 등장</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">일본 3대 국보 건물(닌나지 등) 수문에 모셔짐. 오니 형태지만 수호신</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">이자나미 (伊邪那美)</div>
+      <div class="calt">일본: "부르는 여자" — 일본 창조 여신</div>
+    </div></div>
+    <span class="badge badge-divine">여신 / 요미의 지배자</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">황천 오염, 하루 천 명 사망 저주(이자나기와 다툰 후)</div></div>
+    <div class="row"><div class="rk">장소</div><div class="rv">요미(황천) — 죽은 자의 나라</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">매일 천 명 사망 저주, 요미 지배, 시코메(추한 여자) 군단 지휘</div></div>
+    <div class="row"><div class="rk">신화</div><div class="rv">불의 신 카구쓰치 출산 시 불에 타 사망 → 요미에서 이자나기와 재회 → 썩은 몸 보이자 분노 → 저주</div></div>
+  </div>
+  <div class="card divine">
+    <div class="card-head"><div class="card-icon">⚖️</div><div class="card-names">
+      <div class="cname">엔마(閻魔) / 엔마대왕</div>
+      <div class="calt">일본 불교: 산스크리트 야마(Yama)의 일본화</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 지옥의 왕</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>엔마장(閻魔帳)</b> — 사망 기록부, 홀, 도깨비 부하</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">망자 심판(선악 기록부 확인), 지옥 배치 결정, 거짓말한 혀 뽑기</div></div>
+    <div class="row"><div class="rk">외모</div><div class="rv">붉은 피부·붉은 옷, 검은 관(冠), 험악한 눈빛</div></div>
+    <div class="row"><div class="rk">부하</div><div class="rv">시로케(白鬼)·쿠로케(黒鬼) — 선행·악행 기록 oni 쌍</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">👹</div><div class="card-names">
+      <div class="cname">오니 (鬼)</div>
+      <div class="calt">일본: "숨겨진 자" — 도깨비·귀신</div>
+    </div></div>
+    <span class="badge badge-demon">악령 / 일본 도깨비</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>카나보(金棒, 쇠몽둥이)</b></div></div>
+    <div class="row"><div class="rk">색깔별</div><div class="rv">붉은 오니: 탐욕, 파란 오니: 분노, 노란 오니: 질병, 초록 오니: 질투, 검은 오니: 어둠</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">초강도, 마법, 변신, 인간 납치, 지옥 죄인 처벌(쿠몬(苦悶) 유발)</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">절분(節分) 콩 뿌리기, 이와시(정어리) 머리·나뭇가지, 인왕상(仁王像)</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">죄가 깊은 인간이 오니로 변함. 지옥의 옥졸이기도 하고, 지상의 재앙이기도 함</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🦅</div><div class="card-names">
+      <div class="cname">텐구 (天狗)</div>
+      <div class="calt">일본: "하늘 개" — 산악 정령</div>
+    </div></div>
+    <span class="badge badge-demon">요괴 / 산의 정령</span>
+    <div class="row"><div class="rk">무기</div><div class="rv"><b>하우치와(葉団扇, 잎 부채)</b>, 검(검술 가르침), 지팡이</div></div>
+    <div class="row"><div class="rk">종류</div><div class="rv">다이텐구(大天狗): 인간형, 붉은 코 길고 날개. 코텐구(小天狗): 새 형태, 야마부시 복장</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">비행, 변신, 바람 조종(하우치와), 검술 교육(미나모토 요시쓰네에게), 납치·미혹</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">불교에서는 오만한 승려의 변신. 신도에서는 산신의 사자. 소조보(鞍馬山 텐구) 가장 유명</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">💀</div><div class="card-names">
+      <div class="cname">신이가미 (死神)</div>
+      <div class="calt">일본: "죽음의 신" — 서양 사신 개념의 일본화</div>
+    </div></div>
+    <span class="badge badge-divine">신 / 죽음 관장</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">낫, 수명의 실(자르면 사망)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">수명 결정·종료, 영혼 인도</div></div>
+    <div class="row"><div class="rk">특이사항</div><div class="rv">에도 시대에 서양 사신 개념 수입 후 융합. 애니메이션(블리치·나루토·데스노트)에서 다양하게 변형</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🌊</div><div class="card-names">
+      <div class="cname">갓파 (河童)</div>
+      <div class="calt">일본: "강의 아이" — 수중 요괴</div>
+    </div></div>
+    <span class="badge badge-spirit">요괴 / 강의 악령</span>
+    <div class="row"><div class="rk">외모</div><div class="rv">머리 위 접시(물 필수), 거북이 등껍질, 개구리 발, 녹색 몸</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">물속 끌어들임, 초인적 힘(접시 물 있을 때), 스모 실력, 의학 지식</div></div>
+    <div class="row"><div class="rk">약점</div><div class="rv">접시의 물 엎으면 무력화. 오이(절임) 좋아함. 정중한 인사 — 머리 숙이면 접시 물 쏟아짐</div></div>
+  </div>
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">🦊</div><div class="card-names">
+      <div class="cname">키쓰네 (狐) / 다키니텐</div>
+      <div class="calt">일본: 여우 요괴·신성한 여우</div>
+    </div></div>
+    <span class="badge badge-spirit">요괴/신 / 여우 정령</span>
+    <div class="row"><div class="rk">무기</div><div class="rv">여의주(키츠네다마), 꼬리(꼬리 수 = 나이·능력), 불꽃(기쓰네비)</div></div>
+    <div class="row"><div class="rk">능력</div><div class="rv">변신(여성으로), 불꽃 생성, 환상, 빙의, 꼬리 9개 = 최강 신격(큐비)</div></div>
+    <div class="row"><div class="rk">종류</div><div class="rv">이나리 여우(선신): 풍요의 신 이나리 사자. 노기쓰네(들여우): 인간 홀리는 악한 여우</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ 에녹서·감시자 ══════════ -->
+<div id="tab-enoch" class="section">
+<div class="sec-title">📜 에녹서 — 감시자(그리고리)와 네필림</div>
+
+<div class="info-box">에녹1서(에티오피아 에녹서) 기록: 200명의 감시자(그리고리) 천사들이 인간 여성에게 반해 하늘에서 내려와 금지된 지식을 전수하고 거인족(네필림)을 낳음. 신이 대홍수로 심판.</div>
+
+<div class="sub-title">감시자 20인 지도자</div>
+<table class="rank-table">
+  <tr><th>이름</th><th>가르친 것</th><th>결말</th></tr>
+  <tr><td><b>셈야자 (Semyaza)</b></td><td>마법 주문, 뿌리 자르기 마법</td><td>땅과 하늘 사이 거꾸로 매달려 심판 날까지 봉인</td></tr>
+  <tr><td><b>아자젤 (Azazel)</b></td><td>검·칼·방패·갑옷 제조, 금속 가공, 화장·장신구</td><td>두다엘 사막에 라파엘이 결박·매장</td></tr>
+  <tr><td><b>아므라엘 (Amrael)</b></td><td>마법 주문</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>타므엘 (Tamiel)</b></td><td>점성술</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>라미엘 (Ramiel)</b></td><td>번개·천둥 마법</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>다니엘 (Danel)</b></td><td>천상의 징조, 점성술</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>에제켈 (Ezeqeel)</b></td><td>구름·기상 예측</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>바라키엘 (Baraqijal)</b></td><td>점성술(별)</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>아사엘 (Asael)</b></td><td>금속·은 세공</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>아나넬 (Ananel)</b></td><td>마법 주문</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>자키엘 (Zaqiel)</b></td><td>구름 관련 지식</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>삼사페엘 (Samsapeel)</b></td><td>태양·달 징조</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>사타렐 (Satarel)</b></td><td>달의 비밀</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>투렐 (Turel)</b></td><td>별자리 관련 마법</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>요미엘 (Jomjael)</b></td><td>지식</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>사리엘 (Sariel)</b></td><td>달의 경로 — 이 지식으로 남성들도 죄를 지음</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>코카벨 (Kokabel)</b></td><td>별의 징조</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>아르마로스 (Armaros)</b></td><td>마법 해제 주문</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>바타리엘 (Batariel)</b></td><td>지구의 중심</td><td>타르타로스 감금</td></tr>
+  <tr><td><b>아나니엘 (Ananiel)</b></td><td>비·기상</td><td>타르타로스 감금</td></tr>
+</table>
+
+<div class="sub-title">네필림 (Nephilim) — 감시자와 인간 여성의 자녀들</div>
+<div class="grid">
+  <div class="card demon">
+    <div class="card-head"><div class="card-icon">💪</div><div class="card-names">
+      <div class="cname">네필림 (נְפִילִים)</div>
+      <div class="calt">히브리: "떨어진 자들" 또는 "다른 이를 쓰러트리는 자들"</div>
+    </div></div>
+    <span class="badge badge-demon">반신 거인족</span>
+    <div class="row"><div class="rk">크기</div><div class="rv">에녹서: 신장 3,000 엘(약 1,350m) / 구약 민수기: 거인으로 묘사</div></div>
+    <div class="row"><div class="rk">특징</div><div class="rv">인류의 식량 소비 → 인간 자체를 먹음 → 서로 잡아먹음 → 지구 오염</div></div>
+    <div class="row"><div class="rk">결말</div><div class="rv">대홍수로 육체 사망 → 영혼이 악령(귀신)이 됨 — 지상을 배회하는 악령의 기원</div></div>
+    <div class="row"><div class="rk">유명 네필림</div><div class="rv">아낙족, 르파임(창세기 14장), 에녹 6장의 이름 없는 거인들</div></div>
+  </div>
+</div>
+
+<div class="sub-title">에녹서의 지옥 지형 (7층 하늘 구조)</div>
+<table class="rank-table">
+  <tr><th>하늘층</th><th>이름</th><th>특징</th><th>거주자</th></tr>
+  <tr><td>제1층</td><td>빌론</td><td>눈·얼음 창고</td><td>수백 천사, 눈·서리 관리</td></tr>
+  <tr><td>제2층</td><td>아라보트</td><td>어둠 속 대기</td><td>타락천사 임시 감금 장소</td></tr>
+  <tr><td>제3층 (상)</td><td>에덴동산 상부</td><td>황금 꿀벌 등 낙원</td><td>의로운 자의 영혼 대기</td></tr>
+  <tr><td>제3층 (하)</td><td>북쪽 지옥</td><td>불·냉기 혼합 고문</td><td>지상에서 의롭지 않은 자</td></tr>
+  <tr><td>제4층</td><td>마하논</td><td>태양·달 궤도</td><td>헬리오스, 달 천사</td></tr>
+  <tr><td>제5층</td><td>마콘</td><td>그리고리 200명 감금</td><td>감시자(타락천사) — 슬픔 속에 앉아있음</td></tr>
+  <tr><td>제6층</td><td>마콘 상부</td><td>천체·자연 관리</td><td>7장관 — 기상·달력·식물·계절 천사들</td></tr>
+  <tr><td>제7층</td><td>아라보트</td><td>신의 거처</td><td>세라핌·케루빔·오파님·에녹·엘리야</td></tr>
+</table>
+</div>
+
+<!-- ══════════ 비교표 ══════════ -->
+<div id="tab-compare" class="section">
+<div class="sec-title">🔗 종교 간 비교표</div>
+
+<div class="sub-title">죽음의 천사 / 저승의 왕 비교</div>
+<table class="rank-table">
+  <tr><th>종교</th><th>이름</th><th>무기</th><th>방법</th><th>영혼 처리</th></tr>
+  <tr><td>기독교</td><td>아즈라엘</td><td>낫·죽음의 책</td><td>영혼 분리</td><td>천국/연옥/지옥으로</td></tr>
+  <tr><td>이슬람</td><td>말라크 알마우트</td><td>없음(손)</td><td>영혼 잡아당김(부드럽게/격렬하게)</td><td>잔나(천국)/자한남(지옥)</td></tr>
+  <tr><td>힌두교</td><td>야마</td><td>올가미·철퇴</td><td>야마두타 파견</td><td>업(카르마)에 따라 윤회</td></tr>
+  <tr><td>그리스</td><td>타나토스</td><td>역전된 횃불</td><td>비폭력적 죽음 집행</td><td>카론이 스틱스 강 건넘</td></tr>
+  <tr><td>이집트</td><td>아누비스</td><td>저울·막대기</td><td>영혼 무게 측정</td><td>마아트 깃털 비교 후 판결</td></tr>
+  <tr><td>북유럽</td><td>헬·발키리</td><td>발키리: 창·갑옷</td><td>발키리 선택(전사자만)</td><td>발할라/헬헤임/어둠의 강</td></tr>
+  <tr><td>조로아스터</td><td>아스토 비다투</td><td>올가미</td><td>영혼 포획</td><td>친바트 다리 통과 후 판결</td></tr>
+  <tr><td>일본(불교)</td><td>엔마대왕</td><td>엔마장(기록부)</td><td>기록부 확인 심판</td><td>6도(지옥·아귀·축생·수라·인간·천상)</td></tr>
+  <tr><td>수메르</td><td>갈루</td><td>없음</td><td>에레슈키갈 명으로 집행</td><td>쿠르(지하세계) 영원 거주</td></tr>
+</table>
+
+<div class="sub-title">7대 죄악과 악마 대응 (기독교)</div>
+<table class="rank-table">
+  <tr><th>죄악</th><th>악마</th><th>반대 덕목</th><th>반대 천사</th></tr>
+  <tr><td>교만 (Superbia)</td><td>루시퍼</td><td>겸손</td><td>미카엘</td></tr>
+  <tr><td>탐욕 (Avaritia)</td><td>맘몬</td><td>관대</td><td>가브리엘</td></tr>
+  <tr><td>정욕 (Luxuria)</td><td>아스모데우스</td><td>순결</td><td>라파엘</td></tr>
+  <tr><td>질투 (Invidia)</td><td>레비아탄</td><td>친절</td><td>우리엘</td></tr>
+  <tr><td>탐식 (Gula)</td><td>베엘제붑</td><td>절제</td><td>자드키엘</td></tr>
+  <tr><td>분노 (Ira)</td><td>사탄</td><td>인내</td><td>카미엘</td></tr>
+  <tr><td>나태 (Acedia)</td><td>벨페고르</td><td>근면</td><td>요피엘</td></tr>
+</table>
+
+<div class="sub-title">타락천사 / 악마 기원 비교</div>
+<table class="rank-table">
+  <tr><th>종교</th><th>이름</th><th>타락 이유</th><th>결과</th></tr>
+  <tr><td>기독교/유대교</td><td>루시퍼</td><td>교만 — 신과 같아지려 함</td><td>하늘에서 추방, 지옥 왕</td></tr>
+  <tr><td>이슬람</td><td>이블리스</td><td>교만 — 아담에게 절하기 거부</td><td>유예 후 인류 유혹</td></tr>
+  <tr><td>에녹서</td><td>그리고리(200명)</td><td>인간 여성에 대한 욕정</td><td>타르타로스 감금</td></tr>
+  <tr><td>조로아스터</td><td>앙그라 마이뉴</td><td>창조 때부터 악의 원리로 존재</td><td>12,000년 우주 전쟁 끝 패배</td></tr>
+  <tr><td>힌두교</td><td>아수라</td><td>아므리타(불사 음료) 획득 경쟁에서 패배</td><td>지하(파탈라)로 추방</td></tr>
+  <tr><td>그리스</td><td>티탄</td><td>제우스와의 전쟁 패배</td><td>타르타로스 감금</td></tr>
+  <tr><td>북유럽</td><td>로키</td><td>발드르 살해</td><td>동굴 결박, 라그나로크 해방</td></tr>
+</table>
+
+<div class="sub-title">공통 모티프 — 종교 초월 패턴</div>
+<div class="info-box">
+<b>교만이 타락의 공통 원인:</b> 루시퍼(기독교)·이블리스(이슬람)·마히샤수라(힌두)·히라냐카시푸(힌두)·티탄(그리스) — 모두 우월감·오만함이 파멸 원인<br><br>
+<b>세계뱀/혼돈 뱀 모티프:</b> 레비아탄(기독교)·아포피스(이집트)·요르문간드르(북유럽)·브리트라(힌두)·티아마트(바빌로니아) — 혼돈의 뱀 퇴치가 우주 질서 확립<br><br>
+<b>불로 만든 악마:</b> 이블리스·이프리트(이슬람)·아에샤마(조로아스터)·수르트(북유럽) — 불이 악의 원소<br><br>
+<b>빛/어둠 이원론:</b> 아후라 마즈다vs앙그라 마이뉴(조로아스터)·빛의 천사vs어둠의 악마(기독교)·라vs아포피스(이집트) — 선악 대립의 우주적 구조<br><br>
+<b>대홍수 심판:</b> 노아(기독교/유대교)·우트나피쉬팀(메소포타미아)·마누(힌두) — 악을 씻어내는 대홍수 공통 신화<br><br>
+<b>죽음의 사자(使者):</b> 아즈라엘(기독교/이슬람)·야마두타(힌두)·갈루(수메르)·헤르메스(그리스) — 영혼을 저승으로 안내하는 존재 공통
+</div>
+</div>
+
+<div id="no-result">🔍 검색 결과가 없습니다</div>
+</div>
+
+<script>
+function sw(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('tab-' + id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+  updateCount();
+}
+
+function doSearch(q) {
+  const term = q.trim().toLowerCase();
+  if (!term) {
+    document.querySelectorAll('.card, .gcard, tr').forEach(el => el.style.display = '');
+    document.getElementById('no-result').style.display = 'none';
+    updateCount();
+    return;
+  }
+  let found = 0;
+  // 모든 섹션 보이게
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'block');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+  document.querySelectorAll('.card, .gcard').forEach(card => {
+    const txt = card.textContent.toLowerCase();
+    const show = txt.includes(term);
+    card.style.display = show ? '' : 'none';
+    if (show) found++;
+  });
+  document.getElementById('no-result').style.display = found === 0 ? 'block' : 'none';
+  document.getElementById('count').textContent = found > 0 ? `${found}개 항목` : '';
+}
+
+function updateCount() {
+  const active = document.querySelector('.section.active');
+  if (!active) return;
+  const cards = active.querySelectorAll('.card, .gcard');
+  document.getElementById('count').textContent = cards.length > 0 ? `${cards.length}개 항목` : '';
+}
+
+document.addEventListener('DOMContentLoaded', updateCount);
+</script>
+</body>
+</html>

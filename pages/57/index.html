@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 인체 포즈 레퍼런스</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#151520;--panel:#1e1e2e;--panel2:#26263a;--border:#333352;
+  --accent:#7888ff;--accent2:#a066ff;--text:#e0dff5;--muted:#6668a0;
+  --red:#ff6060;--green:#60e080;--blue:#6080ff;
+  --body-color:#e8d0b5;--joint-color:#ffa040;--joint-sel:#ff4488;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;}
+#app{display:flex;flex-direction:column;height:100%;}
+
+/* ── toolbar ── */
+#toolbar{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:7px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  flex-shrink:0;z-index:10;
+}
+#toolbar h1{font-size:14px;font-weight:700;color:var(--accent);margin-right:4px;white-space:nowrap;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 2px;}
+
+/* ── main layout ── */
+#main{flex:1;display:flex;overflow:hidden;}
+
+/* ── panels ── */
+.panel{
+  width:220px;background:var(--panel);border-right:1px solid var(--border);
+  overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:8px;
+  flex-shrink:0;
+}
+.panel.right{border-right:none;border-left:1px solid var(--border);}
+.psec{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;}
+.ptitle{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;}
+
+/* ── buttons ── */
+.btn{
+  padding:5px 9px;border:1px solid var(--border);border-radius:6px;
+  background:transparent;color:var(--text);font-size:12px;cursor:pointer;
+  transition:all .12s;white-space:nowrap;line-height:1.3;
+}
+.btn:hover{background:rgba(120,136,255,.15);border-color:var(--accent);}
+.btn.on,.btn.active{background:rgba(120,136,255,.22);border-color:var(--accent);color:var(--accent);}
+.btn.prim{background:rgba(120,136,255,.18);border-color:var(--accent);}
+.btn.sm{padding:3px 7px;font-size:11px;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:rgba(255,96,96,.12);}
+.brow{display:flex;gap:4px;flex-wrap:wrap;}
+
+/* ── sliders ── */
+.sl-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.sl-lbl{font-size:11px;color:var(--muted);width:52px;flex-shrink:0;}
+.sl-row input[type=range]{
+  flex:1;-webkit-appearance:none;height:3px;border-radius:2px;
+  background:var(--border);outline:none;cursor:pointer;
+}
+.sl-row input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+}
+.sl-val{width:32px;text-align:right;font-size:11px;color:var(--accent);}
+
+/* ── joint list ── */
+.jlist{display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto;}
+.jitem{
+  padding:4px 8px;border:1px solid transparent;border-radius:5px;
+  font-size:11.5px;cursor:pointer;transition:all .1s;
+  display:flex;align-items:center;gap:6px;
+}
+.jitem:hover{background:rgba(255,255,255,.05);}
+.jitem.sel{background:rgba(120,136,255,.2);border-color:var(--accent);color:var(--accent);}
+.jitem-dot{width:7px;height:7px;border-radius:50%;background:var(--joint-color);flex-shrink:0;}
+.jitem.sel .jitem-dot{background:var(--joint-sel);}
+
+/* ── rotation sliders ── */
+.rot-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;}
+.ax{width:11px;font-size:11px;font-weight:700;flex-shrink:0;}
+.ax.x{color:var(--red);}
+.ax.y{color:var(--green);}
+.ax.z{color:var(--blue);}
+.rot-row input[type=range]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;}
+.rot-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;}
+
+/* ── pose grid ── */
+.pose-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+
+/* ── canvas wrap ── */
+#cw{flex:1;position:relative;overflow:hidden;background:#11111e;}
+canvas{display:block;width:100%!important;height:100%!important;}
+canvas.grab{cursor:grab;}
+canvas.grabbing{cursor:grabbing;}
+canvas.rotating{cursor:crosshair;}
+
+/* ── hud ── */
+#hud{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.55);border-radius:16px;padding:4px 12px;
+  font-size:11px;color:var(--muted);pointer-events:none;white-space:nowrap;
+}
+#jlabel{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  background:rgba(30,30,46,.92);border:1px solid var(--border);border-radius:16px;
+  padding:3px 12px;font-size:12px;color:var(--accent);pointer-events:none;display:none;
+}
+
+/* ── scrollbar ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── divider ── */
+hr.div{border:none;border-top:1px solid var(--border);margin:5px 0;}
+
+@media(max-width:900px){
+  .panel{width:180px;}
+}
+@media(max-width:650px){
+  .panel{display:none;}
+  #toolbar .btn.tbhide{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- toolbar -->
+<div id="toolbar">
+  <h1>✏️ 3D 포즈 레퍼런스</h1>
+  <div class="tb-sep"></div>
+  <button class="btn tbhide" id="btn-grid">그리드</button>
+  <button class="btn tbhide" id="btn-shadow">그림자</button>
+  <button class="btn tbhide" id="btn-mirror">미러</button>
+  <button class="btn tbhide" id="btn-ortho">정투상</button>
+  <button class="btn tbhide" id="btn-outline">윤곽선</button>
+  <div class="tb-sep tbhide"></div>
+  <button class="btn tbhide" id="btn-undo">↩ 되돌리기</button>
+  <button class="btn tbhide danger" id="btn-reset-all">전체 리셋</button>
+  <div style="flex:1"></div>
+  <button class="btn prim" id="btn-cap">📷 캡쳐</button>
+</div>
+
+<!-- main -->
+<div id="main">
+
+  <!-- left panel -->
+  <div class="panel">
+    <div class="psec">
+      <div class="ptitle">체형 선택</div>
+      <div class="brow">
+        <button class="btn on" id="bt-neutral">중성</button>
+        <button class="btn" id="bt-male">남성</button>
+        <button class="btn" id="bt-female">여성</button>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="ptitle">신체 비율</div>
+      <div class="sl-row">
+        <span class="sl-lbl">어깨폭</span>
+        <input type="range" id="sl-sw" min="60" max="150" value="100">
+        <span class="sl-val" id="sv-sw">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">가슴크기</span>
+        <input type="range" id="sl-cs" min="60" max="150" value="100">
+        <span class="sl-val" id="sv-cs">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">허리</span>
+        <input type="range" id="sl-ws" min="50" max="140" value="100">
+        <span class="sl-val" id="sv-ws">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">골반폭</span>
+        <input type="range" id="sl-hw" min="60" max="160" value="100">
+        <span class="sl-val" id="sv-hw">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">팔 길이</span>
+        <input type="range" id="sl-al" min="70" max="130" value="100">
+        <span class="sl-val" id="sv-al">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">다리 길이</span>
+        <input type="range" id="sl-ll" min="70" max="130" value="100">
+        <span class="sl-val" id="sv-ll">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">머리 크기</span>
+        <input type="range" id="sl-hs" min="70" max="140" value="100">
+        <span class="sl-val" id="sv-hs">100</span>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">체고</span>
+        <input type="range" id="sl-th" min="80" max="120" value="100">
+        <span class="sl-val" id="sv-th">100</span>
+      </div>
+      <button class="btn sm danger" id="btn-reset-prop" style="margin-top:4px">비율 초기화</button>
+    </div>
+
+    <div class="psec">
+      <div class="ptitle">조명</div>
+      <div class="brow">
+        <button class="btn sm on" id="light-front">정면</button>
+        <button class="btn sm" id="light-side">측면</button>
+        <button class="btn sm" id="light-top">위</button>
+        <button class="btn sm" id="light-drama">드라마</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- viewport -->
+  <div id="cw">
+    <canvas id="c" class="grab"></canvas>
+    <div id="jlabel"></div>
+    <div id="hud">관절 클릭 선택 · 드래그 회전 · 우클릭/스크롤 카메라</div>
+  </div>
+
+  <!-- right panel -->
+  <div class="panel right">
+    <div class="psec" id="joint-panel">
+      <div class="ptitle">선택된 관절</div>
+      <div id="no-joint" style="font-size:12px;color:var(--muted)">관절을 클릭하세요</div>
+      <div id="joint-ctrl" style="display:none">
+        <div id="jname" style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent)"></div>
+        <div class="rot-row">
+          <span class="ax x">X</span>
+          <input type="range" id="rx" min="-180" max="180" value="0">
+          <span class="sl-val" id="rvx">0°</span>
+        </div>
+        <div class="rot-row">
+          <span class="ax y">Y</span>
+          <input type="range" id="ry" min="-180" max="180" value="0">
+          <span class="sl-val" id="rvy">0°</span>
+        </div>
+        <div class="rot-row">
+          <span class="ax z">Z</span>
+          <input type="range" id="rz" min="-180" max="180" value="0">
+          <span class="sl-val" id="rvz">0°</span>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px;">
+          <button class="btn sm danger" id="btn-rj">관절 리셋</button>
+          <button class="btn sm" id="btn-copy-lr">좌↔우 복사</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="ptitle">포즈 프리셋</div>
+      <div class="pose-grid">
+        <button class="btn sm" onclick="applyPreset('tpose')">T 포즈</button>
+        <button class="btn sm" onclick="applyPreset('apose')">A 포즈</button>
+        <button class="btn sm" onclick="applyPreset('ipose')">I 포즈</button>
+        <button class="btn sm" onclick="applyPreset('sit')">앉기</button>
+        <button class="btn sm" onclick="applyPreset('walk')">걷기</button>
+        <button class="btn sm" onclick="applyPreset('run')">달리기</button>
+        <button class="btn sm" onclick="applyPreset('reach')">손 뻗기</button>
+        <button class="btn sm" onclick="applyPreset('kneel')">무릎꿇기</button>
+        <button class="btn sm" onclick="applyPreset('arms_up')">만세</button>
+        <button class="btn sm" onclick="applyPreset('cross')">팔짱</button>
+        <button class="btn sm" onclick="applyPreset('lay')">눕기</button>
+        <button class="btn sm" onclick="applyPreset('fight')">전투 자세</button>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="ptitle">카메라</div>
+      <div class="brow" style="margin-bottom:5px;">
+        <button class="btn sm" onclick="setCamera('front')">정면</button>
+        <button class="btn sm" onclick="setCamera('back')">후면</button>
+        <button class="btn sm" onclick="setCamera('left')">좌측</button>
+        <button class="btn sm" onclick="setCamera('right')">우측</button>
+        <button class="btn sm" onclick="setCamera('top')">위</button>
+        <button class="btn sm" onclick="setCamera('q34')">3/4</button>
+        <button class="btn sm" onclick="setCamera('persp')">원근</button>
+      </div>
+      <div class="sl-row">
+        <span class="sl-lbl">FOV</span>
+        <input type="range" id="sl-fov" min="10" max="90" value="45">
+        <span class="sl-val" id="sv-fov">45°</span>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="ptitle">관절 목록</div>
+      <div class="jlist" id="jlist"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ========== CONSTANTS ========== */
+const DEG = Math.PI / 180;
+
+const JOINT_DEFS = [
+  { key:'hips',     label:'골반',     parent:null,        lx:0,     ly:0,     lz:0 },
+  { key:'spine',    label:'척추',     parent:'hips',      lx:0,     ly:.32,   lz:0 },
+  { key:'chest',    label:'흉곽',     parent:'spine',     lx:0,     ly:1.1,   lz:0 },
+  { key:'neck',     label:'목',       parent:'chest',     lx:0,     ly:.38,   lz:0 },
+  { key:'head',     label:'머리',     parent:'neck',      lx:0,     ly:.38,   lz:0 },
+  { key:'lShoulder',label:'왼어깨',   parent:'chest',     lx:-.88,  ly:.18,   lz:0 },
+  { key:'lElbow',   label:'왼팔꿈치', parent:'lShoulder', lx:0,     ly:-1.22, lz:0 },
+  { key:'lWrist',   label:'왼손목',   parent:'lElbow',    lx:0,     ly:-1.05, lz:0 },
+  { key:'rShoulder',label:'오른어깨', parent:'chest',     lx:.88,   ly:.18,   lz:0 },
+  { key:'rElbow',   label:'오른팔꿈치',parent:'rShoulder',lx:0,     ly:-1.22, lz:0 },
+  { key:'rWrist',   label:'오른손목', parent:'rElbow',    lx:0,     ly:-1.05, lz:0 },
+  { key:'lHip',     label:'왼고관절', parent:'hips',      lx:-.44,  ly:-.28,  lz:0 },
+  { key:'lKnee',    label:'왼무릎',   parent:'lHip',      lx:0,     ly:-1.82, lz:0 },
+  { key:'lAnkle',   label:'왼발목',   parent:'lKnee',     lx:0,     ly:-1.75, lz:0 },
+  { key:'rHip',     label:'오른고관절',parent:'hips',     lx:.44,   ly:-.28,  lz:0 },
+  { key:'rKnee',    label:'오른무릎', parent:'rHip',      lx:0,     ly:-1.82, lz:0 },
+  { key:'rAnkle',   label:'오른발목', parent:'rKnee',     lx:0,     ly:-1.75, lz:0 },
+];
+
+const MIRROR = {
+  lShoulder:'rShoulder', lElbow:'rElbow', lWrist:'rWrist',
+  lHip:'rHip', lKnee:'rKnee', lAnkle:'rAnkle',
+  rShoulder:'lShoulder', rElbow:'lElbow', rWrist:'lWrist',
+  rHip:'lHip', rKnee:'lKnee', rAnkle:'lAnkle',
+};
+
+const POSES = {
+  tpose:{
+    lShoulder:[0,0,90], rShoulder:[0,0,-90],
+    lElbow:[0,0,0], rElbow:[0,0,0],
+    lWrist:[0,0,0], rWrist:[0,0,0],
+  },
+  apose:{
+    lShoulder:[0,0,45], rShoulder:[0,0,-45],
+  },
+  ipose:{},
+  sit:{
+    lHip:[-85,5,6], rHip:[-85,-5,-6],
+    lKnee:[88,0,0], rKnee:[88,0,0],
+    lAnkle:[0,0,0], rAnkle:[0,0,0],
+    spine:[12,0,0], chest:[-5,0,0],
+    lShoulder:[0,0,18], rShoulder:[0,0,-18],
+  },
+  walk:{
+    hips:[0,8,4], spine:[5,-4,0], chest:[-2,2,0],
+    lShoulder:[-30,0,12], rShoulder:[30,0,-12],
+    lElbow:[35,0,0], rElbow:[20,0,0],
+    lHip:[30,0,4], rHip:[-28,0,-4],
+    rKnee:[55,0,0], lKnee:[5,0,0],
+    rAnkle:[-10,0,0], lAnkle:[5,0,0],
+  },
+  run:{
+    hips:[0,12,5], spine:[8,-8,0], chest:[-4,4,0],
+    lShoulder:[-50,0,15], rShoulder:[60,0,-15],
+    lElbow:[70,0,0], rElbow:[80,0,0],
+    lHip:[55,0,4], rHip:[-45,0,-4],
+    rKnee:[95,0,0], lKnee:[-10,0,0],
+    rAnkle:[-15,0,0], lAnkle:[10,0,0],
+  },
+  reach:{
+    lShoulder:[-20,0,170], lElbow:[-10,0,0],
+    rShoulder:[0,0,-18], rElbow:[30,0,0],
+    spine:[-8,0,0], chest:[-4,0,0],
+  },
+  kneel:{
+    lHip:[-10,0,0], rHip:[-10,0,0],
+    lKnee:[122,0,0], rKnee:[122,0,0],
+    lAnkle:[-40,0,0], rAnkle:[-40,0,0],
+    spine:[-5,0,0],
+    lShoulder:[0,0,20], rShoulder:[0,0,-20],
+  },
+  arms_up:{
+    lShoulder:[-10,0,168], rShoulder:[-10,0,-168],
+    lElbow:[-5,0,0], rElbow:[-5,0,0],
+    spine:[-8,0,0], chest:[-5,0,0],
+  },
+  cross:{
+    lShoulder:[0,0,20], rShoulder:[0,0,-20],
+    lElbow:[70,-30,0], rElbow:[70,30,0],
+    lWrist:[-20,0,0], rWrist:[-20,0,0],
+    spine:[5,0,0],
+  },
+  lay:{
+    hips:[90,0,0],
+    lHip:[-5,0,5], rHip:[-5,0,-5],
+    lShoulder:[0,0,30], rShoulder:[0,0,-30],
+    lElbow:[20,0,0], rElbow:[20,0,0],
+  },
+  fight:{
+    hips:[0,30,0], spine:[5,-15,0], chest:[-3,8,0],
+    lShoulder:[-20,-10,25], rShoulder:[40,10,-15],
+    lElbow:[70,0,0], rElbow:[90,0,0],
+    lHip:[20,-5,8], rHip:[-15,5,-8],
+    lKnee:[25,0,0], rKnee:[30,0,0],
+  },
+};
+
+const BODY_TYPES = {
+  neutral:{ sw:1,   hw:1,    cs:1,   ws:1,    al:1,   ll:1,   hs:1,   th:1   },
+  male:   { sw:1.14,hw:0.92, cs:1.18,ws:1.02, al:1.04,ll:1.04,hs:1.01,th:1.02 },
+  female: { sw:0.87,hw:1.14, cs:1.08,ws:0.78, al:0.97,ll:1.0, hs:0.94,th:0.99 },
+};
+
+/* ========== SCENE ========== */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = false;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x11111e);
+scene.fog = new THREE.Fog(0x11111e, 20, 40);
+
+const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+cam.position.set(0, 4.0, 9);
+const TARGET = new THREE.Vector3(0, 3.5, 0);
+
+const controls = new OrbitControls(cam, canvas);
+controls.target.copy(TARGET);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 2;
+controls.maxDistance = 25;
+controls.update();
+
+/* ── lights ── */
+const ambLight = new THREE.AmbientLight(0xffffff, 0.55);
+scene.add(ambLight);
+const mainLight = new THREE.DirectionalLight(0xffffff, 1.1);
+mainLight.position.set(-3, 8, 6);
+mainLight.castShadow = false;
+scene.add(mainLight);
+const fillLight = new THREE.DirectionalLight(0x8899dd, 0.35);
+fillLight.position.set(4, 2, -4);
+scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffd0a0, 0.2);
+rimLight.position.set(0, -2, -5);
+scene.add(rimLight);
+
+/* ── floor & grid ── */
+const grid = new THREE.GridHelper(12, 12, 0x2a2a44, 0x1e1e36);
+scene.add(grid);
+const shadowFloor = new THREE.Mesh(
+  new THREE.PlaneGeometry(12, 12),
+  new THREE.ShadowMaterial({ opacity: 0.25 })
+);
+shadowFloor.rotation.x = -Math.PI / 2;
+shadowFloor.receiveShadow = true;
+shadowFloor.visible = false;
+scene.add(shadowFloor);
+
+/* ── toon gradient map ── */
+function makeGradMap(n) {
+  const d = new Uint8Array(n);
+  for (let i = 0; i < n; i++) d[i] = Math.round(i / (n - 1) * 255);
+  const t = new THREE.DataTexture(d, n, 1, THREE.RedFormat);
+  t.minFilter = t.magFilter = THREE.NearestFilter;
+  t.needsUpdate = true;
+  return t;
+}
+const gradMap = makeGradMap(3);
+
+/* ── materials ── */
+const matBody  = () => new THREE.MeshToonMaterial({ color: 0xe8d0b5, gradientMap: gradMap });
+const matJoint = () => new THREE.MeshToonMaterial({ color: 0xffa040, gradientMap: gradMap });
+const matJSel  = new THREE.MeshToonMaterial({ color: 0xff4488 });
+const matChest = () => new THREE.MeshToonMaterial({ color: 0xddc4a0, gradientMap: gradMap });
+const matFoot  = () => new THREE.MeshToonMaterial({ color: 0xd4b895, gradientMap: gradMap });
+
+/* ========== STATE ========== */
+let props = { sw:1, hw:1, cs:1, ws:1, al:1, ll:1, hs:1, th:1 };
+let bodyType = 'neutral';
+let mirror = false;
+let selectedKey = null;
+let isDragging = false;
+let dragStartX = 0, dragStartY = 0;
+let shiftDown = false;
+let outlineOn = false;
+let shadowOn = false;
+
+const history = []; // undo stack
+const MAX_HIST = 30;
+
+/* ========== MANNEQUIN ========== */
+let mGroup = null; // root group
+const joints = {}; // key → { pivot:Object3D, sphere:Mesh, def:Object }
+const clickTargets = []; // spheres for raycasting
+
+function buildMannequin() {
+  if (mGroup) { scene.remove(mGroup); disposeGroup(mGroup); }
+  clickTargets.length = 0;
+  Object.keys(joints).forEach(k => delete joints[k]);
+
+  const P = props;
+  mGroup = new THREE.Group();
+  mGroup.position.set(0, 4.05, 0);
+  scene.add(mGroup);
+
+  /* ── helpers ── */
+  function cyl(len, rTop, rBot = rTop * 0.88, color = 0xe8d0b5) {
+    if (len <= 0) len = 0.01;
+    const geo = new THREE.CylinderGeometry(rTop, rBot, len, 14, 1, false);
+    geo.translate(0, -len / 2, 0);
+    const m = new THREE.Mesh(geo, new THREE.MeshToonMaterial({ color, gradientMap: gradMap }));
+    m.castShadow = true;
+    return m;
+  }
+  function sph(r, color = 0xe8d0b5) {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(r, 16, 12),
+      new THREE.MeshToonMaterial({ color, gradientMap: gradMap })
+    );
+    m.castShadow = true;
+    return m;
+  }
+  function box(w, h, d, color = 0xddc4a0) {
+    const m = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d, 2, 2, 2),
+      new THREE.MeshToonMaterial({ color, gradientMap: gradMap })
+    );
+    m.castShadow = true;
+    return m;
+  }
+
+  /* joint builder */
+  function jnt(def, parentObj) {
+    const pivot = new THREE.Object3D();
+    pivot.name = def.key;
+    pivot.position.set(def.lx, def.ly, def.lz);
+    parentObj.add(pivot);
+    const sp = new THREE.Mesh(
+      new THREE.SphereGeometry(0.085, 10, 8),
+      matJoint()
+    );
+    sp.userData = { key: def.key };
+    pivot.add(sp);
+    clickTargets.push(sp);
+    joints[def.key] = { pivot, sphere: sp, def };
+    return pivot;
+  }
+
+  /* build joints by hierarchy */
+  const pivMap = { null: mGroup };
+  JOINT_DEFS.forEach(def => {
+    const parent = pivMap[def.parent];
+    const p = jnt(def, parent);
+    pivMap[def.key] = p;
+  });
+
+  const JJ = joints;
+
+  /* ── proportions scaling ── */
+  const sw = P.sw, hw = P.hw, cs = P.cs, ws = P.ws, al = P.al, ll = P.ll, hs = P.hs, th = P.th;
+
+  // reposition joints based on props
+  JJ.lShoulder.pivot.position.x = -0.88 * sw;
+  JJ.rShoulder.pivot.position.x =  0.88 * sw;
+  JJ.lElbow.pivot.position.y    = -1.22 * al;
+  JJ.rElbow.pivot.position.y    = -1.22 * al;
+  JJ.lWrist.pivot.position.y    = -1.05 * al;
+  JJ.rWrist.pivot.position.y    = -1.05 * al;
+  JJ.lHip.pivot.position.x      = -0.44 * hw;
+  JJ.rHip.pivot.position.x      =  0.44 * hw;
+  JJ.lKnee.pivot.position.y     = -1.82 * ll;
+  JJ.rKnee.pivot.position.y     = -1.82 * ll;
+  JJ.lAnkle.pivot.position.y    = -1.75 * ll;
+  JJ.rAnkle.pivot.position.y    = -1.75 * ll;
+  JJ.spine.pivot.position.y     =  0.32;
+  JJ.chest.pivot.position.y     =  1.1;
+
+  /* ── BODY MESHES ── */
+
+  /* pelvis */
+  const pelvis = box(0.72 * hw, 0.5, 0.42, 0xddc4a0);
+  pelvis.position.y = -0.05;
+  JJ.hips.pivot.add(pelvis);
+
+  /* abdomen */
+  const abdomen = cyl(0.82 * th, 0.25 * ws, 0.28 * hw, 0xddc4a0);
+  JJ.spine.pivot.add(abdomen);
+
+  /* chest */
+  const chestH = 0.88;
+  const chestMesh = box(0.78 * sw * cs, chestH, 0.48 * cs, 0xddc4a0);
+  chestMesh.position.set(0, -chestH / 2, 0);
+  JJ.chest.pivot.add(chestMesh);
+
+  /* female chest bumps */
+  if (bodyType === 'female') {
+    const bc = new THREE.SphereGeometry(0.16, 10, 8);
+    bc.translate(0.22, 0, 0.28);
+    const bl = new THREE.Mesh(bc, new THREE.MeshToonMaterial({ color: 0xddc4a0, gradientMap: gradMap }));
+    const br = bl.clone();
+    br.position.x = -0.44;
+    JJ.chest.pivot.add(bl);
+    JJ.chest.pivot.add(br);
+  }
+
+  /* clavicles visual */
+  const clavW = 0.84 * sw;
+  const clav = cyl(clavW, 0.055, 0.055, 0xe0c8a8);
+  clav.rotation.z = Math.PI / 2;
+  clav.position.set(-clavW / 2, 0.12, 0);
+  JJ.chest.pivot.add(clav);
+
+  /* neck */
+  JJ.neck.pivot.add(cyl(0.38, 0.12, 0.12, 0xe8d0b5));
+
+  /* head */
+  const hR = 0.43 * hs;
+  const headSph = sph(hR, 0xf0d8c0);
+  headSph.position.y = hR;
+  JJ.head.pivot.add(headSph);
+  // face marker
+  const faceDot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.045, 8, 6),
+    new THREE.MeshToonMaterial({ color: 0xffb8a0, gradientMap: gradMap })
+  );
+  faceDot.position.set(0, hR, hR * 0.88);
+  JJ.head.pivot.add(faceDot);
+
+  /* arms */
+  function arm(sk, ek, wk) {
+    const upperL = 1.22 * al;
+    const foreL  = 1.05 * al;
+    const handL  = 0.40 * al;
+    joints[sk].pivot.add(cyl(upperL, 0.115, 0.1, 0xe0c8a8));
+    joints[ek].pivot.add(cyl(foreL,  0.10,  0.085, 0xe0c8a8));
+    const hand = box(0.14 * al, handL, 0.08 * al, 0xe8d8c0);
+    hand.position.y = -handL / 2;
+    joints[wk].pivot.add(hand);
+  }
+  arm('lShoulder','lElbow','lWrist');
+  arm('rShoulder','rElbow','rWrist');
+
+  /* legs */
+  function leg(hk, kk, ak, side) {
+    const upperL = 1.82 * ll;
+    const lowerL = 1.75 * ll;
+    joints[hk].pivot.add(cyl(upperL, 0.195, 0.16, 0xddc4a0));
+    joints[kk].pivot.add(cyl(lowerL, 0.155, 0.115, 0xddc4a0));
+    // foot
+    const foot = box(0.175, 0.115, 0.65, 0xd0b898);
+    foot.position.set(side * 0.03, -0.06, 0.22);
+    joints[ak].pivot.add(foot);
+  }
+  leg('lHip','lKnee','lAnkle', -1);
+  leg('rHip','rKnee','rAnkle',  1);
+
+  /* body scale */
+  mGroup.scale.y = th;
+}
+
+function disposeGroup(g) {
+  g.traverse(obj => {
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+      if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+      else obj.material.dispose();
+    }
+  });
+}
+
+/* ========== OUTLINE ========== */
+let outlineGroup = null;
+function toggleOutline(on) {
+  if (outlineGroup) { scene.remove(outlineGroup); outlineGroup = null; }
+  if (!on) return;
+  outlineGroup = new THREE.Group();
+  const outMat = new THREE.MeshBasicMaterial({ color: 0x111122, side: THREE.BackSide });
+  mGroup.traverse(obj => {
+    if (!obj.isMesh) return;
+    const ol = new THREE.Mesh(obj.geometry, outMat);
+    ol.matrix.copy(obj.matrixWorld);
+    ol.matrixAutoUpdate = false;
+    ol.scale.setScalar(1.045);
+    outlineGroup.add(ol);
+  });
+  scene.add(outlineGroup);
+}
+
+/* ========== RAYCASTER ========== */
+const raycaster = new THREE.Raycaster();
+const mouse2D = new THREE.Vector2();
+
+function getHit(event) {
+  const rect = canvas.getBoundingClientRect();
+  const cx = event.clientX || (event.touches && event.touches[0].clientX) || 0;
+  const cy = event.clientY || (event.touches && event.touches[0].clientY) || 0;
+  mouse2D.set(
+    (cx - rect.left) / rect.width * 2 - 1,
+    -((cy - rect.top) / rect.height) * 2 + 1
+  );
+  raycaster.setFromCamera(mouse2D, cam);
+  const hits = raycaster.intersectObjects(clickTargets);
+  return hits.length > 0 ? hits[0].object : null;
+}
+
+/* ========== SELECTION ========== */
+function selectJoint(key) {
+  // deselect old
+  if (selectedKey && joints[selectedKey]) {
+    joints[selectedKey].sphere.material = matJoint();
+  }
+  selectedKey = key;
+  if (!key) {
+    document.getElementById('no-joint').style.display = '';
+    document.getElementById('joint-ctrl').style.display = 'none';
+    document.getElementById('jlabel').style.display = 'none';
+    updateJointList();
+    return;
+  }
+  const j = joints[key];
+  j.sphere.material = matJSel;
+  document.getElementById('no-joint').style.display = 'none';
+  document.getElementById('joint-ctrl').style.display = '';
+  document.getElementById('jname').textContent = j.def.label;
+  document.getElementById('jlabel').textContent = j.def.label;
+  document.getElementById('jlabel').style.display = '';
+  updateRotSliders(key);
+  updateJointList();
+}
+
+function updateRotSliders(key) {
+  if (!key || !joints[key]) return;
+  const r = joints[key].pivot.rotation;
+  const toDeg = v => Math.round(v / DEG);
+  document.getElementById('rx').value = clamp(toDeg(r.x), -180, 180);
+  document.getElementById('ry').value = clamp(toDeg(r.y), -180, 180);
+  document.getElementById('rz').value = clamp(toDeg(r.z), -180, 180);
+  document.getElementById('rvx').textContent = toDeg(r.x) + '°';
+  document.getElementById('rvy').textContent = toDeg(r.y) + '°';
+  document.getElementById('rvz').textContent = toDeg(r.z) + '°';
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+/* ========== DRAG ROTATION ========== */
+let dragKey = null;
+let dragPrevX = 0, dragPrevY = 0;
+const SENS = 0.012; // radians per pixel
+
+canvas.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  const hit = getHit(e);
+  if (hit) {
+    e.stopPropagation();
+    const key = hit.userData.key;
+    pushHistory();
+    selectJoint(key);
+    dragKey = key;
+    isDragging = true;
+    dragPrevX = e.clientX;
+    dragPrevY = e.clientY;
+    controls.enabled = false;
+    canvas.classList.remove('grab');
+    canvas.classList.add('rotating');
+  } else {
+    selectJoint(null);
+    canvas.classList.remove('grab');
+    canvas.classList.add('grabbing');
+  }
+});
+
+window.addEventListener('pointermove', e => {
+  if (isDragging && dragKey && joints[dragKey]) {
+    const dx = (e.clientX - dragPrevX) * SENS;
+    const dy = (e.clientY - dragPrevY) * SENS;
+    dragPrevX = e.clientX;
+    dragPrevY = e.clientY;
+
+    const pivot = joints[dragKey].pivot;
+    if (shiftDown) {
+      pivot.rotation.z += dx;
+    } else {
+      pivot.rotation.y += dx;
+      pivot.rotation.x += dy;
+    }
+
+    // mirror
+    if (mirror && MIRROR[dragKey]) {
+      const mp = joints[MIRROR[dragKey]].pivot;
+      if (shiftDown) {
+        mp.rotation.z += dx;
+      } else {
+        mp.rotation.y -= dx;
+        mp.rotation.x += dy;
+      }
+    }
+    updateRotSliders(dragKey);
+    needsRender = true;
+  }
+});
+
+window.addEventListener('pointerup', () => {
+  if (isDragging) {
+    isDragging = false;
+    dragKey = null;
+    controls.enabled = true;
+    canvas.classList.remove('grabbing', 'rotating');
+    canvas.classList.add('grab');
+  }
+});
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Shift') shiftDown = true;
+  if (e.key === 'z' && (e.ctrlKey || e.metaKey)) undo();
+  if (e.key === 'Escape') selectJoint(null);
+});
+window.addEventListener('keyup', e => { if (e.key === 'Shift') shiftDown = false; });
+
+/* ========== ROTATION SLIDERS ========== */
+function bindRotSlider(id, axis) {
+  document.getElementById(id).addEventListener('input', e => {
+    if (!selectedKey) return;
+    const val = Number(e.target.value) * DEG;
+    joints[selectedKey].pivot.rotation[axis] = val;
+    const label = { x: 'rvx', y: 'rvy', z: 'rvz' }[axis];
+    document.getElementById(label).textContent = e.target.value + '°';
+    if (mirror && MIRROR[selectedKey]) {
+      const mf = axis === 'x' ? 1 : -1;
+      joints[MIRROR[selectedKey]].pivot.rotation[axis] = val * mf;
+    }
+    needsRender = true;
+  });
+}
+bindRotSlider('rx', 'x');
+bindRotSlider('ry', 'y');
+bindRotSlider('rz', 'z');
+
+/* ── reset selected joint ── */
+document.getElementById('btn-rj').onclick = () => {
+  if (!selectedKey) return;
+  pushHistory();
+  joints[selectedKey].pivot.rotation.set(0, 0, 0);
+  if (mirror && MIRROR[selectedKey])
+    joints[MIRROR[selectedKey]].pivot.rotation.set(0, 0, 0);
+  updateRotSliders(selectedKey);
+  needsRender = true;
+};
+
+/* ── copy left↔right ── */
+document.getElementById('btn-copy-lr').onclick = () => {
+  if (!selectedKey || !MIRROR[selectedKey]) return;
+  pushHistory();
+  const src = joints[selectedKey].pivot.rotation;
+  const dst = joints[MIRROR[selectedKey]].pivot;
+  dst.rotation.set(src.x, -src.y, -src.z);
+  needsRender = true;
+};
+
+/* ========== HISTORY ========== */
+function captureState() {
+  const state = {};
+  JOINT_DEFS.forEach(def => {
+    const r = joints[def.key].pivot.rotation;
+    state[def.key] = [r.x, r.y, r.z];
+  });
+  return state;
+}
+function pushHistory() {
+  history.push(captureState());
+  if (history.length > MAX_HIST) history.shift();
+}
+function undo() {
+  if (!history.length) return;
+  const state = history.pop();
+  Object.entries(state).forEach(([k, v]) => {
+    if (joints[k]) joints[k].pivot.rotation.set(v[0], v[1], v[2]);
+  });
+  if (selectedKey) updateRotSliders(selectedKey);
+  needsRender = true;
+}
+document.getElementById('btn-undo').onclick = undo;
+
+/* ========== PRESETS ========== */
+window.applyPreset = function(name) {
+  pushHistory();
+  JOINT_DEFS.forEach(def => {
+    joints[def.key].pivot.rotation.set(0, 0, 0);
+  });
+  const pose = POSES[name];
+  if (pose) {
+    Object.entries(pose).forEach(([k, v]) => {
+      if (joints[k]) joints[k].pivot.rotation.set(v[0]*DEG, v[1]*DEG, v[2]*DEG);
+    });
+  }
+  if (selectedKey) updateRotSliders(selectedKey);
+  needsRender = true;
+};
+
+/* ========== PROPORTIONS ========== */
+function applyProps() {
+  buildMannequin();
+  if (selectedKey) selectJoint(selectedKey);
+  else selectJoint(null);
+  buildJointList();
+  needsRender = true;
+}
+
+function sliderBind(id, key, scale) {
+  const el = document.getElementById('sl-' + id);
+  const vl = document.getElementById('sv-' + id);
+  el.addEventListener('input', () => {
+    const v = Number(el.value);
+    vl.textContent = v;
+    props[key] = BODY_TYPES[bodyType][key] * (v / 100);
+    applyProps();
+  });
+}
+sliderBind('sw','sw',100);
+sliderBind('cs','cs',100);
+sliderBind('ws','ws',100);
+sliderBind('hw','hw',100);
+sliderBind('al','al',100);
+sliderBind('ll','ll',100);
+sliderBind('hs','hs',100);
+sliderBind('th','th',100);
+
+function setBodyType(type) {
+  bodyType = type;
+  const base = BODY_TYPES[type];
+  // Scale slider values by new base
+  ['sw','cs','ws','hw','al','ll','hs','th'].forEach(k => {
+    const slId = 'sl-' + k;
+    const svId = 'sv-' + k;
+    const sliderVal = Number(document.getElementById(slId).value);
+    props[k] = base[k] * (sliderVal / 100);
+  });
+  applyProps();
+}
+
+['neutral','male','female'].forEach(t => {
+  document.getElementById('bt-' + t).onclick = () => {
+    document.querySelectorAll('.panel .btn[id^="bt-"]').forEach(b => b.classList.remove('on','active'));
+    document.getElementById('bt-' + t).classList.add('on');
+    setBodyType(t);
+  };
+});
+
+document.getElementById('btn-reset-prop').onclick = () => {
+  ['sw','cs','ws','hw','al','ll','hs','th'].forEach(k => {
+    document.getElementById('sl-' + k).value = 100;
+    document.getElementById('sv-' + k).textContent = 100;
+  });
+  props = { ...BODY_TYPES[bodyType] };
+  applyProps();
+};
+
+/* ========== RESET ALL ========== */
+document.getElementById('btn-reset-all').onclick = () => {
+  if (!confirm('모든 포즈를 초기화할까요?')) return;
+  pushHistory();
+  JOINT_DEFS.forEach(def => { joints[def.key].pivot.rotation.set(0,0,0); });
+  if (selectedKey) updateRotSliders(selectedKey);
+  needsRender = true;
+};
+
+/* ========== CAMERA ========== */
+const camDist = () => cam.position.distanceTo(controls.target);
+
+window.setCamera = function(preset) {
+  const d = Math.max(camDist(), 7);
+  const t = TARGET.clone();
+  const posMap = {
+    front:  [0, t.y, d],
+    back:   [0, t.y, -d],
+    left:   [-d, t.y, 0],
+    right:  [d, t.y, 0],
+    top:    [0, t.y + d * 1.2, 0.01],
+    q34:    [-d * 0.7, t.y + 1, d * 0.7],
+    persp:  [-d * 0.5, t.y + 1.5, d * 0.85],
+  };
+  const pos = posMap[preset] || posMap.front;
+  cam.position.set(...pos);
+  controls.target.copy(t);
+  controls.update();
+  needsRender = true;
+};
+
+/* ── FOV slider ── */
+document.getElementById('sl-fov').addEventListener('input', e => {
+  cam.fov = Number(e.target.value);
+  document.getElementById('sv-fov').textContent = e.target.value + '°';
+  cam.updateProjectionMatrix();
+  needsRender = true;
+});
+
+/* ========== TOGGLES ========== */
+function toggleBtn(id, onFn, offFn) {
+  const btn = document.getElementById(id);
+  let on = false;
+  btn.onclick = () => {
+    on = !on;
+    btn.classList.toggle('on', on);
+    on ? onFn() : offFn();
+    needsRender = true;
+  };
+}
+toggleBtn('btn-grid',
+  () => { grid.visible = true; },
+  () => { grid.visible = false; }
+);
+document.getElementById('btn-grid').classList.add('on');
+
+toggleBtn('btn-shadow',
+  () => { renderer.shadowMap.enabled = true; mainLight.castShadow = true; shadowFloor.visible = true; needsRender = true; renderer.shadowMap.needsUpdate = true; },
+  () => { renderer.shadowMap.enabled = false; mainLight.castShadow = false; shadowFloor.visible = false; }
+);
+
+toggleBtn('btn-mirror',
+  () => { mirror = true; },
+  () => { mirror = false; }
+);
+
+toggleBtn('btn-ortho',
+  () => {
+    const h = 5.5;
+    const w = h * (canvas.clientWidth / canvas.clientHeight);
+    const ortho = new THREE.OrthographicCamera(-w/2, w/2, h/2, -h/2, 0.1, 100);
+    ortho.position.copy(cam.position);
+    ortho.lookAt(controls.target);
+    window._prevCam = cam;
+    window._ortho = ortho;
+    controls.object = ortho;
+    controls.update();
+    window._useOrtho = true;
+  },
+  () => {
+    if (window._prevCam) {
+      controls.object = cam;
+      controls.update();
+    }
+    window._useOrtho = false;
+  }
+);
+
+toggleBtn('btn-outline',
+  () => { outlineOn = true; toggleOutline(true); },
+  () => { outlineOn = false; toggleOutline(false); }
+);
+
+/* ── lighting presets ── */
+function setLight(preset) {
+  document.querySelectorAll('#light-front,#light-side,#light-top,#light-drama').forEach(b=>b.classList.remove('on'));
+  document.getElementById('light-'+preset).classList.add('on');
+  const presets = {
+    front:  { mDir:[-3,8,6],  mInt:1.1, fDir:[4,2,-4],  fInt:0.35, aInt:0.55 },
+    side:   { mDir:[-6,4,1],  mInt:1.3, fDir:[5,2,-1],  fInt:0.15, aInt:0.4  },
+    top:    { mDir:[0,10,1],  mInt:1.2, fDir:[3,0,-3],  fInt:0.25, aInt:0.5  },
+    drama:  { mDir:[-4,6,3],  mInt:1.6, fDir:[4,-1,-4], fInt:0.08, aInt:0.2  },
+  };
+  const p = presets[preset];
+  mainLight.position.set(...p.mDir);
+  mainLight.intensity = p.mInt;
+  fillLight.position.set(...p.fDir);
+  fillLight.intensity = p.fInt;
+  ambLight.intensity = p.aInt;
+  needsRender = true;
+}
+['front','side','top','drama'].forEach(id => {
+  document.getElementById('light-'+id).onclick = () => setLight(id);
+});
+
+/* ========== CAPTURE ========== */
+document.getElementById('btn-cap').onclick = () => {
+  renderer.render(window._useOrtho ? window._ortho : cam, scene);
+  // need to render synchronously then download
+  const link = document.createElement('a');
+  link.download = 'pose_' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+};
+
+/* ========== JOINT LIST ========== */
+function buildJointList() {
+  const list = document.getElementById('jlist');
+  list.innerHTML = '';
+  JOINT_DEFS.forEach(def => {
+    const item = document.createElement('div');
+    item.className = 'jitem' + (def.key === selectedKey ? ' sel' : '');
+    item.dataset.key = def.key;
+    item.innerHTML = `<div class="jitem-dot"></div><span>${def.label}</span>`;
+    item.onclick = () => {
+      pushHistory();
+      selectJoint(def.key);
+    };
+    list.appendChild(item);
+  });
+}
+function updateJointList() {
+  document.querySelectorAll('.jitem').forEach(el => {
+    el.classList.toggle('sel', el.dataset.key === selectedKey);
+  });
+}
+
+/* ========== RESIZE ========== */
+function onResize() {
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (canvas.width !== w || canvas.height !== h) {
+    renderer.setSize(w, h, false);
+    cam.aspect = w / h;
+    cam.updateProjectionMatrix();
+    needsRender = true;
+  }
+}
+
+/* ========== ANIMATE ========== */
+let needsRender = true;
+
+function animate() {
+  requestAnimationFrame(animate);
+  onResize();
+  if (controls.update()) needsRender = true;
+  if (outlineGroup) {
+    outlineGroup.children.forEach((ol, i) => {
+      const srcMesh = clickTargets[i]; // imperfect but workable
+    });
+    // simpler: just remove and rebuild outline each few frames if dirty
+  }
+  if (needsRender) {
+    const activeCam = window._useOrtho ? window._ortho : cam;
+    renderer.render(scene, activeCam);
+    needsRender = false;
+  }
+}
+
+/* ========== INIT ========== */
+props = { ...BODY_TYPES.neutral };
+buildMannequin();
+buildJointList();
+animate();
+
+// mark dirty on orbit
+controls.addEventListener('change', () => { needsRender = true; });
+
+</script>
+</body>
+</html>

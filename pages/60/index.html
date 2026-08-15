@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>트럼프 카드 게임 대백과</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#08070a;--bg2:#100e18;--bg3:#181428;--bg4:#201c35;
+  --border:#2e2848;--border2:#4a3e78;
+  --txt:#f0ecff;--txt2:#b0a0d8;--txt3:#6a5898;
+  --gold:#d4a820;--gold2:#f0c840;--gold3:rgba(212,168,32,.12);
+  --red:#cc2233;--red2:#ee3344;--red3:rgba(204,34,51,.12);
+  --grn:#44aa66;--grn2:#66cc88;
+  --cyan:#44aacc;--pur:#9944cc;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+#hdr{
+  background:linear-gradient(135deg,#060410,#100818,#060410);
+  border-bottom:2px solid var(--gold);padding:12px 20px;
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+#hdr h1{font-size:19px;font-weight:700;color:var(--gold2);white-space:nowrap;
+  text-shadow:0 0 16px rgba(212,168,32,.5);letter-spacing:1px;}
+#search{flex:1;min-width:180px;max-width:360px;padding:6px 12px;
+  border-radius:6px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);font-size:13px;outline:none;}
+#search:focus{border-color:var(--gold);}
+#search::placeholder{color:var(--txt3);}
+#cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:3px;padding:8px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 13px;border-radius:5px;border:1px solid transparent;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);
+  white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--gold3);border-color:rgba(212,168,32,.35);color:var(--gold2);}
+
+/* MAIN */
+#main{padding:18px 18px;max-width:1200px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-title{font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:4px;
+  padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);margin-bottom:18px;line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:20px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:16px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px;margin-bottom:20px;}
+
+/* GAME CARD */
+.gc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s;}
+.gc:hover{border-color:var(--border2);}
+.gc.solo{border-left:3px solid var(--grn);}
+.gc.two{border-left:3px solid var(--cyan);}
+.gc.multi{border-left:3px solid var(--gold);}
+.gc.poker{border-left:3px solid var(--red2);}
+.gc-head{padding:11px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.gc-ico{font-size:24px;line-height:1;flex-shrink:0;margin-top:2px;}
+.gc-info{flex:1;}
+.gc-name{font-size:15px;font-weight:700;color:var(--gold2);line-height:1.3;}
+.gc-en{font-size:11px;color:var(--txt3);margin-top:1px;}
+.gc-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+
+/* BADGE */
+.b{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-sol{background:rgba(68,170,102,.14);color:var(--grn2);border:1px solid rgba(68,170,102,.25);}
+.b-two{background:rgba(68,170,204,.14);color:var(--cyan);border:1px solid rgba(68,170,204,.25);}
+.b-mul{background:rgba(212,168,32,.12);color:var(--gold2);border:1px solid rgba(212,168,32,.22);}
+.b-pok{background:rgba(204,34,51,.12);color:var(--red2);border:1px solid rgba(204,34,51,.22);}
+.b-ez{background:rgba(100,200,100,.1);color:#8d8;border:1px solid rgba(100,200,100,.2);}
+.b-md{background:rgba(200,160,40,.1);color:#ca8;border:1px solid rgba(200,160,40,.2);}
+.b-hd{background:rgba(200,60,60,.1);color:#e88;border:1px solid rgba(200,60,60,.2);}
+
+/* CARD BODY */
+.gc-body{padding:12px 14px;}
+.rule-sec{margin-bottom:10px;}
+.rule-sec:last-child{margin-bottom:0;}
+.r-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.r-txt{font-size:12.5px;color:var(--txt2);line-height:1.7;}
+.r-txt b{color:var(--txt);font-weight:600;}
+.r-txt .red{color:var(--red2);}
+.r-txt .gold{color:var(--gold2);}
+
+/* STEPS */
+ol.steps{margin:4px 0 0 16px;color:var(--txt2);font-size:12.5px;}
+ol.steps li{margin-bottom:3px;line-height:1.65;}
+ol.steps li b{color:var(--txt);}
+ul.dots{margin:4px 0 0 14px;color:var(--txt2);font-size:12.5px;}
+ul.dots li{margin-bottom:3px;line-height:1.65;list-style:disc;}
+ul.dots li b{color:var(--txt);}
+
+/* EXAMPLE BOX */
+.ex-box{background:rgba(212,168,32,.06);border:1px solid rgba(212,168,32,.18);
+  border-radius:6px;padding:8px 12px;margin-top:6px;font-size:12px;color:var(--txt2);line-height:1.7;}
+.ex-box b{color:var(--gold2);}
+.ex-box .card-sym{font-size:13px;font-weight:700;}
+.r{color:#ee3344;}.b-s{color:#d0e0ff;}
+
+/* HAND RANK TABLE */
+.rank-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0;}
+.rank-table th{padding:6px 10px;text-align:left;font-size:11px;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.rank-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.rank-table tr:last-child td{border-bottom:none;}
+.rank-table tr:hover td{background:rgba(255,255,255,.02);}
+.rn{color:var(--gold2);font-weight:700;}
+.rd{color:var(--txt2);}
+.re{color:var(--txt);font-family:Consolas,monospace;font-size:11.5px;}
+
+/* OVERVIEW CARD (전체 목록) */
+.ov-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:default;transition:.12s;}
+.ov-card:hover{border-color:var(--border2);}
+.ov-ico{font-size:22px;flex-shrink:0;}
+.ov-name{font-size:13px;font-weight:700;color:var(--txt);}
+.ov-en{font-size:11px;color:var(--txt3);}
+.ov-info{flex:1;}
+.ov-desc{font-size:11.5px;color:var(--txt2);margin-top:2px;}
+
+/* SUB HEADER */
+.sub-hdr{font-size:11px;font-weight:700;color:var(--txt3);margin:20px 0 10px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.6px;}
+
+/* NO RESULT */
+#no-r{display:none;color:var(--txt3);text-align:center;padding:60px;font-size:14px;}
+.searchable.hidden{display:none!important;}
+
+/* SUIT SYMBOLS */
+.suit-demo{display:flex;gap:20px;flex-wrap:wrap;margin:8px 0;}
+.suit-item{text-align:center;font-size:13px;}
+.suit-big{font-size:36px;line-height:1;}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <h1>🃏 트럼프 카드 게임 대백과</h1>
+  <input id="search" type="text" placeholder="🔍 게임명·인원·키워드 검색…" oninput="doSearch(this.value)">
+  <span id="cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" onclick="sw('all',this)">📋 전체 목록</button>
+  <button class="tab" onclick="sw('solo',this)">🧘 혼자 (1인)</button>
+  <button class="tab" onclick="sw('two',this)">👥 2인</button>
+  <button class="tab" onclick="sw('multi',this)">🎉 다인 (3인~)</button>
+  <button class="tab" onclick="sw('poker',this)">♠ 포커 변형</button>
+  <button class="tab" onclick="sw('ref',this)">📖 기본 레퍼런스</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════ 전체 목록 ══════════════ -->
+<div id="tab-all" class="sec on">
+<div class="sec-title">📋 전체 게임 목록</div>
+<div class="sec-sub">표준 트럼프 카드 1묶음(52장)으로 즐길 수 있는 모든 게임. 탭에서 카테고리별 상세 규칙 확인.</div>
+
+<div class="sub-hdr">🧘 혼자 하는 게임 (솔리테어)</div>
+<div class="grid-sm">
+<div class="ov-card searchable" data-s="클론다이크 klondike 솔리테어 solitaire 1인 혼자">
+  <div class="ov-ico">🃏</div><div class="ov-info">
+  <div class="ov-name">클론다이크 <span style="color:var(--txt3);font-weight:400">(Klondike)</span></div>
+  <div class="ov-desc">가장 유명한 솔리테어. 7열 태블로를 정리해 4개 파운데이션에 A→K로 쌓기</div>
+  <div style="margin-top:4px;"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="프리셀 freecell 솔리테어 1인 혼자">
+  <div class="ov-ico">🔲</div><div class="ov-info">
+  <div class="ov-name">프리셀 <span style="color:var(--txt3);font-weight:400">(FreeCell)</span></div>
+  <div class="ov-desc">빈 셀 4개를 활용해 모든 카드를 파운데이션에 옮기기. 거의 모든 판이 풀림</div>
+  <div style="margin-top:4px;"><span class="b b-sol">1인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="피라미드 pyramid 솔리테어 1인 혼자 13">
+  <div class="ov-ico">🔺</div><div class="ov-info">
+  <div class="ov-name">피라미드 <span style="color:var(--txt3);font-weight:400">(Pyramid)</span></div>
+  <div class="ov-desc">합이 13이 되는 두 장을 제거. K는 단독 제거. 28장 피라미드 전부 없애기</div>
+  <div style="margin-top:4px;"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="골프 golf 솔리테어 1인 혼자 점수">
+  <div class="ov-ico">⛳</div><div class="ov-info">
+  <div class="ov-name">골프 솔리테어 <span style="color:var(--txt3);font-weight:400">(Golf)</span></div>
+  <div class="ov-desc">7열 5장 배치 후 덱 기준카드에서 ±1 올리기. 남는 카드 수가 점수(낮을수록 우승)</div>
+  <div style="margin-top:4px;"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="트리피크스 tripeaks 솔리테어 1인 혼자">
+  <div class="ov-ico">⛰️</div><div class="ov-info">
+  <div class="ov-name">트리피크스 <span style="color:var(--txt3);font-weight:400">(TriPeaks)</span></div>
+  <div class="ov-desc">3개의 피크 형태 카드를 기준 카드 ±1로 전부 제거. 연속 제거 시 콤보 점수</div>
+  <div style="margin-top:4px;"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+</div>
+
+<div class="sub-hdr">👥 2인 게임</div>
+<div class="grid-sm">
+<div class="ov-card searchable" data-s="워 war 전쟁 2인">
+  <div class="ov-ico">⚔️</div><div class="ov-info">
+  <div class="ov-name">워 <span style="color:var(--txt3);font-weight:400">(War / 전쟁)</span></div>
+  <div class="ov-desc">26장씩 나눠 동시에 한 장씩 공개. 높은 패가 가져감. 전 연령 가능한 최단순 게임</div>
+  <div style="margin-top:4px;"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="스피드 speed spit 2인">
+  <div class="ov-ico">⚡</div><div class="ov-info">
+  <div class="ov-name">스피드 <span style="color:var(--txt3);font-weight:400">(Speed / Spit)</span></div>
+  <div class="ov-desc">가운데 더미에 ±1 카드를 빠르게 내려놓는 속도전. 먼저 손을 비운 사람이 승리</div>
+  <div style="margin-top:4px;"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="슬랩잭 slapjack 잭 2인">
+  <div class="ov-ico">👋</div><div class="ov-info">
+  <div class="ov-name">슬랩잭 <span style="color:var(--txt3);font-weight:400">(Slap Jack)</span></div>
+  <div class="ov-desc">J가 나오면 먼저 손바닥으로 치기. 더미를 모두 가져가는 사람이 승리</div>
+  <div style="margin-top:4px;"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="스냅 snap 같은카드 2인">
+  <div class="ov-ico">🤏</div><div class="ov-info">
+  <div class="ov-name">스냅 <span style="color:var(--txt3);font-weight:400">(Snap)</span></div>
+  <div class="ov-desc">공개 카드가 같으면 "Snap!" 외쳐 더미 획득. 먼저 상대 카드를 모두 빼앗기</div>
+  <div style="margin-top:4px;"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="고피시 go fish 2인 5인">
+  <div class="ov-ico">🎣</div><div class="ov-info">
+  <div class="ov-name">고피시 <span style="color:var(--txt3);font-weight:400">(Go Fish)</span></div>
+  <div class="ov-desc">상대에게 숫자 카드를 요청해 4장 세트 완성. "없어요" = 덱에서 뽑기</div>
+  <div style="margin-top:4px;"><span class="b b-two">2~5인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="크레이지에이트 crazy eights 2인 4인 8 유노">
+  <div class="ov-ico">8️⃣</div><div class="ov-info">
+  <div class="ov-name">크레이지 에이트 <span style="color:var(--txt3);font-weight:400">(Crazy Eights)</span></div>
+  <div class="ov-desc">UNO의 원조. 같은 무늬나 숫자로 내려놓기. 8은 무늬 지정 만능 패</div>
+  <div style="margin-top:4px;"><span class="b b-two">2~4인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="진러미 gin rummy 2인 멜드">
+  <div class="ov-ico">🍸</div><div class="ov-info">
+  <div class="ov-name">진 러미 <span style="color:var(--txt3);font-weight:400">(Gin Rummy)</span></div>
+  <div class="ov-desc">10장으로 세트·런 멜드 완성. 미멜드 합 ≤10이면 노크. 먼저 100점 획득 승리</div>
+  <div style="margin-top:4px;"><span class="b b-two">2인</span><span class="b b-md">중간</span></div>
+</div></div>
+</div>
+
+<div class="sub-hdr">🎉 다인 게임 (3인 이상)</div>
+<div class="grid-sm">
+<div class="ov-card searchable" data-s="블랙잭 blackjack 21 카지노 딜러">
+  <div class="ov-ico">🎰</div><div class="ov-info">
+  <div class="ov-name">블랙잭 <span style="color:var(--txt3);font-weight:400">(Blackjack / 21)</span></div>
+  <div class="ov-desc">합이 21 이하로 딜러보다 높게. A+그림패 = 블랙잭(즉시 승리 1.5배). 전세계 최인기 카드게임</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~8인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="하츠 hearts 4인 점수 하트 스페이드 퀸">
+  <div class="ov-ico">♥️</div><div class="ov-info">
+  <div class="ov-name">하츠 <span style="color:var(--txt3);font-weight:400">(Hearts)</span></div>
+  <div class="ov-desc">♥ 1점, ♠Q 13점 — 점수를 최대한 적게. 슈팅더문: 26점 전부 먹으면 상대가 26점</div>
+  <div style="margin-top:4px;"><span class="b b-mul">4인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="스페이드 spades 4인 트릭 입찰">
+  <div class="ov-ico">♠️</div><div class="ov-info">
+  <div class="ov-name">스페이드 <span style="color:var(--txt3);font-weight:400">(Spades)</span></div>
+  <div class="ov-desc">4인 2팀. ♠는 항상 최강 트럼프. 입찰한 트릭 수를 정확히 따내야 점수 획득</div>
+  <div style="margin-top:4px;"><span class="b b-mul">4인(2팀)</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="러미 rummy 2인 6인 멜드 세트 런">
+  <div class="ov-ico">🎴</div><div class="ov-info">
+  <div class="ov-name">러미 <span style="color:var(--txt3);font-weight:400">(Rummy)</span></div>
+  <div class="ov-desc">세트(같은 숫자 3~4장) · 런(같은 무늬 연속 3장+) 멜드를 완성해 손패 먼저 비우기</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~6인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="세븐스 sevens 팬탄 fan tan 7 3인 8인">
+  <div class="ov-ico">7️⃣</div><div class="ov-info">
+  <div class="ov-name">세븐스 <span style="color:var(--txt3);font-weight:400">(Sevens / Fan Tan)</span></div>
+  <div class="ov-desc">7부터 시작해 각 무늬를 A↔K 방향으로 이어붙이기. 3번 패스하면 탈락</div>
+  <div style="margin-top:4px;"><span class="b b-mul">3~8인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="올드메이드 old maid 도둑잡기 2인 8인">
+  <div class="ov-ico">👒</div><div class="ov-info">
+  <div class="ov-name">올드 메이드 / 도둑잡기 <span style="color:var(--txt3);font-weight:400">(Old Maid)</span></div>
+  <div class="ov-desc">짝이 없는 카드를 피하라! ♦Q 한 장 제거 후 배분. 마지막 홀 카드를 든 사람이 패배</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~8인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="다우트 거짓말쟁이 cheat bluff 3인 6인">
+  <div class="ov-ico">🤥</div><div class="ov-info">
+  <div class="ov-name">다우트 / 거짓말쟁이 <span style="color:var(--txt3);font-weight:400">(Cheat / Bluff)</span></div>
+  <div class="ov-desc">카드를 거짓 선언해도 됨. 의심되면 "다우트!" — 걸리면 더미 전부 인수</div>
+  <div style="margin-top:4px;"><span class="b b-mul">3~8인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="서티원 31 thirty one 2인 9인">
+  <div class="ov-ico">3️⃣1️⃣</div><div class="ov-info">
+  <div class="ov-name">서티원 <span style="color:var(--txt3);font-weight:400">(Thirty-One / 31)</span></div>
+  <div class="ov-desc">3장으로 같은 무늬 합 31 최대화. A=11, J/Q/K=10. 노크하면 마지막 기회 부여</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~9인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="이집션 랫스크류 egyptian rat screw 잭 더블 샌드위치">
+  <div class="ov-ico">🐀</div><div class="ov-info">
+  <div class="ov-name">이집션 랫스크류 <span style="color:var(--txt3);font-weight:400">(Egyptian Rat Screw)</span></div>
+  <div class="ov-desc">J·Q·K·A 내면 상대가 지정 횟수 안에 고패를 내야 함. 더블·샌드위치·합10에 슬랩</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~8인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="위스트 whist 4인 트릭 트럼프 팀">
+  <div class="ov-ico">🥃</div><div class="ov-info">
+  <div class="ov-name">위스트 <span style="color:var(--txt3);font-weight:400">(Whist)</span></div>
+  <div class="ov-desc">4인 2팀 트릭 게임. 마지막 장으로 트럼프 무늬 결정. 7트릭 이상 획득 시 점수</div>
+  <div style="margin-top:4px;"><span class="b b-mul">4인(2팀)</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="카지노 casino 2인 4인 포획 15">
+  <div class="ov-ico">🏛️</div><div class="ov-info">
+  <div class="ov-name">카지노 <span style="color:var(--txt3);font-weight:400">(Casino)</span></div>
+  <div class="ov-desc">중앙 공개 카드와 합이 같은 조합 포획. ♠2=2점, ♦10=1점. 가장 많은 카드를 모으기</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~4인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="크리비지 cribbage 2인 121점 페깅">
+  <div class="ov-ico">🪵</div><div class="ov-info">
+  <div class="ov-name">크리비지 <span style="color:var(--txt3);font-weight:400">(Cribbage)</span></div>
+  <div class="ov-desc">2인 전략 게임. 페깅(합 31 이하 내려놓기)과 멜드 점수로 121점 먼저 달성</div>
+  <div style="margin-top:4px;"><span class="b b-mul">2~4인</span><span class="b b-hd">어려움</span></div>
+</div></div>
+</div>
+
+<div class="sub-hdr">♠ 포커 변형</div>
+<div class="grid-sm">
+<div class="ov-card searchable" data-s="텍사스홀덤 texas holdem 포커 커뮤니티 2인 10인">
+  <div class="ov-ico">🎯</div><div class="ov-info">
+  <div class="ov-name">텍사스 홀덤 <span style="color:var(--txt3);font-weight:400">(Texas Hold'em)</span></div>
+  <div class="ov-desc">홀카드 2 + 커뮤니티 5. 플랍·턴·리버. 현재 전세계 포커 표준. 2~10인</div>
+  <div style="margin-top:4px;"><span class="b b-pok">2~10인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="5카드드로우 five card draw 포커 클래식">
+  <div class="ov-ico">🃏</div><div class="ov-info">
+  <div class="ov-name">5카드 드로우 <span style="color:var(--txt3);font-weight:400">(5-Card Draw)</span></div>
+  <div class="ov-desc">5장 받고 원하는 장수 교체. 클래식 포커. 2~6인</div>
+  <div style="margin-top:4px;"><span class="b b-pok">2~6인</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="세븐카드스터드 seven card stud 포커 앞면 뒷면">
+  <div class="ov-ico">👁️</div><div class="ov-info">
+  <div class="ov-name">세븐카드 스터드 <span style="color:var(--txt3);font-weight:400">(7-Card Stud)</span></div>
+  <div class="ov-desc">개인 7장(앞+뒷면 혼합)에서 최고 5장 조합. 커뮤니티 카드 없음. 2~8인</div>
+  <div style="margin-top:4px;"><span class="b b-pok">2~8인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="오마하 omaha 포커 홀카드 4장 커뮤니티">
+  <div class="ov-ico">🌅</div><div class="ov-info">
+  <div class="ov-name">오마하 <span style="color:var(--txt3);font-weight:400">(Omaha)</span></div>
+  <div class="ov-desc">홀카드 4장 + 커뮤니티 5장. 반드시 홀 2 + 커뮤니티 3 사용. 홀덤보다 강한 패 자주 나옴</div>
+  <div style="margin-top:4px;"><span class="b b-pok">2~10인</span><span class="b b-md">중간</span></div>
+</div></div>
+
+<div class="ov-card searchable" data-s="3카드포커 three card poker 포커 카지노 딜러">
+  <div class="ov-ico">3️⃣</div><div class="ov-info">
+  <div class="ov-name">3카드 포커 <span style="color:var(--txt3);font-weight:400">(3-Card Poker)</span></div>
+  <div class="ov-desc">단 3장으로 딜러와 승부. 페어 이상이면 보너스 페이. 빠른 카지노 게임</div>
+  <div style="margin-top:4px;"><span class="b b-pok">1~다수 vs 딜러</span><span class="b b-ez">쉬움</span></div>
+</div></div>
+</div>
+
+<div id="no-r">검색 결과가 없습니다.</div>
+</div><!-- end all -->
+
+
+<!-- ══════════════ 혼자 (1인) ══════════════ -->
+<div id="tab-solo" class="sec">
+<div class="sec-title">🧘 혼자 하는 게임 (솔리테어)</div>
+<div class="sec-sub">52장 한 묶음으로 혼자 즐기는 게임. 운과 전략이 적절히 섞인 퍼즐.</div>
+<div class="grid">
+
+<div class="gc solo searchable" data-s="클론다이크 klondike 솔리테어 solitaire 1인 파운데이션 태블로">
+  <div class="gc-head">
+    <div class="gc-ico">🃏</div>
+    <div class="gc-info">
+      <div class="gc-name">클론다이크</div>
+      <div class="gc-en">Klondike Solitaire</div>
+      <div class="gc-badges"><span class="b b-sol">1인</span><span class="b b-ez">쉬움~중간</span><span class="b b-mul">15~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">4개의 <b>파운데이션</b>에 각 무늬별로 A→2→…→K 순서로 쌓아 52장 모두 올리기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">
+        <b>태블로</b>: 7개 열에 1~7장 배분 (각 열 맨 위 카드만 앞면)<br>
+        <b>스톡</b>: 나머지 24장은 뒤집어 덱으로<br>
+        <b>파운데이션</b>: 우상단 4칸 (처음엔 비어 있음)<br>
+        <b>웨이스트</b>: 스톡을 뒤집을 때 카드가 오는 곳
+      </div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li><b>태블로 → 태블로</b>: 다른 색, 내림차순으로 올릴 수 있음 (예: 빨강 7 위에 검정 6)</li>
+        <li><b>태블로 → 파운데이션</b>: 같은 무늬, 오름차순 (A 먼저, 그 다음 2, 3…)</li>
+        <li><b>스톡 뒤집기</b>: 1장씩(입문) 또는 3장씩(표준) 뒤집어 웨이스트로</li>
+        <li>열이 완전히 비워지면 <b>K(또는 K부터 시작하는 그룹)만</b> 놓을 수 있음</li>
+        <li>앞면으로 뒤집힌 카드는 자유롭게 이동 가능</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        태블로: <b class="r">♥8</b> 위에 <b class="b-s">♠7</b> 올리기 (다른 색, 내림차순 ✔)<br>
+        파운데이션: <b class="r">♥A</b> → <b class="r">♥2</b> → <b class="r">♥3</b> 순서로 쌓기<br>
+        스톡: 3장 뒤집으면 제일 위 카드만 사용 가능<br>
+        빈 열: <b class="b-s">♣K</b> 또는 <b class="b-s">♣K-♥Q-♠J</b> 그룹 이동
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc solo searchable" data-s="프리셀 freecell 솔리테어 1인 빈셀 전략">
+  <div class="gc-head">
+    <div class="gc-ico">🔲</div>
+    <div class="gc-info">
+      <div class="gc-name">프리셀</div>
+      <div class="gc-en">FreeCell</div>
+      <div class="gc-badges"><span class="b b-sol">1인</span><span class="b b-md">중간</span><span class="b b-mul">20~40분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">4개의 <b>홈 셀</b>에 각 무늬 A→K로 쌓기. 빈 셀을 임시 보관소로 활용</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">
+        <b>8개 열</b>에 52장 전부 앞면으로 배분 (4열=7장, 4열=6장)<br>
+        <b>프리 셀</b> 4칸: 빈 임시 보관소<br>
+        <b>홈 셀</b> 4칸: 최종 목적지 (A부터)
+      </div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li><b>열 → 열</b>: 다른 색, 내림차순. 이동 가능 카드 수 = (빈 프리셀+1) × 2^(빈 열 수)</li>
+        <li><b>열 → 프리셀</b>: 1장만 임시 보관. 한 칸에 1장 제한</li>
+        <li><b>어디서든 → 홈 셀</b>: 같은 무늬 오름차순</li>
+        <li>빈 열에는 어떤 카드든 놓을 수 있음</li>
+        <li>~99.999% 모든 배열 풀림 (5번 게임만 불가)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        프리셀에 <b class="r">♦J</b> 임시 보관 →<br>
+        그 자리 비워 <b class="b-s">♠Q</b>를 <b class="r">♥K</b> 위로 이동 →<br>
+        이동 가능 수: 프리셀 3칸 비어있고 빈 열 1개 = (3+1)×2 = 8장까지 그룹 이동 가능
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc solo searchable" data-s="피라미드 pyramid 솔리테어 1인 13 합">
+  <div class="gc-head">
+    <div class="gc-ico">🔺</div>
+    <div class="gc-info">
+      <div class="gc-name">피라미드</div>
+      <div class="gc-en">Pyramid Solitaire</div>
+      <div class="gc-badges"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~15분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">피라미드의 28장 + 덱 카드를 합 13으로 짝지어 제거. 전부 없애면 승리</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">카드 값</div>
+      <div class="r-txt">A=1, 2~10 = 액면값, J=11, Q=12, <b>K=13(단독 제거)</b></div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">7줄 피라미드(28장, 맨 아래 줄만 노출), 나머지 24장은 스톡</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li><b>노출된 카드</b>(위 카드가 없는 것) + 덱 상단 카드로 합 13 짝 찾기</li>
+        <li>짝이 된 두 장 또는 K 한 장을 제거</li>
+        <li>스톡을 한 장씩 뒤집어 웨이스트로. 웨이스트 상단도 사용 가능</li>
+        <li>스톡이 다 되면 한 번 뒤집어 재사용 (규칙에 따라 횟수 제한)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        <b class="b-s">♣K</b> → 단독 제거<br>
+        <b class="r">♥8</b> + <b class="b-s">♠5</b> = 13 → 제거<br>
+        <b class="r">♦Q</b> + <b class="b-s">♣A</b> = 13 → 제거<br>
+        피라미드 아랫줄: <b>10+3, 9+4, 8+5, 7+6</b> 조합으로 제거
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc solo searchable" data-s="골프 golf 솔리테어 1인 점수 덱">
+  <div class="gc-head">
+    <div class="gc-ico">⛳</div>
+    <div class="gc-info">
+      <div class="gc-name">골프 솔리테어</div>
+      <div class="gc-en">Golf Solitaire</div>
+      <div class="gc-badges"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~10분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">남는 카드 수(타수)를 최소화. 9라운드 해서 합산 타수가 낮은 사람이 승리 (골프처럼)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">7열 5장씩(35장, 전부 앞면) + 스톡 17장 (맨 위 1장 웨이스트로 공개)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>웨이스트(기준 카드)에서 <b>숫자 ±1</b>인 태블로 카드를 올릴 수 있음</li>
+        <li>무늬 무관. 예: 기준 6이면 5 또는 7 올리기 가능 (연속 연결)</li>
+        <li>K 위에 Q는 OK, K 위에 A는 불가 (순환 없음이 표준 규칙)</li>
+        <li>더 이상 낼 카드 없으면 스톡에서 한 장 뒤집어 기준 갱신</li>
+        <li>스톡 소진 후 남은 태블로 카드 수 = 점수(타수)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        웨이스트: <b>6</b> → 태블로 <b>7</b> 올리기 → 다시 <b>8</b> 올리기 → <b>9</b> → <b>10</b> 연속 4장 제거!<br>
+        막히면 스톡 뒤집어 새 기준 카드 획득
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc solo searchable" data-s="트리피크스 tripeaks 솔리테어 1인 피크 콤보">
+  <div class="gc-head">
+    <div class="gc-ico">⛰️</div>
+    <div class="gc-info">
+      <div class="gc-name">트리피크스</div>
+      <div class="gc-en">TriPeaks</div>
+      <div class="gc-badges"><span class="b b-sol">1인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~10분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">3개의 피크(정상 카드)를 포함한 모든 카드를 기준 카드 ±1로 제거</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">
+        3개의 소형 피라미드 형태(각 3줄, 총 28장), 나머지 24장 스톡<br>
+        맨 아래 줄 카드만 노출된 상태로 시작
+      </div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>스톡 상단을 웨이스트로 공개 → 기준 카드</li>
+        <li>노출된 카드 중 기준 ±1이면 제거 (무늬 무관)</li>
+        <li>연속 제거 시 콤보 점수 증가 (연속 제거 ×배수)</li>
+        <li>더 낼 카드 없으면 스톡에서 뒤집기 (점수 없음)</li>
+        <li>스톡 소진 시 게임 종료. 남은 카드 수만큼 감점</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        기준: <b>5</b> → <b>6</b> → <b>7</b> → <b>8</b> → <b>7</b> → <b>6</b> 연속 6장 제거 = 콤보 보너스!<br>
+        정상(피크) 카드를 제거하면 +추가 점수
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end solo grid -->
+</div><!-- end solo sec -->
+
+
+<!-- ══════════════ 2인 ══════════════ -->
+<div id="tab-two" class="sec">
+<div class="sec-title">👥 2인 게임</div>
+<div class="sec-sub">두 명이 마주 앉아 즐기는 게임. 빠른 반응부터 전략까지 다양.</div>
+<div class="grid">
+
+<div class="gc two searchable" data-s="워 war 전쟁 2인 단순">
+  <div class="gc-head">
+    <div class="gc-ico">⚔️</div>
+    <div class="gc-info">
+      <div class="gc-name">워 (전쟁)</div>
+      <div class="gc-en">War</div>
+      <div class="gc-badges"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span><span class="b b-mul">10~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">상대방의 카드를 모두 빼앗기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">52장을 뒤집어 26장씩 나눔. 각자 앞에 더미 형태로 놓기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>동시에 더미 맨 위 카드를 1장씩 앞면으로 공개</li>
+        <li>높은 숫자 카드를 낸 사람이 두 장 모두 가져감 (자신 더미 아래에 추가)</li>
+        <li>카드 순위: <b>2 &lt; 3 &lt; … &lt; 10 &lt; J &lt; Q &lt; K &lt; A</b></li>
+        <li><b>전쟁 (같은 숫자)</b>: 각각 카드 3장을 엎어두고 4번째 카드 공개 → 높은 쪽이 전부 가져감</li>
+        <li>전쟁 중 전쟁도 가능 (무한 연속)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A: <b class="b-s">♠Q</b> vs B: <b class="r">♥7</b> → A 승리, 2장 획득<br>
+        A: <b class="b-s">♣9</b> vs B: <b class="r">♦9</b> → <b>전쟁!</b><br>
+        각각 카드 3장 엎기 → A: <b class="r">♥K</b> vs B: <b class="b-s">♠6</b> → A가 총 8장 획득
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="스피드 speed spit 2인 속도전">
+  <div class="gc-head">
+    <div class="gc-ico">⚡</div>
+    <div class="gc-info">
+      <div class="gc-name">스피드</div>
+      <div class="gc-en">Speed / Spit</div>
+      <div class="gc-badges"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~15분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">손에 든 카드를 상대보다 먼저 모두 내려놓기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">각 26장. 각자 손패 5장 + 나머지 더미. 가운데 2개의 공유 더미(각 5장)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>동시에 "스피드!" 외치고 시작 (또는 카운트다운)</li>
+        <li>가운데 두 더미 상단 카드 기준으로 <b>숫자 ±1</b>인 손패를 올릴 수 있음</li>
+        <li>무늬 무관. A는 K 또는 2와 연결 (순환 가능)</li>
+        <li>양손 동시 사용 가능, 선착순</li>
+        <li>둘 다 막히면 양쪽 더미에 동시에 새 카드 펼침</li>
+        <li>먼저 손패 0장이 되면 손바닥으로 더미 치며 "스피드!" → 승리</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        가운데 더미: <b>6</b>, <b>J</b><br>
+        내 손패: <b>5</b>, <b>7</b>, <b>Q</b>, <b>10</b> → <b>5</b>(6-1) <b>7</b>(6+1) <b>Q</b>(J+1) <b>10</b>(J-1) 전부 내릴 수 있음!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="슬랩잭 slapjack 잭 2인 손바닥">
+  <div class="gc-head">
+    <div class="gc-ico">👋</div>
+    <div class="gc-info">
+      <div class="gc-name">슬랩잭</div>
+      <div class="gc-en">Slap Jack</div>
+      <div class="gc-badges"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~20분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div><div class="r-txt">가운데 더미를 모두 차지하기</div></div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">26장씩 뒤집어 더미. 가운데 빈 공유 더미 자리</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>번갈아 자신 더미 맨 위를 가운데에 앞면으로 내려놓기</li>
+        <li><b>J가 나오면</b> 먼저 손바닥으로 가운데 더미를 치는 사람이 더미 전체 획득</li>
+        <li>J가 아닌 카드를 쳤을 때 페널티: 자신 더미 최상단 카드 1장을 가운데에 추가</li>
+        <li>더미가 없어진 사람은 다음에 J가 나올 때 먼저 치면 복귀 가능</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A가 <b>3</b> 내려놓기 → B가 <b>9</b> 내려놓기 → A가 <b class="b-s">♠J</b> 내려놓는 순간<br>
+        B가 먼저 손으로 탁! → B가 가운데 더미 전체(지금까지 쌓인 모든 카드) 획득
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="스냅 snap 같은카드 2인">
+  <div class="gc-head">
+    <div class="gc-ico">🤏</div>
+    <div class="gc-info">
+      <div class="gc-name">스냅</div>
+      <div class="gc-en">Snap</div>
+      <div class="gc-badges"><span class="b b-two">2인</span><span class="b b-ez">쉬움</span><span class="b b-mul">5~15분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div><div class="r-txt">상대방 카드를 모두 가져가기</div></div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">26장씩 앞에 더미 (뒤집어 놓음)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>번갈아 자신 더미 맨 위를 앞에 공개 더미에 올리기</li>
+        <li>두 사람의 공개 더미 상단 카드가 <b>같은 숫자</b>이면 먼저 "Snap!" 외치기</li>
+        <li>먼저 외친 사람이 <b>상대방 공개 더미 전체</b>를 가져감</li>
+        <li>실수로 Snap을 외치면 자신 더미 1장을 공개 더미에 추가 (페널티)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A 공개: <b class="r">♥7</b> · B 공개: <b class="b-s">♣7</b> → "Snap!" → 먼저 외친 사람이 B의 공개 더미 전체 획득
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="고피시 go fish 2인 5인 세트 4장">
+  <div class="gc-head">
+    <div class="gc-ico">🎣</div>
+    <div class="gc-info">
+      <div class="gc-name">고피시</div>
+      <div class="gc-en">Go Fish</div>
+      <div class="gc-badges"><span class="b b-two">2~5인</span><span class="b b-ez">쉬움</span><span class="b b-mul">10~20분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">같은 숫자 4장 세트를 가장 많이 모으기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">2인=7장씩, 3~5인=5장씩. 나머지는 가운데 "연못(pool)" 뒤집어 놓기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>자기 차례에 상대를 지정하고 특정 숫자 카드 요청: <b>"7 줘!"</b></li>
+        <li>요청한 숫자를 상대가 갖고 있으면 <b>해당 숫자 카드 전부</b> 넘겨야 함</li>
+        <li>없으면 <b>"Go Fish!"</b> → 요청한 사람이 연못에서 1장 뽑기</li>
+        <li>뽑은 카드가 요청한 숫자면 연속 진행. 아니면 다음 사람 차례</li>
+        <li>같은 숫자 4장 완성 시 공개하고 앞에 세트로 놓기</li>
+        <li>손패 또는 연못이 소진되면 게임 종료. 세트 수 많은 사람 승리</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        내 손: <b class="r">♥5</b> <b class="b-s">♠5</b> 보유 → 상대에게 <b>"5 줘!"</b><br>
+        상대: <b class="r">♦5</b> 보유 → 내게 줌 → 연속으로 다시 요청 가능<br>
+        상대 없음 → "Go Fish!" → 연못에서 뽑기 → <b class="b-s">♣5</b> 뽑히면 4장 세트 완성!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="크레이지에이트 crazy eights 2인 4인 유노 만능패 8">
+  <div class="gc-head">
+    <div class="gc-ico">8️⃣</div>
+    <div class="gc-info">
+      <div class="gc-name">크레이지 에이트</div>
+      <div class="gc-en">Crazy Eights</div>
+      <div class="gc-badges"><span class="b b-two">2~4인</span><span class="b b-ez">쉬움</span><span class="b b-mul">10~20분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div><div class="r-txt">손패를 먼저 모두 내려놓기 (UNO의 원조 게임)</div></div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">7장씩 배분, 나머지 스톡. 맨 위 1장을 공개해 기준 카드로</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>기준 카드와 <b>같은 무늬</b> 또는 <b>같은 숫자</b> 카드를 낼 수 있음</li>
+        <li><b>8은 만능 패</b>: 어느 때나 낼 수 있고 낸 후 원하는 무늬 지정</li>
+        <li>낼 카드 없으면 스톡에서 뽑기 (낼 수 있으면 바로 냄)</li>
+        <li>변형 규칙: <b>2</b> 내면 다음 사람 2장 뽑기, <b>Q</b>=건너뛰기</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        기준: <b class="r">♥6</b> → 내 손패 <b class="r">♥J</b>(같은 무늬) 또는 <b class="b-s">♠6</b>(같은 숫자) 낼 수 있음<br>
+        <b>8</b> 내며 "스페이드!" 선언 → 다음 사람은 ♠ 카드나 8만 낼 수 있음<br>
+        손패 마지막 장 낼 때 "라스트!" 외치기 (안 외치면 2장 패널티)
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc two searchable" data-s="진러미 gin rummy 2인 멜드 세트 런 노크 진">
+  <div class="gc-head">
+    <div class="gc-ico">🍸</div>
+    <div class="gc-info">
+      <div class="gc-name">진 러미</div>
+      <div class="gc-en">Gin Rummy</div>
+      <div class="gc-badges"><span class="b b-two">2인</span><span class="b b-md">중간</span><span class="b b-mul">15~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">멜드를 완성해 미멜드 패 점수를 0에 가깝게 만든 뒤 노크. 100점 먼저 획득</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">멜드 종류</div>
+      <div class="r-txt">
+        <b>세트(Set)</b>: 같은 숫자 3~4장 (예: 7♠7♥7♦)<br>
+        <b>런(Run)</b>: 같은 무늬 연속 3장+ (예: ♦4-5-6-7)
+      </div>
+    </div>
+    <div class="rule-sec"><div class="r-label">카드 값</div>
+      <div class="r-txt">A=1, 2~10=액면, J/Q/K=10</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>10장씩 배분. 스톡 1장 공개(웨이스트)</li>
+        <li>차례: 스톡 또는 웨이스트 상단 1장 뽑기 → 손패 1장 버리기</li>
+        <li><b>노크(Knock)</b>: 미멜드 패 합이 10 이하면 가능 → 멜드 공개, 상대도 멜드 공개</li>
+        <li><b>진(Gin)</b>: 미멜드 패 0장일 때 → 보너스 25점</li>
+        <li>노크 시: 내 미멜드 합 - 상대 미멜드 합 = 점수 획득</li>
+        <li>상대 미멜드가 더 낮으면(언더컷) 상대가 10점 보너스 획득</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        내 손: <b class="b-s">♠7♠8♠9</b>(런) + <b class="r">♥K♦K♣K</b>(세트) + 미멜드 <b class="r">♥3♣2</b><br>
+        미멜드 합 = 3+2 = 5 → 노크 가능!<br>
+        상대 미멜드 합이 8이면 → 내가 8-5=3점 획득<br>
+        미멜드 0장이면 → 진! 25점 보너스
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end two grid -->
+</div><!-- end two sec -->
+
+
+<!-- ══════════════ 다인 ══════════════ -->
+<div id="tab-multi" class="sec">
+<div class="sec-title">🎉 다인 게임 (3인 이상)</div>
+<div class="sec-sub">3명 이상이 즐기는 게임. 파티, 가족, 친구들과 플레이.</div>
+<div class="grid">
+
+<div class="gc multi searchable" data-s="블랙잭 blackjack 21 카지노 딜러 히트 스탠드">
+  <div class="gc-head">
+    <div class="gc-ico">🎰</div>
+    <div class="gc-info">
+      <div class="gc-name">블랙잭</div>
+      <div class="gc-en">Blackjack / 21</div>
+      <div class="gc-badges"><span class="b b-mul">2~8인</span><span class="b b-ez">쉬움</span><span class="b b-mul">무제한</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">패 합이 <b>21 이하</b>로 딜러보다 높게. 21 초과(버스트)하면 즉시 패배</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">카드 값</div>
+      <div class="r-txt">A=1 또는 11(유리한 쪽), J/Q/K=10, 나머지=액면값</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>딜러가 각 플레이어에게 앞면 2장, 딜러는 1앞+1뒤 배분</li>
+        <li><b>블랙잭</b>: 첫 2장이 A + 10점 패 = 즉시 승리 (베팅액 1.5배 지급)</li>
+        <li>각 플레이어 선택: <b>히트</b>(1장 더) / <b>스탠드</b>(그대로) / <b>더블다운</b>(베팅 2배 + 1장만) / <b>스플릿</b>(첫 2장이 같을 때 두 패로 분리)</li>
+        <li>딜러는 합 16 이하면 반드시 히트, 17 이상이면 스탠드 (규칙 고정)</li>
+        <li>딜러 버스트 시 남은 플레이어 전원 승리</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        플레이어: <b class="r">♥A</b> + <b class="b-s">♠7</b> = 소프트 18 (A=11 → 18, A=1 → 8)<br>
+        히트 → <b class="r">♦5</b> → 18 또는 13 → 스탠드(18 선택)<br>
+        딜러: 공개 카드 <b class="b-s">♠9</b> + 뒷면 → 뒤집으면 <b class="r">♥8</b> = 17 → 스탠드<br>
+        결과: 플레이어 18 > 딜러 17 → 플레이어 승리
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="하츠 hearts 4인 점수 하트 스페이드 퀸 슈팅더문">
+  <div class="gc-head">
+    <div class="gc-ico">♥️</div>
+    <div class="gc-info">
+      <div class="gc-name">하츠</div>
+      <div class="gc-en">Hearts</div>
+      <div class="gc-badges"><span class="b b-mul">4인</span><span class="b b-md">중간</span><span class="b b-mul">30~60분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">♥ 1점씩, ♠Q 13점 — <b>점수를 최소화.</b> 100점 이상이면 게임 종료, 최저점 승리</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">13장씩 배분. 시작 전 3장씩 왼쪽 플레이어에게 전달 (카드 교환)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>♣2를 가진 사람이 선공 (♣2로 시작)</li>
+        <li>선공 카드 무늬를 따라야 함 (없으면 아무 패나)</li>
+        <li>같은 무늬 중 가장 높은 카드가 트릭 획득 → 해당 플레이어가 다음 선공</li>
+        <li>♥ 또는 ♠Q는 선공으로 낼 수 없음 (첫 판 제한, 이후 자유)</li>
+        <li>♥를 버릴 수 있게 되면 "하트 브레이크" 선언됨</li>
+        <li><b class="gold">슈팅 더 문</b>: ♥ 13장 + ♠Q 전부 획득 시 자신 0점, 나머지 3명에게 26점씩</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A가 ♣10 선공 → B: ♣J → C: <b class="r">♥3</b>(♣ 없어서 버림) → D: ♣Q<br>
+        → D가 트릭 획득 (♣ 중 Q가 최고), C는 ♥3 = 1점 D에게 부과<br>
+        <b class="gold">슈팅더문 시도</b>: 한 사람이 모든 ♥+♠Q 먹기 → 성공 시 엄청난 역전!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="스페이드 spades 4인 팀 트릭 입찰 트럼프">
+  <div class="gc-head">
+    <div class="gc-ico">♠️</div>
+    <div class="gc-info">
+      <div class="gc-name">스페이드</div>
+      <div class="gc-en">Spades</div>
+      <div class="gc-badges"><span class="b b-mul">4인(2팀)</span><span class="b b-md">중간</span><span class="b b-mul">30~60분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">팀이 입찰한 트릭 수를 정확히 획득. 500점 먼저 달성한 팀 승리</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">13장씩. 2인 팀(맞은편끼리). ♠가 항상 가장 강한 트럼프</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>게임 시작 전 각 플레이어가 따낼 트릭 수 입찰 (0~13)</li>
+        <li>팀 입찰 합계 = 목표 트릭 수</li>
+        <li>선공 무늬 따라가야 함. ♠는 없을 때만 낼 수 있음(하트 브레이크처럼)</li>
+        <li>입찰 이상 트릭 달성 시: 입찰×10점 + 초과 트릭은 백(Bag)으로 기록</li>
+        <li>입찰 미달 시: 입찰×10점 감점</li>
+        <li><b>닐(Nil)</b>: 0트릭 입찰 성공 시 100점, 실패 시 -100점</li>
+        <li>백 10개 누적되면 100점 감점</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        팀 A 입찰: 나 3 + 파트너 4 = 목표 7트릭<br>
+        결과: 9트릭 달성 → 7×10=70점 + 백 2개<br>
+        팀 B 입찰: 5트릭 → 4트릭만 달성 → -50점
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="러미 rummy 2인 6인 멜드 세트 런 버리기">
+  <div class="gc-head">
+    <div class="gc-ico">🎴</div>
+    <div class="gc-info">
+      <div class="gc-name">러미</div>
+      <div class="gc-en">Rummy</div>
+      <div class="gc-badges"><span class="b b-mul">2~6인</span><span class="b b-md">중간</span><span class="b b-mul">20~40분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">손패를 전부 멜드(세트/런)로 내려놓기. 먼저 비우는 사람이 해당 라운드 승리</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">2인=10장, 3~4인=7장, 5~6인=6장. 스톡 1장 공개(웨이스트)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>차례: 스톡 또는 웨이스트 상단 1장 뽑기</li>
+        <li>멜드 가능 시 테이블에 내려놓기 (<b>세트</b>: 같은 숫자 3~4장, <b>런</b>: 같은 무늬 연속 3장+)</li>
+        <li>기존 테이블 멜드에 연결해 추가(레잉 오프)도 가능</li>
+        <li>손패에서 1장 웨이스트에 버리기 (턴 종료)</li>
+        <li>손패 0장이 되면 라운드 종료 → 상대 손패 점수 합산이 내 점수</li>
+        <li>100점(또는 합의 목표) 먼저 달성한 사람이 패배(낮은 점수 목표)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        손패: <b class="b-s">♠4♠5♠6</b>(런 가능) + <b class="r">♥9♦9♣9</b>(세트 가능) + <b class="r">♥J♦K</b>(미멜드)<br>
+        런, 세트 내려놓기 → 남은 ♥J♦K 버리려면 한 장씩 차례에 버리기<br>
+        상대가 런에 <b class="r">♥7</b> 추가 가능하면 레잉 오프!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="세븐스 sevens 팬탄 fan tan 7 3인 8인 무늬 이어붙이기">
+  <div class="gc-head">
+    <div class="gc-ico">7️⃣</div>
+    <div class="gc-info">
+      <div class="gc-name">세븐스 (팬탄)</div>
+      <div class="gc-en">Sevens / Fan Tan</div>
+      <div class="gc-badges"><span class="b b-mul">3~8인</span><span class="b b-ez">쉬움</span><span class="b b-mul">15~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">손패를 먼저 모두 내려놓기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">52장을 균등 배분 (남는 카드는 각자 칩으로 내놓기)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li><b>♦7</b>을 가진 사람이 먼저 내려놓아 게임 시작</li>
+        <li>차례에 낼 수 있는 카드:
+          <ul class="dots" style="margin-left:14px;">
+            <li>이미 내려진 무늬의 <b>양쪽 연장</b> (예: ♦7이 있으면 ♦6 또는 ♦8)</li>
+            <li>새 무늬의 <b>7</b> (예: ♥7, ♠7, ♣7)</li>
+          </ul>
+        </li>
+        <li>낼 카드가 없으면 <b>패스</b> (3번 패스하면 탈락, 규칙에 따라)</li>
+        <li>각 무늬가 A ↔ K 방향으로 완성될 때까지 이어붙이기</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        테이블: <b class="r">♦5-♦6-♦7-♦8-♦9</b>, <b class="b-s">♠7</b><br>
+        낼 수 있는 카드: ♦4, ♦10, ♠6, ♠8, ♥7, ♣7<br>
+        ♦4 내려놓기 → 다음 사람이 ♦3 내릴 수 있음
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="올드메이드 도둑잡기 old maid 2인 8인 짝 홀패">
+  <div class="gc-head">
+    <div class="gc-ico">👒</div>
+    <div class="gc-info">
+      <div class="gc-name">올드 메이드 / 도둑잡기</div>
+      <div class="gc-en">Old Maid</div>
+      <div class="gc-badges"><span class="b b-mul">2~8인</span><span class="b b-ez">쉬움</span><span class="b b-mul">10~20분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">짝 없는 카드(올드 메이드)를 피하기. 마지막에 홀 카드 든 사람이 패배</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt"><b>♦Q 1장 제거</b>(♠Q·♥Q·♣Q는 유지) 후 전부 균등 배분. 짝(같은 숫자 동색)은 즉시 공개해 버리기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>처음에 손패에서 짝이 있는 모든 카드 제거(앞면으로 내려놓기)</li>
+        <li>차례에 왼쪽 플레이어 손패를 <b>뒤집어</b> 1장 뽑기</li>
+        <li>뽑은 카드가 짝이 되면 제거. 아니면 그대로 보유</li>
+        <li>계속 진행하다 2장이 남은 사람은 상대가 1장 뽑음</li>
+        <li>마지막에 <b>♠Q(올드 메이드)를 든 사람</b>이 패배</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        내 손: <b class="b-s">♠Q</b>(올드 메이드), <b class="r">♥K</b>, <b class="b-s">♣K</b> 보유<br>
+        상대가 내 손에서 뽑기 → <b class="r">♥K</b> 뽑힘 → 상대 손에서 ♣K 짝 맞춰 제거<br>
+        <b class="b-s">♠Q</b>만 남을수록 위험!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="다우트 거짓말쟁이 cheat bluff 3인 8인 의심">
+  <div class="gc-head">
+    <div class="gc-ico">🤥</div>
+    <div class="gc-info">
+      <div class="gc-name">다우트 / 거짓말쟁이</div>
+      <div class="gc-en">Cheat / Bluff / I Doubt It</div>
+      <div class="gc-badges"><span class="b b-mul">3~8인</span><span class="b b-ez">쉬움</span><span class="b b-mul">15~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">손패를 먼저 모두 내려놓기 — 거짓말을 해도 됩니다!</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">52장 전부 균등 배분. 가운데 버림 더미(처음엔 비어 있음)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>첫 플레이어: "A 1장" 선언 후 뒤집어 가운데 내려놓기 (실제로 A가 아니어도 됨)</li>
+        <li>다음 플레이어: "2 ○장" 선언 → 그 다음 "3 ○장" → 순서대로 A→2→3→…→K→A 반복</li>
+        <li>1~4장까지 선언 가능 (같은 숫자를 여러 장 낼 수 있다고 선언)</li>
+        <li>의심되면 누구나 즉시 <b>"다우트!"</b> 외치기 → 마지막 낸 카드 확인</li>
+        <li>거짓말이면: 낸 플레이어가 <b>버림 더미 전체</b> 가져감</li>
+        <li>진실이면: "다우트!" 외친 플레이어가 버림 더미 전체 가져감</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A: "A 2장" 내려놓기 (실제론 A 1장 + 5 1장)<br>
+        B: "2 3장" (실제론 2 1장 + J 1장 + Q 1장 = 대담한 거짓말!)<br>
+        C: "다우트!" → 확인 → B 거짓말 → B가 더미 전체(지금까지 쌓인 카드) 인수
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="서티원 31 thirty one 2인 9인 합 같은무늬">
+  <div class="gc-head">
+    <div class="gc-ico">3️⃣1️⃣</div>
+    <div class="gc-info">
+      <div class="gc-name">서티원</div>
+      <div class="gc-en">Thirty-One (31)</div>
+      <div class="gc-badges"><span class="b b-mul">2~9인</span><span class="b b-ez">쉬움</span><span class="b b-mul">10~20분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt"><b>같은 무늬 3장의 합을 31</b>에 최대한 가깝게. A=11, J/Q/K=10</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">3장씩 배분. 스톡 1장 공개(웨이스트). 각자 칩(생명) 3개</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>차례: 스톡 또는 웨이스트 상단 1장 뽑기 → 손패 1장 버리기</li>
+        <li><b>노크(Knock)</b>: 자신이 현재 패로 만족하면 노크 → 나머지 전원 한 번씩 더 기회</li>
+        <li>누군가 <b>31 달성</b> 시 즉시 공개 → 나머지 전원 칩 1개 잃음</li>
+        <li>라운드 종료 시 가장 낮은 패를 가진 사람이 칩 잃음</li>
+        <li>3장이 모두 같은 숫자면 = 30.5점(특수 조합)으로 처리하는 경우도 있음</li>
+        <li>칩 전부 잃으면 탈락. 마지막 남은 사람이 승리</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        손패: <b class="r">♥A(11) ♥9(9) ♥3(3)</b> = ♥ 합계 23<br>
+        스톡에서 <b class="r">♥K(10)</b> 뽑기 → ♥3 버리기 → ♥A+♥K+♥9 = 30<br>
+        노크! 다음 라운드에 상대들이 31 못 만들면 내가 최고점 → 상대 중 최저점자 칩 손실
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="이집션랫스크류 egyptian rat screw 2인 8인 잭 더블 샌드위치 슬랩">
+  <div class="gc-head">
+    <div class="gc-ico">🐀</div>
+    <div class="gc-info">
+      <div class="gc-name">이집션 랫스크류</div>
+      <div class="gc-en">Egyptian Rat Screw (ERS)</div>
+      <div class="gc-badges"><span class="b b-mul">2~8인</span><span class="b b-md">중간</span><span class="b b-mul">15~40분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">모든 카드를 차지하기 (전쟁 + 슬랩 혼합)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">52장 균등 배분. 가운데 공유 더미</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>차례대로 가운데 더미에 카드 공개</li>
+        <li><b>그림패 규칙</b>: J(1장), Q(2장), K(3장), A(4장) 내면 → 다음 사람이 그 횟수 안에 그림패를 내야 함. 실패하면 그림패 낸 사람이 더미 전체 획득</li>
+        <li><b>슬랩 조건</b> (먼저 손 탁! → 더미 획득):
+          <ul class="dots">
+            <li><b>더블</b>: 연속 같은 숫자 (7 위에 7)</li>
+            <li><b>샌드위치</b>: 숫자-다른숫자-같은숫자 (7-K-7)</li>
+            <li><b>합 10</b>: 상단 두 장 합이 10 (3+7, 4+6 등)</li>
+          </ul>
+        </li>
+        <li>잘못 슬랩하면 페널티 카드 2장 추가</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        A가 <b class="b-s">♠J</b> 내기 → B가 1장 기회 → <b class="r">♥5</b>(그림패 아님) → A가 더미 전체 획득<br>
+        더미: …<b>9</b>…<b class="r">♥6</b> → <b class="r">♦9</b> 공개 → 샌드위치! 슬랩하는 사람이 더미 차지
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="카지노 casino 2인 4인 포획 15 점수">
+  <div class="gc-head">
+    <div class="gc-ico">🏛️</div>
+    <div class="gc-info">
+      <div class="gc-name">카지노</div>
+      <div class="gc-en">Casino</div>
+      <div class="gc-badges"><span class="b b-mul">2~4인</span><span class="b b-md">중간</span><span class="b b-mul">20~30분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">카드와 특수 패를 더 많이 포획. ♠2(2점), ♦10(1점) 보너스 있음</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">각 4장씩, 가운데 4장 앞면 공개. A=1, 2~10=액면값, J/Q/K=포획 불가(단독 매칭만)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>차례에 손패 1장으로 가운데 카드 포획:
+          <ul class="dots">
+            <li><b>매칭</b>: 같은 숫자 카드로 가져가기</li>
+            <li><b>합산 포획</b>: 손패 카드 = 가운데 여러 카드의 합 (예: 9로 4+5 가져가기)</li>
+            <li><b>빌드</b>: 나중에 포획하기 위해 합산 조합 만들어 두기 ("3 빌드")</li>
+          </ul>
+        </li>
+        <li>포획 못하면 가운데에 1장 버리기</li>
+        <li>모든 손패 소진 시 4장씩 다시 배분 (덱 소진까지)</li>
+        <li>마지막에 가운데 남은 카드는 마지막으로 포획한 사람이 가져감</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">점수</div>
+      <div class="r-txt">카드 27장 이상=3점, ♠=1점, ♦10=2점, ♠2=1점, A=각 1점, 스윕(한 번에 전부)=1점</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        가운데: <b>4, 5, 3, K</b> / 내 손: <b>9, K</b><br>
+        <b>9</b>로 4+5=9 포획 → <b>K</b>로 K 매칭 포획<br>
+        가운데 3만 남아있으면 다음 차례 활용
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc multi searchable" data-s="위스트 whist 4인 팀 트릭 트럼프 13">
+  <div class="gc-head">
+    <div class="gc-ico">🥃</div>
+    <div class="gc-info">
+      <div class="gc-name">위스트</div>
+      <div class="gc-en">Whist</div>
+      <div class="gc-badges"><span class="b b-mul">4인(2팀)</span><span class="b b-md">중간</span><span class="b b-mul">30~60분</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">13트릭 중 더 많이 따내는 팀이 승리. 7트릭 이상이면 점수 획득</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">13장씩 배분. <b>마지막 카드를 모두에게 공개</b> → 그 무늬가 트럼프. 맞은편끼리 팀</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">규칙</div>
+      <ol class="steps">
+        <li>선공이 아무 카드나 내고, 나머지는 같은 무늬 따라가야 함</li>
+        <li>해당 무늬 없으면 트럼프 또는 다른 무늬 (다른 무늬는 트릭 획득 불가)</li>
+        <li>같은 무늬 중 최고 패가 트릭 획득 (트럼프가 있으면 트럼프 최고 패)</li>
+        <li>트릭 획득자가 다음 선공</li>
+        <li>7트릭=1점, 8=2점, …13=7점. 게임 목표 점수 합의(보통 5 또는 7점)</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        트럼프: ♥ / 선공: <b class="b-s">♠A</b><br>
+        B: <b class="b-s">♠7</b>, C: <b class="b-s">♠K</b>, D: ♠ 없어서 <b class="r">♥3</b>(트럼프!)<br>
+        → D가 트릭 획득 (트럼프 3이 ♠A, ♠K, ♠7 전부 이김)
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end multi grid -->
+</div><!-- end multi sec -->
+
+
+<!-- ══════════════ 포커 변형 ══════════════ -->
+<div id="tab-poker" class="sec">
+<div class="sec-title">♠ 포커 변형 종류</div>
+<div class="sec-sub">같은 52장으로 즐기는 다양한 포커 변형. 패 순위는 '기본 레퍼런스' 탭 참조.</div>
+<div class="grid">
+
+<div class="gc poker searchable" data-s="텍사스홀덤 texas holdem 포커 커뮤니티 플랍 턴 리버 2인 10인">
+  <div class="gc-head">
+    <div class="gc-ico">🎯</div>
+    <div class="gc-info">
+      <div class="gc-name">텍사스 홀덤</div>
+      <div class="gc-en">Texas Hold'em</div>
+      <div class="gc-badges"><span class="b b-pok">2~10인</span><span class="b b-md">중간</span><span class="b b-mul">세계 표준 포커</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">홀카드 2장 + 커뮤니티 5장에서 <b>최고의 5장 조합</b>으로 승리 (또는 블러핑)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">준비</div>
+      <div class="r-txt">딜러 버튼 지정. 왼쪽 1번째=스몰 블라인드, 2번째=빅 블라인드(강제 베팅)</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">게임 진행</div>
+      <ol class="steps">
+        <li><b>프리플랍</b>: 홀카드 2장 배분 → 베팅 라운드 (콜/레이즈/폴드)</li>
+        <li><b>플랍</b>: 커뮤니티 3장 공개 → 베팅</li>
+        <li><b>턴</b>: 커뮤니티 4번째 카드 공개 → 베팅</li>
+        <li><b>리버</b>: 커뮤니티 5번째 카드 공개 → 최종 베팅</li>
+        <li><b>쇼다운</b>: 남은 플레이어 패 공개 → 최고 5장 조합 비교 → 승자가 팟 획득</li>
+        <li>올인 가능. 사이드 팟 규칙 존재</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        내 홀카드: <b class="b-s">♠A♠K</b><br>
+        플랍: <b class="b-s">♠Q♠J</b> <b class="r">♥10</b> → 로열 플러시 완성! (♠A-K-Q-J + 필요 없음, 이미 스트레이트 플러시 성립)<br>
+        턴: <b class="r">♦2</b> / 리버: <b class="b-s">♣3</b><br>
+        최종 5장: ♠A♠K♠Q♠J♥10 = <b class="gold">로열 플러시</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc poker searchable" data-s="5카드드로우 five card draw 포커 클래식 2인 6인 교체">
+  <div class="gc-head">
+    <div class="gc-ico">🃏</div>
+    <div class="gc-info">
+      <div class="gc-name">5카드 드로우</div>
+      <div class="gc-en">5-Card Draw</div>
+      <div class="gc-badges"><span class="b b-pok">2~6인</span><span class="b b-ez">쉬움</span><span class="b b-mul">클래식 포커</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">5장 중 원하는 카드를 교체해 최고 패 만들기</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">게임 진행</div>
+      <ol class="steps">
+        <li>앤티(강제 베팅) 후 각자 5장 배분</li>
+        <li><b>1차 베팅</b>: 콜/레이즈/폴드</li>
+        <li><b>드로우</b>: 원하는 카드 버리고 같은 수 교체 (최대 3장, A 보유 시 4장)</li>
+        <li><b>2차 베팅</b>: 최종 베팅</li>
+        <li><b>쇼다운</b>: 패 공개 → 최고 패 승리</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        손패: <b class="r">♥K♦K</b> + <b class="b-s">♠7♣3♣J</b><br>
+        ♠7♣3♣J 버리고 3장 교체 → <b class="r">♥K♦K</b> + <b class="b-s">♣K</b> + 2장<br>
+        → 트리플 K 달성! (또는 더 운이 좋으면 포카드)
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc poker searchable" data-s="세븐카드스터드 seven card stud 포커 앞면 뒷면 2인 8인">
+  <div class="gc-head">
+    <div class="gc-ico">👁️</div>
+    <div class="gc-info">
+      <div class="gc-name">세븐카드 스터드</div>
+      <div class="gc-en">7-Card Stud</div>
+      <div class="gc-badges"><span class="b b-pok">2~8인</span><span class="b b-md">중간</span><span class="b b-mul">커뮤니티 없음</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">특징</div>
+      <div class="r-txt">커뮤니티 카드 없이 개인 7장으로 진행. 홀덤 이전의 표준 포커</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">게임 진행</div>
+      <ol class="steps">
+        <li><b>써드 스트리트</b>: 뒷면 2장 + 앞면 1장 배분. 앞면 최저 패가 브링인(강제 소액 베팅)</li>
+        <li><b>포스~식스 스트리트</b>: 앞면 카드 3장 추가 (총 앞면 4장), 각 라운드마다 베팅</li>
+        <li><b>세븐스 스트리트(리버)</b>: 7번째 카드를 <b>뒷면</b>으로 배분 → 최종 베팅</li>
+        <li>쇼다운: 7장 중 최고 5장 조합 비교</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        내 패: 뒷면<b class="b-s">♠A♠K</b> / 앞면 <b class="b-s">♠Q♠J♣5</b> / 뒷면 <b class="b-s">♠10</b><br>
+        7장: ♠A♠K♠Q♠J♣5♠10<br>
+        최고 5장: <b class="gold">♠A♠K♠Q♠J♠10 = 로열 플러시!</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc poker searchable" data-s="오마하 omaha 포커 홀카드 4장 커뮤니티 2인 10인">
+  <div class="gc-head">
+    <div class="gc-ico">🌅</div>
+    <div class="gc-info">
+      <div class="gc-name">오마하</div>
+      <div class="gc-en">Omaha Hold'em</div>
+      <div class="gc-badges"><span class="b b-pok">2~10인</span><span class="b b-md">중간</span><span class="b b-mul">홀덤 강화판</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">홀덤과의 차이</div>
+      <div class="r-txt">홀카드 <b>4장</b>. 반드시 홀카드 중 <b>정확히 2장</b> + 커뮤니티 <b>정확히 3장</b> 사용</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">게임 진행</div>
+      <ol class="steps">
+        <li>홀카드 <b>4장</b> 배분 (홀덤은 2장)</li>
+        <li>진행은 텍사스 홀덤과 동일: 프리플랍→플랍→턴→리버→쇼다운</li>
+        <li>쇼다운 시 반드시 홀카드 2장 + 커뮤니티 3장 조합으로만 패 구성</li>
+        <li>강한 패가 자주 나오므로 원페어·투페어로는 승리 어려움</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        홀카드: <b class="b-s">♠A♠K</b> <b class="r">♥Q♦J</b><br>
+        커뮤니티: <b class="b-s">♠Q♠J♣10</b> <b class="r">♥2♦3</b><br>
+        → 사용 조합: 홀카드 <b class="b-s">♠A♠K</b> + 커뮤니티 <b class="b-s">♠Q♠J♣10</b> = 스트레이트 (A-K-Q-J-10)<br>
+        ※ 홀카드 4장 모두 사용 불가! 반드시 2장만
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gc poker searchable" data-s="3카드포커 three card poker 포커 카지노 딜러 3장">
+  <div class="gc-head">
+    <div class="gc-ico">3️⃣</div>
+    <div class="gc-info">
+      <div class="gc-name">3카드 포커</div>
+      <div class="gc-en">3-Card Poker</div>
+      <div class="gc-badges"><span class="b b-pok">1~다수 vs 딜러</span><span class="b b-ez">쉬움</span><span class="b b-mul">카지노 게임</span></div>
+    </div>
+  </div>
+  <div class="gc-body">
+    <div class="rule-sec"><div class="r-label">목표</div>
+      <div class="r-txt">3장만으로 딜러보다 높은 패 구성</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">패 순위 (3카드 전용)</div>
+      <div class="r-txt">스트레이트 플러시 > <b>트리플</b>(3카드에서 특이하게 2위) > 스트레이트 > 플러시 > <b>페어</b> > 하이카드</div>
+    </div>
+    <div class="rule-sec"><div class="r-label">게임 진행</div>
+      <ol class="steps">
+        <li>앤티 베팅 후 플레이어·딜러 각 3장 배분</li>
+        <li>플레이어: 패 확인 후 <b>폴드</b>(앤티 잃음) 또는 <b>플레이</b>(앤티 동액 추가 베팅)</li>
+        <li>딜러 자격: Q 이상 패 보유 시 자격 있음 (없으면 앤티만 지급)</li>
+        <li>딜러 자격 있고 플레이어 승리: 앤티+플레이 베팅 1:1 지급</li>
+        <li><b>페어 플러스</b>: 별도 사이드벳. 페어 이상이면 보너스 지급</li>
+      </ol>
+    </div>
+    <div class="rule-sec"><div class="r-label">예시</div>
+      <div class="ex-box">
+        플레이어: <b class="b-s">♠J♠Q♠K</b> = 스트레이트 플러시!<br>
+        딜러: <b class="r">♥9♦K♣A</b> = 하이카드 A<br>
+        → 플레이어 압도적 승리. 페어 플러스 보너스도 받음
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end poker grid -->
+</div><!-- end poker sec -->
+
+
+<!-- ══════════════ 기본 레퍼런스 ══════════════ -->
+<div id="tab-ref" class="sec">
+<div class="sec-title">📖 기본 레퍼런스</div>
+<div class="sec-sub">트럼프 카드 구성, 무늬·숫자 설명, 포커 패 순위 전체 표.</div>
+
+<div class="sub-hdr">카드 구성</div>
+<div class="grid-wide">
+<div class="gc">
+  <div class="gc-head"><div class="gc-ico">🃏</div><div class="gc-info"><div class="gc-name">표준 트럼프 카드 1묶음 (52장)</div></div></div>
+  <div class="gc-body">
+    <div class="suit-demo">
+      <div class="suit-item"><div class="suit-big b-s">♠</div><div>스페이드 (Spades)<br>13장</div></div>
+      <div class="suit-item"><div class="suit-big r">♥</div><div>하트 (Hearts)<br>13장</div></div>
+      <div class="suit-item"><div class="suit-big r">♦</div><div>다이아몬드 (Diamonds)<br>13장</div></div>
+      <div class="suit-item"><div class="suit-big b-s">♣</div><div>클럽 (Clubs)<br>13장</div></div>
+    </div>
+    <div class="r-txt" style="margin-top:10px;">
+      각 무늬 13장: <b>A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J(잭), Q(퀸), K(킹)</b><br>
+      총 52장 + 조커 2장(대부분 게임에서 미사용)<br>
+      <b>빨간 패</b>: ♥, ♦ / <b>검정 패</b>: ♠, ♣<br>
+      무늬 간 순위: 대부분 게임에서 무늬 서열 없음. 스페이드 계열 게임에서 ♠가 최강
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="sub-hdr">포커 패 순위 (5장 기준, 높은 순)</div>
+<div class="gc" style="max-width:800px;">
+  <div class="gc-body" style="padding:0;">
+    <table class="rank-table">
+      <tr><th>순위</th><th>패 이름</th><th>구성</th><th>예시</th></tr>
+      <tr><td class="rn">1위</td><td class="rd">로열 플러시 (Royal Flush)</td><td class="rd">같은 무늬 A-K-Q-J-10</td><td class="re"><span class="b-s">♠A♠K♠Q♠J♠10</span></td></tr>
+      <tr><td class="rn">2위</td><td class="rd">스트레이트 플러시 (Straight Flush)</td><td class="rd">같은 무늬 5장 연속</td><td class="re"><span class="r">♥7♥8♥9♥10♥J</span></td></tr>
+      <tr><td class="rn">3위</td><td class="rd">포카드 (Four of a Kind)</td><td class="rd">같은 숫자 4장</td><td class="re"><span class="b-s">♠K♣K</span><span class="r">♥K♦K</span>+1</td></tr>
+      <tr><td class="rn">4위</td><td class="rd">풀하우스 (Full House)</td><td class="rd">트리플 + 페어</td><td class="re"><span class="r">♥A♦A♣A</span> + <span class="b-s">♠9♣9</span></td></tr>
+      <tr><td class="rn">5위</td><td class="rd">플러시 (Flush)</td><td class="rd">같은 무늬 5장</td><td class="re"><span class="r">♦2♦6♦8♦J♦K</span></td></tr>
+      <tr><td class="rn">6위</td><td class="rd">스트레이트 (Straight)</td><td class="rd">무늬 무관 5장 연속</td><td class="re"><span class="b-s">♠5</span><span class="r">♥6♦7</span><span class="b-s">♣8</span><span class="r">♥9</span></td></tr>
+      <tr><td class="rn">7위</td><td class="rd">트리플 (Three of a Kind)</td><td class="rd">같은 숫자 3장</td><td class="re"><span class="r">♥Q♦Q♣Q</span> + 2장</td></tr>
+      <tr><td class="rn">8위</td><td class="rd">투페어 (Two Pair)</td><td class="rd">페어 2개</td><td class="re"><span class="b-s">♠J♣J</span> + <span class="r">♥8♦8</span> + 1</td></tr>
+      <tr><td class="rn">9위</td><td class="rd">원페어 (One Pair)</td><td class="rd">같은 숫자 2장</td><td class="re"><span class="r">♥A♦A</span> + 3장</td></tr>
+      <tr><td class="rn">10위</td><td class="rd">하이카드 (High Card)</td><td class="rd">위 패 없음, 최고 카드 비교</td><td class="re"><span class="b-s">♠A</span><span class="r">♥J</span><span class="b-s">♣9♠6</span><span class="r">♦4</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="sub-hdr">게임별 카드 값 비교</div>
+<div class="gc" style="max-width:800px;">
+  <div class="gc-body" style="padding:0;">
+    <table class="rank-table">
+      <tr><th>게임</th><th>A 값</th><th>J/Q/K 값</th><th>기타</th></tr>
+      <tr><td class="rn">블랙잭</td><td class="rd">1 또는 11 (선택)</td><td class="rd">모두 10</td><td class="rd">2~10 = 액면</td></tr>
+      <tr><td class="rn">진 러미</td><td class="rd">1</td><td class="rd">모두 10</td><td class="rd">2~10 = 액면</td></tr>
+      <tr><td class="rn">서티원</td><td class="rd">11</td><td class="rd">모두 10</td><td class="rd">2~10 = 액면</td></tr>
+      <tr><td class="rn">포커</td><td class="rd">최고(K 위) 또는 1(A-2-3-4-5)</td><td class="rd">J<Q<K (서열만)</td><td class="rd">패 순위로 판단</td></tr>
+      <tr><td class="rn">피라미드</td><td class="rd">1</td><td class="rd">J=11, Q=12, K=13</td><td class="rd">K는 단독 제거</td></tr>
+      <tr><td class="rn">워/고피시</td><td class="rd">최고 (K보다 높음)</td><td class="rd">J<Q<K<A (서열)</td><td class="rd">숫자 서열만 사용</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="sub-hdr">트릭 게임 핵심 용어</div>
+<div class="gc" style="max-width:800px;">
+  <div class="gc-body" style="padding:0;">
+    <table class="rank-table">
+      <tr><th>용어</th><th>설명</th></tr>
+      <tr><td class="rn">트릭 (Trick)</td><td class="rd">한 라운드 — 각 플레이어가 1장씩 내고 최고 패가 전부 획득</td></tr>
+      <tr><td class="rn">트럼프 (Trump)</td><td class="rd">선공 무늬를 이기는 특별 무늬. 낮은 트럼프도 다른 무늬 최고패를 이김</td></tr>
+      <tr><td class="rn">선공 (Lead)</td><td class="rd">해당 트릭에서 첫 번째로 카드를 내는 행위 및 플레이어</td></tr>
+      <tr><td class="rn">팔로우 수트 (Follow Suit)</td><td class="rd">선공 무늬를 따라가야 하는 규칙</td></tr>
+      <tr><td class="rn">버프 (Void)</td><td class="rd">특정 무늬가 손패에 전혀 없는 상태 → 트럼프 낼 수 있음</td></tr>
+      <tr><td class="rn">슬러프 (Sluff)</td><td class="rd">이길 수 없는 카드를 버리는 행위 (점수 피하기 등)</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- end ref sec -->
+
+</div><!-- #main -->
+
+<script>
+function sw(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+  doSearch(document.getElementById('search').value);
+}
+
+function doSearch(q){
+  q=q.trim().toLowerCase();
+  const active=document.querySelector('.sec.on');
+  if(!active)return;
+  const items=active.querySelectorAll('.searchable');
+  let v=0;
+  items.forEach(el=>{
+    const txt=(el.dataset.s||'')+(el.textContent||'');
+    const show=!q||txt.toLowerCase().includes(q);
+    el.classList.toggle('hidden',!show);
+    if(show)v++;
+  });
+  document.getElementById('cnt').textContent=q?`${v}건 일치`:'';
+  const nr=document.getElementById('no-r');
+  if(nr)nr.style.display=(q&&v===0)?'block':'none';
+}
+document.getElementById('search').addEventListener('input',e=>doSearch(e.target.value));
+</script>
+</body>
+</html>

@@ -253,7 +253,7 @@ body{
 
 <div id="hdr">
   <h1>☠ Zalgo 공포 텍스트 생성기</h1>
-  <span class="sub">한글 완벽 지원 · 글자별 강도 조절 · 10가지 공포 효과</span>
+  <span class="sub">영문·기호에만 Zalgo 적용 · 한글은 그대로 · 글자별 강도 조절 · 공포 효과 10종</span>
 </div>
 
 <div id="wrap">
@@ -261,7 +261,7 @@ body{
 <!-- INPUT -->
 <div class="sec">
   <div class="sec-title">✏ 텍스트 입력</div>
-  <textarea id="inp" placeholder="여기에 텍스트를 입력하세요…&#10;한글, 영문, 이모지 모두 가능합니다" oninput="onInp()"></textarea>
+  <textarea id="inp" placeholder="영문·기호에 Zalgo가 적용됩니다. 한글은 그대로 출력됩니다.&#10;예) Hello 세상아! → H̷ę̸l̷l̷o̴ 세상아̸!" oninput="onInp()"></textarea>
   <div class="row">
     <button class="btn btn-red" onclick="generate()">⚡ 변환</button>
     <button class="btn btn-dim" onclick="regen()">🔀 재랜덤</button>
@@ -455,8 +455,12 @@ function gliders(){
   };
 }
 
+function isKorean(c){
+  const cp=c.codePointAt(0);
+  return(cp>=0xAC00&&cp<=0xD7A3)||(cp>=0x1100&&cp<=0x11FF)||(cp>=0x3130&&cp<=0x318F)||(cp>=0xA960&&cp<=0xA97F)||(cp>=0xD7B0&&cp<=0xD7FF);
+}
 function zChar(c,u,d,m){
-  if(!c.trim()||c==='\n')return c;
+  if(!c.trim()||c==='\n'||isKorean(c))return c;
   let r=c;
   for(let i=0;i<u;i++)r+=rc(UP);
   for(let i=0;i<m;i++)r+=rc(MID);

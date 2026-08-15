@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blender 완전 정복</title>
+<style>
+:root{
+  --bg:#0d0f11;--bg2:#131618;--bg3:#191d20;--bg4:#1f2428;
+  --border:#252c32;--border2:#2f3840;
+  --txt:#dce8f0;--txt2:#7aa0b5;--txt3:#3f6070;
+  --org:#e87d0d;--org2:#f5a340;--yel:#f5cc60;
+  --cyan:#4fd8e8;--grn:#5fd68a;--red:#f26464;--pur:#c09af5;--blu:#4fa8f5;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;}
+
+.header{background:var(--bg2);border-bottom:2px solid var(--org);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;min-height:54px;flex-wrap:wrap;}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--org2);white-space:nowrap;}
+.logo-icon{font-size:22px;}
+.search-wrap{flex:1;min-width:160px;max-width:340px;}
+.search{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;color:var(--txt);font-size:13px;outline:none;transition:.15s;}
+.search:focus{border-color:var(--org);box-shadow:0 0 0 2px rgba(232,125,13,.2);}
+.search::placeholder{color:var(--txt3);}
+.tab-bar{display:flex;gap:2px;flex-wrap:wrap;padding:6px 0;}
+.tab{padding:6px 11px;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer;transition:.12s;white-space:nowrap;font-family:inherit;}
+.tab:hover{background:var(--bg4);color:var(--txt);}
+.tab.active{background:rgba(232,125,13,.15);color:var(--org2);border-color:rgba(232,125,13,.35);}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:10px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-item{display:block;padding:5px 14px;color:var(--txt2);font-size:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.1s;font-family:inherit;border-left:2px solid transparent;line-height:1.45;}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(232,125,13,.08);color:var(--org2);border-left-color:var(--org);}
+.main{flex:1;padding:20px 24px;max-width:1080px;overflow-x:hidden;}
+
+.panel{display:none;}.panel.active{display:block;}
+.sec-title{font-size:18px;font-weight:700;color:var(--org2);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.sec-sub{color:var(--txt2);font-size:12px;margin-bottom:18px;line-height:1.7;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.card-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--txt);}
+.card-head .ico{font-size:15px;}
+.card-body{padding:12px 14px;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+
+.e-table{width:100%;border-collapse:collapse;}
+.e-table tr{border-bottom:1px solid rgba(255,255,255,.04);}
+.e-table tr:last-child{border-bottom:none;}
+.e-table tr:hover td{background:rgba(255,255,255,.025);}
+.e-table td{padding:7px 10px;vertical-align:top;font-size:13px;}
+.e-table th{padding:6px 10px;text-align:left;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:700;}
+.e-name{color:var(--org2);font-weight:600;white-space:nowrap;width:150px;font-size:12.5px;}
+.e-key{width:240px;}
+.e-desc{color:var(--txt2);}
+.e-desc b{color:var(--txt);font-weight:600;}
+
+/* keyboard keys */
+kbd{display:inline-block;background:var(--bg4);border:1px solid var(--border2);border-bottom:2px solid var(--border2);border-radius:3px;padding:1px 6px;font-family:Consolas,Menlo,monospace;font-size:11px;color:var(--org2);white-space:nowrap;margin:1px;}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-right:4px;white-space:nowrap;}
+.t-must{background:rgba(95,214,138,.16);color:var(--grn);}
+.t-opt{background:rgba(245,204,96,.16);color:var(--yel);}
+.t-warn{background:rgba(242,100,100,.16);color:var(--red);}
+.t-hot{background:rgba(232,125,13,.18);color:var(--org2);}
+.t-mod{background:rgba(192,154,245,.16);color:var(--pur);}
+.t-blu{background:rgba(79,168,245,.16);color:var(--blu);}
+
+.note{border-left:3px solid var(--cyan);background:rgba(79,216,232,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.good{border-left:3px solid var(--grn);background:rgba(95,214,138,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.warn{border-left:3px solid var(--org);background:rgba(232,125,13,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:8px 0;font-size:12.5px;color:var(--txt2);}
+.bad{border-left:3px solid var(--red);background:rgba(242,100,100,.06);padding:8px 12px;border-radius:0 4px 4px 0;margin:6px 0;font-size:12.5px;color:var(--txt2);}
+.note b,.good b,.warn b,.bad b{color:var(--txt);}
+
+ul.li{margin:4px 0 4px 16px;color:var(--txt2);font-size:13px;}
+ul.li li{margin-bottom:4px;}
+ul.li li b{color:var(--txt);font-weight:600;}
+
+/* mode badges */
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin:8px 0;}
+.mode-card{border-radius:6px;padding:10px 12px;border:1px solid;}
+.m-obj{background:rgba(79,168,245,.1);border-color:rgba(79,168,245,.3);color:var(--blu);}
+.m-edit{background:rgba(232,125,13,.1);border-color:rgba(232,125,13,.3);color:var(--org2);}
+.m-sculpt{background:rgba(95,214,138,.1);border-color:rgba(95,214,138,.3);color:var(--grn);}
+.m-vtx{background:rgba(192,154,245,.1);border-color:rgba(192,154,245,.3);color:var(--pur);}
+.m-wgt{background:rgba(245,204,96,.1);border-color:rgba(245,204,96,.3);color:var(--yel);}
+.m-tex{background:rgba(242,100,100,.1);border-color:rgba(242,100,100,.3);color:var(--red);}
+.m-par{background:rgba(79,216,232,.1);border-color:rgba(79,216,232,.3);color:var(--cyan);}
+.mode-card .m-label{font-size:12px;font-weight:700;margin-bottom:2px;}
+.mode-card .m-desc{font-size:11px;opacity:.8;}
+
+/* shortcuts blocks */
+.sh-group{margin-bottom:18px;}
+.sh-label{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+
+/* brush grid */
+.brush-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:8px 0;}
+.brush-card{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;}
+.b-name{font-size:12px;font-weight:700;color:var(--org2);margin-bottom:2px;}
+.b-short{font-size:10px;color:var(--txt3);margin-bottom:4px;}
+.b-desc{font-size:11.5px;color:var(--txt2);}
+
+/* modifier grid */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:8px 0;}
+.mod-card{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;}
+.mc-name{font-size:12px;font-weight:700;color:var(--org2);margin-bottom:2px;}
+.mc-cat{font-size:10px;color:var(--txt3);margin-bottom:3px;}
+.mc-desc{font-size:11.5px;color:var(--txt2);}
+
+#no-result{display:none;color:var(--txt3);text-align:center;padding:40px 0;font-size:13px;}
+.foot{color:var(--txt3);font-size:11px;padding:18px 0 40px;line-height:1.8;border-top:1px solid var(--border);margin-top:20px;}
+.foot a{color:var(--txt2);}
+
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .main{padding:14px;}
+  .e-name,.e-key{width:auto;white-space:normal;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span class="logo-icon">🎨</span>Blender 완전 정복</div>
+  <div class="search-wrap"><input class="search" id="search" placeholder="검색 (예: 압출, Extrude, 렌더, G키)"></div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showPanel('intro')">인터페이스</button>
+    <button class="tab" onclick="showPanel('nav')">내비게이션</button>
+    <button class="tab" onclick="showPanel('model')">모델링</button>
+    <button class="tab" onclick="showPanel('sculpt')">스컬프트</button>
+    <button class="tab" onclick="showPanel('anim')">애니메이션</button>
+    <button class="tab" onclick="showPanel('shade')">셰이딩·렌더링</button>
+    <button class="tab" onclick="showPanel('keys')">전체 단축키</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar"></nav>
+<main class="main">
+
+<!-- ══════════════════ 인터페이스 ══════════════════ -->
+<section class="panel active" id="panel-intro">
+  <div class="sec-title">🎨 Blender — 인터페이스 완전 정복</div>
+  <div class="sec-sub">Blender는 무료·오픈소스 3D 창작 도구입니다. 모델링·스컬프트·애니메이션·렌더링·합성·비디오 편집까지 <b>하나의 프로그램</b>으로 처리합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📋</span>기본 정보</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">개발사</td><td class="e-desc"><b>Blender Foundation</b> (비영리). 오픈소스 (GPL v3). 1994년 시작.</td></tr>
+        <tr><td class="e-name">현재 버전</td><td class="e-desc"><b>Blender 4.x</b> (2024~). LTS 버전은 2년 지원. 매 분기 신규 버전 출시.</td></tr>
+        <tr><td class="e-name">플랫폼</td><td class="e-desc">Windows, macOS, Linux. 64비트 전용. GPU: NVIDIA/AMD/Intel 모두 지원.</td></tr>
+        <tr><td class="e-name">가격</td><td class="e-desc"><b>완전 무료</b>. blender.org에서 다운로드.</td></tr>
+        <tr><td class="e-name">주요 기능</td><td class="e-desc">3D 모델링·스컬프트·애니메이션·리깅·파티클·시뮬레이션·렌더링(Cycles/EEVEE)·합성·그리스 펜슬·비디오 편집·지오메트리 노드</td></tr>
+        <tr><td class="e-name">키맵 기본값</td><td class="e-desc">이 페이지는 <b>Blender 기본 키맵 (4.x)</b> 기준. Industry Compatible 키맵은 일부 다름. Mac은 Ctrl→Cmd 치환.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🖥️</span>화면 구성 — 에디터 영역</div>
+    <div class="card-body">
+      <div class="note"><b>Blender는 화면 전체가 에디터 타일로 나뉩니다.</b> 각 영역의 경계를 드래그해 크기를 조정하고, 모서리를 드래그해 분할·합칩니다.</div>
+      <table class="e-table">
+        <tr><th>영역 이름</th><th>기본 위치</th><th>역할</th></tr>
+        <tr><td class="e-name">3D 뷰포트</td><td class="e-desc">중앙</td><td class="e-desc">3D 씬을 탐색하고 오브젝트를 편집하는 핵심 영역</td></tr>
+        <tr><td class="e-name">타임라인</td><td class="e-desc">하단</td><td class="e-desc">현재 프레임, 재생 범위, 키프레임 위치 확인</td></tr>
+        <tr><td class="e-name">아웃라이너</td><td class="e-desc">우측 상단</td><td class="e-desc">씬의 모든 오브젝트·컬렉션 계층 구조 표시</td></tr>
+        <tr><td class="e-name">프로퍼티</td><td class="e-desc">우측 하단</td><td class="e-desc">선택된 오브젝트의 모든 속성·설정 패널</td></tr>
+        <tr><td class="e-name">메뉴 바</td><td class="e-desc">최상단</td><td class="e-desc">파일·편집·렌더·윈도우·도움말</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📂</span>에디터 타입 전체 목록</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:180px;">에디터</th><th>용도</th></tr>
+        <tr><td class="e-name">3D 뷰포트</td><td class="e-desc">오브젝트 편집·뷰잉의 메인 공간. 오브젝트/에디트/스컬프트 등 다양한 모드 전환 가능.</td></tr>
+        <tr><td class="e-name">이미지 에디터</td><td class="e-desc">이미지·렌더 결과물 뷰잉 및 간단한 페인팅.</td></tr>
+        <tr><td class="e-name">UV 에디터</td><td class="e-desc">UV 언랩 결과를 편집하고 텍스처 위치를 조정.</td></tr>
+        <tr><td class="e-name">셰이더 에디터</td><td class="e-desc">노드 기반 머티리얼(재질) 제작.</td></tr>
+        <tr><td class="e-name">컴포지터</td><td class="e-desc">렌더 후처리. 노드로 색보정·글로우·DOF 효과 추가.</td></tr>
+        <tr><td class="e-name">텍스처 노드 에디터</td><td class="e-desc">절차적 텍스처 노드 편집 (레거시).</td></tr>
+        <tr><td class="e-name">지오메트리 노드</td><td class="e-desc">노드로 메쉬를 프로시저럴하게 생성·변형. 4.x 핵심 기능.</td></tr>
+        <tr><td class="e-name">스크립팅 / 텍스트 에디터</td><td class="e-desc">Python 스크립트 작성·실행.</td></tr>
+        <tr><td class="e-name">타임라인</td><td class="e-desc">재생 제어, 키프레임 위치 확인.</td></tr>
+        <tr><td class="e-name">도프시트</td><td class="e-desc">키프레임을 시간 축 위에서 편집. 여러 채널 동시 확인.</td></tr>
+        <tr><td class="e-name">그래프 에디터</td><td class="e-desc">애니메이션 커브(F-Curve) 세밀 편집.</td></tr>
+        <tr><td class="e-name">드라이버</td><td class="e-desc">속성 간 연결(드라이버) 편집.</td></tr>
+        <tr><td class="e-name">NLA 에디터</td><td class="e-desc">비선형 애니메이션. 액션을 클립처럼 배치·혼합.</td></tr>
+        <tr><td class="e-name">시퀀서 (VSE)</td><td class="e-desc">비디오 편집. 클립·오디오·효과 배치.</td></tr>
+        <tr><td class="e-name">무비 클립 에디터</td><td class="e-desc">모션 트래킹·카메라 솔빙.</td></tr>
+        <tr><td class="e-name">스프레드시트</td><td class="e-desc">메쉬·지오메트리 노드 데이터를 수치로 확인.</td></tr>
+        <tr><td class="e-name">프리퍼런스</td><td class="e-desc">Blender 전체 환경설정.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🏷️</span>워크스페이스 (상단 탭)</div>
+    <div class="card-body">
+      <div class="note">Blender 최상단의 탭들. 각 워크스페이스는 에디터 레이아웃 프리셋입니다. <b>+</b> 버튼으로 커스텀 워크스페이스 추가 가능.</div>
+      <table class="e-table">
+        <tr><th>탭</th><th>주 에디터</th><th>용도</th></tr>
+        <tr><td class="e-name">Layout</td><td class="e-desc">3D 뷰포트 중심</td><td class="e-desc">일반 씬 구성, 오브젝트 배치</td></tr>
+        <tr><td class="e-name">Modeling</td><td class="e-desc">3D 뷰포트 + 프로퍼티</td><td class="e-desc">에디트 모드 메쉬 작업</td></tr>
+        <tr><td class="e-name">Sculpting</td><td class="e-desc">3D 뷰포트 (스컬프트 모드)</td><td class="e-desc">스컬프트 전용 레이아웃</td></tr>
+        <tr><td class="e-name">UV Editing</td><td class="e-desc">UV 에디터 + 3D 뷰포트</td><td class="e-desc">UV 언랩 작업</td></tr>
+        <tr><td class="e-name">Texture Paint</td><td class="e-desc">이미지 에디터 + 3D 뷰포트</td><td class="e-desc">텍스처 직접 페인팅</td></tr>
+        <tr><td class="e-name">Shading</td><td class="e-desc">셰이더 에디터 + 3D 뷰포트</td><td class="e-desc">머티리얼 노드 편집</td></tr>
+        <tr><td class="e-name">Animation</td><td class="e-desc">도프시트 + 3D 뷰포트</td><td class="e-desc">키프레임 애니메이션 작업</td></tr>
+        <tr><td class="e-name">Rendering</td><td class="e-desc">이미지 에디터</td><td class="e-desc">렌더 결과 확인</td></tr>
+        <tr><td class="e-name">Compositing</td><td class="e-desc">컴포지터 노드</td><td class="e-desc">렌더 후처리</td></tr>
+        <tr><td class="e-name">Geometry Nodes</td><td class="e-desc">지오메트리 노드 + 3D 뷰포트</td><td class="e-desc">프로시저럴 모델링</td></tr>
+        <tr><td class="e-name">Scripting</td><td class="e-desc">텍스트 에디터 + Python 콘솔</td><td class="e-desc">Python 자동화·애드온 개발</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎭</span>3D 뷰포트 — 모드 종류</div>
+    <div class="card-body">
+      <div class="note">3D 뷰포트 좌측 상단 드롭다운 또는 <kbd>Tab</kbd>(오브젝트⟷에디트 토글), <kbd>Ctrl</kbd><kbd>Tab</kbd>(파이 메뉴)으로 전환합니다.</div>
+      <div class="mode-grid">
+        <div class="mode-card m-obj"><div class="m-label">오브젝트 모드</div><div class="m-desc">오브젝트 선택·배치·변환. 기본 모드.</div></div>
+        <div class="mode-card m-edit"><div class="m-label">에디트 모드</div><div class="m-desc">메쉬 정점·엣지·면 편집.</div></div>
+        <div class="mode-card m-sculpt"><div class="m-label">스컬프트 모드</div><div class="m-desc">브러쉬로 메쉬를 조각.</div></div>
+        <div class="mode-card m-vtx"><div class="m-label">버텍스 페인트</div><div class="m-desc">정점에 색상 데이터 페인팅.</div></div>
+        <div class="mode-card m-wgt"><div class="m-label">웨이트 페인트</div><div class="m-desc">리깅 스킨 웨이트 페인팅.</div></div>
+        <div class="mode-card m-tex"><div class="m-label">텍스처 페인트</div><div class="m-desc">3D 뷰포트에서 텍스처 직접 페인팅.</div></div>
+        <div class="mode-card m-par"><div class="m-label">파티클 에디트</div><div class="m-desc">파티클·헤어 포인트 편집.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚙️</span>프로퍼티 패널 탭 (우측 패널)</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th style="width:40px;">아이콘</th><th>탭 이름</th><th>내용</th></tr>
+        <tr><td>🔧</td><td class="e-desc"><b>액티브 툴 & 워크스페이스</b></td><td class="e-desc">현재 툴 옵션, 워크스페이스 설정</td></tr>
+        <tr><td>🎬</td><td class="e-desc"><b>씬</b></td><td class="e-desc">씬 속성, 중력, 유닛, 프레임 범위</td></tr>
+        <tr><td>🌍</td><td class="e-desc"><b>월드</b></td><td class="e-desc">배경 색상, HDRI 환경, 안개</td></tr>
+        <tr><td>📷</td><td class="e-desc"><b>오브젝트</b></td><td class="e-desc">트랜스폼 수치, 가시성, 커스텀 속성</td></tr>
+        <tr><td>🔩</td><td class="e-desc"><b>모디파이어</b></td><td class="e-desc">모디파이어 스택 추가·관리</td></tr>
+        <tr><td>✨</td><td class="e-desc"><b>파티클</b></td><td class="e-desc">파티클 시스템 설정</td></tr>
+        <tr><td>🌊</td><td class="e-desc"><b>피직스</b></td><td class="e-desc">물리 시뮬레이션(천, 유체, 리지드 바디 등)</td></tr>
+        <tr><td>⚫</td><td class="e-desc"><b>오브젝트 제약</td><td class="e-desc">위치·회전·스케일 제약 조건 추가</td></tr>
+        <tr><td>🦴</td><td class="e-desc"><b>오브젝트 데이터</b></td><td class="e-desc">메쉬·커브·아마추어 등 데이터 속성</td></tr>
+        <tr><td>🎨</td><td class="e-desc"><b>머티리얼</b></td><td class="e-desc">머티리얼 슬롯 추가·선택, 기본 속성</td></tr>
+        <tr><td>🖼️</td><td class="e-desc"><b>렌더</b></td><td class="e-desc">렌더 엔진, 해상도, 출력 경로, 샘플 수</td></tr>
+        <tr><td>📤</td><td class="e-desc"><b>출력</b></td><td class="e-desc">파일 형식, 경로, 색 공간</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗂️</span>N-패널 · T-툴바</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-name">N-패널 <kbd>N</kbd></td><td class="e-desc">3D 뷰포트 <b>우측</b>에서 슬라이드인. 선택 오브젝트의 위치·회전·스케일 수치 직접 입력, 뷰 설정, 애드온 패널 등.</td></tr>
+        <tr><td class="e-name">T-툴바 <kbd>T</kbd></td><td class="e-desc">3D 뷰포트 <b>좌측</b> 도구 모음. 현재 모드에 따라 툴이 바뀜. 단축키로 빠르게 툴 전환 가능.</td></tr>
+        <tr><td class="e-name">F9 패널 <kbd>F9</kbd></td><td class="e-desc">마지막 작업의 옵션 패널. 작업 직후만 활성화. (예: Extrude 후 방향/거리 수정)</td></tr>
+        <tr><td class="e-name">파이 메뉴 <kbd>~</kbd></td><td class="e-desc">뷰 전환 파이 메뉴. Front/Back/Top/Bottom/Camera 등 방향 선택.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💡</span>필수 일반 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Z</kbd></td><td class="e-desc">실행 취소 (Undo) — 최대 256회</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></td><td class="e-desc">다시 실행 (Redo)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>S</kbd></td><td class="e-desc">저장</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></td><td class="e-desc">다른 이름으로 저장</td></tr>
+        <tr><td class="e-key"><kbd>F3</kbd></td><td class="e-desc">기능 검색 — 이름으로 어떤 기능이든 실행</td></tr>
+        <tr><td class="e-key"><kbd>F4</kbd></td><td class="e-desc">파일 컨텍스트 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Q</kbd></td><td class="e-desc">퀵 즐겨찾기 (Quick Favorites)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Space</kbd></td><td class="e-desc">현재 에디터 최대화 / 복원</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Space</kbd></td><td class="e-desc">전체화면 모드 토글</td></tr>
+        <tr><td class="e-key"><kbd>F12</kbd></td><td class="e-desc">이미지 렌더</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>F12</kbd></td><td class="e-desc">애니메이션 렌더</td></tr>
+        <tr><td class="e-key"><kbd>F11</kbd></td><td class="e-desc">마지막 렌더 결과 보기</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 내비게이션 ══════════════════ -->
+<section class="panel" id="panel-nav">
+  <div class="sec-title">🧭 뷰포트 내비게이션</div>
+  <div class="sec-sub">3D 뷰포트에서의 시점 이동, 숫자패드 단축키, 뷰 설정을 모두 정리합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🖱️</span>마우스 기본 탐색</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>중간 마우스 버튼</kbd> 드래그</td><td class="e-desc">뷰 <b>회전</b> (Orbit)</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd> + 중간 마우스 드래그</td><td class="e-desc">뷰 <b>이동</b> (Pan)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd> + 중간 마우스 드래그</td><td class="e-desc">뷰 <b>줌</b> (위아래 드래그)</td></tr>
+        <tr><td class="e-key">마우스 <b>휠 스크롤</b></td><td class="e-desc">줌 인/아웃</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd> + 휠 스크롤</td><td class="e-desc">뷰포트 클리핑 거리 조정</td></tr>
+        <tr><td class="e-key"><kbd>왼쪽 클릭</kbd></td><td class="e-desc">오브젝트 선택 (기본값)</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd> + 왼쪽 클릭</td><td class="e-desc">선택 추가/제거</td></tr>
+        <tr><td class="e-key"><kbd>오른쪽 클릭</kbd></td><td class="e-desc">컨텍스트 메뉴</td></tr>
+      </table>
+      <div class="note" style="margin-top:8px;"><b>트랙패드 사용자:</b> 두 손가락 스크롤로 줌, 세 손가락 드래그로 패닝. Preferences → Input에서 설정 변경 가능.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔢</span>숫자패드 — 시점 단축키</div>
+    <div class="card-body">
+      <div class="note"><b>숫자패드가 없으면:</b> Preferences → Input → <b>Emulate Numpad</b> 체크. 그러면 키보드 숫자 1~0이 숫자패드 역할.</div>
+      <table class="e-table">
+        <tr><th>키</th><th>시점</th><th>설명</th></tr>
+        <tr><td class="e-key"><kbd>Numpad 1</kbd></td><td class="e-desc"><b>Front</b> (앞면)</td><td class="e-desc">-Y 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Numpad 1</kbd></td><td class="e-desc"><b>Back</b> (뒷면)</td><td class="e-desc">+Y 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 3</kbd></td><td class="e-desc"><b>Right</b> (우측면)</td><td class="e-desc">-X 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Numpad 3</kbd></td><td class="e-desc"><b>Left</b> (좌측면)</td><td class="e-desc">+X 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 7</kbd></td><td class="e-desc"><b>Top</b> (상면)</td><td class="e-desc">-Z (위) 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Numpad 7</kbd></td><td class="e-desc"><b>Bottom</b> (하면)</td><td class="e-desc">+Z (아래) 방향에서 보기</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 0</kbd></td><td class="e-desc"><b>Camera View</b></td><td class="e-desc">씬 카메라 시점으로 전환</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 5</kbd></td><td class="e-desc"><b>원근/직교 토글</b></td><td class="e-desc">Perspective ↔ Orthographic 전환</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 4</kbd></td><td class="e-desc">좌로 회전 15°</td><td class="e-desc">수평 궤도 회전</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 6</kbd></td><td class="e-desc">우로 회전 15°</td><td class="e-desc">수평 궤도 회전</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 8</kbd></td><td class="e-desc">위로 회전 15°</td><td class="e-desc">수직 궤도 회전</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 2</kbd></td><td class="e-desc">아래로 회전 15°</td><td class="e-desc">수직 궤도 회전</td></tr>
+        <tr><td class="e-key"><kbd>Numpad .</kbd></td><td class="e-desc"><b>선택한 오브젝트 중심으로</b></td><td class="e-desc">선택 항목에 뷰를 맞춤 (Frame Selection)</td></tr>
+        <tr><td class="e-key"><kbd>Home</kbd></td><td class="e-desc"><b>전체 씬 보기</b></td><td class="e-desc">모든 오브젝트가 보이도록 뷰를 맞춤</td></tr>
+        <tr><td class="e-key"><kbd>Numpad /</kbd></td><td class="e-desc"><b>로컬 뷰</b></td><td class="e-desc">선택 오브젝트만 분리해서 보기. 다시 누르면 전체로 돌아옴.</td></tr>
+        <tr><td class="e-key"><kbd>Numpad *</kbd></td><td class="e-desc"><b>선택의 방향으로 정렬</b></td><td class="e-desc">선택한 오브젝트의 로컬 방향으로 뷰 회전</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>뷰 설정 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>~</kbd></td><td class="e-desc"><b>뷰 파이 메뉴</b> — 방향·카메라·로컬 뷰 등 빠른 전환</td></tr>
+        <tr><td class="e-key"><kbd>Z</kbd></td><td class="e-desc"><b>셰이딩 파이 메뉴</b> — Solid/Wireframe/Material Preview/Rendered</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>Z</kbd></td><td class="e-desc">와이어프레임 / 솔리드 토글</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>Z</kbd></td><td class="e-desc">렌더 미리보기 토글</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Numpad 0</kbd></td><td class="e-desc">선택한 오브젝트를 카메라로 설정</td></tr>
+        <tr><td class="e-key"><kbd>Numpad 0</kbd> → <kbd>G</kbd>/<kbd>R</kbd></td><td class="e-desc">카메라 뷰에서 카메라 이동·회전</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Numpad 0</kbd></td><td class="e-desc">현재 뷰를 카메라 위치로 설정</td></tr>
+        <tr><td class="e-key"><kbd>Middle Mouse</kbd> 더블클릭</td><td class="e-desc">클릭한 지점을 피봇(회전 중심)으로 설정</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>Middle Mouse</kbd></td><td class="e-desc">회전 축 기준 뷰 정렬</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎯</span>선택 단축키 (오브젝트 & 에디트 공통)</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>A</kbd></td><td class="e-desc">전체 선택 / 전체 해제 (토글)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>A</kbd></td><td class="e-desc">전체 해제 (Deselect All)</td></tr>
+        <tr><td class="e-key"><kbd>B</kbd></td><td class="e-desc"><b>박스 선택</b> — 드래그로 영역 선택</td></tr>
+        <tr><td class="e-key"><kbd>C</kbd></td><td class="e-desc"><b>서클 선택</b> — 브러쉬로 선택. 스크롤로 크기 조절. 우클릭으로 종료.</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>왼쪽클릭</kbd> 드래그</td><td class="e-desc"><b>올가미 선택</b> — 자유형 영역 선택</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>I</kbd></td><td class="e-desc">선택 반전 (Invert Selection)</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>왼쪽클릭</kbd></td><td class="e-desc">선택에 추가 / 제거</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>왼쪽클릭</kbd></td><td class="e-desc">루프 선택 (에디트 모드)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>왼쪽클릭</kbd></td><td class="e-desc">링 선택 (에디트 모드)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔄</span>트랜스폼 — 이동·회전·스케일</div>
+    <div class="card-body">
+      <div class="note"><b>축 잠금:</b> G/R/S 입력 후 X/Y/Z를 누르면 해당 축으로만 변환. Shift+X/Y/Z는 해당 축을 <b>제외</b>한 평면으로 변환.</div>
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>G</kbd></td><td class="e-desc"><b>Grab — 이동.</b> 마우스 이동 후 클릭 확정, 우클릭 취소.</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> <kbd>X</kbd></td><td class="e-desc">X축으로만 이동</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> <kbd>Y</kbd></td><td class="e-desc">Y축으로만 이동</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> <kbd>Z</kbd></td><td class="e-desc">Z축으로만 이동</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> + 숫자 입력</td><td class="e-desc">정확한 거리만큼 이동 (예: G → Z → -2 → Enter = Z축 -2 이동)</td></tr>
+        <tr><td class="e-key"><kbd>R</kbd></td><td class="e-desc"><b>Rotate — 회전</b></td></tr>
+        <tr><td class="e-key"><kbd>R</kbd> <kbd>R</kbd></td><td class="e-desc">트랙볼 회전 (자유 회전)</td></tr>
+        <tr><td class="e-key"><kbd>S</kbd></td><td class="e-desc"><b>Scale — 스케일</b></td></tr>
+        <tr><td class="e-key"><kbd>S</kbd> <kbd>X</kbd> <kbd>0</kbd></td><td class="e-desc">X축으로 납작하게 (스케일 0)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>G</kbd></td><td class="e-desc">위치 초기화 (원점으로)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>R</kbd></td><td class="e-desc">회전 초기화</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>S</kbd></td><td class="e-desc">스케일 초기화 (1,1,1)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>A</kbd></td><td class="e-desc"><b>트랜스폼 적용</b> — 현재 위치·회전·스케일을 기본값(0,0,1)으로 굳힘</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd>/<kbd>R</kbd>/<kbd>S</kbd> 중 <kbd>Ctrl</kbd></td><td class="e-desc">스냅 (1단위씩 이동/5° 회전/10% 스케일)</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd>/<kbd>R</kbd>/<kbd>S</kbd> 중 <kbd>Shift</kbd></td><td class="e-desc">세밀 이동 (천천히)</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 모델링 ══════════════════ -->
+<section class="panel" id="panel-model">
+  <div class="sec-title">🧱 모델링</div>
+  <div class="sec-sub">오브젝트 모드와 에디트 모드의 주요 단축키, 메쉬 편집 도구, 모디파이어를 정리합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗂️</span>오브젝트 모드 — 오브젝트 관리</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>A</kbd></td><td class="e-desc"><b>추가 메뉴</b> — 메쉬/커브/아마추어/카메라/빛 등 오브젝트 추가</td></tr>
+        <tr><td class="e-key"><kbd>X</kbd> 또는 <kbd>Delete</kbd></td><td class="e-desc"><b>삭제</b> — 선택 오브젝트 삭제 (확인 창)</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>D</kbd></td><td class="e-desc"><b>복제</b> (Duplicate) — 독립적인 복사본. 바로 이동 모드 진입.</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>D</kbd></td><td class="e-desc"><b>링크 복제</b> — 메쉬 데이터를 공유하는 복사본. 한쪽 수정 시 다른 쪽도 변경.</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>J</kbd></td><td class="e-desc"><b>합치기 (Join)</b> — 여러 오브젝트를 하나로 합침</td></tr>
+        <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc"><b>컬렉션으로 이동</b> — 선택 오브젝트를 원하는 컬렉션으로 이동</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>M</kbd></td><td class="e-desc">컬렉션에 링크 추가</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>P</kbd></td><td class="e-desc"><b>페어런트 설정</b> — 마지막 선택이 부모가 됨</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>P</kbd></td><td class="e-desc">페어런트 해제</td></tr>
+        <tr><td class="e-key"><kbd>H</kbd></td><td class="e-desc">선택 오브젝트 숨기기</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>H</kbd></td><td class="e-desc">선택 오브젝트 <b>외</b> 나머지 숨기기</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>H</kbd></td><td class="e-desc">모두 표시 (Show Hidden)</td></tr>
+        <tr><td class="e-key"><kbd>F2</kbd></td><td class="e-desc">선택 오브젝트 이름 변경</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>L</kbd></td><td class="e-desc">선택 오브젝트로 링크·데이터 복사</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>C</kbd></td><td class="e-desc">원점(Origin) 설정 — 원점을 지오메트리 중심 등으로 변경</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>G</kbd></td><td class="e-desc">새 컬렉션 생성 및 이동</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">✏️</span>에디트 모드 — 메쉬 편집 기본</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Tab</kbd></td><td class="e-desc">오브젝트 모드 ↔ 에디트 모드 전환</td></tr>
+        <tr><td class="e-key"><kbd>1</kbd></td><td class="e-desc"><b>버텍스(정점) 선택 모드</b></td></tr>
+        <tr><td class="e-key"><kbd>2</kbd></td><td class="e-desc"><b>엣지(모서리) 선택 모드</b></td></tr>
+        <tr><td class="e-key"><kbd>3</kbd></td><td class="e-desc"><b>페이스(면) 선택 모드</b></td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd>+<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd></td><td class="e-desc">여러 선택 모드 동시 활성화</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Tab</kbd></td><td class="e-desc">선택 모드 파이 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>클릭</kbd></td><td class="e-desc">엣지·페이스 루프 선택</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>클릭</kbd></td><td class="e-desc">링(수직 루프) 선택</td></tr>
+        <tr><td class="e-key"><kbd>L</kbd></td><td class="e-desc">커서 아래 연결된 메쉬 선택</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>L</kbd></td><td class="e-desc">선택에서 연결된 메쉬 전체 선택</td></tr>
+        <tr><td class="e-key"><kbd>P</kbd></td><td class="e-desc"><b>분리 (Separate)</b> — 선택·머티리얼·느슨한 파트별로 별개 오브젝트 분리</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔨</span>에디트 모드 — 핵심 메쉬 도구</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>E</kbd></td><td class="e-desc"><b>Extrude (압출)</b> — 선택된 버텍스·엣지·면을 끌어내 새 지오메트리 생성. 방향 잠금 후 수치 입력 가능.</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>E</kbd></td><td class="e-desc">Extrude 특별 메뉴 — 개별 면 압출, 법선 방향 압출 등 선택</td></tr>
+        <tr><td class="e-key"><kbd>I</kbd></td><td class="e-desc"><b>Inset Faces (인셋)</b> — 면 내부에 작은 면 삽입. <kbd>I</kbd> 두 번: 개별 인셋.</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>B</kbd></td><td class="e-desc"><b>Bevel (베벨)</b> — 엣지를 깎아 둥글게. 스크롤로 세그먼트 수 조절.</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>B</kbd></td><td class="e-desc">버텍스 베벨</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>R</kbd></td><td class="e-desc"><b>Loop Cut (루프컷)</b> — 메쉬를 둘러싸는 새 엣지 루프 삽입. 스크롤로 개수 조절.</td></tr>
+        <tr><td class="e-key"><kbd>K</kbd></td><td class="e-desc"><b>Knife (나이프)</b> — 클릭으로 자유형 절단선 그리기. <kbd>Enter</kbd>로 확정.</td></tr>
+        <tr><td class="e-key"><kbd>J</kbd></td><td class="e-desc"><b>Connect Vertices</b> — 두 버텍스를 새 엣지로 연결</td></tr>
+        <tr><td class="e-key"><kbd>F</kbd></td><td class="e-desc"><b>Fill</b> — 선택 버텍스/엣지로 새 면 생성</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>F</kbd></td><td class="e-desc">아름다운 삼각형 분할 (Beauty Fill)</td></tr>
+        <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc"><b>Merge (병합)</b> — 여러 버텍스를 하나로. 중심·커서·마지막 선택 등 선택.</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>M</kbd></td><td class="e-desc">병합 메뉴 (4.0 이전 구버전)</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd><kbd>G</kbd></td><td class="e-desc"><b>Edge Slide</b> — 엣지를 인접 면 위에서 슬라이드 이동</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>T</kbd></td><td class="e-desc">삼각형 분할 (Triangulate Faces)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>J</kbd></td><td class="e-desc">삼각형 → 사각형으로 (Tris to Quads)</td></tr>
+        <tr><td class="e-key"><kbd>Y</kbd></td><td class="e-desc"><b>Split (분리)</b> — 선택 항목을 메쉬에서 분리 (연결은 유지)</td></tr>
+        <tr><td class="e-key"><kbd>V</kbd></td><td class="e-desc"><b>Rip (찢기)</b> — 버텍스·엣지를 메쉬에서 찢어 분리</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>N</kbd></td><td class="e-desc">법선(Normal) 방향 재계산 (바깥쪽으로)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>N</kbd></td><td class="e-desc">법선 방향 재계산 (안쪽으로)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>N</kbd></td><td class="e-desc">법선 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>V</kbd></td><td class="e-desc">버텍스 특별 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>E</kbd></td><td class="e-desc">엣지 특별 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>F</kbd></td><td class="e-desc">페이스 특별 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>O</kbd></td><td class="e-desc"><b>Proportional Editing 토글</b> — 주변 버텍스도 함께 변형. 스크롤로 영향 반경 조절.</td></tr>
+        <tr><td class="e-key"><kbd>U</kbd></td><td class="e-desc"><b>UV 언랩 메뉴</b> — Smart UV/언랩/프로젝션 등</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Numpad +/-</kbd></td><td class="e-desc">선택 확장 / 축소 (Select More/Less)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔩</span>주요 모디파이어 목록</div>
+    <div class="card-body">
+      <div class="note">모디파이어는 <b>비파괴적으로</b> 메쉬를 변형합니다. 적용(Apply) 전에는 언제든 수정 가능. Properties → Wrench(🔩) 탭에서 추가.</div>
+      <div class="mod-grid">
+        <div class="mod-card"><div class="mc-name">Array</div><div class="mc-cat">Generate</div><div class="mc-desc">오브젝트를 일정 간격으로 반복 배열.</div></div>
+        <div class="mod-card"><div class="mc-name">Bevel</div><div class="mc-cat">Generate</div><div class="mc-desc">엣지를 둥글게 깎음. 각도 기준으로도 적용 가능.</div></div>
+        <div class="mod-card"><div class="mc-name">Boolean</div><div class="mc-cat">Generate</div><div class="mc-desc">두 메쉬를 합치거나 빼거나 교차시킴.</div></div>
+        <div class="mod-card"><div class="mc-name">Build</div><div class="mc-cat">Generate</div><div class="mc-desc">시간에 따라 면이 나타나거나 사라지는 애니메이션 효과.</div></div>
+        <div class="mod-card"><div class="mc-name">Decimate</div><div class="mc-cat">Generate</div><div class="mc-desc">폴리곤 수를 줄여 메쉬를 최적화.</div></div>
+        <div class="mod-card"><div class="mc-name">Mirror</div><div class="mc-cat">Generate</div><div class="mc-desc">X/Y/Z 축을 기준으로 메쉬 미러링. 대칭 모델링 필수.</div></div>
+        <div class="mod-card"><div class="mc-name">Multiresolution</div><div class="mc-cat">Generate</div><div class="mc-desc">세분화 단계를 나눠 스컬프트와 로우폴리를 함께 유지.</div></div>
+        <div class="mod-card"><div class="mc-name">Remesh</div><div class="mc-cat">Generate</div><div class="mc-desc">메쉬 토폴로지를 균일하게 재생성.</div></div>
+        <div class="mod-card"><div class="mc-name">Screw</div><div class="mc-cat">Generate</div><div class="mc-desc">프로파일 커브를 나사 모양으로 회전 압출.</div></div>
+        <div class="mod-card"><div class="mc-name">Skin</div><div class="mc-cat">Generate</div><div class="mc-desc">엣지 기반 뼈대에서 메쉬 표면 자동 생성.</div></div>
+        <div class="mod-card"><div class="mc-name">Solidify</div><div class="mc-cat">Generate</div><div class="mc-desc">두께 없는 메쉬에 두께를 부여.</div></div>
+        <div class="mod-card"><div class="mc-name">Subdivision Surface</div><div class="mc-cat">Generate</div><div class="mc-desc"><b>서브디비전</b> — 메쉬를 부드럽게 세분화. 하이폴리 모델링 핵심.</div></div>
+        <div class="mod-card"><div class="mc-name">Triangulate</div><div class="mc-cat">Generate</div><div class="mc-desc">모든 면을 삼각형으로 변환 (게임 엔진 익스포트용).</div></div>
+        <div class="mod-card"><div class="mc-name">Weld</div><div class="mc-cat">Generate</div><div class="mc-desc">일정 거리 내 버텍스를 자동 병합.</div></div>
+        <div class="mod-card"><div class="mc-name">Armature</div><div class="mc-cat">Deform</div><div class="mc-desc">아마추어(뼈대)로 메쉬 변형. 스킨닝 필수.</div></div>
+        <div class="mod-card"><div class="mc-name">Cast</div><div class="mc-cat">Deform</div><div class="mc-desc">메쉬를 구·원통·평면 형태로 투영 변형.</div></div>
+        <div class="mod-card"><div class="mc-name">Curve</div><div class="mc-cat">Deform</div><div class="mc-desc">커브 오브젝트를 따라 메쉬를 변형.</div></div>
+        <div class="mod-card"><div class="mc-name">Displace</div><div class="mc-cat">Deform</div><div class="mc-desc">텍스처 맵으로 메쉬 표면 변위.</div></div>
+        <div class="mod-card"><div class="mc-name">Lattice</div><div class="mc-cat">Deform</div><div class="mc-desc">격자 케이지로 메쉬를 자유롭게 변형.</div></div>
+        <div class="mod-card"><div class="mc-name">Shrinkwrap</div><div class="mc-cat">Deform</div><div class="mc-desc">메쉬를 다른 오브젝트 표면에 붙임.</div></div>
+        <div class="mod-card"><div class="mc-name">Simple Deform</div><div class="mc-cat">Deform</div><div class="mc-desc">구부리기·비틀기·늘리기·수축 변형.</div></div>
+        <div class="mod-card"><div class="mc-name">Smooth</div><div class="mc-cat">Deform</div><div class="mc-desc">버텍스 위치를 부드럽게 평균화.</div></div>
+        <div class="mod-card"><div class="mc-name">Cloth</div><div class="mc-cat">Physics</div><div class="mc-desc">천 시뮬레이션.</div></div>
+        <div class="mod-card"><div class="mc-name">Fluid</div><div class="mc-cat">Physics</div><div class="mc-desc">유체·유동 시뮬레이션.</div></div>
+        <div class="mod-card"><div class="mc-name">Particle System</div><div class="mc-cat">Physics</div><div class="mc-desc">파티클 시스템 (에미터·헤어).</div></div>
+        <div class="mod-card"><div class="mc-name">Soft Body</div><div class="mc-cat">Physics</div><div class="mc-desc">탄성 물체 시뮬레이션.</div></div>
+        <div class="mod-card"><div class="mc-name">Geometry Nodes</div><div class="mc-cat">Generate</div><div class="mc-desc">노드 기반 프로시저럴 메쉬 생성·변형. 4.x 핵심 기능.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 스컬프트 ══════════════════ -->
+<section class="panel" id="panel-sculpt">
+  <div class="sec-title">🗿 스컬프트 모드</div>
+  <div class="sec-sub">브러쉬로 진흙을 빚듯 메쉬를 조각합니다. 컨트롤 패드 태블릿과 함께 사용하면 훨씬 강력합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎛️</span>스컬프트 기본 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>F</kbd></td><td class="e-desc"><b>브러쉬 크기(반경) 조절</b> — 드래그로 크기 변경</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>F</kbd></td><td class="e-desc"><b>브러쉬 강도(Strength) 조절</b></td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>F</kbd></td><td class="e-desc">브러쉬 각도 조절</td></tr>
+        <tr><td class="e-key"><kbd>X</kbd></td><td class="e-desc"><b>브러쉬 방향 반전</b> (밀어내기 ↔ 끌어당기기)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd> + 드래그</td><td class="e-desc">현재 브러쉬를 <b>반전</b>하여 사용 (임시)</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd> + 드래그</td><td class="e-desc"><b>Smooth 브러쉬</b>로 임시 전환</td></tr>
+        <tr><td class="e-key"><kbd>S</kbd></td><td class="e-desc">Smooth 브러쉬로 전환</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd></td><td class="e-desc">Grab 브러쉬로 전환</td></tr>
+        <tr><td class="e-key"><kbd>I</kbd></td><td class="e-desc">Inflate 브러쉬로 전환</td></tr>
+        <tr><td class="e-key"><kbd>C</kbd></td><td class="e-desc">Clay Strips 브러쉬로 전환</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>D</kbd></td><td class="e-desc"><b>Voxel Remesh</b> — 균일한 폴리곤으로 메쉬 재생성</td></tr>
+        <tr><td class="e-key"><kbd>R</kbd></td><td class="e-desc">Remesh (쿼드리메쉬)</td></tr>
+        <tr><td class="e-key"><kbd>D</kbd></td><td class="e-desc">다이나믹 토폴로지 토글 (Dyntopo) — 브러쉬에 맞춰 폴리곤 자동 추가/제거</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Z</kbd></td><td class="e-desc">실행 취소 (스컬프트 전용 히스토리)</td></tr>
+        <tr><td class="e-key"><kbd>O</kbd></td><td class="e-desc">프로포셔널 편집 토글</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>R</kbd></td><td class="e-desc">마스크 재투영</td></tr>
+        <tr><td class="e-key"><kbd>H</kbd></td><td class="e-desc">마스크 숨기기 (Hide Masked)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>H</kbd></td><td class="e-desc">숨김 해제 (Reveal All)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🖌️</span>마스크 & 페이스 셋 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc">마스크 그리기 모드 (Mask 브러쉬)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>M</kbd></td><td class="e-desc">마스크 지우기</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>I</kbd></td><td class="e-desc">마스크 반전 (Invert Mask)</td></tr>
+        <tr><td class="e-key"><kbd>A</kbd></td><td class="e-desc">마스크 전체 지우기</td></tr>
+        <tr><td class="e-key"><kbd>B</kbd></td><td class="e-desc">박스 마스크 (Box Mask)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>B</kbd></td><td class="e-desc">박스 마스크 지우기</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>K</kbd></td><td class="e-desc">라쏘 마스크</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>A</kbd></td><td class="e-desc">마스크 블러 (흐리게)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></td><td class="e-desc">마스크 샤픈 (선명하게)</td></tr>
+        <tr><td class="e-key">페이스 셋 <kbd>Ctrl</kbd>+드래그</td><td class="e-desc">새 페이스 셋 그리기</td></tr>
+        <tr><td class="e-key">페이스 셋 위 <kbd>H</kbd></td><td class="e-desc">해당 페이스 셋 숨기기</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🖌️</span>스컬프트 브러쉬 종류</div>
+    <div class="card-body">
+      <div class="brush-grid">
+        <div class="brush-card"><div class="b-name">Draw</div><div class="b-short"><kbd>X</kbd> 반전 가능</div><div class="b-desc">메쉬를 밀어내거나 당기는 기본 브러쉬.</div></div>
+        <div class="brush-card"><div class="b-name">Draw Sharp</div><div class="b-short"></div><div class="b-desc">날카로운 라인·크리스 각진 선 조각.</div></div>
+        <div class="brush-card"><div class="b-name">Clay</div><div class="b-short"></div><div class="b-desc">점토를 쌓는 느낌. 표면에 레이어를 추가.</div></div>
+        <div class="brush-card"><div class="b-name">Clay Strips</div><div class="b-short"><kbd>C</kbd></div><div class="b-desc">Clay보다 강력. 두껍고 넓은 스트로크로 볼륨 구축.</div></div>
+        <div class="brush-card"><div class="b-name">Layer</div><div class="b-short"></div><div class="b-desc">균일한 높이의 레이어를 추가.</div></div>
+        <div class="brush-card"><div class="b-name">Inflate</div><div class="b-short"><kbd>I</kbd></div><div class="b-desc">버텍스를 법선 방향으로 이동 (부풀리기/수축).</div></div>
+        <div class="brush-card"><div class="b-name">Blob</div><div class="b-short"></div><div class="b-desc">구 모양으로 볼록하게 만들기.</div></div>
+        <div class="brush-card"><div class="b-name">Crease</div><div class="b-short"></div><div class="b-desc">주름·홈 생성. 날카로운 경계선 조각.</div></div>
+        <div class="brush-card"><div class="b-name">Smooth</div><div class="b-short"><kbd>S</kbd> / <kbd>Shift</kbd></div><div class="b-desc">표면을 부드럽게 다듬기.</div></div>
+        <div class="brush-card"><div class="b-name">Flatten</div><div class="b-short"></div><div class="b-desc">표면을 평평하게 만들기.</div></div>
+        <div class="brush-card"><div class="b-name">Fill</div><div class="b-short"></div><div class="b-desc">오목한 부분을 채우기.</div></div>
+        <div class="brush-card"><div class="b-name">Scrape</div><div class="b-short"></div><div class="b-desc">볼록한 부분 긁어내기.</div></div>
+        <div class="brush-card"><div class="b-name">Multiplane Scrape</div><div class="b-short"></div><div class="b-desc">여러 평면에서 동시에 스크랩.</div></div>
+        <div class="brush-card"><div class="b-name">Pinch</div><div class="b-short"></div><div class="b-desc">버텍스를 중심으로 집어당기기.</div></div>
+        <div class="brush-card"><div class="b-name">Grab</div><div class="b-short"><kbd>G</kbd></div><div class="b-desc">영역을 통째로 잡아당기기. 큰 형태 변형에 유용.</div></div>
+        <div class="brush-card"><div class="b-name">Elastic Deform</div><div class="b-short"></div><div class="b-desc">탄성 변형. 이웃 버텍스를 유연하게 함께 당김.</div></div>
+        <div class="brush-card"><div class="b-name">Snake Hook</div><div class="b-short"></div><div class="b-desc">버텍스를 뱀처럼 늘여 당기기. 뿔·촉수 형성.</div></div>
+        <div class="brush-card"><div class="b-name">Thumb</div><div class="b-short"></div><div class="b-desc">엄지로 밀어내는 느낌의 이동.</div></div>
+        <div class="brush-card"><div class="b-name">Pose</div><div class="b-short"></div><div class="b-desc">아마추어 없이도 포즈를 취할 수 있는 브러쉬.</div></div>
+        <div class="brush-card"><div class="b-name">Nudge</div><div class="b-short"></div><div class="b-desc">버텍스를 측면으로 밀어내기.</div></div>
+        <div class="brush-card"><div class="b-name">Rotate</div><div class="b-short"></div><div class="b-desc">영역 내 버텍스를 회전.</div></div>
+        <div class="brush-card"><div class="b-name">Slide Relax</div><div class="b-short"></div><div class="b-desc">토폴로지를 유지하면서 버텍스 슬라이드.</div></div>
+        <div class="brush-card"><div class="b-name">Boundary</div><div class="b-short"></div><div class="b-desc">메쉬 경계 엣지 변형.</div></div>
+        <div class="brush-card"><div class="b-name">Cloth</div><div class="b-short"></div><div class="b-desc">천 시뮬레이션처럼 메쉬를 변형.</div></div>
+        <div class="brush-card"><div class="b-name">Simplify</div><div class="b-short"></div><div class="b-desc">Dyntopo 시 버텍스 밀도 감소.</div></div>
+        <div class="brush-card"><div class="b-name">Draw Face Sets</div><div class="b-short"></div><div class="b-desc">페이스 셋을 페인팅으로 구분.</div></div>
+        <div class="brush-card"><div class="b-name">Multires Displacement Eraser</div><div class="b-short"></div><div class="b-desc">멀티레스 변위 지우기.</div></div>
+        <div class="brush-card"><div class="b-name">Paint</div><div class="b-short"></div><div class="b-desc">텍스처 페인팅 (스컬프트 모드 내).</div></div>
+        <div class="brush-card"><div class="b-name">Smear</div><div class="b-short"></div><div class="b-desc">색상·값 번지게 하기.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 애니메이션 ══════════════════ -->
+<section class="panel" id="panel-anim">
+  <div class="sec-title">🎬 애니메이션</div>
+  <div class="sec-sub">타임라인·도프시트·그래프 에디터·NLA의 단축키와 리깅(아마추어) 작업을 정리합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⏯️</span>재생 & 타임라인 기본</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Space</kbd></td><td class="e-desc"><b>재생 / 정지</b></td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>Space</kbd></td><td class="e-desc">재생 (기능 검색과 구분)</td></tr>
+        <tr><td class="e-key"><kbd>←</kbd> / <kbd>→</kbd></td><td class="e-desc">1 프레임 이전 / 다음</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>←</kbd></td><td class="e-desc">시작 프레임으로 이동</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>→</kbd></td><td class="e-desc">끝 프레임으로 이동</td></tr>
+        <tr><td class="e-key"><kbd>↑</kbd> / <kbd>↓</kbd></td><td class="e-desc">다음 / 이전 키프레임으로 이동</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>←</kbd></td><td class="e-desc">10 프레임 이전으로</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>→</kbd></td><td class="e-desc">10 프레임 다음으로</td></tr>
+        <tr><td class="e-key"><kbd>Home</kbd></td><td class="e-desc">시작 프레임으로</td></tr>
+        <tr><td class="e-key"><kbd>End</kbd></td><td class="e-desc">끝 프레임으로</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔑</span>키프레임 삽입 & 편집</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>I</kbd></td><td class="e-desc"><b>키프레임 삽입 메뉴</b> — 위치·회전·스케일·모두 등 선택. 3D 뷰포트·타임라인·도프시트에서 사용.</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>I</kbd></td><td class="e-desc"><b>키프레임 삭제</b></td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>W</kbd></td><td class="e-desc">키프레임 삽입 단축 (현재 채널)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>I</kbd></td><td class="e-desc">시각적 키프레임 삽입 (실제 월드 위치 기준)</td></tr>
+        <tr><td class="e-key">속성 오른쪽 클릭</td><td class="e-desc">특정 속성에 <b>키프레임 삽입</b> (마우스 오른쪽 메뉴)</td></tr>
+        <tr><td class="e-key">속성 <kbd>I</kbd></td><td class="e-desc">해당 속성에 직접 키프레임 삽입</td></tr>
+        <tr><td class="e-key">자동 키프레임 <kbd>●</kbd></td><td class="e-desc">타임라인의 빨간 점 버튼 → 이동·회전 시 자동 키프레임 삽입</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📊</span>도프시트 & 그래프 에디터</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>단축키</th><th>도프시트/그래프 에디터에서 기능</th></tr>
+        <tr><td class="e-key"><kbd>G</kbd></td><td class="e-desc">선택 키프레임 이동</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd><kbd>X</kbd></td><td class="e-desc">시간 축(수평)으로만 이동</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd><kbd>Y</kbd></td><td class="e-desc">값 축(수직)으로만 이동</td></tr>
+        <tr><td class="e-key"><kbd>S</kbd></td><td class="e-desc">선택 키프레임 스케일</td></tr>
+        <tr><td class="e-key"><kbd>T</kbd></td><td class="e-desc">키프레임 이징 타입 변경 (Linear/Bezier/Constant 등)</td></tr>
+        <tr><td class="e-key"><kbd>V</kbd></td><td class="e-desc">핸들 타입 변경 (그래프 에디터)</td></tr>
+        <tr><td class="e-key"><kbd>N</kbd></td><td class="e-desc">채널 패널 토글</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>G</kbd></td><td class="e-desc">키프레임 그룹화</td></tr>
+        <tr><td class="e-key"><kbd>X</kbd></td><td class="e-desc">선택 키프레임 삭제</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>D</kbd></td><td class="e-desc">키프레임 복제</td></tr>
+        <tr><td class="e-key"><kbd>Home</kbd></td><td class="e-desc">모든 키프레임이 보이도록 뷰 맞춤</td></tr>
+        <tr><td class="e-key"><kbd>.</kbd>(마침표)</td><td class="e-desc">선택 키프레임에 뷰 맞춤</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🦴</span>아마추어 (리깅) — 포즈 모드</div>
+    <div class="card-body">
+      <div class="note"><b>아마추어(Armature)</b>는 3D 뼈대 오브젝트입니다. Edit Mode에서 뼈대 구조를 만들고, Pose Mode에서 포즈를 취합니다.</div>
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Tab</kbd></td><td class="e-desc">오브젝트 ↔ 포즈 ↔ 에디트 모드 전환 파이 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>E</kbd> (에디트 모드)</td><td class="e-desc">선택 본(Bone) 끝에서 새 본 압출</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>클릭</kbd> (에디트)</td><td class="e-desc">클릭 위치에 연결된 새 본 추가</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>D</kbd> (에디트)</td><td class="e-desc">본 복제</td></tr>
+        <tr><td class="e-key"><kbd>P</kbd> (에디트)</td><td class="e-desc">본 분리 (부모-자식 관계 해제)</td></tr>
+        <tr><td class="e-key"><kbd>F</kbd> (에디트)</td><td class="e-desc">두 본 연결 (Fill)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>N</kbd> (포즈)</td><td class="e-desc">자동 웨이트 페인트</td></tr>
+        <tr><td class="e-key"><kbd>R</kbd> (포즈 모드)</td><td class="e-desc">선택 본 회전</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> (포즈)</td><td class="e-desc">선택 본 이동</td></tr>
+        <tr><td class="e-key"><kbd>S</kbd> (포즈)</td><td class="e-desc">선택 본 스케일</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>R</kbd></td><td class="e-desc">본 회전 초기화</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>G</kbd></td><td class="e-desc">본 위치 초기화</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>S</kbd></td><td class="e-desc">본 스케일 초기화</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>A</kbd></td><td class="e-desc">포즈를 레스트 포즈로 적용</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>I</kbd></td><td class="e-desc">IK 체인 추가</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎞️</span>NLA 에디터 & 기타</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>A</kbd></td><td class="e-desc">NLA에 새 트랙/스트립 추가</td></tr>
+        <tr><td class="e-key"><kbd>N</kbd></td><td class="e-desc">NLA 사이드 패널</td></tr>
+        <tr><td class="e-key"><kbd>Tab</kbd></td><td class="e-desc">NLA 스트립 편집 모드 진입</td></tr>
+        <tr><td class="e-key"><kbd>E</kbd></td><td class="e-desc">액션을 NLA 스트립으로 푸시(Push Down)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>G</kbd></td><td class="e-desc">스트립 그룹화</td></tr>
+        <tr><td class="e-key"><kbd>S</kbd></td><td class="e-desc">스트립 시간 스케일</td></tr>
+        <tr><td class="e-key">마커 <kbd>M</kbd></td><td class="e-desc">현재 프레임에 마커 추가</td></tr>
+        <tr><td class="e-key">마커 <kbd>Ctrl</kbd><kbd>M</kbd></td><td class="e-desc">마커 이름 변경</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 셰이딩·렌더링 ══════════════════ -->
+<section class="panel" id="panel-shade">
+  <div class="sec-title">🌈 셰이딩 & 렌더링</div>
+  <div class="sec-sub">머티리얼 노드 편집, 렌더 엔진 비교, UV 에디터, 주요 렌더 설정을 정리합니다.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚫</span>렌더 엔진 비교</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>엔진</th><th>특징</th><th>적합 용도</th></tr>
+        <tr><td class="e-name">EEVEE <span class="tag t-hot">기본값</span></td><td class="e-desc">실시간 레스터라이저. 빠름. GPU 기반. 근사값 사용 (SSR, AO, Bloom).</td><td class="e-desc">게임 느낌, 빠른 미리보기, 반투명 재질, 게임 엔진 시뮬레이션</td></tr>
+        <tr><td class="e-name">Cycles <span class="tag t-must">품질</span></td><td class="e-desc">경로 추적(Path Tracing). 물리 기반 정확한 빛 계산. 느리지만 포토리얼. GPU 가속 가능.</td><td class="e-desc">사진 같은 품질, 건축 비주얼, 제품 렌더링</td></tr>
+        <tr><td class="e-name">Workbench</td><td class="e-desc">UI 미리보기용. 가장 빠름. 씬 검토용.</td><td class="e-desc">토폴로지 확인, 빠른 애니메이션 프리뷰</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔗</span>셰이더 에디터 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>A</kbd></td><td class="e-desc"><b>노드 추가 메뉴</b> — 입력/출력/셰이더/텍스처/색상/벡터/변환/유틸리티</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>클릭</kbd></td><td class="e-desc">클릭한 노드의 출력을 Material Output에 바로 연결 (미리보기)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>R</kbd></td><td class="e-desc">선택 노드를 둘러싸는 Frame 노드 추가</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>G</kbd></td><td class="e-desc">선택 노드들을 <b>그룹</b>으로 묶기</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>G</kbd></td><td class="e-desc">그룹 해제</td></tr>
+        <tr><td class="e-key"><kbd>Tab</kbd></td><td class="e-desc">그룹 노드 내부로 진입 / 나오기</td></tr>
+        <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc">선택 노드 뮤트 (우회)</td></tr>
+        <tr><td class="e-key"><kbd>H</kbd></td><td class="e-desc">선택 노드 숨기기 (축소)</td></tr>
+        <tr><td class="e-key"><kbd>F</kbd></td><td class="e-desc">노드 연결 고정/해제</td></tr>
+        <tr><td class="e-key">링크 <kbd>Ctrl</kbd><kbd>우클릭</kbd></td><td class="e-desc">링크(연결선) 끊기</td></tr>
+        <tr><td class="e-key">링크 위 <kbd>Alt</kbd><kbd>클릭</kbd></td><td class="e-desc">링크에 새 노드 삽입</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎨</span>주요 셰이더 노드</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>노드 이름</th><th>설명</th></tr>
+        <tr><td class="e-name">Principled BSDF</td><td class="e-desc"><b>만능 셰이더.</b> Base Color·Metallic·Roughness·IOR·Alpha 등 대부분의 재질 표현 가능. 첫 번째로 배워야 할 노드.</td></tr>
+        <tr><td class="e-name">Image Texture</td><td class="e-desc">외부 이미지 파일을 텍스처로 사용. UV 좌표와 연결해 사용.</td></tr>
+        <tr><td class="e-name">Texture Coordinate</td><td class="e-desc">UV·오브젝트·월드·반사 등 좌표 소스 제공.</td></tr>
+        <tr><td class="e-name">Mapping</td><td class="e-desc">텍스처 좌표를 이동·회전·스케일 변환.</td></tr>
+        <tr><td class="e-name">Mix Color</td><td class="e-desc">두 색상·텍스처를 다양한 모드로 혼합.</td></tr>
+        <tr><td class="e-name">Normal Map</td><td class="e-desc">노말 맵 텍스처를 법선 데이터로 변환.</td></tr>
+        <tr><td class="e-name">Bump</td><td class="e-desc">높이 맵으로 범프 법선 생성.</td></tr>
+        <tr><td class="e-name">Ambient Occlusion</td><td class="e-desc">주변 차폐 값 제공. 틈새를 어둡게 표현.</td></tr>
+        <tr><td class="e-name">Noise Texture</td><td class="e-desc">프로시저럴 노이즈 패턴. 절차적 텍스처 기반.</td></tr>
+        <tr><td class="e-name">Wave Texture</td><td class="e-desc">줄무늬·파형 패턴 생성.</td></tr>
+        <tr><td class="e-name">Color Ramp</td><td class="e-desc">그레이스케일 값을 색상으로 변환. 그라디언트 매핑.</td></tr>
+        <tr><td class="e-name">Math</td><td class="e-desc">수치 연산 (더하기·곱하기·클램프 등).</td></tr>
+        <tr><td class="e-name">MixRGB (Mix Color)</td><td class="e-desc">색상 혼합 다양한 블렌딩 모드.</td></tr>
+        <tr><td class="e-name">Emission</td><td class="e-desc">자발광 재질. 빛을 방출하는 표면.</td></tr>
+        <tr><td class="e-name">Glass BSDF</td><td class="e-desc">굴절 유리 재질.</td></tr>
+        <tr><td class="e-name">Translucent BSDF</td><td class="e-desc">반투명 재질 (피부·나뭇잎 등).</td></tr>
+        <tr><td class="e-name">Volume Scatter/Absorption</td><td class="e-desc">안개·연기·볼류메트릭 효과.</td></tr>
+        <tr><td class="e-name">Output Material</td><td class="e-desc">최종 출력. Surface·Volume·Displacement 입력.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🗺️</span>UV 에디터 단축키</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>A</kbd></td><td class="e-desc">전체 선택 / 해제</td></tr>
+        <tr><td class="e-key"><kbd>G</kbd> / <kbd>R</kbd> / <kbd>S</kbd></td><td class="e-desc">UV 이동 / 회전 / 스케일</td></tr>
+        <tr><td class="e-key"><kbd>U</kbd></td><td class="e-desc"><b>UV 언랩 메뉴</b> — Unwrap / Smart UV / Project from View 등</td></tr>
+        <tr><td class="e-key"><kbd>P</kbd></td><td class="e-desc">선택 UV 핀 고정 (핀이 있으면 언랩 시 이동 안 됨)</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>P</kbd></td><td class="e-desc">핀 해제</td></tr>
+        <tr><td class="e-key"><kbd>L</kbd></td><td class="e-desc">커서 아래 섬(Island) 선택</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>L</kbd></td><td class="e-desc">연결된 섬 전체 선택</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>J</kbd></td><td class="e-desc">선택 섬 정돈 (Pack Islands)</td></tr>
+        <tr><td class="e-key"><kbd>W</kbd></td><td class="e-desc">UV 특별 메뉴 (Weld/Stitch 등)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>J</kbd></td><td class="e-desc">섬 합치기 (Join)</td></tr>
+        <tr><td class="e-key"><kbd>N</kbd></td><td class="e-desc">사이드 패널 (UV 좌표 수치 입력)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">⚙️</span>렌더 핵심 설정 (Properties → Render)</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><th>설정</th><th>설명</th></tr>
+        <tr><td class="e-name">Resolution</td><td class="e-desc">출력 해상도. 기본 1920×1080. % 슬라이더로 비율 설정 가능.</td></tr>
+        <tr><td class="e-name">Frame Range</td><td class="e-desc">Start Frame ~ End Frame. FPS 설정 (기본 24fps).</td></tr>
+        <tr><td class="e-name">Render Samples</td><td class="e-desc">Cycles: 샘플 수 높을수록 노이즈 감소 & 렌더 시간 증가. EEVEE는 다름.</td></tr>
+        <tr><td class="e-name">Denoising</td><td class="e-desc">AI 노이즈 제거 (OptiX·Open Image Denoise). 샘플 낮아도 깔끔하게.</td></tr>
+        <tr><td class="e-name">Light Paths</td><td class="e-desc">Cycles 광선 반사·굴절·투명 반복 횟수. 높을수록 유리 재질이 정확해짐.</td></tr>
+        <tr><td class="e-name">Film → Transparent</td><td class="e-desc">배경을 투명(알파)으로 렌더. PNG로 저장 시 배경 없는 이미지.</td></tr>
+        <tr><td class="e-name">Color Management</td><td class="e-desc">View Transform: Filmic(권장) / AgX(4.0+) / Standard. Exposure·Gamma 조정.</td></tr>
+        <tr><td class="e-name">Output Path</td><td class="e-desc">렌더 출력 경로 설정. //는 현재 .blend 파일 기준 상대경로.</td></tr>
+        <tr><td class="e-name">File Format</td><td class="e-desc">PNG(무손실), JPEG(압축), OpenEXR(HDR·합성용), MP4/WebM(동영상).</td></tr>
+        <tr><td class="e-name">GPU 렌더</td><td class="e-desc">Preferences → System → Cycles Render Devices에서 GPU 선택. Cycles만 해당.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 전체 단축키 ══════════════════ -->
+<section class="panel" id="panel-keys">
+  <div class="sec-title">⌨️ 전체 단축키 총정리</div>
+  <div class="sec-sub">Blender 기본 키맵(4.x) 기준. Mac 사용자는 <kbd>Ctrl</kbd> → <kbd>Cmd</kbd>. 중간 마우스 버튼 없을 시 Preferences → Input → Emulate Middle Mouse Button 체크.</div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🌐</span>전역 단축키 (어느 에디터에서나)</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Z</kbd> / <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></td><td class="e-desc">실행 취소 / 다시 실행</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>S</kbd></td><td class="e-desc">저장</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></td><td class="e-desc">다른 이름으로 저장</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>N</kbd></td><td class="e-desc">새 파일</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>O</kbd></td><td class="e-desc">파일 열기</td></tr>
+        <tr><td class="e-key"><kbd>F3</kbd></td><td class="e-desc">기능 검색</td></tr>
+        <tr><td class="e-key"><kbd>F4</kbd></td><td class="e-desc">파일 컨텍스트 메뉴 (파일/Append/Link)</td></tr>
+        <tr><td class="e-key"><kbd>F9</kbd></td><td class="e-desc">마지막 작업 옵션 패널 열기</td></tr>
+        <tr><td class="e-key"><kbd>F11</kbd></td><td class="e-desc">마지막 렌더 보기</td></tr>
+        <tr><td class="e-key"><kbd>F12</kbd></td><td class="e-desc">렌더 이미지</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>F12</kbd></td><td class="e-desc">렌더 애니메이션</td></tr>
+        <tr><td class="e-key"><kbd>Esc</kbd></td><td class="e-desc">현재 작업 취소 / 렌더 중단</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Space</kbd></td><td class="e-desc">현재 에디터 최대화</td></tr>
+        <tr><td class="e-key"><kbd>Q</kbd></td><td class="e-desc">퀵 즐겨찾기 메뉴</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">📐</span>3D 뷰포트 — 오브젝트 모드</div>
+    <div class="card-body">
+      <div class="sh-group">
+        <div class="sh-label">선택</div>
+        <table class="e-table">
+          <tr><td class="e-key"><kbd>A</kbd></td><td class="e-desc">전체 선택 토글</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>A</kbd></td><td class="e-desc">전체 해제</td></tr>
+          <tr><td class="e-key"><kbd>B</kbd></td><td class="e-desc">박스 선택</td></tr>
+          <tr><td class="e-key"><kbd>C</kbd></td><td class="e-desc">서클 선택</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>I</kbd></td><td class="e-desc">선택 반전</td></tr>
+          <tr><td class="e-key"><kbd>Shift</kbd><kbd>클릭</kbd></td><td class="e-desc">선택 추가/제거</td></tr>
+        </table>
+      </div>
+      <div class="sh-group">
+        <div class="sh-label">트랜스폼</div>
+        <table class="e-table">
+          <tr><td class="e-key"><kbd>G</kbd> / <kbd>R</kbd> / <kbd>S</kbd></td><td class="e-desc">이동 / 회전 / 스케일</td></tr>
+          <tr><td class="e-key"><kbd>G</kbd><kbd>X</kbd> / <kbd>Y</kbd> / <kbd>Z</kbd></td><td class="e-desc">X/Y/Z 축 이동</td></tr>
+          <tr><td class="e-key"><kbd>G</kbd><kbd>Shift</kbd><kbd>X</kbd></td><td class="e-desc">X 제외 평면(YZ)으로 이동</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>G</kbd> / <kbd>R</kbd> / <kbd>S</kbd></td><td class="e-desc">위치/회전/스케일 초기화</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>A</kbd></td><td class="e-desc">트랜스폼 적용 메뉴</td></tr>
+        </table>
+      </div>
+      <div class="sh-group">
+        <div class="sh-label">오브젝트 조작</div>
+        <table class="e-table">
+          <tr><td class="e-key"><kbd>Shift</kbd><kbd>A</kbd></td><td class="e-desc">오브젝트 추가 메뉴</td></tr>
+          <tr><td class="e-key"><kbd>X</kbd> / <kbd>Delete</kbd></td><td class="e-desc">삭제</td></tr>
+          <tr><td class="e-key"><kbd>Shift</kbd><kbd>D</kbd></td><td class="e-desc">복제</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>D</kbd></td><td class="e-desc">링크 복제</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>J</kbd></td><td class="e-desc">합치기 (Join)</td></tr>
+          <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc">컬렉션으로 이동</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>P</kbd></td><td class="e-desc">페어런트 설정</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>P</kbd></td><td class="e-desc">페어런트 해제</td></tr>
+          <tr><td class="e-key"><kbd>H</kbd> / <kbd>Alt</kbd><kbd>H</kbd></td><td class="e-desc">숨기기 / 숨김 해제</td></tr>
+          <tr><td class="e-key"><kbd>Shift</kbd><kbd>H</kbd></td><td class="e-desc">선택 외 숨기기</td></tr>
+          <tr><td class="e-key"><kbd>Tab</kbd></td><td class="e-desc">에디트 모드 전환</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Tab</kbd></td><td class="e-desc">모드 파이 메뉴</td></tr>
+          <tr><td class="e-key"><kbd>F2</kbd></td><td class="e-desc">이름 변경</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">✏️</span>3D 뷰포트 — 에디트 모드</div>
+    <div class="card-body">
+      <div class="sh-group">
+        <div class="sh-label">선택 모드</div>
+        <table class="e-table">
+          <tr><td class="e-key"><kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td class="e-desc">버텍스 / 엣지 / 페이스 선택 모드</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>클릭</kbd></td><td class="e-desc">루프 선택</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>클릭</kbd></td><td class="e-desc">링 선택</td></tr>
+          <tr><td class="e-key"><kbd>L</kbd></td><td class="e-desc">연결된 메쉬 선택 (커서 위치)</td></tr>
+        </table>
+      </div>
+      <div class="sh-group">
+        <div class="sh-label">메쉬 편집</div>
+        <table class="e-table">
+          <tr><td class="e-key"><kbd>E</kbd></td><td class="e-desc">Extrude (압출)</td></tr>
+          <tr><td class="e-key"><kbd>I</kbd></td><td class="e-desc">Inset Faces (인셋)</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>B</kbd></td><td class="e-desc">Bevel (베벨 엣지)</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>B</kbd></td><td class="e-desc">Bevel (베벨 버텍스)</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>R</kbd></td><td class="e-desc">Loop Cut (루프컷)</td></tr>
+          <tr><td class="e-key"><kbd>K</kbd></td><td class="e-desc">Knife (나이프 자르기)</td></tr>
+          <tr><td class="e-key"><kbd>J</kbd></td><td class="e-desc">버텍스 연결</td></tr>
+          <tr><td class="e-key"><kbd>F</kbd></td><td class="e-desc">면/엣지 채우기 (Fill)</td></tr>
+          <tr><td class="e-key"><kbd>M</kbd></td><td class="e-desc">버텍스 병합 (Merge)</td></tr>
+          <tr><td class="e-key"><kbd>G</kbd><kbd>G</kbd></td><td class="e-desc">Edge Slide</td></tr>
+          <tr><td class="e-key"><kbd>Y</kbd></td><td class="e-desc">Split (분리)</td></tr>
+          <tr><td class="e-key"><kbd>V</kbd></td><td class="e-desc">Rip (찢기)</td></tr>
+          <tr><td class="e-key"><kbd>P</kbd></td><td class="e-desc">Separate (분리 오브젝트)</td></tr>
+          <tr><td class="e-key"><kbd>O</kbd></td><td class="e-desc">프로포셔널 편집 토글</td></tr>
+          <tr><td class="e-key"><kbd>U</kbd></td><td class="e-desc">UV 언랩 메뉴</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>T</kbd></td><td class="e-desc">삼각형 분할</td></tr>
+          <tr><td class="e-key"><kbd>Alt</kbd><kbd>J</kbd></td><td class="e-desc">삼각형 → 사각형</td></tr>
+          <tr><td class="e-key"><kbd>Shift</kbd><kbd>N</kbd></td><td class="e-desc">법선 재계산 (바깥)</td></tr>
+          <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>V</kbd> / <kbd>E</kbd> / <kbd>F</kbd></td><td class="e-desc">버텍스/엣지/페이스 특별 메뉴</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎨</span>스컬프트 모드 단축키 정리</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>F</kbd></td><td class="e-desc">브러쉬 크기</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>F</kbd></td><td class="e-desc">브러쉬 강도</td></tr>
+        <tr><td class="e-key"><kbd>X</kbd></td><td class="e-desc">브러쉬 방향 반전</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd></td><td class="e-desc">브러쉬 임시 반전</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd></td><td class="e-desc">Smooth 브러쉬 임시</td></tr>
+        <tr><td class="e-key"><kbd>D</kbd></td><td class="e-desc">Dyntopo 토글</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>D</kbd></td><td class="e-desc">Voxel Remesh</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd><kbd>I</kbd></td><td class="e-desc">마스크 반전</td></tr>
+        <tr><td class="e-key"><kbd>B</kbd></td><td class="e-desc">박스 마스크</td></tr>
+        <tr><td class="e-key"><kbd>H</kbd></td><td class="e-desc">마스크 영역 숨기기</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🎬</span>애니메이션 단축키 정리</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Space</kbd></td><td class="e-desc">재생/정지</td></tr>
+        <tr><td class="e-key"><kbd>←</kbd> / <kbd>→</kbd></td><td class="e-desc">1프레임 이전/다음</td></tr>
+        <tr><td class="e-key"><kbd>Shift</kbd><kbd>←</kbd> / <kbd>→</kbd></td><td class="e-desc">시작/끝 프레임으로</td></tr>
+        <tr><td class="e-key"><kbd>↑</kbd> / <kbd>↓</kbd></td><td class="e-desc">다음/이전 키프레임으로</td></tr>
+        <tr><td class="e-key"><kbd>I</kbd></td><td class="e-desc">키프레임 삽입 메뉴</td></tr>
+        <tr><td class="e-key"><kbd>Alt</kbd><kbd>I</kbd></td><td class="e-desc">키프레임 삭제</td></tr>
+        <tr><td class="e-key"><kbd>T</kbd> (도프시트)</td><td class="e-desc">이징 타입 변경</td></tr>
+        <tr><td class="e-key"><kbd>V</kbd> (그래프)</td><td class="e-desc">핸들 타입 변경</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">🔢</span>숫자패드 완전 정리</div>
+    <div class="card-body">
+      <table class="e-table">
+        <tr><td class="e-key"><kbd>Num 0</kbd></td><td class="e-desc">카메라 뷰</td></tr>
+        <tr><td class="e-key"><kbd>Num 1</kbd></td><td class="e-desc">프론트 뷰 (-Y)</td></tr>
+        <tr><td class="e-key"><kbd>Num 3</kbd></td><td class="e-desc">라이트 뷰 (-X)</td></tr>
+        <tr><td class="e-key"><kbd>Num 7</kbd></td><td class="e-desc">탑 뷰 (-Z)</td></tr>
+        <tr><td class="e-key"><kbd>Ctrl</kbd>+<kbd>Num 1/3/7</kbd></td><td class="e-desc">백/레프트/바텀 뷰</td></tr>
+        <tr><td class="e-key"><kbd>Num 5</kbd></td><td class="e-desc">원근↔직교 토글</td></tr>
+        <tr><td class="e-key"><kbd>Num 2/4/6/8</kbd></td><td class="e-desc">15° 회전</td></tr>
+        <tr><td class="e-key"><kbd>Num .</kbd></td><td class="e-desc">선택 항목에 뷰 맞춤</td></tr>
+        <tr><td class="e-key"><kbd>Num /</kbd></td><td class="e-desc">로컬 뷰 토글</td></tr>
+        <tr><td class="e-key"><kbd>Home</kbd></td><td class="e-desc">씬 전체 보기</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="ico">💡</span>알아두면 강력한 팁</div>
+    <div class="card-body">
+      <ul class="li">
+        <li><b>F3 기능 검색이 최강.</b> 단축키 모를 때 F3로 기능 이름 검색하면 바로 실행 가능. 검색 후 마우스 오른쪽 클릭으로 단축키 할당도 가능.</li>
+        <li><b>F9 마지막 작업 수정.</b> 어떤 작업(압출·추가·Loop Cut 등) 직후 F9를 누르면 수치 조정 패널이 나타남.</li>
+        <li><b>G → Middle Mouse → 축 드래그.</b> 이동 중 중간 마우스 버튼을 누르면 드래그 방향의 축으로 자동 잠금.</li>
+        <li><b>Alt + 클릭으로 루프 선택.</b> 에디트 모드에서 Alt+클릭 하나로 루프 전체 선택.</li>
+        <li><b>Ctrl + R 스크롤 = 루프컷 개수.</b> Ctrl+R 후 스크롤 휠로 루프 개수 조절.</li>
+        <li><b>Dyntopo는 스컬프트 전용.</b> 편집 중 자동으로 폴리곤 추가·제거. 세밀한 부분에서 시작해 전체로 가는 Top-Down 방식에 적합.</li>
+        <li><b>Ctrl+A로 스케일 적용.</b> 스케일이 1이 아닌 오브젝트는 물리 시뮬레이션·모디파이어에서 문제가 생길 수 있음.</li>
+        <li><b>Render Denoising 필수.</b> Cycles에서 샘플을 낮춰도 OptiX/OIDN으로 노이즈 제거하면 빠른 렌더 가능.</li>
+        <li><b>Mirror 모디파이어 활용.</b> 대칭 모델은 Clipping 켜고 Mirror 사용. 절반만 만들면 됨.</li>
+        <li><b>연산 수치 직접 입력.</b> G/R/S 후 숫자를 타이핑하면 정확한 값으로 이동 (예: G Z 2 Enter = Z축으로 2 이동).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot">
+    참고 자료 —
+    <a href="https://docs.blender.org/manual/ko/latest/" target="_blank" rel="noopener">Blender 공식 매뉴얼 (한국어)</a> ·
+    <a href="https://www.blender.org/support/tutorials/" target="_blank" rel="noopener">공식 튜토리얼</a> ·
+    <a href="https://blenderartists.org" target="_blank" rel="noopener">Blender Artists 커뮤니티</a> ·
+    Blender 4.x 기준 · 기본 키맵 (Blender Keymap) 기준
+  </div>
+</section>
+
+<div id="no-result">검색 결과가 없습니다.</div>
+</main>
+</div>
+
+<script>
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  buildSidebar();
+  document.getElementById('no-result').style.display='none';
+  document.getElementById('search').value='';
+}
+function buildSidebar(){
+  const panel=document.querySelector('.panel.active');
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML='';
+  if(!panel)return;
+  panel.querySelectorAll('.card').forEach(card=>{
+    const head=card.querySelector('.card-head');
+    if(!head)return;
+    const text=head.textContent.trim().replace(/\s+/g,' ');
+    const btn=document.createElement('button');
+    btn.className='sb-item';
+    btn.textContent=text.length>28?text.slice(0,28)+'…':text;
+    btn.onclick=()=>{
+      card.scrollIntoView({behavior:'smooth',block:'start'});
+      sb.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    sb.appendChild(btn);
+  });
+}
+buildSidebar();
+document.getElementById('search').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  const panel=document.querySelector('.panel.active');
+  if(!panel)return;
+  const cards=panel.querySelectorAll('.card,.brush-card,.mod-card,.mode-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const match=!q||card.textContent.toLowerCase().includes(q);
+    card.style.display=match?'':'none';
+    if(match)visible++;
+  });
+  document.getElementById('no-result').style.display=(q&&visible===0)?'block':'none';
+});
+</script>
+</body>
+</html>

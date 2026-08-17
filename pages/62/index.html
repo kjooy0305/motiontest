@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian 완전 가이드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07060d;--bg2:#0e0c1a;--bg3:#151228;--bg4:#1e1a38;
+  --border:#2a2448;--border2:#4a3d88;
+  --txt:#f0ecff;--txt2:#b0a0d8;--txt3:#6a5898;
+  --pur:#7c4dff;--pur2:#9d71ff;--pur3:rgba(124,77,255,.13);
+  --pur4:rgba(124,77,255,.06);
+  --acc:#a07cff;--acc2:#c4a8ff;
+  --grn:#44cc88;--grn2:#66ee9a;
+  --yel:#f0c030;--yel2:#ffe066;
+  --red:#ee4455;--blu:#44aaee;
+  --cyan:#44ccdd;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;min-height:100vh;
+}
+
+/* HEADER */
+#hdr{
+  background:linear-gradient(135deg,#050412 0%,#0a0820 50%,#050412 100%);
+  border-bottom:2px solid var(--pur);padding:12px 20px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+#hdr-logo{font-size:22px;filter:drop-shadow(0 0 10px var(--pur));}
+#hdr h1{font-size:18px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 20px rgba(124,77,255,.5);letter-spacing:.5px;}
+#hdr .badge{font-size:10px;padding:2px 7px;border-radius:10px;
+  background:var(--pur3);border:1px solid rgba(124,77,255,.35);color:var(--pur2);
+  font-weight:600;letter-spacing:.3px;white-space:nowrap;}
+#search{flex:1;min-width:180px;max-width:360px;padding:6px 12px;
+  border-radius:6px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);font-size:13px;outline:none;}
+#search:focus{border-color:var(--pur);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:3px;padding:8px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:50px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 14px;border-radius:5px;border:1px solid transparent;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);
+  white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--pur3);border-color:rgba(124,77,255,.4);color:var(--pur2);}
+
+/* MAIN */
+#main{padding:18px;max-width:1280px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+
+/* SECTION HEADING */
+.sec-hd{margin-bottom:18px;}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:4px;
+  display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:16px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:14px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:12px;margin-bottom:16px;}
+.grid-kb{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:10px;margin-bottom:14px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.card-icon{font-size:18px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card-badge{font-size:10px;padding:1px 6px;border-radius:8px;margin-left:auto;
+  background:var(--pur3);border:1px solid rgba(124,77,255,.3);color:var(--pur2);}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.65;}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.tag{font-size:10px;padding:2px 7px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt3);}
+
+/* SHORTCUT TABLE */
+.kb-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.kb-head{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-size:12px;font-weight:700;color:var(--acc);display:flex;align-items:center;gap:6px;}
+.kb-row{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px 14px;border-bottom:1px solid rgba(42,36,72,.6);
+  transition:.1s;}
+.kb-row:last-child{border-bottom:none;}
+.kb-row:hover{background:var(--pur4);}
+.kb-row.hidden{display:none;}
+.kb-desc{font-size:12px;color:var(--txt2);flex:1;min-width:0;}
+.kb-desc b{color:var(--txt);font-weight:500;}
+.kb-keys{display:flex;gap:3px;align-items:center;flex-shrink:0;}
+kbd{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:22px;padding:0 6px;
+  background:var(--bg4);border:1px solid var(--border2);
+  border-bottom:2px solid rgba(74,61,136,.8);
+  border-radius:4px;font-size:10px;font-weight:700;
+  color:var(--acc2);font-family:'Consolas','Courier New',monospace;
+  white-space:nowrap;letter-spacing:.3px;
+}
+.kb-plus{font-size:9px;color:var(--txt3);}
+
+/* FEATURE LIST */
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:0;}
+.feat-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(42,36,72,.5);}
+.feat-item:last-child{border-bottom:none;}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--pur2);
+  flex-shrink:0;margin-top:5px;}
+.feat-txt{font-size:12px;color:var(--txt2);line-height:1.6;}
+.feat-txt strong{color:var(--txt);font-weight:600;}
+
+/* HIGHLIGHT CARD */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(124,77,255,.3);border-radius:8px;padding:14px 16px;
+  margin-bottom:14px;}
+.hi-card .hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;}
+.hi-card .hi-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* SYNTAX TABLE */
+.syn-table{width:100%;border-collapse:collapse;}
+.syn-table th{background:var(--bg3);padding:8px 12px;font-size:11px;font-weight:700;
+  color:var(--acc);text-align:left;border-bottom:1px solid var(--border2);}
+.syn-table td{padding:7px 12px;font-size:12px;border-bottom:1px solid rgba(42,36,72,.5);
+  vertical-align:top;color:var(--txt2);}
+.syn-table tr:last-child td{border-bottom:none;}
+.syn-table tr:hover td{background:var(--pur4);}
+.syn-table code{background:var(--bg4);border:1px solid var(--border);border-radius:3px;
+  padding:1px 5px;font-size:11px;color:var(--acc2);font-family:'Consolas',monospace;}
+.syn-table .result{color:var(--txt);font-size:12px;}
+.syn-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  margin-bottom:12px;}
+.syn-title{padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;color:var(--acc);}
+
+/* SECTION DIVIDER */
+.div-title{font-size:11px;font-weight:700;color:var(--pur2);
+  letter-spacing:.8px;text-transform:uppercase;margin:18px 0 8px;
+  padding-bottom:6px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;}
+
+/* PLUGIN CARD */
+.plug-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.plug-card:hover{border-color:var(--border2);}
+.plug-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--pur),var(--acc));}
+.plug-name{font-size:13px;font-weight:700;color:var(--acc);margin-bottom:4px;}
+.plug-desc{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:6px;}
+.plug-use{font-size:11px;color:var(--txt3);font-style:italic;}
+.plug-stars{position:absolute;top:10px;right:12px;font-size:10px;color:var(--yel);}
+
+/* WORKFLOW CARD */
+.flow-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.flow-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.flow-step:last-child{margin-bottom:0;}
+.flow-num{min-width:22px;height:22px;border-radius:50%;background:var(--pur3);
+  border:1px solid rgba(124,77,255,.4);display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;color:var(--pur2);flex-shrink:0;}
+.flow-txt{font-size:12px;color:var(--txt2);line-height:1.6;}
+.flow-txt strong{color:var(--txt);}
+
+/* CALLOUT */
+.callout{border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;
+  border-left:3px solid;display:flex;gap:8px;align-items:flex-start;}
+.callout-icon{flex-shrink:0;margin-top:1px;}
+.callout-body{color:var(--txt2);line-height:1.65;}
+.callout-body strong{color:var(--txt);}
+.callout.info{background:rgba(68,170,238,.08);border-color:var(--blu);}
+.callout.tip{background:rgba(68,204,136,.08);border-color:var(--grn);}
+.callout.warn{background:rgba(240,192,48,.08);border-color:var(--yel);}
+
+/* TOGGLE */
+.toggle-group{margin-bottom:8px;}
+.toggle-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;cursor:pointer;transition:.1s;}
+.toggle-hd:hover{border-color:var(--border2);}
+.toggle-hd.open{border-radius:6px 6px 0 0;border-color:var(--border2);}
+.toggle-label{font-size:12px;font-weight:600;color:var(--txt);display:flex;align-items:center;gap:6px;}
+.toggle-arrow{font-size:10px;color:var(--txt3);transition:.15s;}
+.toggle-hd.open .toggle-arrow{transform:rotate(90deg);}
+.toggle-body{display:none;padding:10px 14px;background:var(--bg2);
+  border:1px solid var(--border2);border-top:none;border-radius:0 0 6px 6px;}
+.toggle-hd.open + .toggle-body{display:block;}
+
+/* SEARCH HIGHLIGHT */
+.hl{background:rgba(124,77,255,.25);border-radius:2px;color:var(--acc2);}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .grid,.grid-wide,.grid-kb{grid-template-columns:1fr;}
+  .grid-sm{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div id="hdr-logo">🔮</div>
+  <h1>Obsidian 완전 가이드</h1>
+  <span class="badge">기능 · 플러그인 · 단축키</span>
+  <input id="search" type="text" placeholder="기능, 단축키, 플러그인 검색...">
+  <span id="hit-cnt"></span>
+</div>
+
+<!-- TABS -->
+<div id="tabs">
+  <button class="tab on" data-tab="overview">🏠 개요</button>
+  <button class="tab" data-tab="features">⚡ 핵심 기능</button>
+  <button class="tab" data-tab="core-plugins">🔌 코어 플러그인</button>
+  <button class="tab" data-tab="community">🌐 커뮤니티 플러그인</button>
+  <button class="tab" data-tab="shortcuts">⌨️ 단축키</button>
+  <button class="tab" data-tab="markdown">✍️ 마크다운</button>
+  <button class="tab" data-tab="tips">💡 팁 &amp; 워크플로</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+<!-- ===== 개요 ===== -->
+<div class="sec on" id="sec-overview">
+  <div class="sec-hd">
+    <div class="sec-title">🔮 Obsidian이란?</div>
+    <div class="sec-sub">로컬 마크다운 기반 지식 관리 앱 — 노트 간 링크로 두 번째 뇌를 만든다</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🧠 핵심 철학</div>
+    <div class="hi-body">
+      Obsidian은 <strong>로컬 마크다운(.md) 파일</strong>을 저장소(Vault)로 관리하며, <strong>[[내부 링크]]</strong>로 노트 간 연결망을 형성합니다.
+      클라우드가 아닌 내 PC에 데이터가 저장되어 영구적이고 안전합니다. 인터넷 연결 없이도 완전히 작동합니다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📁</span><span class="card-title">로컬 저장 (Vault)</span></div>
+      <div class="card-desc">모든 노트는 일반 .md 파일로 컴퓨터에 저장됩니다. 앱이 사라져도 데이터는 내 것. 다른 앱으로 언제든 열람 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">양방향 링크</span></div>
+      <div class="card-desc">[[노트이름]] 형식으로 노트를 연결하면 자동으로 백링크가 생성됩니다. 아이디어 간 관계망을 시각화합니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕸️</span><span class="card-title">그래프 뷰</span></div>
+      <div class="card-desc">노트 간 링크를 인터랙티브 그래프로 시각화합니다. 지식 구조를 한눈에 파악하고 고립된 노트를 찾을 수 있습니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧩</span><span class="card-title">플러그인 생태계</span></div>
+      <div class="card-desc">1,000개 이상의 커뮤니티 플러그인으로 기능을 무한 확장. 캘린더, 칸반, 데이터베이스, AI 연동 등 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">테마 &amp; 커스텀</span></div>
+      <div class="card-desc">수백 개의 커뮤니티 테마와 CSS Snippet으로 외관을 완전히 커스터마이즈할 수 있습니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🆓</span><span class="card-title">무료 &amp; 유료 옵션</span></div>
+      <div class="card-desc">개인 사용 무료. 유료 서비스: <strong>Sync</strong>(클라우드 동기화, $8/월), <strong>Publish</strong>(웹 퍼블리시, $16/월).</div>
+    </div>
+  </div>
+
+  <div class="div-title">⚙️ 기본 개념</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🗃️</span><span class="card-title">Vault (보관소)</span></div>
+      <div class="card-desc">Obsidian이 관리하는 폴더 단위. 한 폴더 = 하나의 Vault. 여러 Vault를 동시에 운영할 수 있으며, 설정과 플러그인은 Vault별로 독립됩니다.</div>
+      <div class="card-tags"><span class="tag">.obsidian 폴더</span><span class="tag">설정 분리</span><span class="tag">복수 운영</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📝</span><span class="card-title">Note (노트)</span></div>
+      <div class="card-desc">개별 .md 파일. 마크다운 문법으로 작성하며 제목, 본문, 태그, 프로퍼티(front matter)를 포함할 수 있습니다.</div>
+      <div class="card-tags"><span class="tag">.md 파일</span><span class="tag">마크다운</span><span class="tag">YAML front matter</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏷️</span><span class="card-title">Tags &amp; Properties</span></div>
+      <div class="card-desc">#태그 또는 YAML front matter로 노트를 분류합니다. Properties 패널에서 날짜, 상태, 카테고리 등 구조화된 메타데이터를 관리합니다.</div>
+      <div class="card-tags"><span class="tag">#태그</span><span class="tag">YAML</span><span class="tag">메타데이터</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">Wiki Link</span></div>
+      <div class="card-desc">[[노트제목]] 형식으로 다른 노트에 링크. 파이프(|)로 표시 텍스트 변경: [[파일명|보여줄 이름]]. 헤딩 링크: [[파일#헤딩]].</div>
+      <div class="card-tags"><span class="tag">[[링크]]</span><span class="tag">자동완성</span><span class="tag">백링크</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📎</span><span class="card-title">Embed (포함)</span></div>
+      <div class="card-desc">![[파일명]] 으로 다른 노트, 이미지, PDF를 현재 노트 안에 인라인으로 표시합니다. 블록/헤딩 단위 포함도 가능합니다.</div>
+      <div class="card-tags"><span class="tag">![[포함]]</span><span class="tag">이미지</span><span class="tag">PDF</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧱</span><span class="card-title">Block Reference</span></div>
+      <div class="card-desc">특정 문단/블록에 ^id를 붙이면 다른 노트에서 [[파일^id]] 형식으로 해당 블록만 링크하거나 포함시킬 수 있습니다.</div>
+      <div class="card-tags"><span class="tag">^블록ID</span><span class="tag">세밀한 링크</span></div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ️</span>
+    <div class="callout-body"><strong>플랫폼:</strong> Windows, macOS, Linux, iOS, Android 지원. 모바일 앱도 전체 기능 사용 가능합니다.</div>
+  </div>
+</div>
+
+<!-- ===== 핵심 기능 ===== -->
+<div class="sec" id="sec-features">
+  <div class="sec-hd">
+    <div class="sec-title">⚡ 핵심 기능 상세</div>
+    <div class="sec-sub">Obsidian이 제공하는 강력한 기능들을 카테고리별로 정리</div>
+  </div>
+
+  <div class="div-title">📝 편집 기능</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✏️</span><span class="card-title">Live Preview 모드</span><span class="card-badge">기본</span></div>
+      <div class="card-desc">마크다운을 입력하는 즉시 렌더링 결과를 보여주는 편집 모드. 커서가 있는 곳만 원문 표시, 나머지는 미리보기로 보입니다. Ctrl+E로 Reading View 전환.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📖</span><span class="card-title">Reading View</span><span class="card-badge">기본</span></div>
+      <div class="card-desc">완전히 렌더링된 읽기 전용 뷰. 편집 불가 상태로 노트를 깔끔하게 읽을 수 있습니다. 우상단 연필 아이콘이나 Ctrl+E로 전환.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔤</span><span class="card-title">Source Mode</span><span class="card-badge">기본</span></div>
+      <div class="card-desc">순수 마크다운 원문 편집기. 렌더링 없이 텍스트 그대로 편집. 고급 사용자나 특수 문자 처리 시 유용합니다. 설정에서 기본 모드 지정 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">분할 패널</span><span class="card-badge">기본</span></div>
+      <div class="card-desc">화면을 수평/수직으로 분할해 여러 노트를 동시에 볼 수 있습니다. 원문과 미리보기를 나란히 놓거나 두 노트를 비교할 때 유용합니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔤</span><span class="card-title">Vim 모드</span><span class="card-badge">설정</span></div>
+      <div class="card-desc">설정 → 편집기 → Vim key bindings 활성화. Vim 단축키로 커서 이동, 편집, 선택 등을 키보드만으로 수행합니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌊</span><span class="card-title">Typewriter Scroll</span><span class="card-badge">플러그인</span></div>
+      <div class="card-desc">커서 줄을 항상 화면 중앙에 고정하는 타이프라이터 스크롤. 장문 작성 시 눈의 피로를 줄입니다. 커뮤니티 플러그인으로 추가.</div>
+    </div>
+  </div>
+
+  <div class="div-title">🔍 검색 &amp; 탐색</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">전체 검색</span></div>
+      <div class="card-desc">Vault 내 모든 노트에서 텍스트 검색. 정규식 지원, 태그 검색(tag:#태그), 파일명 검색(file:이름), 경로 검색(path:폴더) 등 연산자 조합 가능.</div>
+      <div class="card-tags"><span class="tag">Ctrl+Shift+F</span><span class="tag">정규식</span><span class="tag">연산자</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">Quick Switcher</span></div>
+      <div class="card-desc">파일 이름으로 빠르게 노트를 열거나 생성하는 팔레트. 입력 즉시 파지 결과를 표시합니다. 존재하지 않는 이름 입력 후 Enter로 새 노트 생성.</div>
+      <div class="card-tags"><span class="tag">Ctrl+O</span><span class="tag">빠른 열기</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">Command Palette</span></div>
+      <div class="card-desc">모든 명령어에 접근하는 팔레트. 플러그인 명령, 설정 열기, 테마 변경 등 GUI 메뉴 없이 키보드로 빠르게 실행합니다.</div>
+      <div class="card-tags"><span class="tag">Ctrl+P</span><span class="tag">모든 명령</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔀</span><span class="card-title">Backlinks 패널</span></div>
+      <div class="card-desc">현재 노트를 링크하는 모든 노트의 목록. Unlinked mentions(링크 없는 언급)도 보여줍니다. 지식 그물망의 역방향 탐색.</div>
+      <div class="card-tags"><span class="tag">우측 패널</span><span class="tag">역링크</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🗂️</span><span class="card-title">Outgoing Links</span></div>
+      <div class="card-desc">현재 노트에서 링크하는 노트 목록과 아직 생성되지 않은 링크(unresolved)를 보여줍니다.</div>
+      <div class="card-tags"><span class="tag">나가는 링크</span><span class="tag">미해결 링크</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📋</span><span class="card-title">Outline 패널</span></div>
+      <div class="card-desc">현재 노트의 헤딩 목차를 사이드 패널에 표시합니다. 클릭으로 해당 섹션으로 즉시 이동. 긴 문서 탐색에 필수.</div>
+      <div class="card-tags"><span class="tag">목차</span><span class="tag">헤딩 탐색</span></div>
+    </div>
+  </div>
+
+  <div class="div-title">🕸️ 그래프 &amp; 시각화</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">Global Graph View</span></div>
+      <div class="card-desc">Vault 전체의 노트 링크 관계를 인터랙티브 그래프로 표시. 줌/팬, 필터(태그·폴더·검색), 색상 그룹, 링크 세기 조절 가능. 지식 구조를 시각적으로 파악.</div>
+      <div class="card-tags"><span class="tag">Ctrl+G</span><span class="tag">필터</span><span class="tag">색상 그룹</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔵</span><span class="card-title">Local Graph View</span></div>
+      <div class="card-desc">현재 열린 노트 중심의 로컬 그래프. 1~6단계까지 깊이 설정으로 관련 노트 범위를 조절합니다.</div>
+      <div class="card-tags"><span class="tag">Ctrl+Shift+G</span><span class="tag">깊이 설정</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">Canvas</span></div>
+      <div class="card-desc">무한 캔버스에 노트 카드, 이미지, 웹 페이지를 자유롭게 배치하고 화살표로 연결하는 시각적 사고 도구. Miro/FigJam 스타일 화이트보드.</div>
+      <div class="card-tags"><span class="tag">무한 캔버스</span><span class="tag">마인드맵</span><span class="tag">.canvas 파일</span></div>
+    </div>
+  </div>
+
+  <div class="div-title">🔒 동기화 &amp; 보안</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">☁️</span><span class="card-title">Obsidian Sync</span><span class="card-badge">유료</span></div>
+      <div class="card-desc">Obsidian 공식 E2E 암호화 동기화 서비스. 버전 기록 1년, 최대 10GB. 월 $8 또는 연 $48. 가장 안정적이지만 가격이 있음.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📂</span><span class="card-title">iCloud / Google Drive 동기화</span><span class="card-badge">무료</span></div>
+      <div class="card-desc">Vault 폴더를 클라우드 드라이브 안에 두면 자동 동기화. 무료지만 모바일 앱과의 동기화 설정이 까다로울 수 있음.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">File Recovery</span></div>
+      <div class="card-desc">코어 플러그인. 변경 사항을 자동으로 스냅샷 저장(기본 5분 간격, 최대 7일). 실수로 삭제하거나 덮어쓴 내용 복구 가능.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 코어 플러그인 ===== -->
+<div class="sec" id="sec-core-plugins">
+  <div class="sec-hd">
+    <div class="sec-title">🔌 코어 플러그인 (내장)</div>
+    <div class="sec-sub">설정 → 코어 플러그인에서 각각 활성화/비활성화 가능. 기본 설치되어 있는 공식 플러그인들.</div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body"><strong>코어 플러그인</strong>은 Obsidian 팀이 직접 개발·유지합니다. 안정성이 보장되며 업데이트 시 함께 갱신됩니다.</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">Backlinks</span></div>
+      <div class="card-desc">현재 노트를 참조하는 모든 노트 목록 표시. 링크되지 않은 언급(Unlinked mentions)도 탐지합니다. 사이드 패널 또는 노트 하단에 표시.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">Canvas</span></div>
+      <div class="card-desc">무한 캔버스 화이트보드. .canvas 파일 형식으로 저장되며 노트 임베드, 이미지, 링크, 자유 그리기 지원.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⌨️</span><span class="card-title">Command Palette</span></div>
+      <div class="card-desc">Ctrl+P로 열리는 명령어 팔레트. 모든 플러그인 명령에 빠르게 접근. 최근 사용 명령 상단 표시, 핀 고정 기능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📅</span><span class="card-title">Daily Notes</span></div>
+      <div class="card-desc">오늘 날짜 노트를 자동 생성. 날짜 형식, 저장 폴더, 템플릿 파일 설정 가능. Ctrl+Shift+D로 바로 열기.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📁</span><span class="card-title">File Explorer</span></div>
+      <div class="card-desc">Vault의 폴더·파일 트리 탐색기. 새 파일/폴더 생성, 이동, 이름 변경, 드래그&amp;드롭 지원.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💾</span><span class="card-title">File Recovery</span></div>
+      <div class="card-desc">편집 내역을 주기적으로 스냅샷 저장. 실수로 내용을 삭제했을 때 이전 버전 복구 가능. 보존 기간과 간격 설정 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕸️</span><span class="card-title">Graph View</span></div>
+      <div class="card-desc">노트 링크 관계 시각화. 전체/로컬 그래프 모두 지원. 필터, 색상 그룹, 물리 시뮬레이션 설정 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔵</span><span class="card-title">Note Composer</span></div>
+      <div class="card-desc">현재 노트의 일부를 새 노트로 분리하거나, 반대로 다른 노트를 현재 노트에 합칩니다. 노트 재구성 시 유용.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">Outgoing Links</span></div>
+      <div class="card-desc">현재 노트가 링크하는 노트와 미해결 링크 목록. 존재하지 않는 링크를 클릭하면 새 노트 생성.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📋</span><span class="card-title">Outline</span></div>
+      <div class="card-desc">현재 노트의 헤딩 목차를 사이드 패널에 표시. 헤딩 클릭으로 즉시 이동. 긴 문서 탐색에 필수적.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👀</span><span class="card-title">Page Preview</span></div>
+      <div class="card-desc">링크 위에 마우스를 올리면 해당 노트 내용을 팝업으로 미리 봅니다. 링크를 열지 않고 내용 확인 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🗂️</span><span class="card-title">Properties</span></div>
+      <div class="card-desc">노트의 YAML front matter를 UI로 편집. 필드 타입(텍스트, 날짜, 숫자, 체크박스, 리스트, 링크) 지원. 노트 메타데이터 관리 핵심.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">Quick Switcher</span></div>
+      <div class="card-desc">Ctrl+O로 노트 이름 검색 후 즉시 이동. 없는 이름 입력 후 Enter로 새 노트 생성. 키보드 중심 워크플로의 핵심.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎲</span><span class="card-title">Random Note</span></div>
+      <div class="card-desc">Vault에서 무작위로 노트를 엽니다. 잊혀진 오래된 노트를 다시 발견하거나 복습할 때 활용.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">Search</span></div>
+      <div class="card-desc">Vault 전체 텍스트 검색. tag:, file:, path:, line:, block: 등 다양한 검색 연산자. 결과를 파일로 저장하는 Copy Results 기능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">/</span><span class="card-title">Slash Commands</span></div>
+      <div class="card-desc">편집기에서 / 입력 시 삽입 명령 목록 표시. 날짜 삽입, 템플릿 적용, 콜아웃 삽입 등을 마우스 없이 실행.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📊</span><span class="card-title">Slides</span></div>
+      <div class="card-desc">--- 구분선으로 슬라이드를 나누어 프레젠테이션 모드로 보기. 간단한 발표 자료 제작에 활용.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏷️</span><span class="card-title">Tags View</span></div>
+      <div class="card-desc">Vault의 모든 태그와 사용 빈도를 목록으로 표시. 태그 클릭으로 해당 태그를 가진 노트만 검색.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📄</span><span class="card-title">Templates</span></div>
+      <div class="card-desc">지정한 폴더의 노트를 템플릿으로 사용. {{date}}, {{time}}, {{title}} 변수 지원. Ctrl+Shift+T로 현재 노트에 삽입.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🆔</span><span class="card-title">Unique Note Creator</span></div>
+      <div class="card-desc">Zettelkasten 스타일의 고유 ID(타임스탬프) 노트 생성. 날짜/시간 기반 파일명으로 노트 충돌 방지.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📊</span><span class="card-title">Word Count</span></div>
+      <div class="card-desc">편집기 하단 상태바에 단어 수, 문자 수 표시. 현재 선택 영역 기준 카운트도 실시간으로 반영.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">Publish</span><span class="card-badge">유료</span></div>
+      <div class="card-desc">선택한 노트를 obsidian.md 도메인 웹사이트로 공개 퍼블리시. 월 $16. 그래프 뷰, 검색, 커스텀 도메인 지원.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">☁️</span><span class="card-title">Sync</span><span class="card-badge">유료</span></div>
+      <div class="card-desc">Obsidian 공식 E2E 암호화 동기화. 버전 기록, 선택적 동기화, 최대 10GB. 월 $8. 가장 안정적인 동기화 방법.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 커뮤니티 플러그인 ===== -->
+<div class="sec" id="sec-community">
+  <div class="sec-hd">
+    <div class="sec-title">🌐 커뮤니티 플러그인 (인기 TOP)</div>
+    <div class="sec-sub">설정 → 커뮤니티 플러그인 → 찾아보기에서 설치. 1,000개 이상 존재.</div>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>주의:</strong> 커뮤니티 플러그인은 서드파티 개발자 작성. 설치 전 <strong>제한 모드</strong> 비활성화 필요. 신뢰할 수 있는 플러그인만 설치 권장.</div>
+  </div>
+
+  <div class="div-title">📊 데이터 &amp; 쿼리</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 필수</div>
+      <div class="plug-name">Dataview</div>
+      <div class="plug-desc">노트 메타데이터를 SQL 유사 언어로 쿼리하여 테이블·목록·캘린더 뷰로 표시. 동적 대시보드 제작의 핵심.</div>
+      <div class="plug-use">예: 이번 주 작성한 모든 #프로젝트 노트 목록 자동 생성</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 인기</div>
+      <div class="plug-name">DB Folder</div>
+      <div class="plug-desc">폴더를 Notion 스타일 데이터베이스로 변환. 인라인 편집, 필터, 정렬, 속성 관리 가능.</div>
+      <div class="plug-use">예: 독서 목록, 영화 리뷰, 레시피 관리</div>
+    </div>
+  </div>
+
+  <div class="div-title">📝 템플릿 &amp; 자동화</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 필수</div>
+      <div class="plug-name">Templater</div>
+      <div class="plug-desc">코어 Templates보다 강력한 템플릿 엔진. JavaScript 실행, 날짜 계산, 사용자 입력 받기, 파일 이동 등 고급 자동화.</div>
+      <div class="plug-use">예: 회의록 자동 날짜 삽입, 제목 기반 파일 이동</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 인기</div>
+      <div class="plug-name">QuickAdd</div>
+      <div class="plug-desc">빠른 노트 추가, 템플릿 실행, 매크로 등록을 단축키로 연결. 캡처·처리 워크플로를 단순화.</div>
+      <div class="plug-use">예: 단축키 하나로 읽은 책 항목 입력 + 템플릿 적용</div>
+    </div>
+  </div>
+
+  <div class="div-title">📅 시간 관리</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 필수</div>
+      <div class="plug-name">Calendar</div>
+      <div class="plug-desc">사이드 패널에 달력 표시. 날짜 클릭으로 데일리 노트 열기/생성. 주간·월간 뷰 지원.</div>
+      <div class="plug-use">데일리 노트 연동 필수 플러그인</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 인기</div>
+      <div class="plug-name">Periodic Notes</div>
+      <div class="plug-desc">데일리 외 위클리(주간), 먼슬리(월간), 쿼터리(분기), 이어리(연간) 노트 자동 생성. Zettelkasten 계획 관리.</div>
+      <div class="plug-use">주간 리뷰, 월간 목표 관리</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Tasks</div>
+      <div class="plug-desc">Vault 전체의 태스크를 쿼리하여 통합 할 일 목록 생성. 마감일, 반복, 우선순위, 완료 처리 지원.</div>
+      <div class="plug-use">전체 Vault의 미완료 작업 한 번에 보기</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Natural Language Dates</div>
+      <div class="plug-desc">@내일, @다음주 월요일처럼 자연어로 날짜를 삽입. Templater·Tasks와 연동하면 강력해짐.</div>
+      <div class="plug-use">날짜 입력 속도 향상</div>
+    </div>
+  </div>
+
+  <div class="div-title">🎨 시각화 &amp; UI</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 필수</div>
+      <div class="plug-name">Excalidraw</div>
+      <div class="plug-desc">Obsidian 안에서 Excalidraw 손그림 다이어그램 편집. 노트 임베드, SVG 내보내기, 스크립트 자동화 지원.</div>
+      <div class="plug-use">개념도, 플로우차트, 스케치 노트</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Kanban</div>
+      <div class="plug-desc">마크다운 기반 칸반 보드. 마크다운으로 저장되므로 일반 텍스트로도 열람 가능. 드래그&amp;드롭, 컬러 레이블.</div>
+      <div class="plug-use">프로젝트 관리, 할 일 보드</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Mind Map</div>
+      <div class="plug-desc">마크다운 헤딩 구조를 자동으로 마인드맵 형태로 시각화. 실시간 업데이트.</div>
+      <div class="plug-use">브레인스토밍, 아이디어 구조화</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Heatmap Calendar</div>
+      <div class="plug-desc">Dataview와 연동해 GitHub 스타일 잔디 히트맵 달력 생성. 글쓰기 습관 추적에 활용.</div>
+      <div class="plug-use">일기·독서 스트릭 시각화</div>
+    </div>
+  </div>
+
+  <div class="div-title">✍️ 편집 강화</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 인기</div>
+      <div class="plug-name">Advanced Tables</div>
+      <div class="plug-desc">마크다운 표 편집을 Excel처럼. Tab으로 셀 이동, 자동 정렬, 열 추가/삭제, CSV 내보내기.</div>
+      <div class="plug-use">표 많은 노트 필수</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Linter</div>
+      <div class="plug-desc">저장 시 마크다운 형식 자동 정리. YAML front matter 정렬, 제목 레벨 수정, 빈 줄 통일 등 규칙 설정.</div>
+      <div class="plug-use">노트 형식 일관성 유지</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Paste URL into Selection</div>
+      <div class="plug-desc">텍스트 선택 후 URL 붙여넣기 시 자동으로 [선택텍스트](URL) 마크다운 링크 형식으로 변환.</div>
+      <div class="plug-use">링크 삽입 속도 향상</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Obsidian Footnotes</div>
+      <div class="plug-desc">단축키로 각주를 자동 번호 매겨 삽입하고 커서를 각주 내용 위치로 이동. 학술 글쓰기에 유용.</div>
+      <div class="plug-use">각주 자동화</div>
+    </div>
+  </div>
+
+  <div class="div-title">🔄 동기화 &amp; 버전 관리</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-stars">⭐ 인기</div>
+      <div class="plug-name">Obsidian Git</div>
+      <div class="plug-desc">Git 저장소로 Vault 자동 백업. 자동 커밋·푸시 간격 설정, 변경 이력 관리. GitHub 무료 비공개 저장소로 동기화.</div>
+      <div class="plug-use">무료 동기화 대안, 버전 기록</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Remotely Save</div>
+      <div class="plug-desc">S3, Dropbox, OneDrive, WebDAV 등 다양한 스토리지로 동기화. 자체 서버 운영도 가능.</div>
+      <div class="plug-use">Sync 유료 대안</div>
+    </div>
+  </div>
+
+  <div class="div-title">🤖 AI &amp; 생산성</div>
+  <div class="grid">
+    <div class="plug-card">
+      <div class="plug-name">Copilot</div>
+      <div class="plug-desc">ChatGPT/Claude/Gemini 등 AI와 노트 내용을 연동. 요약, 번역, 질의응답을 Obsidian 내에서 처리.</div>
+      <div class="plug-use">AI 기반 지식 관리</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Smart Connections</div>
+      <div class="plug-desc">로컬 임베딩으로 의미적으로 유사한 노트를 자동 추천. AI 기반 semantic search.</div>
+      <div class="plug-use">관련 노트 자동 발견</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">Spaced Repetition</div>
+      <div class="plug-desc">노트 안에 플래시카드를 작성하고 간격 반복 복습(SRS) 알고리즘으로 학습. Anki 대안.</div>
+      <div class="plug-use">언어 학습, 시험 준비</div>
+    </div>
+    <div class="plug-card">
+      <div class="plug-name">ReadItLater</div>
+      <div class="plug-desc">URL을 입력하면 웹 페이지 내용을 마크다운으로 변환해 Vault에 저장. 아티클 스크랩에 최적.</div>
+      <div class="plug-use">웹 클리핑</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 단축키 ===== -->
+<div class="sec" id="sec-shortcuts">
+  <div class="sec-hd">
+    <div class="sec-title">⌨️ 단축키 전체 목록</div>
+    <div class="sec-sub">Windows/Linux 기준. Mac은 Ctrl → Cmd, Alt → Option으로 대체.</div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ️</span>
+    <div class="callout-body">설정 → 단축키에서 모든 단축키를 확인·수정할 수 있습니다. 충돌 없이 원하는 키 조합을 자유롭게 지정 가능.</div>
+  </div>
+
+  <div class="grid-kb">
+    <!-- 일반 -->
+    <div class="kb-card">
+      <div class="kb-head">🏠 일반</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>새 노트 만들기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>N</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>새 창에서 노트 만들기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>N</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>빠른 전환기 열기</b> (노트 열기/생성)</span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>O</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>명령어 팔레트</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>P</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>설정 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>,</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>현재 탭 닫기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>W</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>다음 탭</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Tab</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>이전 탭</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>Tab</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>뒤로 이동</b> (히스토리)</span>
+        <div class="kb-keys"><kbd>Alt</kbd><span class="kb-plus">+</span><kbd>←</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>앞으로 이동</b></span>
+        <div class="kb-keys"><kbd>Alt</kbd><span class="kb-plus">+</span><kbd>→</kbd></div>
+      </div>
+    </div>
+
+    <!-- 편집 -->
+    <div class="kb-card">
+      <div class="kb-head">✏️ 텍스트 편집</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>굵게</b> Bold</span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>B</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>기울임</b> Italic</span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>I</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>링크 삽입</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>K</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>실행 취소</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Z</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>다시 실행</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>Z</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>파일 내 검색</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>F</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>찾기 및 바꾸기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>H</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>체크박스 토글</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>L</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>목록 들여쓰기</b></span>
+        <div class="kb-keys"><kbd>Tab</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>목록 내어쓰기</b></span>
+        <div class="kb-keys"><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>Tab</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>현재 줄 삭제</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>K</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>현재 줄 복제</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>D</kbd></div>
+      </div>
+    </div>
+
+    <!-- 보기 & 패널 -->
+    <div class="kb-card">
+      <div class="kb-head">👁️ 보기 &amp; 패널</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>편집↔읽기 모드 전환</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>E</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>그래프 뷰 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>G</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>로컬 그래프 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>G</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>오른쪽으로 패널 분할</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>\</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>왼쪽 사이드바 토글</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>←</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>오른쪽 사이드바 토글</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>→</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>전체 화면 / 포커스 모드</b></span>
+        <div class="kb-keys"><kbd>F11</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>현재 파일 링크 복사</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>C</kbd></div>
+      </div>
+    </div>
+
+    <!-- 링크 & 탐색 -->
+    <div class="kb-card">
+      <div class="kb-head">🔗 링크 &amp; 탐색</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>커서 위치의 링크 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Enter</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>새 탭에서 링크 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Click</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>새 창에서 링크 열기</b></span>
+        <div class="kb-keys"><kbd>Alt</kbd><span class="kb-plus">+</span><kbd>Enter</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>전체 검색</b> (Search in all files)</span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>F</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>파일 탐색기로 포커스</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>E</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>파일 탐색기에서 현재 파일 표시</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>R</kbd></div>
+      </div>
+    </div>
+
+    <!-- 데일리 노트 & 템플릿 -->
+    <div class="kb-card">
+      <div class="kb-head">📅 데일리 노트 &amp; 템플릿</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>오늘의 데일리 노트 열기</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>D</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>템플릿 삽입</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>T</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>무작위 노트 열기</b></span>
+        <div class="kb-keys"><span class="kb-desc" style="color:var(--txt3);font-size:11px;">명령 팔레트 → Random note</span></div>
+      </div>
+    </div>
+
+    <!-- 커서 이동 -->
+    <div class="kb-card">
+      <div class="kb-head">🖱️ 커서 이동</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>문서 맨 앞으로</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Home</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>문서 맨 끝으로</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>End</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 처음으로</b></span>
+        <div class="kb-keys"><kbd>Home</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 끝으로</b></span>
+        <div class="kb-keys"><kbd>End</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>단어 단위로 이동</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>←</kbd> <kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>→</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>전체 선택</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>A</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>선택 + 단어 이동</b></span>
+        <div class="kb-keys"><kbd>Ctrl</kbd><span class="kb-plus">+</span><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>←/→</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 맨 앞까지 선택</b></span>
+        <div class="kb-keys"><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>Home</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 맨 끝까지 선택</b></span>
+        <div class="kb-keys"><kbd>Shift</kbd><span class="kb-plus">+</span><kbd>End</kbd></div>
+      </div>
+    </div>
+
+    <!-- Mac 전용 -->
+    <div class="kb-card">
+      <div class="kb-head">🍎 Mac 기준 (Cmd 사용)</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>새 노트</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>N</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>빠른 전환기</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>O</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>명령어 팔레트</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>P</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>굵게</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>B</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>그래프 뷰</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>G</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>링크 열기</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>Enter</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>전체 검색</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>⇧</kbd><span class="kb-plus">+</span><kbd>F</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>뒤로/앞으로</b></span>
+        <div class="kb-keys"><kbd>⌘</kbd><span class="kb-plus">+</span><kbd>[</kbd> / <kbd>]</kbd></div>
+      </div>
+    </div>
+
+    <!-- Vim 모드 -->
+    <div class="kb-card">
+      <div class="kb-head">🔧 Vim 모드 (활성화 시)</div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>Normal Mode</b> 진입</span>
+        <div class="kb-keys"><kbd>Esc</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>Insert Mode</b> 진입</span>
+        <div class="kb-keys"><kbd>i</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 뒤에 삽입</b></span>
+        <div class="kb-keys"><kbd>a</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 끝에 삽입</b></span>
+        <div class="kb-keys"><kbd>A</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>아래 새 줄 삽입</b></span>
+        <div class="kb-keys"><kbd>o</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>커서 이동</b></span>
+        <div class="kb-keys"><kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>단어 이동</b></span>
+        <div class="kb-keys"><kbd>w</kbd> <kbd>b</kbd> <kbd>e</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>줄 삭제</b></span>
+        <div class="kb-keys"><kbd>d</kbd><kbd>d</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>단어 삭제</b></span>
+        <div class="kb-keys"><kbd>d</kbd><kbd>w</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>검색</b></span>
+        <div class="kb-keys"><kbd>/</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>저장</b></span>
+        <div class="kb-keys"><kbd>:</kbd><kbd>w</kbd></div>
+      </div>
+      <div class="kb-row">
+        <span class="kb-desc"><b>맨 앞/끝 이동</b></span>
+        <div class="kb-keys"><kbd>g</kbd><kbd>g</kbd> / <kbd>G</kbd></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 마크다운 ===== -->
+<div class="sec" id="sec-markdown">
+  <div class="sec-hd">
+    <div class="sec-title">✍️ Obsidian 마크다운 문법</div>
+    <div class="sec-sub">표준 마크다운 + Obsidian 확장 문법. Live Preview에서 즉시 확인 가능.</div>
+  </div>
+
+  <div class="grid-wide">
+    <div class="syn-wrap">
+      <div class="syn-title">📝 기본 서식</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>결과</th><th>설명</th></tr>
+        <tr><td><code>**텍스트**</code></td><td class="result"><strong>텍스트</strong></td><td>굵게 (Bold)</td></tr>
+        <tr><td><code>*텍스트*</code></td><td class="result"><em>텍스트</em></td><td>기울임 (Italic)</td></tr>
+        <tr><td><code>~~텍스트~~</code></td><td class="result"><s>텍스트</s></td><td>취소선</td></tr>
+        <tr><td><code>==텍스트==</code></td><td class="result" style="background:#ff0;color:#000;padding:0 2px;">텍스트</td><td>형광펜 하이라이트</td></tr>
+        <tr><td><code>`인라인 코드`</code></td><td class="result"><code style="background:var(--bg4);padding:1px 4px;border-radius:2px;">코드</code></td><td>인라인 코드</td></tr>
+        <tr><td><code>***굵은기울임***</code></td><td class="result"><strong><em>굵은기울임</em></strong></td><td>Bold + Italic</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">📌 헤딩</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>결과</th></tr>
+        <tr><td><code># 제목1</code></td><td class="result" style="font-size:20px;font-weight:700;">제목 1 (H1)</td></tr>
+        <tr><td><code>## 제목2</code></td><td class="result" style="font-size:17px;font-weight:700;">제목 2 (H2)</td></tr>
+        <tr><td><code>### 제목3</code></td><td class="result" style="font-size:14px;font-weight:700;">제목 3 (H3)</td></tr>
+        <tr><td><code>#### 제목4</code></td><td class="result" style="font-size:13px;font-weight:600;">제목 4 (H4)</td></tr>
+        <tr><td><code>##### 제목5</code></td><td class="result" style="font-size:12px;font-weight:600;">제목 5 (H5)</td></tr>
+        <tr><td><code>###### 제목6</code></td><td class="result" style="font-size:11px;font-weight:600;">제목 6 (H6)</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">📋 목록</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>- 항목</code> 또는 <code>* 항목</code></td><td>순서 없는 목록</td></tr>
+        <tr><td><code>1. 항목</code></td><td>순서 있는 목록</td></tr>
+        <tr><td><code>- [ ] 할 일</code></td><td>체크박스 (미완료)</td></tr>
+        <tr><td><code>- [x] 완료</code></td><td>체크박스 (완료)</td></tr>
+        <tr><td><code>  - 하위 항목</code></td><td>탭으로 들여쓰기 중첩</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">🔗 링크 &amp; 임베드</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>[[노트이름]]</code></td><td>내부 링크 (Wiki Link)</td></tr>
+        <tr><td><code>[[노트이름|표시 텍스트]]</code></td><td>별칭 링크</td></tr>
+        <tr><td><code>[[노트이름#헤딩]]</code></td><td>특정 헤딩으로 링크</td></tr>
+        <tr><td><code>[[노트이름^블록ID]]</code></td><td>특정 블록으로 링크</td></tr>
+        <tr><td><code>![[노트이름]]</code></td><td>노트 임베드 (포함)</td></tr>
+        <tr><td><code>![[이미지.png]]</code></td><td>이미지 임베드</td></tr>
+        <tr><td><code>![[파일.pdf]]</code></td><td>PDF 임베드</td></tr>
+        <tr><td><code>[텍스트](URL)</code></td><td>외부 링크</td></tr>
+        <tr><td><code>![대체텍스트](이미지URL)</code></td><td>외부 이미지</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">💻 코드 블록</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>```언어<br>코드<br>```</code></td><td>코드 블록 (언어 하이라이트)</td></tr>
+        <tr><td><code>```python</code></td><td>Python 하이라이트</td></tr>
+        <tr><td><code>```javascript</code></td><td>JavaScript 하이라이트</td></tr>
+        <tr><td><code>```dataview</code></td><td>Dataview 쿼리 블록</td></tr>
+        <tr><td><code>```dataviewjs</code></td><td>Dataview JS 블록</td></tr>
+        <tr><td><code>```mermaid</code></td><td>Mermaid 다이어그램</td></tr>
+        <tr><td><code>```latex</code></td><td>LaTeX 수식 블록</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">📦 Callout (콜아웃)</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>&gt; [!NOTE]<br>&gt; 내용</code></td><td>기본 정보 콜아웃</td></tr>
+        <tr><td><code>&gt; [!TIP]</code></td><td>팁 (초록)</td></tr>
+        <tr><td><code>&gt; [!WARNING]</code></td><td>경고 (노랑)</td></tr>
+        <tr><td><code>&gt; [!DANGER]</code></td><td>위험 (빨강)</td></tr>
+        <tr><td><code>&gt; [!INFO]</code></td><td>정보 (파랑)</td></tr>
+        <tr><td><code>&gt; [!SUCCESS]</code></td><td>성공 (초록)</td></tr>
+        <tr><td><code>&gt; [!EXAMPLE]</code></td><td>예시</td></tr>
+        <tr><td><code>&gt; [!QUOTE]</code></td><td>인용</td></tr>
+        <tr><td><code>&gt; [!NOTE]+ 제목</code></td><td>기본 펼쳐진 접을 수 있는 콜아웃</td></tr>
+        <tr><td><code>&gt; [!NOTE]- 제목</code></td><td>기본 접힌 접을 수 있는 콜아웃</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">📐 수식 (LaTeX)</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>$수식$</code></td><td>인라인 수식</td></tr>
+        <tr><td><code>$$<br>수식<br>$$</code></td><td>블록 수식</td></tr>
+        <tr><td><code>$E=mc^2$</code></td><td>예: E=mc²</td></tr>
+        <tr><td><code>$\frac{a}{b}$</code></td><td>분수</td></tr>
+        <tr><td><code>$\sum_{i=1}^{n}$</code></td><td>시그마</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">🗃️ 표 (Table)</div>
+      <table class="syn-table">
+        <tr><th colspan="2">문법 예시</th></tr>
+        <tr><td colspan="2"><code>| 열1 | 열2 | 열3 |<br>| --- | :---: | ---: |<br>| 왼쪽 | 가운데 | 오른쪽 |</code></td></tr>
+        <tr><td><code>---</code></td><td>기본 정렬 (왼쪽)</td></tr>
+        <tr><td><code>:---:</code></td><td>가운데 정렬</td></tr>
+        <tr><td><code>---:</code></td><td>오른쪽 정렬</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">🏷️ Properties (YAML Front Matter)</div>
+      <table class="syn-table">
+        <tr><th colspan="2">예시 구조</th></tr>
+        <tr><td colspan="2"><code>---<br>title: 노트 제목<br>date: 2024-01-15<br>tags: [공부, 개발]<br>status: 진행중<br>aliases: [별칭1, 별칭2]<br>---</code></td></tr>
+        <tr><td><code>aliases</code></td><td>다른 이름으로도 링크 가능</td></tr>
+        <tr><td><code>cssclasses</code></td><td>CSS 클래스 적용</td></tr>
+        <tr><td><code>publish</code></td><td>Publish 공개 여부</td></tr>
+      </table>
+    </div>
+
+    <div class="syn-wrap">
+      <div class="syn-title">🔀 기타 문법</div>
+      <table class="syn-table">
+        <tr><th>문법</th><th>설명</th></tr>
+        <tr><td><code>---</code></td><td>수평선 구분자</td></tr>
+        <tr><td><code>&gt; 텍스트</code></td><td>인용구 (Blockquote)</td></tr>
+        <tr><td><code>^블록ID</code></td><td>블록 ID 지정 (링크용)</td></tr>
+        <tr><td><code>#태그</code></td><td>태그 (문장 내 어디든 가능)</td></tr>
+        <tr><td><code>#태그/서브태그</code></td><td>중첩 태그</td></tr>
+        <tr><td><code>[[#헤딩]]</code></td><td>같은 노트 내 헤딩 링크</td></tr>
+        <tr><td><code>\n 두 번 Enter</code></td><td>문단 구분</td></tr>
+        <tr><td><code>  (줄 끝 공백 2개)</code></td><td>줄 바꿈</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 팁 ===== -->
+<div class="sec" id="sec-tips">
+  <div class="sec-hd">
+    <div class="sec-title">💡 팁 &amp; 워크플로</div>
+    <div class="sec-sub">실전에서 유용한 사용 패턴과 워크플로 예시</div>
+  </div>
+
+  <div class="div-title">🎯 PARA 시스템</div>
+  <div class="hi-card">
+    <div class="hi-title">📁 PARA 폴더 구조 (Tiago Forte)</div>
+    <div class="hi-body">
+      <strong>P</strong>rojects (프로젝트) — 현재 진행 중인 목표 기한 있는 작업<br>
+      <strong>A</strong>reas (영역) — 지속적으로 관리하는 책임 영역 (건강, 재정, 업무...)<br>
+      <strong>R</strong>esources (자원) — 관심 주제, 참고 자료, 나중에 쓸 정보<br>
+      <strong>A</strong>rchives (아카이브) — 완료됐거나 비활성화된 모든 것
+    </div>
+  </div>
+
+  <div class="div-title">🗃️ Zettelkasten 방법론</div>
+  <div class="grid">
+    <div class="flow-card">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-txt"><strong>Fleeting Note</strong> — 떠오르는 생각을 즉시 캡처. 임시 메모, 나중에 정리.</div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-txt"><strong>Literature Note</strong> — 책·아티클 내용 요약. 자기 말로 바꿔 기록.</div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-txt"><strong>Permanent Note</strong> — 하나의 아이디어만 담은 원자적 노트. 독립적으로 의미를 가져야 함.</div></div>
+      <div class="flow-step"><div class="flow-num">4</div><div class="flow-txt"><strong>Index Note</strong> — 관련 노트들을 모아주는 목차 노트. MOC(Map of Content) 라고도 함.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💡</span><span class="card-title">Zettelkasten 핵심 원칙</span></div>
+      <ul class="feat-list">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">노트 하나에 아이디어 <strong>하나만</strong> — 원자성(Atomicity)</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">복사가 아닌 <strong>자기 말로</strong> 재구성 — 이해한 것만 기록</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">노트 간 <strong>링크를 적극적으로</strong> 생성 — 지식망 형성</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">폴더보다 <strong>링크와 태그</strong>로 구조화</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">노트 파일명은 <strong>타임스탬프</strong>나 간결한 제목 권장</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">⚡ 생산성 팁</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">검색 연산자 활용</span></div>
+      <ul class="feat-list">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">tag:#태그</code> — 태그로 검색</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">file:파일명</code> — 파일명 검색</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">path:폴더</code> — 특정 폴더만</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">"정확한 문구"</code> — 완전 일치</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">-제외어</code> — 특정 단어 제외</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><code style="color:var(--acc2);background:var(--bg4);padding:1px 4px;border-radius:2px;font-size:11px;">/정규식/</code> — 정규식 검색</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">CSS Snippet 활용</span></div>
+      <div class="card-desc">설정 → 테마 → CSS Snippet. .obsidian/snippets/ 폴더에 .css 파일 추가로 세밀한 커스터마이징 가능.</div>
+      <ul class="feat-list" style="margin-top:8px;">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">폰트 크기·종류 변경</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">특정 헤딩 색상 커스텀</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">칼럼 레이아웃 구현</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">cssclasses로 노트별 스타일 적용</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔄</span><span class="card-title">Dataview 활용 예시</span></div>
+      <div class="card-desc">코드 블록에 <code>dataview</code> 언어 지정 후 쿼리 작성:</div>
+      <ul class="feat-list" style="margin-top:8px;">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><strong>TABLE</strong> file.mtime FROM #독서 — 독서 노트 최근 수정순 목록</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><strong>LIST</strong> FROM "프로젝트" WHERE status = "진행중" — 진행 중 프로젝트</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><strong>CALENDAR</strong> file.ctime — 노트 생성 달력</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt"><strong>TASK</strong> FROM #할일 WHERE !completed — 미완료 작업</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📱</span><span class="card-title">모바일 활용</span></div>
+      <ul class="feat-list">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">iOS/Android 앱 무료 (Sync 별도 유료)</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">퀵 액션 버튼으로 데일리 노트 바로 열기</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">화면 스와이프로 사이드 패널 열기/닫기</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">iCloud(iOS) 또는 Google Drive로 무료 동기화 가능</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">모바일 툴바 커스터마이징 지원</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">빠른 캡처 워크플로</span></div>
+      <div class="flow-step" style="padding:4px 0;"><div class="flow-num">1</div><div class="flow-txt">QuickAdd 단축키로 캡처 폼 열기</div></div>
+      <div class="flow-step" style="padding:4px 0;"><div class="flow-num">2</div><div class="flow-txt">아이디어/링크/할 일 즉시 입력</div></div>
+      <div class="flow-step" style="padding:4px 0;"><div class="flow-num">3</div><div class="flow-txt">Inbox 폴더에 자동 저장</div></div>
+      <div class="flow-step" style="padding:4px 0;"><div class="flow-num">4</div><div class="flow-txt">주간 리뷰 시 정리·링크·이동</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎓</span><span class="card-title">학습 &amp; 복습 시스템</span></div>
+      <ul class="feat-list">
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">Spaced Repetition 플러그인으로 SRS 카드 생성</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">Random Note로 오래된 노트 재발견</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">Heatmap Calendar로 학습 습관 추적</div></li>
+        <li class="feat-item"><div class="feat-dot"></div><div class="feat-txt">MOC(Map of Content)로 지식 구조화</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">🛠️ 자주 묻는 설정</div>
+  <div class="toggle-group">
+    <div class="toggle-hd" onclick="this.classList.toggle('open')">
+      <span class="toggle-label">📁 새 노트의 저장 위치를 지정하고 싶어요</span>
+      <span class="toggle-arrow">›</span>
+    </div>
+    <div class="toggle-body"><div class="feat-txt">설정 → 파일 및 링크 → <strong>새 노트의 위치</strong> → "지정한 폴더"로 선택 후 폴더 경로 입력. Inbox 폴더를 지정해두면 모든 새 노트가 거기에 모입니다.</div></div>
+  </div>
+  <div class="toggle-group">
+    <div class="toggle-hd" onclick="this.classList.toggle('open')">
+      <span class="toggle-label">🔗 링크 형식을 짧게 바꾸고 싶어요 (상대경로 → 파일명만)</span>
+      <span class="toggle-arrow">›</span>
+    </div>
+    <div class="toggle-body"><div class="feat-txt">설정 → 파일 및 링크 → <strong>새 링크 형식</strong> → "최단 경로"로 설정. [[폴더/파일]] 대신 [[파일]]만 표시됩니다.</div></div>
+  </div>
+  <div class="toggle-group">
+    <div class="toggle-hd" onclick="this.classList.toggle('open')">
+      <span class="toggle-label">🎨 다크/라이트 테마를 바꾸고 싶어요</span>
+      <span class="toggle-arrow">›</span>
+    </div>
+    <div class="toggle-body"><div class="feat-txt">설정 → 테마 → 외관 → <strong>기본 색상 구성</strong> 또는 커뮤니티 테마 찾아보기. 인기 테마: Minimal, Things, Prism, Catppuccin, AnuPpuccin.</div></div>
+  </div>
+  <div class="toggle-group">
+    <div class="toggle-hd" onclick="this.classList.toggle('open')">
+      <span class="toggle-label">📝 기본 편집기 폰트를 바꾸고 싶어요</span>
+      <span class="toggle-arrow">›</span>
+    </div>
+    <div class="toggle-body"><div class="feat-txt">설정 → 테마 → <strong>텍스트 폰트 / 모노스페이스 폰트</strong>에서 시스템에 설치된 폰트명 직접 입력. 한글 폰트: 맑은 고딕, 나눔고딕, Pretendard 등.</div></div>
+  </div>
+  <div class="toggle-group">
+    <div class="toggle-hd" onclick="this.classList.toggle('open')">
+      <span class="toggle-label">⚡ 시작 시 자동으로 데일리 노트를 열고 싶어요</span>
+      <span class="toggle-arrow">›</span>
+    </div>
+    <div class="toggle-body"><div class="feat-txt">코어 플러그인 → Daily Notes → <strong>시작 시 자동으로 열기</strong> 체크. Obsidian 실행 시 오늘 데일리 노트가 자동으로 열립니다.</div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+    tab.classList.add('on');
+    const key = tab.dataset.tab;
+    const sec = document.getElementById('sec-' + key);
+    if(sec) sec.classList.add('on');
+  });
+});
+
+// Search
+const searchEl = document.getElementById('search');
+const hitCnt = document.getElementById('hit-cnt');
+
+searchEl.addEventListener('input', function(){
+  const q = this.value.trim().toLowerCase();
+  if(!q){ clearSearch(); return; }
+
+  // Switch to searching all sections
+  activateAllForSearch();
+
+  // Find all searchable text nodes
+  const targets = document.querySelectorAll(
+    '.card-title,.card-desc,.plug-name,.plug-desc,.plug-use,.kb-desc,.feat-txt,.feat-item,.syn-table td,.syn-table th,.hi-body,.callout-body,.toggle-label,.flow-txt'
+  );
+
+  let hits = 0;
+  targets.forEach(el => {
+    const text = el.textContent.toLowerCase();
+    if(text.includes(q)){
+      hits++;
+      highlightText(el, q);
+    }
+  });
+
+  // Hide non-matching kb-rows
+  document.querySelectorAll('.kb-row').forEach(row => {
+    const txt = row.textContent.toLowerCase();
+    row.classList.toggle('hidden', !txt.includes(q));
+  });
+
+  hitCnt.textContent = hits > 0 ? hits + '개 결과' : '결과 없음';
+});
+
+function clearSearch(){
+  document.querySelectorAll('.hl').forEach(el => {
+    const parent = el.parentNode;
+    parent.replaceChild(document.createTextNode(el.textContent), el);
+    parent.normalize();
+  });
+  document.querySelectorAll('.kb-row').forEach(r => r.classList.remove('hidden'));
+  hitCnt.textContent = '';
+
+  // Restore tabs
+  const activeTab = document.querySelector('.tab.on');
+  if(activeTab){
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+    const sec = document.getElementById('sec-' + activeTab.dataset.tab);
+    if(sec) sec.classList.add('on');
+  }
+}
+
+function activateAllForSearch(){
+  document.querySelectorAll('.sec').forEach(s => s.classList.add('on'));
+}
+
+function highlightText(el, q){
+  // Simple highlight using innerHTML (safe for our controlled content)
+  const html = el.innerHTML;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const regex = new RegExp('(' + escaped + ')', 'gi');
+  el.innerHTML = html.replace(/<[^>]*>/g, tag => tag)
+    .replace(regex, '<span class="hl">$1</span>');
+}
+
+// Toggle handlers already inline
+</script>
+</body>
+</html>

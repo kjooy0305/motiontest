@@ -522,5 +522,12 @@ const PAGES = {
     desc  : 'MythicMobs · ModelEngine 4 · Crucible · Dungeons · RPG · Enchants · HUD · Cosmetics · Armors · Achievements — 공식 위키 문서 1,688개 전문 + 예시 구문 + 한글 요약',
   },
 
-  // 74 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
+  74: {
+    label : '드림코어 완전 정리',
+    url   : 'pages/74/',
+    thumb : null,
+    desc  : '드림코어·위어드코어·리미널 스페이스·백룸·풀코어·아날로그 호러 — 핵심 개념·시각 문법·색 팔레트·유명 작품·게임·음악·영상·제작 가이드·100년 계보 총정리',
+  },
+
+  // 75 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
 };

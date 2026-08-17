@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>드림코어 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07060d;--bg2:#0d0b16;--bg3:#13101f;--bg4:#1b1730;
+  --border:#221c38;--border2:#382d5c;
+  --txt:#e6e0f5;--txt2:#9b8fc4;--txt3:#544a78;
+  --acc:#a87fe8;--acc2:#c9a8ff;--acc3:rgba(168,127,232,.14);--acc4:rgba(168,127,232,.06);
+  --cyan:#5fd4e8;--cyan2:#8ae9f8;--cyanB:rgba(95,212,232,.12);
+  --pink:#f07ab8;--pink2:#ff9fd0;--pinkB:rgba(240,122,184,.12);
+  --yel:#e8d24a;--yel2:#ffe97a;--yelB:rgba(232,210,74,.12);
+  --grn:#5fd48a;--grn2:#88eaad;--grnB:rgba(95,212,138,.12);
+  --red:#e8556b;--red2:#ff8093;--redB:rgba(232,85,107,.12);
+  --blu:#6a8ce8;--blu2:#9ab0ff;--bluB:rgba(106,140,232,.12);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;-webkit-text-size-adjust:100%;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#050409,#100c1e,#050409);
+  border-bottom:2px solid var(--acc);padding:9px 16px;position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#hdr-logo{font-size:19px;filter:drop-shadow(0 0 10px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 20px rgba(168,127,232,.5);}
+#hdr .badge{font-size:9px;padding:2px 6px;border-radius:2px;background:var(--acc3);
+  border:1px solid rgba(168,127,232,.35);color:var(--acc);font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+#search{flex:1;min-width:140px;max-width:300px;padding:6px 11px;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;
+  outline:none;font-family:inherit;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:2px;padding:6px 12px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:45px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 12px;border-radius:3px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(168,127,232,.45);color:var(--acc2);}
+
+/* MAIN */
+#main{padding:16px;max-width:1280px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 9px;
+  padding-left:9px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+h4.sub{font-size:12.5px;font-weight:700;color:var(--acc);margin:14px 0 7px;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:12px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:10px;margin-bottom:12px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;}
+.card.hidden{display:none;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;}
+.card-icon{font-size:15px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card-sub{font-size:9px;color:var(--txt3);margin-left:auto;padding:1px 5px;border-radius:5px;
+  background:var(--bg4);border:1px solid var(--border);white-space:nowrap;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.72;}
+.card-desc strong{color:var(--txt);}
+.card-desc em{color:var(--acc2);font-style:normal;}
+ul.tips{list-style:none;}
+ul.tips li{display:flex;gap:7px;padding:4px 0;border-bottom:1px solid rgba(34,28,56,.7);
+  font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--acc);flex-shrink:0;margin-top:1px;}
+ul.tips li strong{color:var(--txt);}
+ul.tips li em{color:var(--acc2);font-style:normal;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);}
+.tbl-wrap.hidden{display:none;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:430px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;padding:7px 10px;
+  border-bottom:1px solid var(--border2);white-space:nowrap;font-size:11.5px;}
+td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(168,127,232,.05);}
+td strong{color:var(--txt);}
+td em{color:var(--acc2);font-style:normal;}
+.tbl-cap{font-size:11px;color:var(--txt3);padding:6px 10px;background:var(--bg3);
+  border-bottom:1px solid var(--border);font-weight:600;}
+
+/* CODE / SWATCH */
+code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;font-size:11.5px;color:var(--cyan2);}
+pre.code{background:#040308;border:1px solid var(--border2);border-radius:5px;padding:10px 12px;
+  font-family:'Consolas','Courier New',monospace;font-size:11.5px;line-height:1.7;
+  color:var(--cyan2);overflow-x:auto;white-space:pre-wrap;margin:7px 0;}
+.sw-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;}
+.sw{width:78px;text-align:center;font-size:9.5px;color:var(--txt2);}
+.sw i{display:block;height:44px;border-radius:5px;border:1px solid rgba(255,255,255,.13);margin-bottom:3px;}
+.sw b{display:block;font-family:'Consolas',monospace;font-size:9px;color:var(--txt3);font-weight:400;}
+
+/* HIGHLIGHT / CALLOUT */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(168,127,232,.24);border-radius:7px;padding:12px 15px;margin-bottom:12px;}
+.hi-card.hidden{display:none;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.78;}
+.hi-body strong{color:var(--txt);}
+.hi-body em{color:var(--acc2);font-style:normal;}
+.callout{border-radius:5px;padding:9px 12px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout.hidden{display:none;}
+.callout-body{color:var(--txt2);line-height:1.68;}
+.callout-body strong{color:var(--txt);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.cyan{background:var(--cyanB);border-color:var(--cyan);}
+.callout.pink{background:var(--pinkB);border-color:var(--pink);}
+.callout.yel{background:var(--yelB);border-color:var(--yel);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+
+/* TAG */
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(168,127,232,.4);background:var(--acc3);}
+.tag.c{color:var(--cyan2);border-color:rgba(95,212,232,.4);background:var(--cyanB);}
+.tag.p{color:var(--pink2);border-color:rgba(240,122,184,.4);background:var(--pinkB);}
+.tag.y{color:var(--yel2);border-color:rgba(232,210,74,.4);background:var(--yelB);}
+.tag.r{color:var(--red2);border-color:rgba(232,85,107,.4);background:var(--redB);}
+
+/* ASCII 다이어그램 */
+.diag{background:#040308;border:1px solid var(--border2);border-radius:5px;padding:11px 13px;
+  font-family:'Consolas','Courier New',monospace;font-size:11px;line-height:1.55;
+  color:var(--cyan2);white-space:pre;overflow-x:auto;margin:8px 0 12px;}
+
+/* 타임라인 */
+.tl{position:relative;padding-left:22px;margin-bottom:14px;}
+.tl::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;
+  background:linear-gradient(180deg,var(--acc),var(--cyan),transparent);}
+.tl-item{position:relative;margin-bottom:13px;}
+.tl-item.hidden{display:none;}
+.tl-item::before{content:'';position:absolute;left:-19px;top:5px;width:9px;height:9px;
+  border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);}
+.tl-year{font-size:11px;font-weight:700;color:var(--cyan2);font-family:'Consolas',monospace;}
+.tl-title{font-size:13px;font-weight:700;color:var(--txt);margin:1px 0 3px;}
+.tl-desc{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:26px 10px 40px;line-height:1.8;}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid,.grid-sm,.grid-wide{grid-template-columns:1fr;}
+  #hdr h1{font-size:14px;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-logo">🌙</span>
+  <h1>드림코어 완전 정리</h1>
+  <span class="badge">DREAMCORE · WEIRDCORE · LIMINAL</span>
+  <input id="search" type="text" placeholder="🔍 검색 (예: 백룸, 리미널, 아네모이아)">
+  <span id="hit-cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="intro">🌙 드림코어란</button>
+  <button class="tab" data-tab="concept">🧠 핵심 개념</button>
+  <button class="tab" data-tab="visual">🎨 시각 문법</button>
+  <button class="tab" data-tab="genre">🧩 하위·인접 장르</button>
+  <button class="tab" data-tab="famous">⭐ 유명 작품</button>
+  <button class="tab" data-tab="game">🎮 게임</button>
+  <button class="tab" data-tab="music">🎧 음악</button>
+  <button class="tab" data-tab="video">📺 영상·ARG</button>
+  <button class="tab" data-tab="make">🛠️ 만드는 법</button>
+  <button class="tab" data-tab="history">📅 계보</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════════ 드림코어란 ══════════════════ -->
+<div class="sec on" id="sec-intro">
+  <div class="sec-hd">
+    <div class="sec-title">🌙 드림코어(Dreamcore)란</div>
+    <div class="sec-sub">"꿈에서 본 것 같은데 어디였는지 기억나지 않는 장소" — 인터넷에서 자생한 시각 미학 장르</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">✦ 한 문장 정의</div>
+    <div class="hi-body">
+      <strong>드림코어</strong>는 <em>꿈·반쯤 잊힌 기억·잠들기 직전의 감각</em>을 시각화한 인터넷 미학입니다.
+      익숙한 공간(수영장, 복도, 놀이터, 계단, 대형마트)을 <em>사람 없이, 이상하게 비어 있고, 어딘가 어긋난 상태</em>로 보여줘
+      "본 적 있는 것 같은데 여기가 어디지?"라는 감각을 만듭니다.<br><br>
+      핵심은 <strong>공포가 아니라 불안한 그리움</strong>입니다. 무서운 게 목적이라면 그건 위어드코어나 아날로그 호러 쪽입니다.
+    </div>
+  </div>
+
+  <h3 class="blk">🎯 무엇이 드림코어를 드림코어로 만드는가</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🚪</span><span class="card-title">사람이 없다</span></div>
+      <div class="card-desc"><strong>사람으로 가득해야 할 공간이 텅 비어 있다.</strong> 이게 가장 중요한 규칙입니다. 수영장, 학교 복도, 쇼핑몰, 놀이터 — 원래 소음과 인파가 있어야 하는 곳의 정적. 사람이 나온다면 <em>얼굴이 가려지거나 지워져</em> 있습니다.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">🌀</span><span class="card-title">공간이 논리적으로 어긋난다</span></div>
+      <div class="card-desc">복도가 끝나지 않고, 계단이 어디로도 이어지지 않고, 문을 열면 같은 방이 또 나옵니다. <strong>꿈의 논리</strong> — 그 안에서는 이상하지 않지만 깨어나서 떠올리면 말이 안 되는 구조.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">📼</span><span class="card-title">기억처럼 열화되어 있다</span></div>
+      <div class="card-desc">저해상도, JPEG 뭉개짐, VHS 노이즈, 색 번짐. <strong>이미지의 화질이 낮은 것 자체가 "오래된 기억"이라는 신호</strong>가 됩니다. 깨끗한 4K 사진은 드림코어가 되기 어렵습니다.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">💡</span><span class="card-title">빛이 이상하다</span></div>
+      <div class="card-desc">형광등의 균일하고 그림자 없는 빛, 창문 하나 없는데 밝은 방, 반대로 낮인데 어두운 실내. <strong>광원이 어디인지 알 수 없는 조명</strong>이 언캐니의 절반을 만듭니다.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">🕰️</span><span class="card-title">시대가 90~2000년대 초</span></div>
+      <div class="card-desc">CRT 모니터, Windows 95/98, 초기 3D 그래픽, 형광색 카펫, 타일 벽. <strong>인터넷 세대가 어린 시절을 보낸 시각 환경</strong>이 반복적으로 소환됩니다. 그 시절을 겪지 않은 사람에게도 통합니다.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">😌</span><span class="card-title">공포가 아니라 그리움 + 불안</span></div>
+      <div class="card-desc">점프 스케어가 없습니다. 위협도 없습니다. 그런데 편안하지도 않습니다. <strong>"슬프고 안전한데 무섭다"</strong>는 모순된 감정이 목표입니다.</div></div>
+  </div>
+
+  <h3 class="blk">📊 헷갈리는 이웃 장르와 비교</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">한 장소를 세 장르로 찍으면 이렇게 달라진다 — "텅 빈 학교 복도"</div>
+    <table>
+      <tr><th>장르</th><th>목표 감정</th><th>표현</th><th>같은 복도를 이렇게 찍는다</th></tr>
+      <tr><td><strong>드림코어</strong></td><td>그리움 + 불안</td><td>부드러운 빛, 몽환, 채도 낮음</td><td>오후 햇빛이 들어오는 빈 복도. 조용하고 아름답고 슬프다</td></tr>
+      <tr><td><strong>위어드코어</strong></td><td>혼란 + 불편</td><td>왜곡, 저화질, 텍스트 오버레이, 화살표</td><td>같은 복도에 눈알이 떠 있고 <em>"WHERE ARE YOU GOING"</em> 글자가 박혀 있다</td></tr>
+      <tr><td><strong>리미널 스페이스</strong></td><td>공허 + 정적</td><td>다큐멘터리처럼 담백, 필터 없음</td><td>보정 없이 그냥 찍은 빈 복도. 아무 연출도 없어서 더 이상하다</td></tr>
+      <tr><td><strong>아날로그 호러</strong></td><td>공포 + 경고</td><td>가짜 방송, 긴급 경보, 노이즈</td><td>복도 CCTV 영상에 <em>"DO NOT LOOK BEHIND YOU"</em> 자막이 뜬다</td></tr>
+      <tr><td><strong>백룸</strong></td><td>고립 + 절망</td><td>노란 벽지, 형광등, 무한 반복</td><td>복도가 노란 단색이 되고 끝없이 이어진다. 나갈 수 없다</td></tr>
+    </table>
+  </div>
+
+  <div class="callout acc"><span>💡</span><div class="callout-body">
+    <strong>실전 구분법:</strong> 이미지를 보고 <em>"여기 다시 가고 싶다"</em>는 감정이 조금이라도 섞이면 드림코어,
+    <em>"여기서 빨리 나가고 싶다"</em>면 위어드코어·백룸 계열입니다. 경계는 흐릿하고 섞여 쓰이는 게 보통입니다.
+  </div></div>
+
+  <h3 class="blk">🌐 어디서 자랐나</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">Tumblr</span></div><div class="card-desc">2014~2018년 미학(aesthetic) 태그 문화의 본진. <strong>"~core"라는 작명법 자체가 여기서 나왔습니다.</strong></div></div>
+    <div class="card"><div class="card-head"><span class="card-title">4chan /x/</span></div><div class="card-desc">2019년 <strong>백룸</strong>이 태어난 곳. "불안한 이미지를 올려라" 스레드가 시작이었습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Aesthetics Wiki</span></div><div class="card-desc">수백 개 미학을 문서화한 팬 위키. 장르 정의를 찾을 때 사실상 표준 참고서입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">TikTok · Reels</span></div><div class="card-desc">2020~2021년 대중화의 결정타. 짧은 영상 + 슬로우 음악 조합으로 폭발적으로 퍼졌습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">r/LiminalSpace</span></div><div class="card-desc">레딧의 리미널 스페이스 서브레딧. <strong>"연출 없는 실제 사진"</strong>의 저장고입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Pinterest</span></div><div class="card-desc">레퍼런스 수집의 실무 도구. 다만 출처가 잘려 원작자를 찾기 어려운 문제가 큽니다.</div></div>
+  </div>
+
+  <div class="callout yel"><span>⚠</span><div class="callout-body">
+    <strong>출처 표기에 대해:</strong> 이 장르는 이미지가 무한 재업로드되며 자란 탓에 <em>원작자를 잃어버린 작품이 정말 많습니다.</em>
+    본인 작업에 참고하거나 재게시할 때는 역방향 이미지 검색으로 원작자를 찾아 표기하는 게 이 문화에 대한 최소한의 예의입니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 핵심 개념 ══════════════════ -->
+<div class="sec" id="sec-concept">
+  <div class="sec-hd">
+    <div class="sec-title">🧠 핵심 개념 — 왜 이런 느낌이 드는가</div>
+    <div class="sec-sub">감정의 이름을 알면 의도적으로 만들 수 있습니다. 대부분 원래 학술·문학 용어에서 왔습니다.</div>
+  </div>
+
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚪</span><span class="card-title">리미널리티 (Liminality)</span><span class="card-sub">인류학</span></div>
+      <div class="card-desc">
+        라틴어 <em>limen</em>(문턱)에서 온 말. 인류학자 <strong>아르놀드 반 헤네프</strong>가 통과의례 연구에서 쓰고 <strong>빅터 터너</strong>가 발전시킨 개념으로,
+        <em>"이전도 이후도 아닌 중간 상태"</em>를 뜻합니다.<br><br>
+        미학으로 옮겨오면 <strong>리미널 스페이스</strong> = 머무는 곳이 아니라 <em>지나가는 곳</em>입니다.
+        복도, 계단참, 대기실, 공항 게이트, 주차장, 엘리베이터, 지하도, 휴게소.
+        <strong>목적지가 아니라 통로인 공간에 아무도 없을 때</strong> 특유의 불안이 생깁니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💭</span><span class="card-title">아네모이아 (Anemoia)</span><span class="card-sub">신조어</span></div>
+      <div class="card-desc">
+        <strong>겪어본 적 없는 시대에 대한 향수.</strong> 존 케니그의 <em>『모호한 슬픔의 사전』</em>에서 만들어진 조어입니다(실제 사전 단어는 아닙니다).<br><br>
+        2005년생이 1997년 쇼핑몰 사진을 보고 그리워하는 현상이 정확히 이것입니다.
+        드림코어가 <strong>세대를 넘어 통하는 이유</strong>가 여기 있습니다 — 실제 기억이 필요 없습니다.
+        <em>미디어를 통해 학습된 가짜 기억</em>만으로 충분합니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">언캐니 (The Uncanny)</span><span class="card-sub">정신분석</span></div>
+      <div class="card-desc">
+        프로이트의 <em>「Das Unheimliche」</em>(1919). 독일어 <em>heimlich</em>(친숙한, 집 같은)의 반대말이지만
+        단순히 "낯선 것"이 아니라 <strong>"친숙한 것이 낯설어졌을 때"</strong>의 공포입니다.<br><br>
+        드림코어의 작동 원리 그 자체입니다. 완전히 모르는 장소는 무섭지 않습니다.
+        <em>내가 아는 학교인데 뭔가 틀렸을 때</em> 무섭습니다.<br><br>
+        관련: <strong>언캐니 밸리</strong>(모리 마사히로, 1970) — 인간과 거의 같지만 미묘하게 다를 때 호감도가 급락하는 현상.
+        드림코어 인물 묘사가 얼굴을 지우는 이유입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👻</span><span class="card-title">하운톨로지 (Hauntology)</span><span class="card-sub">철학·음악비평</span></div>
+      <div class="card-desc">
+        데리다가 <em>『마르크스의 유령들』</em>(1993)에서 만든 말(haunt + ontology)을,
+        음악비평가 <strong>마크 피셔</strong>와 사이먼 레이놀즈가 2000년대 음악에 적용했습니다.<br><br>
+        핵심은 <strong>"실현되지 못한 미래에 대한 애도"</strong>입니다.
+        1970~90년대가 상상했던 미래(우주 시대, 낙관적 기술)는 오지 않았고,
+        우리는 <em>그 오지 않은 미래의 유령</em>과 함께 삽니다.<br><br>
+        베이퍼웨이브와 드림코어가 왜 하필 <strong>낡은 기업 로고, 공공 안내 영상, 백화점 음악</strong>을 소재로 삼는지 설명해 줍니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏚️</span><span class="card-title">케노프시아 (Kenopsia)</span><span class="card-sub">신조어</span></div>
+      <div class="card-desc">
+        <strong>사람으로 붐벼야 할 장소가 텅 비었을 때의 쓸쓸함.</strong> 역시 『모호한 슬픔의 사전』의 조어입니다.<br><br>
+        방과 후 교실, 폐업한 쇼핑몰, 새벽 4시의 지하철역.
+        <em>"비어 있음" 자체가 아니라 "원래 안 비어 있어야 하는데 비었음"</em>이 핵심입니다.
+        드림코어에서 사진을 고를 때의 판단 기준으로 바로 쓸 수 있습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌫️</span><span class="card-title">꿈의 논리 (Dream Logic)</span><span class="card-sub">서사 구조</span></div>
+      <div class="card-desc">
+        꿈에서는 <strong>인과가 아니라 연상으로 장면이 이어집니다.</strong>
+        문을 열면 갑자기 다른 나라이고, 그 사람이 동시에 다른 사람이고, 이유는 설명되지 않지만 그 안에선 자연스럽습니다.<br><br>
+        드림코어 작품은 <em>이야기를 설명하지 않는 것</em>을 원칙으로 삼습니다.
+        설명하는 순간 꿈이 아니라 <strong>배경 설정</strong>이 되어 버립니다.
+        "왜?"에 답하지 않는 절제가 이 장르의 기술입니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🔬 감정을 설계하는 공식</h3>
+  <div class="diag">
+   익숙함  ─────────────  낯섦
+      │                    │
+      │   ← 여기 ─────→    │
+      │   (드림코어)        │
+      │                    │
+  "우리 집"          "외계 행성"
+   감정 없음           그냥 SF
+
+   ★ 익숙함 70% + 낯섦 30%  →  언캐니
+   ★ 익숙함 30% + 낯섦 70%  →  그냥 이상한 그림 (감정이 안 생김)
+  </div>
+  <div class="callout cyan"><span>🎯</span><div class="callout-body">
+    <strong>실무 규칙:</strong> 낯선 요소는 <em>한 장면에 하나만</em> 넣으세요.
+    빈 수영장 + 물 없음 + 하늘이 초록 + 문이 공중에 뜸 + 눈알 = 아무 감정도 안 생기는 난장판이 됩니다.
+    <strong>"거의 정상인데 딱 하나 틀렸다"</strong>가 가장 강합니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 시각 문법 ══════════════════ -->
+<div class="sec" id="sec-visual">
+  <div class="sec-hd">
+    <div class="sec-title">🎨 시각 문법 — 어떻게 생겼나</div>
+    <div class="sec-sub">색·구도·질감·조명을 요소별로 분해했습니다. 그대로 따라 하면 드림코어가 됩니다.</div>
+  </div>
+
+  <h3 class="blk">🎨 색 팔레트</h3>
+  <h4 class="sub">① 몽환 파스텔 — 가장 전형적인 드림코어</h4>
+  <div class="sw-row">
+    <div class="sw"><i style="background:#b8a5e8"></i>연보라<b>#B8A5E8</b></div>
+    <div class="sw"><i style="background:#f5c2dd"></i>연분홍<b>#F5C2DD</b></div>
+    <div class="sw"><i style="background:#a8dced"></i>하늘<b>#A8DCED</b></div>
+    <div class="sw"><i style="background:#fdf6c9"></i>크림<b>#FDF6C9</b></div>
+    <div class="sw"><i style="background:#c9e8d4"></i>민트<b>#C9E8D4</b></div>
+    <div class="sw"><i style="background:#e8d5c4"></i>베이지<b>#E8D5C4</b></div>
+  </div>
+  <div class="callout acc"><span>🖌️</span><div class="callout-body">
+    <strong>포인트:</strong> 채도를 낮추고 명도를 높입니다. <em>안개 한 겹을 덮은 것처럼</em> 흐릿하게.
+    콘트라스트를 낮추면 "꿈", 높이면 "선명한 현실"이 되어 효과가 죽습니다.
+  </div></div>
+
+  <h4 class="sub">② 수영장·풀룸 — 물과 타일</h4>
+  <div class="sw-row">
+    <div class="sw"><i style="background:#4fb8c9"></i>수영장청<b>#4FB8C9</b></div>
+    <div class="sw"><i style="background:#7fd4d9"></i>얕은물<b>#7FD4D9</b></div>
+    <div class="sw"><i style="background:#1a6b82"></i>깊은물<b>#1A6B82</b></div>
+    <div class="sw"><i style="background:#e8f0ee"></i>흰타일<b>#E8F0EE</b></div>
+    <div class="sw"><i style="background:#c4d8d2"></i>회타일<b>#C4D8D2</b></div>
+  </div>
+
+  <h4 class="sub">③ 백룸·형광등 — 노란 지옥</h4>
+  <div class="sw-row">
+    <div class="sw"><i style="background:#cdb96c"></i>벽지노랑<b>#CDB96C</b></div>
+    <div class="sw"><i style="background:#a89049"></i>어두운노랑<b>#A89049</b></div>
+    <div class="sw"><i style="background:#e0d090"></i>형광등빛<b>#E0D090</b></div>
+    <div class="sw"><i style="background:#6b5f38"></i>그림자<b>#6B5F38</b></div>
+    <div class="sw"><i style="background:#8a7a52"></i>젖은카펫<b>#8A7A52</b></div>
+  </div>
+
+  <h4 class="sub">④ 90s 컴퓨터 — 웹 1.0</h4>
+  <div class="sw-row">
+    <div class="sw"><i style="background:#008080"></i>Win95틸<b>#008080</b></div>
+    <div class="sw"><i style="background:#c0c0c0"></i>실버<b>#C0C0C0</b></div>
+    <div class="sw"><i style="background:#000080"></i>네이비<b>#000080</b></div>
+    <div class="sw"><i style="background:#ff00ff"></i>마젠타<b>#FF00FF</b></div>
+    <div class="sw"><i style="background:#00ffff"></i>시안<b>#00FFFF</b></div>
+  </div>
+
+  <h4 class="sub">⑤ 심야·불안 — 어두운 드림코어</h4>
+  <div class="sw-row">
+    <div class="sw"><i style="background:#1a1030"></i>심야<b>#1A1030</b></div>
+    <div class="sw"><i style="background:#2d1b4e"></i>보라어둠<b>#2D1B4E</b></div>
+    <div class="sw"><i style="background:#5a3a7a"></i>중간<b>#5A3A7A</b></div>
+    <div class="sw"><i style="background:#ff6b35"></i>나트륨등<b>#FF6B35</b></div>
+    <div class="sw"><i style="background:#0d4d5c"></i>비상구<b>#0D4D5C</b></div>
+  </div>
+
+  <h3 class="blk">📐 구도 — 이렇게 찍는다</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구도</th><th>방법</th><th>효과</th></tr>
+      <tr><td><strong>일점 투시 정면</strong></td><td>복도·통로 정중앙에서 소실점을 화면 중앙에 두고 정면으로</td><td><em>가장 강력한 리미널 구도.</em> 대칭이 인공적 불안을 만든다</td></tr>
+      <tr><td><strong>눈높이보다 낮게</strong></td><td>카메라를 허리~무릎 높이로 내린다</td><td><em>어린아이의 시점</em> = 어린 시절 기억이라는 신호</td></tr>
+      <tr><td><strong>과도한 여백</strong></td><td>피사체를 아주 작게, 화면 대부분을 빈 벽·바닥·천장으로</td><td>고립감. 공간이 사람을 압도한다</td></tr>
+      <tr><td><strong>어중간한 프레이밍</strong></td><td>일부러 잘 못 찍은 것처럼. 지평선 기울이고, 중심 어긋나게</td><td><em>"누군가 급하게 찍은 사진"</em> = 파운드 푸티지 감각</td></tr>
+      <tr><td><strong>문·창 프레임 안쪽</strong></td><td>열린 문 사이로 다른 방을 본다</td><td>훔쳐보는 느낌 + 공간이 겹겹이 이어지는 암시</td></tr>
+      <tr><td><strong>반복 구조</strong></td><td>같은 요소(문, 기둥, 타일)를 화면에 여러 번</td><td>무한 반복 암시. 나갈 수 없다는 감각</td></tr>
+      <tr><td><strong>천장이 보이는 각도</strong></td><td>위를 살짝 올려다본다. 형광등·환풍구·스프링클러를 넣는다</td><td>실내라는 답답함 강조. <em>바깥이 없는 세계</em></td></tr>
+      <tr><td><strong>물에 반쯤 잠긴 시점</strong></td><td>수면 높이에 카메라</td><td>풀코어의 핵심. 익사 직전 같은 신체감각</td></tr>
+    </table>
+  </div>
+
+  <div class="diag">
+  ┌──────────────────────────┐   일점 투시 정면
+  │                          │
+  │   ╲                  ╱   │   · 소실점을 정중앙에
+  │    ╲                ╱    │   · 좌우 대칭
+  │     ╲______________╱     │   · 끝이 안 보이게
+  │     │      ▪       │     │   · 사람 없음
+  │     │              │     │
+  │     │______________│     │   → 가장 실패 없는 구도
+  └──────────────────────────┘
+  </div>
+
+  <h3 class="blk">🧱 반복 등장하는 소재 사전</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">🏊 빈 수영장</span></div><div class="card-desc">물이 있든 없든. <strong>드림코어 소재 1위.</strong> 타일 + 물 + 형광등 + 반향음</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🏫 학교 복도</span></div><div class="card-desc">사물함, 리놀륨 바닥, 방과 후. 대부분의 사람이 공유하는 기억</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🛒 폐업한 쇼핑몰</span></div><div class="card-desc">데드몰(Dead Mall). 분수대, 에스컬레이터, 화분, 텅 빈 푸드코트</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🛝 놀이터</span></div><div class="card-desc">해질녘 또는 밤. 아무도 없는 그네가 흔들리는 정도가 최대 연출</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🏨 호텔 복도</span></div><div class="card-desc">무늬 카펫, 똑같은 문의 반복, 번호가 이상하게 매겨진 방</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🅿️ 지하 주차장</span></div><div class="card-desc">나트륨등 오렌지빛, 기둥 반복, 차가 한 대도 없음</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🪜 계단참</span></div><div class="card-desc">비상계단. 위아래로 무한히 이어지는 구조가 촬영하기 쉽다</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🚻 공중화장실</span></div><div class="card-desc">타일, 거울, 형광등. 거울에 비치지 않는 것을 넣으면 위어드코어로</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">💻 CRT 모니터</span></div><div class="card-desc">켜져 있는데 아무도 없음. 화면에 이상한 것이 떠 있으면 더 좋다</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🚌 심야 버스·지하철</span></div><div class="card-desc">차창 밖은 어둠뿐. 종점이 없는 노선</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🌾 끝없는 들판·주차장</span></div><div class="card-desc">실내의 반대. <em>너무 넓어서</em> 생기는 불안(아고라포비아)</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🧸 버려진 장난감</span></div><div class="card-desc">인형, 놀이기구, 생일 파티 흔적. 키드코어와 겹치는 지점</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🚪 아무 데도 안 가는 문</span></div><div class="card-desc">벽 중간의 문, 공중의 문, 열면 벽인 문. 꿈 논리의 대표 소재</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🌫️ 물에 잠긴 실내</span></div><div class="card-desc">거실에 물이 무릎까지. 논리적으로 불가능한데 조용하다</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">🎈 생일 파티</span></div><div class="card-desc">아무도 없는 파티 상차림. 케이크에 촛불만 켜져 있음</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">📺 방송 종료 화면</span></div><div class="card-desc">컬러바, 조정 패턴, "방송을 마칩니다". 아날로그 호러로 넘어가는 문</div></div>
+  </div>
+
+  <h3 class="blk">📼 질감·후처리 기법</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">"기억처럼 보이게" 만드는 열화 기법 — 과하면 촌스러워지니 강도에 주의</div>
+    <table>
+      <tr><th>기법</th><th>무엇</th><th>권장 강도</th></tr>
+      <tr><td><strong>해상도 낮추기</strong></td><td>이미지를 480p 정도로 줄였다가 다시 키운다</td><td>가장 효과적. <em>이거 하나만 해도 절반은 완성</em></td></tr>
+      <tr><td><strong>JPEG 압축 열화</strong></td><td>품질 20~40%로 여러 번 저장 반복</td><td>3~5회 반복. 블록 노이즈가 보일 정도</td></tr>
+      <tr><td><strong>필름 그레인 / 노이즈</strong></td><td>거친 입자 추가</td><td>약~중. 너무 넣으면 사진이 안 보인다</td></tr>
+      <tr><td><strong>색수차</strong></td><td>R·G·B 채널을 1~3px 어긋나게</td><td>매우 약하게. 1~2px이면 충분</td></tr>
+      <tr><td><strong>비네팅</strong></td><td>네 귀퉁이를 어둡게</td><td>중간. 시선을 중앙으로 모은다</td></tr>
+      <tr><td><strong>블룸 / 글로우</strong></td><td>밝은 부분이 번지게</td><td>중~강. <em>꿈 느낌의 핵심</em></td></tr>
+      <tr><td><strong>VHS 트래킹 노이즈</strong></td><td>가로 줄무늬, 화면 밀림, 색 번짐</td><td>영상에만. 정지 이미지엔 과하다</td></tr>
+      <tr><td><strong>CRT 스캔라인</strong></td><td>가로 주사선 + 화면 곡률</td><td>레트로 컴퓨터 소재일 때만</td></tr>
+      <tr><td><strong>흐림(가우시안)</strong></td><td>전체를 살짝 흐리게</td><td>약. 초점이 안 맞은 것처럼</td></tr>
+      <tr><td><strong>날짜 타임스탬프</strong></td><td>우하단에 <code>1998 07 14</code> 같은 캠코더 날짜</td><td>강력한 클리셰. 즉시 시대감이 생긴다</td></tr>
+      <tr><td><strong>텍스트 오버레이</strong></td><td>Comic Sans·MS Sans Serif로 짧은 문구</td><td>위어드코어 쪽. 드림코어는 보통 안 넣는다</td></tr>
+      <tr><td><strong>얼굴 지우기</strong></td><td>인물의 얼굴을 흐리기·검게·잘라내기</td><td>사람이 등장할 때 거의 필수</td></tr>
+    </table>
+  </div>
+
+  <div class="callout red"><span>🚫</span><div class="callout-body">
+    <strong>초보가 가장 많이 하는 실수:</strong> 필터를 <em>전부</em> 최대로 넣는 것.
+    노이즈 + 색수차 + VHS + 텍스트 + 눈알 + 화살표를 한 장에 다 넣으면 감정이 사라지고 그냥 지저분한 이미지가 됩니다.
+    <strong>기법은 2~3개만, 약하게.</strong> 원본 사진이 좋으면 후처리는 거의 필요 없습니다.
+  </div></div>
+
+  <h3 class="blk">🔊 소리 문법 (영상을 만든다면)</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🌬️</span><span class="card-title">룸톤과 반향</span></div>
+      <div class="card-desc"><strong>정적을 "무음"으로 만들지 마세요.</strong> 형광등 웅웅거림, 환풍기 소리, 먼 곳의 알 수 없는 저음. 큰 공간의 <em>리버브</em>가 공간감을 만듭니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">💧</span><span class="card-title">물소리</span></div>
+      <div class="card-desc">풀코어의 정체성. 물방울, 수면 찰랑임, 수중 웅웅거림. <strong>물이 안 보이는데 물소리가 들리면</strong> 효과가 배가 됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎹</span><span class="card-title">기억 속 멜로디</span></div>
+      <div class="card-desc">단순한 신스나 오르골, <em>느리고 살짝 음이 어긋난</em> 연주. 오래된 카세트처럼 피치가 흔들리게(wobble) 하면 좋습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📢</span><span class="card-title">먼 사람 소리</span></div>
+      <div class="card-desc">알아들을 수 없는 안내방송, 멀리서 노는 아이들 소리. <strong>사람이 있어야 할 곳에 소리만 남았다</strong>는 암시가 강력합니다.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 하위·인접 장르 ══════════════════ -->
+<div class="sec" id="sec-genre">
+  <div class="sec-hd">
+    <div class="sec-title">🧩 하위·인접 장르 지도</div>
+    <div class="sec-sub">경계는 흐릿하고 서로 섞여 쓰입니다. 정의를 놓고 다투는 것보다 특징을 아는 게 유용합니다.</div>
+  </div>
+
+  <div class="diag">
+                    ┌─ 리미널 스페이스 ─┐   (연출 없음, 실사)
+                    │                   │
+        아네모이아 ──┤    드 림 코 어    ├── 언캐니
+        (가짜 향수)  │   (꿈 · 그리움)   │   (친숙함의 배신)
+                    └─────────┬─────────┘
+                              │
+       ┌──────────┬───────────┼───────────┬──────────┐
+       │          │           │           │          │
+   위어드코어   백룸       풀코어    트라우마코어  노스탤지어코어
+   (혼란·왜곡) (고립·미로) (물·타일)  (⚠ 주의)    (90s 향수)
+       │                                              │
+   아날로그 호러 ───────────────────────────── 베이퍼웨이브
+   (가짜 방송·공포)                            (소비문화·유령)
+  </div>
+
+  <h3 class="blk">🌀 위어드코어 (Weirdcore)</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌀</span><span class="card-title">특징</span><span class="card-sub">드림코어의 불안한 형제</span></div>
+      <ul class="tips">
+        <li><strong>저화질 사진을 의도적으로 왜곡</strong> — 늘리기, 뒤틀기, 채널 분리</li>
+        <li><strong>텍스트 오버레이</strong> — <em>"YOU ARE HERE"</em>, <em>"WHERE DID EVERYONE GO"</em> 같은 짧은 문구</li>
+        <li><strong>화살표·원·동그라미</strong>로 아무것도 없는 곳을 가리킨다</li>
+        <li><strong>신체 부위의 이상한 배치</strong> — 눈알, 입, 손이 공간에 떠 있다</li>
+        <li>MS Paint로 급하게 그린 듯한 <strong>조악한 낙서</strong></li>
+        <li>드림코어보다 <strong>공격적이고 불편하다.</strong> 그리움이 없다</li>
+      </ul>
+      <div class="card-desc" style="margin-top:6px">
+        <strong>여담:</strong> <em>Weirdcore</em>는 에이펙스 트윈의 무대 영상으로 유명한 실제 영국 비주얼 아티스트의 활동명이기도 합니다.
+        장르 이름과 이 작가는 직접적 관계가 없지만, 검색할 때 섞여 나옵니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🟨</span><span class="card-title">백룸 (The Backrooms)</span><span class="card-sub">2019 · 4chan</span></div>
+      <div class="card-desc">
+        <strong>드림코어 계열에서 가장 대중적으로 성공한 갈래.</strong>
+        2019년 5월 4chan /x/의 "불안한 이미지를 올려라" 스레드에 올라온
+        <em>노란 벽지 방 사진 한 장</em>과 짧은 창작 글에서 시작됐습니다.<br><br>
+        원문의 설정: 현실에서 <em>"클립 아웃(noclip)"</em> 되면 도착하는 곳.
+        <strong>축축한 카펫 냄새, 끝없는 단색 노란 벽, 형광등의 최대 웅웅거림</strong>,
+        약 6억 제곱마일의 공간. 원문에는 <em>"무언가가 근처를 배회한다"</em>는 암시가 있습니다.<br><br>
+        이후 팬 위키에서 <strong>"레벨" 체계</strong>(Level 0, 1, 2… / Entity 번호)로 확장되며
+        SCP 재단과 비슷한 집단 창작 세계관이 되었습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏊</span><span class="card-title">풀코어 · 풀룸 (Poolcore / Poolrooms)</span></div>
+      <div class="card-desc">
+        <strong>타일과 물로만 이루어진 무한 공간.</strong> 백룸의 한 갈래로 시작했으나
+        미학적으로 워낙 강력해서 독립 장르처럼 다뤄집니다.<br><br>
+        구성 요소: 흰·하늘색 타일, 얕은 물, 아치형 통로, 창문 없는데 밝은 빛, 반향음.
+        <em>공포보다 압도적인 평온함</em>이 특징이라 드림코어 쪽에 더 가깝습니다.<br><br>
+        수영을 배우던 어린 시절 기억, 물에 대한 원초적 감각을 건드립니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📺</span><span class="card-title">아날로그 호러 (Analog Horror)</span></div>
+      <div class="card-desc">
+        <strong>가짜 옛 방송·VHS 테이프 형식을 빌린 공포.</strong> 드림코어와 미학은 공유하지만 <em>목표가 공포</em>라 다릅니다.<br><br>
+        구성: 비상 방송 경보(EAS), 공공 안내 영상, 컬러바, 조정 패턴,
+        <strong>"이 방송은 실제입니다" 같은 가짜 진정성</strong>, 점점 드러나는 이면의 진실.<br><br>
+        1990년대 지역 방송의 질감을 정확히 재현하는 게 핵심 기술입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🛍️</span><span class="card-title">베이퍼웨이브 · 몰소프트</span><span class="card-sub">2010년대 초</span></div>
+      <div class="card-desc">
+        드림코어의 <strong>직계 조상</strong>. 1980~90년대 소비문화·기업 미학·엘리베이터 음악을
+        느리게 늘려 <em>"자본주의의 유령"</em>으로 만든 장르입니다.<br><br>
+        시각: 로마 흉상, 야자수, 격자 무늬, 일본어 글자, Windows 95, 핑크·시안.<br>
+        <strong>몰소프트(Mallsoft)</strong>는 그중 <em>텅 빈 쇼핑몰의 배경음악</em>에 집중한 하위 갈래로,
+        데드몰 미학과 직결됩니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📻</span><span class="card-title">노스탤지어코어 · 키드코어</span></div>
+      <div class="card-desc">
+        <strong>노스탤지어코어</strong>는 90~2000년대의 실제 물건에 집중합니다 — 다마고치, 플립폰, 브라운관 TV, 문방구.
+        불안 요소를 빼고 <em>따뜻한 향수만</em> 남긴 버전.<br><br>
+        <strong>키드코어</strong>는 유아기의 원색·장난감·크레용 그림. 밝고 유쾌하지만,
+        <em>어른이 된 뒤 돌아본 어린 시절</em>이라는 층이 깔리면 드림코어와 만납니다.
+      </div></div>
+  </div>
+
+  <div class="callout red"><span>⚠</span><div class="callout-body">
+    <strong>트라우마코어(Traumacore)에 대해:</strong> 키드코어 이미지에 학대·자기혐오 관련 문구를 얹는 갈래로,
+    드림코어를 찾다 보면 자연스럽게 노출됩니다. <em>실제 트라우마를 표현하는 창작</em>이라는 정당한 측면이 있지만,
+    커뮤니티에서 <strong>고통을 미화하거나 자해를 낭만화하는 방향으로 흐르는 문제</strong>가 반복 지적돼 왔습니다.
+    이 계열을 찾아보거나 만들 때는 자신의 상태를 먼저 살피고, 힘들어지면 멈추는 게 맞습니다.
+    이 페이지에서는 존재와 맥락만 밝히고 더 다루지 않습니다.
+  </div></div>
+
+  <h3 class="blk">🗂️ 그 밖의 인접 미학</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>이름</th><th>한 줄 설명</th></tr>
+      <tr><td><strong>드림펑크</strong></td><td>꿈을 <em>음악 장르</em>로 구현. 앰비언트 + 몽환적 신스</td></tr>
+      <tr><td><strong>에테리얼(Ethereal)</strong></td><td>천상적·비현실적 아름다움. 불안 요소가 거의 없는 밝은 쪽</td></tr>
+      <tr><td><strong>드림코어의 어두운 쪽</strong></td><td>흔히 <em>나이트코어</em>가 아니라 <em>다크 드림코어</em>로 불림. 심야·나트륨등·비</td></tr>
+      <tr><td><strong>오드코어(Oddcore)</strong></td><td>그냥 이상한 것들의 모음. 정의가 가장 느슨하다</td></tr>
+      <tr><td><strong>클라이언트코어</strong></td><td>기업 재고 사진(스톡 이미지)의 인공적 부자연스러움을 활용</td></tr>
+      <tr><td><strong>프랙처드 아메리카나</strong></td><td>미국 교외·주차장·모텔의 공허함. 리미널 스페이스의 지역판</td></tr>
+      <tr><td><strong>웹코어 / 올드웹</strong></td><td>Geocities, GIF, 방문자 카운터. 초기 인터넷의 향수</td></tr>
+      <tr><td><strong>크립티드코어</strong></td><td>미확인 생물·목격담·흐릿한 증거 사진</td></tr>
+      <tr><td><strong>SCP · 백룸 위키</strong></td><td>집단 창작 세계관. 드림코어 이미지의 서사적 배경 제공</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════ 유명 작품 ══════════════════ -->
+<div class="sec" id="sec-famous">
+  <div class="sec-hd">
+    <div class="sec-title">⭐ 유명 작품 · 이미지 · 작가</div>
+    <div class="sec-sub">이 장르를 정의한 결정적 작품들. 이름을 알면 검색해서 원본을 찾을 수 있습니다.</div>
+  </div>
+
+  <h3 class="blk">🏆 장르를 정의한 이미지</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🟨</span><span class="card-title">백룸 원본 사진</span><span class="card-sub">2019 · 익명</span></div>
+      <div class="card-desc">
+        <strong>이 장르 전체에서 가장 유명한 단 한 장.</strong> 2019년 5월 4chan /x/에 올라온
+        노랗게 변색된 벽지, 낡은 카펫, 형광등의 어중간한 방 사진입니다.
+        누군가 이 사진에 <em>"현실에서 잘못 클립 아웃하면 여기로 온다"</em>는 짧은 글을 붙인 것이 시작이었습니다.<br><br>
+        아이러니는 <strong>원본이 그냥 평범한 실내 사진</strong>이었다는 점입니다.
+        훗날 미국 위스콘신주 오시코시의 한 건물을 2003년경 찍은 사진으로 밝혀졌다는 보도가 있었습니다.
+        <em>맥락을 제거하고 이야기를 붙이는 것만으로 미학이 탄생</em>한 사례입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏊</span><span class="card-title">Jared Pike — 풀룸 / Dream Pools</span><span class="card-sub">3D 아티스트</span></div>
+      <div class="card-desc">
+        <strong>풀코어의 시각적 정의를 사실상 혼자 만든 작가.</strong>
+        흰 타일, 얕은 물, 아치형 통로, 창문 없이 밝은 빛으로 이루어진 무한 수영장 연작으로 유명합니다.<br><br>
+        본인의 <em>실제 반복 꿈</em>을 3D로 재현한 작업이라고 밝혔고, 그래서 이미지에 일관된 건축 논리가 있습니다.
+        인터넷에 떠도는 "풀룸" 이미지 대부분이 이 사람 작업이거나 그 모방입니다.<br><br>
+        <strong>참고 시 주의:</strong> 출처가 잘린 채 유통되는 경우가 매우 많으니 크레딧을 확인하세요.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎥</span><span class="card-title">Kane Pixels — The Backrooms (Found Footage)</span><span class="card-sub">2022 · 유튜브</span></div>
+      <div class="card-desc">
+        <strong>백룸을 "설정"에서 "영상 언어"로 끌어올린 결정적 작품.</strong>
+        당시 열여섯 살이던 <em>케인 파슨스</em>가 1996년 캠코더 파운드 푸티지 형식으로 만든 단편으로,
+        수천만 뷰를 기록하며 이 미학의 대중적 기준이 되었습니다.<br><br>
+        기술적으로 배울 점이 많습니다 — <strong>흔들리는 핸드헬드, 좁은 화각, 오토포커스 헤맴,
+        낮은 다이내믹 레인지, 테이프 노이즈</strong>를 3D 렌더에 얹어 "실제로 찍은 것"처럼 만들었습니다.<br><br>
+        이후 A24가 장편 영화화를 발표하며 감독으로 참여하게 되었습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">r/LiminalSpace 의 실사 사진들</span><span class="card-sub">집단 아카이브</span></div>
+      <div class="card-desc">
+        특정 작가의 작품이 아니라 <strong>수만 명이 올린 "그냥 찍은 사진"의 집합</strong>이 하나의 정전을 이룹니다.<br><br>
+        반복적으로 회자되는 유형: <em>새벽의 이케아, 텅 빈 맥도날드 놀이터, 폐업한 쇼핑몰 분수대,
+        아무도 없는 워터파크, 밤의 학교 수영장, 조명만 켜진 사무실</em>.<br><br>
+        <strong>이 장르가 3D나 AI 없이도 성립한다는 증거</strong>입니다. 관찰과 선택만으로 충분합니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🖼️ 미술사적 조상 — 인터넷보다 100년 앞선 사람들</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">드림코어는 갑자기 나타난 게 아닙니다. 이 계보를 알면 작업의 깊이가 달라집니다.</div>
+    <table>
+      <tr><th>작가 · 작품</th><th>연도</th><th>무엇을 먼저 했나</th></tr>
+      <tr><td><strong>조르조 데 키리코</strong><br>형이상회화 연작</td><td>1910년대</td><td><em>리미널 스페이스의 진짜 원조.</em> 텅 빈 광장, 긴 그림자, 아무도 없는 아케이드, 사람 대신 마네킹. 100년 전에 이미 완성형이었습니다</td></tr>
+      <tr><td><strong>에드워드 호퍼</strong><br>「나이트호크스」 등</td><td>1942</td><td>도시 안의 고립. <em>사람이 있어도 서로 연결되지 않은</em> 공간의 쓸쓸함</td></tr>
+      <tr><td><strong>브라이언 이노</strong><br>『Music for Airports』</td><td>1978</td><td>말 그대로 <em>리미널 공간을 위한 음악</em>을 발명. 앰비언트 장르의 시작</td></tr>
+      <tr><td><strong>스탠리 큐브릭</strong><br>「샤이닝」</td><td>1980</td><td>호텔 복도·카펫 무늬·대칭 구도. <em>오늘날 드림코어 구도의 교과서</em></td></tr>
+      <tr><td><strong>데이비드 린치</strong><br>「트윈 픽스」 붉은 방</td><td>1990</td><td>꿈 논리를 영상 서사로. 설명하지 않는 것의 힘</td></tr>
+      <tr><td><strong>안드레아스 구르스키</strong><br>대형 사진 연작</td><td>1990년대</td><td>거대한 익명 공간(공장·호텔·주식거래소)의 압도적 스케일</td></tr>
+      <tr><td><strong>그레고리 크루드슨</strong><br>연출 사진</td><td>1990~2000년대</td><td>미국 교외의 언캐니를 영화처럼 연출. 프랙처드 아메리카나의 원형</td></tr>
+      <tr><td><strong>즈지스와프 벡신스키</strong></td><td>1970~80년대</td><td>디스토피아 초현실. 어두운 드림코어 계열의 시각 원천</td></tr>
+      <tr><td><strong>「사일런트 힐」</strong></td><td>1999</td><td>안개로 드로우 디스턴스를 감춘 기술적 한계가 <em>미학</em>이 된 사례</td></tr>
+    </table>
+  </div>
+
+  <div class="callout cyan"><span>💡</span><div class="callout-body">
+    <strong>왜 조상을 알아야 하나:</strong> 인터넷 이미지만 참고하면 <em>모방의 모방</em>이 됩니다.
+    데 키리코의 그림자 길이, 호퍼의 창문 구도, 큐브릭의 대칭을 직접 보면
+    "왜 이 구도가 불안한가"를 원리로 이해할 수 있습니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 게임 ══════════════════ -->
+<div class="sec" id="sec-game">
+  <div class="sec-hd">
+    <div class="sec-title">🎮 게임</div>
+    <div class="sec-sub">드림코어 감각을 직접 걸어 다니며 체험할 수 있는 작품들. 연도순이 아니라 중요도순입니다.</div>
+  </div>
+
+  <h3 class="blk">👑 반드시 알아야 하는 3작품</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌸</span><span class="card-title">Yume Nikki (유메닛키)</span><span class="card-sub">2004 · Kikiyama</span></div>
+      <div class="card-desc">
+        <strong>이 장르 전체의 시조.</strong> 정체를 알 수 없는 개인 개발자 <em>키키야마</em>가
+        RPG 만들기 2003으로 만든 무료 게임입니다.<br><br>
+        방에서 나가지 않는 소녀 <em>마도츠키</em>가 잠들어 꿈 세계를 돌아다니며
+        <strong>"이펙트"를 수집하는 것</strong>이 전부입니다. 전투도 대화도 목표 설명도 없습니다.<br><br>
+        <strong>왜 결정적인가:</strong> "설명하지 않는 초현실 공간을 그냥 걷는다"는 형식 자체를 발명했습니다.
+        드림코어라는 말이 생기기 15년 전에 이미 드림코어였습니다.
+        이후 수많은 팬 게임(<em>Yume 2kki</em> 등)과 장르 전체에 영향을 남겼습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💿</span><span class="card-title">LSD: Dream Emulator</span><span class="card-sub">1998 · PS1 · 오사무 사토</span></div>
+      <div class="card-desc">
+        <strong>실제 꿈 일기를 게임으로 만든 전설적 괴작.</strong> 일본에서만 소량 발매되어
+        오랫동안 구하기 어려운 컬트 작품이었습니다.<br><br>
+        벽에 부딪히면 다른 장면으로 <em>순간이동</em>하는 것이 유일한 규칙입니다.
+        조작 목표도, 승패도, 설명도 없습니다. 매번 다른 꿈이 생성되고 텍스처가 무작위로 바뀝니다.<br><br>
+        <strong>초기 3D의 조악함이 오히려 꿈처럼 작동한다는 것</strong>을 증명한 작품으로,
+        "PS1 그래픽 = 꿈"이라는 오늘날의 공식이 여기서 나왔습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎮</span><span class="card-title">Petscop</span><span class="card-sub">2017~2019 · 유튜브 ARG</span></div>
+      <div class="card-desc">
+        <strong>존재하지 않는 1997년 PS1 게임의 플레이 영상</strong> 형식을 빌린 ARG입니다.
+        실제로는 처음부터 끝까지 창작이지만, 초기 시청자들은 진짜 미발매 게임이라 믿었습니다.<br><br>
+        귀여운 아동용 게임처럼 시작해 점점 <em>제작자의 사적인 어둠</em>이 드러나는 구조로,
+        <strong>"게임이 나를 알고 있다"</strong>는 형식의 공포를 확립했습니다.<br><br>
+        드림코어·위어드코어의 <em>서사 방법론</em>에 가장 큰 영향을 준 작품입니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🚪 리미널 스페이스 탐험 게임</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>게임</th><th>연도</th><th>특징</th></tr>
+      <tr><td><strong>NaissanceE</strong></td><td>2014</td><td>흑백 거대 브루탈리즘 건축을 걷는다. <em>스케일 압박의 교과서</em></td></tr>
+      <tr><td><strong>Babbdi</strong></td><td>2022</td><td>짧고 <strong>무료</strong>. 콘크리트 도시를 탈출하는 기묘한 소품. 입문에 최적</td></tr>
+      <tr><td><strong>Anemoiapolis</strong></td><td>2022~</td><td>제목이 아예 <em>아네모이아</em>. 쇼핑몰·수영장·아파트를 잇는 리미널 탐험</td></tr>
+      <tr><td><strong>Pools</strong></td><td>2024</td><td>풀룸 미학만으로 만든 워킹 시뮬레이터. 적도 목표도 없다</td></tr>
+      <tr><td><strong>Superliminal</strong></td><td>2019</td><td>꿈 치료 프로그램 설정 + 원근 트릭 퍼즐. 밝고 접근성 좋다</td></tr>
+      <tr><td><strong>Control</strong></td><td>2019</td><td>거대 브루탈리즘 관청 <em>가장 오래된 집</em>. AAA급 리미널 공간</td></tr>
+      <tr><td><strong>Hypnospace Outlaw</strong></td><td>2019</td><td>1999년 가짜 인터넷을 서핑한다. 올드웹 향수의 정점</td></tr>
+      <tr><td><strong>Paratopic</strong></td><td>2018</td><td>PS1 질감의 저해상도 로우폴리 호러. 짧고 강렬</td></tr>
+      <tr><td><strong>Signalis</strong></td><td>2022</td><td>레트로 서바이벌 호러 + 꿈 논리 서사. 완성도가 매우 높다</td></tr>
+      <tr><td><strong>The Stanley Parable</strong></td><td>2013 / 2021</td><td>끝나지 않는 사무실. 리미널 공간의 코믹한 변주</td></tr>
+      <tr><td><strong>Yume 2kki</strong></td><td>2007~</td><td>유메닛키 팬 후속작. 수백 명이 만든 <em>끝없이 늘어나는</em> 꿈 세계</td></tr>
+      <tr><td><strong>Escape the Backrooms</strong></td><td>2022</td><td>협동 백룸 탈출. 레벨 체계를 게임으로 옮긴 대표작</td></tr>
+      <tr><td><strong>Roblox 백룸 게임들</strong></td><td>2020~</td><td>10대가 이 미학을 처음 접하는 <em>실제 관문.</em> 무시하면 안 되는 유통 경로</td></tr>
+      <tr><td><strong>마인크래프트 리미널 맵</strong></td><td>2021~</td><td>백룸·풀룸 재현 맵이 방대하다. 직접 만들어 보기에도 가장 쉬운 도구</td></tr>
+    </table>
+  </div>
+
+  <div class="callout grn"><span>🎯</span><div class="callout-body">
+    <strong>딱 하나만 해본다면</strong> — 감각을 알고 싶다면 <em>Babbdi</em>(무료, 30분).
+    장르의 뿌리를 알고 싶다면 <em>Yume Nikki</em>(무료).
+    영상 언어를 배우려면 게임보다 <em>Kane Pixels의 유튜브</em>가 빠릅니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 음악 ══════════════════ -->
+<div class="sec" id="sec-music">
+  <div class="sec-hd">
+    <div class="sec-title">🎧 음악</div>
+    <div class="sec-sub">드림코어 영상에 붙는 음악은 대부분 이 계보에서 옵니다.</div>
+  </div>
+
+  <h3 class="blk">👑 결정적 앨범</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕰️</span><span class="card-title">The Caretaker — Everywhere at the End of Time</span><span class="card-sub">2016~2019</span></div>
+      <div class="card-desc">
+        <strong>이 계열 음악에서 가장 유명한 작품.</strong> 레이랜드 커비의 프로젝트로,
+        <em>치매의 진행</em>을 6단계 앨범(총 6시간 반)으로 표현했습니다.<br><br>
+        1단계는 1930년대 무도회 음악처럼 아련하고 아름답습니다.
+        단계가 올라갈수록 <strong>루프가 무너지고, 노이즈가 삼키고, 마지막엔 형체가 사라집니다.</strong><br><br>
+        틱톡을 통해 10대에게 폭발적으로 퍼졌고, 특히 1단계의 <em>「It's Just a Burning Memory」</em>가
+        수많은 드림코어 영상의 기본 BGM이 되었습니다.<br><br>
+        <em>전곡 청취는 정서적으로 상당히 무거우니 상태가 괜찮을 때 들으세요.</em>
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌴</span><span class="card-title">Macintosh Plus — Floral Shoppe</span><span class="card-sub">2011 · Vektroid</span></div>
+      <div class="card-desc">
+        <strong>베이퍼웨이브를 장르로 확정한 앨범.</strong> 보라 배경 + 로마 흉상 + 일본어 글자의
+        그 표지는 인터넷 미학 역사상 가장 많이 인용된 이미지 중 하나입니다.<br><br>
+        기법은 단순합니다 — <em>1980년대 팝·스무스 재즈를 느리게 늘리고 리버브를 씌우는 것.</em>
+        그런데 그 결과가 <strong>"기억 속에서 재생되는 음악"</strong>처럼 들립니다.<br><br>
+        드림코어의 <em>slowed + reverb</em> 문화가 전부 여기서 나왔습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📼</span><span class="card-title">Boards of Canada — Music Has the Right to Children</span><span class="card-sub">1998</span></div>
+      <div class="card-desc">
+        <strong>"향수의 사운드"를 정의한 앨범.</strong> 낡은 테이프의 피치 흔들림,
+        1970년대 교육 영상에서 따온 아이들 목소리, 살짝 음이 어긋난 신스.<br><br>
+        하운톨로지 음악의 원형으로 평가되며, <em>"따뜻한데 어딘가 불안한"</em>
+        드림코어 정서를 음악으로 가장 정확히 구현한 작업입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌙</span><span class="card-title">2814 — 新しい日の誕生 (Birth of a New Day)</span><span class="card-sub">2015 · 드림펑크</span></div>
+      <div class="card-desc">
+        <strong>드림펑크 장르의 대표작.</strong> t e l e p a t h 와 HKE 의 듀오 프로젝트로,
+        <em>Dream Catalogue</em> 레이블에서 나왔습니다 (레이블 이름 자체가 이 미학의 선언입니다).<br><br>
+        비 오는 밤의 사이버펑크 도시를 앰비언트로 옮긴 사운드로,
+        베이퍼웨이브의 아이러니를 걷어내고 <strong>진지한 몽환</strong>만 남긴 방향을 열었습니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🎵 알아두면 좋은 아티스트·앨범</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>아티스트 / 작품</th><th>연도</th><th>왜 관련 있나</th></tr>
+      <tr><td><strong>Brian Eno</strong> — Ambient 1: Music for Airports</td><td>1978</td><td>리미널 공간을 위한 음악의 발명. 모든 것의 출발점</td></tr>
+      <tr><td><strong>Aphex Twin</strong> — Selected Ambient Works Vol. II</td><td>1994</td><td>제목 없는 트랙들의 꿈 같은 무형성</td></tr>
+      <tr><td><strong>Angelo Badalamenti</strong> — Twin Peaks OST</td><td>1990</td><td>느린 재즈 + 불안. 드림코어 정서의 원형</td></tr>
+      <tr><td><strong>Chuck Person</strong> — Eccojams Vol. 1</td><td>2010</td><td>원 오트릭스 포인트 네버의 프로토 베이퍼웨이브</td></tr>
+      <tr><td><strong>Burial</strong> — Untrue</td><td>2007</td><td>도시의 유령. 하운톨로지 계열 필청</td></tr>
+      <tr><td><strong>猫 シ Corp.</strong> — Palm Mall</td><td>2014</td><td><em>몰소프트</em> 대표작. 텅 빈 쇼핑몰의 배경음악</td></tr>
+      <tr><td><strong>Windows 96</strong></td><td>2017~</td><td>드림웨이브. 이름 그대로의 미학. 접근성이 좋다</td></tr>
+      <tr><td><strong>Stars of the Lid</strong>, <strong>Tim Hecker</strong></td><td>2000년대</td><td>느린 앰비언트 드론. 영상 BGM으로 실용적</td></tr>
+      <tr><td><strong>Sewerslvt</strong></td><td>2019~</td><td>브레이크코어 + 앰비언트. 위어드코어 영상과 자주 짝지어진다</td></tr>
+      <tr><td><strong>slowed + reverb 리믹스</strong></td><td>2019~</td><td>틱톡 시대의 실질적 표준 포맷. 아무 곡이나 이 처리를 하면 장르가 된다</td></tr>
+    </table>
+  </div>
+
+  <div class="callout acc"><span>🎚️</span><div class="callout-body">
+    <strong>직접 만들 때 공식:</strong> 아무 옛날 곡 → 속도 <em>0.8~0.85배</em> → 리버브 크게 →
+    고음역 살짝 깎기 → 테이프 워블(피치 흔들림) 약간 → 끝. 이것만으로 드림코어 BGM이 됩니다.
+    <em>저작권이 있는 곡은 개인 감상용으로만.</em> 공개할 거라면 로열티 프리 음원이나 직접 만든 것을 쓰세요.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 영상·ARG ══════════════════ -->
+<div class="sec" id="sec-video">
+  <div class="sec-hd">
+    <div class="sec-title">📺 영상 · ARG · 아날로그 호러</div>
+    <div class="sec-sub">드림코어의 서사적 확장. 대부분 유튜브에서 무료로 볼 수 있습니다.</div>
+  </div>
+
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎥</span><span class="card-title">Kane Pixels — Backrooms 시리즈</span><span class="card-sub">2022~</span></div>
+      <div class="card-desc">
+        <strong>이 분야 영상의 현재 기준점.</strong> 1996년 건설회사 촬영 테이프라는 설정으로,
+        3D 렌더를 실사 캠코더 푸티지처럼 위장했습니다.<br><br>
+        <em>배울 점:</em> 공포 장면이 거의 없는데도 긴장이 유지됩니다.
+        <strong>대부분의 시간을 아무 일도 일어나지 않는 이동에 씁니다.</strong>
+        그 지루함이 오히려 실재감을 만듭니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📡</span><span class="card-title">Local 58</span><span class="card-sub">2015~ · Kris Straub</span></div>
+      <div class="card-desc">
+        <strong>아날로그 호러의 원형.</strong> 가상의 지역 방송국 채널 58의
+        <em>침입 방송</em> 아카이브 형식입니다.<br><br>
+        「Weather Service」, 「Contingency」, 「Show For Children」 등 각 편이 짧고 완결적입니다.
+        <strong>가짜 공공 방송의 권위</strong>를 이용해 공포를 만드는 기법을 확립했습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌌</span><span class="card-title">Gemini Home Entertainment</span><span class="card-sub">2019~ · Remy Abode</span></div>
+      <div class="card-desc">
+        1990년대 교육용 VHS 형식으로 <strong>우주적 공포(코스믹 호러)</strong>를 전달합니다.
+        자연 다큐멘터리처럼 시작해 점점 지구가 이미 침식되었음을 알려주는 구조.<br><br>
+        조악한 3D 그래픽과 담백한 나레이션의 조합이 특히 효과적입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📁</span><span class="card-title">The Mandela Catalogue</span><span class="card-sub">2021~ · Alex Kister</span></div>
+      <div class="card-desc">
+        <strong>가장 대중적으로 성공한 아날로그 호러.</strong> 얼굴을 복제하는 "대체자"를 다룹니다.
+        경보 방송·수사 자료·홈비디오를 섞은 구성.<br><br>
+        <em>주의:</em> 이 계열 중에서도 점프 스케어와 강한 이미지가 많은 편입니다.
+        드림코어의 조용한 결을 기대하고 보면 결이 다릅니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏠</span><span class="card-title">This House Has People In It</span><span class="card-sub">2016 · Alan Resnick / Adult Swim</span></div>
+      <div class="card-desc">
+        가정용 감시 카메라 영상 형식의 단편. <strong>가족의 일상이 조용히 붕괴하는 과정</strong>을
+        설명 없이 보여줍니다.<br><br>
+        같은 작가의 <em>「Unedited Footage of a Bear」</em>(2014)와 함께,
+        <strong>기업/방송 포맷을 뒤틀어 언캐니를 만드는</strong> 방식의 교본입니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧶</span><span class="card-title">Don't Hug Me I'm Scared</span><span class="card-sub">2011~ · 영국</span></div>
+      <div class="card-desc">
+        어린이 인형극 형식으로 시작해 <strong>급격히 무너지는</strong> 시리즈.
+        <em>"교육 프로그램의 배신"</em>이라는 아이디어를 대중화했습니다.<br><br>
+        키드코어·트라우마코어 계열 시각 언어에 큰 영향을 남겼습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕯️</span><span class="card-title">Candle Cove</span><span class="card-sub">2009 · Kris Straub</span></div>
+      <div class="card-desc">
+        <strong>이 모든 것의 조상 격 크리피파스타.</strong> 어른들이 온라인 게시판에서
+        어린 시절 봤던 이상한 어린이 프로그램을 회상하는 짧은 글입니다.<br><br>
+        <em>"기억은 공유되지만 그 프로그램은 존재하지 않았다"</em>는 반전으로,
+        <strong>집단 기억의 불확실성</strong>이라는 주제를 처음 제시했습니다.
+      </div></div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌲</span><span class="card-title">Marble Hornets</span><span class="card-sub">2009~2014</span></div>
+      <div class="card-desc">
+        슬렌더맨 ARG. 유튜브 파운드 푸티지 웹시리즈의 <strong>형식 자체를 개척</strong>했습니다.<br><br>
+        오늘날 아날로그 호러의 문법(짧은 편, 노이즈 삽입, 시청자 참여 해석)이
+        대부분 여기서 정립되었습니다.
+      </div></div>
+  </div>
+
+  <div class="callout blu"><span>📌</span><div class="callout-body">
+    <strong>드림코어 vs 아날로그 호러 정리:</strong> 위 작품 대부분은 엄밀히 말하면 <em>아날로그 호러</em>이고,
+    드림코어와는 <strong>미학은 공유하지만 목적이 다릅니다</strong>(공포 vs 그리움).
+    순수한 드림코어 영상은 서사가 없는 짧은 무편집 클립 + 음악 형태가 많아 개별 작품으로 유명해지기 어렵습니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 만드는 법 ══════════════════ -->
+<div class="sec" id="sec-make">
+  <div class="sec-hd">
+    <div class="sec-title">🛠️ 직접 만드는 법</div>
+    <div class="sec-sub">사진 · 3D · AI · 영상 — 네 가지 경로별 실전 가이드. 난이도 낮은 순입니다.</div>
+  </div>
+
+  <h3 class="blk">📷 경로 1 — 사진 (난이도 ★, 가장 추천)</h3>
+  <div class="hi-card">
+    <div class="hi-title">✦ 핵심은 촬영이 아니라 "언제 가느냐"입니다</div>
+    <div class="hi-body">
+      좋은 장비도 보정 실력도 필요 없습니다. <strong>사람이 없는 시간</strong>에 <strong>사람이 있어야 하는 곳</strong>에 가는 것,
+      그게 90%입니다. 폰카메라로 충분합니다.
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🕐</span><span class="card-title">시간대</span></div>
+      <ul class="tips">
+        <li><strong>평일 오후 2~4시</strong> — 학교·상가가 가장 한산하다</li>
+        <li><strong>일요일 이른 아침</strong> — 도심이 비어 있다</li>
+        <li><strong>비 오는 날</strong> — 사람이 없고 빛이 균일해진다</li>
+        <li><strong>해질녘 30분</strong> — 오렌지빛 + 형광등이 겹치는 시간</li>
+        <li><strong>영업 종료 직전</strong> — 조명은 켜져 있고 사람은 없다</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📍</span><span class="card-title">한국에서 찍기 좋은 곳</span></div>
+      <ul class="tips">
+        <li><strong>지하상가</strong> — 을지로·강남 등. 형광등 + 반복 구조</li>
+        <li><strong>아파트 지하주차장·계단</strong> — 접근이 가장 쉽다</li>
+        <li><strong>지하철 환승 통로</strong> — 심야에 특히 좋다</li>
+        <li><strong>구축 상가·시장 2층</strong> — 공실이 많은 층</li>
+        <li><strong>실내 수영장·목욕탕</strong> — 촬영 허가 필수, 탈의실은 절대 금지</li>
+        <li><strong>대학 건물 복도</strong> — 방학 중</li>
+        <li><strong>고속도로 휴게소</strong> — 새벽</li>
+        <li><strong>실내 놀이터·키즈카페</strong> — 폐점 후</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">지켜야 할 선</span></div>
+      <ul class="tips">
+        <li><strong>폐건물 무단 침입은 범죄다.</strong> 주거침입·건조물침입으로 처벌된다</li>
+        <li>붕괴·석면·추락 위험이 실제로 있다. <em>사진 한 장 값이 아니다</em></li>
+        <li>사유지·상업시설은 <strong>관리자에게 물어보면 의외로 허락해 준다</strong></li>
+        <li>사람이 찍히면 얼굴을 가리거나 지운다 (초상권)</li>
+        <li>수영장·화장실·탈의실은 <strong>촬영 자체가 문제가 될 수 있다</strong></li>
+        <li>학교는 반드시 사전 허가</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎛️</span><span class="card-title">후보정 3단계</span></div>
+      <div class="card-desc">
+        <strong>① 해상도 낮추기</strong> — 긴 변 720~1080px로 축소<br>
+        <strong>② 색 빼기</strong> — 채도 -20~40%, 콘트라스트 -15%, 하이라이트 살짝 올림<br>
+        <strong>③ 열화 한 스푼</strong> — 노이즈 약간 + 블룸 약간. 끝.<br><br>
+        <em>이 이상 만지면 오히려 나빠집니다.</em> 스마트폰 기본 편집기로도 다 됩니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🧊 경로 2 — 3D (난이도 ★★★, 자유도 최고)</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔨</span><span class="card-title">도구</span></div>
+      <ul class="tips">
+        <li><strong>Blender</strong> (무료) — 사실상 표준. Cycles 렌더 사용</li>
+        <li><strong>Unreal Engine 5</strong> (무료) — Lumen 조명이 이 미학에 매우 잘 맞는다</li>
+        <li><strong>SketchUp</strong> — 건축 구조만 빠르게 잡을 때</li>
+        <li><strong>Cinema 4D</strong> — 상업 작업에서 많이 쓰인다</li>
+        <li><strong>텍스처</strong>: ambientCG, Poly Haven (둘 다 무료·상업 이용 가능)</li>
+      </ul></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💡</span><span class="card-title">조명이 전부다</span></div>
+      <ul class="tips">
+        <li><strong>Area Light를 천장 형광등 위치에 격자로 배치</strong> — 그림자가 거의 없게</li>
+        <li>색온도를 <strong>약간 초록/노랑으로</strong> (형광등 특유의 색)</li>
+        <li><strong>HDRI를 쓰지 마라.</strong> 창문 없는 실내가 목표다</li>
+        <li>Volumetric(안개)을 아주 약하게 넣으면 공간감이 산다</li>
+        <li>Bloom / Glare를 후처리로 강하게</li>
+        <li><strong>Ambient Occlusion을 살짝 과하게</strong> — 구석이 어두워야 실재감이 생긴다</li>
+      </ul></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">모델링 원칙</span></div>
+      <ul class="tips">
+        <li><strong>모듈 하나를 만들고 배열(Array)로 복제</strong> — 반복이 곧 무한함</li>
+        <li>천장 높이를 <em>일부러 낮게</em>(2.2~2.5m) → 답답함</li>
+        <li>또는 <em>비현실적으로 높게</em>(10m+) → 압도감. 둘 중 하나를 고를 것</li>
+        <li><strong>가구를 거의 넣지 마라.</strong> 빈 공간이 주인공이다</li>
+        <li>타일·카펫 무늬는 <strong>반복 주기가 보이게</strong> — 실제 건물처럼</li>
+        <li>먼지·물때·얼룩 텍스처를 넣으면 즉시 현실감이 붙는다</li>
+      </ul></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📼</span><span class="card-title">"찍은 것처럼" 만드는 마무리</span></div>
+      <ul class="tips">
+        <li><strong>화각을 좁게</strong> (35~50mm 상당). 광각은 CG 티가 난다</li>
+        <li>카메라를 <strong>사람 눈높이(1.5~1.6m)</strong>에 정확히 둔다</li>
+        <li>핸드헬드 흔들림 + 오토포커스 헤맴을 넣는다 (영상일 때)</li>
+        <li>렌즈 왜곡·색수차·비네팅을 <em>약하게</em></li>
+        <li>렌더를 <strong>1080p 이하로 뽑고</strong> 노이즈·압축을 얹는다</li>
+        <li>날짜 타임스탬프 오버레이 하나로 시대감이 완성된다</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">🤖 경로 3 — AI 이미지 (난이도 ★★, 가장 빠름)</h3>
+  <div class="callout yel"><span>⚠</span><div class="callout-body">
+    AI 생성물을 공개할 때는 <strong>AI로 만들었다고 밝히는 게 이 커뮤니티의 관례</strong>입니다.
+    실사 리미널 사진으로 위장해 올리면 반발이 큽니다. 또 특정 작가 이름을 프롬프트에 넣는 것은 피하세요.
+  </div></div>
+
+  <h4 class="sub">프롬프트 뼈대</h4>
+  <pre class="code">[공간] + [비어 있음] + [조명] + [질감/카메라] + [분위기]
+
+예시 ①  풀룸
+empty indoor swimming pool, endless white tiled rooms, shallow turquoise water,
+arched doorways, no people, fluorescent lighting, no windows,
+liminal space, backrooms aesthetic, found footage, low resolution,
+slight film grain, 35mm, eye level, unsettling calm
+
+예시 ②  학교 복도
+empty school hallway at late afternoon, lockers, linoleum floor,
+warm sunlight through window, dust in air, no people,
+nostalgic, dreamcore, faded colors, soft focus, low contrast, VHS grain
+
+예시 ③  폐업 쇼핑몰
+abandoned shopping mall interior, dead mall, empty food court,
+dry fountain, plants in planters, skylight, dim fluorescent light, no people,
+1990s, liminal space, mallsoft aesthetic, disposable camera photo, slight blur
+
+예시 ④  심야 주차장
+underground parking garage at night, sodium vapor orange lights,
+repeating concrete pillars, wet floor reflections, no cars, no people,
+liminal, eerie, security camera footage, low quality, grain, vignette</pre>
+
+  <h4 class="sub">효과 좋은 키워드 사전</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>목적</th><th>키워드</th></tr>
+      <tr><td>장르 지정</td><td><code>liminal space</code> <code>dreamcore</code> <code>backrooms aesthetic</code> <code>weirdcore</code> <code>poolrooms</code> <code>mallsoft</code></td></tr>
+      <tr><td>비어 있음</td><td><code>no people</code> <code>empty</code> <code>deserted</code> <code>abandoned</code> <code>desolate</code> <code>uninhabited</code></td></tr>
+      <tr><td>조명</td><td><code>fluorescent lighting</code> <code>no windows</code> <code>overexposed</code> <code>flat lighting</code> <code>sodium vapor light</code> <code>dim</code></td></tr>
+      <tr><td>화질 열화</td><td><code>low resolution</code> <code>film grain</code> <code>VHS</code> <code>found footage</code> <code>disposable camera</code> <code>security camera footage</code> <code>compression artifacts</code></td></tr>
+      <tr><td>시대감</td><td><code>1990s</code> <code>early 2000s</code> <code>retro</code> <code>CRT monitor</code> <code>faded photograph</code></td></tr>
+      <tr><td>분위기</td><td><code>eerie</code> <code>unsettling calm</code> <code>nostalgic</code> <code>melancholic</code> <code>surreal</code> <code>uncanny</code></td></tr>
+      <tr><td>구도</td><td><code>one point perspective</code> <code>symmetrical</code> <code>eye level</code> <code>wide empty space</code> <code>endless corridor</code></td></tr>
+      <tr><td>네거티브</td><td><code>people, crowd, faces, text, watermark, high contrast, vibrant colors, sharp, HDR, 4k</code></td></tr>
+    </table>
+  </div>
+  <div class="callout grn"><span>💡</span><div class="callout-body">
+    <strong>가장 중요한 요령:</strong> 네거티브에 <code>sharp, 4k, HDR, vibrant</code>를 반드시 넣으세요.
+    AI는 기본적으로 "예쁘고 선명한" 이미지를 만들려 하는데, 그게 드림코어를 죽이는 주범입니다.
+    <em>일부러 나쁜 사진을 요구</em>해야 합니다.
+  </div></div>
+
+  <h3 class="blk">🎬 경로 4 — 영상 (난이도 ★★★★)</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⏱️</span><span class="card-title">길이와 리듬</span></div>
+      <div class="card-desc"><strong>30초~3분.</strong> 컷을 아끼세요. 한 컷을 <em>10~20초</em> 유지하는 게 이 장르의 문법입니다. 빠른 편집은 즉시 분위기를 파괴합니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎥</span><span class="card-title">카메라 움직임</span></div>
+      <div class="card-desc"><strong>느리게 전진하거나 멈춰 있기.</strong> 복도를 천천히 걸어가는 시점이 가장 강력합니다. 핸드헬드 흔들림을 아주 약하게 넣으면 실재감이 생깁니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔇</span><span class="card-title">소리</span></div>
+      <div class="card-desc">무음으로 두지 마세요. <strong>룸톤 + 형광등 웅웅 + 먼 소음</strong>을 깔고, 음악은 아주 낮게. 소리가 화면보다 중요한 장르입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🛠️</span><span class="card-title">도구</span></div>
+      <div class="card-desc"><strong>DaVinci Resolve</strong>(무료·강력), <strong>CapCut</strong>(모바일·쉬움), <strong>Premiere / After Effects</strong>. VHS 효과 플러그인은 대부분 과하니 강도를 30% 이하로 줄이세요.</div></div>
+  </div>
+
+  <h3 class="blk">✅ 완성 전 자기 점검</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>질문</th><th>아니라면</th></tr>
+      <tr><td>사람이 없거나 얼굴이 가려져 있는가?</td><td>사람을 지우거나 다시 찍는다</td></tr>
+      <tr><td>낯선 요소가 <strong>하나뿐</strong>인가?</td><td>가장 강한 하나만 남기고 지운다</td></tr>
+      <tr><td>화질이 <em>일부러</em> 나쁜가?</td><td>해상도를 낮춘다</td></tr>
+      <tr><td>이 공간에 <em>가본 것 같은</em> 느낌이 드는가?</td><td>더 평범하고 흔한 공간으로 바꾼다</td></tr>
+      <tr><td>필터를 3개 이하로 썼는가?</td><td>과한 효과를 뺀다</td></tr>
+      <tr><td>설명하지 않고 남겨 뒀는가?</td><td>텍스트·자막·배경설정을 줄인다</td></tr>
+      <tr><td>출처·저작권 문제가 없는가?</td><td>원작자를 표기하거나 직접 만든 소재로 교체</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════ 계보 ══════════════════ -->
+<div class="sec" id="sec-history">
+  <div class="sec-hd">
+    <div class="sec-title">📅 계보 — 어떻게 여기까지 왔나</div>
+    <div class="sec-sub">드림코어는 2019년에 갑자기 생긴 게 아니라 100년의 축적입니다.</div>
+  </div>
+
+  <div class="tl">
+    <div class="tl-item"><div class="tl-year">1910년대</div><div class="tl-title">데 키리코의 형이상회화</div>
+      <div class="tl-desc">텅 빈 광장, 긴 그림자, 사람 없는 아케이드. <strong>리미널 스페이스의 시각 문법이 이미 완성</strong>되어 있었습니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">1919</div><div class="tl-title">프로이트 「언캐니」</div>
+      <div class="tl-desc">"친숙한 것이 낯설어질 때"의 공포를 이론화. 이 장르의 심리학적 토대입니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">1978</div><div class="tl-title">브라이언 이노 『Music for Airports』</div>
+      <div class="tl-desc">공항이라는 리미널 공간을 위한 음악. 앰비언트 장르의 탄생.</div></div>
+
+    <div class="tl-item"><div class="tl-year">1980 · 1990</div><div class="tl-title">「샤이닝」 · 「트윈 픽스」</div>
+      <div class="tl-desc">호텔 복도의 대칭 구도와 꿈 논리 서사. <strong>오늘날 드림코어 구도의 직접적 출처.</strong></div></div>
+
+    <div class="tl-item"><div class="tl-year">1990년대</div><div class="tl-title">초기 3D 게임의 기술적 한계</div>
+      <div class="tl-desc">저폴리곤, 안개, 뭉개진 텍스처. 당시엔 <em>단점</em>이었던 것이 30년 뒤 <strong>"꿈의 질감"</strong>이 됩니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">1998</div><div class="tl-title">LSD: Dream Emulator</div>
+      <div class="tl-desc">꿈 일기를 게임으로. 목표 없는 초현실 공간 탐험이라는 형식의 시작.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2004</div><div class="tl-title">Yume Nikki</div>
+      <div class="tl-desc"><strong>장르의 실질적 원점.</strong> "설명 없는 꿈 세계를 그냥 걷는다"를 확립. 드림코어라는 단어보다 15년 앞섰습니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2009</div><div class="tl-title">Candle Cove · Marble Hornets</div>
+      <div class="tl-desc">크리피파스타와 유튜브 파운드 푸티지. <strong>집단 기억의 불확실성</strong>이라는 주제와 웹시리즈 형식이 정립됩니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2010~2011</div><div class="tl-title">베이퍼웨이브 등장</div>
+      <div class="tl-desc">Eccojams, Floral Shoppe. <strong>낡은 소비문화를 유령처럼 재생</strong>하는 방법론 확립. 드림코어의 직계 부모.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2014~2018</div><div class="tl-title">Tumblr "~core" 미학 문화</div>
+      <div class="tl-desc">수백 개의 미학이 이름을 얻습니다. <strong>드림코어·위어드코어·트라우마코어 같은 명칭이 이 시기에 정착</strong>했습니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2016~2019</div><div class="tl-title">The Caretaker 『Everywhere at the End of Time』</div>
+      <div class="tl-desc">기억의 붕괴를 6시간 반에 걸쳐. 훗날 틱톡을 통해 10대에게 폭발적으로 확산됩니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2017</div><div class="tl-title">Petscop</div>
+      <div class="tl-desc">존재하지 않는 게임의 플레이 영상. <strong>"게임이 나를 알고 있다"</strong>는 서사 형식의 발명.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2019. 5</div><div class="tl-title">★ 백룸 탄생</div>
+      <div class="tl-desc">4chan /x/에 올라온 노란 방 사진 한 장 + 짧은 창작 글. <strong>이 장르가 대중에게 알려지는 결정적 순간.</strong></div></div>
+
+    <div class="tl-item"><div class="tl-year">2019~2020</div><div class="tl-title">리미널 스페이스의 유행 · 팬데믹</div>
+      <div class="tl-desc">r/LiminalSpace 급성장. 그리고 <strong>코로나로 실제 세계가 텅 비어 버립니다.</strong> 미학이 현실이 된 시기 — 이 장르가 폭발한 결정적 배경입니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2020~2021</div><div class="tl-title">틱톡을 통한 대중화</div>
+      <div class="tl-desc">짧은 영상 + slowed reverb 음악 포맷으로 <strong>10대 전체에 확산.</strong> 드림코어가 하위문화에서 주류 시각 언어로 이동합니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2022. 1</div><div class="tl-title">★ Kane Pixels — Backrooms</div>
+      <div class="tl-desc">16세 창작자의 파운드 푸티지 단편. <strong>영상 언어의 기준이 되고</strong> 이후 A24의 장편 영화화로 이어집니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">2022~2024</div><div class="tl-title">게임화 · 산업화</div>
+      <div class="tl-desc">Escape the Backrooms, Anemoiapolis, Pools 등 상업 게임 등장. 로블록스·마인크래프트로 <strong>10대의 놀이 문화</strong>가 됩니다.</div></div>
+
+    <div class="tl-item"><div class="tl-year">현재</div><div class="tl-title">AI 생성과 포화</div>
+      <div class="tl-desc">AI로 무한 생성이 가능해지며 <strong>이미지의 희소성이 사라지는 문제</strong>가 논의됩니다.
+      동시에 <em>"실제로 존재하는 공간을 직접 찍은 사진"</em>의 가치가 다시 올라가는 흐름도 나타납니다.</div></div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔍 왜 하필 지금 이 미학이 통하는가</div>
+    <div class="hi-body">
+      몇 가지 설명이 함께 제시됩니다. 어느 하나가 정답은 아니지만 모두 일리가 있습니다.<br><br>
+      <strong>① 디지털 네이티브의 첫 향수</strong> — 어린 시절 기억이 <em>사진이 아니라 저화질 디지털 이미지</em>로 남은 첫 세대가 성인이 되었습니다. 그들의 향수는 필연적으로 JPEG 뭉개짐의 형태를 띱니다.<br><br>
+      <strong>② 오지 않은 미래</strong> — 하운톨로지의 설명. 90년대가 약속한 미래는 오지 않았고, 우리는 그 <em>실현되지 못한 미래의 폐허</em>에서 살고 있습니다.<br><br>
+      <strong>③ 팬데믹</strong> — 2020년에 전 세계가 실제로 리미널 스페이스가 되었습니다. 텅 빈 도시를 모두가 직접 봤습니다.<br><br>
+      <strong>④ 제3의 장소의 소멸</strong> — 쇼핑몰·오락실·놀이터처럼 <em>목적 없이 머물던 공간</em>이 사라지고 있습니다. 드림코어는 그 상실에 대한 애도로 읽힙니다.<br><br>
+      <strong>⑤ 알고리즘 피로</strong> — 최적화된 자극에 지친 사람들이 <em>아무 일도 일어나지 않는 이미지</em>에서 휴식을 찾습니다.
+    </div>
+  </div>
+
+  <div class="callout acc"><span>🌙</span><div class="callout-body">
+    <strong>마지막으로:</strong> 이 장르의 매력은 <em>정답이 없다는 것</em>입니다.
+    누군가에게는 어린 시절 수영장이고, 누군가에게는 불안의 이미지이고, 누군가에게는 그냥 예쁜 사진입니다.
+    <strong>설명하지 않고 남겨 두는 것이 이 미학의 예의</strong>이기도 합니다.
+  </div></div>
+</div>
+
+<div class="footnote">
+  드림코어 · 위어드코어 · 리미널 스페이스 · 백룸 · 풀코어 · 아날로그 호러 · 베이퍼웨이브<br>
+  개념 · 시각 문법 · 유명 작품 · 게임 · 음악 · 영상 · 제작 가이드 · 계보 총정리
+</div>
+
+</div><!-- /main -->
+
+<script src="app.js"></script>
+</body>
+</html>

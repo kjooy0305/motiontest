@@ -40,6 +40,10 @@ body{background:var(--bg);color:var(--txt);font-size:14px;line-height:1.65;
 #hdr .src{font-size:11px;color:var(--txt3);text-decoration:none;border:1px solid var(--border2);
   padding:4px 9px;border-radius:6px;white-space:nowrap;transition:.15s;}
 #hdr .src:hover{color:var(--txt);border-color:var(--acc);}
+#origBtn{background:var(--bg3);cursor:pointer;font-family:inherit;}
+#origBtn.on{background:var(--acc3);border-color:var(--acc);color:var(--acc2);font-weight:700;}
+.trnote{font-size:11px;color:var(--txt3);margin-top:8px;padding:6px 10px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:6px;line-height:1.5;}
 #menuBtn{display:none;background:var(--bg3);border:1px solid var(--border2);color:var(--txt2);
   border-radius:6px;width:32px;height:30px;font-size:14px;cursor:pointer;}
 
@@ -233,6 +237,7 @@ pre.cb code{background:none;border:none;padding:0;color:#d4d4e8;font-size:12px;w
     <span class="kbd">/</span>
   </div>
   <span class="cnt" id="cnt"></span>
+  <button class="src" id="origBtn" title="한국어 번역 / 위키 원문 전환">원문 EN</button>
   <a class="src" href="https://git.mythiccraft.io/mythiccraft" target="_blank" rel="noopener">공식 위키 ↗</a>
 </header>
 
@@ -250,20 +255,24 @@ pre.cb code{background:none;border:none;padding:0;color:#d4d4e8;font-size:12px;w
 <script>
 /* ═══ 청크 로더 ═══ */
 var MC = {
-  DOC: {},
-  add: function (o) { for (var k in o) MC.DOC[k] = o[k]; },
+  DOC: {},                                   // 한국어 본문
+  DOCO: {},                                  // 원문(영문) 본문
+  add:  function (o) { for (var k in o) MC.DOC[k] = o[k]; },
+  addO: function (o) { for (var k in o) MC.DOCO[k] = o[k]; },
   _done: {}, _pend: {},
-  load: function (g) {
-    if (MC._done[g]) return Promise.resolve();
-    if (MC._pend[g]) return MC._pend[g];
-    return (MC._pend[g] = new Promise(function (res) {
+  _get: function (f) {
+    if (MC._done[f]) return Promise.resolve();
+    if (MC._pend[f]) return MC._pend[f];
+    return (MC._pend[f] = new Promise(function (res) {
       var s = document.createElement('script');
-      s.src = 'data/c' + g + '.js';
-      s.onload = function () { MC._done[g] = 1; res(); };
+      s.src = 'data/' + f + '.js';
+      s.onload = function () { MC._done[f] = 1; res(); };
       s.onerror = function () { res(); };
       document.head.appendChild(s);
     }));
-  }
+  },
+  load:  function (g) { return MC._get('c' + g); },
+  loadO: function (g) { return MC._get('o' + g); }
 };
 </script>
 <script src="data/index.js"></script>

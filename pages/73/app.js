@@ -33,7 +33,8 @@ var $ = function (s) { return document.querySelector(s); };
 var tabsEl = $('#tabs'), catsEl = $('#cats'), listEl = $('#list'), docEl = $('#docInner');
 var searchEl = $('#search'), cntEl = $('#cnt'), sideEl = $('#side'), ovlEl = $('#ovl');
 
-var state = { plug: 'home', cat: null, id: null, q: '' };
+var state = { plug: 'home', cat: null, id: null, q: '', orig: false };
+try { state.orig = localStorage.getItem('mcwiki_orig') === '1'; } catch (err) {}
 
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
@@ -146,8 +147,11 @@ function openDoc(id) {
   var e = BYID[id];
   if (!e) { return; }
   docEl.innerHTML = '<div class="lempty">불러오는 중…</div>';
-  MC.load(e.g).then(function () {
+  var jobs = [MC.load(e.g)];
+  if (state.orig) jobs.push(MC.loadO(e.g));
+  Promise.all(jobs).then(function () {
     var d = MC.DOC[id];
+    var body = (state.orig && MC.DOCO[id]) ? MC.DOCO[id].h : (d ? d.h : null);
     var p = PMAP[e.p];
     var h = '<div class="dhead">' +
       '<div class="crumb"><b>' + esc(p.n) + '</b> &nbsp;›&nbsp; ' + esc(CATS[e.c] || e.c) + '</div>' +
@@ -156,12 +160,30 @@ function openDoc(id) {
       '<div class="meta">';
     (e.a || []).forEach(function (a) { h += '<span class="chip al">별칭 ' + esc(a) + '</span>'; });
     (e.t || []).forEach(function (t) { h += '<span class="chip tg">#' + esc(t) + '</span>'; });
-    if (d && d.u) h += '<a class="chip ext" href="' + esc(d.u) + '" target="_blank" rel="noopener">원문 보기 ↗</a>';
-    h += '</div></div><div id="body">' + (d ? d.h : '<p>문서를 불러오지 못했습니다.</p>') + '</div>';
+    h += '<span class="chip ext" id="docLang">' + (state.orig ? '🇬🇧 원문(EN) — 번역으로' : '🇰🇷 한국어 번역 — 원문으로') + '</span>';
+    if (d && d.u) h += '<a class="chip ext" href="' + esc(d.u) + '" target="_blank" rel="noopener">공식 위키 ↗</a>';
+    h += '</div></div><div id="body">' + (body || '<p>문서를 불러오지 못했습니다.</p>') + '</div>';
     docEl.innerHTML = h;
+    var lang = document.getElementById('docLang');
+    if (lang) lang.onclick = toggleOrig;
     decorate(docEl);
     $('#doc').scrollTop = 0;
   });
+}
+
+/* 한국어 번역 ↔ 위키 원문 전환 */
+function toggleOrig() {
+  state.orig = !state.orig;
+  try { localStorage.setItem('mcwiki_orig', state.orig ? '1' : '0'); } catch (err) {}
+  syncOrigBtn();
+  if (state.id) openDoc(state.id);
+}
+
+function syncOrigBtn() {
+  var b = document.getElementById('origBtn');
+  if (!b) return;
+  b.textContent = state.orig ? '번역 KO' : '원문 EN';
+  b.classList.toggle('on', state.orig);
 }
 
 function decorate(root) {
@@ -363,12 +385,14 @@ function renderHome() {
   gcard('검색', '이름 · 별칭 · 한글 설명 전체에서 찾습니다.', 'damage / @PIR / onTimer / 발사체') +
   gcard('단축키', '<code>/</code> 검색 포커스, <code>Esc</code> 검색 해제', '') +
   gcard('카테고리', '탭 선택 후 왼쪽 칩으로 메카닉·조건·타게터 등을 좁힙니다.', '') +
-  gcard('원문 링크', '각 문서 상단의 “원문 보기”로 공식 위키 페이지가 열립니다.', '') +
+  gcard('원문 대조', '우측 상단 <b>원문 EN</b> 버튼으로 영문 원문과 즉시 전환됩니다. 설정은 저장됩니다.', '') +
 '</div></div>' +
 
 '<div class="ftr">' +
-'출처: <a href="https://git.mythiccraft.io/mythiccraft" target="_blank" rel="noopener">git.mythiccraft.io</a> 공식 위키 11개 저장소에서 자동 추출 · 본문은 원문(영문) 그대로이며, 항목 요약과 가이드는 한국어로 작성했습니다.<br>' +
-'플러그인 버전 업데이트에 따라 실제 동작이 달라질 수 있으니, 중요한 설정은 반드시 상단의 “원문 보기”로 최신 문서를 확인하세요.' +
+'출처: <a href="https://git.mythiccraft.io/mythiccraft" target="_blank" rel="noopener">git.mythiccraft.io</a> 공식 위키 11개 저장소 · 본문 전체를 한국어로 옮겼습니다.<br>' +
+'코드 블록과 속성명·메카닉명·열거값(<code>amount</code>, <code>@PIR</code>, <code>~onTimer</code>, <code>true</code> 등)은 실제로 입력하는 값이므로 원문 그대로 두었습니다.<br>' +
+'번역이 애매하면 우측 상단 <b>원문 EN</b> 버튼으로 영문 원문과 바로 대조할 수 있습니다. ' +
+'플러그인 업데이트로 원문이 달라질 수 있으니, 중요한 설정은 각 문서의 “공식 위키” 링크로 최신본을 확인하세요.' +
 '</div>';
 
   decorate(docEl);
@@ -440,6 +464,8 @@ document.addEventListener('keydown', function (e) {
 function openSide() { sideEl.classList.add('open'); ovlEl.classList.add('on'); }
 function closeSide() { sideEl.classList.remove('open'); ovlEl.classList.remove('on'); }
 $('#menuBtn').onclick = function () { sideEl.classList.contains('open') ? closeSide() : openSide(); };
+$('#origBtn').onclick = toggleOrig;
+syncOrigBtn();
 ovlEl.onclick = closeSide;
 
 /* ─────────────────────── 시작 ─────────────────────── */

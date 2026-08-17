@@ -159,8 +159,8 @@ code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
 <div id="hdr">
   <span id="hdr-logo">🎭</span>
   <h1>마피아42 완전 정리</h1>
-  <span class="badge">직업 · 용어 · 스킬 · 공략</span>
-  <input id="search" type="text" placeholder="🔍 검색 (예: 경크, 접선, 도굴꾼, 시한부)">
+  <span class="badge">직업 · 용어 · 스킬 · 공략 · 계정</span>
+  <input id="search" type="text" placeholder="🔍 검색 (예: 경크, 접선, 도굴꾼, 계정 탈퇴)">
   <span id="hit-cnt"></span>
 </div>
 
@@ -174,6 +174,7 @@ code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
   <button class="tab" data-tab="term">📚 용어 사전</button>
   <button class="tab" data-tab="mode">🏆 모드·랭크</button>
   <button class="tab" data-tab="guide">🎯 초보 가이드</button>
+  <button class="tab" data-tab="acc">🔄 계정 · 리세</button>
 </div>
 
 <div id="main">
@@ -936,9 +937,206 @@ code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
   </div></div>
 </div>
 
+<!-- ══════════════════ 계정 · 리세 ══════════════════ -->
+<div class="sec" id="sec-acc">
+  <div class="sec-hd">
+    <div class="sec-title">🔄 계정 · 리세(초기화)</div>
+    <div class="sec-sub">계정 탈퇴 · 새 계정으로 다시 시작 · 휴대폰 인증 제약 · 번호 초기화 신청 · 하면 안 되는 것</div>
+  </div>
+
+  <div class="callout gold"><span>⚠</span><div class="callout-body">
+    <strong>먼저 알아둘 것:</strong> 마피아42는 <em>자체 회원가입이 없습니다.</em>
+    구글 · 애플 · 페이스북 계정에 연동하는 방식이라, 흔히 말하는 "리세"는
+    <strong>① 계정을 탈퇴해서 지우거나 ② 다른 소셜 계정으로 새로 시작하거나</strong> 둘 중 하나입니다.<br>
+    그런데 <strong>휴대폰 인증</strong> 때문에 새 계정을 만들어도 <em>번호 기준 제한이 그대로 따라옵니다.</em>
+    즉 <strong>진짜 백지 상태로 되돌리는 리세는 사실상 불가능</strong>합니다. 아래에서 이유를 설명합니다.
+  </div></div>
+
+  <div class="hi-card">
+    <div class="hi-title">🗺️ 리세 경로 한눈에</div>
+    <div class="hi-body">
+      <strong>내 계정을 지우고 싶다</strong> → 방법 1(계정 탈퇴). 되돌릴 수 없습니다.<br>
+      <strong>기존 계정은 남겨두고 새로 하고 싶다</strong> → 방법 2(다른 소셜 계정 로그인).<br>
+      <strong>초보 혜택·멘티를 다시 받고 싶다</strong> → <em>같은 번호로는 안 됩니다.</em> 아래 「휴대폰 인증」 참고.<br>
+      <strong>제재를 피하고 싶다</strong> → <em>불가능하고, 시도 자체가 가중 처벌 대상입니다.</em>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">세 가지 선택지 비교</div>
+    <table>
+      <thead><tr><th>방법</th><th>하는 법</th><th>기존 계정</th><th>주의</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>① 계정 탈퇴</strong></td>
+          <td>게임 내 <code>설정 → 계정 → 계정 탈퇴</code></td>
+          <td><em>완전 삭제</em> (복구 불가)</td>
+          <td>루나·루블 환불 안 됨 / 제재 기록 있으면 거부될 수 있음</td>
+        </tr>
+        <tr>
+          <td><strong>② 다른 소셜 계정</strong></td>
+          <td>구글·애플·페이스북 중 <strong>다른 계정</strong>으로 로그인</td>
+          <td>그대로 보존 (나중에 복귀 가능)</td>
+          <td>같은 번호로 인증하면 번호 기준 제한이 그대로 적용</td>
+        </tr>
+        <tr>
+          <td><strong>③ 번호 초기화</strong></td>
+          <td>공식 홈페이지 1:1 문의 + 통신사 증빙</td>
+          <td>보존</td>
+          <td><em>실제로 번호를 바꿨을 때만</em> 가능 / 남용 시 제재</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="blk">🗑️ 방법 1 — 계정 탈퇴 (완전 삭제)</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">📍</span><span class="card-title">경로</span></div>
+    <div class="card-desc">
+      게임 실행 → <code>설정</code> → <code>계정</code> → 화면 <strong>우측 하단 [계정 탈퇴]</strong>.
+      탈퇴는 <em>게임 안에서만</em> 신청할 수 있습니다. 홈페이지 문의로는 대신 처리해 주지 않습니다.
+    </div></div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">💥</span><span class="card-title">사라지는 것</span></div>
+      <ul class="tips">
+        <li>레벨 · 랭크 티어 · 전적 · 컬렉션</li>
+        <li>보유 <strong>아이템 · 스킨 · 보석</strong></li>
+        <li>보유 <em>루나 · 루블</em> — 과금분도 <strong>환불되지 않습니다</strong></li>
+        <li><strong>접메(쪽지)</strong> 내용 · 길드 채팅 · 보낸 엽서</li>
+        <li>친구 목록 · 길드 소속</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🚫</span><span class="card-title">탈퇴가 막히는 경우</span></div>
+      <ul class="tips">
+        <li><strong>영구정지 · 영구추방</strong> 기록이 있으면 기록 보존 때문에 <em>탈퇴가 취소될 수 있습니다</em></li>
+        <li>즉 <strong>제재를 지우려고 탈퇴하는 건 통하지 않습니다</strong></li>
+        <li>진행 중인 문의·분쟁이 있으면 처리가 늦어질 수 있습니다</li>
+      </ul></div>
+  </div>
+
+  <div class="callout acc"><span>❗</span><div class="callout-body">
+    <strong>탈퇴는 되돌릴 수 없습니다.</strong> 운영진은 <em>계정 정보 이전·복구를 규정상 처리하지 않습니다</em>
+    (개인정보를 직접 보관하지 않고 구글·애플·페이스북 계정 정보를 빌려 쓰는 구조이기 때문).<br>
+    과금한 게 있다면 탈퇴 전에 <strong>루나를 다 쓰고</strong> 결정하세요.
+  </div></div>
+
+  <h3 class="blk">🆕 방법 2 — 다른 소셜 계정으로 새로 시작</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">🔑</span><span class="card-title">가장 많이 쓰는 방법</span></div>
+    <div class="card-desc">
+      기존 계정을 지우지 않고, <strong>연동한 적 없는 다른 구글·애플·페이스북 계정</strong>으로 로그인하면
+      레벨 1부터 새로 시작합니다. 원래 계정으로 돌아가고 싶으면 <em>로그아웃 후 원래 소셜 계정으로 다시 로그인</em>하면 됩니다.<br>
+      부계정을 만드는 것 자체는 금지가 아니지만, <strong>아래 「휴대폰 인증」 제한이 반드시 따라붙습니다.</strong>
+    </div></div>
+
+  <div class="callout blu"><span>💡</span><div class="callout-body">
+    <strong>닉네임만 바꾸고 싶은 거라면</strong> 리세할 필요가 없습니다.
+    인게임 <strong>닉네임 변경권</strong>을 쓰는 쪽이 전적·아이템을 지키면서 훨씬 쌉니다.
+  </div></div>
+
+  <h3 class="blk gold">📱 휴대폰 인증 — 리세를 막는 진짜 벽</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">📵</span><span class="card-title">왜 완전 리세가 안 되나</span></div>
+    <div class="card-desc">
+      2016년 10월 21일 업데이트로 <strong>모든 유저가 휴대폰 인증을 해야 게임을 할 수 있게</strong> 바뀌었습니다.
+      이름·나이·성별은 수집하지 않고 <em>번호만</em> 받습니다.<br>
+      문제는 <strong>계정이 아니라 "번호" 단위로 제한이 걸린다</strong>는 점입니다.
+      새 계정을 만들어도 같은 번호로 인증하면 아래 제한을 원래 계정과 <em>공유</em>합니다.
+    </div></div>
+
+  <div class="tbl-wrap gold">
+    <div class="tbl-cap">같은 번호로 인증한 계정끼리 공유되는 제한</div>
+    <table>
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td><strong>일일 퀘스트 보상</strong></td><td>한 계정이 수령하면 다른 계정에서는 받을 수 없습니다</td></tr>
+        <tr><td><strong>엽서 발송</strong></td><td>한 계정이 보내면 다른 계정에서는 제한됩니다</td></tr>
+        <tr><td><strong>멘토 · 멘티</strong></td><td><em>그 번호의 첫 계정만</em> 이용 가능 — 새 계정은 멘티 혜택을 못 받습니다</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout gold"><span>🎯</span><div class="callout-body">
+    <strong>정리하면:</strong> "초보 보상 다시 받으려고 리세"는 <em>같은 번호로는 목적을 달성할 수 없습니다.</em>
+    실제로 얻는 건 새 닉네임과 초기화된 전적뿐입니다.
+  </div></div>
+
+  <h3 class="blk">🔢 번호 초기화 신청</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">📄</span><span class="card-title">언제 · 어떻게</span></div>
+    <div class="card-desc">
+      <strong>실제로 휴대폰 번호를 바꿨을 때만</strong> 신청할 수 있습니다.
+      공식 홈페이지 1:1 문의의 <code>번호 초기화 문의</code> 분류로 접수하며,
+      본인 명의 <strong>통신사 고객센터 앱의 [내정보 → 가입정보]</strong> 화면에서
+      <em>가입일자와 바뀐 번호 일부가 함께 보이는 스크린샷</em>을 첨부해야 합니다.<br>
+      증빙 양식이 이렇게 빡빡해진 이유는 <strong>영구추방 유저의 계정 거래 악용</strong> 때문입니다.
+    </div></div>
+
+  <div class="callout acc"><span>⛔</span><div class="callout-body">
+    <strong>초기화 후 갈라치기는 제재됩니다.</strong> 번호를 초기화하면 그 번호로 인증했던 계정들이 함께 풀리는데,
+    이때 <em>계정마다 서로 다른 번호를 인증해 제한을 우회하면</em> 처벌 대상입니다.<br>
+    <strong>1차</strong> — 전화번호 인증 내역 초기화 + 전체 계정 <em>1주일 이상 이용 제한</em> ·
+    <strong>2차</strong> — <em>영구 추방</em>
+  </div></div>
+
+  <h3 class="blk">🚨 하면 안 되는 것</h3>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">👥</span><span class="card-title">번호 쪼개기 부계정</span></div>
+      <div class="card-desc">
+        서로 다른 번호로 인증한 계정으로 <strong>번호 기준 제한 콘텐츠</strong>(일일퀘·엽서·멘티 등)를 이용하면 제재 대상입니다.
+        과거에는 3개 이상이 기준이었지만 <em>정책이 바뀌어 2개부터</em> 해당합니다.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔨</span><span class="card-title">영구추방 = 기기 차단</span></div>
+      <div class="card-desc">
+        영구<strong>정지</strong>는 그 계정만 막히지만, 영구<strong>추방</strong>은 <em>기기 차단</em>이라
+        새 부계정 생성 자체가 불가능합니다. 랭크 어뷰징 · 계정 공유 · 운영 방해가 대표 사유입니다.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">💳</span><span class="card-title">스토어 직접 환불</span></div>
+      <div class="card-desc">
+        구글 플레이에서 <strong>직접 환불</strong>하면 아이템이 회수되지 않아 <em>즉시 영구추방</em>됩니다.
+        환불·재지급은 반드시 <strong>공식 홈페이지 문의</strong>로 진행하세요.
+        이미 쓴 재화는 청약철회가 불가합니다.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🤝</span><span class="card-title">계정 거래 · 공유</span></div>
+      <div class="card-desc">
+        계정을 사고팔거나 빌려주는 행위는 <strong>영구추방</strong> 사유입니다.
+        운영진은 <em>계정 정보 이전을 규정상 처리하지 않으므로</em> 사고가 나도 구제받을 수 없습니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">📮 문의 방법</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">🏠</span><span class="card-title">공식 창구</span></div>
+    <ul class="tips">
+      <li><strong>공식 홈페이지</strong> <code>mafia42.com</code> 접속 → <em>게임에 연동된 계정으로 로그인</em> → 고객센터 → 1:1 문의 → 분류 선택</li>
+      <li>메일: <code>support@mafia42.co.kr</code></li>
+      <li>결제 문의 시 <strong>닉네임 · 상품명 · 결제 계정(Gmail 등) · 주문번호</strong>를 함께 적으면 처리가 빠릅니다</li>
+      <li><strong>계정 분실 복구는 불가</strong>합니다 — 연동한 소셜 계정 자체를 찾는 수밖에 없습니다</li>
+    </ul></div>
+
+  <h3 class="blk">✅ 리세 전 체크리스트</h3>
+
+  <div class="card"><div class="card-head"><span class="card-icon">🧾</span><span class="card-title">누르기 전에 확인</span></div>
+    <ul class="tips">
+      <li><strong>남은 루나·루블을 다 썼는가</strong> — 탈퇴하면 그대로 소멸합니다</li>
+      <li><strong>정말 탈퇴가 필요한가</strong> — 닉네임만 바꾸려면 닉네임 변경권이면 충분합니다</li>
+      <li><strong>초보 혜택이 목적인가</strong> — 같은 번호면 멘티·일일퀘 보상은 어차피 못 받습니다</li>
+      <li><strong>기존 계정을 남길 이유가 있는가</strong> — 있다면 탈퇴 대신 다른 소셜 계정으로 새로 시작하세요</li>
+      <li><strong>길드·친구에게 말했는가</strong> — 탈퇴하면 접메와 길드 채팅까지 전부 사라집니다</li>
+    </ul></div>
+
+  <div class="callout cyan"><span>📌</span><div class="callout-body">
+    <strong>이 문서 기준일:</strong> 2026년 8월. 계정·제재 정책은 공지 없이 바뀌는 경우가 있으니
+    실제로 진행하기 전에 <strong>게임 내 [설정 → 계정]</strong>과 <strong>공식 홈페이지 공지·고객센터</strong>에서
+    현재 안내 문구를 한 번 더 확인하세요. 인게임·공식 안내가 항상 최종 기준입니다.
+  </div></div>
+</div>
+
 <div class="footnote">
-  마피아42 — 직업(시민팀·마피아팀·교주팀) · 접선 시스템 · 듀얼 스킬 · 용어 112개 · 모드·랭크 · 초보 공략<br>
-  자료 출처: 나무위키 마피아42 문서군(직업/용어/스킬/게임 방법), 아카라이브 마피아42 채널, 에펨코리아 정리글<br>
+  마피아42 — 직업(시민팀·마피아팀·교주팀) · 접선 시스템 · 듀얼 스킬 · 용어 112개 · 모드·랭크 · 초보 공략 · 계정/리세<br>
+  자료 출처: 나무위키 마피아42 문서군(직업/용어/스킬/게임 방법/기타 시스템), 아카라이브 마피아42 채널,
+  에펨코리아 정리글, 마피아42 공식 홈페이지 고객센터·개인정보 처리방침<br>
   ※ 업데이트가 잦은 게임이므로 세부 수치는 인게임 설명을 우선하세요.
 </div>
 

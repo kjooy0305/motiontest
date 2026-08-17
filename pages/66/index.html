@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정보 보안 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050a06;--bg2:#09110a;--bg3:#0e1a0f;--bg4:#152016;
+  --border:#1a2e1c;--border2:#2a4a2c;
+  --txt:#b8d8ba;--txt2:#6a9a6c;--txt3:#3a5a3c;
+  --grn:#00cc44;--grn2:#00ff55;--grn3:rgba(0,204,68,.12);
+  --grn4:rgba(0,204,68,.06);
+  --red:#cc2200;--red2:#ff3311;--red3:rgba(204,34,0,.15);
+  --yel:#ccaa00;--yel2:#ffcc00;--yel3:rgba(204,170,0,.12);
+  --blu:#0088cc;--blu2:#00aaff;--blu3:rgba(0,136,204,.12);
+  --pur:#8800cc;--pur2:#aa33ff;
+  --cya:#00aaaa;--cya2:#00cccc;
+  --code-bg:#030806;
+  --mono:'Consolas','Courier New',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+
+/* SCANLINE EFFECT */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1000;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#020603 0%,#050e06 50%,#020603 100%);border-bottom:2px solid var(--grn);padding:12px 20px;position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+#hdr-logo{font-size:22px;filter:drop-shadow(0 0 10px var(--grn));}
+#hdr h1{font-size:17px;font-weight:700;color:var(--grn2);white-space:nowrap;text-shadow:0 0 20px rgba(0,255,85,.4);letter-spacing:.5px;font-family:var(--mono);}
+#hdr .sub{font-size:11px;color:var(--txt2);white-space:nowrap;font-family:var(--mono);}
+#search{flex:1;min-width:160px;max-width:340px;padding:6px 12px;border-radius:4px;background:var(--bg3);border:1px solid var(--border2);color:var(--grn2);font-size:13px;outline:none;font-family:var(--mono);}
+#search:focus{border-color:var(--grn);box-shadow:0 0 8px rgba(0,204,68,.2);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;font-family:var(--mono);}
+.highlight{background:rgba(0,204,68,.25);border-radius:2px;}
+
+/* TABS */
+#tabs{display:flex;gap:3px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:200;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 16px;border-radius:4px;border:1px solid transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;transition:.12s;font-family:var(--mono);}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--grn3);border-color:rgba(0,204,68,.35);color:var(--grn2);}
+
+/* CONTENT */
+#main{padding:18px;max-width:1400px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+
+/* SUB TABS */
+.stabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap;}
+.stab{padding:4px 12px;border-radius:3px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;color:var(--txt3);white-space:nowrap;background:var(--bg3);transition:.1s;font-family:var(--mono);}
+.stab:hover{color:var(--txt2);border-color:var(--border2);}
+.stab.on{background:var(--grn4);border-color:rgba(0,204,68,.3);color:var(--grn);}
+.ssec{display:none;}.ssec.on{display:block;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:14px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px 16px;transition:.12s;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.card-icon{font-size:18px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--grn2);font-family:var(--mono);}
+.card-sub{font-size:11px;color:var(--txt3);margin-bottom:6px;font-family:var(--mono);}
+.card-body{font-size:12px;color:var(--txt2);line-height:1.75;}
+.card-body b{color:var(--txt);font-weight:600;}
+.card-body .tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-right:4px;margin-bottom:2px;font-family:var(--mono);}
+
+/* SEVERITY BADGES */
+.critical{background:rgba(204,34,0,.2);color:var(--red2);border:1px solid rgba(204,34,0,.4);}
+.high{background:rgba(204,102,0,.15);color:#ff7722;border:1px solid rgba(204,102,0,.35);}
+.medium{background:rgba(204,170,0,.12);color:var(--yel2);border:1px solid rgba(204,170,0,.3);}
+.low{background:rgba(0,136,204,.1);color:var(--blu2);border:1px solid rgba(0,136,204,.25);}
+.info{background:var(--grn3);color:var(--grn);border:1px solid rgba(0,204,68,.3);}
+
+/* SEC TITLE */
+.sec-title{font-size:17px;font-weight:700;color:var(--grn2);margin-bottom:4px;display:flex;align-items:center;gap:8px;font-family:var(--mono);}
+.sec-title::before{content:'>';color:var(--grn);margin-right:4px;}
+.sec-sub{font-size:12px;color:var(--txt2);margin-bottom:18px;line-height:1.7;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0;}
+.tbl th{text-align:left;padding:6px 10px;background:var(--bg4);color:var(--grn);font-weight:600;border-bottom:1px solid var(--border2);font-family:var(--mono);}
+.tbl td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:rgba(0,0,0,.15);}
+.tbl td:first-child{color:var(--grn2);font-weight:600;font-family:var(--mono);white-space:nowrap;}
+
+/* CODE BLOCK */
+.code{background:var(--code-bg);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--grn2);overflow-x:auto;margin:8px 0;white-space:pre;line-height:1.6;}
+.code .cm{color:var(--txt3);}
+.code .kw{color:var(--yel2);}
+.code .st{color:var(--cya2);}
+.code .nu{color:var(--pur2);}
+
+/* ACCORDION */
+.acc{margin-bottom:8px;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+.acc-head{padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg3);font-size:12px;font-weight:600;color:var(--txt2);user-select:none;transition:.1s;font-family:var(--mono);}
+.acc-head:hover{background:var(--bg4);color:var(--txt);}
+.acc-head.open{color:var(--grn2);}
+.acc-arr{transition:transform .2s;}
+.acc-head.open .acc-arr{transform:rotate(180deg);}
+.acc-body{display:none;padding:14px;background:var(--bg2);}
+.acc-body.open{display:block;}
+
+/* ALERT */
+.alert{border-radius:5px;padding:10px 14px;margin:8px 0;font-size:12px;}
+.alert-danger{background:var(--red3);border:1px solid rgba(204,34,0,.3);color:#ffaa99;}
+.alert-warn{background:var(--yel3);border:1px solid rgba(204,170,0,.3);color:#ffdd88;}
+.alert-info{background:var(--blu3);border:1px solid rgba(0,136,204,.25);color:#88ccff;}
+.alert-ok{background:var(--grn3);border:1px solid rgba(0,204,68,.25);color:#88ffaa;}
+.alert .al-label{font-weight:700;font-family:var(--mono);margin-bottom:4px;}
+
+/* ATTACK FLOW */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:10px 0;}
+.flow-step{background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--txt2);font-family:var(--mono);}
+.flow-arrow{color:var(--grn);font-weight:700;}
+
+/* PORT TABLE */
+.port-tag{display:inline-block;padding:1px 6px;background:var(--bg4);border:1px solid var(--border2);border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--grn);}
+
+/* CERT CARD */
+.cert-card{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:6px;}
+.cert-name{font-size:14px;font-weight:700;color:var(--grn2);font-family:var(--mono);}
+.cert-org{font-size:11px;color:var(--txt3);}
+.cert-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+.cert-tags{display:flex;gap:4px;flex-wrap:wrap;}
+
+/* OWASP */
+.owasp-item{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:8px;}
+.owasp-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.owasp-num{font-size:11px;font-weight:700;color:var(--grn);font-family:var(--mono);min-width:30px;}
+.owasp-title{font-size:13px;font-weight:700;color:var(--txt);}
+.owasp-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--grn),var(--blu),var(--pur));}
+.tl-item{position:relative;margin-bottom:12px;}
+.tl-dot{position:absolute;left:-18px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--grn);border:2px solid var(--bg2);}
+.tl-dot.red{background:var(--red2);}
+.tl-dot.yel{background:var(--yel2);}
+.tl-head{font-size:12px;font-weight:700;color:var(--grn2);margin-bottom:3px;font-family:var(--mono);}
+.tl-body{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;}
+  .grid-wide{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <span id="hdr-logo">🛡️</span>
+  <div>
+    <h1>[ INFOSEC COMPLETE GUIDE ]</h1>
+    <div class="sub">정보 보안 완전 정리 — 기초 · 공격 · 방어 · 암호학 · 도구 · 자격증</div>
+  </div>
+  <input id="search" type="text" placeholder="검색: SQL Injection, AES, Nmap ..." autocomplete="off">
+  <span id="hit-cnt"></span>
+</header>
+
+<nav id="tabs">
+  <button class="tab on" onclick="showTab('basics')">🔵 기초 개념</button>
+  <button class="tab" onclick="showTab('attack')">🔴 공격 기법</button>
+  <button class="tab" onclick="showTab('defense')">🟢 방어 기법</button>
+  <button class="tab" onclick="showTab('crypto')">🔐 암호학</button>
+  <button class="tab" onclick="showTab('tools')">🔧 도구 &amp; 실습</button>
+  <button class="tab" onclick="showTab('cert')">📋 자격증 &amp; 법규</button>
+</nav>
+
+<div id="main">
+
+<!-- ========== 기초 개념 ========== -->
+<section id="sec-basics" class="sec on">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('basics','cia')">CIA 삼각형</button>
+    <button class="stab" onclick="showSub('basics','terms')">핵심 용어</button>
+    <button class="stab" onclick="showSub('basics','threat')">위협 모델링</button>
+    <button class="stab" onclick="showSub('basics','network')">네트워크 기초</button>
+    <button class="stab" onclick="showSub('basics','ports')">주요 포트</button>
+  </div>
+
+  <div id="basics-cia" class="ssec on">
+    <div class="sec-title">CIA 삼각형 &amp; 보안 기초 원칙</div>
+    <p class="sec-sub">정보 보안의 모든 목표는 <b style="color:var(--grn2)">CIA Triad</b>로 귀결된다. 세 요소 중 하나라도 침해되면 보안 사고다.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔒</span><span class="card-title">C — 기밀성 (Confidentiality)</span></div>
+        <div class="card-body">
+          <b>정의:</b> 인가된 사용자만 정보에 접근 가능.<br><br>
+          <b>위협:</b> 도청, 스니핑, 계정 탈취, 중간자 공격(MitM).<br><br>
+          <b>보호 수단:</b> 암호화(AES, RSA), 접근 제어(ACL), VPN, 최소 권한 원칙(PoLP).<br><br>
+          <b>예시 침해:</b> 데이터베이스 덤프 유출, 평문 비밀번호 전송.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">✅</span><span class="card-title">I — 무결성 (Integrity)</span></div>
+        <div class="card-body">
+          <b>정의:</b> 정보가 허가 없이 변조되지 않음을 보장.<br><br>
+          <b>위협:</b> 중간자 공격, SQL Injection, 파일 변조, 로그 조작.<br><br>
+          <b>보호 수단:</b> 해시(SHA-256), 디지털 서명, HMAC, 체크섬, 감사 로그.<br><br>
+          <b>예시 침해:</b> 금융 거래 금액 변조, 악성코드 삽입.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">A — 가용성 (Availability)</span></div>
+        <div class="card-body">
+          <b>정의:</b> 인가된 사용자가 필요할 때 서비스에 접근 가능.<br><br>
+          <b>위협:</b> DDoS, 랜섬웨어, 하드웨어 장애, 서비스 과부하.<br><br>
+          <b>보호 수단:</b> 이중화(HA), CDN, DDoS 방어, 백업, 로드밸런싱.<br><br>
+          <b>예시 침해:</b> 서버 다운, 병원 IT 시스템 랜섬웨어 마비.
+        </div>
+      </div>
+    </div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">AAA 프레임워크</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>요소</th><th>설명</th><th>예시</th></tr>
+            <tr><td>Authentication (인증)</td><td>당신이 누구인지 확인</td><td>비밀번호, 생체인식, OTP</td></tr>
+            <tr><td>Authorization (인가)</td><td>무엇을 할 수 있는지 확인</td><td>RBAC, ACL, sudo</td></tr>
+            <tr><td>Accounting (감사)</td><td>무엇을 했는지 기록</td><td>로그, SIEM, 감사 추적</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">핵심 보안 원칙</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>최소 권한 원칙 (PoLP)</td><td>업무에 필요한 최소한의 권한만 부여</td></tr>
+            <tr><td>심층 방어 (DiD)</td><td>다층 보안 — 하나 뚫려도 다음 방어선 존재</td></tr>
+            <tr><td>제로 트러스트 (ZTA)</td><td>"절대 믿지 마라, 항상 검증하라"</td></tr>
+            <tr><td>보안 기본값 (Secure by Default)</td><td>기본 설정이 가장 안전한 상태</td></tr>
+            <tr><td>단순성 (KISS)</td><td>복잡한 시스템은 취약점을 만든다</td></tr>
+            <tr><td>개인정보 최소화</td><td>필요 이상의 데이터를 수집·보관하지 않음</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="basics-terms" class="ssec">
+    <div class="sec-title">핵심 보안 용어 사전</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📖</span><span class="card-title">기본 용어</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>Threat (위협)</td><td>시스템에 해를 끼칠 수 있는 잠재적 위험</td></tr>
+            <tr><td>Vulnerability (취약점)</td><td>공격자가 악용 가능한 시스템 약점</td></tr>
+            <tr><td>Exploit (익스플로잇)</td><td>취약점을 악용하는 코드/기법</td></tr>
+            <tr><td>Risk (위험)</td><td>위협 × 취약점 × 영향도</td></tr>
+            <tr><td>Attack Surface (공격 표면)</td><td>공격자가 접근 가능한 모든 진입점</td></tr>
+            <tr><td>Zero-day (제로데이)</td><td>패치 없는 미공개 취약점</td></tr>
+            <tr><td>CVE</td><td>공통 취약점 목록 (Common Vulnerabilities &amp; Exposures)</td></tr>
+            <tr><td>CVSS</td><td>취약점 심각도 점수 (0~10)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏴</span><span class="card-title">공격자 분류</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>Script Kiddie</td><td>남이 만든 도구만 사용하는 초보 공격자</td></tr>
+            <tr><td>Black Hat</td><td>불법 목적의 악성 해커</td></tr>
+            <tr><td>White Hat</td><td>합법적 보안 연구·모의 해킹 전문가</td></tr>
+            <tr><td>Gray Hat</td><td>비허가이지만 악의 없는 해킹</td></tr>
+            <tr><td>APT</td><td>국가 지원 지속적 고급 위협 그룹</td></tr>
+            <tr><td>Insider Threat</td><td>내부자에 의한 위협</td></tr>
+            <tr><td>Hacktivism</td><td>정치적 목적의 해킹</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧩</span><span class="card-title">인증 관련 용어</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>MFA/2FA</td><td>다중/이중 인증 — 비밀번호+OTP 등</td></tr>
+            <tr><td>SSO</td><td>단일 로그인 — 하나의 계정으로 여러 서비스</td></tr>
+            <tr><td>OAuth 2.0</td><td>토큰 기반 인가 프레임워크</td></tr>
+            <tr><td>JWT</td><td>JSON Web Token — 서명된 토큰</td></tr>
+            <tr><td>SAML</td><td>XML 기반 SSO 프로토콜</td></tr>
+            <tr><td>LDAP</td><td>디렉터리 서비스 프로토콜 (AD 등)</td></tr>
+            <tr><td>Kerberos</td><td>티켓 기반 네트워크 인증 프로토콜</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏛️</span><span class="card-title">보안 아키텍처 용어</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>DMZ</td><td>비무장지대 — 공개 서버와 내부망 분리 구간</td></tr>
+            <tr><td>VLAN</td><td>가상 LAN — 논리적 네트워크 분리</td></tr>
+            <tr><td>Bastion Host</td><td>외부 접근의 유일한 진입점 서버</td></tr>
+            <tr><td>Honeypot</td><td>공격자를 유인하는 가짜 시스템</td></tr>
+            <tr><td>Air Gap</td><td>물리적으로 완전히 분리된 네트워크</td></tr>
+            <tr><td>SOC</td><td>보안 운영 센터 (24/7 모니터링)</td></tr>
+            <tr><td>SIEM</td><td>보안 정보 및 이벤트 관리 시스템</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="basics-threat" class="ssec">
+    <div class="sec-title">위협 모델링 (Threat Modeling)</div>
+    <p class="sec-sub">시스템의 위협을 체계적으로 식별·분류·대응하는 프로세스.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">STRIDE 모델</span></div>
+        <div class="card-body">
+          Microsoft가 제안한 위협 분류 체계.
+          <table class="tbl" style="margin-top:8px;">
+            <tr><th>위협</th><th>설명</th><th>위반 요소</th></tr>
+            <tr><td>S — Spoofing</td><td>위장 — 타인의 신원 가장</td><td>인증</td></tr>
+            <tr><td>T — Tampering</td><td>변조 — 데이터·코드 무단 수정</td><td>무결성</td></tr>
+            <tr><td>R — Repudiation</td><td>부인 — 행위를 했다는 사실 부인</td><td>부인방지</td></tr>
+            <tr><td>I — Information Disclosure</td><td>정보 노출 — 비인가 접근</td><td>기밀성</td></tr>
+            <tr><td>D — Denial of Service</td><td>서비스 거부 — 가용성 침해</td><td>가용성</td></tr>
+            <tr><td>E — Elevation of Privilege</td><td>권한 상승 — 더 높은 권한 획득</td><td>인가</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔄</span><span class="card-title">사이버 킬체인 (Cyber Kill Chain)</span></div>
+        <div class="card-body">
+          Lockheed Martin이 제안한 공격 단계 모델.
+          <div class="tl" style="margin-top:10px;">
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">1. Reconnaissance (정찰)</div><div class="tl-body">대상 정보 수집 — Shodan, OSINT, 소셜 미디어</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">2. Weaponization (무기화)</div><div class="tl-body">악성코드·페이로드 제작</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">3. Delivery (전달)</div><div class="tl-body">이메일 첨부, 악성 링크, USB</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">4. Exploitation (취약점 공격)</div><div class="tl-body">취약점 트리거 — 제로데이, 알려진 취약점</div></div>
+            <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">5. Installation (설치)</div><div class="tl-body">백도어·RAT 설치, 지속성 확보</div></div>
+            <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">6. C2 (명령·제어)</div><div class="tl-body">공격자의 원격 제어 채널 수립</div></div>
+            <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">7. Actions on Objectives (목표 달성)</div><div class="tl-body">데이터 탈취, 파괴, 랜섬웨어 실행</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head"><span class="card-icon">🕸️</span><span class="card-title">MITRE ATT&amp;CK 프레임워크</span></div>
+      <div class="card-body">
+        실제 공격 기법을 전술(Tactics) → 기법(Techniques) → 서브기법(Sub-techniques)으로 분류한 지식 베이스.<br><br>
+        <b>14개 전술 카테고리:</b> 초기 접근(Initial Access) · 실행(Execution) · 지속성(Persistence) · 권한 상승(Privilege Escalation) · 방어 회피(Defense Evasion) · 자격증명 접근(Credential Access) · 탐지(Discovery) · 측면 이동(Lateral Movement) · 수집(Collection) · C2 · 추출(Exfiltration) · 충격(Impact) 등.<br><br>
+        <b>활용:</b> <span style="color:var(--grn2);font-family:var(--mono)">attack.mitre.org</span> — 레드팀·블루팀 모두 참고하는 표준 프레임워크.
+      </div>
+    </div>
+  </div>
+
+  <div id="basics-network" class="ssec">
+    <div class="sec-title">네트워크 기초 보안</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📡</span><span class="card-title">OSI 7계층과 보안 관련성</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>계층</th><th>이름</th><th>주요 보안 위협</th><th>보호 기술</th></tr>
+            <tr><td>7</td><td>응용 (Application)</td><td>SQLi, XSS, 피싱</td><td>WAF, 입력 검증</td></tr>
+            <tr><td>6</td><td>표현 (Presentation)</td><td>SSL 스트립, 암호화 취약점</td><td>TLS 1.3, 인증서 검증</td></tr>
+            <tr><td>5</td><td>세션 (Session)</td><td>세션 하이재킹</td><td>세션 타임아웃, 토큰</td></tr>
+            <tr><td>4</td><td>전송 (Transport)</td><td>포트 스캔, TCP 스캔</td><td>방화벽, 포트 필터링</td></tr>
+            <tr><td>3</td><td>네트워크 (Network)</td><td>IP 스푸핑, 라우팅 공격</td><td>IPSec, 라우터 ACL</td></tr>
+            <tr><td>2</td><td>데이터링크 (Data Link)</td><td>ARP 스푸핑, MAC 플러딩</td><td>Dynamic ARP Inspection</td></tr>
+            <tr><td>1</td><td>물리 (Physical)</td><td>도청, 탭핑, 물리적 침입</td><td>물리 잠금, 광케이블</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">주요 프로토콜 보안 특성</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>프로토콜</th><th>보안 여부</th><th>대안</th></tr>
+            <tr><td>HTTP</td><td><span class="tag critical">평문</span> 도청 가능</td><td>HTTPS (TLS)</td></tr>
+            <tr><td>FTP</td><td><span class="tag critical">평문</span> 자격증명 노출</td><td>SFTP / FTPS</td></tr>
+            <tr><td>Telnet</td><td><span class="tag critical">평문</span> 전체 세션 노출</td><td>SSH</td></tr>
+            <tr><td>DNS</td><td><span class="tag high">취약</span> 스푸핑 가능</td><td>DNSSEC / DoH / DoT</td></tr>
+            <tr><td>SMTP</td><td><span class="tag medium">부분</span> 설정에 따름</td><td>SMTPS, STARTTLS</td></tr>
+            <tr><td>SSH</td><td><span class="tag info">안전</span> 암호화</td><td>기본 사용 권장</td></tr>
+            <tr><td>HTTPS</td><td><span class="tag info">안전</span> TLS 암호화</td><td>TLS 1.3 권장</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="basics-ports" class="ssec">
+    <div class="sec-title">주요 포트 번호 완전 정리</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔌</span><span class="card-title">Well-Known Ports (0~1023)</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>포트</th><th>프로토콜</th><th>서비스</th><th>위험도</th></tr>
+            <tr><td><span class="port-tag">20/21</span></td><td>TCP</td><td>FTP</td><td><span class="tag critical">고위험</span></td></tr>
+            <tr><td><span class="port-tag">22</span></td><td>TCP</td><td>SSH</td><td><span class="tag medium">중간</span></td></tr>
+            <tr><td><span class="port-tag">23</span></td><td>TCP</td><td>Telnet</td><td><span class="tag critical">고위험</span></td></tr>
+            <tr><td><span class="port-tag">25</span></td><td>TCP</td><td>SMTP</td><td><span class="tag high">주의</span></td></tr>
+            <tr><td><span class="port-tag">53</span></td><td>TCP/UDP</td><td>DNS</td><td><span class="tag medium">중간</span></td></tr>
+            <tr><td><span class="port-tag">80</span></td><td>TCP</td><td>HTTP</td><td><span class="tag critical">평문</span></td></tr>
+            <tr><td><span class="port-tag">110</span></td><td>TCP</td><td>POP3</td><td><span class="tag high">주의</span></td></tr>
+            <tr><td><span class="port-tag">143</span></td><td>TCP</td><td>IMAP</td><td><span class="tag high">주의</span></td></tr>
+            <tr><td><span class="port-tag">443</span></td><td>TCP</td><td>HTTPS</td><td><span class="tag info">안전</span></td></tr>
+            <tr><td><span class="port-tag">445</span></td><td>TCP</td><td>SMB</td><td><span class="tag critical">고위험</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔌</span><span class="card-title">등록 포트 &amp; 서비스 포트</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>포트</th><th>서비스</th><th>비고</th></tr>
+            <tr><td><span class="port-tag">1433</span></td><td>MS SQL Server</td><td>DB 직접 노출 위험</td></tr>
+            <tr><td><span class="port-tag">1521</span></td><td>Oracle DB</td><td>DB 직접 노출 위험</td></tr>
+            <tr><td><span class="port-tag">3306</span></td><td>MySQL / MariaDB</td><td>DB 직접 노출 위험</td></tr>
+            <tr><td><span class="port-tag">3389</span></td><td>RDP (원격 데스크탑)</td><td>브루트포스 대상</td></tr>
+            <tr><td><span class="port-tag">5432</span></td><td>PostgreSQL</td><td>DB 직접 노출 위험</td></tr>
+            <tr><td><span class="port-tag">6379</span></td><td>Redis</td><td>인증 없으면 위험</td></tr>
+            <tr><td><span class="port-tag">8080</span></td><td>HTTP Alt / Tomcat</td><td>관리 콘솔 노출 주의</td></tr>
+            <tr><td><span class="port-tag">8443</span></td><td>HTTPS Alt</td><td>대체 HTTPS</td></tr>
+            <tr><td><span class="port-tag">27017</span></td><td>MongoDB</td><td>인증 없으면 위험</td></tr>
+            <tr><td><span class="port-tag">9200</span></td><td>Elasticsearch</td><td>인증 없으면 위험</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 공격 기법 ========== -->
+<section id="sec-attack" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('attack','web')">웹 공격 (OWASP)</button>
+    <button class="stab" onclick="showSub('attack','net')">네트워크 공격</button>
+    <button class="stab" onclick="showSub('attack','social')">소셜 엔지니어링</button>
+    <button class="stab" onclick="showSub('attack','malware')">악성코드</button>
+    <button class="stab" onclick="showSub('attack','pw')">인증 공격</button>
+  </div>
+
+  <div id="attack-web" class="ssec on">
+    <div class="sec-title">웹 공격 — OWASP Top 10 (2021)</div>
+    <div class="alert alert-danger"><div class="al-label">⚠ 주의</div>이 내용은 교육·방어 목적입니다. 허가 없는 실제 공격은 불법입니다.</div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A01</span><span class="owasp-title">Broken Access Control — 취약한 접근 제어</span><span class="tag critical">Critical</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 인가되지 않은 기능·데이터에 접근 가능. 가장 흔한 취약점.<br>
+        <b>예시:</b> URL 직접 접근 (<code>/admin/</code>), IDOR (타인 리소스 접근), 수평적 권한 상승.<br>
+        <b>방어:</b> 서버 측 접근 제어 강제, 최소 권한, 모든 요청 인가 검증.
+        <div class="code"><span class="cm"># 취약한 예: 파라미터로 사용자 결정</span>
+GET /api/user?id=1234  <span class="cm"># id=1235로 바꾸면 다른 사람 정보 접근</span>
+
+<span class="cm"># 방어: 세션 기반으로 현재 로그인 사용자만 접근</span>
+user_id = request.session['user_id']  <span class="cm"># 파라미터 무시</span></div>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A02</span><span class="owasp-title">Cryptographic Failures — 암호화 실패</span><span class="tag critical">Critical</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 민감 데이터의 암호화 부재 또는 취약한 암호화 사용.<br>
+        <b>예시:</b> MD5 비밀번호 저장, HTTP 평문 전송, 하드코딩된 키, ECB 모드 사용.<br>
+        <b>방어:</b> 강력한 암호화(AES-256), bcrypt/Argon2 비밀번호 해시, HTTPS 강제.
+        <div class="code"><span class="cm"># 취약: MD5 사용</span>
+password_hash = md5(password)  <span class="cm"># 레인보우 테이블로 크랙 가능</span>
+
+<span class="cm"># 안전: bcrypt 사용</span>
+password_hash = bcrypt.hashpw(password, bcrypt.gensalt(rounds=12))</div>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A03</span><span class="owasp-title">Injection — 인젝션</span><span class="tag critical">Critical</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 신뢰할 수 없는 데이터가 인터프리터로 전달되어 의도치 않은 명령 실행.<br>
+        <b>유형:</b> SQL Injection, Command Injection, LDAP Injection, NoSQL Injection.<br>
+        <b>SQL Injection 예시:</b>
+        <div class="code"><span class="cm"># 취약한 쿼리</span>
+query = "SELECT * FROM users WHERE name='" + username + "'"
+<span class="cm"># 공격: username = ' OR '1'='1</span>
+<span class="cm"># 결과: SELECT * FROM users WHERE name='' OR '1'='1' (전체 조회)</span>
+
+<span class="cm"># 방어: Prepared Statement 사용</span>
+query = "SELECT * FROM users WHERE name = ?"
+cursor.execute(query, (username,))</div>
+        <b>방어:</b> Parameterized Query / Prepared Statement, ORM, 입력 검증, WAF.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A04</span><span class="owasp-title">Insecure Design — 안전하지 않은 설계</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 구현 버그가 아닌 설계 단계의 보안 결함.<br>
+        <b>예시:</b> 비밀번호 재설정 로직 취약, 속도 제한 없는 OTP, 보안 설계 없는 아키텍처.<br>
+        <b>방어:</b> 위협 모델링, 보안 설계 원칙 적용, Secure SDLC.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A05</span><span class="owasp-title">Security Misconfiguration — 보안 설정 오류</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 기본 설정 그대로 사용, 불필요한 기능 활성화, 오류 메시지 과다 노출.<br>
+        <b>예시:</b> 기본 admin/admin 계정, 디렉터리 리스팅 허용, 스택 트레이스 노출.<br>
+        <b>방어:</b> 보안 하드닝, 불필요 기능 비활성화, 정기 설정 점검.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A06</span><span class="owasp-title">Vulnerable Components — 취약한 구성 요소</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 알려진 취약점이 있는 라이브러리·프레임워크·컴포넌트 사용.<br>
+        <b>예시:</b> Log4Shell (Log4j), Heartbleed (OpenSSL), EternalBlue (SMB).<br>
+        <b>방어:</b> 의존성 최신 유지, SCA(Software Composition Analysis) 도구 사용, 취약점 모니터링.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A07</span><span class="owasp-title">Identification &amp; Auth Failures — 인증 실패</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 취약한 세션 관리, 크레덴셜 스터핑 허용, 취약한 비밀번호 정책.<br>
+        <b>예시:</b> 세션 ID URL 노출, 로그아웃 후 세션 미삭제, 브루트포스 허용.<br>
+        <b>방어:</b> MFA, 안전한 세션 관리, 계정 잠금, 비밀번호 복잡도 강제.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A08</span><span class="owasp-title">Software &amp; Data Integrity Failures — 무결성 실패</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 코드·데이터의 무결성 검증 없는 업데이트, 안전하지 않은 역직렬화.<br>
+        <b>예시:</b> 서명 없는 자동 업데이트, 악성 역직렬화 페이로드, CI/CD 파이프라인 침해.<br>
+        <b>방어:</b> 디지털 서명 검증, 안전한 역직렬화, CI/CD 보안 강화.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A09</span><span class="owasp-title">Security Logging &amp; Monitoring Failures — 로깅/모니터링 실패</span><span class="tag medium">Medium</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 보안 이벤트 로깅 부재, 모니터링 미비로 침해 탐지 실패.<br>
+        <b>예시:</b> 로그인 실패 미기록, 의심 활동 알림 없음, 로그 변조 가능.<br>
+        <b>방어:</b> 중앙 로그 관리(SIEM), 실시간 알림, 로그 무결성 보호.
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-head"><span class="owasp-num">A10</span><span class="owasp-title">Server-Side Request Forgery (SSRF)</span><span class="tag high">High</span></div>
+      <div class="owasp-body">
+        <b>설명:</b> 서버가 공격자가 지정한 URL로 요청을 전송하도록 유도.<br>
+        <b>예시:</b> <code>http://example.com/load?url=http://169.254.169.254/metadata</code> (AWS 메타데이터 접근)<br>
+        <b>방어:</b> URL 화이트리스트, 내부 네트워크 접근 차단, 응답 검증.
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-head" onclick="toggleAcc(this)">+ XSS (Cross-Site Scripting) 심화 <span class="acc-arr">▼</span></div>
+      <div class="acc-body">
+        <table class="tbl">
+          <tr><th>유형</th><th>설명</th><th>예시</th></tr>
+          <tr><td>Reflected XSS</td><td>URL 파라미터의 스크립트가 즉시 반사</td><td><code>?q=&lt;script&gt;alert(1)&lt;/script&gt;</code></td></tr>
+          <tr><td>Stored XSS</td><td>DB에 저장된 스크립트가 모든 방문자에 실행</td><td>게시판 댓글에 스크립트 저장</td></tr>
+          <tr><td>DOM-based XSS</td><td>JavaScript가 DOM을 직접 조작하며 발생</td><td>innerHTML에 사용자 입력 삽입</td></tr>
+        </table>
+        <div class="code"><span class="cm"># 방어: HTML 이스케이프</span>
+&amp;lt;script&amp;gt; → 브라우저가 텍스트로만 렌더링
+
+<span class="cm"># CSP 헤더로 스크립트 소스 제한</span>
+Content-Security-Policy: script-src 'self' https://trusted.com</div>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-head" onclick="toggleAcc(this)">+ CSRF (Cross-Site Request Forgery) <span class="acc-arr">▼</span></div>
+      <div class="acc-body">
+        피해자의 인증된 세션을 이용해 공격자가 원하는 요청을 강제 실행시키는 공격.<br><br>
+        <b>공격 흐름:</b>
+        <div class="flow">
+          <div class="flow-step">피해자 로그인 (세션 유지)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">악성 사이트 방문</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">숨겨진 요청 자동 전송</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">은행 이체 등 실행</div>
+        </div>
+        <b>방어:</b> CSRF 토큰, SameSite 쿠키, Referer 검증, Double Submit Cookie.
+      </div>
+    </div>
+  </div>
+
+  <div id="attack-net" class="ssec">
+    <div class="sec-title">네트워크 공격 기법</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌊</span><span class="card-title">DoS / DDoS</span></div>
+        <div class="card-sub"><span class="tag critical">서비스 가용성 침해</span></div>
+        <div class="card-body">
+          <b>DoS:</b> 단일 출처에서 대량 트래픽으로 서비스 마비.<br>
+          <b>DDoS:</b> 수천~수백만 봇넷에서 동시 공격.<br><br>
+          <b>유형:</b><br>
+          · <b>Volume-based:</b> UDP Flood, ICMP Flood — 대역폭 소진<br>
+          · <b>Protocol:</b> SYN Flood, Ping of Death — 연결 리소스 소진<br>
+          · <b>Application:</b> HTTP Flood, Slowloris — 서버 자원 소진<br><br>
+          <b>방어:</b> Rate Limiting, CDN, Anycast, DDoS 방어 서비스(Cloudflare, AWS Shield).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🕵️</span><span class="card-title">중간자 공격 (MitM)</span></div>
+        <div class="card-sub"><span class="tag critical">기밀성·무결성 침해</span></div>
+        <div class="card-body">
+          공격자가 통신 양 끝 사이에 개입하여 데이터를 도청·변조.<br><br>
+          <b>기법:</b><br>
+          · <b>ARP Spoofing:</b> 가짜 ARP 응답으로 트래픽 탈취<br>
+          · <b>DNS Spoofing:</b> 가짜 DNS 응답으로 악성 사이트 리다이렉트<br>
+          · <b>SSL Strip:</b> HTTPS를 HTTP로 다운그레이드<br>
+          · <b>Evil Twin:</b> 가짜 Wi-Fi AP 생성<br><br>
+          <b>방어:</b> HTTPS 강제(HSTS), 인증서 고정(Pinning), VPN, DNSSEC.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">포트 스캔 / 정찰</span></div>
+        <div class="card-sub"><span class="tag medium">정보 수집 단계</span></div>
+        <div class="card-body">
+          <b>Nmap 스캔 유형:</b><br>
+          · TCP Connect: 완전한 3-way handshake<br>
+          · SYN (Stealth): half-open, 로그 회피<br>
+          · UDP: UDP 포트 스캔<br>
+          · OS Fingerprinting: OS 탐지<br><br>
+          <div class="code">nmap -sS -O -p 1-65535 target.com
+nmap -sV --script vuln target.com</div>
+          <b>방어:</b> 방화벽, IDS, 불필요 포트 차단, 포트 노킹.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📦</span><span class="card-title">패킷 스니핑</span></div>
+        <div class="card-sub"><span class="tag high">기밀성 침해</span></div>
+        <div class="card-body">
+          네트워크 트래픽을 캡처해 평문 데이터 추출.<br><br>
+          <b>도구:</b> Wireshark, tcpdump, tshark<br><br>
+          <b>위험 시나리오:</b><br>
+          · 공개 Wi-Fi에서 HTTP 트래픽 도청<br>
+          · 스위치드 네트워크 + ARP 스푸핑으로 스니핑<br><br>
+          <b>방어:</b> 암호화 프로토콜 사용(HTTPS, SSH, TLS), 스위치드 네트워크, 암호화 Wi-Fi(WPA3).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔀</span><span class="card-title">스푸핑 (Spoofing)</span></div>
+        <div class="card-sub"><span class="tag high">신원 위장</span></div>
+        <div class="card-body">
+          <b>IP Spoofing:</b> 출발지 IP 위조<br>
+          <b>ARP Spoofing:</b> 가짜 MAC-IP 매핑으로 트래픽 탈취<br>
+          <b>DNS Spoofing:</b> 가짜 DNS 응답<br>
+          <b>Email Spoofing:</b> From 헤더 위조<br><br>
+          <b>방어:</b><br>
+          · IP: 라우터 필터링, Unicast RPF<br>
+          · ARP: Dynamic ARP Inspection<br>
+          · DNS: DNSSEC<br>
+          · Email: SPF, DKIM, DMARC
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔁</span><span class="card-title">재전송 공격 (Replay Attack)</span></div>
+        <div class="card-sub"><span class="tag medium">인증 우회</span></div>
+        <div class="card-body">
+          유효한 데이터 전송을 캡처해 재전송함으로써 인증 우회.<br><br>
+          <b>예시:</b> 인증 토큰 캡처 후 재사용, 결제 요청 재전송.<br><br>
+          <b>방어:</b> Nonce(일회용 값), 타임스탬프 검증, 세션 토큰 짧은 만료.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="attack-social" class="ssec">
+    <div class="sec-title">소셜 엔지니어링 (Social Engineering)</div>
+    <p class="sec-sub">기술적 취약점이 아닌 <b>사람의 심리</b>를 이용하는 공격. 가장 성공률이 높은 공격 벡터 중 하나.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎣</span><span class="card-title">피싱 (Phishing)</span></div>
+        <div class="card-body">
+          <b>Phishing:</b> 대량 발송 가짜 이메일/SMS로 자격증명 탈취.<br>
+          <b>Spear Phishing:</b> 특정 대상 맞춤형 피싱 (더 위험).<br>
+          <b>Whaling:</b> CEO·임원급 대상 피싱.<br>
+          <b>Smishing:</b> SMS 피싱.<br>
+          <b>Vishing:</b> 음성(전화) 피싱.<br>
+          <b>Pharming:</b> DNS 조작으로 정상 URL을 악성 사이트로 유도.<br><br>
+          <b>징후:</b> 긴박감 조성, 문법 오류, 이상한 발신자, 의심스러운 링크.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">프리텍스팅 &amp; 베이팅</span></div>
+        <div class="card-body">
+          <b>Pretexting (프리텍스팅):</b> 허구의 시나리오를 만들어 정보 획득. 예: IT 지원팀 직원 사칭.<br><br>
+          <b>Baiting (베이팅):</b> 호기심을 자극해 악성 장치 실행 유도. 예: 주차장에 USB 드라이브 방치.<br><br>
+          <b>Quid Pro Quo:</b> 도움을 제공하는 척 정보 요청. 예: 가짜 기술 지원.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🚪</span><span class="card-title">물리적 침투 기법</span></div>
+        <div class="card-body">
+          <b>Tailgating / Piggybacking:</b> 승인된 직원 뒤를 따라 보안 구역 침입.<br><br>
+          <b>Shoulder Surfing:</b> 어깨 너머로 비밀번호·화면 엿보기.<br><br>
+          <b>Dumpster Diving:</b> 버려진 문서에서 민감 정보 수집.<br><br>
+          <b>방어:</b> 보안 인식 교육, 방문자 절차, 문서 파쇄.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🛡️</span><span class="card-title">소셜 엔지니어링 방어</span></div>
+        <div class="card-body">
+          <b>기술적 방어:</b><br>
+          · 이메일 필터링 (SPF, DKIM, DMARC)<br>
+          · MFA 강제<br>
+          · URL 필터링<br><br>
+          <b>인적 방어:</b><br>
+          · 정기 보안 인식 교육<br>
+          · 모의 피싱 훈련<br>
+          · "확인하고 또 확인" 문화<br>
+          · 민감 정보 요청 시 공식 채널 재확인
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="attack-malware" class="ssec">
+    <div class="sec-title">악성코드 (Malware) 완전 정리</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🦠</span><span class="card-title">바이러스 (Virus)</span></div>
+        <div class="card-body">
+          정상 파일에 코드를 삽입하여 실행 시 전파. 반드시 사용자의 실행이 필요.<br>
+          <b>종류:</b> 파일 감염형, 부트 섹터형, 매크로 바이러스.<br>
+          <b>방어:</b> 안티바이러스, 파일 실행 제한.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🐛</span><span class="card-title">웜 (Worm)</span></div>
+        <div class="card-body">
+          사용자 개입 없이 네트워크를 통해 자가 복제·전파. 대역폭 소모.<br>
+          <b>예시:</b> WannaCry (EternalBlue 취약점 이용), Code Red, Slammer.<br>
+          <b>방어:</b> 패치 적용, 방화벽, 네트워크 분리.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🐴</span><span class="card-title">트로이목마 (Trojan)</span></div>
+        <div class="card-body">
+          정상 소프트웨어인 척 숨어 악성 행위 수행.<br>
+          <b>종류:</b> RAT(Remote Access Trojan), 다운로더, 드로퍼.<br>
+          <b>예시:</b> Zeus, Emotet, njRAT.<br>
+          <b>방어:</b> 신뢰된 출처 소프트웨어만 설치, 행위 기반 탐지.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔒</span><span class="card-title">랜섬웨어 (Ransomware)</span></div>
+        <div class="card-body">
+          파일을 암호화하고 복호화 키를 대가로 금전 요구.<br>
+          <b>공격 흐름:</b> 피싱 → 감염 → 데이터 유출 → 암호화 → 협박.<br>
+          <b>예시:</b> WannaCry, REvil, LockBit, Ryuk, Conti.<br>
+          <b>방어:</b> 오프라인 백업(3-2-1 규칙), 패치, EDR, 네트워크 분리.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🕷️</span><span class="card-title">스파이웨어 / 애드웨어</span></div>
+        <div class="card-body">
+          <b>스파이웨어:</b> 사용자 몰래 정보(키로깅, 스크린샷, 활동) 수집 후 전송.<br>
+          <b>키로거:</b> 타이핑 내용 모두 기록 (비밀번호 등).<br>
+          <b>애드웨어:</b> 광고 표시. 개인정보 수집 병행 가능.<br>
+          <b>방어:</b> 안티스파이웨어, 행위 기반 탐지.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👻</span><span class="card-title">루트킷 (Rootkit)</span></div>
+        <div class="card-body">
+          운영체제 수준에서 존재를 숨기는 악성코드. 가장 제거하기 어렵다.<br>
+          <b>유형:</b> 커널 루트킷, 부트킷, 하이퍼바이저 루트킷.<br>
+          <b>탐지:</b> 외부 부팅 후 스캔, 무결성 검증(Tripwire), 메모리 포렌식.<br>
+          <b>방어:</b> UEFI Secure Boot, 커널 무결성 보호.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🤖</span><span class="card-title">봇넷 (Botnet)</span></div>
+        <div class="card-body">
+          공격자가 원격으로 제어하는 감염된 컴퓨터(좀비) 네트워크.<br>
+          <b>용도:</b> DDoS, 스팸 발송, 크립토재킹, 자격증명 탈취.<br>
+          <b>C2 통신:</b> IRC, HTTP, P2P, 도메인 생성 알고리즘(DGA).<br>
+          <b>방어:</b> 감염 방지, 의심 C2 도메인 차단, 네트워크 모니터링.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⛏️</span><span class="card-title">크립토재킹 (Cryptojacking)</span></div>
+        <div class="card-body">
+          피해자의 컴퓨팅 자원을 몰래 사용해 암호화폐 채굴.<br>
+          <b>징후:</b> CPU 사용량 급증, 과열, 전기료 증가, 성능 저하.<br>
+          <b>방어:</b> 브라우저 확장 프로그램 차단, EDR, 리소스 모니터링.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="attack-pw" class="ssec">
+    <div class="sec-title">인증 공격 기법</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔨</span><span class="card-title">브루트포스 (Brute Force)</span></div>
+        <div class="card-body">
+          모든 가능한 조합을 시도해 비밀번호 추출.<br>
+          <b>온라인:</b> 실제 서버에 요청 (느림, 탐지 용이).<br>
+          <b>오프라인:</b> 덤프된 해시에 대해 로컬 계산 (빠름).<br>
+          <b>방어:</b> 계정 잠금, Rate Limiting, CAPTCHA, MFA.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📖</span><span class="card-title">딕셔너리 / 레인보우 테이블</span></div>
+        <div class="card-body">
+          <b>Dictionary Attack:</b> 사전 단어·패턴 목록으로 시도. (rockyou.txt 등)<br><br>
+          <b>Rainbow Table:</b> 사전 계산된 해시값 역조회 테이블.<br>
+          <b>방어:</b> 강력한 솔트(Salt) 추가 → 레인보우 테이블 무효화.<br><br>
+          <div class="code"><span class="cm"># Salt 적용 예</span>
+hash = sha256(salt + password)
+<span class="cm"># 같은 비밀번호도 Salt마다 다른 해시값</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">크레덴셜 스터핑</span></div>
+        <div class="card-body">
+          타 서비스에서 유출된 아이디/비밀번호를 다른 사이트에 그대로 시도.<br><br>
+          <b>이유:</b> 사람들이 비밀번호를 재사용하기 때문.<br><br>
+          <b>방어:</b> 고유 비밀번호 정책, 유출 비밀번호 감지(HaveIBeenPwned 통합), MFA.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">Pass-the-Hash / Pass-the-Ticket</span></div>
+        <div class="card-body">
+          <b>Pass-the-Hash:</b> Windows 환경에서 비밀번호 대신 NTLM 해시로 인증 우회.<br><br>
+          <b>Pass-the-Ticket:</b> Kerberos 티켓을 탈취해 재사용.<br><br>
+          <b>방어:</b> Credential Guard, 권한 분리, 모니터링, Windows Defender.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 방어 기법 ========== -->
+<section id="sec-defense" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('defense','fw')">방화벽 &amp; IDS</button>
+    <button class="stab" onclick="showSub('defense','web')">웹 방어</button>
+    <button class="stab" onclick="showSub('defense','endpoint')">엔드포인트</button>
+    <button class="stab" onclick="showSub('defense','arch')">보안 아키텍처</button>
+    <button class="stab" onclick="showSub('defense','ir')">사고 대응</button>
+  </div>
+
+  <div id="defense-fw" class="ssec on">
+    <div class="sec-title">방화벽 &amp; IDS/IPS</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧱</span><span class="card-title">방화벽 (Firewall) 유형</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>유형</th><th>특징</th><th>계층</th></tr>
+            <tr><td>패킷 필터링</td><td>IP/포트 기반 단순 필터링</td><td>L3/L4</td></tr>
+            <tr><td>상태 기반 (Stateful)</td><td>연결 상태 추적, 더 안전</td><td>L4</td></tr>
+            <tr><td>응용 계층 (NGFW)</td><td>애플리케이션 인식, DPI</td><td>L7</td></tr>
+            <tr><td>WAF</td><td>웹 트래픽 특화 방어</td><td>L7</td></tr>
+            <tr><td>클라우드 방화벽</td><td>AWS SG, Azure NSG 등</td><td>L3-L7</td></tr>
+          </table>
+          <b>기본 원칙:</b> 화이트리스트 방식 (명시적 허용 외 전부 차단).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">IDS / IPS</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>구분</th><th>IDS</th><th>IPS</th></tr>
+            <tr><td>기능</td><td>탐지만 (알림)</td><td>탐지 + 차단</td></tr>
+            <tr><td>위치</td><td>트래픽 미러링</td><td>인라인 배치</td></tr>
+            <tr><td>지연</td><td>없음</td><td>약간 있음</td></tr>
+          </table>
+          <b>탐지 방식:</b><br>
+          · <b>시그니처 기반:</b> 알려진 패턴 매칭 (FP 낮음)<br>
+          · <b>이상 기반:</b> 정상 기준선 대비 이상 탐지 (FP 높음)<br>
+          · <b>행위 기반:</b> 의심 행동 패턴 탐지<br><br>
+          <b>대표 도구:</b> Snort, Suricata, Zeek.
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔐</span><span class="card-title">VPN (가상 사설망)</span></div>
+        <div class="card-body">
+          암호화된 터널로 안전하게 원격 네트워크 접속.<br><br>
+          <b>프로토콜:</b><br>
+          · <b>OpenVPN:</b> 오픈소스, 범용적, TLS 기반<br>
+          · <b>WireGuard:</b> 최신, 빠름, 간단한 코드베이스<br>
+          · <b>IPSec:</b> 기업 환경 표준, 터널/전송 모드<br>
+          · <b>L2TP/IPSec:</b> 레거시 환경<br><br>
+          <b>주의:</b> VPN이 모든 것을 해결하지 않음 — 연결 후 내부 트래픽 관리 필요.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📊</span><span class="card-title">SIEM (보안 정보 및 이벤트 관리)</span></div>
+        <div class="card-body">
+          여러 소스의 로그를 수집·분석·상관관계 분석해 위협 탐지.<br><br>
+          <b>기능:</b> 로그 수집·정규화, 실시간 분석, 경보, 대시보드, 보고서.<br><br>
+          <b>대표 제품:</b> Splunk, IBM QRadar, Microsoft Sentinel, Elastic SIEM, Wazuh(오픈소스).<br><br>
+          <b>핵심 개념:</b> Use Case 설계, 탐지 규칙(Rule) 튜닝, 위협 인텔리전스 통합.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">DNS 보안</span></div>
+        <div class="card-body">
+          <b>DNSSEC:</b> DNS 응답에 디지털 서명 — 스푸핑 방지.<br>
+          <b>DNS over HTTPS (DoH):</b> HTTPS 터널로 DNS 암호화.<br>
+          <b>DNS over TLS (DoT):</b> TLS 터널로 DNS 암호화.<br>
+          <b>RPZ (Response Policy Zone):</b> 악성 도메인 차단.<br><br>
+          <b>공급업체:</b> Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9 9.9.9.9.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="defense-web" class="ssec">
+    <div class="sec-title">웹 애플리케이션 방어</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🛡️</span><span class="card-title">보안 HTTP 헤더</span></div>
+        <div class="card-body">
+          <div class="code"><span class="cm"># Content Security Policy — 스크립트 소스 제한</span>
+Content-Security-Policy: default-src 'self'; script-src 'self' cdn.com
+
+<span class="cm"># HSTS — HTTPS 강제</span>
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+<span class="cm"># XSS 보호 (구형 브라우저)</span>
+X-XSS-Protection: 1; mode=block
+
+<span class="cm"># 클릭재킹 방지</span>
+X-Frame-Options: DENY
+
+<span class="cm"># MIME 타입 스니핑 방지</span>
+X-Content-Type-Options: nosniff
+
+<span class="cm"># 리퍼러 정보 제한</span>
+Referrer-Policy: strict-origin-when-cross-origin</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔒</span><span class="card-title">인증 보안 모범 사례</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>비밀번호 저장</td><td>bcrypt / Argon2id (cost factor 12+)</td></tr>
+            <tr><td>세션 ID</td><td>128bit 이상 난수, HttpOnly, Secure 쿠키</td></tr>
+            <tr><td>JWT</td><td>RS256/ES256 서명, 짧은 만료, 블랙리스트</td></tr>
+            <tr><td>MFA</td><td>TOTP(Google Authenticator), WebAuthn 권장</td></tr>
+            <tr><td>로그인 실패</td><td>지수 백오프 + 계정 잠금 + CAPTCHA</td></tr>
+            <tr><td>비밀번호 재설정</td><td>시간 제한 토큰, 이메일 확인, 단일 사용</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧹</span><span class="card-title">입력 검증 원칙</span></div>
+        <div class="card-body">
+          <b>1. 화이트리스트 방식:</b> 허용된 패턴만 통과 (블랙리스트는 우회 가능).<br>
+          <b>2. 서버 측 검증 필수:</b> 클라이언트 검증은 UX용으로만.<br>
+          <b>3. 이스케이프 처리:</b> 출력 컨텍스트에 맞게 인코딩.<br>
+          <b>4. Parameterized Query:</b> SQL 인젝션 차단.<br>
+          <b>5. 파일 업로드:</b> 확장자·MIME·내용 검증, 저장 경로 분리.
+          <div class="code"><span class="cm"># 정규식으로 화이트리스트 검증</span>
+import re
+if not re.match(r'^[a-zA-Z0-9_]{3,20}$', username):
+    raise ValueError("Invalid username")</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">OAuth 2.0 / OpenID Connect</span></div>
+        <div class="card-body">
+          <b>OAuth 2.0:</b> 제3자 앱에 제한적 접근 인가.<br>
+          <b>OpenID Connect:</b> OAuth 위에 인증 레이어 추가.<br><br>
+          <b>주요 플로우:</b><br>
+          · Authorization Code + PKCE (권장 — 웹/모바일)<br>
+          · Client Credentials (서버-서버)<br><br>
+          <b>보안 주의사항:</b><br>
+          · state 파라미터로 CSRF 방지<br>
+          · redirect_uri 화이트리스트<br>
+          · access token은 짧은 만료 설정
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="defense-endpoint" class="ssec">
+    <div class="sec-title">엔드포인트 보안</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💻</span><span class="card-title">EDR / AV / XDR</span></div>
+        <div class="card-body">
+          <b>AV (안티바이러스):</b> 시그니처 기반 악성코드 탐지. 알려진 위협에 효과적.<br><br>
+          <b>EDR (Endpoint Detection &amp; Response):</b> 행위 기반 탐지 + 사고 대응. 알려지지 않은 위협도 탐지.<br><br>
+          <b>XDR:</b> EDR + 네트워크 + 클라우드 통합 탐지.<br><br>
+          <b>대표 제품:</b> CrowdStrike Falcon, SentinelOne, Microsoft Defender, Carbon Black.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🖥️</span><span class="card-title">OS 하드닝</span></div>
+        <div class="card-body">
+          <b>Linux 하드닝:</b><br>
+          · 불필요 서비스 비활성화<br>
+          · SSH: root 로그인 차단, 키 인증만 허용<br>
+          · 방화벽: iptables / nftables / ufw<br>
+          · SELinux / AppArmor 활성화<br>
+          · 정기 업데이트 자동화<br><br>
+          <b>Windows 하드닝:</b><br>
+          · Windows Defender / Firewall 활성화<br>
+          · BitLocker 디스크 암호화<br>
+          · UAC 설정, 계정 권한 분리<br>
+          · LAPS (로컬 관리자 암호 솔루션)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📱</span><span class="card-title">모바일 보안</span></div>
+        <div class="card-body">
+          <b>MDM (Mobile Device Management):</b> 기업 모바일 기기 중앙 관리.<br><br>
+          <b>위협:</b> 악성 앱, 루팅/탈옥, 안전하지 않은 Wi-Fi, 블루투스 공격.<br><br>
+          <b>방어:</b><br>
+          · 공식 앱스토어만 사용<br>
+          · OS·앱 최신 업데이트<br>
+          · 화면 잠금 + 생체인증<br>
+          · 원격 초기화 기능 활성화<br>
+          · VPN 사용 (공개 Wi-Fi 시)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">☁️</span><span class="card-title">클라우드 보안</span></div>
+        <div class="card-body">
+          <b>공동 책임 모델:</b> 클라우드 제공사 = 인프라 보안 / 사용자 = 데이터·설정 보안.<br><br>
+          <b>주요 위험:</b><br>
+          · S3 버킷 공개 노출<br>
+          · IAM 과도한 권한 (AWS Access Key 노출)<br>
+          · 보안 그룹 0.0.0.0/0 허용<br>
+          · 암호화되지 않은 스냅샷<br><br>
+          <b>도구:</b> AWS Security Hub, GuardDuty, CloudTrail, Prowler, ScoutSuite.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="defense-arch" class="ssec">
+    <div class="sec-title">보안 아키텍처</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🚫</span><span class="card-title">제로 트러스트 (Zero Trust)</span></div>
+        <div class="card-body">
+          "절대 신뢰하지 마라, 항상 검증하라 (Never Trust, Always Verify)"<br><br>
+          <b>핵심 원칙:</b><br>
+          · 모든 요청을 비신뢰 네트워크에서 오는 것처럼 처리<br>
+          · 최소 권한 접근<br>
+          · 모든 접근을 검증·기록<br>
+          · 마이크로 세그멘테이션 (Micro-segmentation)<br><br>
+          <b>구현 요소:</b> MFA + Identity Provider + 기기 건강 확인 + 지속 모니터링.<br><br>
+          <b>참고:</b> NIST SP 800-207 제로 트러스트 아키텍처.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏰</span><span class="card-title">심층 방어 (Defense in Depth)</span></div>
+        <div class="card-body">
+          다중 보안 계층 적용 — 하나의 방어선이 무너져도 다음 방어선이 차단.<br><br>
+          <table class="tbl">
+            <tr><th>계층</th><th>예시</th></tr>
+            <tr><td>물리적</td><td>잠금장치, CCTV, 출입 통제</td></tr>
+            <tr><td>네트워크</td><td>방화벽, IDS/IPS, VPN, VLAN</td></tr>
+            <tr><td>호스트</td><td>OS 하드닝, EDR, 패치</td></tr>
+            <tr><td>응용</td><td>WAF, 코드 보안, 입력 검증</td></tr>
+            <tr><td>데이터</td><td>암호화, DLP, 접근 제어</td></tr>
+            <tr><td>사람</td><td>보안 교육, 정책, 문화</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏗️</span><span class="card-title">DMZ 아키텍처</span></div>
+        <div class="card-body">
+          외부망 ↔ <b>DMZ</b>(웹서버, 메일서버) ↔ 내부망.<br><br>
+          공개 서버와 내부 시스템을 분리하여 침해 시 내부망 보호.<br><br>
+          <b>구성:</b> 외부 방화벽 + DMZ + 내부 방화벽.<br>
+          <b>DMZ에 두는 것:</b> 웹서버, 메일서버, DNS, 리버스 프록시.<br>
+          <b>내부에 두는 것:</b> DB, 파일서버, 사내 시스템.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔬</span><span class="card-title">침투 테스트 (Penetration Testing)</span></div>
+        <div class="card-body">
+          <b>방법론:</b> PTES, OWASP Testing Guide, NIST SP 800-115.<br><br>
+          <b>단계:</b> 사전 계약 → 정찰 → 스캐닝 → 취약점 분석 → 익스플로잇 → 후속 행동 → 보고서.<br><br>
+          <b>범위:</b><br>
+          · Black Box: 내부 정보 없음 (외부 공격자 시뮬레이션)<br>
+          · White Box: 모든 정보 제공 (내부 감사)<br>
+          · Gray Box: 일부 정보 제공
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔵</span><span class="card-title">레드팀 / 블루팀 / 퍼플팀</span></div>
+        <div class="card-body">
+          <b>레드팀 (Red Team):</b> 공격자 역할. 실제 공격 시뮬레이션으로 방어 취약점 발견.<br><br>
+          <b>블루팀 (Blue Team):</b> 방어자 역할. 탐지·대응·복구 담당.<br><br>
+          <b>퍼플팀 (Purple Team):</b> 레드팀 + 블루팀 협업. 공격 결과를 즉시 방어에 반영.<br><br>
+          <b>화이트팀:</b> 모의 훈련 규칙·범위 관리.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="defense-ir" class="ssec">
+    <div class="sec-title">사고 대응 (Incident Response)</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">IR 6단계 (NIST)</span></div>
+        <div class="card-body">
+          <div class="tl">
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">1. 준비 (Preparation)</div><div class="tl-body">IR 정책·절차 수립, 팀 구성, 도구 준비, 훈련.</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">2. 탐지 &amp; 분석 (Detection &amp; Analysis)</div><div class="tl-body">이상 징후 탐지, 사고 분류·우선순위화, 영향 분석.</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">3. 억제 (Containment)</div><div class="tl-body">단기 억제(격리), 장기 억제(백도어 제거), 증거 보존.</div></div>
+            <div class="tl-item"><div class="tl-dot red"></div><div class="tl-head">4. 근절 (Eradication)</div><div class="tl-body">악성코드 제거, 취약점 패치, 계정 재설정.</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">5. 복구 (Recovery)</div><div class="tl-body">서비스 복원, 모니터링 강화, 정상화 확인.</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">6. 교훈 (Lessons Learned)</div><div class="tl-body">사후 분석, 개선 사항 도출, 문서화.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">디지털 포렌식 기초</span></div>
+        <div class="card-body">
+          <b>원칙:</b> 원본 보존, 증거 연계 보관(Chain of Custody), 재현 가능성.<br><br>
+          <b>수집 순서 (휘발성 낮은 순):</b><br>
+          CPU 캐시 → 메모리(RAM) → 스왑/페이지파일 → 네트워크 연결 → 실행 중 프로세스 → 디스크 이미지<br><br>
+          <b>주요 도구:</b><br>
+          · <b>메모리:</b> Volatility, WinPMem<br>
+          · <b>디스크:</b> FTK Imager, dd, Autopsy<br>
+          · <b>네트워크:</b> Wireshark, NetworkMiner<br>
+          · <b>타임라인:</b> Plaso/log2timeline<br><br>
+          <b>해시 검증:</b> 이미지 전·후 MD5/SHA-256 일치 확인.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 암호학 ========== -->
+<section id="sec-crypto" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('crypto','sym')">대칭키 암호화</button>
+    <button class="stab" onclick="showSub('crypto','asym')">비대칭키 암호화</button>
+    <button class="stab" onclick="showSub('crypto','hash')">해시 함수</button>
+    <button class="stab" onclick="showSub('crypto','pki')">PKI &amp; 인증서</button>
+    <button class="stab" onclick="showSub('crypto','tls')">TLS &amp; HTTPS</button>
+  </div>
+
+  <div id="crypto-sym" class="ssec on">
+    <div class="sec-title">대칭키 암호화 (Symmetric Encryption)</div>
+    <p class="sec-sub">암호화·복호화에 동일한 키 사용. 빠르지만 키 배송 문제가 있다.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔐</span><span class="card-title">AES (Advanced Encryption Standard)</span></div>
+        <div class="card-body">
+          현재 표준 대칭키 암호. SPN 구조.<br>
+          <b>키 길이:</b> 128 / 192 / 256 비트 (AES-256 권장).<br>
+          <b>블록 크기:</b> 128 비트.<br>
+          <b>운용 모드:</b><br>
+          · <b>ECB:</b> 같은 블록 = 같은 암호문 ❌ (패턴 노출)<br>
+          · <b>CBC:</b> 이전 블록 XOR. IV 필요. 안전하지만 느림<br>
+          · <b>GCM:</b> 인증 암호화 (AEAD). 현재 권장 ✅<br>
+          · <b>CTR:</b> 스트림 암호화 방식. 빠름<br>
+          <b>용도:</b> 데이터 저장, 파일 암호화, TLS 내부.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📟</span><span class="card-title">DES / 3DES (구형)</span></div>
+        <div class="card-body">
+          <b>DES:</b> 56비트 키 — 현재 안전하지 않음 (브루트포스 가능). ❌<br><br>
+          <b>3DES (Triple DES):</b> DES를 3회 반복. 레거시 호환성용. 느리고 취약. ⚠<br><br>
+          <b>현재 상태:</b> NIST 2023년 3DES 공식 폐기. AES로 마이그레이션 필요.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌊</span><span class="card-title">스트림 암호 (ChaCha20)</span></div>
+        <div class="card-body">
+          비트/바이트 단위로 암호화. 블록 암호보다 빠른 경우가 많음.<br><br>
+          <b>ChaCha20-Poly1305:</b> AEAD 스트림 암호. TLS 1.3에서 AES-GCM과 함께 사용. 저사양 기기에 유리.<br><br>
+          <b>RC4:</b> 구식 스트림 암호. 심각한 취약점으로 사용 금지. ❌
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🗝️</span><span class="card-title">키 관리</span></div>
+        <div class="card-body">
+          <b>키 배송 문제:</b> 같은 키를 안전하게 공유하는 방법이 필요.<br><br>
+          <b>해결책:</b><br>
+          · 비대칭 암호로 대칭 키 교환 (TLS Handshake)<br>
+          · KMS (Key Management Service): AWS KMS, HashiCorp Vault<br><br>
+          <b>키 보관:</b> HSM(Hardware Security Module) — 물리적 보안 모듈.<br><br>
+          <b>원칙:</b> 키를 코드에 하드코딩하지 말 것!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="crypto-asym" class="ssec">
+    <div class="sec-title">비대칭키 암호화 (Asymmetric / Public-Key Cryptography)</div>
+    <p class="sec-sub">공개키(Public Key)로 암호화, 개인키(Private Key)로 복호화. 키 배송 문제 해결. 대칭키보다 느리다.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">RSA</span></div>
+        <div class="card-body">
+          소인수 분해의 어려움에 기반한 가장 널리 쓰이는 비대칭 암호.<br><br>
+          <b>키 길이:</b> 최소 2048비트 (현재), 4096비트 권장.<br>
+          <b>용도:</b> 디지털 서명, 키 교환, 인증서.<br><br>
+          <div class="code"><span class="cm"># OpenSSL RSA 키 생성</span>
+openssl genrsa -out private.pem 4096
+openssl rsa -in private.pem -pubout -out public.pem</div>
+          <b>주의:</b> 2048비트 미만 → 안전하지 않음.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">〰️</span><span class="card-title">ECC (타원 곡선 암호)</span></div>
+        <div class="card-body">
+          타원 곡선의 이산 대수 문제에 기반. RSA보다 짧은 키로 동등한 보안.<br><br>
+          <b>비교:</b> RSA 2048비트 ≈ ECC 256비트 보안 강도.<br><br>
+          <b>알고리즘:</b> ECDSA (서명), ECDH (키 교환).<br>
+          <b>곡선:</b> P-256 (NIST), Curve25519 (권장), secp256k1 (비트코인).<br><br>
+          <b>장점:</b> 빠름, 작은 키, 모바일·IoT에 적합.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🤝</span><span class="card-title">Diffie-Hellman 키 교환</span></div>
+        <div class="card-body">
+          실제 키를 전송하지 않고 공개 채널에서 공유 비밀 생성.<br><br>
+          <b>동작:</b> 각자 난수(개인값) 생성 → 공개값 교환 → 같은 공유 비밀 도출.<br><br>
+          <b>ECDHE:</b> 타원 곡선 기반 DH + 임시 키 (Perfect Forward Secrecy 제공).<br><br>
+          <b>PFS (완전 순방향 비밀성):</b> 세션 키가 노출되어도 과거 통신 복호화 불가.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">✍️</span><span class="card-title">디지털 서명</span></div>
+        <div class="card-body">
+          <b>목적:</b> 무결성(변조 감지) + 인증(발신자 확인) + 부인 방지.<br><br>
+          <b>과정:</b><br>
+          1. 문서 해시 계산 (SHA-256 등)<br>
+          2. 개인키로 해시 서명 → 서명값<br>
+          3. 수신자가 공개키로 서명 검증 + 해시 비교<br><br>
+          <b>알고리즘:</b> RSA-PSS, ECDSA, EdDSA (Ed25519 권장).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="crypto-hash" class="ssec">
+    <div class="sec-title">해시 함수 (Hash Functions)</div>
+    <p class="sec-sub">임의 길이 입력 → 고정 길이 출력. 단방향 함수 — 복호화 불가. 무결성 검증·비밀번호 저장에 사용.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">#️⃣</span><span class="card-title">주요 해시 알고리즘 비교</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>알고리즘</th><th>출력 길이</th><th>안전 여부</th><th>용도</th></tr>
+            <tr><td>MD5</td><td>128비트</td><td><span class="tag critical">위험</span> 충돌 발견</td><td>파일 체크섬만 (레거시)</td></tr>
+            <tr><td>SHA-1</td><td>160비트</td><td><span class="tag critical">위험</span> 충돌 발견</td><td>사용 금지</td></tr>
+            <tr><td>SHA-256</td><td>256비트</td><td><span class="tag info">안전</span></td><td>일반 해싱, 인증서</td></tr>
+            <tr><td>SHA-384</td><td>384비트</td><td><span class="tag info">안전</span></td><td>높은 보안 요구</td></tr>
+            <tr><td>SHA-512</td><td>512비트</td><td><span class="tag info">안전</span></td><td>높은 보안 요구</td></tr>
+            <tr><td>SHA-3</td><td>다양</td><td><span class="tag info">안전</span></td><td>차세대 표준</td></tr>
+            <tr><td>bcrypt</td><td>가변</td><td><span class="tag info">안전</span> (비밀번호용)</td><td>비밀번호 저장</td></tr>
+            <tr><td>Argon2</td><td>가변</td><td><span class="tag info">최고</span> (비밀번호용)</td><td>비밀번호 저장 권장</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔏</span><span class="card-title">HMAC &amp; 메시지 인증 코드</span></div>
+        <div class="card-body">
+          <b>HMAC (Hash-based MAC):</b> 해시 + 비밀 키 = 메시지 무결성 + 인증.<br><br>
+          <div class="code">HMAC-SHA256(key, message) → 32바이트 태그</div>
+          <b>용도:</b> API 서명 검증, JWT 서명, 웹훅 검증.<br><br>
+          <b>타이밍 공격 방지:</b> 상수 시간 비교 함수 사용.<br>
+          <div class="code"><span class="cm"># Python: 안전한 비교</span>
+import hmac
+hmac.compare_digest(expected, received)</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧂</span><span class="card-title">솔트 (Salt) &amp; 페퍼 (Pepper)</span></div>
+        <div class="card-body">
+          <b>Salt:</b> 비밀번호 해시 전 추가하는 난수값. 사용자마다 다름. DB에 저장.<br>
+          → 레인보우 테이블, 해시 충돌 공격 무효화.<br><br>
+          <b>Pepper:</b> 추가 비밀값. Salt와 달리 DB가 아닌 코드/환경변수에 저장.<br>
+          → DB 단독 유출 시 복호화 어렵게 만듦.<br><br>
+          <b>bcrypt/Argon2:</b> Salt를 내장, 자동 처리.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔢</span><span class="card-title">해시 활용 사례</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>비밀번호 저장</td><td>bcrypt / Argon2id</td></tr>
+            <tr><td>파일 무결성</td><td>SHA-256 체크섬</td></tr>
+            <tr><td>디지털 서명</td><td>SHA-256으로 문서 해시</td></tr>
+            <tr><td>블록체인</td><td>SHA-256 (비트코인)</td></tr>
+            <tr><td>소프트웨어 배포</td><td>SHA-256 해시 공개 검증</td></tr>
+            <tr><td>API 인증</td><td>HMAC-SHA256</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="crypto-pki" class="ssec">
+    <div class="sec-title">PKI &amp; 디지털 인증서</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏛️</span><span class="card-title">PKI (Public Key Infrastructure)</span></div>
+        <div class="card-body">
+          공개키 암호화를 신뢰할 수 있게 관리하는 체계.<br><br>
+          <b>구성 요소:</b><br>
+          · <b>CA (Certificate Authority):</b> 인증서를 발행하고 서명하는 신뢰 기관.<br>
+          · <b>RA (Registration Authority):</b> CA 대신 신원 확인.<br>
+          · <b>CRL (Certificate Revocation List):</b> 폐기된 인증서 목록.<br>
+          · <b>OCSP:</b> 실시간 인증서 유효성 확인.<br><br>
+          <b>신뢰 체인:</b> 루트 CA → 중간 CA → 서버 인증서.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📜</span><span class="card-title">X.509 인증서</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>Subject</td><td>인증서 발급 대상 (도메인·조직)</td></tr>
+            <tr><td>Issuer</td><td>발급 CA</td></tr>
+            <tr><td>Validity</td><td>유효 기간</td></tr>
+            <tr><td>Public Key</td><td>대상의 공개키</td></tr>
+            <tr><td>Signature</td><td>CA의 서명 (신뢰 보증)</td></tr>
+            <tr><td>SAN</td><td>Subject Alternative Name (추가 도메인)</td></tr>
+          </table>
+          <b>인증서 유형:</b><br>
+          · DV (Domain Validation): 도메인 소유 확인만<br>
+          · OV (Organization Validation): 조직 확인<br>
+          · EV (Extended Validation): 확장 검증, 최고 신뢰
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">Let's Encrypt &amp; ACME</span></div>
+        <div class="card-body">
+          무료 자동화 DV 인증서 발급 서비스.<br>
+          <b>발급 도구:</b> Certbot, acme.sh.<br>
+          <b>유효 기간:</b> 90일 → 자동 갱신 설정 필수.<br>
+          <div class="code">certbot --nginx -d example.com -d www.example.com</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📌</span><span class="card-title">인증서 고정 (Pinning)</span></div>
+        <div class="card-body">
+          클라이언트가 특정 인증서·공개키만 신뢰하도록 고정.<br>
+          MitM 공격 방지에 효과적.<br>
+          <b>HPKP:</b> HTTP 헤더 기반 (폐기됨).<br>
+          <b>앱 내 핀닝:</b> 모바일 앱에서 직접 구현.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="crypto-tls" class="ssec">
+    <div class="sec-title">TLS &amp; HTTPS</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔒</span><span class="card-title">TLS 버전 비교</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><th>버전</th><th>상태</th><th>비고</th></tr>
+            <tr><td>SSL 2.0 / 3.0</td><td><span class="tag critical">폐기</span></td><td>POODLE 등 치명적 취약점</td></tr>
+            <tr><td>TLS 1.0</td><td><span class="tag critical">폐기</span></td><td>BEAST, POODLE 취약점</td></tr>
+            <tr><td>TLS 1.1</td><td><span class="tag critical">폐기</span></td><td>2021년 주요 브라우저 지원 중단</td></tr>
+            <tr><td>TLS 1.2</td><td><span class="tag medium">유지</span></td><td>안전하지만 TLS 1.3 권장</td></tr>
+            <tr><td>TLS 1.3</td><td><span class="tag info">권장</span></td><td>2018년, 빠르고 안전, PFS 기본</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🤝</span><span class="card-title">TLS Handshake 과정</span></div>
+        <div class="card-body">
+          <b>TLS 1.3 핸드셰이크 (1-RTT):</b>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;">
+            <div style="display:flex;align-items:center;gap:6px;"><div class="flow-step">클라이언트 → 서버</div><div class="flow-arrow">→</div><div style="font-size:11px;color:var(--txt2)">ClientHello (암호화 스위트, 키 공유 데이터)</div></div>
+            <div style="display:flex;align-items:center;gap:6px;"><div class="flow-step">서버 → 클라이언트</div><div class="flow-arrow">→</div><div style="font-size:11px;color:var(--txt2)">ServerHello + 인증서 + Finished</div></div>
+            <div style="display:flex;align-items:center;gap:6px;"><div class="flow-step">클라이언트 → 서버</div><div class="flow-arrow">→</div><div style="font-size:11px;color:var(--txt2)">Finished (인증서 검증 완료)</div></div>
+            <div style="display:flex;align-items:center;gap:6px;"><div class="flow-step">암호화 통신 시작</div></div>
+          </div>
+          <b>TLS 1.2 대비 개선:</b> 라운드트립 감소, 취약 암호 제거, PFS 기본 적용.
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">권장 TLS 설정 (Nginx 예시)</span></div>
+      <div class="card-body">
+        <div class="code">server {
+    listen 443 ssl http2;
+
+    <span class="cm"># TLS 버전 (1.2 최소, 1.3 권장)</span>
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    <span class="cm"># 강력한 암호화 스위트</span>
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+    <span class="cm"># HSTS — 1년간 HTTPS 강제</span>
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    <span class="cm"># OCSP Stapling</span>
+    ssl_stapling on;
+    ssl_stapling_verify on;
+}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 도구 & 실습 ========== -->
+<section id="sec-tools" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('tools','recon')">정보 수집</button>
+    <button class="stab" onclick="showSub('tools','net')">네트워크 분석</button>
+    <button class="stab" onclick="showSub('tools','web')">웹 분석</button>
+    <button class="stab" onclick="showSub('tools','exploit')">취약점 / 익스플로잇</button>
+    <button class="stab" onclick="showSub('tools','forensic')">포렌식</button>
+  </div>
+
+  <div id="tools-recon" class="ssec on">
+    <div class="sec-title">정보 수집 도구</div>
+    <div class="alert alert-warn"><div class="al-label">⚠ 주의</div>모의 해킹 도구는 허가된 시스템에서만 사용하세요. 무단 사용은 불법입니다.</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🗺️</span><span class="card-title">Nmap — 포트 스캐너</span></div>
+        <div class="card-body">
+          <div class="code"><span class="cm"># 기본 스캔</span>
+nmap 192.168.1.1
+
+<span class="cm"># SYN 스텔스 스캔</span>
+nmap -sS 192.168.1.1
+
+<span class="cm"># 서비스 버전 탐지</span>
+nmap -sV 192.168.1.1
+
+<span class="cm"># OS 탐지</span>
+nmap -O 192.168.1.1
+
+<span class="cm"># 전체 포트 + 버전 + OS</span>
+nmap -sS -sV -O -p- 192.168.1.1
+
+<span class="cm"># 취약점 스크립트</span>
+nmap --script vuln 192.168.1.1
+
+<span class="cm"># 특정 NSE 스크립트</span>
+nmap --script smb-vuln-ms17-010 -p 445 192.168.1.1</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">OSINT 도구</span></div>
+        <div class="card-body">
+          <b>Shodan:</b> 인터넷 연결 기기 검색 엔진. 노출된 서비스 탐색.<br>
+          <div class="code">port:22 country:KR  <span class="cm"># 한국 SSH 서버</span>
+product:Apache version:2.4.49  <span class="cm"># 취약 버전</span></div>
+          <b>theHarvester:</b> 이메일·서브도메인·IP 수집.<br>
+          <div class="code">theHarvester -d example.com -b google,linkedin</div>
+          <b>Maltego:</b> 시각적 OSINT 관계도 생성.<br>
+          <b>OSINT Framework:</b> osintframework.com — 도구 모음.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌐</span><span class="card-title">DNS 정찰</span></div>
+        <div class="card-body">
+          <div class="code"><span class="cm"># DNS 조회</span>
+nslookup example.com
+dig example.com ANY
+
+<span class="cm"># 서브도메인 열거</span>
+amass enum -d example.com
+subfinder -d example.com
+
+<span class="cm"># DNS Zone Transfer (설정 오류 시 가능)</span>
+dig axfr @ns1.example.com example.com
+
+<span class="cm"># 역방향 DNS</span>
+dig -x 1.2.3.4</div>
+          <b>도구:</b> DNSrecon, Fierce, Sublist3r, dnsx.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🕷️</span><span class="card-title">웹 정찰</span></div>
+        <div class="card-body">
+          <div class="code"><span class="cm"># 디렉터리 브루트포스</span>
+gobuster dir -u http://example.com -w wordlist.txt
+ffuf -w wordlist.txt -u http://example.com/FUZZ
+
+<span class="cm"># 웹 기술 탐지</span>
+whatweb http://example.com
+wappalyzer (브라우저 확장)
+
+<span class="cm"># robots.txt, sitemap.xml 확인</span>
+curl http://example.com/robots.txt</div>
+          <b>Google Dorks (구글 해킹):</b><br>
+          <div class="code">site:example.com filetype:pdf
+inurl:admin site:example.com
+intitle:"index of" site:example.com</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tools-net" class="ssec">
+    <div class="sec-title">네트워크 분석 도구</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🦈</span><span class="card-title">Wireshark</span></div>
+        <div class="card-body">
+          패킷 캡처·분석 도구. GUI 기반.<br><br>
+          <b>주요 필터:</b>
+          <div class="code"><span class="cm"># 특정 IP 필터</span>
+ip.addr == 192.168.1.1
+
+<span class="cm"># HTTP 트래픽</span>
+http
+
+<span class="cm"># 포트 필터</span>
+tcp.port == 80
+
+<span class="cm"># SYN 패킷 (포트 스캔 탐지)</span>
+tcp.flags.syn == 1 and tcp.flags.ack == 0
+
+<span class="cm"># DNS 쿼리</span>
+dns.flags.response == 0
+
+<span class="cm"># 평문 비밀번호 탐지</span>
+http contains "password"</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⌨️</span><span class="card-title">tcpdump</span></div>
+        <div class="card-body">
+          CLI 패킷 캡처 도구. 서버 환경에 적합.<br><br>
+          <div class="code"><span class="cm"># 인터페이스에서 캡처</span>
+tcpdump -i eth0
+
+<span class="cm"># 특정 포트</span>
+tcpdump -i eth0 port 80
+
+<span class="cm"># 파일로 저장</span>
+tcpdump -i eth0 -w capture.pcap
+
+<span class="cm"># 파일 읽기</span>
+tcpdump -r capture.pcap
+
+<span class="cm"># 호스트 필터</span>
+tcpdump host 192.168.1.1 and port 443
+
+<span class="cm"># 상세 출력</span>
+tcpdump -vvv -i eth0</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔧</span><span class="card-title">Netcat &amp; Ncat</span></div>
+        <div class="card-body">
+          "네트워크의 맥가이버 칼" — 연결, 청취, 파일 전송, 역방향 셸.<br><br>
+          <div class="code"><span class="cm"># 포트 청취</span>
+nc -lvnp 4444
+
+<span class="cm"># 연결</span>
+nc 192.168.1.1 4444
+
+<span class="cm"># 파일 전송</span>
+<span class="cm"># 수신측:</span>
+nc -lvnp 4444 > received.txt
+<span class="cm"># 송신측:</span>
+nc 192.168.1.1 4444 < file.txt
+
+<span class="cm"># 배너 그래빙</span>
+nc -v 192.168.1.1 22</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏹</span><span class="card-title">기타 네트워크 도구</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>masscan</td><td>초고속 포트 스캐너 (Nmap보다 빠름)</td></tr>
+            <tr><td>hping3</td><td>패킷 조작·전송 (DoS 테스트)</td></tr>
+            <tr><td>arpspoof</td><td>ARP 스푸핑 테스트</td></tr>
+            <tr><td>ettercap</td><td>MitM 공격 프레임워크</td></tr>
+            <tr><td>netstat</td><td>연결 상태 확인</td></tr>
+            <tr><td>ss</td><td>소켓 통계 (netstat 대체)</td></tr>
+            <tr><td>traceroute</td><td>경로 추적</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tools-web" class="ssec">
+    <div class="sec-title">웹 분석 도구</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔫</span><span class="card-title">Burp Suite</span></div>
+        <div class="card-body">
+          웹 애플리케이션 모의 해킹의 표준 도구.<br><br>
+          <b>주요 기능:</b><br>
+          · <b>Proxy:</b> HTTP/HTTPS 트래픽 가로채기·수정<br>
+          · <b>Intruder:</b> 자동화 퍼징·브루트포스<br>
+          · <b>Repeater:</b> 요청 반복 수정 전송<br>
+          · <b>Scanner:</b> 자동 취약점 스캔 (Pro 버전)<br>
+          · <b>Decoder:</b> Base64, URL, HTML 인코딩<br>
+          · <b>Comparer:</b> 응답 비교<br><br>
+          <b>설정:</b> 브라우저 프록시 → 127.0.0.1:8080.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🕷️</span><span class="card-title">OWASP ZAP</span></div>
+        <div class="card-body">
+          무료 오픈소스 웹 취약점 스캐너.<br><br>
+          <b>기능:</b><br>
+          · 자동 크롤링 + 취약점 스캔<br>
+          · 능동/수동 스캔<br>
+          · CI/CD 통합 (API 모드)<br>
+          · Fuzzer, Spider, Ajax Spider<br><br>
+          <b>용도:</b> 개발 중 보안 테스트, CI 파이프라인 통합.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💉</span><span class="card-title">SQLMap</span></div>
+        <div class="card-body">
+          SQL Injection 자동 탐지 및 악용 도구.<br><br>
+          <div class="code"><span class="cm"># 기본 사용</span>
+sqlmap -u "http://example.com/page?id=1"
+
+<span class="cm"># POST 요청</span>
+sqlmap -u "http://example.com/login" \
+  --data "user=admin&pass=test"
+
+<span class="cm"># 데이터베이스 열거</span>
+sqlmap -u "..." --dbs
+
+<span class="cm"># 테이블 열거</span>
+sqlmap -u "..." -D dbname --tables</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔐</span><span class="card-title">Hashcat &amp; John the Ripper</span></div>
+        <div class="card-body">
+          비밀번호 해시 크래킹 도구.<br><br>
+          <div class="code"><span class="cm"># Hashcat — GPU 가속</span>
+hashcat -m 0 hash.txt wordlist.txt    <span class="cm"># MD5</span>
+hashcat -m 1800 hash.txt wordlist.txt <span class="cm"># SHA-512</span>
+hashcat -m 3200 hash.txt wordlist.txt <span class="cm"># bcrypt</span>
+hashcat -a 3 hash.txt ?a?a?a?a?a?a   <span class="cm"># 브루트포스</span>
+
+<span class="cm"># John the Ripper</span>
+john --wordlist=rockyou.txt hash.txt
+john --show hash.txt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tools-exploit" class="ssec">
+    <div class="sec-title">취약점 스캔 &amp; 익스플로잇 프레임워크</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💣</span><span class="card-title">Metasploit Framework</span></div>
+        <div class="card-body">
+          가장 널리 쓰이는 오픈소스 익스플로잇 프레임워크.<br><br>
+          <div class="code"><span class="cm"># Metasploit 시작</span>
+msfconsole
+
+<span class="cm"># 모듈 검색</span>
+search eternalblue
+
+<span class="cm"># 모듈 사용</span>
+use exploit/windows/smb/ms17_010_eternalblue
+
+<span class="cm"># 옵션 확인</span>
+show options
+
+<span class="cm"># 타겟 설정</span>
+set RHOSTS 192.168.1.10
+set LHOST 192.168.1.1
+
+<span class="cm"># 실행</span>
+run</div>
+          <b>페이로드 유형:</b> Meterpreter, Shell, PowerShell.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔬</span><span class="card-title">취약점 스캐너</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>Nessus</td><td>상용 취약점 스캐너 (무료 에센셜)</td></tr>
+            <tr><td>OpenVAS</td><td>오픈소스 취약점 스캐너</td></tr>
+            <tr><td>Nikto</td><td>웹서버 취약점 스캐너</td></tr>
+            <tr><td>Nuclei</td><td>템플릿 기반 빠른 취약점 스캐너</td></tr>
+          </table>
+          <div class="code"><span class="cm"># Nikto 웹서버 스캔</span>
+nikto -h http://example.com
+
+<span class="cm"># Nuclei CVE 스캔</span>
+nuclei -u http://example.com -t cves/</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🐧</span><span class="card-title">Kali Linux / Parrot OS</span></div>
+        <div class="card-body">
+          보안 전문가를 위한 Linux 배포판.<br><br>
+          <b>Kali Linux:</b> 600+ 보안 도구 사전 설치. 침투 테스팅 업계 표준.<br>
+          <b>Parrot OS:</b> Kali보다 가볍고 일상 사용에 적합.<br><br>
+          <b>도구 카테고리:</b><br>
+          · 정보 수집, 취약점 분석, 익스플로잇<br>
+          · 포스트 익스플로잇, 포렌식, 리포팅<br>
+          · 무선 공격, 스니핑, 크래킹
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">CTF &amp; 실습 환경</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>HackTheBox</td><td>실제 해킹 시나리오 실습 플랫폼</td></tr>
+            <tr><td>TryHackMe</td><td>입문자 친화적 학습 플랫폼</td></tr>
+            <tr><td>PicoCTF</td><td>무료 CTF 대회·학습</td></tr>
+            <tr><td>DVWA</td><td>취약한 웹앱 로컬 실습 환경</td></tr>
+            <tr><td>VulnHub</td><td>취약한 VM 이미지 모음</td></tr>
+            <tr><td>WebGoat</td><td>OWASP 제작 취약한 웹앱</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tools-forensic" class="ssec">
+    <div class="sec-title">디지털 포렌식 도구</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🗄️</span><span class="card-title">디스크 포렌식</span></div>
+        <div class="card-body">
+          <div class="code"><span class="cm"># dd로 디스크 이미지 생성</span>
+dd if=/dev/sda of=disk.img bs=4096 conv=noerror,sync
+
+<span class="cm"># 해시 검증</span>
+sha256sum disk.img > disk.img.sha256
+
+<span class="cm"># 쓰기 방지 마운트</span>
+mount -o ro,noexec /dev/sda /mnt/evidence</div>
+          <b>도구:</b><br>
+          · <b>FTK Imager:</b> 이미지 생성·분석<br>
+          · <b>Autopsy:</b> 오픈소스 포렌식 플랫폼<br>
+          · <b>Sleuth Kit:</b> CLI 파일시스템 분석<br>
+          · <b>Foremost/Scalpel:</b> 파일 카빙 (삭제 파일 복구)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧠</span><span class="card-title">메모리 포렌식</span></div>
+        <div class="card-body">
+          RAM 덤프 분석. 실행 중 프로세스, 네트워크 연결, 암호화 키 복구 가능.<br><br>
+          <div class="code"><span class="cm"># Volatility 3 사용</span>
+<span class="cm"># 프로세스 목록</span>
+vol -f memory.dmp windows.pslist
+
+<span class="cm"># 네트워크 연결</span>
+vol -f memory.dmp windows.netstat
+
+<span class="cm"># 악성코드 탐지</span>
+vol -f memory.dmp windows.malfind
+
+<span class="cm"># 커맨드 히스토리</span>
+vol -f memory.dmp windows.cmdline</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📋</span><span class="card-title">로그 분석</span></div>
+        <div class="card-body">
+          <b>Linux 주요 로그:</b>
+          <div class="code"><span class="cm"># 인증 로그</span>
+/var/log/auth.log  (또는 secure)
+<span class="cm"># SSH 로그인 실패</span>
+grep "Failed password" /var/log/auth.log
+
+<span class="cm"># 웹서버 로그</span>
+/var/log/nginx/access.log
+/var/log/apache2/access.log
+
+<span class="cm"># 시스템 로그</span>
+journalctl -xe  (systemd)</div>
+          <b>Windows 이벤트 ID:</b><br>
+          4624: 로그인 성공 / 4625: 로그인 실패<br>
+          4688: 프로세스 생성 / 4663: 파일 접근
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 자격증 & 법규 ========== -->
+<section id="sec-cert" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('cert','certs')">보안 자격증</button>
+    <button class="stab" onclick="showSub('cert','law')">법규 &amp; 컴플라이언스</button>
+    <button class="stab" onclick="showSub('cert','roadmap')">학습 로드맵</button>
+  </div>
+
+  <div id="cert-certs" class="ssec on">
+    <div class="sec-title">정보 보안 자격증</div>
+    <h3 style="color:var(--grn);font-size:13px;margin-bottom:10px;font-family:var(--mono)">[ 국제 자격증 ]</h3>
+    <div class="grid">
+      <div class="cert-card">
+        <div class="cert-name">CompTIA Security+</div>
+        <div class="cert-org">CompTIA · 입문 레벨</div>
+        <div class="cert-tags">
+          <span class="tag info">입문</span><span class="tag medium">국제 표준</span>
+        </div>
+        <div class="cert-body">
+          <b>대상:</b> 보안 입문자, IT 경력 1~2년.<br>
+          <b>내용:</b> 위협·공격, 아키텍처, 구현, 운영, 법규 — 보안 전반.<br>
+          <b>특징:</b> 미 DoD 8570 인정, 취업 시장에서 폭넓게 인정.<br>
+          <b>갱신:</b> 3년 (CEU 이수).
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">CEH (Certified Ethical Hacker)</div>
+        <div class="cert-org">EC-Council · 중급</div>
+        <div class="cert-tags">
+          <span class="tag medium">중급</span><span class="tag yel2" style="background:var(--yel3);color:var(--yel2);border:1px solid rgba(204,170,0,.3);">공격 기술</span>
+        </div>
+        <div class="cert-body">
+          <b>대상:</b> 모의 해킹, 취약점 분석 직무.<br>
+          <b>내용:</b> 해킹 5단계, 시스템 해킹, 네트워크·웹·모바일 공격.<br>
+          <b>특징:</b> 공격 기법에 집중. 실무보다는 이론 중심이라는 평도 있음.<br>
+          <b>조건:</b> 2년 이상 경력 또는 EC-Council 공인 훈련.
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">OSCP (OffSec Certified Professional)</div>
+        <div class="cert-org">Offensive Security · 실무 중심</div>
+        <div class="cert-tags">
+          <span class="tag high">고급</span><span class="tag critical">실전 시험</span>
+        </div>
+        <div class="cert-body">
+          <b>대상:</b> 침투 테스터 지망생, 실무자.<br>
+          <b>내용:</b> PWK(PEN-200) 코스 + 24시간 해킹 시험<br>
+          <b>특징:</b> "Try Harder" 철학. 실제 해킹 실력 검증. 업계 최고 인정.<br>
+          <b>시험:</b> 24시간 내 5개 머신 해킹 → 24시간 내 보고서 제출.
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">CISSP (Certified Information Systems Security Professional)</div>
+        <div class="cert-org">ISC² · 관리 레벨</div>
+        <div class="cert-tags">
+          <span class="tag critical">최고급</span><span class="tag medium">관리직</span>
+        </div>
+        <div class="cert-body">
+          <b>대상:</b> CISO, 보안 관리자, 5년+ 경력.<br>
+          <b>내용:</b> 8개 도메인 (보안·위험·자산·아키텍처·통신·ID·보안 평가·소프트웨어).<br>
+          <b>특징:</b> 보안 자격증의 "황금 표준". 기술보다 정책·관리 관점.<br>
+          <b>조건:</b> 8개 도메인 중 2개에서 5년 유급 경력.
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">CISM (Certified Information Security Manager)</div>
+        <div class="cert-org">ISACA · 관리 레벨</div>
+        <div class="cert-tags">
+          <span class="tag high">고급</span><span class="tag medium">관리직</span>
+        </div>
+        <div class="cert-body">
+          <b>대상:</b> 보안 관리자, IT 감사자.<br>
+          <b>내용:</b> 보안 거버넌스, 위험 관리, 사고 관리, 보안 프로그램.<br>
+          <b>특징:</b> CISSP와 유사하지만 더 비즈니스·경영 중심.
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">CompTIA PenTest+ / PNPT</div>
+        <div class="cert-org">CompTIA / TCM Security</div>
+        <div class="cert-tags">
+          <span class="tag medium">중급</span><span class="tag yel2" style="background:var(--yel3);color:var(--yel2);border:1px solid rgba(204,170,0,.3);">침투 테스팅</span>
+        </div>
+        <div class="cert-body">
+          <b>PenTest+:</b> CompTIA 침투 테스팅 자격증. OSCP 전 단계로 적합.<br>
+          <b>PNPT:</b> TCM Security 실전형 자격증. 보고서 제출 포함. 가성비 높음.
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--grn);font-size:13px;margin:16px 0 10px;font-family:var(--mono)">[ 국내 자격증 ]</h3>
+    <div class="grid">
+      <div class="cert-card">
+        <div class="cert-name">정보보안기사 / 산업기사</div>
+        <div class="cert-org">한국인터넷진흥원(KISA) · 한국산업인력공단</div>
+        <div class="cert-tags"><span class="tag info">국가 공인</span></div>
+        <div class="cert-body">
+          <b>기사:</b> 4년제 대학 졸업 또는 동등 학력.<br>
+          <b>내용:</b> 시스템 보안, 네트워크 보안, 애플리케이션 보안, 정보보안 일반, 정보보안 관리 및 법규.<br>
+          <b>특징:</b> 국내 취업 시 기본 자격증. 필기(객관식) + 실기(서술형·실무).
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">ISMS-P 인증 심사원</div>
+        <div class="cert-org">KISA · 관리 레벨</div>
+        <div class="cert-tags"><span class="tag info">국가 공인</span></div>
+        <div class="cert-body">
+          정보보호 및 개인정보보호 관리체계 인증 심사 자격.<br>
+          <b>용도:</b> 기업 ISMS-P 인증 심사 수행.
+        </div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-name">해킹보안전문가 / 디지털포렌식전문가</div>
+        <div class="cert-org">한국정보보호진흥원 등</div>
+        <div class="cert-tags"><span class="tag low">민간 공인</span></div>
+        <div class="cert-body">
+          민간 자격증이지만 실무 능력 증명에 활용.<br>
+          실기 중심으로 취업 포트폴리오 보완에 도움.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cert-law" class="ssec">
+    <div class="sec-title">법규 &amp; 컴플라이언스</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌍</span><span class="card-title">GDPR (일반 개인정보보호규정)</span></div>
+        <div class="card-body">
+          EU의 개인정보보호 최고 법규. 비EU 기업도 EU 시민 데이터 처리 시 적용.<br><br>
+          <b>핵심 원칙:</b> 목적 제한, 데이터 최소화, 정확성, 저장 제한, 무결성·기밀성.<br><br>
+          <b>정보주체 권리:</b> 접근권, 정정권, 삭제권(잊힐 권리), 이동권, 반대권.<br><br>
+          <b>위반 시 제재:</b> 최대 연간 매출 4% 또는 2,000만 유로 중 큰 금액.<br><br>
+          <b>의무:</b> 개인정보 침해 시 72시간 내 당국 신고, DPO 지정 (경우에 따라).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📐</span><span class="card-title">ISO 27001</span></div>
+        <div class="card-body">
+          정보보호 관리체계(ISMS)의 국제 표준.<br><br>
+          <b>구조:</b> 정책 수립 → 위험 평가 → 통제 선택 → 구현 → 모니터링 → 감사 → 개선 (PDCA 사이클).<br><br>
+          <b>Annex A:</b> 114개 통제 항목 (조직·인적·물리·기술 보안).<br><br>
+          <b>인증:</b> 외부 심사기관 인증 취득 가능 → 비즈니스 신뢰성 증가.<br><br>
+          <b>ISO 27002:</b> 27001 통제 항목 구현 가이드라인.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏛️</span><span class="card-title">NIST 사이버보안 프레임워크 (CSF)</span></div>
+        <div class="card-body">
+          미 국립표준기술연구소의 사이버보안 프레임워크.<br><br>
+          <b>5대 기능:</b><br>
+          · <b>Identify (식별):</b> 자산·위험 관리<br>
+          · <b>Protect (보호):</b> 안전장치 구현<br>
+          · <b>Detect (탐지):</b> 이상 징후 탐지<br>
+          · <b>Respond (대응):</b> 사고 대응<br>
+          · <b>Recover (복구):</b> 서비스 복원<br><br>
+          <b>특징:</b> 자발적 채택, 비즈니스 친화적 언어.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💳</span><span class="card-title">PCI-DSS</span></div>
+        <div class="card-body">
+          카드 결제 업계 데이터 보안 표준.<br><br>
+          <b>대상:</b> 카드 정보를 처리·저장·전송하는 모든 조직.<br><br>
+          <b>12개 요구사항:</b><br>
+          · 방화벽 설치 · 기본 비밀번호 변경 · 저장 카드 정보 보호<br>
+          · 전송 암호화 · 안티바이러스 · 보안 시스템 개발<br>
+          · 접근 제한 · ID 인증 · 물리적 접근 제한<br>
+          · 모니터링 · 보안 테스트 · 보안 정책 유지<br><br>
+          <b>수준:</b> Level 1~4 (거래량에 따라).
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--grn);font-size:13px;margin:16px 0 10px;font-family:var(--mono)">[ 국내 법규 ]</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🇰🇷</span><span class="card-title">개인정보 보호법</span></div>
+        <div class="card-body">
+          개인정보의 수집·이용·제공·관리·파기 전반을 규율하는 기본법.<br><br>
+          <b>주요 내용:</b><br>
+          · 최소 수집 원칙<br>
+          · 목적 외 이용·제공 금지<br>
+          · 정보주체 동의 획득<br>
+          · 개인정보 보호책임자(CPO) 지정<br>
+          · 침해 사고 시 신고 의무<br><br>
+          <b>소관:</b> 개인정보보호위원회(PIPC).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📡</span><span class="card-title">정보통신망법</span></div>
+        <div class="card-body">
+          정보통신서비스 제공자의 보안 의무를 규정.<br><br>
+          <b>주요 내용:</b><br>
+          · 개인정보 보호 의무<br>
+          · 정보보호 관리체계(ISMS) 인증 의무화<br>
+          · 악성프로그램 유포 금지<br>
+          · 침해 사고 신고 의무 (24시간 내)<br><br>
+          <b>ISMS 의무 대상:</b> ISP, IDC, 연간 매출 100억 이상 또는 일평균 이용자 100만 이상의 정보통신서비스 제공자.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">정보보안 관련 형사 처벌</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>해킹 (정보통신망법)</td><td>5년 이하 징역 또는 5000만원 이하 벌금</td></tr>
+            <tr><td>DDoS 공격</td><td>10년 이하 징역 또는 1억원 이하 벌금</td></tr>
+            <tr><td>악성 프로그램 유포</td><td>7년 이하 징역 또는 7000만원 이하 벌금</td></tr>
+            <tr><td>개인정보 유출 (과실)</td><td>과징금 + 과태료</td></tr>
+            <tr><td>개인정보 유출 (고의)</td><td>5년 이하 징역 또는 5000만원 이하 벌금</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cert-roadmap" class="ssec">
+    <div class="sec-title">학습 로드맵</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌱</span><span class="card-title">입문 (0~6개월)</span></div>
+        <div class="card-body">
+          <div class="tl">
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">네트워크 기초</div><div class="tl-body">TCP/IP, OSI 7계층, DNS, HTTP/HTTPS 이해. 교재: CompTIA Network+.</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">Linux 기초</div><div class="tl-body">파일 시스템, 권한, 프로세스, 네트워크 명령어. OverTheWire Bandit.</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">보안 개념</div><div class="tl-body">CIA 삼각형, 공격 유형, 방어 기초. CompTIA Security+ 공부.</div></div>
+            <div class="tl-item"><div class="tl-dot"></div><div class="tl-head">TryHackMe 학습 경로</div><div class="tl-body">Pre-Security → SOC Level 1 → Jr Penetration Tester.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌿</span><span class="card-title">중급 (6개월~2년)</span></div>
+        <div class="card-body">
+          <div class="tl">
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">웹 보안</div><div class="tl-body">OWASP Top 10 실습, Burp Suite 숙달, WebGoat, PortSwigger Web Security Academy.</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">네트워크 분석</div><div class="tl-body">Wireshark, tcpdump. 패킷 분석 CTF 문제 풀기.</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">HackTheBox 시작</div><div class="tl-body">Easy → Medium 머신. 워크스루 없이 도전.</div></div>
+            <div class="tl-item"><div class="tl-dot yel"></div><div class="tl-head">스크립팅</div><div class="tl-body">Python으로 보안 스크립트 작성. 네트워크 스캐너, 익스플로잇 자동화.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔥</span><span class="card-title">고급 (2년+)</span></div>
+        <div class="card-body">
+          · OSCP 취득 목표<br>
+          · CTF 대회 정기 참가 (DEFCON, 코드게이트 등)<br>
+          · 취약점 리서치·버그 바운티<br>
+          · 특화 분야 선택: 리버싱, 클라우드 보안, ICS/SCADA, 모바일<br>
+          · 컨퍼런스: DEFCON, Black Hat, CODEGATE, HITCON
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💰</span><span class="card-title">버그 바운티</span></div>
+        <div class="card-body">
+          기업이 취약점 발견자에게 포상금 지급하는 프로그램.<br><br>
+          <b>플랫폼:</b> HackerOne, Bugcrowd, Intigriti, 국내 KISA 신고.<br><br>
+          <b>시작:</b> 공개 프로그램 → 스코프 이해 → 정찰 → 보고서 작성.<br><br>
+          <b>보고서 핵심:</b> 재현 단계, 영향도, 개념 증명(PoC).
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📚</span><span class="card-title">추천 학습 자료</span></div>
+        <div class="card-body">
+          <table class="tbl">
+            <tr><td>서적</td><td>해킹 입문: "Hacking: The Art of Exploitation"<br>웹 보안: "The Web Application Hacker's Handbook"<br>국내: "화이트해커를 위한 웹 해킹의 기술"</td></tr>
+            <tr><td>온라인</td><td>PortSwigger Academy (무료), TCM Security, PentesterLab</td></tr>
+            <tr><td>유튜브</td><td>John Hammond, IppSec (HTB 워크스루), NetworkChuck</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('sec-' + id).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+function showSub(tab, sub) {
+  const sec = document.getElementById('sec-' + tab);
+  sec.querySelectorAll('.ssec').forEach(s => s.classList.remove('on'));
+  sec.querySelectorAll('.stab').forEach(t => t.classList.remove('on'));
+  document.getElementById(tab + '-' + sub).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+function toggleAcc(head) {
+  head.classList.toggle('open');
+  head.nextElementSibling.classList.toggle('open');
+}
+
+// Search
+const searchEl = document.getElementById('search');
+const hitCnt = document.getElementById('hit-cnt');
+let st;
+searchEl.addEventListener('input', () => { clearTimeout(st); st = setTimeout(doSearch, 200); });
+
+function doSearch() {
+  const q = searchEl.value.trim().toLowerCase();
+  document.querySelectorAll('.highlight').forEach(el => { el.outerHTML = el.innerHTML; });
+  hitCnt.textContent = '';
+  if (!q) return;
+  let count = 0;
+  document.querySelectorAll('.card,.owasp-item,.cert-card,.tl-item').forEach(card => {
+    if (card.textContent.toLowerCase().includes(q)) { count++; hlText(card, q); }
+  });
+  hitCnt.textContent = count ? count + ' 결과' : '없음';
+}
+function hlText(el, q) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let n;
+  while (n = walker.nextNode()) nodes.push(n);
+  nodes.forEach(tn => {
+    const t = tn.textContent, l = t.toLowerCase(), i = l.indexOf(q);
+    if (i === -1) return;
+    const sp = document.createElement('span');
+    sp.innerHTML = esc(t.slice(0,i)) + '<span class="highlight">' + esc(t.slice(i,i+q.length)) + '</span>' + esc(t.slice(i+q.length));
+    tn.parentNode.replaceChild(sp, tn);
+  });
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

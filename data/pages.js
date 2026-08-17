@@ -508,5 +508,12 @@ const PAGES = {
     desc  : '게임 에셋(2D/3D/사운드) · 아이콘 · 폰트 · 이미지 · AI API · 공개 데이터 · 소셜 · 이메일 · 인증 · 결제 · DB · 지도 · 번역 — 180+ 리소스',
   },
 
-  // 72 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
+  72: {
+    label : 'AI 도구 극한 활용법',
+    url   : 'pages/72/',
+    thumb : null,
+    desc  : 'ChatGPT · Gemini · Claude · NotebookLM · Perplexity — 무료 계정 완전 공략, 프롬프트 기법, 용도별 추천, AI별 꿀팁 총정리',
+  },
+
+  // 73 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
 };

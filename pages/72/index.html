@@ -18,6 +18,7 @@
   --cla:#cc7a52;--cla2:#ff9966;--cla3:rgba(204,122,82,.14);
   --nlm:#1a73e8;--nlm2:#5599ff;--nlm3:rgba(26,115,232,.14);
   --ppx:#20b2aa;--ppx2:#3de0d6;--ppx3:rgba(32,178,170,.14);
+  --use:#9b5de5;--use2:#c77dff;--use3:rgba(155,93,229,.14);
 }
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
@@ -44,6 +45,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .tab.t-cla.on{background:var(--cla3);border-color:rgba(204,122,82,.4);color:var(--cla2);}
 .tab.t-nlm.on{background:var(--nlm3);border-color:rgba(26,115,232,.4);color:var(--nlm2);}
 .tab.t-ppx.on{background:var(--ppx3);border-color:rgba(32,178,170,.4);color:var(--ppx2);}
+.tab.t-use.on{background:var(--use3);border-color:rgba(155,93,229,.4);color:var(--use2);}
 
 /* CONTENT */
 #main{padding:18px;max-width:1400px;margin:0 auto;}
@@ -63,6 +65,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .stabs.nlm .stab.on{background:var(--nlm3);border-color:rgba(26,115,232,.4);color:var(--nlm2);}
 .stabs.ppx .stab.on{background:var(--ppx3);border-color:rgba(32,178,170,.4);color:var(--ppx2);}
 .stabs.all .stab.on{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--txt);}
+.stabs.use .stab.on{background:var(--use3);border-color:rgba(155,93,229,.4);color:var(--use2);}
+.card.use{border-left:3px solid var(--use);}.card.use .card-title{color:var(--use2);}
 
 /* GRID */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;}
@@ -176,6 +180,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <button class="tab t-cla" onclick="showTab('cla')">🟠 Claude</button>
   <button class="tab t-nlm" onclick="showTab('nlm')">📓 NotebookLM</button>
   <button class="tab t-ppx" onclick="showTab('ppx')">🔍 Perplexity</button>
+  <button class="tab t-use" onclick="showTab('use')">🎯 분야별 팁</button>
 </nav>
 
 <div id="main">
@@ -1587,6 +1592,736 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 </section>
 
 </div>
+
+<!-- ========== 분야별 팁 ========== -->
+<section id="sec-use" class="sec">
+  <div class="sec-hdr">
+    <div class="ai-badge">
+      <span class="ai-icon">🎯</span>
+      <div>
+        <div class="ai-name" style="color:var(--use2);">분야별 AI 활용 팁</div>
+        <div style="font-size:11px;color:var(--use);font-weight:600;">소설 창작 · 그림/이미지 · 공부/학습 · 게임 · 기타 분야</div>
+      </div>
+    </div>
+    <div class="ai-desc">하는 일마다 AI를 어떻게 다르게 써야 하는지. 각 분야에 최적화된 프롬프트와 워크플로우 정리.</div>
+  </div>
+
+  <div class="stabs use">
+    <button class="stab on" onclick="showSub('use','novel')">📖 소설 창작</button>
+    <button class="stab" onclick="showSub('use','art')">🎨 그림/이미지</button>
+    <button class="stab" onclick="showSub('use','study')">📚 공부/학습</button>
+    <button class="stab" onclick="showSub('use','game')">🎮 게임</button>
+    <button class="stab" onclick="showSub('use','etc')">✨ 기타 분야</button>
+  </div>
+
+  <!-- 소설 창작 -->
+  <div id="use-novel" class="ssec on">
+    <div style="margin-bottom:14px;">
+      <span style="font-size:13px;color:var(--txt2);">추천 AI: </span>
+      <span class="badge" style="background:var(--cla3);color:var(--cla2);border:1px solid rgba(204,122,82,.3);">Claude (1위)</span>
+      <span class="badge" style="background:var(--gpt3);color:var(--gpt2);border:1px solid rgba(16,163,127,.3);">ChatGPT (2위)</span>
+      <span style="font-size:11px;color:var(--txt3);margin-left:6px;">— 긴 문맥 유지·지시 준수·자연스러운 문체</span>
+    </div>
+    <div class="grid">
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🌍</span><span class="card-title">세계관 구축 프롬프트</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">세계관 설계</div>
+            <div class="prompt-text">판타지 소설의 세계관을 만들어줘.
+
+장르: <span class="prompt-var">[판타지/SF/현대물/역사]</span>
+분위기: <span class="prompt-var">[어둡고 잔인한/따뜻한/디스토피아]</span>
+주요 갈등: <span class="prompt-var">[인간vs마법/계급 갈등/외계 침략]</span>
+
+다음 항목을 구체적으로 만들어줘:
+1. 지리 (대륙·나라·주요 도시)
+2. 역사 (과거 주요 사건 3가지)
+3. 마법/기술 체계 (규칙과 한계 포함)
+4. 사회 구조 (계급·종족·종교)
+5. 내가 앞으로 확장할 수 있는 미지의 영역</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">👤</span><span class="card-title">캐릭터 설정 시트</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">캐릭터 심층 설계</div>
+            <div class="prompt-text">소설 주인공의 캐릭터 시트를 만들어줘.
+
+역할: <span class="prompt-var">[주인공/악당/조력자]</span>
+배경: <span class="prompt-var">[간단한 설정]</span>
+
+항목:
+• 외형 (인상적인 특징 위주로)
+• 성격 (강점 2개, 결점 2개)
+• 핵심 욕망 (진짜로 원하는 것)
+• 표면적 목표 (겉으로 드러나는 것)
+• 트라우마나 과거의 상처
+• 말투 특징 (대사에서 쓸 수 있는 버릇)
+• 이 캐릭터가 절대 안 하는 행동
+
+독자가 공감하면서도 입체적으로 느낄 수 있게.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📋</span><span class="card-title">플롯 구조화</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">스토리 구조 (3막 기반)</div>
+            <div class="prompt-text">내 소설 아이디어를 3막 구조로 짜줘.
+
+아이디어: <span class="prompt-var">[한두 줄로 설명]</span>
+장르: <span class="prompt-var">[장르]</span>
+타겟 독자: <span class="prompt-var">[대상]</span>
+
+1막 (설정): 주인공 소개·세계관·사건의 발단
+2막 (갈등): 주요 장애물, 중간 위기, 반전 포인트
+3막 (해결): 클라이맥스, 결말 유형 2가지 제안 (해피·새드)
+
+각 막마다 챕터 수 추천과 핵심 씬 1개씩 제안해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">✍️</span><span class="card-title">막힐 때 돌파하는 법</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">작가 블록 돌파</div>
+            <div class="prompt-text">지금 이 장면에서 막혔어.
+
+현재 상황:
+<span class="prompt-var">[어디서 막혔는지 설명]</span>
+
+등장인물들: <span class="prompt-var">[이름·관계]</span>
+
+다음 중 선택해줘:
+A. 이 장면을 이어갈 방향 3가지 제안
+B. 이 장면을 건너뛰고 다음으로 넘어가는 브리지 문장
+C. 이 장면을 다른 인물 시점으로 쓰면 어떻게 되는지</div>
+          </div>
+          <div class="tip tip-gold">막힌 장면을 "일단 요약 버전으로 써줘"라고 요청해서 초안을 받고, 나중에 살을 붙이는 방법도 효과적.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">긴 소설 일관성 유지법</span></div>
+        <div class="card-body">
+          AI는 대화가 길어지면 초반 설정을 잊는다. 일관성을 유지하는 방법:<br><br>
+          <div class="steps">
+            <div class="step"><div class="step-num" style="background:var(--use3);color:var(--use2);">1</div><div class="step-body"><b>캐릭터 바이블 파일</b>을 따로 만든다. 각 대화 시작 때 "아래 설정을 기억하고 시작해줘"와 함께 붙여넣기.</div></div>
+            <div class="step"><div class="step-num" style="background:var(--use3);color:var(--use2);">2</div><div class="step-body">Claude의 <b>Projects 기능</b>에 세계관·캐릭터 시트를 업로드해두면 매번 붙여넣을 필요 없다.</div></div>
+            <div class="step"><div class="step-num" style="background:var(--use3);color:var(--use2);">3</div><div class="step-body">챕터 완성 후 <b>"이 챕터에서 달라진 설정이 있으면 알려줘"</b>로 변경 사항 추적.</div></div>
+            <div class="step"><div class="step-num" style="background:var(--use3);color:var(--use2);">4</div><div class="step-body">NotebookLM에 완성된 챕터를 업로드 → <b>"3챕터와 현재 설정 사이에 모순이 있어?"</b>로 검수.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🪄</span><span class="card-title">문체·대사 개선</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">문장 품질 향상</div>
+            <div class="prompt-text">내가 쓴 이 단락을 개선해줘:
+
+<span class="prompt-var">[단락 붙여넣기]</span>
+
+요청:
+• 진부한 표현을 신선한 표현으로
+• 수동태를 능동태로 바꿔줘
+• 불필요한 부사 제거
+• 감각적 묘사 1문장 추가
+원래 내 문장의 흐름은 최대한 살려줘.</div>
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-label">캐릭터 말투 일관성</div>
+            <div class="prompt-text">이 캐릭터의 말투를 확인해줘.
+
+캐릭터 특징: <span class="prompt-var">[말투 특징 설명]</span>
+대화문: <span class="prompt-var">[대화 붙여넣기]</span>
+
+캐릭터답지 않은 대사를 찾아 수정안을 제시해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📝</span><span class="card-title">피드백 받기 (독자 시뮬레이션)</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">독자 반응 예측</div>
+            <div class="prompt-text">내가 쓴 이 장면을 <span class="prompt-var">[타겟 독자층]</span>의 입장에서 읽어줘.
+
+<span class="prompt-var">[장면 붙여넣기]</span>
+
+다음을 피드백해줘:
+• 몰입이 깨지는 순간
+• 캐릭터 행동이 납득 안 되는 부분
+• 지루해질 수 있는 부분
+• 가장 인상적인 부분
+칭찬보다 솔직한 비판을 원해.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">💬</span><span class="card-title">AI와 공동 집필하기</span></div>
+        <div class="card-body">
+          AI를 공동 작가로 사용하는 효과적인 방식:<br><br>
+          <b>방법 1 — 이어쓰기:</b><br>
+          내가 쓴 마지막 문단을 주고 "이어서 다음 장면을 써줘. 단, 내 문체와 같은 방식으로."<br><br>
+          <b>방법 2 — 초안 생성:</b><br>
+          씬의 목적과 감정을 주고 초안을 받은 뒤 내가 전면 수정. AI는 뼈대만 담당.<br><br>
+          <b>방법 3 — 브레인스토밍 파트너:</b><br>
+          플롯 결정을 못 할 때 "다음 중 어떤 결말이 더 문학적으로 설득력 있어?"로 의견 청취.<br><br>
+          <div class="tip tip-red">AI가 쓴 문장을 그대로 쓰지 마라. 반드시 내 손으로 고쳐야 내 소설이 된다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 그림/이미지 -->
+  <div id="use-art" class="ssec">
+    <div style="margin-bottom:14px;">
+      <span style="font-size:13px;color:var(--txt2);">이미지 생성 도구: </span>
+      <span class="badge" style="background:var(--gpt3);color:var(--gpt2);border:1px solid rgba(16,163,127,.3);">ChatGPT DALL-E</span>
+      <span class="badge" style="background:var(--gem3);color:var(--gem2);border:1px solid rgba(66,133,244,.3);">Gemini Imagen</span>
+      <span class="badge new">Midjourney</span>
+      <span class="badge" style="background:rgba(255,80,80,.12);color:#ff8888;border:1px solid rgba(255,80,80,.3);">Stable Diffusion</span>
+    </div>
+    <div class="grid">
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🖼️</span><span class="card-title">이미지 생성 프롬프트 기초</span></div>
+        <div class="card-body">
+          좋은 이미지 프롬프트의 구조:<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">프롬프트 공식</div>
+            <div class="prompt-text"><span class="kw">[주제]</span>, <span class="kw">[스타일]</span>, <span class="kw">[구도]</span>, <span class="kw">[조명]</span>, <span class="kw">[색감]</span>, <span class="kw">[품질 태그]</span>
+
+예시:
+A young woman with silver hair standing in a rainy city at night, anime style, low angle shot, neon lighting, dark blue and pink color palette, highly detailed, cinematic</div>
+          </div>
+          <b>스타일 키워드:</b> anime / oil painting / watercolor / pixel art / photorealistic / concept art / illustration<br><br>
+          <b>구도 키워드:</b> close-up / wide shot / bird's eye view / low angle / portrait<br><br>
+          <b>조명 키워드:</b> golden hour / neon lighting / dramatic shadows / soft diffused light
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🤖</span><span class="card-title">ChatGPT로 프롬프트 생성하기</span></div>
+        <div class="card-body">
+          이미지 생성 프롬프트 자체를 AI에게 써달라고 할 수 있다.<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">프롬프트 생성 요청</div>
+            <div class="prompt-text">이런 이미지를 만들고 싶어:
+<span class="prompt-var">[원하는 이미지를 한국어로 설명]</span>
+
+DALL-E / Midjourney에 쓸 영어 프롬프트를 만들어줘.
+스타일, 구도, 조명, 분위기를 자세하게 포함해서.
+긍정적 표현(무엇을 그려라)으로만 써줘.
+부정 프롬프트(그리지 말 것)도 따로 5개 줘.</div>
+          </div>
+          <div class="tip tip-gold">한국어로 대략적인 그림을 설명하면 AI가 최적화된 영어 프롬프트를 만들어준다.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">스타일 일관성 유지하기</span></div>
+        <div class="card-body">
+          여러 장의 그림에서 스타일을 통일시키는 방법:<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">스타일 고정 프롬프트</div>
+            <div class="prompt-text"><span class="cm"># 스타일을 먼저 정의하고 저장</span>
+내 소설의 삽화 스타일:
+- 배경: 수채화 질감, 파스텔 색조
+- 캐릭터: 세미리얼 애니메이션, 눈이 큰 편
+- 조명: 항상 따뜻한 자연광
+- 선: 부드럽고 깔끔한 선화
+
+이 스타일로 <span class="prompt-var">[다음 씬]</span>을 그리는 프롬프트 만들어줘.</div>
+          </div>
+          <b>팁:</b> 성공한 프롬프트는 반드시 메모해두고, 다음 그림에 "이전 프롬프트에서 배경만 바꿔줘" 방식으로 활용.
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">이미지 분석으로 레퍼런스 활용</span></div>
+        <div class="card-body">
+          마음에 드는 그림을 AI에게 분석시켜 그 스타일을 뽑아낸다.<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">스타일 역분석</div>
+            <div class="prompt-text">[이미지 첨부]
+
+이 그림의 시각적 스타일을 분석해줘:
+• 그림체/화풍
+• 색 팔레트 (주요 색 3~5가지)
+• 선 처리 방식
+• 조명과 그림자
+• 분위기를 만드는 요소
+
+이 스타일로 새 이미지를 만들 수 있는 AI 프롬프트를 써줘.</div>
+          </div>
+          <div class="tip tip-red">타인의 작품 스타일 분석은 학습용으로만. 그 아티스트의 이름을 직접 프롬프트에 쓰는 건 삼가는 게 좋다.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">✏️</span><span class="card-title">직접 그릴 때 AI 보조</span></div>
+        <div class="card-body">
+          이미지 생성 말고, 실제로 그림을 그릴 때 AI를 활용하는 방법:<br><br>
+          <b>구도 조언:</b><br>
+          "이 씬을 그리려는데 캐릭터 2명이 대화하는 구도를 3가지 제안해줘"<br><br>
+          <b>색조합 제안:</b><br>
+          "우울한 분위기의 실내 씬에 어울리는 색 팔레트 3가지를 HEX 코드로 줘"<br><br>
+          <b>원근법 도움:</b><br>
+          "3점 투시로 빌딩 아래를 올려다보는 구도를 어떻게 잡는지 단계별로 설명해줘"<br><br>
+          <b>참고 자료 찾기:</b> Perplexity로 "실제 사진 레퍼런스" 검색해서 구도·빛 참고.
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🚫</span><span class="card-title">무료 생성의 한계와 대안</span></div>
+        <div class="card-body">
+          <b>ChatGPT DALL-E 무료:</b> 하루 2~3장, 품질 좋음<br>
+          <b>Gemini Imagen 무료:</b> 일부 지역, 장수 제한<br><br>
+          <b>추가 무료 이미지 생성 도구:</b><br>
+          · <b>Adobe Firefly</b> — 매월 무료 크레딧 (저작권 안전)<br>
+          · <b>Bing Image Creator</b> — DALL-E 3 기반, 무료 (마이크로소프트 계정)<br>
+          · <b>Leonardo.ai</b> — 매일 일정 크레딧 무료<br>
+          · <b>Canva AI</b> — 무료 플랜에서 일부 생성 가능<br>
+          · <b>Stable Diffusion</b> — 로컬 설치시 무제한 (GPU 필요)<br><br>
+          <div class="tip tip-gold">Bing Image Creator는 ChatGPT Plus 없이도 DALL-E 3를 무료로 쓸 수 있는 최고의 방법.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공부/학습 -->
+  <div id="use-study" class="ssec">
+    <div style="margin-bottom:14px;">
+      <span style="font-size:13px;color:var(--txt2);">추천 조합: </span>
+      <span class="badge" style="background:var(--nlm3);color:var(--nlm2);border:1px solid rgba(26,115,232,.3);">NotebookLM (자료 기반)</span>
+      <span class="badge" style="background:var(--cla3);color:var(--cla2);border:1px solid rgba(204,122,82,.3);">Claude (개념 설명)</span>
+      <span class="badge" style="background:var(--ppx3);color:var(--ppx2);border:1px solid rgba(32,178,170,.3);">Perplexity (최신 정보)</span>
+    </div>
+    <div class="grid">
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🎓</span><span class="card-title">AI를 개인 튜터로 설정하기</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">튜터 설정 프롬프트</div>
+            <div class="prompt-text">지금부터 <span class="prompt-var">[과목/주제]</span> 개인 튜터야.
+
+내 현재 수준: <span class="prompt-var">[초보/중급/고급]</span>
+목표: <span class="prompt-var">[시험 합격/개념 이해/실무 적용]</span>
+기간: <span class="prompt-var">[2주/한 달]</span>
+
+규칙:
+• 내가 모른다고 하면 더 쉽게 설명해줘
+• 설명 후 반드시 확인 문제 1개를 내줘
+• 내 답이 틀리면 바로 답 주지 말고 힌트 먼저
+• 잘 했을 때도 칭찬보다 더 어려운 응용 문제로 발전</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🧠</span><span class="card-title">소크라테스 문답으로 진짜 이해</span></div>
+        <div class="card-body">
+          단순히 설명을 듣는 게 아니라, 질문을 받으며 스스로 깨닫는 방식.<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">소크라테스 방식 요청</div>
+            <div class="prompt-text"><span class="prompt-var">[개념]</span>을 소크라테스 방식으로 가르쳐줘.
+
+설명하지 말고, 나에게 질문을 해서 내가 스스로 개념을 발견하게 유도해줘. 내가 막히면 그때 힌트를 줘.</div>
+          </div>
+          <div class="tip tip-gold">시험 전날 벼락치기보다 이 방식으로 1시간 공부하는 게 훨씬 오래 기억된다.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">❓</span><span class="card-title">퀴즈·모의고사 생성</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">커스텀 퀴즈</div>
+            <div class="prompt-text">내가 공부한 <span class="prompt-var">[범위/주제]</span>에서 퀴즈를 만들어줘.
+
+형식:
+• 객관식 5문제 (4지선다)
+• 단답형 3문제
+• 서술형 2문제 (핵심 키워드 포함 여부로 채점)
+
+난이도: <span class="prompt-var">[쉬움/보통/어려움]</span>
+답은 모든 문제 끝난 후에 한꺼번에 보여줘.</div>
+          </div>
+          <div class="tip tip-blue">NotebookLM에 교재를 올리고 "이 챕터에서 퀴즈 만들어줘"가 가장 정확한 방법.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🗂️</span><span class="card-title">암기 자료 자동 생성</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">플래시카드 생성</div>
+            <div class="prompt-text">다음 내용으로 플래시카드를 만들어줘:
+
+<span class="prompt-var">[공부할 내용 붙여넣기]</span>
+
+형식: Q: [질문] / A: [답]
+• 중요 개념 정의 10개
+• 비교해야 할 것 5쌍
+• 공식/법칙 5개
+
+Anki에 바로 붙여넣을 수 있게 탭으로 구분해서 줘.</div>
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-label">연상 기억법</div>
+            <div class="prompt-text"><span class="prompt-var">[외울 것]</span>을 기억하기 쉬운 방법으로 알려줘. 두문자어, 스토리, 비유, 시각적 이미지 등 여러 방법을 제안해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🔬</span><span class="card-title">어려운 개념 쉽게 이해하기</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">레벨별 설명</div>
+            <div class="prompt-text"><span class="prompt-var">[어려운 개념]</span>을 설명해줘.
+
+먼저 일상의 비유로 한 줄 설명.
+그 다음 내가 이미 아는 <span class="prompt-var">[관련 개념]</span>에 연결해서 설명.
+마지막으로 실제로 어디에 쓰이는지 예시 1개.</div>
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-label">오개념 교정</div>
+            <div class="prompt-text">내가 <span class="prompt-var">[개념]</span>에 대해 이렇게 이해하고 있어:
+<span class="prompt-var">[내 설명]</span>
+
+내 이해가 맞는지 틀린지 검사하고, 틀린 부분을 정확하게 교정해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🌍</span><span class="card-title">영어 공부 특화 팁</span></div>
+        <div class="card-body">
+          <b>회화 연습:</b><br>
+          <div class="prompt-box">
+            <div class="prompt-label">영어 대화 파트너</div>
+            <div class="prompt-text">지금부터 영어로만 대화해. 내가 틀린 표현을 쓰면 자연스럽게 교정된 표현으로 답하되, 대화 흐름은 끊지 마. 내 수준: <span class="prompt-var">[초급/중급]</span>. 주제: <span class="prompt-var">[일상/비즈니스/여행]</span></div>
+          </div>
+          <b>단어 문맥 학습:</b><br>
+          "이 영어 단어들을 예문과 함께 알려줘. 비슷한 단어들의 미묘한 차이도 설명해줘."<br><br>
+          <b>작문 교정:</b><br>
+          "내 영어 작문을 첨삭해줘. 수정한 이유도 한국어로 설명해줘."
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📊</span><span class="card-title">수학·과학 문제 풀이</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">단계별 풀이 요청</div>
+            <div class="prompt-text">이 문제를 풀어줘:
+<span class="prompt-var">[문제 붙여넣기]</span>
+
+조건:
+• 단계를 최대한 잘게 나눠서 설명
+• 각 단계에서 왜 그 방법을 쓰는지 이유 포함
+• 비슷한 유형의 문제를 풀 때 쓸 수 있는 일반적인 공식/전략 알려줘
+• 내가 자주 실수하는 포인트도 알려줘</div>
+          </div>
+          <div class="tip tip-blue">수식이 있는 문제는 사진 찍어서 이미지로 올리면 빠르다. ChatGPT와 Claude 모두 수식 이미지 인식 가능.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📅</span><span class="card-title">학습 계획 세우기</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">커스텀 학습 플랜</div>
+            <div class="prompt-text">나에게 맞는 학습 계획을 짜줘.
+
+목표: <span class="prompt-var">[자격증/시험/기술 습득]</span>
+시험일/데드라인: <span class="prompt-var">[날짜]</span>
+하루 가용 시간: <span class="prompt-var">[1시간/2시간]</span>
+현재 수준: <span class="prompt-var">[설명]</span>
+약점 과목: <span class="prompt-var">[과목명]</span>
+
+주차별 커리큘럼을 표로 만들어줘. 마지막 1~2주는 반드시 복습·모의고사 기간으로.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게임 -->
+  <div id="use-game" class="ssec">
+    <div style="margin-bottom:14px;">
+      <span style="font-size:13px;color:var(--txt2);">추천 AI: </span>
+      <span class="badge" style="background:var(--ppx3);color:var(--ppx2);border:1px solid rgba(32,178,170,.3);">Perplexity (공략·최신)</span>
+      <span class="badge" style="background:var(--cla3);color:var(--cla2);border:1px solid rgba(204,122,82,.3);">Claude (시나리오·롤플레이)</span>
+      <span class="badge" style="background:var(--gpt3);color:var(--gpt2);border:1px solid rgba(16,163,127,.3);">ChatGPT (게임 개발)</span>
+    </div>
+    <div class="grid">
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🗺️</span><span class="card-title">게임 공략 정보 수집</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">공략 요청 (Perplexity 추천)</div>
+            <div class="prompt-text"><span class="prompt-var">[게임 이름]</span>에서 <span class="prompt-var">[구간/보스/시스템]</span> 공략법 알려줘.
+
+내 상황:
+• 캐릭터/직업: <span class="prompt-var">[정보]</span>
+• 현재 레벨/장비: <span class="prompt-var">[정보]</span>
+• 막힌 이유: <span class="prompt-var">[설명]</span>
+
+패턴 공략, 추천 빌드, 주의할 점 포함해줘. 최신 패치 기준으로.</div>
+          </div>
+          <div class="tip tip-gold">Perplexity로 검색하면 최신 패치 반영된 정보 + 공식 위키/커뮤니티 출처를 함께 볼 수 있다.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">빌드 최적화 조언</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">빌드 분석 요청</div>
+            <div class="prompt-text"><span class="prompt-var">[게임 이름]</span> <span class="prompt-var">[캐릭터/직업]</span> 빌드를 분석해줘.
+
+내 현재 빌드:
+<span class="prompt-var">[스탯/스킬/장비 정보]</span>
+
+플레이 스타일: <span class="prompt-var">[공격적/서포터/솔로/파티]</span>
+주로 하는 컨텐츠: <span class="prompt-var">[PVP/레이드/솔로]</span>
+
+문제점과 개선안을 알려줘. 예산/파밍 난이도도 고려해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🎲</span><span class="card-title">TRPG / 롤플레이 진행</span></div>
+        <div class="card-body">
+          Claude는 TRPG 게임 마스터(GM)로 탁월하다.<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">TRPG 마스터 설정</div>
+            <div class="prompt-text">지금부터 TRPG 게임 마스터야.
+
+배경: <span class="prompt-var">[세계관 설명]</span>
+룰셋: <span class="prompt-var">[D&D 5e / 자유 형식]</span>
+내 캐릭터: <span class="prompt-var">[이름·직업·성격]</span>
+
+규칙:
+• 내 행동을 설명하면 결과를 서술해줘
+• 주요 판정은 "d20 굴리기" 요청해줘 (내가 숫자 입력)
+• 죽음의 위기도 적당히 넣어줘
+• NPC들에게 각각 다른 말투를 써줘
+
+이야기 시작해줘.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📖</span><span class="card-title">게임 시나리오 / 스토리 제작</span></div>
+        <div class="card-body">
+          자신만의 게임을 만들거나, 팬픽 시나리오를 쓸 때:<br><br>
+          <div class="prompt-box">
+            <div class="prompt-label">게임 스토리 설계</div>
+            <div class="prompt-text"><span class="prompt-var">[장르]</span> 게임의 스토리를 설계해줘.
+
+테마: <span class="prompt-var">[복수/성장/미스터리]</span>
+플레이어 역할: <span class="prompt-var">[주인공의 위치]</span>
+플레이 시간 목표: <span class="prompt-var">[5시간/20시간]</span>
+
+설계 항목:
+• 메인 퀘스트 흐름 (5단계)
+• 사이드 스토리 3개 (각 연결고리 포함)
+• 반전 포인트 2개
+• 선택지가 결말을 바꾸는 분기점 1개</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">💻</span><span class="card-title">게임 개발 보조</span></div>
+        <div class="card-body">
+          Unity, Godot, RPG Maker 등 게임 개발 시 AI 활용:<br><br>
+          <b>코드 작성:</b><br>
+          "Unity에서 캐릭터가 벽에 닿으면 튕기는 물리 코드 C#으로 짜줘"<br><br>
+          <b>버그 해결:</b><br>
+          "이 Godot 스크립트에서 NPC가 플레이어를 인식 못 하는 이유를 찾아줘 [코드 첨부]"<br><br>
+          <b>게임 디자인 밸런싱:</b><br>
+          "적의 HP와 데미지를 레벨별로 자연스럽게 스케일링하는 수식을 만들어줘. 플레이어 DPS는 50~200 범위야."<br><br>
+          <b>에셋 생성:</b><br>
+          "이 게임 배경음악의 BPM과 분위기를 Suno AI로 생성할 프롬프트 만들어줘"
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">📡</span><span class="card-title">게임 스트리밍/유튜브 보조</span></div>
+        <div class="card-body">
+          <b>스트리밍 대본:</b><br>
+          "오늘 [게임] 방송 오프닝 멘트 30초 분량으로 써줘. 에너지 넘치고 구독자에게 친근한 톤으로."<br><br>
+          <b>썸네일 문구:</b><br>
+          "이 클립의 유튜브 썸네일 텍스트를 5개 제안해줘. 클릭하고 싶게 짧고 임팩트 있게."<br><br>
+          <b>편집 포인트 추출:</b><br>
+          "이 방송 하이라이트 대본에서 유튜브 쇼츠로 쓸 수 있는 재미있는 순간 5개를 찾아줘."<br><br>
+          <b>챗 반응 이벤트 아이디어:</b><br>
+          "롤 방송에서 시청자가 참여할 수 있는 이벤트 10개 아이디어 줘."
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 기타 분야 -->
+  <div id="use-etc" class="ssec">
+    <div class="grid">
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🎵</span><span class="card-title">음악 작곡·작사</span></div>
+        <div class="card-body">
+          <b>작사:</b><br>
+          <div class="prompt-box">
+            <div class="prompt-label">가사 작성</div>
+            <div class="prompt-text">이 곡의 가사를 써줘.
+
+장르: <span class="prompt-var">[장르]</span>
+분위기: <span class="prompt-var">[감정/테마]</span>
+구조: 벌스 2개 / 프리코러스 / 코러스 / 브릿지
+언어: 한국어 (영어 후크 라인 1개 포함)
+피해야 할 표현: <span class="prompt-var">[진부한 표현 등]</span></div>
+          </div>
+          <b>코드 진행 제안:</b><br>
+          "I, IV, V, vi를 기반으로 [장르]에 어울리는 코드 진행 3가지 제안해줘. 각각 분위기 설명 포함."<br><br>
+          <b>AI 작곡 도구:</b> Suno, Udio (무료 크레딧), Mureka
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🎬</span><span class="card-title">영상 제작 보조</span></div>
+        <div class="card-body">
+          <b>스크립트 작성:</b><br>
+          "이 유튜브 영상의 대본을 써줘. 주제: [주제], 길이: 10분 분량, 대상: [시청자], 훅(첫 30초)과 CTA(마지막 30초) 포함."<br><br>
+          <b>편집 순서 설계:</b><br>
+          "이 인터뷰 영상을 편집할 편집 포인트를 알려줘. [대본 붙여넣기]"<br><br>
+          <b>AI 영상 생성 도구:</b><br>
+          · Runway (무료 크레딧)<br>
+          · Kling AI (무료 티어)<br>
+          · Google Veo 2 (Gemini에서 일부 접근)<br><br>
+          <b>자막 파일 번역:</b><br>
+          "이 .srt 자막 파일을 한국어로 번역해줘. [파일 내용 붙여넣기]"
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">✈️</span><span class="card-title">여행 계획</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">여행 플래너</div>
+            <div class="prompt-text"><span class="prompt-var">[목적지]</span> 여행 일정을 짜줘.
+
+기간: <span class="prompt-var">[N박 N일]</span>
+예산: <span class="prompt-var">[총 예산]</span>
+여행 스타일: <span class="prompt-var">[관광지 위주/맛집 투어/자연/쇼핑]</span>
+동행: <span class="prompt-var">[혼자/커플/가족/친구]</span>
+이동 수단: <span class="prompt-var">[대중교통만/렌터카]</span>
+
+일차별 일정 + 예상 비용 + 숙소 구역 추천. Perplexity에서 최신 가격 확인 추천.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🍳</span><span class="card-title">요리·레시피</span></div>
+        <div class="card-body">
+          <b>냉장고 파먹기:</b><br>
+          "냉장고에 [재료들]만 있어. 30분 안에 만들 수 있는 한 끼 레시피 3개 알려줘."<br><br>
+          <b>레시피 변환:</b><br>
+          "이 레시피를 채식으로 변환해줘. [레시피 붙여넣기]"<br><br>
+          <b>이미지 → 레시피:</b><br>
+          "이 음식 사진을 보고 레시피를 추측해줘. [사진 첨부]"<br><br>
+          <b>영양 분석:</b><br>
+          "내가 오늘 먹은 것들의 칼로리와 영양소를 분석해줘: [메뉴 목록]"<br><br>
+          <b>식단 계획:</b><br>
+          "1주일 식단을 짜줘. 조건: 하루 1800kcal, 단백질 위주, 한식 5일·양식 2일."
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">💪</span><span class="card-title">운동·건강</span></div>
+        <div class="card-body">
+          <div class="prompt-box">
+            <div class="prompt-label">맞춤 운동 루틴</div>
+            <div class="prompt-text">나에게 맞는 운동 루틴을 짜줘.
+
+목표: <span class="prompt-var">[다이어트/근육/체력]</span>
+현재 상태: <span class="prompt-var">[키·몸무게·운동 경력]</span>
+장소: <span class="prompt-var">[헬스장/집/공원]</span>
+주 운동 가능 횟수: <span class="prompt-var">[N회]</span>
+부상/제한 사항: <span class="prompt-var">[무릎 약함 등]</span>
+
+세트·횟수·세트 간 휴식시간까지 구체적으로.</div>
+          </div>
+          <div class="tip tip-red">AI의 건강·의학 정보는 참고용. 만성 질환이나 부상이 있다면 반드시 전문의와 상담해라.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">💰</span><span class="card-title">재테크·투자 정보 수집</span></div>
+        <div class="card-body">
+          <b>개념 학습:</b><br>
+          "ETF, 배당주, 채권의 차이를 초보자에게 설명해줘. 각각 언제 유리한지 포함."<br><br>
+          <b>최신 정보:</b><br>
+          Perplexity로 "현재 [종목/자산] 전망" 검색 → 출처 포함 최신 분석 수집<br><br>
+          <b>정보 정리:</b><br>
+          "이 기업의 실적 발표 자료를 요약해줘. [PDF 첨부 또는 내용 붙여넣기]"<br><br>
+          <div class="tip tip-red">AI는 투자 조언을 할 수 없다. 정보 수집과 개념 이해에만 활용하고, 실제 투자 결정은 직접 해라.</div>
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🧑‍💻</span><span class="card-title">취업·커리어</span></div>
+        <div class="card-body">
+          <b>자기소개서:</b><br>
+          <div class="prompt-box">
+            <div class="prompt-label">자소서 작성</div>
+            <div class="prompt-text">자기소개서 초안을 써줘.
+
+지원 회사: <span class="prompt-var">[회사명·산업]</span>
+지원 직무: <span class="prompt-var">[포지션]</span>
+내 경험: <span class="prompt-var">[경험·스킬 나열]</span>
+강조하고 싶은 것: <span class="prompt-var">[핵심 강점]</span>
+분량: <span class="prompt-var">[800자/1500자]</span>
+
+STAR 기법(상황·과제·행동·결과)으로 구체적 에피소드 포함.</div>
+          </div>
+          <b>면접 준비:</b><br>
+          "이 직무에서 자주 나오는 면접 질문 20개를 예상하고, 내 경험 [경험 설명]을 바탕으로 모범 답변 초안을 써줘."
+        </div>
+      </div>
+
+      <div class="card use">
+        <div class="card-head"><span class="card-icon">🧘</span><span class="card-title">일상 생산성</span></div>
+        <div class="card-body">
+          <b>할 일 우선순위 정리:</b><br>
+          "오늘 해야 할 일 목록이야: [목록]. 아이젠하워 매트릭스로 분류하고 처리 순서 추천해줘."<br><br>
+          <b>이메일·메시지 초안:</b><br>
+          "이 상황에서 보낼 정중한 거절 메시지를 써줘: [상황]"<br><br>
+          <b>회의 요약:</b><br>
+          "이 회의 내용을 요약해줘. 결정 사항, 담당자, 다음 행동 항목 구분해서. [회의록 붙여넣기]"<br><br>
+          <b>아이디어 구체화:</b><br>
+          "이 막연한 아이디어를 실행 가능한 계획으로 만들어줘: [아이디어]"
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
 function showTab(id) {

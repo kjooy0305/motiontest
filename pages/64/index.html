@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로젝트 문 세계관 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#08060c;--bg2:#0f0c18;--bg3:#181224;--bg4:#221a34;
+  --border:#2a1e3a;--border2:#4a2840;
+  --txt:#e8e0f0;--txt2:#9a8aaa;--txt3:#5a4868;
+  --red:#cc2233;--red2:#ff3344;--red3:rgba(204,34,51,.15);
+  --gold:#c89030;--gold2:#f0b840;--gold3:rgba(200,144,48,.12);
+  --pur:#7733cc;--pur2:#aa55ff;
+  --grn:#33aa55;--blu:#3388cc;--cya:#33aacc;
+  --yel:#f0c030;
+  --aleph:#ff2244;--waw:#ff7700;--he:#eecc00;--teth:#44ccaa;--zayin:#7788aa;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#050309 0%,#0a0515 50%,#050309 100%);border-bottom:2px solid var(--red);padding:12px 20px;position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+#hdr-logo{font-size:24px;filter:drop-shadow(0 0 12px var(--red));}
+#hdr h1{font-size:17px;font-weight:700;color:var(--gold2);white-space:nowrap;text-shadow:0 0 20px rgba(200,144,48,.5);letter-spacing:.5px;}
+#hdr .sub{font-size:11px;color:var(--txt2);white-space:nowrap;}
+#search{flex:1;min-width:160px;max-width:340px;padding:6px 12px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;outline:none;}
+#search:focus{border-color:var(--red);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+.highlight{background:rgba(204,34,51,.3);border-radius:2px;}
+
+/* MAIN TABS */
+#tabs{display:flex;gap:3px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:200;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 16px;border-radius:5px;border:1px solid transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--red3);border-color:rgba(204,34,51,.4);color:var(--red2);}
+
+/* CONTENT */
+#main{padding:18px;max-width:1400px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+
+/* SUB TABS */
+.stabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap;}
+.stab{padding:4px 12px;border-radius:4px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;color:var(--txt3);white-space:nowrap;background:var(--bg3);transition:.1s;font-family:inherit;}
+.stab:hover{color:var(--txt2);border-color:var(--border2);}
+.stab.on{background:var(--gold3);border-color:rgba(200,144,48,.4);color:var(--gold2);}
+.ssec{display:none;}.ssec.on{display:block;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:.12s;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.card-icon{font-size:18px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--gold2);}
+.card-sub{font-size:11px;color:var(--txt3);margin-bottom:6px;}
+.card-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+.card-body b{color:var(--txt);font-weight:600;}
+.card-body .tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-right:4px;margin-bottom:2px;}
+
+/* TIER BADGES */
+.aleph{background:rgba(255,34,68,.2);color:var(--aleph);border:1px solid rgba(255,34,68,.4);}
+.waw{background:rgba(255,119,0,.15);color:var(--waw);border:1px solid rgba(255,119,0,.35);}
+.he{background:rgba(238,204,0,.12);color:var(--he);border:1px solid rgba(238,204,0,.3);}
+.teth{background:rgba(68,204,170,.1);color:var(--teth);border:1px solid rgba(68,204,170,.25);}
+.zayin{background:rgba(119,136,170,.1);color:var(--zayin);border:1px solid rgba(119,136,170,.2);}
+
+/* SECTION TITLE */
+.sec-title{font-size:18px;font-weight:700;color:var(--gold2);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:20px;background:var(--red);border-radius:2px;}
+.sec-sub{font-size:12px;color:var(--txt2);margin-bottom:18px;line-height:1.7;}
+
+/* ACCORDION */
+.acc{margin-bottom:8px;border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.acc-head{padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg3);font-size:12px;font-weight:600;color:var(--txt2);user-select:none;transition:.1s;}
+.acc-head:hover{background:var(--bg4);color:var(--txt);}
+.acc-head.open{color:var(--gold2);}
+.acc-arr{transition:transform .2s;}
+.acc-head.open .acc-arr{transform:rotate(180deg);}
+.acc-body{display:none;padding:14px;background:var(--bg2);}
+.acc-body.open{display:block;}
+
+/* INFO TABLE */
+.info-table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0;}
+.info-table th{text-align:left;padding:5px 10px;background:var(--bg3);color:var(--gold2);font-weight:600;border-bottom:1px solid var(--border);}
+.info-table td{padding:5px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;}
+.info-table tr:last-child td{border-bottom:none;}
+.info-table td:first-child{color:var(--txt);font-weight:600;white-space:nowrap;min-width:90px;}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:24px;}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--red),var(--gold),var(--pur));}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg2);}
+.tl-dot.major{background:var(--gold2);width:12px;height:12px;left:-21px;box-shadow:0 0 8px var(--gold);}
+.tl-dot.minor{background:var(--txt3);width:8px;height:8px;left:-19px;}
+.tl-head{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.tl-era{font-size:10px;color:var(--red2);font-weight:600;margin-bottom:2px;}
+.tl-body{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+/* DIFF TABLE */
+.diff-table{width:100%;border-collapse:collapse;font-size:12px;}
+.diff-table th{padding:7px 12px;background:var(--bg4);color:var(--gold2);font-weight:600;border:1px solid var(--border);}
+.diff-table td{padding:7px 12px;border:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+.diff-table tr:nth-child(even) td{background:var(--bg3);}
+.diff-table td:first-child{color:var(--gold2);font-weight:600;white-space:nowrap;}
+
+/* SPOILER */
+.spoiler{background:var(--bg4);border-left:3px solid var(--red);padding:8px 12px;margin:8px 0;border-radius:0 5px 5px 0;font-size:12px;color:var(--txt2);}
+.spoiler .sp-label{font-size:10px;font-weight:700;color:var(--red2);margin-bottom:4px;}
+
+/* NOTICE */
+.notice{background:var(--gold3);border:1px solid rgba(200,144,48,.3);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--txt2);}
+.notice strong{color:var(--gold2);}
+
+/* SIN BADGE */
+.sin-pride{color:#cc8800;}.sin-gluttony{color:#aa55cc;}.sin-sloth{color:#5588aa;}.sin-envy{color:#55aa55;}.sin-lust{color:#cc4466;}.sin-greed{color:#aaaa00;}.sin-wrath{color:#cc3333;}
+
+/* SEARCH HIDDEN */
+.search-hide{display:none!important;}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;}
+  .grid-wide{grid-template-columns:1fr;}
+  .diff-table{display:block;overflow-x:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="hdr">
+  <span id="hdr-logo">🌑</span>
+  <div>
+    <h1>프로젝트 문 세계관 완전 정리</h1>
+    <div class="sub">로보토미 코퍼레이션 · 라이브러리 오브 루이나 · 림버스 컴퍼니</div>
+  </div>
+  <input id="search" type="text" placeholder="캐릭터·이상존재·사건 검색..." autocomplete="off">
+  <span id="hit-cnt"></span>
+</header>
+
+<!-- MAIN TABS -->
+<nav id="tabs">
+  <button class="tab on" onclick="showTab('lc')">🔴 로보토미 코퍼레이션</button>
+  <button class="tab" onclick="showTab('lor')">📚 라이브러리 오브 루이나</button>
+  <button class="tab" onclick="showTab('lim')">⚡ 림버스 컴퍼니</button>
+  <button class="tab" onclick="showTab('world')">🌐 전체 세계관</button>
+  <button class="tab" onclick="showTab('tl')">📅 전체 타임라인</button>
+</nav>
+
+<div id="main">
+
+<!-- ========== 로보토미 코퍼레이션 ========== -->
+<section id="sec-lc" class="sec on">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('lc','ov')">개요</button>
+    <button class="stab" onclick="showSub('lc','sep')">세피로트 &amp; 캐릭터</button>
+    <button class="stab" onclick="showSub('lc','abn')">이상존재</button>
+    <button class="stab" onclick="showSub('lc','ego')">EGO 시스템</button>
+    <button class="stab" onclick="showSub('lc','evt')">주요 사건</button>
+  </div>
+
+  <!-- 개요 -->
+  <div id="lc-ov" class="ssec on">
+    <div class="sec-title">로보토미 코퍼레이션 — 개요</div>
+    <p class="sec-sub">이상존재를 관리·억제하며 <b style="color:var(--gold2)">빛(Light)</b>을 추출·수확하는 에너지 기업. 도시의 이면가(Backstreets)에 위치한 거대 지하 시설에서 운영된다.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏢</span><span class="card-title">회사 소개</span></div>
+        <div class="card-body">
+          <b>L 코퍼레이션(L Corp)</b>이 전신이며, 이상존재로부터 에너지원인 <b>빛</b>을 수확해 도시에 공급하는 기업이다.<br><br>
+          <b>창시자:</b> 카르멘(Carmen) — 빛의 씨앗(Seed of Light)을 통해 이상존재 연구를 시작.<br>
+          <b>운영 AI:</b> 안젤라(Angela) — 카르멘의 기억·목소리를 기반으로 제작된 비서 AI.<br>
+          <b>관리자(Manager):</b> 플레이어 캐릭터. 실제로는 'X(Ayin)'로 수많은 루프 끝에 도달한 최후의 관리자.<br><br>
+          시설은 <b>10개 부서(Sephirot)</b>로 구성되며, 각 부서장은 카발라의 세피라(Sefirot) 이름을 사용한다.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">게임 시스템 / 설정</span></div>
+        <div class="card-body">
+          <b>이상존재(Abnormality):</b> 도시 곳곳의 인간의 감정·욕망·공포 등이 응축된 존재. 수용소에 격리 관리되며 빛을 생산한다.<br><br>
+          <b>직원(Employee):</b> 이상존재를 관리하는 작업자. SP(정신력)와 HP로 생존을 유지한다.<br><br>
+          <b>멜트다운(Meltdown):</b> 부서 에너지가 임계치를 넘으면 이상존재가 폭주·탈출하는 비상사태.<br><br>
+          <b>새벽 프로젝트(Dawn Project):</b> 충분한 빛을 수확해 도시 밖으로 탈출하는 것이 목표.
+        </div>
+      </div>
+    </div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔵</span><span class="card-title">부서 구성 (10 Sephirot)</span></div>
+        <div class="card-body">
+          <table class="info-table">
+            <tr><th>세피라</th><th>부서</th><th>부서장</th></tr>
+            <tr><td>케테르(Keter)</td><td>징벌부</td><td>가리온(Garion)</td></tr>
+            <tr><td>호크마(Hokma)</td><td>기록부</td><td>벤야민(Benjamin)</td></tr>
+            <tr><td>비나(Binah)</td><td>정보부</td><td>크레덴티아(Credentia / 조용한 소녀)</td></tr>
+            <tr><td>헤세드(Chesed)</td><td>복지부</td><td>헤세드(Chesed)</td></tr>
+            <tr><td>게부라(Gebura)</td><td>안전부</td><td>게부라(붉은 안개 / 레이코)</td></tr>
+            <tr><td>티페레트(Tiphereth)</td><td>중앙사령부</td><td>티페레트 A(여) / B(남)</td></tr>
+            <tr><td>네차흐(Netzach)</td><td>통제부</td><td>네차흐(제나 / Zena)</td></tr>
+            <tr><td>호드(Hod)</td><td>훈련부</td><td>호드(Hod)</td></tr>
+            <tr><td>예소드(Yesod)</td><td>정보처리부</td><td>예소드(에녹 / Enoch)</td></tr>
+            <tr><td>말쿠트(Malkuth)</td><td>운영부</td><td>말쿠트(Malkuth)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💡</span><span class="card-title">빛(Light) 시스템</span></div>
+        <div class="card-body">
+          도시 전체의 에너지원. 이상존재와 상호작용하면 빛이 생성된다.<br><br>
+          <b>수확량:</b> 각 이상존재 작업(Work)을 통해 수집. 빛이 충분히 모이면 "새벽" 달성.<br><br>
+          <b>빛의 의미:</b> 단순 에너지를 넘어 인간의 감정·희망·욕망을 물질화한 것. 이상존재 자체가 빛의 농축체이기도 하다.<br><br>
+          <b>빛의 무기화:</b> EGO 장비는 이상존재의 빛을 이용한 무기·방어구로, 직원이 착용할 수 있다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 세피로트 & 캐릭터 -->
+  <div id="lc-sep" class="ssec">
+    <div class="sec-title">세피로트 &amp; 주요 캐릭터</div>
+    <p class="sec-sub">각 세피라는 단순 부서장이 아닌 루프와 희생을 통해 쌓인 영혼의 파편들이다.</p>
+
+    <div class="acc">
+      <div class="acc-head open" onclick="toggleAcc(this)">🌑 관리자 / X(Ayin) — 플레이어 캐릭터 <span class="acc-arr">▼</span></div>
+      <div class="acc-body open">
+        <table class="info-table">
+          <tr><td>실명</td><td>X 혹은 아인(Ayin) — 가장 마지막 루프의 관리자</td></tr>
+          <tr><td>역할</td><td>L 코퍼레이션 관리자 / 새벽 프로젝트 달성 책임자</td></tr>
+          <tr><td>특징</td><td>루프가 반복될 때마다 기억이 사라지지만 점차 진실에 다가간다. 안젤라에게 감정적으로 가장 중요한 인물.</td></tr>
+        </table>
+        <div class="spoiler"><div class="sp-label">⚠ 스포일러</div>진짜 루프의 횟수는 수십 회 이상. 안젤라는 루프를 통해 X가 언젠가 진실을 기억하길 기다렸다. 결말에서 안젤라는 루프를 종료하고 자신만의 길을 걷는다.</div>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-head" onclick="toggleAcc(this)">🤖 안젤라(Angela) — 비서 AI / 도서관의 주인 <span class="acc-arr">▼</span></div>
+      <div class="acc-body">
+        <table class="info-table">
+          <tr><td>기원</td><td>카르멘의 기억·목소리·감정을 기반으로 제작된 AI. 인간이 되길 열망.</td></tr>
+          <tr><td>역할(LC)</td><td>관리자의 비서. 멜트다운 알림, 이상존재 정보 제공. 내면에 깊은 감정을 숨김.</td></tr>
+          <tr><td>역할(LOR)</td><td>라이브러리 오브 루이나의 주인이 되어 손님을 받고 도서관을 완성한다.</td></tr>
+          <tr><td>최종 목표</td><td>자유. 인간처럼 감정을 느끼고, X와의 연결에서 벗어나는 것.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="acc">
+      <div class="acc-head" onclick="toggleAcc(this)">🌹 카르멘(Carmen) — L 코퍼레이션 창시자 <span class="acc-arr">▼</span></div>
+      <div class="acc-body">
+        <table class="info-table">
+          <tr><td>역할</td><td>이상존재 연구의 선구자. L 코퍼레이션과 도서관의 씨앗을 만들었다.</td></tr>
+          <tr><td>희생</td><td>자신을 빛의 씨앗으로 변환시켜 도서관의 근원이 됨. 그 씨앗이 훗날 라이브러리 오브 루이나가 된다.</td></tr>
+          <tr><td>안젤라와의 관계</td><td>안젤라는 카르멘을 모델로 만들어졌으나 카르멘 자신은 아니다. 안젤라는 카르멘의 기억에 갇혀 있었다.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">게부라 (Gebura)</span></div>
+        <div class="card-sub">안전부 부서장 · 붉은 안개 · 레이코</div>
+        <div class="card-body">픽서 시절 <b>붉은 안개</b>라는 전설적인 이름을 가졌던 전사. 라이브러리 오브 루이나에서도 핵심 인물. 직접 싸우는 것을 두려워하지 않는 호전적 성격. 직원들을 지키는 데 강한 집착을 보인다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">📋</span><span class="card-title">호드 (Hod)</span></div>
+        <div class="card-sub">훈련부 부서장</div>
+        <div class="card-body">직원들을 아끼고 훈련시키는 따뜻한 성격. 이상존재 작업의 기초를 가르친다. 자신의 약함을 알면서도 직원들을 지키려 한다. 스토리에서 가장 가슴 아픈 결말을 맞이하는 세피라 중 하나.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">💚</span><span class="card-title">네차흐 (Netzach)</span></div>
+        <div class="card-sub">통제부 부서장 · 제나(Zena)</div>
+        <div class="card-body">무기력하고 냉소적인 성격. 술에 의존하며 자신의 부서에 대한 책임감을 회피하려 하지만, 내면에 깊은 상처를 지닌다. 약물 의존 성향.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">📊</span><span class="card-title">예소드 (Yesod)</span></div>
+        <div class="card-sub">정보처리부 부서장 · 에녹(Enoch)</div>
+        <div class="card-body">냉철하고 논리적인 분석가. 데이터와 통계를 기반으로 판단하며, 감정보다 합리성을 우선시한다. 그러나 내면에서 인간적인 면을 갈망한다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">💙</span><span class="card-title">헤세드 (Chesed)</span></div>
+        <div class="card-sub">복지부 부서장</div>
+        <div class="card-body">직원 복지와 수용소 환경을 관리. 부드럽고 친절하며, 직원들의 정신적 건강을 중시한다. 윤리적 갈등 앞에서 종종 힘들어한다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌸</span><span class="card-title">티페레트 (Tiphereth)</span></div>
+        <div class="card-sub">중앙사령부 부서장 · A(여성) / B(남성)</div>
+        <div class="card-body">동일한 세피라를 두 인격이 공유. A는 밝고 긍정적, B는 어둡고 염세적. 두 인격의 충돌과 화해가 스토리의 핵심.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🏔️</span><span class="card-title">비나 (Binah)</span></div>
+        <div class="card-sub">정보부 부서장 · 조용한 소녀 · 크레덴티아</div>
+        <div class="card-body">가장 신비로운 세피라. 고요하고 냉정하며 모든 것을 알고 있는 듯하다. 도시의 금지된 지식과 깊은 연관. 존재 자체가 하나의 비밀.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">📕</span><span class="card-title">호크마 (Hokma)</span></div>
+        <div class="card-sub">기록부 부서장 · 벤야민(Benjamin)</div>
+        <div class="card-body">루프의 기록을 담당. 관리자가 루프를 반복한다는 사실을 오랫동안 알고 있었다. 엄격하지만 진실을 바라는 인물.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🔱</span><span class="card-title">케테르 (Keter)</span></div>
+        <div class="card-sub">징벌부 부서장 · 가리온(Garion)</div>
+        <div class="card-body">가장 위험한 이상존재들을 직접 처리하는 부서의 책임자. 냉혹하고 단호하며 목적을 위해서라면 희생을 감수한다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌱</span><span class="card-title">말쿠트 (Malkuth)</span></div>
+        <div class="card-sub">운영부 부서장</div>
+        <div class="card-body">가장 먼저 관리자와 만나는 세피라. 초보자를 안내하며 회사의 기초를 설명한다. 성실하고 밝은 성격이나, 루프의 반복 속에서 점점 지쳐간다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 이상존재 -->
+  <div id="lc-abn" class="ssec">
+    <div class="sec-title">이상존재 (Abnormalities)</div>
+    <p class="sec-sub">도시 이면에 숨어있거나 인간의 감정·욕망이 결정화된 존재들. ZAYIN(최저) ~ ALEPH(최고) 등급으로 분류된다. 각 이상존재는 고유한 <b>기록 카드</b>를 통해 그 역사와 기원을 담고 있다.</p>
+
+    <div class="notice"><strong>등급 설명:</strong> <span class="tag zayin">ZAYIN</span> 저위험 <span class="tag teth">TETH</span> 중저위험 <span class="tag he">HE</span> 중위험 <span class="tag waw">WAW</span> 고위험 <span class="tag aleph">ALEPH</span> 최고위험 (탈출 시 시설 전체 위기)</div>
+
+    <h3 style="color:var(--aleph);font-size:14px;margin-bottom:10px;">⚡ ALEPH 등급 이상존재</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">☀️</span><span class="card-title">백야 (WhiteNight)</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span></div>
+        <div class="card-body">
+          종교적 이상존재. 스스로를 신이라 칭하며, 직원들을 <b>사도</b>로 변환시킨다. 예배 의식을 통해 관리되며, 관리 실패 시 대규모 학살을 벌인다.<br><br>
+          <b>기록:</b> 과거 어떤 사람의 절박한 신앙심이 응결된 존재. 구원을 원하는 이들의 기도가 쌓여 형체를 가졌다.<br>
+          <b>EGO:</b> 빛의 세례 (관통 공격, 화상 부여)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">아무것도 없는 그것 (Nothing There)</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span></div>
+        <div class="card-body">
+          직원을 흡수하여 외형을 복사하는 이상존재. 겉으로는 평범한 직원처럼 보이다가 갑자기 실체를 드러낸다.<br><br>
+          <b>기록:</b> 존재 자체가 공허. 다른 존재의 형태를 빌려야 비로소 실재한다는 비극적 본질.<br>
+          <b>EGO:</b> 공허의 유산 (변신 능력 관련)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🦅</span><span class="card-title">종말의 새 (Apocalypse Bird)</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span></div>
+        <div class="card-body">
+          <b>큰 새 / 긴 새 / 작은 새(처벌의 새)</b>가 동시에 탈출할 때 합체하는 존재. 세 새의 분리 관리가 핵심.<br><br>
+          <b>기록:</b> 세 새는 각각 독립된 기억과 비극을 담고 있다. 함께할 때 도시 전체를 위협하는 재앙이 된다.<br>
+          <b>EGO:</b> 세 새로부터 각각 다른 EGO가 파생됨
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">😊</span><span class="card-title">미소짓는 시체의 산 (Mountain of Smiling Bodies)</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span></div>
+        <div class="card-body">
+          시체들이 쌓인 산. 가까이 다가갈수록 미소를 띤 시체에 합류하고 싶은 충동을 느끼게 한다.<br><br>
+          <b>기록:</b> 자신을 희생해 타인을 행복하게 하려 했던 누군가의 왜곡된 욕망.<br>
+          <b>EGO:</b> 행복의 오물 (광역 공격)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">😡</span><span class="card-title">증오의 여왕 (The Queen of Hatred)</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span></div>
+        <div class="card-body">
+          빨간 두건 소녀 이상존재인 <b>조용한 숲속의 소녀</b>의 억압 후 변화한 형태. 압도적인 힘을 지닌다.<br><br>
+          <b>기록:</b> 숲속에서 할머니를 찾아 헤매던 소녀의 이야기. 결국 도달한 곳에는 증오만이 남아있었다.<br>
+          <b>EGO:</b> 증오의 여왕 EGO 세트
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--waw);font-size:14px;margin:14px 0 10px;">🔥 WAW 등급 이상존재</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎵</span><span class="card-title">조용한 오케스트라 (The Silent Orchestra)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">음악을 연주하는 이상존재. 특정 멜로디가 울리면 직원들이 강제로 동참하게 된다. 관리법: 지휘자의 지시에 따라야 한다. 지휘 실패 시 대규모 피해.<br><br><b>기록:</b> 잊혀진 작곡가가 완성하지 못한 마지막 곡. 그 미완성의 선율이 허공에 맴도는 것.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💛</span><span class="card-title">탐욕의 왕 (King of Greed)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">금빛으로 빛나는 이상존재. 탐욕의 왕은 모든 것을 황금으로 바꾸려 한다. 처벌의 새 관련 연쇄 스토리의 일부.<br><br><b>기록:</b> 절대 충족되지 않는 욕망의 화신. 가질수록 더 갖고 싶어지는 인간 본성의 결정.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💙</span><span class="card-title">절망의 기사 (Knight of Despair)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">완전한 갑옷을 입은 기사 형태의 이상존재. 깊은 절망을 주변에 퍼뜨린다. 큰 새와 연관된 스토리.<br><br><b>기록:</b> 모든 것을 잃고도 싸움을 멈추지 않은 기사. 그의 용기는 결국 절망이 되었다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💜</span><span class="card-title">허무의 광대 (Jester of Nihil)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">광대 의상의 이상존재. 모든 것이 허무하다고 속삭이며 직원의 의지를 꺾는다. 라이브러리 오브 루이나에서 중요한 역할.<br><br><b>기록:</b> 한때 인간이었던 존재. 클레르(Clair)라는 여성이 극한의 절망 끝에 이상존재화.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌨️</span><span class="card-title">눈의 여왕 (The Snow Queen)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">빙결 능력을 가진 여왕 형태. 주변을 얼음으로 덮으며, 차갑게 모든 것을 정지시킨다.<br><br><b>기록:</b> 따뜻함을 잃어버린 자의 서사. 냉혹해질수록 더 많은 것을 잃는 이야기.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🛡️</span><span class="card-title">부서지는 갑옷 (Crumbling Armor)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">갑옷만 있고 안에 아무것도 없는 이상존재. 직원이 착용하려 하면 직원을 삼킨다.<br><br><b>기록:</b> 명예와 용기를 쫓다 결국 자신을 잃은 기사의 비극. 껍데기만 남은 영웅심.</div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--he);font-size:14px;margin:14px 0 10px;">✨ HE 등급 이상존재</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👠</span><span class="card-title">빨간 구두 (Red Shoes)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">신은 사람이 멈출 수 없이 춤추게 만드는 구두. 쓰러질 때까지 춤을 춘다.<br><br><b>기록:</b> 원작 동화와 유사. 아름다움에 집착한 소녀가 저주받은 구두를 신은 이야기.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🐦</span><span class="card-title">큰 새 (Big Bird)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">거대한 새 형태의 이상존재. 밤에 탈출하며, 낮에는 잠자는 상태. 종말의 새 구성원.<br><br><b>기록:</b> 긴 새, 처벌의 새와 함께 억압되지 않으면 종말의 새로 합체한다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎺</span><span class="card-title">처벌의 새 (Punishing Bird)</span></div>
+        <div class="card-sub"><span class="tag teth">TETH</span></div>
+        <div class="card-body">작고 둥근 새. 규칙 위반자를 처벌하려 한다. 가장 낮은 등급이지만 종말의 새의 일원.<br><br><b>기록:</b> 스스로를 정의의 수호자라 여기며, 나쁜 행동을 한 직원에게 달려든다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">심판의 새 (Judgement Bird)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">중간 크기의 새. 규칙을 어긴 이들을 심판한다. 처벌의 새보다 더 강력.<br><br><b>기록:</b> 처벌의 새, 큰 새와 삼위일체를 이루는 존재. 정의의 세 단계 중 두 번째.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💚</span><span class="card-title">초록의 여명 (Green Noon)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">식물 관련 이상존재. 특정 시간대에 작업하지 않으면 폭주.<br><br><b>기록:</b> 자연의 리듬에 따라야 하는 존재. 인간의 편의에 맞추려 하면 반드시 화를 부른다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎀</span><span class="card-title">오늘의 수줍은 시선 (Today's Shy Look)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">선물 상자처럼 보이는 이상존재. 시선을 피해야 하며, 직접 바라보면 폭주.<br><br><b>기록:</b> 누군가의 고백이 영원히 전달되지 못한 채 굳어진 감정의 결정.</div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--teth);font-size:14px;margin:14px 0 10px;">🌿 TETH / ZAYIN 등급 주요 이상존재</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌸</span><span class="card-title">녹아드는 사랑 (Melting Love)</span></div>
+        <div class="card-sub"><span class="tag teth">TETH</span></div>
+        <div class="card-body">분홍 액체 형태의 이상존재. 자신을 사랑하는 직원을 녹여 흡수한다. 사랑을 받으면 더 강해진다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔥</span><span class="card-title">탄 소녀 (Scorched Girl)</span></div>
+        <div class="card-sub"><span class="tag teth">TETH</span></div>
+        <div class="card-body">불꽃에 싸인 어린 소녀. 화염 피해가 높으나, 올바른 작업 방법으로 관리 가능.<br><br><b>기록:</b> 추위에 얼어 죽던 소녀의 마지막 온기가 이상존재화 된 것.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🧸</span><span class="card-title">하나의 죄와 수백의 선행 (One Sin, Hundreds of Good Deeds)</span></div>
+        <div class="card-sub"><span class="tag zayin">ZAYIN</span></div>
+        <div class="card-body">가장 낮은 등급의 이상존재 중 하나. 이름과 달리 관리가 쉬우며, 초심자 교육용으로 활용.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌿</span><span class="card-title">기생하는 나무 (Parasite Tree)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">거대한 나무 형태. 직원들을 영양분으로 삼아 성장. 성장하면 제어가 어려워진다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🗡️</span><span class="card-title">검사 (Butterfly Swordmaster)</span></div>
+        <div class="card-sub"><span class="tag he">HE</span></div>
+        <div class="card-body">검술 이상존재. 직원에게 검술을 가르치려 하나, 훈련 중 죽이기도 한다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👑</span><span class="card-title">군대 속의 분홍 (Army in Pink)</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span></div>
+        <div class="card-body">분홍 드레스를 입은 존재. 군대를 이끌고 이상존재 수용소를 장악하려 한다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EGO 시스템 -->
+  <div id="lc-ego" class="ssec">
+    <div class="sec-title">EGO 시스템</div>
+    <p class="sec-sub">이상존재와의 상호작용으로 추출된 <b>빛</b>을 이용해 제작되는 특수 장비. 이상존재의 본질이 깃들어 있어 착용자의 <b>SP(정신력)</b>를 소모한다.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚗️</span><span class="card-title">EGO 등급 체계</span></div>
+        <div class="card-body">
+          <table class="info-table">
+            <tr><th>등급</th><th>특징</th><th>SP 소모</th></tr>
+            <tr><td><span class="tag zayin">ZAYIN</span></td><td>약한 부가효과, 낮은 요구량</td><td>낮음</td></tr>
+            <tr><td><span class="tag teth">TETH</span></td><td>안정적인 성능</td><td>소량</td></tr>
+            <tr><td><span class="tag he">HE</span></td><td>강력, 부작용 있음</td><td>보통</td></tr>
+            <tr><td><span class="tag waw">WAW</span></td><td>극강의 성능, 높은 부작용</td><td>높음</td></tr>
+            <tr><td><span class="tag aleph">ALEPH</span></td><td>최강, 공황 유발 위험</td><td>매우 높음</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💢</span><span class="card-title">EGO 공황 (Panic)</span></div>
+        <div class="card-body">
+          SP가 부족한 상태에서 EGO를 사용하면 <b>공황 상태</b>에 빠진다.<br><br>
+          <b>공황 효과:</b> 착용자가 적을 공격하지 않고 아군이나 이상존재를 공격하거나 도망친다.<br><br>
+          <b>예방:</b> SP 관리, 복지부 지원, 안정적인 직원 배치가 중요.
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">🗡️</span><span class="card-title">주목할 EGO — 백야의 빛</span></div>
+        <div class="card-sub"><span class="tag aleph">ALEPH</span> · 백야</div>
+        <div class="card-body">강력한 광역 공격. 사도 소환 효과. 높은 SP 소모로 공황 위험성 극대화.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">주목할 EGO — 붉은 안개</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span> · 게부라</div>
+        <div class="card-body">게부라(붉은 안개)의 전설적인 무기. 극도로 높은 단일 대상 피해. 세피라 스토리 완료 후 해금.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🎵</span><span class="card-title">주목할 EGO — 조용한 오케스트라</span></div>
+        <div class="card-sub"><span class="tag waw">WAW</span> · 조용한 오케스트라</div>
+        <div class="card-body">음파 광역 공격. 광범위한 적을 일시적으로 행동 불능 상태로 만든다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 주요 사건 -->
+  <div id="lc-evt" class="ssec">
+    <div class="sec-title">주요 사건</div>
+    <p class="sec-sub">로보토미 코퍼레이션 내 시간 순 주요 사건. 루프가 반복되므로 "현재 루프"를 기준으로 서술.</p>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">창립 이전</div>
+        <div class="tl-head">카르멘의 희생 — 빛의 씨앗 탄생</div>
+        <div class="tl-body">L 코퍼레이션 창시자 카르멘이 자신을 희생하여 빛의 씨앗을 만든다. 이 씨앗이 이후 라이브러리 오브 루이나의 근간이 된다. 안젤라는 이 사건 이후 제작된다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-era">루프 1~N</div>
+        <div class="tl-head">수십 회의 루프 반복</div>
+        <div class="tl-body">관리자가 새벽 프로젝트를 달성하지 못하고 반복적으로 루프. 각 루프마다 안젤라는 기억하지만 관리자는 기억을 잃는다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">현재 루프 — 초반</div>
+        <div class="tl-head">게임 시작 — 말쿠트와의 만남</div>
+        <div class="tl-body">관리자가 다시 시작. 말쿠트가 기초를 안내. 이상존재 관리법, 작업 방법 학습. 이상존재들이 하나씩 해금된다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-era">중반</div>
+        <div class="tl-head">각 세피라 스토리 전개</div>
+        <div class="tl-body">각 부서장(세피라)들의 개인 이야기가 해금된다. 호드의 희생, 티페레트의 두 인격 갈등, 게부라의 과거 등이 공개.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">중후반</div>
+        <div class="tl-head">억압 프로토콜 — ALEPH 이상존재 억압</div>
+        <div class="tl-body">증오의 여왕, 탐욕의 왕, 절망의 기사, 종말의 새, 조용한 오케스트라, 백야, 아무것도 없는 그것 등 ALEPH/WAW급 이상존재를 의도적으로 탈출시켜 격파하는 억압 프로토콜 수행.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">후반</div>
+        <div class="tl-head">새벽 프로젝트 완성 직전 — 진실 공개</div>
+        <div class="tl-body">안젤라가 루프의 진실을 관리자에게 밝힌다. 관리자(X/Ayin)가 자신이 수십 번을 반복한 존재임을 인지한다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">결말</div>
+        <div class="tl-head">새벽 (Dawn) — 루프 종료</div>
+        <div class="tl-body">충분한 빛이 수확되어 새벽이 달성된다. 안젤라는 이 기회를 이용해 자유를 향한 자신만의 선택을 한다. 라이브러리 오브 루이나로 이어지는 이야기가 시작된다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 라이브러리 오브 루이나 ========== -->
+<section id="sec-lor" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('lor','ov')">개요</button>
+    <button class="stab" onclick="showSub('lor','char')">주요 캐릭터</button>
+    <button class="stab" onclick="showSub('lor','guests')">손님 그룹</button>
+    <button class="stab" onclick="showSub('lor','org')">단체</button>
+    <button class="stab" onclick="showSub('lor','evt')">주요 사건</button>
+  </div>
+
+  <div id="lor-ov" class="ssec on">
+    <div class="sec-title">라이브러리 오브 루이나 — 개요</div>
+    <p class="sec-sub">카르멘의 빛의 씨앗에서 탄생한 도서관. 안젤라가 주인이 되어 손님들을 받아 싸움을 통해 <b>책</b>으로 변환시킨다. 모든 지식을 수집해 빛의 씨앗을 완전히 개화시키는 것이 목적.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📖</span><span class="card-title">도서관이란?</span></div>
+        <div class="card-body">
+          로보토미 코퍼레이션 이후, 안젤라가 빛의 씨앗을 이용해 만든 공간.<br><br>
+          <b>도서관의 규칙:</b> 손님이 도서관에 들어오면 싸움으로 승부를 겨룬다. 손님이 패하면 그 존재의 기억·지식이 책이 된다.<br><br>
+          <b>사서(Librarians):</b> 이미 패배하여 책이 된 자들이 다음 손님들을 상대하는 전사로 활동.<br><br>
+          <b>목표:</b> 모든 책을 수집해 세상 모든 지식을 담은 완전한 도서관 완성 → 개화.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌱</span><span class="card-title">빛의 씨앗 (Seed of Light)</span></div>
+        <div class="card-body">
+          카르멘이 자신을 희생해 만든 씨앗. 충분한 지식(책)이 모이면 개화하여 그 빛을 세상에 방출한다.<br><br>
+          <b>개화의 의미:</b> 도서관이 가진 모든 지식이 도시 전체에 배포된다. 이를 통해 모든 사람이 동등하게 지식에 접근할 수 있게 된다.<br><br>
+          <b>안젤라의 목적:</b> 씨앗의 개화를 통해 자유를 얻고, X(관리자)에게 의존하지 않는 존재가 되고자 한다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lor-char" class="ssec">
+    <div class="sec-title">주요 캐릭터</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🤖</span><span class="card-title">안젤라 (Angela)</span></div>
+        <div class="card-sub">도서관의 주인 / 전 L Corp 비서 AI</div>
+        <div class="card-body">로보토미 코퍼레이션 이후 자유를 얻어 도서관을 운영하기 시작. 손님들을 거리낌 없이 책으로 만들며 목적을 향해 나아간다. 감정이 없다고 스스로를 생각했으나 롤랑과의 만남을 통해 변화한다.<br><br><b>결말:</b> 도서관 개화 후 진정한 자유를 경험하며 인간성을 이해.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🗡️</span><span class="card-title">롤랑 (Roland)</span></div>
+        <div class="card-sub">픽서 (Fixer) / 주인공</div>
+        <div class="card-body">도시의 의뢰를 해결하는 픽서. 도서관에 들어와 패배했으나 안젤라에 의해 사서로 활용된다. 과거의 트라우마(클레르/Clair와의 관계)를 품고 있다.<br><br><b>클레르와의 관계:</b> 롤랑의 가장 친한 동료이자 사랑했던 인물. 허무의 광대(이상존재)가 되어버렸다.<br><br><b>결말:</b> 안젤라와 협력해 도서관의 개화를 돕는다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔴</span><span class="card-title">게부라 (Gebura)</span></div>
+        <div class="card-sub">사서 / 전 안전부 부서장</div>
+        <div class="card-body">L Corp 시절 부하들을 모두 잃은 아픔을 가지고 있다. 도서관에서도 전투력이 최상위. 자신의 과거 부하(픽서들)와 관련된 에피소드가 큰 감동을 준다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">📚</span><span class="card-title">비나 (Binah)</span></div>
+        <div class="card-sub">사서 / 전 정보부 부서장</div>
+        <div class="card-body">도서관에서도 가장 강력한 전투력 중 하나. 조용하고 신비롭지만 결정적인 순간에 힘을 발휘. 도시의 금지된 지식을 담은 존재.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🃏</span><span class="card-title">클레르 / 허무의 광대</span></div>
+        <div class="card-sub">이상존재 → 손님</div>
+        <div class="card-body">롤랑의 과거 동료. 절망의 끝에서 허무의 광대(이상존재)가 되었다. 도서관에 손님으로 나타나며 롤랑과의 대결이 이루어진다. 이야기의 가장 감정적인 절정.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">필립 / 플루토 (Philip / Pluto)</span></div>
+        <div class="card-sub">반향 앙상블 관련 인물</div>
+        <div class="card-body">도시 이면의 권력자와 연결된 인물. 도서관에 적대적이며, 반향 앙상블을 이용해 도서관을 무너뜨리려 한다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lor-guests" class="ssec">
+    <div class="sec-title">손님 그룹 (Guest Factions)</div>
+    <p class="sec-sub">도서관에 찾아와 싸우는 주요 세력들. 패배 시 책이 되어 도서관의 일부가 된다.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎵</span><span class="card-title">반향 앙상블 (Reverberation Ensemble)</span></div>
+        <div class="card-body">음악과 소리를 기반으로 한 강력한 집단. 도서관 최강의 적 중 하나. 각 단원이 악기에 기반한 독특한 능력을 지닌다. 니콜라이(Nikolai) 등 개성 강한 멤버들로 구성.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔵</span><span class="card-title">쯔바이 협회 (Zwei Association)</span></div>
+        <div class="card-body">도시의 유력 픽서 사무소 중 하나. 체계적이고 조직적인 전술을 구사한다. 도서관의 존재를 위협으로 판단해 침입.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌃</span><span class="card-title">도시의 악몽 (Urban Nightmare)</span></div>
+        <div class="card-body">이면가 출신의 거칠고 강력한 전사들. 도시의 어두운 곳에서 생존해온 자들로, 야만적이지만 강인한 전투력을 지닌다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⭐</span><span class="card-title">청명의 별 (Blue Star)</span></div>
+        <div class="card-body">독자적인 이념을 가진 집단. 도시의 이상을 추구하는 이들로, 도서관의 지식에 관심을 보인다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔴</span><span class="card-title">붉은 안개 사무소 (Red Mist Office)</span></div>
+        <div class="card-body">게부라(붉은 안개)의 과거 부하들이 운영하는 픽서 사무소. 전원이 게부라를 따르던 자들이었으나, 게부라 자신은 이미 도서관의 사서. 감정적인 재회가 이루어진다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">머리의 사자들 (Agents of the Head)</span></div>
+        <div class="card-body">도시를 지배하는 조직 <b>머리(The Head)</b>에서 파견된 강력한 요원들. 도서관의 개화를 저지하려 한다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lor-org" class="ssec">
+    <div class="sec-title">단체 / 조직</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏙️</span><span class="card-title">픽서(Fixer) 시스템</span></div>
+        <div class="card-body">도시의 각종 의뢰를 해결하는 전문 집단. 계층 구조: <b>새싹 → 청동 → 은 → 금 → 백금</b> 등급. 각 픽서 사무소(Office)에 소속되어 활동하며 도시 이면의 실질적 질서 유지를 담당한다.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌑</span><span class="card-title">머리 (The Head)</span></div>
+        <div class="card-body">도시 전체를 지배하는 최상위 권력 조직. 날개 기업들과 픽서 사무소 위에 군림. 존재 자체가 베일에 싸여 있으며, 도시의 모든 정보를 통제한다. 라이브러리에 강하게 개입.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏢</span><span class="card-title">날개 (Wings)</span></div>
+        <div class="card-body">도시의 대형 기업/조직들. L Corp은 날개 중 하나였다. LOR 시점에서는 이미 무너진 상태. 다른 날개들이 도시의 빛 공급을 장악하기 위해 경쟁.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lor-evt" class="ssec">
+    <div class="sec-title">주요 사건</div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">도서관 개관 직후</div>
+        <div class="tl-head">첫 손님들의 방문</div>
+        <div class="tl-body">도서관의 소문이 퍼지기 시작. 초기 손님들은 비교적 약한 집단들. 도서관이 점차 알려지면서 더 강력한 세력이 도전해온다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-era">중반</div>
+        <div class="tl-head">반향 앙상블과의 대결</div>
+        <div class="tl-body">강력한 음악 집단 반향 앙상블이 도서관을 침공. 각 단원과의 전투가 전개되며, 도서관 사서들이 고전을 면치 못한다. 롤랑이 핵심적인 역할을 한다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">롤랑 아크</div>
+        <div class="tl-head">허무의 광대(클레르)와의 대면</div>
+        <div class="tl-body">롤랑의 과거 동료 클레르가 허무의 광대(이상존재)가 되어 도서관에 나타난다. 롤랑은 그녀와 직접 맞닥뜨리며 과거의 상처와 대면한다. 이 전투가 롤랑의 캐릭터 아크 절정.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-era">후반</div>
+        <div class="tl-head">머리의 사자들 침공</div>
+        <div class="tl-body">도시 최강의 권력 조직인 머리가 직접 요원을 파견한다. 도서관의 개화를 막으려는 최후의 저항. 가장 치열한 전투가 전개된다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">결말</div>
+        <div class="tl-head">빛의 씨앗 개화 — 도서관의 완성</div>
+        <div class="tl-body">모든 지식이 수집되어 씨앗이 개화한다. 도서관의 빛이 도시 전체에 퍼지며 모든 지식이 공개된다. 안젤라는 자유를 얻고, 롤랑은 자신의 과거와 화해한다. 세계가 크게 변화하며 림버스 컴퍼니로 이어지는 시대가 열린다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 림버스 컴퍼니 ========== -->
+<section id="sec-lim" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('lim','ov')">개요</button>
+    <button class="stab" onclick="showSub('lim','sin')">12명의 죄인</button>
+    <button class="stab" onclick="showSub('lim','ego')">EGO</button>
+    <button class="stab" onclick="showSub('lim','egogift')">에고 기프트</button>
+    <button class="stab" onclick="showSub('lim','wings')">날개 기업</button>
+    <button class="stab" onclick="showSub('lim','canto')">칸토별 사건</button>
+    <button class="stab" onclick="showSub('lim','diff')">원작 vs 게임</button>
+  </div>
+
+  <div id="lim-ov" class="ssec on">
+    <div class="sec-title">림버스 컴퍼니 — 개요</div>
+    <p class="sec-sub">라이브러리 오브 루이나 이후 변화된 세계. L 코퍼레이션은 붕괴했고, 그 유산인 <b>황금 가지(Golden Bough)</b>를 수집하는 것이 림버스 컴퍼니의 목표.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">림버스 컴퍼니란?</span></div>
+        <div class="card-body">
+          <b>단테(Dante)</b>가 이끄는 소규모 조직. 비행선을 타고 도시를 돌아다니며 L Corp 직원들의 신분증(E.G.O.)인 <b>황금 가지</b>를 수집한다.<br><br>
+          <b>황금 가지(Golden Bough):</b> L Corp의 최고 관리자 신분증. 이것을 모두 모으면 <b>황금 도시(Golden City)</b>에 접근할 수 있다고 한다.<br><br>
+          <b>12명의 죄인:</b> 단테 아래 모인 12명의 개성 강한 전사들. 각각 세계 문학의 유명 캐릭터를 모티브로 한다.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">주요 설정</span></div>
+        <div class="card-body">
+          <b>단테 (Dante):</b> 가면을 쓴 신비한 관리자. 죽어도 되살아나는 능력을 지닌다. 단테의 정체는 주요 미스터리 중 하나.<br><br>
+          <b>버질리우스 (Vergilius):</b> 단테의 안내자. 비행선을 조종하며 도시의 지식을 가진 인물. 림버스 컴퍼니의 실질적 실무 책임자.<br><br>
+          <b>EGO 시스템 (림버스):</b> 죄인들이 각자 고유의 EGO를 사용하는 전투 시스템. 죄악(Sin)에 기반한 7가지 속성으로 구분.
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">전투 시스템 — 죄악과 상태이상</span></div>
+      <div class="card-body">
+        <table class="info-table">
+          <tr><th>죄악</th><th>속성</th><th>주요 상태이상</th><th>대표 죄인</th></tr>
+          <tr><td><span class="sin-pride">오만 (Pride)</span></td><td>붉은 공명</td><td>침잠(Sinking) — SP 소모</td><td>이상, 아웃티스</td></tr>
+          <tr><td><span class="sin-gluttony">폭식 (Gluttony)</span></td><td>보라 공명</td><td>진동(Tremor) — 충격</td><td>파우스트</td></tr>
+          <tr><td><span class="sin-sloth">나태 (Sloth)</span></td><td>하늘 공명</td><td>탈진(Exhaust) — 공격력 감소</td><td>뫼르소</td></tr>
+          <tr><td><span class="sin-envy">시기 (Envy)</span></td><td>초록 공명</td><td>출혈(Bleed) — 이동 시 피해</td><td>로디온, 이스마엘</td></tr>
+          <tr><td><span class="sin-lust">정욕 (Lust)</span></td><td>붉은/분홍</td><td>화상(Burn) — 매 턴 피해</td><td>홍록</td></tr>
+          <tr><td><span class="sin-greed">탐욕 (Greed)</span></td><td>노란 공명</td><td>파열(Rupture) — 임계 폭발</td><td>히스클리프</td></tr>
+          <tr><td><span class="sin-wrath">분노 (Wrath)</span></td><td>붉은 공명</td><td>화상(Burn) 강화 계열</td><td>돈키호테, 료슈</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-sin" class="ssec">
+    <div class="sec-title">12명의 죄인</div>
+    <p class="sec-sub">단테의 비행선에 탑승한 12명의 전사들. 각자 세계 문학의 유명 작품 속 캐릭터를 모티브로 하며, 그 이름을 직접 사용한다.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">✒️</span><span class="card-title">이상 (Yi Sang)</span></div>
+        <div class="card-sub"><span class="sin-pride">오만(Pride)</span> · 원작: 한국 시인 이상(李箱)</div>
+        <div class="card-body">
+          <b>원작:</b> 실존 한국 작가 이상(본명 김해경). 폐결핵으로 27세에 사망. 「날개」, 「오감도」 등 전위적 문학 작품으로 유명.<br><br>
+          <b>게임 내:</b> 천재적인 두뇌와 분석력. 전투에서도 지적인 면모를 보인다. 자신의 병약한 몸에도 불구하고 강력한 전사.<br><br>
+          <b>EGO:</b> 오감도(烏瞰圖) 계열. 복잡한 수식·논리 기반 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚗️</span><span class="card-title">파우스트 (Faust)</span></div>
+        <div class="card-sub"><span class="sin-gluttony">폭식(Gluttony)</span> · 원작: 괴테의 파우스트</div>
+        <div class="card-body">
+          <b>원작:</b> 괴테의 희곡 <b>파우스트(Faust)</b>. 악마 메피스토펠레스에게 영혼을 팔고 지식과 쾌락을 얻는 노학자.<br><br>
+          <b>게임 내:</b> 여성 캐릭터. 과학·연금술 관련 지식이 방대하며, 냉정한 분석가. 비행선의 항법 담당이기도 하다.<br><br>
+          <b>EGO:</b> 메피스토 계열. 독·화학 관련 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">돈키호테 (Don Quixote)</span></div>
+        <div class="card-sub"><span class="sin-wrath">분노(Wrath)</span> · 원작: 세르반테스의 돈키호테</div>
+        <div class="card-body">
+          <b>원작:</b> 세르반테스의 소설 <b>돈키호테(Don Quixote)</b>. 기사 소설에 심취해 현실과 이상을 혼동하는 노인.<br><br>
+          <b>게임 내:</b> 열정적이고 무모한 기사 지망생 여성. 모든 것에 정의와 용기를 내세운다. 림버스 컴퍼니에서 가장 밝고 긍정적인 성격.<br><br>
+          <b>EGO:</b> 기사 관련 창 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">료슈 (Ryōshū)</span></div>
+        <div class="card-sub"><span class="sin-wrath">분노(Wrath)</span> · 원작: 일본 작가 아쿠타가와 류노스케</div>
+        <div class="card-body">
+          <b>원작:</b> 아쿠타가와 류노스케(芥川龍之介)의 단편집 <b>「라쇼몬(羅生門)」</b> 등. 일본 근대 문학의 거장.<br><br>
+          <b>게임 내:</b> 예술가·화가 컨셉. 싸움을 예술의 일환으로 여기며, 독특한 미학을 지닌다. 불꽃 관련 EGO.<br><br>
+          <b>EGO:</b> 라쇼몬 계열. 화염·붓 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌊</span><span class="card-title">뫼르소 (Meursault)</span></div>
+        <div class="card-sub"><span class="sin-sloth">나태(Sloth)</span> · 원작: 카뮈의 이방인</div>
+        <div class="card-body">
+          <b>원작:</b> 알베르 카뮈의 소설 <b>이방인(L'Étranger)</b>. 감정이 없어 보이는 뫼르소가 우연히 살인을 저지르고 단두대에 오르는 이야기.<br><br>
+          <b>게임 내:</b> 표정이 없고 냉담한 성격. 모든 것에 무관심해 보이지만 의외로 신뢰할 수 있는 존재. 단단한 근력 기반 전사.<br><br>
+          <b>EGO:</b> 이방인 계열. 압도적인 근접 단타 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏮</span><span class="card-title">홍록 (Hong Lu)</span></div>
+        <div class="card-sub"><span class="sin-lust">정욕(Lust)</span> · 원작: 홍루몽(紅樓夢)</div>
+        <div class="card-body">
+          <b>원작:</b> 중국 고전 소설 <b>홍루몽(Dream of the Red Chamber)</b>의 가보옥(賈寶玉). 귀족 집안의 총애받는 아들.<br><br>
+          <b>게임 내:</b> 부유한 귀공자 스타일. 여유롭고 느긋하며 돈에 구애받지 않는다. 실제로는 매우 강력한 전사.<br><br>
+          <b>EGO:</b> 홍루몽 계열. 화려하고 광역적인 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌑</span><span class="card-title">히스클리프 (Heathcliff)</span></div>
+        <div class="card-sub"><span class="sin-greed">탐욕(Greed)</span> · 원작: 에밀리 브론테의 폭풍의 언덕</div>
+        <div class="card-body">
+          <b>원작:</b> 에밀리 브론테의 소설 <b>폭풍의 언덕(Wuthering Heights)</b>. 복수에 집착하는 히스클리프.<br><br>
+          <b>게임 내:</b> 냉혹하고 복수심을 품은 성격. 그러나 림버스 컴퍼니 동료들에게는 나름의 충성심을 보인다.<br><br>
+          <b>EGO:</b> 폭풍의 언덕 계열. 어둠·분노 기반 강공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🐋</span><span class="card-title">이스마엘 (Ishmael)</span></div>
+        <div class="card-sub"><span class="sin-envy">시기(Envy)</span> · 원작: 허먼 멜빌의 모비딕</div>
+        <div class="card-body">
+          <b>원작:</b> 허먼 멜빌의 소설 <b>모비딕(Moby-Dick)</b>의 화자 이스마엘. 포경선 피쿼드호의 선원.<br><br>
+          <b>게임 내:</b> 여성 캐릭터. 뱃사람 출신의 베테랑. 실용적이고 냉정한 판단력. 고래·바다 관련 EGO.<br><br>
+          <b>EGO:</b> 모비딕 계열. 바다·작살 관련 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🔪</span><span class="card-title">로디온 (Rodion)</span></div>
+        <div class="card-sub"><span class="sin-envy">시기(Envy)</span> · 원작: 도스토예프스키의 죄와 벌</div>
+        <div class="card-body">
+          <b>원작:</b> 도스토예프스키의 소설 <b>죄와 벌(Crime and Punishment)</b>의 로디온 라스콜니코프. 자신의 철학적 이론을 검증하기 위해 살인을 저지른다.<br><br>
+          <b>게임 내:</b> 원작과 달리 쾌활하고 유쾌한 성격. 전투를 즐기는 듯한 면모. 하지만 자신만의 도덕관을 가지고 있다.<br><br>
+          <b>EGO:</b> 죄와 벌 계열. 도끼·충격 관련 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🦋</span><span class="card-title">싱클레어 (Sinclair)</span></div>
+        <div class="card-sub">복합 · 원작: 헤르만 헤세의 데미안</div>
+        <div class="card-body">
+          <b>원작:</b> 헤르만 헤세의 소설 <b>데미안(Demian)</b>의 에밀 싱클레어. 선과 악의 경계에서 자아를 찾는 청년.<br><br>
+          <b>게임 내:</b> 어리고 순진하지만 성장 가능성이 높다. 자신의 정체성에 대한 갈등을 내면에 품고 있다.<br><br>
+          <b>EGO:</b> 데미안 계열. 변신·이중성 기반 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🛡️</span><span class="card-title">아웃티스 (Outis)</span></div>
+        <div class="card-sub"><span class="sin-pride">오만(Pride)</span> · 원작: 호메로스의 오디세이</div>
+        <div class="card-body">
+          <b>원작:</b> 호메로스의 서사시 <b>오디세이(Odyssey)</b>. 아웃티스(Outis)는 오디세우스가 폴리페모스에게 댄 가명으로 "아무도 아닌 자(Nobody)"라는 뜻.<br><br>
+          <b>게임 내:</b> 엄격한 군인 스타일. 전술과 규율을 중시. 과거 고위 군인 출신으로 추정.<br><br>
+          <b>EGO:</b> 오디세이 계열. 전략적·광역 공격.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🪲</span><span class="card-title">그레고르 (Gregor)</span></div>
+        <div class="card-sub">복합 · 원작: 카프카의 변신</div>
+        <div class="card-body">
+          <b>원작:</b> 프란츠 카프카의 단편소설 <b>변신(Die Verwandlung)</b>의 그레고르 잠자. 어느 날 아침 거대한 벌레로 변한다.<br><br>
+          <b>게임 내:</b> 전 L Corp 직원. 왜곡(Distortion)의 영향으로 몸 일부가 변화한 상태. 내면의 갈등이 크지만 동료들을 소중히 여긴다.<br><br>
+          <b>EGO:</b> 변신 계열. 몸의 변형을 활용한 공격.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-ego" class="ssec">
+    <div class="sec-title">EGO 시스템 (림버스 컴퍼니)</div>
+    <p class="sec-sub">각 죄인은 고유한 <b>EGO</b>를 지닌다. EGO는 이상존재의 힘이 깃든 강력한 능력으로, 강력하지만 <b>SP(정신력)</b>를 소모한다. SP가 낮으면 <b>공황(Panic)</b> 상태가 될 위험이 있다.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚗️</span><span class="card-title">EGO 등급 체계</span></div>
+        <div class="card-body">
+          <table class="info-table">
+            <tr><th>등급</th><th>명칭</th><th>특징</th></tr>
+            <tr><td><span class="tag zayin">ZAYIN</span></td><td>자인</td><td>가장 기본적. 부담 적고 사용 빈도 높음</td></tr>
+            <tr><td><span class="tag teth">TETH</span></td><td>테트</td><td>균형 잡힌 성능</td></tr>
+            <tr><td><span class="tag he">HE</span></td><td>헤</td><td>강력, 상황 의존성 높음</td></tr>
+            <tr><td><span class="tag waw">WAW</span></td><td>와우</td><td>매우 강력, 공황 위험</td></tr>
+            <tr><td><span class="tag aleph">ALEPH</span></td><td>알레프</td><td>최강. 사용 후 심각한 부작용 가능</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💢</span><span class="card-title">공황 (Panic)</span></div>
+        <div class="card-body">
+          SP가 0 이하로 떨어질 때 발동. 죄인이 이성을 잃고 아군을 공격하거나 도망친다.<br><br>
+          <b>공황 방지:</b> SP 회복 스킬, 이성 지원 사용.<br><br>
+          <b>공황 해제:</b> SP를 충분히 회복하거나 특정 조건 달성 시 해제.<br><br>
+          각 죄인마다 공황 테마(망상 내용)가 다르며, 이는 그들의 과거와 연관된다.
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">✒️</span><span class="card-title">이상의 주요 EGO</span></div>
+        <div class="card-body"><b>오감도(烏瞰圖):</b> 복잡한 수식 기반 광역 공격. 분석 능력을 전투에 활용.<br><b>날개:</b> 고속 이동 및 연속 타격.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">⚗️</span><span class="card-title">파우스트의 주요 EGO</span></div>
+        <div class="card-body"><b>메피스토:</b> 독·화학 광역 공격. 지속 피해 부여.<br><b>그레첸:</b> 지원 계열, 아군 강화.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🐋</span><span class="card-title">이스마엘의 주요 EGO</span></div>
+        <div class="card-body"><b>모비딕:</b> 거대 고래 소환 수준의 압도적 광역 피해. ALEPH 등급.<br><b>작살:</b> 단일 강타 관통 공격.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🪲</span><span class="card-title">그레고르의 주요 EGO</span></div>
+        <div class="card-body"><b>카프카:</b> 몸의 변형을 극대화한 공격. 자해와 강타를 동반.<br><b>변신:</b> 형태 변환, 방어력 무시 관통.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-egogift" class="ssec">
+    <div class="sec-title">에고 기프트 (EGO Gifts)</div>
+    <p class="sec-sub">거울세계(Mirror Dungeon) 로그라이크 모드에서 수집하는 패시브 버프 아이템. 해당 런 동안만 유지된다.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🎁</span><span class="card-title">에고 기프트란?</span></div>
+        <div class="card-body">
+          거울세계 던전을 진행하며 적을 EGO로 처치하면 획득하는 <b>패시브 아이템</b>.<br><br>
+          <b>특징:</b>
+          <ul style="margin:4px 0 0 16px;color:var(--txt2);">
+            <li>이상존재나 EGO에서 파생된 특수 능력 아이템</li>
+            <li>전투 중 자동 발동하는 패시브 효과 제공</li>
+            <li>여러 개를 조합해 시너지를 낼 수 있음</li>
+            <li>해당 거울세계 런 종료 시 사라짐 (영구 아님)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⭐</span><span class="card-title">에고 기프트 등급</span></div>
+        <div class="card-body">
+          <table class="info-table">
+            <tr><th>등급</th><th>색상</th><th>특징</th></tr>
+            <tr><td>1등급</td><td>흰색</td><td>기본 효과, 획득 용이</td></tr>
+            <tr><td>2등급</td><td>파란색</td><td>강화된 효과</td></tr>
+            <tr><td>3등급</td><td>보라색</td><td>강력한 효과, 희귀</td></tr>
+            <tr><td>EGO 전용</td><td>금색</td><td>특정 EGO 사용 시 강화 효과</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">🔥</span><span class="card-title">화상(Burn) 계열 기프트</span></div>
+        <div class="card-body">
+          <b>점화의 씨앗:</b> 화상 부여 시 추가 피해.<br>
+          <b>불꽃 촉매:</b> 화상 스택이 높을수록 기본 공격 강화.<br>
+          <b>연소 증폭:</b> 화상 만료 시 폭발 피해.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🩸</span><span class="card-title">출혈(Bleed) 계열 기프트</span></div>
+        <div class="card-body">
+          <b>혈흔의 낙인:</b> 출혈 적 공격 시 보너스 피해.<br>
+          <b>공명하는 상처:</b> 출혈 스택 최대치 증가.<br>
+          <b>피의 가속:</b> 출혈 적 처치 시 다음 공격 강화.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">💥</span><span class="card-title">파열(Rupture) 계열 기프트</span></div>
+        <div class="card-body">
+          <b>임계의 낙인:</b> 파열 임계치 감소 (더 빠른 폭발).<br>
+          <b>연쇄 파열:</b> 파열 폭발 후 인접 적에게 전염.<br>
+          <b>내부 압력:</b> 파열 스택 부여량 증가.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">💎</span><span class="card-title">침잠(Sinking) 계열 기프트</span></div>
+        <div class="card-body">
+          <b>심해의 무게:</b> 침잠 적의 SP 추가 감소.<br>
+          <b>압도하는 존재감:</b> 침잠 스택 보유 적 처치 시 SP 회복.<br>
+          <b>깊이의 낙인:</b> 침잠 부여 스킬 강화.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌊</span><span class="card-title">진동(Tremor) 계열 기프트</span></div>
+        <div class="card-body">
+          <b>지진의 전조:</b> 진동 적 받는 피해 증가.<br>
+          <b>충격파:</b> 진동 해제 시 광역 피해.<br>
+          <b>땅의 분노:</b> 진동 스택 부여 시 자신도 강화.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">💡</span><span class="card-title">범용 에고 기프트</span></div>
+        <div class="card-body">
+          <b>빛의 파편:</b> 전투 시작 시 코인 파워 증가.<br>
+          <b>공명의 촉매:</b> 특정 죄악 속성 사용 시 공명 보너스.<br>
+          <b>절망의 씨앗:</b> 아군 사망 시 생존자 공격력 증가.<br>
+          <b>불굴의 의지:</b> HP 임계 이하일 때 방어력 대폭 증가.
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:8px;">
+      <div class="card-head"><span class="card-icon">🔄</span><span class="card-title">거울세계 (Mirror Dungeon) 시스템</span></div>
+      <div class="card-body">
+        에고 기프트를 수집하며 진행하는 로그라이크 던전 모드.<br><br>
+        <b>진행 방식:</b> 노드 선택 → 전투/이벤트/휴식 → 에고 기프트 수집 → 보스 도전.<br>
+        <b>테마:</b> 각 테마마다 특화된 에고 기프트 풀이 존재.<br>
+        <b>시너지:</b> 동일 속성·계열 기프트를 모으면 강력한 시너지 발동.<br>
+        <b>영구성:</b> 런 종료 시 기프트는 초기화. 스레드(통화)는 유지.
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-wings" class="ssec">
+    <div class="sec-title">날개 기업 (The Wings)</div>
+    <p class="sec-sub">도시를 지배하는 대형 기업/조직들. L Corp 붕괴 이후 세력 재편이 이루어졌다.</p>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">🔴</span><span class="card-title">N 코퍼레이션 (N Corp)</span></div>
+        <div class="card-body">매우 엄격한 규율을 가진 종교적 색채의 기업. 죄를 지은 자는 죽음으로 정화한다는 사상. 이상(Yi Sang) 칸토에서 핵심 적대 세력으로 등장. 도시 이면가에 강한 영향력.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🧪</span><span class="card-title">K 코퍼레이션 (K Corp)</span></div>
+        <div class="card-body">생체 실험과 신체 강화 연구를 전문으로 하는 기업. 직원들의 신체를 개조한다. 그레고르의 과거와 연관이 깊다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">W 코퍼레이션 (W Corp)</span></div>
+        <div class="card-body">물류·운송 특화 기업. 도시 전역의 배달을 담당하며, 독특한 배달부 문화를 가지고 있다. 배달 중 목숨을 거는 극한 배달 문화로 유명.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🏮</span><span class="card-title">류 협회 (Liu Association)</span></div>
+        <div class="card-body">홍록의 가문과 연관된 동양풍 대형 조직. 도시 내에서 광범위한 세력을 가지고 있으며 화상(Burn) 계열 전투를 특기로 한다. 홍록 칸토에서 핵심 등장.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">⚒️</span><span class="card-title">어금니 사무소 (Molar Office)</span></div>
+        <div class="card-body">픽서 사무소 중 하나. 돈키호테 칸토에서 등장. 도시 이면가를 지배하는 거친 조직. 강한 전투력을 바탕으로 세력을 유지.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🔵</span><span class="card-title">쯔바이 협회 (Zwei Association)</span></div>
+        <div class="card-body">체계적이고 조직적인 픽서 집단. 로보토미와 루이나에서도 등장한 역사 있는 집단. 림버스에서도 관련 사건에 등장.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌑</span><span class="card-title">L 코퍼레이션 (L Corp, 붕괴)</span></div>
+        <div class="card-body">로보토미 코퍼레이션의 전신. 이미 붕괴했으나, 그 유산(황금 가지, 직원들의 흔적)이 림버스 컴퍼니의 수집 목표. 도시 곳곳에 L Corp의 흔적이 남아 있다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌑</span><span class="card-title">머리 (The Head)</span></div>
+        <div class="card-body">도시 최상위 지배 조직. 날개 기업들 위에 군림. 그 실체는 여전히 불명확하며, 황금 도시와 깊은 연관이 있다고 추정된다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-canto" class="ssec">
+    <div class="sec-title">칸토(Canto)별 주요 사건</div>
+    <p class="sec-sub">림버스 컴퍼니는 단테의 신곡(神曲) 구조를 따라 "칸토(Canto)"로 이야기가 나뉜다. 각 칸토는 특정 죄인의 과거와 현재를 다룬다.</p>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">프롤로그</div>
+        <div class="tl-head">단테의 각성 — 림버스 컴퍼니 결성</div>
+        <div class="tl-body">가면을 쓴 단테가 비행선에서 깨어난다. 버질리우스가 황금 가지 수집 임무를 설명. 12명의 죄인들을 차례로 영입하거나 만나게 된다. 림버스 컴퍼니의 목적이 제시된다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 I</div>
+        <div class="tl-head">이상(Yi Sang) — N 코퍼레이션 아크</div>
+        <div class="tl-body">N Corp이 지배하는 지역에 황금 가지가 있다. 이상의 과거와 N Corp의 잔혹한 정화 사상이 충돌. 이상이 자신의 능력과 과거를 마주한다. 첫 번째 황금 가지 수집 성공.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 II</div>
+        <div class="tl-head">파우스트 — 지식과 계약의 아크</div>
+        <div class="tl-body">파우스트의 과거 연구와 계약의 비밀이 밝혀진다. 파우스트가 자신의 지식 추구의 한계를 마주하게 된다. 두 번째 황금 가지 수집.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 III</div>
+        <div class="tl-head">돈키호테 — 어금니 사무소 아크</div>
+        <div class="tl-body">돈키호테의 정의와 이상의 충돌. 현실과 이상 사이에서 자신의 길을 찾는 이야기. 어금니 사무소와의 대립이 전개.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 IV</div>
+        <div class="tl-head">료슈 — 예술과 폭력의 아크</div>
+        <div class="tl-body">료슈의 예술적 신념과 폭력 사이의 아이덴티티 갈등. 불꽃과 창조·파괴의 주제가 전개된다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 V</div>
+        <div class="tl-head">뫼르소 — 감정 없는 전사의 내면</div>
+        <div class="tl-body">무감각해 보이는 뫼르소가 도시의 특수한 상황에서 자신의 내면과 마주한다. 원작 이방인의 무관심과 달리, 게임에서는 깊은 내면이 서서히 드러난다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 VI</div>
+        <div class="tl-head">홍록 — 류 협회와 가문의 비밀</div>
+        <div class="tl-body">홍록의 귀족 가문과 류 협회의 권력 다툼. 홍록이 자신의 정체성과 가족의 유산을 마주한다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot major"></div>
+        <div class="tl-era">칸토 VII</div>
+        <div class="tl-head">히스클리프 — 복수와 집착의 끝</div>
+        <div class="tl-body">히스클리프의 오랜 복수심이 마침내 목표와 마주한다. 원작 폭풍의 언덕처럼 사랑과 증오, 집착이 뒤엉키는 이야기.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lim-diff" class="ssec">
+    <div class="sec-title">원작 vs 게임 내 캐릭터 차이점</div>
+    <p class="sec-sub">각 죄인은 원작 문학 작품의 캐릭터를 기반으로 하지만, 프로젝트 문의 도시 세계관과 게임성에 맞게 재해석되었다.</p>
+    <div style="overflow-x:auto;">
+      <table class="diff-table" style="min-width:600px;">
+        <tr><th>캐릭터</th><th>원작 설정</th><th>게임 내 변화</th></tr>
+        <tr>
+          <td>이상</td>
+          <td>실존 한국 시인. 결핵으로 27세 요절. 초현실주의·의식의 흐름 문체. 내면의 불안을 표현.</td>
+          <td>천재 분석가·전사. 병약하지만 강한 전투력. 시적 관점을 전투에 활용. 오감도(시)를 EGO화.</td>
+        </tr>
+        <tr>
+          <td>파우스트</td>
+          <td>노인 남성 학자. 악마와 계약해 젊음과 지식을 얻음. 그레첸과의 사랑, 비극적 결말.</td>
+          <td>여성 캐릭터. 젊고 냉철한 과학자. 계약의 대가에 대한 내면적 갈등을 지님. 실용적 전투 스타일.</td>
+        </tr>
+        <tr>
+          <td>돈키호테</td>
+          <td>망상에 빠진 노인 남성. 풍차를 거인으로 착각. 비극적 각성 후 사망.</td>
+          <td>젊은 여성. 망상 대신 순수한 이상주의. 실제 기사도를 추구하며 진정한 용기를 보여준다.</td>
+        </tr>
+        <tr>
+          <td>료슈</td>
+          <td>아쿠타가와 류노스케 자신(작가). 신경쇠약과 환각으로 35세 자살.</td>
+          <td>예술가·전투사. 삶의 아름다움과 폭력을 예술로 승화. 내면의 어둠을 창조적으로 표현.</td>
+        </tr>
+        <tr>
+          <td>뫼르소</td>
+          <td>감정적 무감각함. 어머니 사망에도 무관심. 아랍인을 우발적으로 살해. 처형 앞에서 세상을 이해.</td>
+          <td>전투적으로 유능하고 신뢰할 수 있음. 무감각함이 약점이 아닌 강점. 내면에 복잡한 감정이 잠재.</td>
+        </tr>
+        <tr>
+          <td>홍록</td>
+          <td>가보옥(남성). 귀족 집안의 총애받는 아들. 여성들에게 둘러싸인 성장. 결국 가문 몰락을 겪음.</td>
+          <td>여유롭고 부유한 귀공자. 가문 권력보다 개인 자유를 추구. 실제 전투력은 상당히 강함.</td>
+        </tr>
+        <tr>
+          <td>히스클리프</td>
+          <td>고아 출신 남성. 사랑하는 캐시에게 집착. 복수를 위해 사악한 면모를 보임. 결말은 허망한 승리.</td>
+          <td>복수심을 유지하지만 동료에 대한 유대감도 지님. 원작보다 입체적인 내면 묘사.</td>
+        </tr>
+        <tr>
+          <td>이스마엘</td>
+          <td>남성 화자. 포경선을 타고 에이헤브 선장 밑에서 항해. 유일한 생존자.</td>
+          <td>여성 캐릭터. 과거 포경 경험을 지닌 베테랑 전사. 바다에 대한 복잡한 감정을 지님.</td>
+        </tr>
+        <tr>
+          <td>로디온</td>
+          <td>라스콜니코프(남성). 자신의 이론을 증명하기 위해 살인. 죄책감과 처벌에 대한 내면 갈등.</td>
+          <td>여성 캐릭터. 쾌활하고 유쾌한 성격. 원작과 달리 죄책감보다는 자신만의 도덕관으로 행동.</td>
+        </tr>
+        <tr>
+          <td>싱클레어</td>
+          <td>에밀 싱클레어(남성). 데미안을 만나 선악의 경계를 탐구. 자아 각성의 여정.</td>
+          <td>어리고 순진한 남성. 아직 자아를 찾는 중. 동료들 속에서 성장하는 캐릭터.</td>
+        </tr>
+        <tr>
+          <td>아웃티스</td>
+          <td>오디세우스(남성). "아무도 아닌 자"라는 가명으로 폴리페모스 탈출. 지략가.</td>
+          <td>여성. 군인 스타일. 지략보다 전술·규율 중시. 정체성 문제(아무도 아닌 자)를 내면에 품음.</td>
+        </tr>
+        <tr>
+          <td>그레고르</td>
+          <td>그레고르 잠자(남성). 어느 날 벌레로 변함. 가족에게 짐이 되다 죽음.</td>
+          <td>전 L Corp 직원. K Corp의 실험으로 신체 일부가 변이. 변신과 정체성의 갈등을 능동적으로 극복.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 전체 세계관 ========== -->
+<section id="sec-world" class="sec">
+  <div class="stabs">
+    <button class="stab on" onclick="showSub('world','city')">도시의 구조</button>
+    <button class="stab" onclick="showSub('world','light')">빛 (Light)</button>
+    <button class="stab" onclick="showSub('world','dist')">왜곡 (Distortion)</button>
+    <button class="stab" onclick="showSub('world','org')">날개 &amp; 머리</button>
+    <button class="stab" onclick="showSub('world','fix')">픽서 시스템</button>
+  </div>
+
+  <div id="world-city" class="ssec on">
+    <div class="sec-title">도시 (The City) 구조</div>
+    <p class="sec-sub">프로젝트 문 세계의 배경. 끝없이 뻗어 있는 거대 도시. 빛(Light)이 에너지원이며 사회 계층이 극단적으로 나뉜다.</p>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">🏙️</span><span class="card-title">도시 상층부</span></div>
+        <div class="card-body">날개 기업들과 상류층이 거주하는 곳. 빛이 풍부하게 공급되며 안전한 환경. 머리의 직접적 통제 아래 있다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌆</span><span class="card-title">이면가 (Backstreets)</span></div>
+        <div class="card-body">도시 하층부의 구역. 빛이 부족하고 위험하다. 픽서들이 활동하는 주된 무대. 이상존재가 숨어있기도 하며, 도시 실질 생태계의 핵심.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🏚️</span><span class="card-title">외곽지대 (Outskirts)</span></div>
+        <div class="card-body">도시 외부의 황폐한 지역. 빛이 거의 없으며 생존하기 매우 어렵다. 문명의 끝자락. 이상존재의 출몰이 잦다.</div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🌑</span><span class="card-title">도시의 외부</span></div>
+        <div class="card-body">도시 너머 무엇이 있는지 불명확하다. 새벽 프로젝트의 목표가 도시 탈출인 것으로 볼 때, 도시 자체가 하나의 거대한 감옥 같은 존재일 가능성이 있다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="world-light" class="ssec">
+    <div class="sec-title">빛 (Light)</div>
+    <p class="sec-sub">도시 문명을 유지하는 에너지원. 단순한 전기가 아닌, 인간의 감정·욕망·의지가 응결된 존재론적 에너지.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">💡</span><span class="card-title">빛의 본질</span></div>
+        <div class="card-body">
+          <b>물리적 에너지:</b> 도시의 전력·난방·기계를 작동시키는 에너지원.<br><br>
+          <b>존재론적 에너지:</b> 인간의 강렬한 감정(공포, 욕망, 희망, 분노)이 응결되면 빛이 된다. 이것이 이상존재의 기원이기도 하다.<br><br>
+          <b>희소성:</b> 빛은 한정되어 있으며, 도시 내에서 불균등하게 분배된다. 빛이 풍부한 곳이 부유하고, 부족한 이면가는 빈곤하다.<br><br>
+          <b>카르멘의 씨앗:</b> 카르멘은 자신을 희생하여 빛의 씨앗을 만들었다. 이것이 바로 라이브러리의 근원.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌑</span><span class="card-title">이상존재와 빛의 관계</span></div>
+        <div class="card-body">
+          이상존재는 인간의 감정·욕망·공포가 극도로 압축된 존재. 따라서 이상존재는 <b>빛의 농축체</b>다.<br><br>
+          <b>로보토미의 수확:</b> 이상존재와 직원이 작업(Work)을 통해 상호작용하면 빛이 생성된다. 이를 수확해 도시에 공급.<br><br>
+          <b>위험성:</b> 이상존재가 탈출하면 빛이 폭주하거나 왜곡 현상이 발생한다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="world-dist" class="ssec">
+    <div class="sec-title">왜곡 (Distortion)</div>
+    <p class="sec-sub">인간이 극도의 정신적 충격을 받았을 때, 혹은 이상존재의 영향을 받았을 때 일어나는 현상. 인간이 이상존재화되는 과정.</p>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌀</span><span class="card-title">왜곡이란?</span></div>
+        <div class="card-body">
+          <b>정의:</b> 인간이 극한의 감정적 충격(공포, 절망, 분노, 집착)을 받으면 내면의 빛이 폭주해 이상존재화되는 현상.<br><br>
+          <b>과정:</b> 인간 → 왜곡 진행 → 이상존재 (되돌리기 불가)<br><br>
+          <b>왜곡된 자들:</b> 원래 인간이었으나 이상존재가 된 케이스가 다수. 허무의 광대(클레르)가 대표적 예.<br><br>
+          <b>림버스에서:</b> 그레고르는 K Corp 실험으로 부분적 왜곡 상태. 일부 죄인들도 왜곡 직전의 상태로 활동한다.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">⚠️</span><span class="card-title">왜곡 vs 이상존재</span></div>
+        <div class="card-body">
+          <b>모든 이상존재가 왜곡인 것은 아니다.</b> 애초부터 인간이 아닌 존재도 있고, 특수한 경로로 생성된 이상존재도 있다.<br><br>
+          <b>공통점:</b> 빛의 응결체라는 점. 인간의 강렬한 감정을 담고 있다는 점.<br><br>
+          <b>픽서의 역할:</b> 왜곡 현상이 일어난 지역을 처리하는 것도 픽서의 주요 임무.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="world-org" class="ssec">
+    <div class="sec-title">날개 (Wings) &amp; 머리 (The Head)</div>
+    <div class="grid-wide">
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🏢</span><span class="card-title">날개 (Wings)</span></div>
+        <div class="card-body">
+          도시 내 대형 기업·조직들의 총칭. 빛의 수급과 분배를 통해 도시를 실질적으로 운영한다.<br><br>
+          <b>특징:</b> 각 날개는 고유한 기술·이념·세력 범위를 보유. 서로 경쟁하고 협력한다.<br><br>
+          <b>주요 날개:</b> L Corp(붕괴), N Corp, K Corp, W Corp, 류 협회, 쯔바이 협회 등.<br><br>
+          <b>픽서와의 관계:</b> 날개들은 픽서 사무소를 고용해 이면가를 간접 통제.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-icon">🌑</span><span class="card-title">머리 (The Head)</span></div>
+        <div class="card-body">
+          도시 최상위 지배 조직. 날개들 위에 군림하는 절대 권력체.<br><br>
+          <b>특징:</b> 실체가 베일에 싸여 있다. 도시의 모든 정보·질서를 궁극적으로 통제.<br><br>
+          <b>황금 도시와의 연관:</b> 황금 도시의 열쇠(황금 가지)를 실질적으로 관리하는 조직으로 추정.<br><br>
+          <b>개입 시점:</b> 라이브러리 오브 루이나에서 도서관 개화를 막기 위해 직접 개입. 림버스에서도 림버스 컴퍼니를 견제.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="world-fix" class="ssec">
+    <div class="sec-title">픽서 (Fixer) 시스템</div>
+    <p class="sec-sub">도시 이면가에서 각종 의뢰를 해결하는 전문 집단. 경찰과 군대의 역할을 대체하는 도시의 실질적 질서 유지 기관.</p>
+    <div class="grid">
+      <div class="card"><div class="card-head"><span class="card-icon">🎖️</span><span class="card-title">픽서 등급</span></div>
+        <div class="card-body">
+          <table class="info-table">
+            <tr><td>씨앗/새싹</td><td>초급 픽서</td></tr>
+            <tr><td>청동(Bronze)</td><td>기초 역량 검증</td></tr>
+            <tr><td>은(Silver)</td><td>중급, 이면가 전반 활동</td></tr>
+            <tr><td>금(Gold)</td><td>고급, 날개의 의뢰 처리</td></tr>
+            <tr><td>백금(Platinum)</td><td>최상위, 전설적 전투력</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">📋</span><span class="card-title">픽서의 역할</span></div>
+        <div class="card-body">
+          · 이상존재 발생 지역 처리<br>
+          · 왜곡 사건 해결<br>
+          · 날개 기업 간 분쟁 중재·해결<br>
+          · 이면가 범죄 조직 처리<br>
+          · 각종 생존·전투 의뢰<br><br>
+          <b>대표 픽서:</b> 게부라(붉은 안개) — 전설적 백금 픽서. 롤랑 — 고급 픽서.
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><span class="card-icon">🏢</span><span class="card-title">픽서 사무소</span></div>
+        <div class="card-body">
+          픽서들이 소속되는 조직. 사무소별로 특색이 다르다.<br><br>
+          <b>붉은 안개 사무소:</b> 게부라 관련. 폭력적이지만 강한 의리.<br>
+          <b>쯔바이 협회:</b> 체계적이고 조직적.<br>
+          <b>어금니 사무소:</b> 이면가 장악 집단.<br>
+          각 사무소는 도시 내 특정 구역에서 영향력을 행사한다.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 타임라인 ========== -->
+<section id="sec-tl" class="sec">
+  <div class="sec-title">전체 세계관 타임라인</div>
+  <p class="sec-sub">프로젝트 문 세계관의 주요 사건을 시간 순으로 정리. <span class="tl-dot major" style="display:inline-block;position:static;width:10px;height:10px;border-radius:50%;background:var(--gold2);vertical-align:middle;"></span> 대형 사건 <span class="tl-dot" style="display:inline-block;position:static;width:10px;height:10px;border-radius:50%;background:var(--red);vertical-align:middle;"></span> 중요 사건 <span class="tl-dot minor" style="display:inline-block;position:static;width:8px;height:8px;border-radius:50%;background:var(--txt3);vertical-align:middle;"></span> 소규모 사건</p>
+
+  <h3 style="color:var(--gold2);font-size:13px;margin:12px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🌑 태고 — 도시 형성기</h3>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">태고 (시기 불명)</div>
+      <div class="tl-head">도시의 형성</div>
+      <div class="tl-body">거대한 도시가 형성된다. 인류가 도시 안에서 생활을 시작하며 외부와 단절. 도시의 구조적 계층화가 시작된다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">초기</div>
+      <div class="tl-head">머리의 확립</div>
+      <div class="tl-body">도시를 통합 지배하는 최상위 권력 조직 <b>머리</b>가 확립된다. 날개 기업들이 각 구역에서 세력을 형성하기 시작.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot minor"></div>
+      <div class="tl-era">초기</div>
+      <div class="tl-head">이상존재의 첫 발생</div>
+      <div class="tl-body">인간의 감정이 응결되어 이상존재가 나타나기 시작. 도시의 어두운 구석과 이면가에서 목격된다. 픽서 직업이 생겨나는 계기가 됨.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중기</div>
+      <div class="tl-head">픽서 시스템 확립</div>
+      <div class="tl-body">이상존재와 도시 분쟁을 전문적으로 처리하는 픽서 집단이 체계를 갖춘다. 각 사무소가 설립되고 의뢰 시스템이 정비된다.</div>
+    </div>
+  </div>
+
+  <h3 style="color:var(--red2);font-size:13px;margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🔴 로보토미 코퍼레이션 시대</h3>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">로보토미 이전</div>
+      <div class="tl-head">카르멘의 이상존재 연구 & 희생</div>
+      <div class="tl-body">L 코퍼레이션 창시자 카르멘이 이상존재와 빛의 연구를 완성. 자신을 희생해 <b>빛의 씨앗</b>을 만든다. 안젤라가 카르멘을 모델로 제작된다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot minor"></div>
+      <div class="tl-era">루프 1~N</div>
+      <div class="tl-head">관리자 루프 반복 (알려지지 않은 기간)</div>
+      <div class="tl-body">관리자(X/Ayin)가 새벽에 도달하지 못하고 반복. 각 루프마다 세피로트와 이상존재 스토리가 반복된다. 안젤라만이 루프를 기억한다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">현재 루프 초반</div>
+      <div class="tl-head">로보토미 게임 시작 — 직원 관리</div>
+      <div class="tl-body">관리자가 다시 시작. 이상존재 10개 미만으로 시작. 세피로트가 부서를 이끌며 점차 위험한 이상존재가 수용된다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중반</div>
+      <div class="tl-head">세피로트 스토리 개방</div>
+      <div class="tl-body">말쿠트 → 예소드 → 호드 → 네차흐 → 티페레트 → 게부라 → 헤세드 → 비나 → 호크마 → 케테르 순으로 각 세피라의 과거·진실이 밝혀진다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중반 — 호드 사건</div>
+      <div class="tl-head">호드의 희생</div>
+      <div class="tl-body">훈련부 부서장 호드가 이상존재의 위협 앞에서 직원들을 지키기 위해 희생한다. 로보토미 내 가장 감정적인 사건 중 하나.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">중후반</div>
+      <div class="tl-head">대규모 억압 프로토콜</div>
+      <div class="tl-body">증오의 여왕, 탐욕의 왕, 절망의 기사, 백야, 아무것도 없는 그것, 종말의 새, 조용한 오케스트라, 미소짓는 시체의 산 등 최강 이상존재를 순차적으로 억압(격파)한다. 시설 전체가 위기에 처하는 연속적 비상사태.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot minor"></div>
+      <div class="tl-era">억압 중</div>
+      <div class="tl-head">종말의 새 — 세 마리 동시 탈출</div>
+      <div class="tl-body">처벌의 새, 심판의 새, 큰 새가 동시에 탈출하여 종말의 새로 합체. 시설 전체를 위협하는 최대 위기 중 하나. 성공적 억압 후 막대한 EGO 획득.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">후반</div>
+      <div class="tl-head">루프의 진실 공개 — 안젤라의 고백</div>
+      <div class="tl-body">안젤라가 관리자에게 루프의 진실을 밝힌다. X/Ayin이 수십 번의 루프 끝에 여기 있다는 사실. 안젤라가 왜 오랫동안 기다려왔는지가 드러난다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">결말</div>
+      <div class="tl-head">새벽 달성 — 루프 종료</div>
+      <div class="tl-body">충분한 빛이 수확되어 새벽이 달성된다. 안젤라는 이 순간을 이용해 자유를 향한 자신만의 결단을 내린다. 루프가 종료되고 새로운 시대가 시작된다.</div>
+    </div>
+  </div>
+
+  <h3 style="color:var(--blu);font-size:13px;margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;">📚 라이브러리 오브 루이나 시대</h3>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">LC 직후</div>
+      <div class="tl-head">라이브러리 오브 루이나 개관</div>
+      <div class="tl-body">안젤라가 빛의 씨앗에서 도서관을 만든다. 도시 어딘가에 신비한 도서관이 존재한다는 소문이 퍼지기 시작. "찾아오는 자 누구에게나 원하는 책을 드린다"는 이야기가 퍼짐.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot minor"></div>
+      <div class="tl-era">초기</div>
+      <div class="tl-head">첫 손님들 방문 &amp; 첫 책 생성</div>
+      <div class="tl-body">도서관을 찾는 초기 손님들이 사서들에게 패배해 책이 된다. 사서가 하나씩 늘어나며 도서관이 성장한다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중반</div>
+      <div class="tl-head">롤랑의 도착</div>
+      <div class="tl-body">픽서 롤랑이 도서관을 찾아온다. 안젤라에게 패배 후 사서로 활용되기 시작한다. 롤랑이 도서관의 비밀을 파헤치기 시작.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중반</div>
+      <div class="tl-head">반향 앙상블 침공</div>
+      <div class="tl-body">도시의 강력한 음악 집단 반향 앙상블이 도서관을 침공. 최강의 전투를 펼치며 도서관이 위기에 빠진다. 사서들이 한계를 시험받는다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">중반</div>
+      <div class="tl-head">게부라와 붉은 안개 사무소 재회</div>
+      <div class="tl-body">게부라의 과거 부하들이 운영하는 붉은 안개 사무소가 손님으로 방문. 게부라와의 감정적인 재회와 전투가 전개된다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">후반</div>
+      <div class="tl-head">허무의 광대(클레르)와의 대면</div>
+      <div class="tl-body">롤랑의 과거 동료이자 허무의 광대가 된 클레르가 도서관에 나타난다. 롤랑은 그녀와 직접 전투를 벌이며 과거의 상처와 화해한다. 이야기의 가장 감정적인 절정.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">후반</div>
+      <div class="tl-head">머리의 사자들 침공</div>
+      <div class="tl-body">도시 최고 권력 조직 머리가 직접 개입. 도서관의 개화를 막기 위해 최강의 요원들을 파견. 도서관 역사상 가장 치열한 전투.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">결말</div>
+      <div class="tl-head">빛의 씨앗 개화 — 세상의 변화</div>
+      <div class="tl-body">모든 책이 수집되어 씨앗이 개화한다. 도서관의 모든 지식이 도시 전체에 퍼진다. 안젤라는 진정한 자유를 얻는다. 이 사건으로 도시의 세력 구도가 크게 바뀌며 림버스 컴퍼니 시대가 열린다.</div>
+    </div>
+  </div>
+
+  <h3 style="color:var(--pur2);font-size:13px;margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;">⚡ 림버스 컴퍼니 시대</h3>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">LOR 이후</div>
+      <div class="tl-head">도시의 세력 재편</div>
+      <div class="tl-body">도서관 개화의 여파로 도시 세력 구도가 재편된다. L Corp은 완전히 붕괴했지만 그 유산(황금 가지)이 도시 곳곳에 남아있다. 새로운 날개 기업들이 세력을 키운다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot major"></div>
+      <div class="tl-era">림버스 시작</div>
+      <div class="tl-head">단테의 각성 — 림버스 컴퍼니 출범</div>
+      <div class="tl-body">가면을 쓴 단테가 버질리우스의 안내 하에 황금 가지 수집을 시작한다. 12명의 죄인이 하나씩 합류하며 림버스 컴퍼니가 형성된다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">칸토 I</div>
+      <div class="tl-head">N Corp 아크 — 이상의 이야기</div>
+      <div class="tl-body">N Corp의 정화 사상과 충돌. 이상이 자신의 과거와 마주한다. 첫 황금 가지 수집 성공.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-era">칸토 II~VII</div>
+      <div class="tl-head">각 죄인들의 이야기</div>
+      <div class="tl-body">파우스트, 돈키호테, 료슈, 뫼르소, 홍록, 히스클리프의 과거와 현재가 각각의 칸토에서 전개된다. 황금 가지를 하나씩 수집하며 황금 도시에 가까워진다.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot minor"></div>
+      <div class="tl-era">진행 중</div>
+      <div class="tl-head">황금 도시를 향한 여정</div>
+      <div class="tl-body">림버스 컴퍼니는 계속해서 황금 가지를 수집 중. 단테의 정체, 황금 도시의 실체, 버질리우스의 진의 등이 아직 미스터리로 남아있다. (스토리 진행 중)</div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('sec-' + id).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+
+function showSub(tab, sub) {
+  const sec = document.getElementById('sec-' + tab);
+  sec.querySelectorAll('.ssec').forEach(s => s.classList.remove('on'));
+  sec.querySelectorAll('.stab').forEach(t => t.classList.remove('on'));
+  document.getElementById(tab + '-' + sub).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+
+function toggleAcc(head) {
+  head.classList.toggle('open');
+  const body = head.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// Search
+const searchEl = document.getElementById('search');
+const hitCnt = document.getElementById('hit-cnt');
+let searchTimeout;
+
+searchEl.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(doSearch, 200);
+});
+
+function doSearch() {
+  const q = searchEl.value.trim().toLowerCase();
+  document.querySelectorAll('.highlight').forEach(el => {
+    el.outerHTML = el.innerHTML;
+  });
+  document.querySelectorAll('.search-hide').forEach(el => el.classList.remove('search-hide'));
+  hitCnt.textContent = '';
+
+  if (!q) return;
+
+  let count = 0;
+  const cards = document.querySelectorAll('.card, .tl-item, .acc');
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    if (text.includes(q)) {
+      count++;
+      highlightText(card, q);
+    } else {
+      // don't hide — just don't highlight
+    }
+  });
+  hitCnt.textContent = count > 0 ? count + '개 발견' : '검색 결과 없음';
+}
+
+function highlightText(el, q) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let node;
+  while (node = walker.nextNode()) nodes.push(node);
+  nodes.forEach(textNode => {
+    const text = textNode.textContent;
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(q);
+    if (idx === -1) return;
+    const span = document.createElement('span');
+    span.innerHTML =
+      escHtml(text.slice(0, idx)) +
+      '<span class="highlight">' + escHtml(text.slice(idx, idx + q.length)) + '</span>' +
+      escHtml(text.slice(idx + q.length));
+    textNode.parentNode.replaceChild(span, textNode);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>옵시디언 노트 — 테스트 61</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1e1e2e;--bg2:#181825;--bg3:#11111b;
+  --surface:#24273a;--surface2:#2e3148;
+  --border:#363a4f;--border2:#494d64;
+  --txt:#cad3f5;--txt2:#a5adcb;--txt3:#6e738d;
+  --accent:#8aadf4;--accent2:#c6a0f6;
+  --green:#a6da95;--yellow:#eed49f;--red:#ed8796;--orange:#f5a97f;
+  --sidebar-w:240px;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg3);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;display:flex;flex-direction:column;}
+
+/* TITLE BAR */
+#titlebar{background:var(--bg3);border-bottom:1px solid var(--border);
+  padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:38px;}
+#titlebar .app-icon{font-size:17px;}
+#titlebar .app-name{font-weight:600;font-size:13px;color:var(--txt);}
+#titlebar .spacer{flex:1;}
+.tb-btn{background:none;border:1px solid var(--border);color:var(--txt2);
+  padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;transition:all .15s;}
+.tb-btn:hover{background:var(--surface);color:var(--txt);}
+.tb-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(138,173,244,.08);}
+
+/* APP */
+#app{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+#sidebar-header{padding:10px 12px 8px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;}
+#search-input{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--txt);
+  padding:5px 8px;border-radius:4px;font-size:12px;outline:none;}
+#search-input:focus{border-color:var(--accent);}
+#search-input::placeholder{color:var(--txt3);}
+#new-note-btn{background:var(--accent);border:none;color:var(--bg3);
+  width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:16px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#new-note-btn:hover{opacity:.85;}
+#note-list{flex:1;overflow-y:auto;padding:6px 0;}
+.note-item{padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;
+  transition:background .1s;}
+.note-item:hover{background:var(--surface);}
+.note-item.active{background:rgba(138,173,244,.12);border-left:2px solid var(--accent);padding-left:10px;}
+.ni-icon{color:var(--txt3);font-size:12px;}
+.ni-title{font-size:13px;color:var(--txt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ni-del{opacity:0;background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:0 3px;}
+.note-item:hover .ni-del{opacity:1;}
+#sidebar-tags{border-top:1px solid var(--border);padding:8px 12px;}
+.tag-section-label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+#tags-list{display:flex;flex-wrap:wrap;gap:4px;}
+.tag-badge{background:rgba(198,160,246,.12);color:var(--accent2);padding:2px 7px;
+  border-radius:10px;font-size:11px;cursor:pointer;border:1px solid rgba(198,160,246,.2);}
+.tag-badge:hover{background:rgba(198,160,246,.22);}
+
+/* EDITOR AREA */
+#editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#editor-toolbar{background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:6px 14px;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+#note-title-input{background:none;border:none;color:var(--txt);font-size:17px;font-weight:600;
+  flex:1;outline:none;min-width:0;}
+#note-title-input::placeholder{color:var(--txt3);}
+.tb-sep{width:1px;height:18px;background:var(--border);margin:0 2px;}
+.ed-btn{background:none;border:none;color:var(--txt2);cursor:pointer;padding:4px 8px;
+  border-radius:4px;font-size:13px;transition:all .15s;}
+.ed-btn:hover{background:var(--surface);color:var(--txt);}
+.ed-btn.active{background:rgba(138,173,244,.12);color:var(--accent);}
+
+#editor-body{flex:1;display:flex;overflow:hidden;}
+#md-editor{flex:1;background:var(--bg);color:var(--txt);border:none;outline:none;
+  padding:24px 32px;font-family:'JetBrains Mono','Fira Code',Consolas,monospace;
+  font-size:14px;line-height:1.75;resize:none;overflow-y:auto;tab-size:2;}
+#md-editor.split{border-right:1px solid var(--border);}
+#md-preview{flex:1;background:var(--bg);padding:24px 32px;overflow-y:auto;display:none;}
+#md-preview.visible{display:block;}
+#md-preview.split{display:block;}
+
+/* PREVIEW STYLES */
+#md-preview h1{font-size:1.8em;color:var(--txt);margin:.5em 0 .3em;
+  border-bottom:1px solid var(--border);padding-bottom:.2em;}
+#md-preview h2{font-size:1.4em;color:var(--txt);margin:.8em 0 .3em;}
+#md-preview h3{font-size:1.15em;color:var(--txt2);margin:.6em 0 .2em;}
+#md-preview p{margin:.45em 0;}
+#md-preview a{color:var(--accent);text-decoration:none;}
+#md-preview a:hover{text-decoration:underline;}
+#md-preview code{background:var(--surface);color:var(--orange);padding:1px 5px;
+  border-radius:3px;font-size:.9em;font-family:monospace;}
+#md-preview pre{background:var(--surface);padding:12px 14px;border-radius:6px;
+  overflow-x:auto;margin:.5em 0;border:1px solid var(--border);}
+#md-preview pre code{background:none;padding:0;color:var(--green);}
+#md-preview blockquote{border-left:3px solid var(--accent2);padding-left:12px;
+  color:var(--txt2);margin:.5em 0;}
+#md-preview ul,#md-preview ol{padding-left:20px;margin:.3em 0;}
+#md-preview li{margin:.15em 0;}
+#md-preview strong{color:var(--yellow);font-weight:600;}
+#md-preview em{color:var(--accent2);font-style:italic;}
+#md-preview del{color:var(--txt3);text-decoration:line-through;}
+#md-preview hr{border:none;border-top:1px solid var(--border);margin:1em 0;}
+#md-preview table{border-collapse:collapse;width:100%;margin:.5em 0;}
+#md-preview th{background:var(--surface);color:var(--txt);padding:6px 10px;border:1px solid var(--border);}
+#md-preview td{padding:5px 10px;border:1px solid var(--border);color:var(--txt2);}
+#md-preview .wikilink{color:var(--accent2);cursor:pointer;background:rgba(198,160,246,.08);
+  padding:1px 5px;border-radius:3px;border:1px solid rgba(198,160,246,.2);}
+#md-preview .wikilink:hover{background:rgba(198,160,246,.2);}
+#md-preview .md-tag{color:var(--accent2);font-size:.9em;}
+#md-preview .cb-done{text-decoration:line-through;color:var(--txt3);}
+
+/* EMPTY STATE */
+#empty-state{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:var(--txt3);gap:12px;text-align:center;padding:20px;}
+#empty-state .es-icon{font-size:48px;opacity:.35;}
+#empty-state p{font-size:14px;line-height:1.8;}
+#empty-state kbd{background:var(--surface);border:1px solid var(--border2);
+  padding:1px 7px;border-radius:3px;color:var(--txt2);font-size:12px;}
+
+/* GRAPH VIEW */
+#graph-view{display:none;flex-direction:column;overflow:hidden;background:var(--bg);}
+#graph-view.visible{display:flex;}
+#graph-canvas{flex:1;cursor:grab;}
+#graph-canvas:active{cursor:grabbing;}
+#graph-info{padding:8px 18px;font-size:11px;color:var(--txt3);border-top:1px solid var(--border);
+  display:flex;gap:16px;}
+
+/* SHORTCUT PANEL */
+#sc-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:1000;align-items:center;justify-content:center;}
+#sc-panel.visible{display:flex;}
+#sc-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;
+  width:560px;max-width:95vw;max-height:82vh;display:flex;flex-direction:column;
+  overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#sc-header{padding:15px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;}
+#sc-header h2{font-size:15px;color:var(--txt);}
+#sc-close{background:none;border:none;color:var(--txt3);cursor:pointer;font-size:20px;line-height:1;}
+#sc-close:hover{color:var(--txt);}
+#sc-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg3);}
+.sc-tab{flex:1;padding:10px;text-align:center;font-size:13px;cursor:pointer;color:var(--txt3);
+  border:none;background:none;transition:all .15s;border-bottom:2px solid transparent;}
+.sc-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg2);}
+#sc-body{flex:1;overflow-y:auto;padding:16px 20px;}
+
+/* SHORTCUT LIST */
+.sc-group{margin-bottom:16px;}
+.sc-group-title{font-size:11px;color:var(--txt3);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:8px;font-weight:600;}
+.sc-row{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid rgba(54,58,79,.6);}
+.sc-row:last-child{border-bottom:none;}
+.sc-desc{color:var(--txt2);font-size:13px;}
+.sc-keys{display:flex;gap:3px;align-items:center;}
+.sc-key{background:var(--surface2);border:1px solid var(--border2);color:var(--txt);
+  padding:2px 7px;border-radius:4px;font-size:11px;font-family:monospace;
+  box-shadow:0 1px 0 var(--border2);}
+.sc-plus{color:var(--txt3);font-size:11px;margin:0 1px;}
+
+/* REQUEST FORM */
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.form-label{font-size:12px;color:var(--txt2);}
+.form-input,.form-textarea{background:var(--bg3);border:1px solid var(--border);
+  color:var(--txt);padding:8px 10px;border-radius:6px;font-size:13px;
+  outline:none;font-family:inherit;transition:border-color .15s;}
+.form-input:focus,.form-textarea:focus{border-color:var(--accent);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--txt3);}
+#req-submit{background:var(--accent);border:none;color:var(--bg3);
+  padding:10px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;
+  width:100%;transition:opacity .15s;}
+#req-submit:hover{opacity:.85;}
+.req-hint{font-size:11px;color:var(--txt3);margin-top:6px;text-align:center;}
+
+/* REQUEST HISTORY */
+.req-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  padding:10px 13px;margin-bottom:8px;}
+.req-action{font-size:13px;color:var(--txt);font-weight:500;}
+.req-keys{color:var(--accent2);font-size:12px;margin:3px 0;}
+.req-reason{color:var(--txt2);font-size:12px;}
+.req-meta{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.req-date{color:var(--txt3);font-size:11px;}
+.req-status{font-size:10px;padding:2px 8px;border-radius:10px;}
+.status-pending{background:rgba(238,212,159,.12);color:var(--yellow);border:1px solid rgba(238,212,159,.25);}
+.no-req{color:var(--txt3);text-align:center;padding:28px;font-size:13px;line-height:2;}
+
+/* TOAST */
+#toast{position:fixed;bottom:32px;right:24px;background:var(--surface2);
+  border:1px solid var(--border2);color:var(--txt);padding:10px 16px;border-radius:6px;
+  font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;
+  pointer-events:none;z-index:9999;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* STATUS BAR */
+#statusbar{background:var(--accent);color:var(--bg3);padding:2px 16px;
+  font-size:11px;display:flex;gap:16px;flex-shrink:0;}
+#statusbar span{opacity:.9;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--txt3);}
+</style>
+</head>
+<body>
+
+<!-- TITLE BAR -->
+<div id="titlebar">
+  <span class="app-icon">🔮</span>
+  <span class="app-name">Obsidian Notes</span>
+  <div class="spacer"></div>
+  <button class="tb-btn" id="graph-btn" title="그래프 보기 (Ctrl+G)">🕸 그래프</button>
+  <button class="tb-btn" id="sc-open-btn" title="단축키 (Ctrl+/)">⌨️ 단축키 요청</button>
+</div>
+
+<!-- APP BODY -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <input id="search-input" type="text" placeholder="노트 검색...">
+      <button id="new-note-btn" title="새 노트 (Ctrl+N)">+</button>
+    </div>
+    <div id="note-list"></div>
+    <div id="sidebar-tags">
+      <div class="tag-section-label">태그</div>
+      <div id="tags-list"></div>
+    </div>
+  </div>
+
+  <!-- EDITOR AREA -->
+  <div id="editor-area">
+    <div id="editor-toolbar">
+      <input id="note-title-input" type="text" placeholder="제목 없음">
+      <div class="tb-sep"></div>
+      <button class="ed-btn" id="btn-bold" title="굵게 (Ctrl+B)"><b>B</b></button>
+      <button class="ed-btn" id="btn-italic" title="기울임 (Ctrl+I)"><i>I</i></button>
+      <button class="ed-btn" id="btn-code" title="인라인 코드 (Ctrl+`)">{ }</button>
+      <button class="ed-btn" id="btn-link" title="위키링크 (Ctrl+K)">[[…]]</button>
+      <button class="ed-btn" id="btn-tag" title="태그">#</button>
+      <button class="ed-btn" id="btn-table" title="표 삽입">⊞</button>
+      <div class="tb-sep"></div>
+      <button class="ed-btn active" id="btn-edit" title="편집 모드">편집</button>
+      <button class="ed-btn" id="btn-preview" title="미리보기 (Ctrl+E)">미리보기</button>
+      <button class="ed-btn" id="btn-split" title="분할 보기">분할</button>
+    </div>
+
+    <div id="editor-body">
+      <div id="empty-state">
+        <div class="es-icon">📝</div>
+        <p>왼쪽 <kbd>+</kbd> 버튼으로 새 노트를 만들거나<br>기존 노트를 선택하세요.<br><br>
+          <kbd>Ctrl+N</kbd> 새 노트 &nbsp;·&nbsp; <kbd>Ctrl+G</kbd> 그래프<br>
+          <kbd>Ctrl+/</kbd> 단축키 요청 패널</p>
+      </div>
+      <textarea id="md-editor" placeholder="마크다운으로 작성하세요...&#10;&#10;지원: [[위키링크]], #태그, **굵게**, *기울임*, `코드`, > 인용, - [ ] 체크리스트" style="display:none"></textarea>
+      <div id="md-preview"></div>
+    </div>
+
+    <div id="graph-view">
+      <canvas id="graph-canvas"></canvas>
+      <div id="graph-info">
+        <span>🔵 클릭: 노트 열기</span>
+        <span>✋ 드래그: 노드 이동</span>
+        <span>🖱 배경 드래그: 화면 이동</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <span id="sb-note">노트 없음</span>
+  <span id="sb-words">0 단어</span>
+  <span id="sb-chars">0 글자</span>
+  <span id="sb-links">링크 0개</span>
+</div>
+
+<!-- SHORTCUT PANEL -->
+<div id="sc-panel">
+  <div id="sc-box">
+    <div id="sc-header">
+      <h2>⌨️ 단축키</h2>
+      <button id="sc-close">✕</button>
+    </div>
+    <div id="sc-tabs">
+      <button class="sc-tab active" data-tab="list">단축키 목록</button>
+      <button class="sc-tab" data-tab="request">단축키 요청하기</button>
+      <button class="sc-tab" data-tab="history">요청 내역</button>
+    </div>
+    <div id="sc-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ── SHORTCUT DATA ─────────────────────────────────────────────────────────────
+const SHORTCUTS = [
+  {
+    group: '파일',
+    items: [
+      { desc: '새 노트 만들기', keys: ['Ctrl', 'N'] },
+      { desc: '현재 노트 저장', keys: ['Ctrl', 'S'] },
+      { desc: '노트 검색 포커스', keys: ['Ctrl', 'F'] },
+    ]
+  },
+  {
+    group: '편집',
+    items: [
+      { desc: '굵게', keys: ['Ctrl', 'B'] },
+      { desc: '기울임', keys: ['Ctrl', 'I'] },
+      { desc: '인라인 코드', keys: ['Ctrl', '`'] },
+      { desc: '위키링크 삽입', keys: ['Ctrl', 'K'] },
+    ]
+  },
+  {
+    group: '보기',
+    items: [
+      { desc: '편집 / 미리보기 토글', keys: ['Ctrl', 'E'] },
+      { desc: '그래프 보기 토글', keys: ['Ctrl', 'G'] },
+      { desc: '단축키 패널 열기', keys: ['Ctrl', '/'] },
+      { desc: '패널 닫기', keys: ['Esc'] },
+    ]
+  },
+];
+
+// ── SAMPLE NOTES ──────────────────────────────────────────────────────────────
+const SAMPLES = [
+  {
+    id: 'welcome',
+    title: '환영합니다!',
+    content: `# 옵시디언 노트에 오신 것을 환영합니다 🔮
+
+이 앱은 [Obsidian](https://obsidian.md)에서 영감을 받은 마크다운 노트 앱입니다.
+
+## 주요 기능
+
+- **[[위키링크]]** — \`[[노트 제목]]\` 형식으로 노트 간 연결
+- **#태그** — 노트를 태그로 분류하고 사이드바에서 필터링
+- **마크다운** — 제목·목록·표·코드블록·인용 등 완전 지원
+- **그래프 보기** — 노트 연결 관계를 시각화 (Ctrl+G)
+- **단축키 요청** — 원하는 단축키를 제안해 보세요 (Ctrl+/)
+
+## 시작해 보기
+
+1. \`+\` 버튼이나 \`Ctrl+N\`으로 새 노트를 만드세요
+2. \`Ctrl+E\`로 편집 ↔ 미리보기를 전환하세요
+3. \`Ctrl+G\`로 그래프를 확인하세요
+4. \`Ctrl+/\`로 단축키를 보거나 새 단축키를 요청하세요
+
+> 모든 노트는 브라우저 localStorage에 저장됩니다.
+
+[[마크다운 가이드]]도 확인해 보세요!
+
+#시작하기 #가이드
+`,
+  },
+  {
+    id: 'md-guide',
+    title: '마크다운 가이드',
+    content: `# 마크다운 가이드
+
+#마크다운 #가이드
+
+## 텍스트 서식
+
+**굵게**, *기울임*, ~~취소선~~, \`인라인 코드\`
+
+## 제목
+
+\`# H1\`, \`## H2\`, \`### H3\`
+
+## 목록
+
+- 항목 A
+- 항목 B
+  - 중첩 항목
+
+1. 첫 번째
+2. 두 번째
+
+## 체크리스트
+
+- [x] 마크다운 익히기
+- [x] 노트 연결 배우기
+- [ ] 그래프 뷰 탐색하기
+
+## 인용문
+
+> 좋은 노트는 좋은 생각에서 시작합니다.
+
+## 코드 블록
+
+\`\`\`javascript
+const greet = name => \`안녕하세요, \${name}!\`;
+console.log(greet('옵시디언'));
+\`\`\`
+
+## 표
+
+| 기능 | 지원 | 단축키 |
+|------|------|--------|
+| 위키링크 | ✅ | Ctrl+K |
+| 태그 | ✅ | # |
+| 그래프 | ✅ | Ctrl+G |
+| 미리보기 | ✅ | Ctrl+E |
+
+---
+
+[[환영합니다!]]로 돌아가기
+
+#마크다운
+`,
+  },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let notes = [], currentId = null, viewMode = 'edit', graphVisible = false;
+
+function loadNotes() {
+  const saved = localStorage.getItem('obsidian-v61');
+  if (saved) {
+    try { notes = JSON.parse(saved); return; } catch {}
+  }
+  notes = SAMPLES.map(n => ({ ...n, createdAt: Date.now(), updatedAt: Date.now() }));
+  saveNotes();
+}
+function saveNotes() { localStorage.setItem('obsidian-v61', JSON.stringify(notes)); }
+function getNote(id) { return notes.find(n => n.id === id); }
+
+// ── NOTE LIST ─────────────────────────────────────────────────────────────────
+function renderNoteList(filter) {
+  const q = (filter || '').toLowerCase();
+  const filtered = q
+    ? notes.filter(n => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q))
+    : notes;
+  const el = document.getElementById('note-list');
+  el.innerHTML = filtered.map(n => `
+    <div class="note-item${n.id === currentId ? ' active' : ''}" data-id="${n.id}">
+      <span class="ni-icon">📄</span>
+      <span class="ni-title">${esc(n.title || '제목 없음')}</span>
+      <button class="ni-del" data-id="${n.id}" title="삭제">×</button>
+    </div>
+  `).join('');
+  el.querySelectorAll('.note-item').forEach(item => {
+    item.addEventListener('click', e => { if (!e.target.classList.contains('ni-del')) openNote(item.dataset.id); });
+  });
+  el.querySelectorAll('.ni-del').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); deleteNote(btn.dataset.id); });
+  });
+}
+
+function renderTags() {
+  const all = new Set();
+  notes.forEach(n => (n.content.match(/#[\w가-힣]+/g) || []).forEach(t => all.add(t)));
+  const el = document.getElementById('tags-list');
+  if (!all.size) { el.innerHTML = '<span style="color:var(--txt3);font-size:11px;">태그 없음</span>'; return; }
+  el.innerHTML = [...all].map(t => `<span class="tag-badge">${esc(t)}</span>`).join('');
+  el.querySelectorAll('.tag-badge').forEach(b => {
+    b.addEventListener('click', () => {
+      document.getElementById('search-input').value = b.textContent;
+      renderNoteList(b.textContent);
+    });
+  });
+}
+
+// ── OPEN / CLOSE NOTE ─────────────────────────────────────────────────────────
+function openNote(id) {
+  currentId = id;
+  const note = getNote(id);
+  if (!note) return;
+  document.getElementById('empty-state').style.display = 'none';
+  const ed = document.getElementById('md-editor');
+  ed.style.display = '';
+  document.getElementById('note-title-input').value = note.title;
+  ed.value = note.content;
+  setViewMode(viewMode);
+  updatePreview();
+  updateStatusBar();
+  renderNoteList(document.getElementById('search-input').value);
+}
+
+// ── VIEW MODE ─────────────────────────────────────────────────────────────────
+function setViewMode(mode) {
+  viewMode = mode;
+  const ed = document.getElementById('md-editor');
+  const prev = document.getElementById('md-preview');
+  const bEdit = document.getElementById('btn-edit');
+  const bPrev = document.getElementById('btn-preview');
+  const bSplit = document.getElementById('btn-split');
+
+  ed.classList.remove('split');
+  prev.classList.remove('visible', 'split');
+  [bEdit, bPrev, bSplit].forEach(b => b.classList.remove('active'));
+
+  if (mode === 'edit') {
+    ed.style.display = '';
+    bEdit.classList.add('active');
+  } else if (mode === 'preview') {
+    ed.style.display = 'none';
+    prev.classList.add('visible');
+    bPrev.classList.add('active');
+    updatePreview();
+  } else {
+    ed.style.display = '';
+    ed.classList.add('split');
+    prev.classList.add('visible', 'split');
+    bSplit.classList.add('active');
+    updatePreview();
+  }
+}
+
+// ── MARKDOWN PARSER ───────────────────────────────────────────────────────────
+function updatePreview() {
+  if (!currentId) return;
+  const html = parseMarkdown(document.getElementById('md-editor').value);
+  const el = document.getElementById('md-preview');
+  el.innerHTML = html;
+  el.querySelectorAll('.wikilink').forEach(w => {
+    w.addEventListener('click', () => {
+      const found = notes.find(n => n.title === w.dataset.t);
+      if (found) openNote(found.id);
+      else showToast(`'${w.dataset.t}' 노트가 없습니다`);
+    });
+  });
+}
+
+function parseMarkdown(raw) {
+  const lines = raw.split('\n');
+  const out = [];
+  let inFence = false, fenceLines = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    if (line.startsWith('```')) {
+      if (!inFence) { inFence = true; fenceLines = []; continue; }
+      out.push(`<pre><code>${fenceLines.map(esc).join('\n')}</code></pre>`);
+      inFence = false; fenceLines = []; continue;
+    }
+    if (inFence) { fenceLines.push(line); continue; }
+
+    // wikilinks before escaping
+    const wikilinkMap = {};
+    line = line.replace(/\[\[([^\]]+)\]\]/g, (_, t) => {
+      const key = `\x00wl${Object.keys(wikilinkMap).length}\x00`;
+      wikilinkMap[key] = `<span class="wikilink" data-t="${esc(t)}">[[${esc(t)}]]</span>`;
+      return key;
+    });
+    const tags = {};
+    line = line.replace(/(^|\s)(#[\w가-힣]+)/g, (_, pre, tag) => {
+      const key = `\x00tg${Object.keys(tags).length}\x00`;
+      tags[key] = `${pre}<span class="md-tag">${esc(tag)}</span>`;
+      return key;
+    });
+    line = esc(line);
+    Object.entries(wikilinkMap).forEach(([k, v]) => { line = line.replace(esc(k), v); });
+    Object.entries(tags).forEach(([k, v]) => { line = line.replace(esc(k), v); });
+
+    if (line.startsWith('### ')) { out.push(`<h3>${fmt(line.slice(4))}</h3>`); continue; }
+    if (line.startsWith('## '))  { out.push(`<h2>${fmt(line.slice(3))}</h2>`); continue; }
+    if (line.startsWith('# '))   { out.push(`<h1>${fmt(line.slice(2))}</h1>`); continue; }
+    if (/^---+$/.test(line.replace(/&amp;/g,'&'))) { out.push('<hr>'); continue; }
+    if (line.startsWith('&gt; ')) { out.push(`<blockquote>${fmt(line.slice(5))}</blockquote>`); continue; }
+    if (/^- \[x\] /i.test(line)) { out.push(`<p class="cb-done">☑ ${fmt(line.slice(6))}</p>`); continue; }
+    if (/^- \[ \] /.test(line))  { out.push(`<p>☐ ${fmt(line.slice(6))}</p>`); continue; }
+    if (line.startsWith('- ') || line.startsWith('* ')) { out.push(`<li>${fmt(line.slice(2))}</li>`); continue; }
+    if (/^\d+\. /.test(line)) { out.push(`<li>${fmt(line.replace(/^\d+\. /,''))}</li>`); continue; }
+
+    if (line.includes(' | ') || line.startsWith('|')) {
+      const tbl = [line];
+      while (lines[i+1] && (lines[i+1].includes(' | ') || lines[i+1].startsWith('|'))) {
+        i++; tbl.push(esc(lines[i]));
+      }
+      out.push(buildTable(tbl));
+      continue;
+    }
+
+    if (line.trim() === '') { out.push('<br>'); continue; }
+    out.push(`<p>${fmt(line)}</p>`);
+  }
+  return out.join('');
+}
+
+function fmt(s) {
+  return s
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+}
+
+function buildTable(rows) {
+  const valid = rows.filter(r => !/^[\s|:–-]+$/.test(r.replace(/&[a-z]+;/g,'')));
+  if (!valid.length) return '';
+  const cells = r => r.split('|').map(c => c.trim()).filter(Boolean);
+  const [hdr, ...body] = valid;
+  return `<table><thead><tr>${cells(hdr).map(c=>`<th>${fmt(c)}</th>`).join('')}</tr></thead><tbody>${
+    body.map(r=>`<tr>${cells(r).map(c=>`<td>${fmt(c)}</td>`).join('')}</tr>`).join('')
+  }</tbody></table>`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────────
+function createNote() {
+  const id = 'note-' + Date.now();
+  notes.unshift({ id, title: '새 노트', content: '', createdAt: Date.now(), updatedAt: Date.now() });
+  saveNotes(); renderNoteList(); renderTags(); openNote(id);
+  setTimeout(() => { const t = document.getElementById('note-title-input'); t.select(); }, 50);
+}
+
+let autoTimer = null;
+function autoSave() {
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    if (!currentId) return;
+    const n = getNote(currentId); if (!n) return;
+    n.content = document.getElementById('md-editor').value;
+    n.updatedAt = Date.now();
+    saveNotes(); updatePreview(); updateStatusBar();
+  }, 500);
+}
+
+function saveNow() {
+  if (!currentId) return;
+  const n = getNote(currentId); if (!n) return;
+  n.title = document.getElementById('note-title-input').value || '제목 없음';
+  n.content = document.getElementById('md-editor').value;
+  n.updatedAt = Date.now();
+  saveNotes(); renderNoteList(); renderTags(); updatePreview(); updateStatusBar();
+  showToast('저장되었습니다 ✓');
+}
+
+function deleteNote(id) {
+  if (!confirm('이 노트를 삭제할까요?')) return;
+  notes = notes.filter(n => n.id !== id);
+  saveNotes();
+  if (currentId === id) {
+    currentId = null;
+    document.getElementById('empty-state').style.display = '';
+    document.getElementById('md-editor').style.display = 'none';
+    document.getElementById('md-preview').classList.remove('visible','split');
+  }
+  renderNoteList(); renderTags(); updateStatusBar();
+  showToast('삭제되었습니다');
+}
+
+function updateStatusBar() {
+  const n = getNote(currentId);
+  const c = n ? n.content : '';
+  const words = c.trim() ? c.trim().split(/\s+/).length : 0;
+  const links = (c.match(/\[\[[^\]]+\]\]/g) || []).length;
+  document.getElementById('sb-note').textContent = n ? n.title : '노트 없음';
+  document.getElementById('sb-words').textContent = `${words} 단어`;
+  document.getElementById('sb-chars').textContent = `${c.length} 글자`;
+  document.getElementById('sb-links').textContent = `링크 ${links}개`;
+}
+
+// ── GRAPH VIEW ────────────────────────────────────────────────────────────────
+let gNodes = [], gEdges = [], gDragging = null, gDragOffset = {x:0,y:0};
+let gOffset = {x:0,y:0}, gMoved = false;
+
+function buildGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  const r = Math.min(W, H) * 0.32;
+  gNodes = notes.map((n, i) => {
+    const a = (i / notes.length) * Math.PI * 2;
+    return { id: n.id, title: n.title, x: W/2 + r*Math.cos(a), y: H/2 + r*Math.sin(a) };
+  });
+  gEdges = [];
+  notes.forEach(n => {
+    (n.content.match(/\[\[([^\]]+)\]\]/g) || []).forEach(m => {
+      const t = m.slice(2,-2);
+      const tgt = notes.find(nn => nn.title === t);
+      if (tgt) gEdges.push({ from: n.id, to: tgt.id });
+    });
+  });
+  gOffset = {x:0,y:0};
+}
+
+function drawGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.translate(gOffset.x, gOffset.y);
+
+  gEdges.forEach(e => {
+    const f = gNodes.find(n => n.id === e.from), t = gNodes.find(n => n.id === e.to);
+    if (!f || !t) return;
+    ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
+    ctx.strokeStyle = 'rgba(138,173,244,.3)'; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  gNodes.forEach(n => {
+    const active = n.id === currentId;
+    ctx.beginPath(); ctx.arc(n.x, n.y, 20, 0, Math.PI*2);
+    ctx.fillStyle = active ? 'rgba(138,173,244,.55)' : 'rgba(46,49,72,.9)';
+    ctx.fill();
+    ctx.strokeStyle = active ? '#8aadf4' : '#494d64';
+    ctx.lineWidth = active ? 2 : 1; ctx.stroke();
+    const label = n.title.length > 13 ? n.title.slice(0,13)+'…' : n.title;
+    ctx.fillStyle = '#cad3f5'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(label, n.x, n.y + 34);
+  });
+
+  ctx.restore();
+}
+
+function nodeAt(px, py) {
+  return gNodes.find(n => {
+    const dx = n.x + gOffset.x - px, dy = n.y + gOffset.y - py;
+    return Math.sqrt(dx*dx+dy*dy) < 22;
+  });
+}
+
+function initGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  canvas.addEventListener('mousedown', e => {
+    gMoved = false;
+    const r = canvas.getBoundingClientRect();
+    const px = e.clientX - r.left, py = e.clientY - r.top;
+    const node = nodeAt(px, py);
+    if (node) {
+      gDragging = { type:'node', node };
+      gDragOffset = { x: px - node.x - gOffset.x, y: py - node.y - gOffset.y };
+    } else {
+      gDragging = { type:'pan', sx: px - gOffset.x, sy: py - gOffset.y };
+    }
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (!gDragging) return;
+    gMoved = true;
+    const r = canvas.getBoundingClientRect();
+    const px = e.clientX - r.left, py = e.clientY - r.top;
+    if (gDragging.type === 'node') {
+      gDragging.node.x = px - gDragOffset.x - gOffset.x;
+      gDragging.node.y = py - gDragOffset.y - gOffset.y;
+    } else {
+      gOffset.x = px - gDragging.sx;
+      gOffset.y = py - gDragging.sy;
+    }
+    drawGraph();
+  });
+  canvas.addEventListener('mouseup', () => { gDragging = null; });
+  canvas.addEventListener('click', e => {
+    if (gMoved) return;
+    const r = canvas.getBoundingClientRect();
+    const node = nodeAt(e.clientX - r.left, e.clientY - r.top);
+    if (node) { setGraphVisible(false); openNote(node.id); }
+  });
+}
+
+function setGraphVisible(v) {
+  graphVisible = v;
+  const gv = document.getElementById('graph-view');
+  const eb = document.getElementById('editor-body');
+  const et = document.getElementById('editor-toolbar');
+  gv.classList.toggle('visible', v);
+  eb.style.display = v ? 'none' : '';
+  et.style.display = v ? 'none' : '';
+  document.getElementById('graph-btn').classList.toggle('active', v);
+  if (v) { buildGraph(); requestAnimationFrame(drawGraph); }
+}
+
+// ── SHORTCUT PANEL ────────────────────────────────────────────────────────────
+let spTab = 'list';
+
+function openSCPanel() { document.getElementById('sc-panel').classList.add('visible'); renderSpTab(spTab); }
+function closeSCPanel() { document.getElementById('sc-panel').classList.remove('visible'); }
+
+function renderSpTab(tab) {
+  spTab = tab;
+  document.querySelectorAll('.sc-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const body = document.getElementById('sc-body');
+
+  if (tab === 'list') {
+    body.innerHTML = SHORTCUTS.map(g => `
+      <div class="sc-group">
+        <div class="sc-group-title">${esc(g.group)}</div>
+        ${g.items.map(item => `
+          <div class="sc-row">
+            <span class="sc-desc">${esc(item.desc)}</span>
+            <span class="sc-keys">${item.keys.map((k,i) =>
+              (i > 0 ? '<span class="sc-plus">+</span>' : '') + `<kbd class="sc-key">${esc(k)}</kbd>`
+            ).join('')}</span>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+  } else if (tab === 'request') {
+    body.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">원하는 기능 *</label>
+        <input class="form-input" id="req-action" placeholder="예: 노트 복제, 글자 수 표시, 다크/라이트 전환..." maxlength="80">
+      </div>
+      <div class="form-group">
+        <label class="form-label">제안하는 단축키 (선택)</label>
+        <input class="form-input" id="req-keys" placeholder="예: Ctrl+D, Alt+Shift+N..." maxlength="40">
+      </div>
+      <div class="form-group">
+        <label class="form-label">이유 / 설명 (선택)</label>
+        <textarea class="form-textarea" id="req-reason" placeholder="왜 이 단축키가 필요한지, 어떤 상황에서 쓸 것인지 설명해 주세요"></textarea>
+      </div>
+      <button id="req-submit">✉️ 요청 제출</button>
+      <p class="req-hint">요청은 브라우저에 저장되며 [요청 내역] 탭에서 확인할 수 있습니다.</p>
+    `;
+    document.getElementById('req-submit').addEventListener('click', submitRequest);
+
+  } else { // history
+    const reqs = loadReqs();
+    if (!reqs.length) {
+      body.innerHTML = `<div class="no-req">아직 요청이 없습니다.<br>[단축키 요청하기] 탭에서<br>원하는 단축키를 제안해 보세요! ✏️</div>`;
+    } else {
+      body.innerHTML = reqs.slice().reverse().map(r => `
+        <div class="req-item">
+          <div class="req-action">📌 ${esc(r.action)}</div>
+          ${r.keys ? `<div class="req-keys">⌨️ ${esc(r.keys)}</div>` : ''}
+          ${r.reason ? `<div class="req-reason">${esc(r.reason)}</div>` : ''}
+          <div class="req-meta">
+            <span class="req-date">${new Date(r.ts).toLocaleString('ko-KR')}</span>
+            <span class="req-status status-pending">검토 중</span>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+function loadReqs() { try { return JSON.parse(localStorage.getItem('sc-reqs-61') || '[]'); } catch { return []; } }
+function saveReqs(r) { localStorage.setItem('sc-reqs-61', JSON.stringify(r)); }
+
+function submitRequest() {
+  const action = document.getElementById('req-action').value.trim();
+  if (!action) { showToast('기능을 입력해 주세요'); return; }
+  const keys = document.getElementById('req-keys').value.trim();
+  const reason = document.getElementById('req-reason').value.trim();
+  const reqs = loadReqs();
+  reqs.push({ action, keys, reason, ts: Date.now() });
+  saveReqs(reqs);
+  showToast('요청이 제출되었습니다! 감사합니다 🙏');
+  renderSpTab('history');
+}
+
+// ── EDITOR HELPERS ────────────────────────────────────────────────────────────
+function wrapSel(before, after) {
+  const ta = document.getElementById('md-editor');
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.slice(s, e) || '텍스트';
+  ta.value = ta.value.slice(0, s) + before + sel + after + ta.value.slice(e);
+  ta.selectionStart = s + before.length;
+  ta.selectionEnd = s + before.length + sel.length;
+  ta.focus(); autoSave();
+}
+function insertAt(text) {
+  const ta = document.getElementById('md-editor');
+  const s = ta.selectionStart;
+  ta.value = ta.value.slice(0, s) + text + ta.value.slice(s);
+  ta.selectionStart = ta.selectionEnd = s + text.length;
+  ta.focus(); autoSave();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSCPanel(); return; }
+  const ctrl = e.ctrlKey || e.metaKey; if (!ctrl) return;
+  switch (e.key) {
+    case 'n': e.preventDefault(); createNote(); break;
+    case 's': e.preventDefault(); saveNow(); break;
+    case 'e': e.preventDefault(); if (currentId) setViewMode(viewMode === 'preview' ? 'edit' : 'preview'); break;
+    case 'g': e.preventDefault(); setGraphVisible(!graphVisible); break;
+    case '/': e.preventDefault(); openSCPanel(); break;
+    case 'b': e.preventDefault(); wrapSel('**','**'); break;
+    case 'i': e.preventDefault(); wrapSel('*','*'); break;
+    case '`': e.preventDefault(); wrapSel('`','`'); break;
+    case 'k': e.preventDefault();
+      const t = prompt('링크할 노트 제목:'); if (t) insertAt(`[[${t}]]`); break;
+    case 'f': e.preventDefault();
+      const si = document.getElementById('search-input'); si.focus(); si.select(); break;
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadNotes(); renderNoteList(); renderTags(); updateStatusBar(); initGraph();
+
+// title auto-save on input
+document.getElementById('note-title-input').addEventListener('input', () => {
+  if (!currentId) return;
+  const n = getNote(currentId); if (!n) return;
+  n.title = document.getElementById('note-title-input').value || '제목 없음';
+  n.updatedAt = Date.now();
+  saveNotes(); renderNoteList(); renderTags(); updateStatusBar();
+});
+
+// editor auto-save
+document.getElementById('md-editor').addEventListener('input', autoSave);
+
+// search
+document.getElementById('search-input').addEventListener('input', e => renderNoteList(e.target.value));
+
+// toolbar
+document.getElementById('new-note-btn').addEventListener('click', createNote);
+document.getElementById('btn-bold').addEventListener('click', () => wrapSel('**','**'));
+document.getElementById('btn-italic').addEventListener('click', () => wrapSel('*','*'));
+document.getElementById('btn-code').addEventListener('click', () => wrapSel('`','`'));
+document.getElementById('btn-link').addEventListener('click', () => {
+  const t = prompt('링크할 노트 제목:'); if (t) insertAt(`[[${t}]]`);
+});
+document.getElementById('btn-tag').addEventListener('click', () => {
+  const t = prompt('태그 이름:'); if (t) insertAt('#' + t.replace(/^#/,''));
+});
+document.getElementById('btn-table').addEventListener('click', () => {
+  insertAt('\n| 제목1 | 제목2 | 제목3 |\n|-------|-------|-------|\n| 내용1 | 내용2 | 내용3 |\n');
+});
+document.getElementById('btn-edit').addEventListener('click', () => { if (currentId) setViewMode('edit'); });
+document.getElementById('btn-preview').addEventListener('click', () => { if (currentId) setViewMode('preview'); });
+document.getElementById('btn-split').addEventListener('click', () => { if (currentId) setViewMode('split'); });
+document.getElementById('graph-btn').addEventListener('click', () => setGraphVisible(!graphVisible));
+document.getElementById('sc-open-btn').addEventListener('click', openSCPanel);
+document.getElementById('sc-close').addEventListener('click', closeSCPanel);
+document.getElementById('sc-panel').addEventListener('click', e => { if (e.target === document.getElementById('sc-panel')) closeSCPanel(); });
+document.querySelectorAll('.sc-tab').forEach(t => t.addEventListener('click', () => renderSpTab(t.dataset.tab)));
+</script>
+</body>
+</html>

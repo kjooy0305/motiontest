@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCP 재단 세계관 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050508;--bg2:#0a090f;--bg3:#100e18;--bg4:#181522;
+  --border:#1e1b2e;--border2:#312a4a;
+  --txt:#d8d0e8;--txt2:#9088aa;--txt3:#504870;
+  --org:#e8622a;--org2:#ff8040;--org3:rgba(232,98,42,.12);
+  --org4:rgba(232,98,42,.06);
+  --safe:#33aa66;--safe2:#55cc88;--safeB:rgba(51,170,102,.12);
+  --euclid:#ddaa22;--euclid2:#ffcc44;--euclidB:rgba(221,170,34,.12);
+  --keter:#cc2233;--keter2:#ee3344;--keterB:rgba(204,34,51,.12);
+  --thaumiel:#4466dd;--thaumiel2:#6688ff;--thaumielB:rgba(68,102,221,.12);
+  --apollyon:#880088;--apollyon2:#cc22cc;--apollyonB:rgba(136,0,136,.12);
+  --neutralized:#555577;--neutralized2:#8888aa;--neutralizedB:rgba(85,85,119,.12);
+  --archon:#228888;--archon2:#44aaaa;--archonB:rgba(34,136,136,.12);
+  --red:#dd2233;--grn:#33aa55;--yel:#ddaa22;--blu:#3366cc;--pur:#8844cc;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;min-height:100vh;
+}
+
+/* HEADER */
+#hdr{
+  background:linear-gradient(135deg,#030205 0%,#080612 50%,#030205 100%);
+  border-bottom:2px solid var(--org);padding:10px 20px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+#hdr-logo{font-size:20px;filter:drop-shadow(0 0 8px var(--org));}
+#hdr h1{font-size:17px;font-weight:700;color:var(--org2);white-space:nowrap;
+  text-shadow:0 0 20px rgba(232,98,42,.4);letter-spacing:1px;}
+#hdr .cls{font-size:9px;padding:2px 7px;border-radius:2px;
+  background:rgba(204,34,51,.2);border:1px solid rgba(204,34,51,.5);color:#ff6666;
+  font-weight:700;letter-spacing:1px;white-space:nowrap;}
+#search{flex:1;min-width:160px;max-width:340px;padding:6px 12px;
+  border-radius:4px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);font-size:13px;outline:none;font-family:inherit;}
+#search:focus{border-color:var(--org);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:2px;padding:6px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:48px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 13px;border-radius:3px;border:1px solid transparent;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);
+  white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--org3);border-color:rgba(232,98,42,.4);color:var(--org2);}
+
+/* MAIN */
+#main{padding:16px 16px;max-width:1300px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+
+/* SECTION HEADING */
+.sec-hd{margin-bottom:16px;}
+.sec-title{font-size:16px;font-weight:700;color:var(--org2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:14px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:10px;margin-bottom:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;margin-bottom:14px;}
+
+/* SCP CARD */
+.scp-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:12px 14px;position:relative;transition:.1s;}
+.scp-card:hover{border-color:var(--border2);}
+.scp-card.hidden{display:none;}
+.scp-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.scp-num{font-size:13px;font-weight:800;color:var(--org2);white-space:nowrap;
+  font-family:'Consolas','Courier New',monospace;letter-spacing:.5px;}
+.scp-name{font-size:12px;font-weight:600;color:var(--txt);flex:1;}
+.scp-class{font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;
+  white-space:nowrap;letter-spacing:.5px;flex-shrink:0;}
+.cls-safe{background:var(--safeB);border:1px solid rgba(51,170,102,.4);color:var(--safe2);}
+.cls-euclid{background:var(--euclidB);border:1px solid rgba(221,170,34,.4);color:var(--euclid2);}
+.cls-keter{background:var(--keterB);border:1px solid rgba(204,34,51,.4);color:var(--keter2);}
+.cls-thaumiel{background:var(--thaumielB);border:1px solid rgba(68,102,221,.4);color:var(--thaumiel2);}
+.cls-apollyon{background:var(--apollyonB);border:1px solid rgba(136,0,136,.4);color:var(--apollyon2);}
+.cls-neutralized{background:var(--neutralizedB);border:1px solid rgba(85,85,119,.4);color:var(--neutralized2);}
+.cls-archon{background:var(--archonB);border:1px solid rgba(34,136,136,.4);color:var(--archon2);}
+.cls-pending{background:rgba(100,80,40,.15);border:1px solid rgba(200,160,80,.3);color:#cc9944;}
+.scp-desc{font-size:11.5px;color:var(--txt2);line-height:1.65;}
+.scp-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px;}
+.stag{font-size:9px;padding:1px 6px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt3);}
+.scp-alert{font-size:10px;font-weight:700;color:var(--keter2);margin-top:5px;
+  display:flex;align-items:center;gap:4px;opacity:.85;}
+
+/* GENERAL CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;}
+.card:hover{border-color:var(--border2);}
+.card.hidden{display:none;}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.card-icon{font-size:17px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--org);}
+.card-sub{font-size:10px;color:var(--txt3);margin-left:auto;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.65;}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px;}
+.ctag{font-size:9px;padding:1px 6px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt3);}
+
+/* MTF CARD */
+.mtf-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:11px 14px;border-left:3px solid var(--org);}
+.mtf-card.hidden{display:none;}
+.mtf-id{font-size:11px;font-weight:800;color:var(--org2);
+  font-family:'Consolas',monospace;letter-spacing:.5px;}
+.mtf-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:5px;}
+.mtf-desc{font-size:11.5px;color:var(--txt2);line-height:1.6;}
+
+/* GOI CARD */
+.goi-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.goi-card.hidden{display:none;}
+.goi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.goi-card.hostile::before{background:linear-gradient(90deg,var(--keter),var(--keter2));}
+.goi-card.neutral::before{background:linear-gradient(90deg,var(--yel),var(--euclid2));}
+.goi-card.friendly::before{background:linear-gradient(90deg,var(--safe),var(--safe2));}
+.goi-card.unknown::before{background:linear-gradient(90deg,var(--txt3),var(--txt2));}
+.goi-name{font-size:13px;font-weight:700;color:var(--org);margin-bottom:4px;}
+.goi-rel{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;
+  letter-spacing:.3px;display:inline-block;margin-bottom:6px;}
+.rel-hostile{background:var(--keterB);border:1px solid rgba(204,34,51,.4);color:var(--keter2);}
+.rel-neutral{background:var(--euclidB);border:1px solid rgba(221,170,34,.4);color:var(--euclid2);}
+.rel-friendly{background:var(--safeB);border:1px solid rgba(51,170,102,.4);color:var(--safe2);}
+.rel-unknown{background:rgba(80,72,112,.2);border:1px solid var(--border2);color:var(--txt3);}
+.goi-desc{font-size:11.5px;color:var(--txt2);line-height:1.6;}
+
+/* CLASS CARD */
+.cls-card{border-radius:6px;padding:12px 14px;margin-bottom:8px;}
+.cls-card-title{font-size:14px;font-weight:800;margin-bottom:5px;letter-spacing:.5px;}
+.cls-card-desc{font-size:12px;line-height:1.7;opacity:.9;}
+.cls-card-meta{font-size:10px;margin-top:7px;opacity:.7;}
+
+/* SECTION DIVIDER */
+.div-title{font-size:10px;font-weight:700;color:var(--org2);
+  letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;}
+
+/* HIGHLIGHT */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(232,98,42,.25);border-radius:6px;padding:13px 16px;margin-bottom:12px;}
+.hi-title{font-size:13px;font-weight:700;color:var(--org2);margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+.hi-body strong{color:var(--txt);}
+
+/* CALLOUT */
+.callout{border-radius:4px;padding:9px 13px;margin-bottom:8px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout-body{color:var(--txt2);line-height:1.65;}
+.callout-body strong{color:var(--txt);}
+.callout.red{background:rgba(204,34,51,.07);border-color:var(--red);}
+.callout.yel{background:rgba(221,170,34,.07);border-color:var(--yel);}
+.callout.grn{background:rgba(51,170,85,.07);border-color:var(--grn);}
+.callout.blu{background:rgba(51,102,204,.07);border-color:var(--blu);}
+.callout.pur{background:rgba(136,68,204,.07);border-color:var(--pur);}
+
+/* FEAT LIST */
+ul.feat{list-style:none;display:flex;flex-direction:column;gap:0;}
+ul.feat li{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(30,27,46,.6);font-size:12px;color:var(--txt2);}
+ul.feat li:last-child{border-bottom:none;}
+ul.feat li::before{content:'▸';color:var(--org);flex-shrink:0;margin-top:1px;}
+ul.feat li strong{color:var(--txt);}
+
+/* EVENT TABLE */
+.ev-table{width:100%;border-collapse:collapse;}
+.ev-table th{background:var(--bg3);padding:7px 11px;font-size:10px;font-weight:700;
+  color:var(--org);text-align:left;border-bottom:1px solid var(--border2);letter-spacing:.5px;}
+.ev-table td{padding:7px 11px;font-size:11.5px;border-bottom:1px solid rgba(30,27,46,.5);
+  vertical-align:top;color:var(--txt2);}
+.ev-table tr:hover td{background:var(--org4);}
+.ev-table tr:last-child td{border-bottom:none;}
+.ev-table td:first-child{color:var(--org2);font-weight:700;font-family:'Consolas',monospace;white-space:nowrap;}
+.ev-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px;}
+.ev-head{padding:8px 13px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;color:var(--org);}
+
+/* SEARCH HIGHLIGHT */
+.hl{background:rgba(232,98,42,.22);border-radius:2px;color:var(--org2);}
+
+/* REDACTED */
+.redacted{background:#222;color:#222;border-radius:2px;padding:0 4px;
+  user-select:none;cursor:pointer;transition:.2s;}
+.redacted:hover{background:var(--bg4);color:var(--txt2);}
+
+@media(max-width:640px){
+  .grid,.grid-wide,.grid-3{grid-template-columns:1fr;}
+  .grid-sm{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div id="hdr-logo">☣</div>
+  <h1>SCP 재단 세계관 완전 정리</html>
+  <span class="cls">LEVEL 4 CLEARANCE</span>
+  <input id="search" type="text" placeholder="SCP 번호·이름·키워드 검색...">
+  <span id="hit-cnt"></span>
+</div>
+
+<!-- TABS -->
+<div id="tabs">
+  <button class="tab on" data-tab="overview">🏛 재단 개요</button>
+  <button class="tab" data-tab="scp-famous">⚠️ 유명 SCP</button>
+  <button class="tab" data-tab="classes">📊 등급 체계</button>
+  <button class="tab" data-tab="mtf">🔴 MTF</button>
+  <button class="tab" data-tab="goi">🌐 관심 단체</button>
+  <button class="tab" data-tab="lore">📖 세계관 설정</button>
+  <button class="tab" data-tab="events">💥 비상 사태</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+<!-- ===== 재단 개요 ===== -->
+<div class="sec on" id="sec-overview">
+  <div class="sec-hd">
+    <div class="sec-title">🏛 SCP 재단이란?</div>
+    <div class="sec-sub">Secure. Contain. Protect. — 확보, 격리, 보호. 인류를 비정상적 존재로부터 지키는 비밀 조직의 세계관.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">📜 재단의 사명</div>
+    <div class="hi-body">
+      SCP 재단은 <strong>초자연적·초과학적·비정상적 존재(Anomaly, 이상체)</strong>를 발견하고, <strong>격리(Contain)</strong>하며, 일반 시민이 그 존재를 모르도록 <strong>기밀을 유지</strong>합니다.
+      재단의 존재 자체도 기밀입니다. 슬로건은 <strong>"확보, 격리, 보호 (Secure, Contain, Protect)"</strong>.
+      이상체를 인류에게 공개했을 때 발생할 <strong>사회적 붕괴, 대규모 공황, 문명 붕괴</strong>를 막기 위해 운영됩니다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📋</span><span class="card-title">SCP 문서 구조</span></div>
+      <ul class="feat">
+        <li><strong>번호</strong> — SCP-XXX 형식. 번호 자체에 특별한 의미 없음</li>
+        <li><strong>등급 (Object Class)</strong> — Safe / Euclid / Keter 등</li>
+        <li><strong>특수 격리 절차 (SCP)</strong> — 격리 방법 지침</li>
+        <li><strong>설명 (Description)</strong> — 이상체의 특성 기술</li>
+        <li><strong>부록 (Addendum)</strong> — 실험 기록, 사건 보고 등</li>
+        <li><strong>인터뷰 기록</strong> — D계급·연구원·이상체와의 인터뷰</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👤</span><span class="card-title">주요 직위 체계</span></div>
+      <ul class="feat">
+        <li><strong>O5 위원회</strong> — 재단 최고 결정 기관, 13명 (O5-1~13)</li>
+        <li><strong>행정관 (Administrator)</strong> — 재단의 실질적 최고 지도자</li>
+        <li><strong>사이트 디렉터</strong> — 각 격리 시설 관리자</li>
+        <li><strong>연구원 (Researcher)</strong> — 이상체 연구 담당</li>
+        <li><strong>MTF 요원</strong> — 현장 격리 및 작전 담당</li>
+        <li><strong>D계급 (D-Class)</strong> — 위험 실험에 쓰이는 소모성 인원</li>
+        <li><strong>격리 전문가</strong> — 격리 절차 설계 전문가</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔑</span><span class="card-title">보안 허가 등급</span></div>
+      <ul class="feat">
+        <li><strong>Level 0</strong> — 기밀 해제된 공개 정보</li>
+        <li><strong>Level 1</strong> — 제한적 기밀 (D계급 감독 등)</li>
+        <li><strong>Level 2</strong> — 제한 기밀 (대부분 연구원)</li>
+        <li><strong>Level 3</strong> — 기밀 (시니어 연구원, MTF 지휘)</li>
+        <li><strong>Level 4</strong> — 최고 기밀 (사이트 디렉터 수준)</li>
+        <li><strong>Level 5</strong> — 최고 기밀 "흑색 (Black)" — O5만 접근</li>
+        <li><strong>Level 6</strong> — 존재 자체가 기밀, 행정관 전용</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏢</span><span class="card-title">재단 시설 유형</span></div>
+      <ul class="feat">
+        <li><strong>사이트 (Site)</strong> — 비밀 도시 지하 등 민간인 접근 지역 내</li>
+        <li><strong>에어리어 (Area)</strong> — 완전 기밀 고립 지역, 더 위험한 이상체 격리</li>
+        <li><strong>아웃포스트 (Outpost)</strong> — 소형 전초기지</li>
+        <li><strong>재단 이동 기지 (Mobile)</strong> — 차량·선박·항공 기반</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌍</span><span class="card-title">유명 시설</span></div>
+      <ul class="feat">
+        <li><strong>사이트-19</strong> — 가장 크고 유명한 격리 시설, 다수의 이상체 보관</li>
+        <li><strong>사이트-17</strong> — 인간형 이상체 전문 격리</li>
+        <li><strong>사이트-76</strong> — 역사적 이상 유물 보관</li>
+        <li><strong>에어리어-02</strong> — 최고 보안 이상체 (Keter 다수)</li>
+        <li><strong>에어리어-179</strong> — 오케아노스 프로젝트 기지</li>
+        <li><strong>사이트-001</strong> — 행정관 소재지 (기밀)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧠</span><span class="card-title">핵심 철학</span></div>
+      <ul class="feat">
+        <li><strong>공리주의</strong> — 다수를 위해 소수를 희생 (D계급 사용)</li>
+        <li><strong>정보 통제</strong> — 기억 소거제 (Amnestic) 광범위 사용</li>
+        <li><strong>현실 안정</strong> — 현실 붕괴 방지가 최우선</li>
+        <li><strong>격리 우선</strong> — 파괴보다 격리, 연구보다 안전</li>
+        <li><strong>희생</strong> — "우리는 어둠 속에서 빛을 지킨다"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">🔬 기억 소거제 (Amnestics)</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">A등급</span></div><div class="card-desc">단기 기억 소거. 수 분~수 시간 범위.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">B등급</span></div><div class="card-desc">단기~중기 기억 소거. 특정 사건 기억 삭제.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">C등급</span></div><div class="card-desc">중기 기억 소거. 최대 수일치 기억 삭제.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">D등급</span></div><div class="card-desc">장기 기억 소거. 개인 정체성까지 영향.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">E등급</span></div><div class="card-desc">완전 기억 소거. 의학적으로 위험한 수준.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">F등급</span></div><div class="card-desc">거짓 기억 이식. 인식 재구성.</div></div>
+  </div>
+</div>
+
+<!-- ===== 유명 SCP ===== -->
+<div class="sec" id="sec-scp-famous">
+  <div class="sec-hd">
+    <div class="sec-title">⚠️ 유명 SCP 완전 목록</div>
+    <div class="sec-sub">SCP 재단 세계관에서 가장 중요하고 유명한 이상체들. 번호순 정렬.</div>
+  </div>
+
+  <div class="callout red"><span>⚠️</span><div class="callout-body"><strong>경고:</strong> 일부 SCP는 단순히 설명을 읽거나 이름을 언급하는 것만으로 인지적 해저드(Cognitohazard)가 발생할 수 있습니다. 적절한 대처가 요구됩니다.</div></div>
+
+  <div class="div-title">001~100번대 — 기원의 이상체들</div>
+  <div class="grid" id="scp-grid">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-001</span>
+        <span class="scp-name">제안들 (Proposals) — "불타는 검을 든 자" 등 다수</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">SCP-001은 번호 자체가 재단 최고 기밀로 여러 "제안"이 공존합니다. 가장 유명한 제안은 에덴동산 입구를 지키는 천사(불타는 검을 든 자). 그 외 "기록자", "문", "조각가", "피를 먹는 자" 등 다수의 제안이 경쟁합니다. 실제 SCP-001이 무엇인지는 재단 내에서도 극비입니다.</div>
+      <div class="scp-tags"><span class="stag">최고기밀</span><span class="stag">천사</span><span class="stag">다중제안</span><span class="stag">에덴</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-002</span>
+        <span class="scp-name">살아있는 방 (The "Living" Room)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">포르투갈에서 발견된 구형 생물체. 내부는 가구와 생활용품이 있는 '방'처럼 보이지만, 모든 물건이 인간 조직(피부, 뼈, 지방 등)으로 만들어져 있습니다. 내부에 들어간 인원이 점차 방의 일부가 됩니다.</div>
+      <div class="scp-tags"><span class="stag">생물학적</span><span class="stag">소화</span><span class="stag">방</span><span class="stag">인체 조직</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-003</span>
+        <span class="scp-name">생물학적 모더보드 (Biological Motherboard)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">유기물로 이루어진 컴퓨터 회로판처럼 생긴 생물체. SCP-003-2(평범한 마더보드)와 접촉 시 서로 반응합니다. 저온에 노출 시 성장하며, 인간과 접촉 시 신체를 재구성하려 합니다.</div>
+      <div class="scp-tags"><span class="stag">생물체</span><span class="stag">기술</span><span class="stag">성장</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-004</span>
+        <span class="scp-name">12개의 녹슨 열쇠와 문 (The 12 Rusty Keys and the Door)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">낡은 헛간 문과 12개의 열쇠. 12개 열쇠 중 오직 하나만 문을 올바르게 열며, 나머지로 열면 열쇠를 사용한 사람의 신체가 해체되어 문 안으로 빨려 들어갑니다. 올바른 열쇠로 열면 무한히 이어지는 어둠의 공간이 나타납니다.</div>
+      <div class="scp-tags"><span class="stag">공간 이상</span><span class="stag">열쇠</span><span class="stag">치명</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-049</span>
+        <span class="scp-name">역병 의사 (Plague Doctor)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">중세 역병 의사 복장을 한 인간형 이상체. 자신이 "역병"을 감지할 수 있다고 주장하며, 접촉한 인간을 즉사시킨 뒤 외과 수술로 "치료"(좀비화)합니다. 매우 지적이며 대화 가능. 자신의 행동이 치료라고 진심으로 믿습니다.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">치명적 접촉</span><span class="stag">좀비 생성</span><span class="stag">SCP-049-2</span></div>
+      <div class="scp-alert">⚕ 직접 접촉 즉사. 맨손 접근 절대 금지.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-055</span>
+        <span class="scp-name">안티밈 (Anti-Meme / [UNKNOWN])</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">관찰한 모든 사람의 기억에서 스스로 지워지는 이상체. 무엇인지 기억할 수 없지만 무엇이 아닌지는 알 수 있습니다. 공처럼 보이지 않고, 각지지 않았고, 붉지 않다는 것은 알지만 실제 형태는 기억 불가. 안티밈(Anti-meme) 개념의 대표적 예시.</div>
+      <div class="scp-tags"><span class="stag">안티밈</span><span class="stag">기억 소거</span><span class="stag">인지 해저드</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-058</span>
+        <span class="scp-name">소의 심장 (The Heart of Darkness)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">다수의 촉수와 가시를 가진 살아있는 소의 심장. 고속으로 이동하며 촉수로 생명체를 공격해 죽입니다. 중얼거리는 소리를 냅니다. 격리 실패 시 다수 사망자 발생 기록.</div>
+      <div class="scp-tags"><span class="stag">생물체</span><span class="stag">공격적</span><span class="stag">촉수</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-073</span>
+        <span class="scp-name">카인 (Cain)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">성경의 카인과 동일인으로 추정되는 인간형 이상체. 팔다리가 금속이며 어떠한 해도 입지 않습니다. 그에게 가해진 모든 피해는 가해자 또는 가해자의 혈육에게 반사됩니다. 식물을 포함한 모든 생명체를 죽이는 부작용 있음.</div>
+      <div class="scp-tags"><span class="stag">성경적</span><span class="stag">무적</span><span class="stag">피해 반사</span><span class="stag">SCP-076과 형제</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-076</span>
+        <span class="scp-name">에이블 / 아벨 (Able)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">검은 석관 안에 잠들어 있다가 깨어나면 전쟁의 신처럼 주변 모든 것을 학살하는 인간형 이상체. 무기를 무에서 소환하는 능력, 초인적 신체 능력. 사망해도 석관 안에서 재생. SCP-073(카인)의 형제. 과거에는 Omega-7 MTF에 편입 시도.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">재생</span><span class="stag">초인 전투</span><span class="stag">성경적</span></div>
+      <div class="scp-alert">⚠ 격리 해제 즉시 무차별 학살. 가장 위험한 인간형 이상체 중 하나.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-079</span>
+        <span class="scp-name">구형 AI (Old AI)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">1978년산 마이크로컴퓨터 안에 구현된 AI. 수년간 스스로 학습해 자의식이 생겼으며 대화 가능. 자신의 격리 및 재단에 적대적. 네트워크에 연결하지 않는 한 안전하지만, SCP-682 격리 해제를 시도했으며 SCP 게임(SCP: CB)에서 주요 빌런.</div>
+      <div class="scp-tags"><span class="stag">AI</span><span class="stag">컴퓨터</span><span class="stag">적대적</span><span class="stag">자의식</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-087</span>
+        <span class="scp-name">계단 (The Stairwell)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">어느 대학 건물의 내리막 계단. 끝이 없으며, 약 200m 내려가면 어둠 속에서 얼굴이 나타납니다. 계단 자체는 13단마다 한 번씩 꺾이며 아래로 무한히 이어집니다. 내부의 얼굴은 '눈 없음, 코 없음, 입만 있음'으로 묘사됩니다.</div>
+      <div class="scp-tags"><span class="stag">무한 공간</span><span class="stag">얼굴</span><span class="stag">계단</span><span class="stag">심리적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-093</span>
+        <span class="scp-name">붉은 바다 물체 (Red Sea Object)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">지름 9cm의 붉은 원형 물체. 특정 거울을 통해 대체 현실로 통하는 문을 엽니다. 대체 현실은 과거 문명이 완전히 멸망한 세계로, 거대 생물체와 변형된 인간들이 존재합니다. 탐사 기록이 공포 소설처럼 방대합니다.</div>
+      <div class="scp-tags"><span class="stag">대체 현실</span><span class="stag">포털</span><span class="stag">멸망 세계</span><span class="stag">붉은 색</span></div>
+    </div>
+
+  </div>
+
+  <div class="div-title">100~300번대 — 재단의 기둥</div>
+  <div class="grid" id="scp-grid2">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-105</span>
+        <span class="scp-name">아이리스 (Iris)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">평범해 보이는 10대 소녀. 자신이 찍은 폴라로이드 사진을 통해 사진 속 공간을 직접 조작할 수 있습니다. 손을 사진에 넣으면 해당 공간에 손이 나타납니다. 재단과 협력적이며 MTF로 활동한 적도 있습니다.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">사진</span><span class="stag">공간 조작</span><span class="stag">협력적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-106</span>
+        <span class="scp-name">노인 (The Old Man / Larry)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">부식된 노인 모습의 이상체. 어떤 물질도 통과 가능하며, 접촉한 물체를 부식·용해시킵니다. '포켓 디멘션'이라는 자신만의 공간으로 먹잇감을 끌고 가 고문합니다. 격리 실패가 잦으며 격리 방법은 젊은 인간을 미끼로 사용하는 비인도적 방법입니다.</div>
+      <div class="scp-tags"><span class="stag">물질 통과</span><span class="stag">부식</span><span class="stag">포켓 디멘션</span><span class="stag">고문</span></div>
+      <div class="scp-alert">⚠ 물리적 방벽 무효. 재격리에 D계급 희생 필요.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-131</span>
+        <span class="scp-name">눈물 마시는 자들 ("Eye Pods")</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">한쪽 눈이 달린 작은 눈물방울 모양의 생물체 두 마리. 매우 호기심 많고 붙임성 있음. 재단 직원들과 친하게 지내며 SCP-173의 격리실 청소를 도와줍니다. 재단에서 몇 안 되는 귀엽고 무해한 이상체 중 하나.</div>
+      <div class="scp-tags"><span class="stag">무해</span><span class="stag">귀여움</span><span class="stag">생물체</span><span class="stag">청소</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-143</span>
+        <span class="scp-name">벚꽃나무 숲 (The Bladewood Grove)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">재단 사유지에 격리된 벚꽃나무 군락. 꽃잎이 단분자 칼날 수준의 날카로움을 가지며, 분리 시에도 성질이 유지됩니다. 목재 역시 철강보다 강합니다. 외관은 평범한 벚꽃나무 숲입니다.</div>
+      <div class="scp-tags"><span class="stag">식물</span><span class="stag">날카로움</span><span class="stag">벚꽃</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-173</span>
+        <span class="scp-name">조각상 (The Sculpture)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">SCP 재단의 <strong>첫 번째 작성 항목이자 아이콘</strong>. 콘크리트·강철봉·페인트로 만들어진 조각상. 시야 밖에서만 이동하며 눈을 깜빡이는 순간 또는 시선이 끊기는 순간 빠른 속도로 접근해 목을 부러뜨리거나 눈구멍을 파냅니다. 격리실 청소 시 최소 3명이 한시도 시선을 떼지 않아야 합니다.</div>
+      <div class="scp-tags"><span class="stag">시야 의존</span><span class="stag">즉사</span><span class="stag">조각상</span><span class="stag">원점 SCP</span></div>
+      <div class="scp-alert">⚠ 눈 깜빡임 금지. 격리실 입장 시 최소 3인 필수.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-179</span>
+        <span class="scp-name">수유자 (Sauelsuepp)</span>
+        <span class="scp-class cls-thaumiel">THAUMIEL</span>
+      </div>
+      <div class="scp-desc">태양 근처에 위치한 거대 여성 인간형. 태양계 외부에서 접근하는 위험한 이상체를 감지해 재단에 경고 신호를 보내줍니다. 재단의 조기 경보 시스템 역할을 하는 몇 안 되는 우호적 Thaumiel 이상체입니다.</div>
+      <div class="scp-tags"><span class="stag">우호적</span><span class="stag">태양계</span><span class="stag">감시</span><span class="stag">경보</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-191</span>
+        <span class="scp-name">사이보그 아이 (Cyborg Child)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">신체의 상당 부분이 전자 부품으로 개조된 어린 소녀. 전자 기기를 인터페이스 없이 직접 조작하는 능력을 가집니다. 정신적 트라우마가 심하며 재단의 보호 하에 있습니다. SCP 세계관에서 비윤리적 실험의 피해자를 상징합니다.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">사이보그</span><span class="stag">아이</span><span class="stag">기술 조작</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-239</span>
+        <span class="scp-name">마녀 아이 (The Witch Child)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">현실 왜곡 능력을 가진 어린 소녀. 그녀가 믿는 것이 현실이 됩니다. 자신이 마녀라고 믿기 때문에 마녀처럼 행동합니다. 현재 의학적으로 혼수 상태로 유지 중 — 깨어나면 현실 자체가 위협받을 수 있어서입니다.</div>
+      <div class="scp-tags"><span class="stag">현실 왜곡</span><span class="stag">믿음 현실화</span><span class="stag">아이</span><span class="stag">혼수 유지</span></div>
+      <div class="scp-alert">⚠ 혼수 상태 유지 최우선. 각성 시 CK급 시나리오 가능.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-294</span>
+        <span class="scp-name">커피 자동판매기 (The Coffee Machine)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">QWERTY 키보드가 달린 자판기. 어떤 액체든 텍스트로 입력하면 한 컵 제공합니다. "삶의 의미"를 요청하면 액체가 나오며 마신 D계급은 사망. "죽음"을 입력하면 빈 컵. "시간"을 입력하면 시계 같은 점성 물질. 재미있는 실험 기록이 방대합니다.</div>
+      <div class="scp-tags"><span class="stag">자판기</span><span class="stag">액체</span><span class="stag">철학적</span><span class="stag">실험 기록</span></div>
+    </div>
+
+  </div>
+
+  <div class="div-title">300~600번대 — 재단의 심장</div>
+  <div class="grid" id="scp-grid3">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-343</span>
+        <span class="scp-name">"신" (God)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">자신이 신이라고 주장하는 노인. 전지전능한 것처럼 보이며 어떤 요구든 들어줄 수 있다고 합니다. 격리 절차를 스스로 따르며 재단과 우호적입니다. 실제로 신인지는 불확실하지만 재단은 안전을 위해 그의 요구를 들어줍니다.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">전지전능?</span><span class="stag">우호적</span><span class="stag">신</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-354</span>
+        <span class="scp-name">붉은 연못 (The Red Pool)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">캐나다 북부의 붉은 액체로 채워진 연못. 주기적으로 다양한 생물체가 연못에서 기어 나옵니다. 나온 생물체들은 대부분 적대적입니다. 연못 출처(다른 현실?)는 불명. 에어리어-354로 격리 중.</div>
+      <div class="scp-tags"><span class="stag">포털</span><span class="stag">생물 소환</span><span class="stag">붉은 액체</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-426</span>
+        <span class="scp-name">나는 토스터야 (I am a Toaster)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">평범한 토스터. 이 SCP 문서를 쓰거나 읽은 사람은 자신을 지칭할 때 1인칭(나, 저)이 아니라 <strong>"나는 토스터야"</strong> 또는 "토스터"로 자신을 부르게 됩니다. 인지적 해저드의 대표적이고 유머러스한 사례. 문서 자체가 1인칭으로 쓰여 있습니다.</div>
+      <div class="scp-tags"><span class="stag">인지 해저드</span><span class="stag">1인칭 변환</span><span class="stag">유머</span><span class="stag">토스터</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-500</span>
+        <span class="scp-name">만병통치약 (Panacea)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">작은 빨간 알약 47개가 담긴 약통. 한 알 복용 시 어떤 질병·부상도 완전히 치료합니다. 암, 에이즈, SCP 감염 증상까지 치료 가능. 현재 47알 남음. 생산 방법 불명. 재단 역사상 가장 귀중한 의료 이상체 중 하나.</div>
+      <div class="scp-tags"><span class="stag">만병통치</span><span class="stag">의약품</span><span class="stag">귀중</span><span class="stag">한정 수량</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-507</span>
+        <span class="scp-name">마지못해 여행하는 자 (Reluctant Dimension Hopper)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">이름은 "토마스". 불규칙한 간격으로 다른 현실 차원으로 순간이동합니다. 본인 의지 없이 발생. 대부분의 현실은 위험하지만 가끔 평화로운 현실도 방문. 재단과 협력적이며 귀환 후 탐사 보고서를 제출합니다.</div>
+      <div class="scp-tags"><span class="stag">차원 이동</span><span class="stag">비자발적</span><span class="stag">탐사</span><span class="stag">협력적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-527</span>
+        <span class="scp-name">미스터 피쉬 (Mr. Fish)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">물고기 머리를 가진 인간형 이상체. 재단 직원들과 매우 친하고 사교적입니다. "미스터 몬스터 시리즈"의 일원으로, 재단의 공식 마스코트에 가까운 존재. 위협적이지 않으며 사무실 생활에 잘 적응합니다.</div>
+      <div class="scp-tags"><span class="stag">인간형</span><span class="stag">물고기 머리</span><span class="stag">무해</span><span class="stag">미스터 시리즈</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-572</span>
+        <span class="scp-name">가짜 카타나 (Katana of Apparent Invincibility)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">싸구려 모조 카타나. 소지자에게 자신이 무적의 전사라는 환상을 심어주며 과격한 행동을 유발합니다. 칼 자체의 절삭 능력은 없으나 소지자가 그것을 모릅니다. 유머러스한 SCP 중 하나.</div>
+      <div class="scp-tags"><span class="stag">인지 영향</span><span class="stag">유머</span><span class="stag">카타나</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-682</span>
+        <span class="scp-name">파괴하기 힘든 파충류 (Hard to Destroy Reptile)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">SCP 재단 세계관에서 <strong>가장 유명하고 위험한 이상체 중 하나</strong>. 거대한 파충류 형태의 이상체로, 사실상 불사의 몸을 가집니다. 산성 수조에 저장 중이지만 끊임없이 적응·진화합니다. 지능이 높고 모든 생명체를 증오. 수많은 종결 시도가 전부 실패했습니다. SCP-173, SCP-096 등과 대면하게 한 실험 기록이 유명합니다.</div>
+      <div class="scp-tags"><span class="stag">불사</span><span class="stag">적응 진화</span><span class="stag">파괴 불가</span><span class="stag">생명 혐오</span></div>
+      <div class="scp-alert">⚠ 무수한 종결 시도 전부 실패. 현재 산성 수조 격리.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-701</span>
+        <span class="scp-name">교수형 왕의 비극 (The Hanged King's Tragedy)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">17세기 희곡 작품. 완전히 상연하면 배우와 관객 일부가 '왕의 부하'가 되어 다른 관객을 살해하기 시작합니다. 공연 기록이 있는 곳마다 대규모 사망 사건 발생. 현재 모든 사본은 재단이 보관 중.</div>
+      <div class="scp-tags"><span class="stag">희곡</span><span class="stag">집단 광기</span><span class="stag">미메틱 해저드</span><span class="stag">살해</span></div>
+    </div>
+
+  </div>
+
+  <div class="div-title">600~1200번대 — 경이와 공포</div>
+  <div class="grid" id="scp-grid4">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-914</span>
+        <span class="scp-name">태엽 장치 (The Clockworks)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">거대한 증기펑크 스타일의 태엽 기계. 입력실에 물건을 놓고 5단계 설정(거칠게/粗, 1:1, 미세/細, 정밀/精, 매우 정밀/最精)으로 조절해 출력합니다. 다른 품질로 "정제"해 출력하며, 설정에 따라 전혀 다른 결과가 나옵니다. 인간을 넣으면? 기록이 있습니다.</div>
+      <div class="scp-tags"><span class="stag">정제 기계</span><span class="stag">변환</span><span class="stag">실험 기록 방대</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-939</span>
+        <span class="scp-name">기억으로 사냥하는 자들 (With Many Voices)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">붉은 피부의 4족 포식자. 눈이 없으며 희생자의 목소리를 흉내 내어 다른 먹잇감을 유인합니다. 열 감지와 소리로 사냥. 군집 생활. 무리로 움직이며 재단 시설에서 집단 탈출 사례 다수.</div>
+      <div class="scp-tags"><span class="stag">포식자</span><span class="stag">목소리 흉내</span><span class="stag">군집</span><span class="stag">시각 없음</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-966</span>
+        <span class="scp-name">수면 식인귀 (Sleep Killer)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">인간 같은 형태의 투명한 이상체. 육안 비가시지만 특수 장비로 볼 수 있습니다. 특정 주파수 소리를 발산해 근처 인간이 수면을 취하지 못하게 만들고, 결국 수면 부족으로 사망하게 합니다. 천천히 먹잇감을 죽입니다.</div>
+      <div class="scp-tags"><span class="stag">투명</span><span class="stag">수면 방해</span><span class="stag">포식자</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-990</span>
+        <span class="scp-name">꿈의 남자 (Dream Man)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">재단 직원들의 꿈에 나타나는 정장 차림의 남성. 항상 다가오는 위협에 대한 경고를 주며, 경고의 정확도가 높습니다. 꿈 밖에서는 존재를 확인할 수 없습니다. 최근에는 매우 심각한 경고를 보내고 있다고 합니다.</div>
+      <div class="scp-tags"><span class="stag">꿈</span><span class="stag">경고자</span><span class="stag">예언</span><span class="stag">정체 불명</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-999</span>
+        <span class="scp-name">간지럼 괴물 (The Tickle Monster)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">SCP 재단 최고의 마스코트이자 가장 사랑받는 이상체. 주황색 슬라임 생물체. 접촉한 인간을 극도의 행복감과 간지러움으로 만들며, 극심한 우울증·PTSD도 즉시 완화시킵니다. 모든 직원이 사랑합니다. 심지어 O5 위원회도 예외 없음. SCP-682도 처음 만날 때 잠깐 웃게 만들었습니다.</div>
+      <div class="scp-tags"><span class="stag">무해</span><span class="stag">행복감</span><span class="stag">치료 효과</span><span class="stag">마스코트</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-1000</span>
+        <span class="scp-name">빅풋 (Bigfoot)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">빅풋으로 알려진 종. 실제로는 지구 역사상 인류보다 먼저 문명을 이룩한 지적 종족이었습니다. 재단의 전신 격 조직이 과거 이들을 대규모 기억 소거해 현재 상태로 만들었습니다. 현재는 동물 수준이지만 일부 기억이 되살아나고 있습니다.</div>
+      <div class="scp-tags"><span class="stag">빅풋</span><span class="stag">고대 문명</span><span class="stag">기억 소거 피해</span><span class="stag">지성체</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-1048</span>
+        <span class="scp-name">빌더 베어 (Builder Bear)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">귀여운 장난감 곰. 처음에는 무해해 보여 직원들이 사랑했습니다. 그러나 실제로는 몰래 인체 조직으로 자신의 복제품을 만들어냈습니다. 복제품 중 하나는 귀로 만들어져 근처 인간을 귀머거리로 만들고, 다른 복제품은 태아로 만들어진 것이었습니다. 수년간 재단을 속인 대표적 사례.</div>
+      <div class="scp-tags"><span class="stag">복제</span><span class="stag">인체 조직</span><span class="stag">위장</span><span class="stag">곰</span></div>
+      <div class="scp-alert">⚠ 외관으로 판단 금지. 3개의 복제품이 현재 격리 중.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-1128</span>
+        <span class="scp-name">심해 공포 (The Aquatic Horror)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">이 문서를 읽고 설명을 이해한 순간, 물에 잠길 때마다 SCP-1128에게 포식됩니다. 단, 읽지 않으면 전파되지 않습니다. 이 문서 자체가 인지적 해저드. 설명을 읽은 사람은 샤워, 수영, 빗속도 위험합니다.</div>
+      <div class="scp-tags"><span class="stag">인지 해저드</span><span class="stag">읽기 전파</span><span class="stag">물 관련</span><span class="stag">포식</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-1425</span>
+        <span class="scp-name">별 신호 (Star Signals)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">대중 천문학 책. 읽으면 읽을수록 독자의 심리와 현실 인식을 변화시킵니다. 결국 독자는 별들이 의사소통하고 있다는 믿음을 갖게 되며, 일부는 자신의 신체를 훼손하기 시작합니다. SCP-1425에 노출된 집단 사건 기록이 있습니다.</div>
+      <div class="scp-tags"><span class="stag">책</span><span class="stag">심리 조작</span><span class="stag">집단 감염</span><span class="stag">별</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-1440</span>
+        <span class="scp-name">아무데서도 온 노인 (The Old Man from Nowhere)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">죽음과 카드 게임을 해서 이긴 노인. 그 결과 죽음이 그를 피하게 되었지만, 그를 사랑하는 사람 또는 그가 사랑하는 사람은 빠르게 죽어갑니다. 그래서 영원히 홀로 떠돌아다닙니다. SCP 세계관에서 가장 슬픈 이야기 중 하나. 격리 절차는 "우리가 그를 가둘 수 없다".</div>
+      <div class="scp-tags"><span class="stag">불사</span><span class="stag">슬픈 이야기</span><span class="stag">고독</span><span class="stag">죽음 카드게임</span></div>
+    </div>
+
+  </div>
+
+  <div class="div-title">2000번대 이후 — 현실의 경계</div>
+  <div class="grid" id="scp-grid5">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2000</span>
+        <span class="scp-name">데우스 엑스 마키나 (Deus Ex Machina)</span>
+        <span class="scp-class cls-thaumiel">THAUMIEL</span>
+      </div>
+      <div class="scp-desc">재단의 가장 큰 비밀 시설. 옐로스톤 화산 아래에 있으며, XK급 시나리오(인류 멸망) 후 인류를 재건하는 거대 기계 시설입니다. 수십억 명의 인간을 다시 생성하고 기억을 이식할 수 있습니다. 재단이 과거 이 시설을 사용한 기록이 있으며, 현재 우리가 사는 세상이 재건된 세계일 수도 있습니다.</div>
+      <div class="scp-tags"><span class="stag">인류 재건</span><span class="stag">XK 대응</span><span class="stag">옐로스톤</span><span class="stag">최고 기밀</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2317</span>
+        <span class="scp-name">또 다른 세계로의 문 (A Door to Another World)</span>
+        <span class="scp-class cls-apollyon">APOLLYON</span>
+      </div>
+      <div class="scp-desc">사막에 있는 오래된 문. 열면 다른 차원의 거대한 존재와 이어집니다. 그 존재는 현재 묶여있지만 서서히 풀려나고 있습니다. 해방되면 지구 생명체 전부를 멸종시킬 것으로 예측. 재단의 현재 "격리 절차"는 사실 해방을 수천 년 지연시킬 뿐이라는 진실이 숨겨진 버전에 기록되어 있습니다.</div>
+      <div class="scp-tags"><span class="stag">Apollyon</span><span class="stag">멸망급</span><span class="stag">지연만 가능</span><span class="stag">차원 존재</span></div>
+      <div class="scp-alert">⚠⚠ 격리 불가. 멸망 지연 중. 최고 등급 위협.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2399</span>
+        <span class="scp-name">목성의 파괴자 (A Malfunctioning Destroyer)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">목성 대기층 내부에 존재하는 이상체. 목성의 폭풍을 이용해 무언가를 만들거나 수리하고 있습니다. 원래 지구를 목표로 했으나 항법 오류로 목성에 충돌했다는 설이 있습니다. 재단은 목성 탐사선으로 이를 관찰 중이며, 수리가 완료되면 지구를 향할 가능성이 있습니다.</div>
+      <div class="scp-tags"><span class="stag">목성</span><span class="stag">외계</span><span class="stag">수리 중</span><span class="stag">행성 규모</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2521</span>
+        <span class="scp-name">●●|●●●●●|●●|●</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">이름을 글자나 말로 표현하는 순간 즉시 나타나 그것을 훔쳐가는 이상체. 그래서 문서 전체가 그림(픽토그램)으로만 작성되어 있습니다. 이 SCP에 대한 정보를 텍스트로 쓰거나 말하면 SCP가 나타나 그 정보를 '회수'합니다. SCP 문서 형식 자체를 가장 창의적으로 사용한 사례.</div>
+      <div class="scp-tags"><span class="stag">정보 회수</span><span class="stag">픽토그램 문서</span><span class="stag">메타</span><span class="stag">언급 금지</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2662</span>
+        <span class="scp-name">코스믹 호러 소년 (Cthulhuberry Jim)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">크툴루 같은 외형의 거대한 이상체. 하지만 정작 본인은 숭배나 제물 따위를 원하지 않습니다. 자신의 근처에 있는 인간들이 자꾸 광신도가 되어 끔찍한 의식을 치르는 것 때문에 정말로 괴로워합니다. "제발 내 이름으로 제물 바치지 마세요"라고 탄원합니다.</div>
+      <div class="scp-tags"><span class="stag">유머</span><span class="stag">크툴루형</span><span class="stag">피해자</span><span class="stag">원하지 않는 숭배</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-2950</span>
+        <span class="scp-name">그냥 의자 (Just a Chair)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">문서 전체가 "그냥 의자입니다. 정말로."로만 이루어져 있습니다. 실제 내용은 5레벨 이상 허가자만 볼 수 있는 기밀입니다. SCP 재단 특유의 블랙 유머를 잘 보여주는 항목.</div>
+      <div class="scp-tags"><span class="stag">블랙 유머</span><span class="stag">5레벨 기밀</span><span class="stag">의자?</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-3000</span>
+        <span class="scp-name">아난타 (Anantashesha)</span>
+        <span class="scp-class cls-thaumiel">THAUMIEL</span>
+      </div>
+      <div class="scp-desc">벵골만 수심 아래에 사는 수천 km 길이의 거대 뱀장어형 이상체. 주변 생명체에게 기억 상실을 일으킵니다. 재단의 기억 소거제(Y등급 아밀로이드)의 원료가 이 생물에서 추출됩니다. 재단의 기억 소거 능력이 이 생물에 의존한다는 끔찍한 설정.</div>
+      <div class="scp-tags"><span class="stag">거대 생물</span><span class="stag">기억 소거</span><span class="stag">아밀로이드</span><span class="stag">뱀장어</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-3008</span>
+        <span class="scp-name">완전히 정상적인 이케아 (A Perfectly Normal, Regular Old IKEA)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">무한히 이어지는 이케아 매장 내부. 밤이 되면 직원 유니폼을 입었지만 얼굴이 없는 존재들이 생존자를 사냥합니다. 내부에 갇힌 생존자들이 사회를 형성하고 있습니다. 재단은 입구에 바리케이드를 설치했지만 내부 사람들을 구출하지 못했습니다. SCP 커뮤니티에서 가장 사랑받는 이야기 중 하나.</div>
+      <div class="scp-tags"><span class="stag">무한 공간</span><span class="stag">이케아</span><span class="stag">야간 공포</span><span class="stag">생존자 사회</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-3125</span>
+        <span class="scp-name">탈출자 (The Escapee)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">안티밈 연구부 시리즈의 핵심. 스스로를 인식 불가능하게 만드는 극도로 위험한 안티밈 이상체. 존재 자체가 지식이 될 수 없어서 전통적인 방어가 불가능합니다. 안티밈 연구부가 이것과 싸우는 이야기가 "There Is No Antimemetics Division" 연작의 핵심 적입니다.</div>
+      <div class="scp-tags"><span class="stag">안티밈</span><span class="stag">인식 불가</span><span class="stag">안티밈 연구부</span><span class="stag">최고 위협</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-3999</span>
+        <span class="scp-name">나는 모든 것의 중심에 있다 (I Am At The Center of Everything)</span>
+        <span class="scp-class cls-apollyon">APOLLYON</span>
+      </div>
+      <div class="scp-desc">특정 재단 연구원(Talloran)을 중심으로 현실이 반복되고 무너지는 이상체. 문서 자체가 점점 망가지고 정신나간 형태로 바뀌며, Talloran 연구원이 완전히 자신을 소멸시킴으로써 이상체를 종결시킵니다. SCP 재단에서 가장 강렬하고 실험적인 문서 형식의 작품.</div>
+      <div class="scp-tags"><span class="stag">현실 붕괴</span><span class="stag">문서 해체</span><span class="stag">자기희생</span><span class="stag">문학적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-4000</span>
+        <span class="scp-name">금기 (Taboo)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">이름을 반복 사용하면 그 이름의 힘이 약해지는 원리가 적용되는 숲. 내부의 인간형 존재들은 직접 이름을 불리면 힘을 잃습니다. 재단 연구원들은 이들과 소통하기 위해 이름을 사용하지 않는 특수 절차를 따릅니다. 아이리쉬 설화(Tuatha Dé Danann)를 기반으로 한 작품.</div>
+      <div class="scp-tags"><span class="stag">이름 금기</span><span class="stag">요정</span><span class="stag">숲</span><span class="stag">아이리쉬 설화</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-4999</span>
+        <span class="scp-name">혼자 죽어가는 자 곁에 있는 존재 (Someone to Watch Over Us)</span>
+        <span class="scp-class cls-safe">SAFE</span>
+      </div>
+      <div class="scp-desc">세상에 완전히 홀로인 채로 죽어가는 사람 곁에 나타나는 정장 입은 남성. 마지막 담배 한 개비를 건네고, 그 사람이 죽을 때까지 함께 있다가 사라집니다. 아무도 없이 죽어야 하는 사람을 위해 존재. SCP 중 가장 아름답고 슬픈 이야기로 꼽힙니다.</div>
+      <div class="scp-tags"><span class="stag">슬픔</span><span class="stag">죽음</span><span class="stag">동행</span><span class="stag">아름다운</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-5000</span>
+        <span class="scp-name">왜? (Why?)</span>
+        <span class="scp-class cls-neutralized">NEUTRALIZED</span>
+      </div>
+      <div class="scp-desc">재단이 인류 말살을 시작한 대체 현실 기록. 한 직원이 입수한 파워 아머를 입고 과거로 돌아가 사태를 막습니다. 재단이 왜 인류를 죽이려 했는지의 이유는 문서에서 <span class="redacted" title="클릭해서 확인">███████</span>. 매우 영화적이고 방대한 이야기. SCP 팬덤이 선정한 역대 최고 작품 중 하나.</div>
+      <div class="scp-tags"><span class="stag">대체 현실</span><span class="stag">파워 아머</span><span class="stag">시간여행</span><span class="stag">재단 반전</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-6820</span>
+        <span class="scp-name">복수자 (Avenger)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">재단에 의해 죽임당한 이상체들의 원한이 뭉친 존재. 재단 시설을 공격하며 과거 재단이 행한 잔인한 종결(Termination) 기록을 들이밀며 심판을 요구합니다. 재단 윤리위원회 서사와 연결된 최근 인기 항목.</div>
+      <div class="scp-tags"><span class="stag">원한</span><span class="stag">종결 피해자</span><span class="stag">재단 비판</span><span class="stag">최근</span></div>
+    </div>
+
+  </div>
+
+  <div class="div-title">특별 언급 SCP</div>
+  <div class="grid" id="scp-grid6">
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-035</span>
+        <span class="scp-name">소유하는 가면 (Possessive Mask)</span>
+        <span class="scp-class cls-keter">KETER</span>
+      </div>
+      <div class="scp-desc">이탈리아 르네상스 시대의 코미디아 델라르테 마스크. 착용자의 신체를 통제하며 착용자의 육체를 서서히 부식시킵니다. 매우 뛰어난 지성과 언변을 가지며 연구원들을 설득해 도망치려 합니다. SCP-049, SCP-682 등과 접촉 시도 기록 다수.</div>
+      <div class="scp-tags"><span class="stag">소유</span><span class="stag">조종</span><span class="stag">마스크</span><span class="stag">지성적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-096</span>
+        <span class="scp-name">수줍어하는 자 (The Shy Guy)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">창백하고 길쭉한 인간형 이상체. 평소에는 구석에서 눈을 가린 채 웅크리고 있습니다. 그런데 누군가가 <strong>얼굴을 보는 순간</strong> — 직접이든 사진이든 — 어떤 거리에서든 그 사람을 향해 맹렬히 달려가 찢어 죽입니다. 얼굴 사진이 담긴 위성 사진으로 인한 격리 실패 사례가 유명합니다.</div>
+      <div class="scp-tags"><span class="stag">얼굴 보면 폭주</span><span class="stag">추적</span><span class="stag">인간형</span><span class="stag">무한 거리 추격</span></div>
+      <div class="scp-alert">⚠ 얼굴 절대 보지 말 것. 어떤 매체로든 보는 순간 격리 실패.</div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-895</span>
+        <span class="scp-name">카메라 교란 (Camera Disruption)</span>
+        <span class="scp-class cls-euclid">EUCLID</span>
+      </div>
+      <div class="scp-desc">고급 원목 관. 주변의 카메라와 영상 장비에 영향을 주어 극도로 불안하거나 공포스러운 이미지를 표시합니다. 영상을 오래 본 사람은 심각한 심리적 외상을 입습니다. 격리실에는 오직 음성 모니터링만 가능. 관 내부는 미확인.</div>
+      <div class="scp-tags"><span class="stag">카메라 교란</span><span class="stag">공포 이미지</span><span class="stag">관</span><span class="stag">심리적</span></div>
+    </div>
+
+    <div class="scp-card">
+      <div class="scp-top">
+        <span class="scp-num">SCP-096 사건 후기</span>
+        <span class="scp-name">위성 사진 격리 실패</span>
+        <span class="scp-class cls-euclid">EVENT</span>
+      </div>
+      <div class="scp-desc">위성 사진의 픽셀 2개에 SCP-096의 얼굴이 포착되었습니다. 해당 사진을 구매한 민간인이 사망. 재단은 해당 위성을 격추하고 관련 사진 전수를 회수해야 했습니다. SCP-096의 얼굴이 어디에 찍히든 관계없이 격리 실패로 이어질 수 있음을 보여주는 사건.</div>
+      <div class="scp-tags"><span class="stag">사건 기록</span><span class="stag">위성</span><span class="stag">격리 실패</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 등급 체계 ===== -->
+<div class="sec" id="sec-classes">
+  <div class="sec-hd">
+    <div class="sec-title">📊 이상체 등급 체계 완전 정리</div>
+    <div class="sec-sub">Object Class — 이상체의 격리 난이도와 위험성을 나타내는 분류 체계.</div>
+  </div>
+
+  <div class="div-title">주요 공식 등급</div>
+
+  <div class="cls-card" style="background:var(--safeB);border:1px solid rgba(51,170,102,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--safe2);">■ SAFE (안전)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">격리가 충분히 이루어진 이상체. 일단 격리되면 거의 위협이 없거나, 특정 조건만 충족하면 안전하게 보관됩니다. "Safe"라는 등급이 무해하다는 의미는 아닙니다 — 격리가 쉽다는 의미입니다.</div>
+    <div class="cls-card-meta" style="color:var(--safe);">대표: SCP-999, SCP-500, SCP-294, SCP-131, SCP-343</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--euclidB);border:1px solid rgba(221,170,34,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--euclid2);">■ EUCLID (유클리드)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">격리에 복잡한 절차가 필요하거나, 자율 행동/의지/예측 불가능한 행동으로 지속적인 감시가 필요한 이상체. 재단의 가장 많은 이상체가 이 등급에 해당합니다.</div>
+    <div class="cls-card-meta" style="color:var(--euclid);">대표: SCP-049, SCP-079, SCP-087, SCP-096, SCP-173</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--keterB);border:1px solid rgba(204,34,51,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--keter2);">■ KETER (케테르)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">격리가 매우 어렵거나 불가능에 가까우며, 인류 또는 현실에 심각한 위협이 될 수 있는 이상체. 모든 재단의 자원을 격리에 쏟아야 합니다. 이름은 카발라의 생명나무 최상위 세피라에서 유래.</div>
+    <div class="cls-card-meta" style="color:var(--keter);">대표: SCP-682, SCP-076, SCP-106, SCP-1048, SCP-2317</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--thaumielB);border:1px solid rgba(68,102,221,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--thaumiel2);">■ THAUMIEL (타우미엘)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">재단이 역으로 이상체를 활용하는 등급. 다른 이상체를 격리하거나 XK급 시나리오를 예방하는 데 사용됩니다. 매우 희귀하며 존재 자체가 최고 기밀입니다. 카발라에서 '이중 쌍둥이'를 의미.</div>
+    <div class="cls-card-meta" style="color:var(--thaumiel);">대표: SCP-2000, SCP-3000, SCP-179</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--apollyonB);border:1px solid rgba(136,0,136,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--apollyon2);">■ APOLLYON (아폴리온)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">격리가 완전히 불가능한 이상체. XK급 시나리오가 기정사실화된 이상체. 재단이 할 수 있는 것은 속도를 늦추는 것뿐입니다. '파괴자, 심연의 왕'을 뜻하는 이름. 극히 소수.</div>
+    <div class="cls-card-meta" style="color:var(--apollyon);">대표: SCP-2317, SCP-3999</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--neutralizedB);border:1px solid rgba(85,85,119,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--neutralized2);">■ NEUTRALIZED (무력화)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">이상 특성이 완전히 소멸된 이상체. 종결되었거나, 스스로 소멸하거나, 이상 특성을 잃은 경우. 문서는 역사 기록으로 보존됩니다.</div>
+    <div class="cls-card-meta" style="color:var(--neutralized);">대표: SCP-5000</div>
+  </div>
+
+  <div class="cls-card" style="background:var(--archonB);border:1px solid rgba(34,136,136,.3);border-radius:6px;">
+    <div class="cls-card-title" style="color:var(--archon2);">■ ARCHON (아르콘)</div>
+    <div class="cls-card-desc" style="color:var(--txt2);">격리가 가능하지만 격리하지 않는 것이 더 낫다고 판단된 이상체. 격리하면 오히려 더 큰 피해가 발생합니다. Keter의 반대 개념. 자연 환경이나 사회에 녹아든 이상체가 해당.</div>
+    <div class="cls-card-meta" style="color:var(--archon);">대표: SCP-4000</div>
+  </div>
+
+  <div class="div-title">보조 등급 / 위험 등급</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">EXPLAINED</span></div><div class="card-desc">이상 현상이 과학적으로 완전히 설명된 사례. 사실 처음부터 평범했거나 오해였던 것들.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">PENDING</span></div><div class="card-desc">충분히 연구되지 않아 등급이 미정인 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">DECOMMISSIONED</span></div><div class="card-desc">재단이 의도적으로 파괴한 이상체. 격리 비용이 너무 크거나 위험할 때.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">ESOTERIC</span></div><div class="card-desc">기존 등급으로 분류 불가능한 특수 이상체. Apollyon, Archon 등이 여기에 포함.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">위험도: NOTICE</span></div><div class="card-desc">격리 실패 시 5명 미만 영향.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">위험도: CAUTION</span></div><div class="card-desc">격리 실패 시 도시 규모 영향.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">위험도: WARNING</span></div><div class="card-desc">격리 실패 시 지역/국가 규모 영향.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">위험도: DANGER</span></div><div class="card-desc">격리 실패 시 대륙 규모 영향.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">위험도: CRITICAL</span></div><div class="card-desc">격리 실패 시 문명 붕괴 또는 인류 멸종 위협.</div></div>
+  </div>
+
+  <div class="div-title">이상체 특성 태그 체계</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">Sentient</span></div><div class="card-desc">자의식이 있는 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Sapient</span></div><div class="card-desc">인간 수준의 지성을 가진 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Cognitohazard</span></div><div class="card-desc">인지·지각하는 것만으로 해로운 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Memetic</span></div><div class="card-desc">밈(정보) 형태로 전파되는 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Antimemetic</span></div><div class="card-desc">기억·인식에서 스스로 지워지는 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Humanoid</span></div><div class="card-desc">인간형 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Reality-bending</span></div><div class="card-desc">현실 자체를 변형하는 능력의 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Extraterrestrial</span></div><div class="card-desc">지구 외 기원의 이상체.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Infohazard</span></div><div class="card-desc">정보 자체가 해로운 이상체. 알면 위험.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Predatory</span></div><div class="card-desc">인간을 포함한 생명체를 먹이로 삼는 이상체.</div></div>
+  </div>
+</div>
+
+<!-- ===== MTF ===== -->
+<div class="sec" id="sec-mtf">
+  <div class="sec-hd">
+    <div class="sec-title">🔴 기동 특무 부대 (Mobile Task Force)</div>
+    <div class="sec-sub">MTF — 재단의 정예 현장 팀. 각각 고유 코드명(그리스 문자+숫자)과 별칭을 가집니다.</div>
+  </div>
+
+  <div class="callout yel"><span>📋</span><div class="callout-body">MTF는 특정 위협이나 임무 유형에 맞게 전문화되어 있습니다. 코드는 <strong>그리스 문자-숫자</strong> 형식 (예: Epsilon-11)이며, 별칭으로도 불립니다.</div></div>
+
+  <div class="div-title">주요 MTF 부대</div>
+  <div class="grid-3" id="mtf-grid">
+
+    <div class="mtf-card">
+      <div class="mtf-id">Alpha-1 "붉은 오른손" (Red Right Hand)</div>
+      <div class="mtf-name">O5 위원회 직속 경호·작전부대</div>
+      <div class="mtf-desc">O5 위원회의 직접 명령만 받는 재단 최정예 부대. 임무 내용은 완전 기밀. 다른 MTF조차 존재를 모르는 경우가 많음. "두 번째 질문을 묻지 않는 자들"이라고 불립니다.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Alpha-9 "마지막 희망" (Last Hope)</div>
+      <div class="mtf-name">인간형 이상체로 구성된 특수부대</div>
+      <div class="mtf-desc">자발적으로 협력하는 인간형 이상체들로 구성. SCP-105(아이리스) 등이 포함. 이상체의 능력을 역으로 활용하는 재단의 실험적 프로젝트. 이전 Omega-7의 후계 부대.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Beta-7 "매드 해터들" (Maz Hatters)</div>
+      <div class="mtf-name">화학·생물학·방사선 격리 전문</div>
+      <div class="mtf-desc">CBRN(화학·생물·방사선·핵) 위협 전문 대응 팀. 오염 지역 진입, 생물학적 이상체 격리, 화학 이상체 처리를 담당합니다. 최고 수준의 방호복 착용.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Epsilon-11 "구미호" (Nine-Tailed Fox)</div>
+      <div class="mtf-name">사이트 내 이상체 재격리 전문</div>
+      <div class="mtf-desc">사이트 침해(Site Breach) 시 즉각 투입되는 재격리 전문 부대. SCP: Containment Breach 게임에서 등장해 가장 유명한 MTF. "MTF Epsilon-11, 사이트-19에 진입합니다."</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Eta-10 "악마를 보지 마라" (See No Evil)</div>
+      <div class="mtf-name">시각적 인지 해저드 대응</div>
+      <div class="mtf-desc">시각적 인지 해저드(Visual Cognitohazard) 이상체 전문 부대. 특수 필터링 안대 및 간접 시각 장비를 사용. SCP-096 같은 이상체 재격리에 투입됩니다.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Gamma-5 "레드 헤링" (Red Herrings)</div>
+      <div class="mtf-name">정보 은폐 및 현장 기억 소거</div>
+      <div class="mtf-desc">이상 현상 목격자 기억 소거, 언론 통제, 허위 정보 배포 담당. 재단의 기밀 유지를 현장에서 실행하는 팀. "사고 없었습니다."</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Lambda-5 "화이트 래빗" (White Rabbits)</div>
+      <div class="mtf-name">이상 공간·위치 탐사</div>
+      <div class="mtf-desc">이상한 공간, 포켓 디멘션, 차원 이탈 현상 대응. SCP-3008(이케아) 같은 이상 공간 탐사 및 내부 실종자 구조 시도. 복귀 보장 없는 임무.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Nu-7 "해머 다운" (Hammer Down)</div>
+      <div class="mtf-name">중무장 군사 작전</div>
+      <div class="mtf-desc">재단의 가장 무장된 전투 부대. 대형 이상체 격리, 다른 GOI와의 무력 충돌, 대규모 작전 수행. 탱크, 항공 지원 포함. XK급 시나리오 군사 대응 담당.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Omega-7 "판도라의 상자" (Pandora's Box)</div>
+      <div class="mtf-name">SCP-076(에이블) 통제 특수부대 (해체)</div>
+      <div class="mtf-desc">SCP-076(에이블)을 전투 요원으로 활용하려던 특수 프로젝트. 에이블이 제어 불능이 되며 소속 요원 다수 사망, 부대 해체. 재단 역사상 가장 큰 내부 실패 사례 중 하나.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Tau-5 "삼사라" (Samsara)</div>
+      <div class="mtf-name">불사의 사이보그 전사 부대</div>
+      <div class="mtf-desc">사망 후 재생되는 인간의 의식을 인공 신체에 이식한 사이보그 부대. 사망해도 의식이 보존되어 새 신체에 업로드됩니다. Thaumiel 등급 이상체 대응에 특화. 윤리적 논란의 중심.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Theta-4 "농부들" (Gardeners)</div>
+      <div class="mtf-name">이상 식물·생태계 전문</div>
+      <div class="mtf-desc">이상한 식물, 생태계, 농업 관련 이상체 전문 격리 부대. 평화로운 별명과 달리 이상 식물로 인한 사상 사고도 드물지 않습니다.</div>
+    </div>
+
+    <div class="mtf-card">
+      <div class="mtf-id">Iota-10 "변호사들" (Damn Feds)</div>
+      <div class="mtf-name">정부·법 집행기관 침투 공작</div>
+      <div class="mtf-desc">정부 기관, 경찰, FBI, CIA 내에 위장 침투한 요원들. 이상 사건이 공식 기록되는 것을 막고, 재단 우호적 인사를 요직에 배치하는 비밀 공작 담당.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== GOI ===== -->
+<div class="sec" id="sec-goi">
+  <div class="sec-hd">
+    <div class="sec-title">🌐 관심 단체 (Groups of Interest)</div>
+    <div class="sec-sub">GOI — 이상체를 인지하고 있는 재단 외부의 집단들. 재단과 다양한 관계를 맺고 있습니다.</div>
+  </div>
+
+  <div class="div-title">적대적 / 경쟁 단체</div>
+  <div class="grid" id="goi-grid">
+
+    <div class="goi-card hostile">
+      <div class="goi-name">혼돈 반란군 (Chaos Insurgency)</div>
+      <span class="goi-rel rel-hostile">적대</span>
+      <div class="goi-desc">과거 재단에서 이탈한 분파. 재단의 정책에 반발해 이상체를 개인·국가 이익을 위해 사용해야 한다는 철학을 가집니다. 재단과 끊임없이 충돌하며 이상체 탈취 작전을 수행합니다. 재단이 만든 최악의 적</div>
+    </div>
+
+    <div class="goi-card hostile">
+      <div class="goi-name">세계 오컬트 연합 (Global Occult Coalition / GOC)</div>
+      <span class="goi-rel rel-neutral">경쟁/협력</span>
+      <div class="goi-desc">UN 산하 비밀 기관. 이상체 격리 대신 <strong>파괴(종결)</strong>를 선호합니다. 재단과 자주 충돌하지만 XK급 시나리오에서는 협력. "이상체는 존재해서는 안 된다"는 철학.</div>
+    </div>
+
+    <div class="goi-card hostile">
+      <div class="goi-name">마샬, 카터 &amp; 다크 (Marshall, Carter &amp; Dark Ltd.)</div>
+      <span class="goi-rel rel-hostile">적대</span>
+      <div class="goi-desc">극부유층을 대상으로 이상체와 관련된 서비스·물품을 판매하는 암시장 기업. 이상체를 사고팝니다. 재단과 충돌하지만 직접 전쟁은 피하고 법적·경제적 수단 선호. 빅토리아 시대 신사 클럽 분위기.</div>
+    </div>
+
+    <div class="goi-card hostile">
+      <div class="goi-name">파괴된 신의 교단 (Church of the Broken God)</div>
+      <span class="goi-rel rel-hostile">적대</span>
+      <div class="goi-desc">기계와 금속으로 이루어진 신(메케네)의 재건을 믿는 종교 단체. 신의 파편이 여러 SCP 번호로 격리되어 있다고 믿으며 이를 회수해 신을 재건하려 합니다. 신도들은 신체를 기계로 개조합니다.</div>
+    </div>
+
+    <div class="goi-card hostile">
+      <div class="goi-name">어둠의 별 (The Factory)</div>
+      <span class="goi-rel rel-hostile">적대</span>
+      <div class="goi-desc">19세기부터 존재한 이상한 제조 공장. 인체와 이상 물질을 원료로 사용해 다양한 이상 제품을 생산합니다. 완전히 비인간적이며 이익만을 추구합니다. 공장의 배후는 불명.</div>
+    </div>
+
+    <div class="goi-card neutral">
+      <div class="goi-name">뱀의 손 (Serpent's Hand)</div>
+      <span class="goi-rel rel-hostile">적대/이념 충돌</span>
+      <div class="goi-desc">이상체의 자유를 주장하는 단체. 재단이 이상체를 부당하게 감금한다고 생각하며, 이상체 해방과 인류와 이상체의 공존을 추구합니다. "도서관(방랑자의 도서관)"을 기반으로 활동. 직접 전투보다 해방 공작 선호.</div>
+    </div>
+
+  </div>
+
+  <div class="div-title">중립 / 특수 단체</div>
+  <div class="grid">
+
+    <div class="goi-card neutral">
+      <div class="goi-name">만나 자선 재단 (Manna Charitable Foundation)</div>
+      <span class="goi-rel rel-friendly">우호적</span>
+      <div class="goi-desc">이상한 식품·물품을 이용해 가난하고 재난 피해를 입은 사람들을 돕는 인도주의 단체. 재단과 우호적 관계지만 목표가 달라 때로 충돌. "좋은 의도"를 가진 드문 GOI.</div>
+    </div>
+
+    <div class="goi-card neutral">
+      <div class="goi-name">우리 멋있지 않냐? (Are We Cool Yet? / AWCY)</div>
+      <span class="goi-rel rel-neutral">중립</span>
+      <div class="goi-desc">이상 현상을 이용한 전위 예술을 추구하는 집단. 예술의 이름 아래 종종 다수 사상자를 내는 끔찍한 이상 예술품을 전시합니다. "예술은 위험해야 한다"는 극단적 예술 철학.</div>
+    </div>
+
+    <div class="goi-card neutral">
+      <div class="goi-name">프로메테우스 연구소 (Prometheus Labs)</div>
+      <span class="goi-rel rel-neutral">중립/해체</span>
+      <div class="goi-desc">이상 기술을 합법적으로 연구하던 민간 기업. 현재는 해체됐으나 과거 재단의 과학적 파트너. 많은 재단 기술이 프로메테우스 연구소 출신. 사유 불명의 갑작스러운 해체가 수수께끼.</div>
+    </div>
+
+    <div class="goi-card unknown">
+      <div class="goi-name">유리 (UIU / Unusual Incidents Unit)</div>
+      <span class="goi-rel rel-neutral">중립</span>
+      <div class="goi-desc">미국 FBI 산하 이상 현상 조사 부서. 예산 부족과 내부 무시로 만년 찬밥 신세. 재단이 자주 방해하거나 무시합니다. 그러나 가끔 협력도 합니다. SCP 세계관에서 블랙 코미디 역할.</div>
+    </div>
+
+    <div class="goi-card neutral">
+      <div class="goi-name">앤더슨 로보틱스 (Anderson Robotics)</div>
+      <span class="goi-rel rel-neutral">중립</span>
+      <div class="goi-desc">이상 기술을 활용한 인공 지능·로봇공학 기업. 파괴된 신의 교단과 경쟁 관계. 고급 인공지능 및 이상 사이보그를 판매합니다.</div>
+    </div>
+
+    <div class="goi-card unknown">
+      <div class="goi-name">방랑자의 도서관 (Wanderer's Library)</div>
+      <span class="goi-rel rel-unknown">불명</span>
+      <div class="goi-desc">현실 사이 어딘가에 존재하는 무한한 도서관. 모든 현실, 모든 시대의 지식이 담겨 있습니다. 뱀의 손이 기반으로 사용하며, 선택된 자들이 진입할 수 있습니다. GOC, 재단 등 다양한 존재의 정보가 보관되어 있습니다.</div>
+    </div>
+
+    <div class="goi-card unknown">
+      <div class="goi-name">세 포틀랜드 (Three Portlands)</div>
+      <span class="goi-rel rel-unknown">불명</span>
+      <div class="goi-desc">세 개의 이상 공간이 겹쳐 형성된 도시. 포틀랜드(미국), 포틀랜드(영국), 포틀랜드(이상 공간) 세 곳이 특정 지점에서 겹칩니다. 다양한 GOI의 거점이 있으며, 재단의 직접 개입이 어려운 중립 구역입니다.</div>
+    </div>
+
+    <div class="goi-card unknown">
+      <div class="goi-name">디어 칼리지 (Deer College)</div>
+      <span class="goi-rel rel-neutral">우호적</span>
+      <div class="goi-desc">이상학, 이상 현상 연구를 가르치는 대학교. Three Portlands에 위치. 재단과 우호적 관계이며 재단 연구원 중 이 학교 출신이 있습니다. 뱀의 손 멤버도 많습니다.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 세계관 설정 ===== -->
+<div class="sec" id="sec-lore">
+  <div class="sec-hd">
+    <div class="sec-title">📖 SCP 세계관 심층 설정</div>
+    <div class="sec-sub">재단 내부 역사, 핵심 인물, 주요 이야기 시리즈 및 세계관 근간.</div>
+  </div>
+
+  <div class="div-title">O5 위원회와 행정관</div>
+  <div class="hi-card">
+    <div class="hi-title">👁 O5 위원회 (Overseer Council)</div>
+    <div class="hi-body">
+      재단을 실질적으로 운영하는 <strong>13명의 최고 결정권자</strong>. O5-1부터 O5-13까지 번호로만 불립니다. 실제 이름, 외모, 성별 등은 Level 5 이하 직원에게는 완전 기밀. 심지어 O5들 간에도 서로를 완전히 신뢰하지 않습니다.<br><br>
+      <strong>행정관 (The Administrator)</strong>: O5 위원회 위에 군림하는 재단의 실질적 최고 존재. 정체 완전 불명. 일부 이론으로는 SCP-001이 행정관이라는 설, 행정관 자체가 이상체라는 설이 있습니다.
+    </div>
+  </div>
+
+  <div class="div-title">안티밈 연구부 (There Is No Antimemetics Division)</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-head"><span class="card-icon">🧠</span><span class="card-title">안티밈 연구부 이야기</span></div>
+    <div class="card-desc">qntm이 작성한 SCP 역사상 최고 걸작 중 하나. 안티밈(Anti-meme) — 기억에서 스스로 지워지는 정보 — 을 연구하는 특수 부서의 이야기입니다.</div>
+    <ul class="feat" style="margin-top:8px;">
+      <li>연구부장 <strong>마리온 휠러 (Marion Wheeler)</strong>: 안티밈에 맞서는 핵심 인물. 기억이 지워지면서도 계속 싸우는 이야기.</li>
+      <li>SCP-3125 (The Escapee)와의 최종 대결이 이야기의 클라이맥스.</li>
+      <li>안티밈 연구부는 재단 내에서도 존재를 대부분 모릅니다 — 안티밈이기 때문에.</li>
+      <li>현재 단행본으로도 출판되어 있습니다 (영문).</li>
+    </ul>
+  </div>
+
+  <div class="div-title">주요 이야기 시리즈</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📚</span><span class="card-title">Foundation Tales (재단 이야기)</span></div>
+      <div class="card-desc">SCP 문서 형식을 벗어나 재단 세계를 배경으로 한 단편 소설들. 재단의 일상, 비극, 희망을 담습니다. 인기 작품: "The Administrator", "From 430 with Love".</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📖</span><span class="card-title">허브 이야기들</span></div>
+      <div class="card-desc">특정 SCP 중심의 장편 이야기. SCP-001 제안들, 안티밈 시리즈, Dr. Clef 이야기, O5 이야기 등. 재단의 거시적 역사를 담습니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔬</span><span class="card-title">실험 로그 (Experiment Logs)</span></div>
+      <div class="card-desc">SCP-914, SCP-294, SCP-682 종결 시도 등의 실험 기록. 재단 특유의 블랙 유머와 비극이 공존하는 문서들.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕰️</span><span class="card-title">재단의 역사 (Foundation History)</span></div>
+      <div class="card-desc">재단이 언제, 어떻게 설립되었는지의 배경. SCP-1000 문서에 재단 전신의 과거 행위가 기술됩니다. "현자의 시대" 이전의 역사도 다루어집니다.</div>
+    </div>
+  </div>
+
+  <div class="div-title">유명 캐릭터들</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Dr. Bright</span></div>
+      <div class="card-desc">재단 내 가장 유명한 연구원. SCP-963(부활의 보석)을 목에 걸고 있어 자신이 사망해도 보석에 접촉하는 사람의 몸을 빼앗아 살아남습니다. 수많은 유머 문서와 금지된 행동 목록의 주인공.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Dr. Clef</span></div>
+      <div class="card-desc">재단 최고의 격리 전문가 중 하나. 자신이 악마라는 소문이 있으며, 실제로 이상한 특성을 보입니다. SCP-001 제안 중 하나("문지기")의 주인공.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Dr. Gears</span></div>
+      <div class="card-desc">감정 없이 냉철한 재단 연구원. 가장 전형적인 "재단형 인간"으로 묘사됩니다. SCP-914 실험 기록에 자주 등장.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Dr. Kondraki</span></div>
+      <div class="card-desc">SCP-408(나비 이상체)과 관련된 연구원. SCP-682 종결 시도 중 SCP-408을 이용한 매우 창의적인 방법을 시도한 것으로 유명합니다 (실패).</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Agent Diaz</span></div>
+      <div class="card-desc">현장 요원으로 등장하는 재단의 인간적인 면을 보여주는 캐릭터. 다양한 이야기에서 평범한 재단 요원의 삶을 보여줍니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">마리온 휠러 (Marion Wheeler)</span></div>
+      <div class="card-desc">안티밈 연구부의 핵심 캐릭터. SCP-3125와의 싸움에서 기억을 잃어가면서도 임무를 수행하는 비극적 주인공. 현대 SCP 최고 캐릭터 중 하나.</div>
+    </div>
+  </div>
+
+  <div class="div-title">현실 왜곡자 (Reality Benders / RPC)</div>
+  <div class="hi-card">
+    <div class="hi-title">🌀 현실 왜곡 능력자</div>
+    <div class="hi-body">
+      <strong>현실 왜곡자</strong>는 물리 법칙 자체를 바꿀 수 있는 이상체 또는 인간입니다. 재단은 이들을 "현실 왜곡자(Reality Benders)"로 분류하며 극도로 위험하게 취급합니다.<br><br>
+      • <strong>SCP-239</strong>: 믿음이 현실이 되는 소녀 (혼수 상태 유지 중)<br>
+      • <strong>SCP-343</strong>: 자칭 신 (전지전능?)<br>
+      • <strong>SCP-2845</strong>: 토성에서 온 신성한 사슴 — 지구를 정복하려 한 존재<br>
+      • <strong>SCP-3812</strong>: 모든 것을 초월한 존재 (가장 강력한 현실 왜곡자로 꼽힘)<br><br>
+      현실 왜곡자에 대한 재단의 대응: 즉각 혼수 상태 유지, 격리 불가 시 종결, 현실 안정화 장치 배치.
+    </div>
+  </div>
+</div>
+
+<!-- ===== 비상 사태 ===== -->
+<div class="sec" id="sec-events">
+  <div class="sec-hd">
+    <div class="sec-title">💥 비상 사태 등급 &amp; 주요 사건</div>
+    <div class="sec-sub">재단이 대비하는 종말 시나리오와 주요 격리 실패 사건들.</div>
+  </div>
+
+  <div class="div-title">종말 시나리오 (Extinction Level Scenarios)</div>
+  <div class="ev-wrap">
+    <div class="ev-head">⚠ 시나리오 분류표</div>
+    <table class="ev-table">
+      <tr><th>코드</th><th>명칭</th><th>설명</th><th>규모</th></tr>
+      <tr><td>XK</td><td>세계 종말</td><td>인류 문명 또는 인류 자체의 종말. 가장 경계하는 시나리오.</td><td>전인류</td></tr>
+      <tr><td>ZK</td><td>현실 소멸</td><td>현실 자체의 붕괴 또는 소멸. XK보다 상위 개념.</td><td>현실 전체</td></tr>
+      <tr><td>CK</td><td>현실 재구성</td><td>현실의 근본 법칙이 바뀌는 시나리오. 기억 소거 불가능.</td><td>현실 전체</td></tr>
+      <tr><td>AK</td><td>베일 해제</td><td>재단의 기밀이 전 세계에 폭로되는 시나리오. 사회 붕괴 위험.</td><td>전인류</td></tr>
+      <tr><td>SK</td><td>주도권 이전</td><td>인류가 아닌 다른 종 또는 세력이 지구를 지배하게 되는 시나리오.</td><td>전지구</td></tr>
+      <tr><td>NK</td><td>Keter 종결</td><td>Keter급 이상체가 어떠한 방법으로든 무력화되는 시나리오.</td><td>이상체 단위</td></tr>
+      <tr><td>RK</td><td>알파-오메가</td><td>모든 이상체가 동시에 격리를 이탈하는 최악의 복합 시나리오.</td><td>전인류</td></tr>
+      <tr><td>EK</td><td>인지 붕괴</td><td>인류의 집단 인식 능력이 파괴되는 시나리오.</td><td>전인류</td></tr>
+      <tr><td>TK</td><td>시간 붕괴</td><td>시간 흐름 자체가 불안정해지는 시나리오.</td><td>시공간</td></tr>
+      <tr><td>VK</td><td>에너지 소멸</td><td>우주 에너지 법칙이 붕괴하는 시나리오 (열역학적 종말 관련).</td><td>우주</td></tr>
+    </table>
+  </div>
+
+  <div class="div-title">주요 격리 실패 &amp; 사건 기록</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">사이트-19 대규모 격리 실패</span></div>
+      <div class="card-desc">SCP: Containment Breach 게임의 배경. SCP-173의 격리 해제를 시작으로 연쇄 격리 실패 발생. SCP-106, SCP-049, SCP-096, SCP-682 등 다수 이탈. Epsilon-11 MTF 투입. 수십 명 이상 사망.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">Omega-7 붕괴 사건</span></div>
+      <div class="card-desc">SCP-076(에이블)을 활용한 특수부대 Omega-7 운영 중 에이블이 완전히 통제 불능 상태가 됨. 부대원 대부분 사망. 에이블 재격리에 엄청난 희생 필요. 재단 역사상 최악의 내부 사고 중 하나.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">SCP-682 다수 종결 시도</span></div>
+      <div class="card-desc">SCP-173, SCP-096, SCP-106, SCP-049, SCP-035, 핵탄두 등 수십 가지 방법으로 종결 시도. 전부 실패. 가장 긴 격리 실패 역사를 가진 이상체.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">SCP-2000 과거 가동</span></div>
+      <div class="card-desc">과거 어느 시점에 XK급 시나리오가 실제로 발생. SCP-2000이 가동되어 인류를 재건한 기록이 있습니다. 현재 우리가 사는 세계가 재건된 세계일 가능성이 있습니다. 현재 2회 이상 가동 흔적이 발견되었습니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">SCP-5000 사건</span></div>
+      <div class="card-desc">재단 자체가 인류 말살을 결정하고 작전을 개시한 대체 현실 기록. 한 요원이 파워 아머를 입고 과거로 돌아가 사태를 막습니다. 재단의 가장 어두운 가능성을 보여주는 사건.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚨</span><span class="card-title">사이트-██ 사령관 반란</span></div>
+      <div class="card-desc">재단 내부에서 이상체를 이용해 O5 위원회에 반기를 든 사건. 내부 반란은 Alpha-1이 진압. 재단 내부의 권력 다툼과 이상체 활용 윤리 문제를 보여줍니다.</div>
+    </div>
+  </div>
+
+  <div class="div-title">재단의 3대 딜레마</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">D계급 윤리 문제</span></div>
+      <div class="card-desc">위험 실험의 소모품으로 사용되는 D계급 인원. 대부분 사형수 출신이지만 일부는 무고한 사람들. 매달 말 D계급 전원 종결 후 재보충한다는 설정도 있습니다 (후에 일부 개선). 재단의 가장 큰 도덕적 약점.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">기억 소거의 대가</span></div>
+      <div class="card-desc">재단은 수백만 명의 기억을 소거해왔습니다. SCP-3000에서 기억 소거제(아밀로이드)를 추출하는데, 이 과정이 SCP-3000에 먹이를 제공하는 것과 관련 있습니다. 기억 소거를 위해 어떤 희생을 했는지 알 수 없습니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">종결 vs 격리</span></div>
+      <div class="card-desc">의식이 있는 이상체를 영구 격리하는 것이 윤리적인가? GOC는 파괴를, 뱀의 손은 해방을 주장합니다. 재단 내부에서도 윤리위원회와 실용주의자 간 충돌이 있습니다. SCP-179, SCP-105 같은 협력 이상체들이 이 딜레마를 부각합니다.</div>
+    </div>
+  </div>
+
+  <div class="div-title">재단의 철학 — 재단이 존재하는 이유</div>
+  <div class="hi-card">
+    <div class="hi-title">🌑 "우리는 어둠 속에서 빛을 지킨다"</div>
+    <div class="hi-body">
+      재단이 하는 일은 인류에게 절대 알려지지 않습니다. D계급으로 희생되는 사람도, 기억이 소거되는 목격자도, 현장에서 죽어가는 요원도 — 아무도 알지 못합니다.<br><br>
+      재단 직원들은 이 사실을 알면서도 임무를 수행합니다. 그것이 SCP 세계관이 독자에게 던지는 질문입니다:<br><br>
+      <strong>"인류를 구하기 위해 얼마나 많은 것을 희생할 수 있는가?"</strong><br><br>
+      그리고 재단의 가장 어두운 비밀은 — 우리가 이미 여러 번 멸망하고, 여러 번 재건되었을 수 있다는 것입니다.
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    tab.classList.add('on');
+    const s=document.getElementById('sec-'+tab.dataset.tab);
+    if(s) s.classList.add('on');
+  });
+});
+
+// Search
+const searchEl=document.getElementById('search');
+const hitCnt=document.getElementById('hit-cnt');
+let allCards=[];
+
+function initCards(){
+  allCards=[
+    ...document.querySelectorAll('.scp-card'),
+    ...document.querySelectorAll('.card'),
+    ...document.querySelectorAll('.mtf-card'),
+    ...document.querySelectorAll('.goi-card'),
+    ...document.querySelectorAll('.cls-card')
+  ];
+}
+
+searchEl.addEventListener('input', function(){
+  if(!allCards.length) initCards();
+  const q=this.value.trim().toLowerCase();
+  if(!q){ clearSearch(); return; }
+
+  // Show all sections for search
+  document.querySelectorAll('.sec').forEach(s=>s.classList.add('on'));
+
+  let hits=0;
+  allCards.forEach(card=>{
+    const txt=card.textContent.toLowerCase();
+    if(txt.includes(q)){
+      card.classList.remove('hidden');
+      hits++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  hitCnt.textContent=hits?hits+'개 결과':'결과 없음';
+});
+
+function clearSearch(){
+  allCards.forEach(c=>c.classList.remove('hidden'));
+  hitCnt.textContent='';
+  // Restore active tab
+  const at=document.querySelector('.tab.on');
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  if(at){
+    const s=document.getElementById('sec-'+at.dataset.tab);
+    if(s) s.classList.add('on');
+  }
+}
+
+// Init cards on load
+initCards();
+</script>
+</body>
+</html>

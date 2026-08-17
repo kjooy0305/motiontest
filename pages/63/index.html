@@ -175,6 +175,28 @@ body{background:var(--bg);color:var(--txt);
 .tip-icon{font-size:17px;flex-shrink:0;}
 .tip-txt{font-size:13px;color:var(--txt2);line-height:1.6;}
 
+/* ─ MY LAPTOP ─ */
+.ml-specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:11px;}
+.ml-spec{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:13px;}
+.ml-spec-name{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.ml-spec-val{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:4px;}
+.ml-spec-note{font-size:11px;color:var(--txt2);line-height:1.55;}
+.ml-spec-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:700;margin-top:6px;}
+.poss-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.poss-tbl th,.poss-tbl td{padding:7px 10px;border:1px solid var(--border);}
+.poss-tbl th{background:var(--bg4);color:var(--txt2);font-size:11px;font-weight:600;text-align:left;}
+.poss-tbl td:nth-child(2){text-align:center;white-space:nowrap;font-weight:700;}
+.poss-tbl td:last-child{color:var(--txt2);font-size:11px;}
+.poss-tbl tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.pok{color:var(--grn);}.pwarn{color:var(--yel);}.pno{color:var(--red);}
+.cat-title{font-size:13px;font-weight:700;color:var(--txt);margin:14px 0 7px;}
+.cat-title:first-child{margin-top:0;}
+.lim-card{background:var(--bg3);border:1px solid;border-radius:8px;padding:14px;
+  display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.lim-num{font-size:22px;font-weight:800;flex-shrink:0;width:26px;}
+.lim-body h4{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px;}
+.lim-body p{font-size:12px;color:var(--txt2);line-height:1.55;}
+
 /* ─ SCROLLBAR ─ */
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg2);}
@@ -1015,22 +1037,114 @@ const PARTS = [
 
 
 // ════════════════════════════════════════════════════════
+//  MY LAPTOP DATA
+// ════════════════════════════════════════════════════════
+
+const MY_LAPTOP = {
+  icon:'💻', color:'#a070ff',
+  colorBg:'rgba(160,112,255,.12)', colorBorder:'rgba(160,112,255,.3)',
+  specs:[
+    { name:'CPU', val:'i5-1240P (12세대)',
+      note:'P코어 4개 + E코어 8개 = 12코어 16스레드. 기본 1.7GHz는 절전 클럭이고 실제 작업 시 최대 4.4GHz까지 자동으로 올라감. 노트북용 28W이지만 성능은 준수한 편.',
+      badge:'중급 수준', badgeBg:'rgba(68,136,255,.2)', badgeTxt:'#6ab0ff' },
+    { name:'GPU', val:'Intel Iris Xe',
+      note:'전용 GPU 없음. 128MB는 고정 할당이고 실제로는 시스템 RAM을 최대 2GB 공유해서 사용. 내장 그래픽 중 좋은 편이지만 전용 GPU와 비교하면 5~10배 성능 차이.',
+      badge:'핵심 제약', badgeBg:'rgba(255,64,96,.2)', badgeTxt:'#ff8090' },
+    { name:'RAM', val:'16GB',
+      note:'2025~2026년 기준 충분한 수준. 일반 작업·개발·가벼운 게임까지 무난. 방송+게임 동시이거나 영상 편집 병행이면 가끔 빡빡하게 느껴질 수 있음.',
+      badge:'충분', badgeBg:'rgba(40,204,136,.2)', badgeTxt:'#50e8a0' },
+    { name:'여유 저장공간', val:'236GB',
+      note:'Unity·Android Studio·Node.js·게임 등 여러 개 설치하면 빠르게 줄어듦. 외장 SSD 하나 마련하면 걱정 줄어듦.',
+      badge:'관리 필요', badgeBg:'rgba(240,192,48,.2)', badgeTxt:'#f0c030' },
+  ],
+  categories:[
+    { name:'게임', icon:'🎮', items:[
+      { task:'리그 오브 레전드', ok:'ok', note:'낮음~중간 설정, 60fps 전후 가능' },
+      { task:'발로란트', ok:'ok', note:'낮음 설정, 60fps 근처' },
+      { task:'마인크래프트 (Java)', ok:'ok', note:'낮음~중간 설정, OptiFine 설치 추천' },
+      { task:'스팀 인디 · 2D 게임', ok:'ok', note:'대부분 쾌적하게 가능' },
+      { task:'원신', ok:'warn', note:'낮음 설정 30fps 가능, 오래 하면 발열 주의' },
+      { task:'오버워치 2', ok:'warn', note:'최저 설정 40~60fps, 불안정한 편' },
+      { task:'FIFA / EA FC', ok:'warn', note:'최저 설정에서 플레이 가능' },
+      { task:'배틀그라운드', ok:'no', note:'최저도 20~30fps, 실질적으로 비권장' },
+      { task:'사이버펑크 2077 · 엘든링', ok:'no', note:'전용 GPU 필수 — 사실상 불가' },
+    ]},
+    { name:'방송 (스트리밍)', icon:'📡', items:[
+      { task:'얼굴캠 + 토크 방송', ok:'ok', note:'OBS + Intel Quick Sync 사용 시 CPU 부담 낮음' },
+      { task:'화면 공유 방송 (강의·코딩)', ok:'ok', note:'720p~1080p 30fps 충분' },
+      { task:'유튜브 쇼츠 녹화·편집', ok:'ok', note:'FHD 편집 문제없음' },
+      { task:'LOL 등 가벼운 게임 + 방송', ok:'warn', note:'Quick Sync 설정 필수, 발열·팬 소음 주의' },
+      { task:'고사양 게임 + 방송 동시', ok:'no', note:'게임 자체가 이미 한계 — 동시는 어려움' },
+    ]},
+    { name:'코딩 · 개발', icon:'💻', items:[
+      { task:'웹 개발 (VS Code, 브라우저)', ok:'ok', note:'최적의 환경, 매우 쾌적' },
+      { task:'Python · 백엔드 개발', ok:'ok', note:'스크립트·자동화·서버 모두 쾌적' },
+      { task:'GitHub Copilot · Cursor AI', ok:'ok', note:'클라우드 기반 — 로컬 GPU 불필요' },
+      { task:'안드로이드 앱 (Android Studio)', ok:'ok', note:'가능, 에뮬레이터보다 실기기 디버깅 권장' },
+      { task:'경량 ML (scikit-learn, pandas)', ok:'ok', note:'CPU 연산이라 문제없음' },
+      { task:'Docker · 가상화 (1~2개)', ok:'warn', note:'RAM 16GB로 1~2개는 가능, 많이 띄우면 버벅임' },
+      { task:'로컬 LLM (Ollama 등)', ok:'warn', note:'매우 느림, 소형 모델(3B 이하)만 간신히 가능' },
+      { task:'대규모 딥러닝 학습', ok:'no', note:'전용 GPU 없어서 수십~수백 배 느림 — 비권장' },
+    ]},
+    { name:'게임 개발', icon:'🕹️', items:[
+      { task:'Godot 4 (2D · 3D 소규모)', ok:'ok', note:'매우 쾌적한 최적 환경' },
+      { task:'Unity 6 (2D 프로젝트)', ok:'ok', note:'완벽하게 쾌적' },
+      { task:'RPG Maker', ok:'ok', note:'완전히 문제없음' },
+      { task:'웹 게임 (Phaser · JavaScript)', ok:'ok', note:'매우 쾌적' },
+      { task:'Unity 6 (3D 중규모)', ok:'ok', note:'가능, 복잡한 씬에서 뷰포트 느려질 수 있음' },
+      { task:'Unreal Engine 5', ok:'warn', note:'기본 편집 가능, Lumen·Nanite 끄고 작업 필요' },
+    ]},
+    { name:'기타 창작', icon:'🎨', items:[
+      { task:'문서 · 발표 · 사무', ok:'ok', note:'매우 쾌적' },
+      { task:'포토샵 · 일러스트 (2D)', ok:'ok', note:'무거운 필터 처리 시 약간 느림' },
+      { task:'영상 편집 FHD', ok:'ok', note:'Intel Quick Sync 덕에 렌더 빠름' },
+      { task:'DAW 음악 제작 (FL Studio 등)', ok:'ok', note:'플러그인 적게 쓰면 쾌적' },
+      { task:'영상 편집 4K', ok:'warn', note:'편집은 되지만 렌더링 오래 걸림' },
+      { task:'3D 렌더링 (Blender)', ok:'warn', note:'편집은 가능, GPU 렌더링 불가 — CPU 렌더는 매우 느림' },
+    ]},
+  ],
+  limits:[
+    { num:'1', color:'rgba(255,64,96,.1)', border:'rgba(255,64,96,.3)',
+      title:'전용 GPU 없음 — 게임·렌더링의 근본적 한계',
+      desc:'Intel Iris Xe는 내장 그래픽 중 좋은 편이지만, RTX 3060 같은 전용 GPU와 비교하면 5~10배 이상 성능 차이가 납니다. 고사양 게임·3D 렌더링·AI 로컬 실행에 근본적인 제약이 있습니다.' },
+    { num:'2', color:'rgba(240,192,48,.08)', border:'rgba(240,192,48,.3)',
+      title:'노트북 발열 — 지속 성능 저하 (쓰로틀링)',
+      desc:'무거운 작업을 오래 하면 CPU가 과열을 막기 위해 스스로 성능을 낮추는 "쓰로틀링"이 발생합니다. 쿨링 패드(1~3만원)를 사용하면 온도를 5~10°C 낮출 수 있어 성능 유지에 도움이 됩니다.' },
+    { num:'3', color:'rgba(58,143,255,.08)', border:'rgba(58,143,255,.3)',
+      title:'여유 공간 236GB — 개발 환경 설치 시 주의',
+      desc:'Unity, Android Studio, Node.js, 게임 등을 함께 설치하면 빠르게 줄어듭니다. 외장 SSD 1TB(6~9만원)를 하나 마련해두면 공간 걱정이 크게 줄어들고 작업 파일 백업도 됩니다.' },
+  ],
+  tips:[
+    { icon:'❄️', txt:'쿨링 패드 (1~3만원): 노트북 하단에 두면 온도 5~10°C 저하, 쓰로틀링 감소 → 성능을 더 오래 유지할 수 있습니다. 투자 대비 효과가 가장 큰 액세서리입니다.' },
+    { icon:'💾', txt:'외장 SSD (6~12만원): 1TB NVMe 외장 SSD 하나면 저장공간 걱정이 사라집니다. USB 3.2 Gen 2 지원 제품이면 전송 속도도 충분히 빠릅니다.' },
+    { icon:'🖥️', txt:'외부 모니터 (10~30만원): 24~27인치 FHD 모니터를 연결하면 작업 효율이 크게 올라갑니다. i5-1240P는 HDMI / USB-C DisplayPort 출력을 잘 지원합니다.' },
+    { icon:'📡', txt:'OBS 방송 Quick Sync 설정: OBS → 설정 → 출력 → 인코더를 "Intel QSV H.264"로 변경. CPU 점유율이 크게 줄어 방송과 다른 작업을 동시에 하기 훨씬 편해집니다.' },
+    { icon:'⚠️', txt:'RAM 업그레이드 전 확인: 이 노트북이 RAM 슬롯이 있고 납땜(온보드)이 아닌 경우에만 32GB로 업그레이드 가능합니다. 제조사 페이지 또는 분해 영상을 먼저 확인하세요.' },
+  ],
+};
+
+// ════════════════════════════════════════════════════════
 //  RENDER
 // ════════════════════════════════════════════════════════
 
-let cur = null; // null = overview
+let cur = null; // null=overview, 'mylaptop'=내노트북, object=part
 
 function renderNav() {
   const nav = document.getElementById('cnav');
   const ovBtn = `<button class="cbtn${cur===null?' on':''}" onclick="sel(null)">
     <span class="ci">🗺️</span><span>전체가이드</span></button>`;
+  const mlBtn = `<button class="cbtn${cur==='mylaptop'?' on':''}"
+    style="${cur==='mylaptop'?`color:${MY_LAPTOP.color};border-color:${MY_LAPTOP.colorBorder};background:${MY_LAPTOP.colorBg};`:''}"
+    onclick="sel('mylaptop')">
+    <span class="ci">${MY_LAPTOP.icon}</span><span>내 노트북</span>
+  </button>`;
   const partBtns = PARTS.map(p=>`
     <button class="cbtn${cur&&cur.id===p.id?' on':''}"
       style="${cur&&cur.id===p.id?`color:${p.color};border-color:${p.colorBorder};background:${p.colorBg};`:''}"
       onclick="sel('${p.id}')">
       <span class="ci">${p.icon}</span><span>${p.name}</span>
     </button>`).join('');
-  nav.innerHTML = ovBtn + partBtns;
+  nav.innerHTML = ovBtn + mlBtn + partBtns;
 }
 
 function renderOverview() {
@@ -1170,10 +1284,69 @@ function mkTips(tips){
     </div>`).join('')}</div>`;
 }
 
+function renderMyLaptop() {
+  const d = MY_LAPTOP;
+  const sty = `--pc:${d.color};--pca:${d.colorBg};`;
+
+  const specsHtml = `<div class="ml-specs">${d.specs.map(s=>`
+    <div class="ml-spec">
+      <div class="ml-spec-name">${s.name}</div>
+      <div class="ml-spec-val">${s.val}</div>
+      <div class="ml-spec-note">${s.note}</div>
+      <span class="ml-spec-badge" style="background:${s.badgeBg};color:${s.badgeTxt};">${s.badge}</span>
+    </div>`).join('')}</div>`;
+
+  const catHtml = d.categories.map(c=>`
+    <div class="cat-title">${c.icon} ${c.name}</div>
+    <div class="ptbl-wrap" style="margin-bottom:4px;">
+      <table class="poss-tbl">
+        <thead><tr><th>작업</th><th style="width:90px;">가능 여부</th><th>비고</th></tr></thead>
+        <tbody>${c.items.map(i=>`
+          <tr>
+            <td>${i.task}</td>
+            <td class="${i.ok==='ok'?'pok':i.ok==='warn'?'pwarn':'pno'}">
+              ${i.ok==='ok'?'✅ 가능':i.ok==='warn'?'⚠️ 제한적':'❌ 어려움'}
+            </td>
+            <td>${i.note}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`).join('');
+
+  const limHtml = d.limits.map(l=>`
+    <div class="lim-card" style="background:${l.color};border-color:${l.border};">
+      <div class="lim-num" style="color:var(--txt3);">${l.num}</div>
+      <div class="lim-body"><h4>${l.title}</h4><p>${l.desc}</p></div>
+    </div>`).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="hero" style="${sty}">
+      <div class="hero-icon">${d.icon}</div>
+      <div class="hero-txt">
+        <h2>내 노트북 스펙 분석</h2>
+        <div class="hero-tag" style="background:${d.colorBg};border:1px solid ${d.colorBorder};color:${d.color};">이 노트북으로 무엇을 할 수 있을까?</div>
+        <div class="hero-analogy">12th Gen Intel Core i5-1240P · Intel Iris Xe · RAM 16GB · 여유 저장공간 236GB</div>
+        <div class="hero-role">방송·게임·코딩·게임 개발 등 카테고리별로 ✅ 가능 / ⚠️ 제한적 / ❌ 어려움을 정리했습니다.</div>
+      </div>
+    </div>
+    ${mkSec('🔍 스펙 해석','ml-sp', specsHtml)}
+    ${mkSec('📋 카테고리별 가능 여부','ml-cat', catHtml)}
+    ${mkSec('⚠️ 핵심 제약 3가지','ml-lim', limHtml)}
+    ${mkSec('💡 활용 팁 & 소소한 업그레이드','ml-tip', mkTips(d.tips))}
+  `;
+  document.querySelectorAll('.sec-hdr').forEach(h=>{
+    h.addEventListener('click',()=>{h.classList.toggle('op');h.nextElementSibling.classList.toggle('op');});
+    h.classList.add('op'); h.nextElementSibling.classList.add('op');
+  });
+}
+
 function sel(id){
-  cur = id===null ? null : PARTS.find(p=>p.id===id);
+  if(id===null) cur=null;
+  else if(id==='mylaptop') cur='mylaptop';
+  else cur=PARTS.find(p=>p.id===id);
   renderNav();
   if(cur===null) renderOverview();
+  else if(cur==='mylaptop') renderMyLaptop();
   else renderPart(cur);
   window.scrollTo(0,0);
 }

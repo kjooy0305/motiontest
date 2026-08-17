@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마피아42 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0708;--bg2:#120d0f;--bg3:#191214;--bg4:#241a1d;
+  --border:#2b1e22;--border2:#48313a;
+  --txt:#ece3e5;--txt2:#a89096;--txt3:#63494f;
+  --acc:#d9434f;--acc2:#ff7b85;--acc3:rgba(217,67,79,.14);--acc4:rgba(217,67,79,.06);
+  --gold:#d4a53a;--gold2:#f5cd6a;--goldB:rgba(212,165,58,.13);
+  --blu:#4b86d8;--blu2:#7fb0ff;--bluB:rgba(75,134,216,.13);
+  --grn:#46b26b;--grn2:#6fd894;--grnB:rgba(70,178,107,.13);
+  --pur:#9560d4;--pur2:#bb8dff;--purB:rgba(149,96,212,.13);
+  --cyan:#39aab8;--cyan2:#63d3e0;--cyanB:rgba(57,170,184,.13);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;-webkit-text-size-adjust:100%;}
+
+#hdr{background:linear-gradient(135deg,#060405,#1a1013,#060405);
+  border-bottom:2px solid var(--acc);padding:9px 16px;position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#hdr-logo{font-size:19px;filter:drop-shadow(0 0 9px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 18px rgba(217,67,79,.45);}
+#hdr .badge{font-size:9px;padding:2px 6px;border-radius:2px;background:var(--acc3);
+  border:1px solid rgba(217,67,79,.35);color:var(--acc);font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+#search{flex:1;min-width:140px;max-width:300px;padding:6px 11px;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;
+  outline:none;font-family:inherit;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+#tabs{display:flex;gap:2px;padding:6px 12px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:45px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 12px;border-radius:3px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(217,67,79,.45);color:var(--acc2);}
+.tab.t-cit{color:#8fc3ff;}.tab.t-cit.on{background:var(--bluB);border-color:rgba(75,134,216,.5);color:var(--blu2);}
+.tab.t-maf{color:#ff9098;}.tab.t-maf.on{background:var(--acc3);border-color:rgba(217,67,79,.5);color:var(--acc2);}
+.tab.t-cul{color:#c49bff;}.tab.t-cul.on{background:var(--purB);border-color:rgba(149,96,212,.5);color:var(--pur2);}
+
+#main{padding:16px;max-width:1300px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 9px;
+  padding-left:9px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+h3.blk.cit{border-color:var(--blu);}h3.blk.maf{border-color:var(--acc);}
+h3.blk.cul{border-color:var(--pur);}h3.blk.gold{border-color:var(--gold);}
+h4.sub{font-size:12.5px;font-weight:700;color:var(--acc);margin:14px 0 7px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:12px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(450px,1fr));gap:10px;margin-bottom:12px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;}
+.card.hidden{display:none;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;}
+.card-icon{font-size:15px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card.c-cit .card-title{color:var(--blu2);}
+.card.c-cul .card-title{color:var(--pur2);}
+.card-sub{font-size:9px;color:var(--txt3);margin-left:auto;padding:1px 5px;border-radius:5px;
+  background:var(--bg4);border:1px solid var(--border);white-space:nowrap;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.72;}
+.card-desc strong{color:var(--txt);}
+.card-desc em{color:var(--acc2);font-style:normal;}
+ul.tips{list-style:none;}
+ul.tips li{display:flex;gap:7px;padding:4px 0;border-bottom:1px solid rgba(43,30,34,.8);
+  font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--acc);flex-shrink:0;margin-top:1px;}
+ul.tips li strong{color:var(--txt);}
+ul.tips li em{color:var(--acc2);font-style:normal;}
+
+.tbl-wrap{overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);}
+.tbl-wrap.hidden{display:none;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;padding:7px 10px;
+  border-bottom:1px solid var(--border2);white-space:nowrap;font-size:11.5px;}
+td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(217,67,79,.05);}
+td strong{color:var(--txt);}
+td em{color:var(--acc2);font-style:normal;}
+.tbl-cap{font-size:11px;color:var(--txt3);padding:6px 10px;background:var(--bg3);
+  border-bottom:1px solid var(--border);font-weight:600;}
+.tbl-wrap.cit th{color:var(--blu2);}
+.tbl-wrap.cul th{color:var(--pur2);}
+.tbl-wrap.gold th{color:var(--gold2);}
+
+code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;font-size:11.5px;color:var(--gold2);}
+.diag{background:#040203;border:1px solid var(--border2);border-radius:5px;padding:11px 13px;
+  font-family:'Consolas','Courier New',monospace;font-size:11px;line-height:1.55;
+  color:var(--gold2);white-space:pre;overflow-x:auto;margin:8px 0 12px;}
+
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(217,67,79,.24);border-radius:7px;padding:12px 15px;margin-bottom:12px;}
+.hi-card.hidden{display:none;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.78;}
+.hi-body strong{color:var(--txt);}
+.hi-body em{color:var(--acc2);font-style:normal;}
+.callout{border-radius:5px;padding:9px 12px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout.hidden{display:none;}
+.callout-body{color:var(--txt2);line-height:1.68;}
+.callout-body strong{color:var(--txt);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.gold{background:var(--goldB);border-color:var(--gold);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.cyan{background:var(--cyanB);border-color:var(--cyan);}
+
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(217,67,79,.4);background:var(--acc3);}
+.tag.b{color:var(--blu2);border-color:rgba(75,134,216,.4);background:var(--bluB);}
+.tag.g{color:var(--gold2);border-color:rgba(212,165,58,.4);background:var(--goldB);}
+.tag.p{color:var(--pur2);border-color:rgba(149,96,212,.4);background:var(--purB);}
+.tag.n{color:var(--grn2);border-color:rgba(70,178,107,.4);background:var(--grnB);}
+
+/* 용어 사전 */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:6px;margin-bottom:12px;}
+.gl-i{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12px;}
+.gl-i.hidden{display:none;}
+.gl-i:hover{border-color:var(--border2);}
+.gl-t{font-weight:700;color:var(--gold2);margin-bottom:1px;}
+.gl-d{color:var(--txt2);font-size:11.5px;line-height:1.55;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:26px 10px 40px;line-height:1.8;}
+.footnote a{color:var(--txt2);}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid,.grid-sm,.grid-wide,.gl{grid-template-columns:1fr;}
+  #hdr h1{font-size:14px;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-logo">🎭</span>
+  <h1>마피아42 완전 정리</h1>
+  <span class="badge">직업 · 용어 · 스킬 · 공략</span>
+  <input id="search" type="text" placeholder="🔍 검색 (예: 경크, 접선, 도굴꾼, 시한부)">
+  <span id="hit-cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="intro">📖 개요</button>
+  <button class="tab" data-tab="flow">🌗 게임 진행</button>
+  <button class="tab t-cit" data-tab="cit">👮 시민팀 직업</button>
+  <button class="tab t-maf" data-tab="maf">🔫 마피아팀 직업</button>
+  <button class="tab t-cul" data-tab="cul">🕯️ 교주팀</button>
+  <button class="tab" data-tab="skill">⚡ 듀얼 스킬</button>
+  <button class="tab" data-tab="term">📚 용어 사전</button>
+  <button class="tab" data-tab="mode">🏆 모드·랭크</button>
+  <button class="tab" data-tab="guide">🎯 초보 가이드</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════════ 개요 ══════════════════ -->
+<div class="sec on" id="sec-intro">
+  <div class="sec-hd">
+    <div class="sec-title">📖 마피아42 개요</div>
+    <div class="sec-sub">TEAM42가 만든 한국 모바일 마피아 게임. 2014년 2월 9일 출시 · Android / iOS / Windows PC</div>
+  </div>
+
+  <div class="callout gold"><span>⚠</span><div class="callout-body">
+    <strong>먼저 알아둘 것:</strong> 마피아42는 <em>업데이트가 매우 잦아 직업 능력과 수치가 자주 바뀝니다.</em>
+    이 페이지는 나무위키·커뮤니티 정리글을 기준으로 작성했으니, 세부 수치는 <strong>인게임 직업 설명이 항상 최신</strong>입니다.
+    특히 듀얼 스킬은 밸런스 패치가 빈번합니다.
+  </div></div>
+
+  <div class="hi-card">
+    <div class="hi-title">🎭 한눈에 보는 구조</div>
+    <div class="hi-body">
+      <strong>3개 팀</strong>이 서로 다른 승리 조건을 갖고 싸웁니다.<br><br>
+      <span class="tag b">시민팀</span> 마피아를 전부 찾아 처형하면 승리. <em>정보를 모아 추리</em>하는 쪽.<br>
+      <span class="tag a">마피아팀</span> 머릿수가 시민팀과 같아지면 승리. <em>속이고 밤에 죽이는</em> 쪽.<br>
+      <span class="tag p">교주팀</span> 9인 이상 방에서만 등장. <em>포교로 세력을 늘리는</em> 제3세력.<br><br>
+      여기에 <strong>보조직업의 접선</strong>, <strong>듀얼 스킬 조합</strong>이 얹혀 일반 마피아 게임보다 훨씬 복잡합니다.
+    </div>
+  </div>
+
+  <h3 class="blk">🧩 팀 구성 원리</h3>
+  <div class="diag">
+  ┌─────────────── 시 민 팀 ───────────────┐
+  │  중요직업(중직)  ← 무조건 배정          │
+  │    · 경찰 / 자경단원 / 요원 / 형사  1명 │
+  │    · 의사                          1명 │
+  │  특수직업(특직)  ← 나머지에 무작위      │
+  │    · 군인 · 정치인 · 영매 · 기자 …     │
+  └────────────────────────────────────────┘
+  ┌────────────── 마 피 아 팀 ─────────────┐
+  │  마피아        ← 첫밤부터 서로 대화 O   │
+  │  보조직업      ← 접선해야 대화 O        │
+  │    · 스파이 · 짐승인간 · 마담 · 마녀 …  │
+  └────────────────────────────────────────┘
+  ┌─────────────── 교 주 팀 ───────────────┐
+  │  교주 · 광신도   ← 9인 이상 방          │
+  └────────────────────────────────────────┘
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⭐</span><span class="card-title">고정 배정 직업은 딱 2개</span></div>
+      <div class="card-desc"><strong>마피아</strong>와 <strong>의사</strong>는 모든 게임에 반드시 있습니다. 나머지는 인원·모드에 따라 달라집니다. 그래서 <em>"의사는 무조건 있다"</em>는 전제로 판을 읽습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔗</span><span class="card-title">접선 — 이 게임의 핵심 시스템</span></div>
+      <div class="card-desc">마피아 보조직업은 <strong>처음엔 투표권이 시민팀으로 계산</strong>됩니다. 조건을 달성해 <em>접선</em>되어야 마피아팀으로 편입되고 밤 대화가 가능해집니다. 초보가 가장 많이 헷갈리는 부분입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🃏</span><span class="card-title">듀얼 — 스킬 조합 모드</span></div>
+      <div class="card-desc">직업에 <strong>고유능력(스킬)</strong>을 붙여 자신만의 조합을 만드는 모드입니다. 같은 경찰이라도 스킬에 따라 완전히 다르게 플레이됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗣️</span><span class="card-title">말이 실력의 절반</span></div>
+      <div class="card-desc">직업 능력보다 <strong>어필·판읽기·오더</strong>가 승률을 좌우합니다. 그래서 이 게임에는 <em>용어와 은어가 100개 넘게</em> 발달했습니다.</div></div>
+  </div>
+
+  <h3 class="blk">📊 8인 랭크 기준 구성 예시</h3>
+  <div class="tbl-wrap gold">
+    <div class="tbl-cap">인원과 모드에 따라 달라지므로 절대적 기준은 아닙니다</div>
+    <table>
+      <tr><th>구분</th><th>인원</th><th>내용</th></tr>
+      <tr><td><span class="tag a">마피아</span></td><td>2명</td><td>첫밤부터 서로 대화 가능</td></tr>
+      <tr><td><span class="tag a">보조직업</span></td><td>2명</td><td>접선 전까지 투표권은 시민팀 판정</td></tr>
+      <tr><td><span class="tag b">중요직업</span></td><td>2명</td><td>경찰(또는 자경단원/요원/형사) + 의사</td></tr>
+      <tr><td><span class="tag b">특수직업</span></td><td>나머지</td><td>중복 없이 무작위 배정 (연인·비밀결사는 예외적으로 2인)</td></tr>
+    </table>
+  </div>
+
+  <div class="callout blu"><span>💡</span><div class="callout-body">
+    <strong>왜 접선 시스템이 중요한가:</strong> 마피아 2명 + 보조 1명 + 시민 2명 상황에서
+    보조가 아직 접선 안 됐다면 머릿수는 <em>마피아 2 : 시민 3</em>으로 계산되어 게임이 끝나지 않습니다.
+    반대로 접선되는 순간 <em>3 : 2</em>가 되어 마피아팀이 즉시 승리할 수 있습니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 게임 진행 ══════════════════ -->
+<div class="sec" id="sec-flow">
+  <div class="sec-hd">
+    <div class="sec-title">🌗 게임 진행 방식</div>
+    <div class="sec-sub">밤 → 낮(토론) → 투표 → 최후변론 → 찬반투표 → 밤 … 반복</div>
+  </div>
+
+  <h3 class="blk">⏱️ 페이즈와 시간</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>페이즈</th><th>시간</th><th>하는 일</th></tr>
+      <tr><td><strong>0번째 밤 (첫밤)</strong></td><td>25초</td><td>직업 확인, 능력 사용, 마피아끼리 대화·처형 대상 지정. <em>마피아는 지령으로 경찰계열 파악</em></td></tr>
+      <tr><td><strong>낮 · 토론</strong></td><td><em>생존자 수 × 15초</em></td><td>직공·조결 발표·어필·추리. 인원이 줄면 시간도 줄어든다</td></tr>
+      <tr><td><strong>낮 · 투표</strong></td><td>15초</td><td>처형 후보를 지목. 1인 1표(정치인 2표). 자투 가능</td></tr>
+      <tr><td><strong>최후의 반론</strong></td><td>15초</td><td>최다 득표자가 변론</td></tr>
+      <tr><td><strong>찬반 투표</strong></td><td>5초</td><td>과반 찬성 시 처형. 동표면 처형(판사가 있으면 판사 판단 우선)</td></tr>
+      <tr><td><strong>밤</strong></td><td>25초</td><td>능력 사용 + 마피아 처형. 이후 낮으로 반복</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">🗳️ 투표 규칙</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">✋</span><span class="card-title">기본</span></div>
+      <ul class="tips">
+        <li>1인 1표. <strong>정치인은 2표</strong>로 계산</li>
+        <li><strong>자투</strong>(자기 투표) 가능 — 투표를 거부하는 의미로도 쓴다</li>
+        <li><strong>무투</strong>(아무에게도 투표 안 함)도 가능</li>
+        <li>최다 득표자가 <strong>최후 반론</strong> → 찬반 투표로 확정</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">특수 상황</span></div>
+      <ul class="tips">
+        <li><strong>투갈(투표 갈림)</strong> — 최다 득표가 둘 이상이면 아무도 처형되지 않는다</li>
+        <li><strong>정치인</strong>은 투표로 처형되지 않는다 (→ 정인 인증에 이용)</li>
+        <li><strong>판사</strong>가 있으면 투표 결과를 뒤집는 선고가 가능</li>
+        <li><strong>건달</strong>에게 공갈당하면 다음날 투표권 상실</li>
+        <li><strong>마담</strong>에게 유혹당하면 능력·발언 봉인</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">🏁 승리 조건</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>팀</th><th>승리 조건</th></tr>
+      <tr><td><span class="tag b">시민팀</span></td><td>
+        · 마피아팀 <strong>전원 제거</strong><br>
+        · <strong>예언자</strong>가 4번째 낮까지 생존 (계시)<br>
+        · <strong>비밀결사</strong> 조건 달성 (밀사)
+      </td></tr>
+      <tr><td><span class="tag a">마피아팀</span></td><td>
+        · <strong>머릿수가 시민팀 이상</strong>이 되는 순간<br>
+        · <strong>시한부</strong> 스킬 조건 달성 (생존자 절반+2번째 밤까지 생존)<br>
+        · <strong>10번째 밤</strong>에 도달 (시간 초과 승리)
+      </td></tr>
+      <tr><td><span class="tag p">교주팀</span></td><td>
+        · 교주 생존 + 마피아 전멸 + 머릿수 조건 등 <strong>복합 조건</strong><br>
+        · 포교로 세력을 늘려 최종 인원 우위를 확보
+      </td></tr>
+      <tr><td><span class="tag n">악인</span></td><td>· <strong>시민팀 전부 제거</strong> 시 단독 승리 (접선 불가·독립 조건)</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">🌙 "조용하게 밤이 지나갔습니다"</h3>
+  <div class="hi-card">
+    <div class="hi-title">✦ 조밤 판정 — 초보가 반드시 알아야 하는 정보</div>
+    <div class="hi-body">
+      아무도 죽지 않은 밤을 <strong>조밤</strong>이라 합니다. 원인이 여러 가지라 <em>이걸 해석하는 게 추리의 핵심</em>입니다.<br><br>
+      <strong>① 의사가 치료 성공</strong> — 가장 흔하다. 의사가 마피아 타겟을 맞혔다<br>
+      <strong>② 군인의 방탄 발동</strong> — 군인이 총을 맞고 살아남았다 (보통 정체 공개)<br>
+      <strong>③ 간호사의 간호</strong> — 의사 계열 보조<br>
+      <strong>④ 마피아가 일부러 안 쏨</strong> — <em>고조(고의 조밤)</em>. 의사 힐 유도나 혼란 목적<br>
+      <strong>⑤ 짐승인간·사기꾼을 쐈다</strong> — 마피아 공격에 면역인 대상<br>
+      <strong>⑥ 은폐 스킬</strong> — 처형 실패를 조밤으로 위장<br><br>
+      즉 <strong>조밤이 떴다고 반드시 의사가 살린 건 아닙니다.</strong> 이걸 착각하면 판을 크게 잘못 읽습니다.
+    </div>
+  </div>
+
+  <h3 class="blk">💀 사망 후</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">능력·투표 불가</span></div><div class="card-desc">죽으면 게임에 개입할 수 없습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">망자 채팅</span></div><div class="card-desc">죽은 사람끼리만 대화 가능. 산 사람은 못 봅니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">영매</span></div><div class="card-desc"><strong>영매는 망자 채팅을 볼 수 있습니다.</strong> 그래서 죽은 뒤 정보를 남기는 게 의미가 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">성불</span></div><div class="card-desc">영매가 성불시키면 <strong>부활 불가</strong>(지박령 스킬은 예외). 성직자·과학자를 막는 수단.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">유언</span></div><div class="card-desc"><strong>유언</strong> 스킬이 있으면 밤에 죽을 때 최대 60자를 남길 수 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">유품</span></div><div class="card-desc"><strong>유품</strong> 스킬은 사망 시 자기 직업을 전체 공개합니다.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 시민팀 직업 ══════════════════ -->
+<div class="sec" id="sec-cit">
+  <div class="sec-hd">
+    <div class="sec-title">👮 시민팀 직업 <span class="tag b">마피아 전원 제거 시 승리</span></div>
+    <div class="sec-sub">중요직업(중직) 4종 + 의사 + 특수직업(특직) 다수. 특직은 중복 배정되지 않습니다(연인·비밀결사 예외).</div>
+  </div>
+
+  <h3 class="blk cit">⭐ 중요직업 (중직) — 무조건 배정된다</h3>
+  <div class="callout blu"><span>📌</span><div class="callout-body">
+    <strong>경찰 / 자경단원 / 요원 / 형사 중 1명</strong> + <strong>의사 1명</strong>이 반드시 들어갑니다.
+    즉 <em>"조사 계열 1명 + 의사 1명"</em>은 항상 존재합니다. 이게 모든 판 읽기의 출발점입니다.
+  </div></div>
+  <div class="grid-wide">
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">👮</span><span class="card-title">경찰</span><span class="card-sub">중직 · 클래식 필수</span></div>
+      <div class="card-desc">
+        <strong>밤마다 한 명을 조사해 마피아 여부를 확인</strong>합니다. 시민팀 최고의 정보원.<br>
+        결과는 <em>"n픽 마피아"</em> 또는 <em>"n픽 노마피아"</em>로 나오며, 이를 낮에 발표하는 것을 <strong>조결</strong>이라 합니다.<br>
+        마피아를 찾아냈을 때를 <strong>경크(경찰 크리티컬)</strong>라 부릅니다.<br><br>
+        <em>주의:</em> 마피아의 <strong>위선</strong> 스킬에 걸리면 시민팀을 조사해도 의사로 판정될 수 있습니다.
+      </div></div>
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">🔪</span><span class="card-title">자경단원</span><span class="card-sub">중직 · 듀얼</span></div>
+      <div class="card-desc">
+        <strong>낮에 1회 조사한 뒤, 밤에 적팀으로 확인된 대상을 직접 처형</strong>할 수 있습니다.<br>
+        경찰과 달리 <em>정보를 알리는 게 아니라 직접 제거</em>하는 공격형 중직입니다.<br>
+        잘못 쏘면 시민을 죽이므로 확신이 있을 때만 써야 합니다.
+      </div></div>
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">🕵️</span><span class="card-title">요원</span><span class="card-sub">중직 · 듀얼</span></div>
+      <div class="card-desc">
+        <strong>지령을 받아 시민 직업을 확인</strong>합니다. 마피아 여부가 아니라 <em>구체적 직업</em>을 아는 방향.<br>
+        <strong>휴민트</strong> 스킬이 붙으면 지령 대상이 요원에게 능력을 쓸 때 정보가 전달됩니다.
+      </div></div>
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">🚔</span><span class="card-title">형사</span><span class="card-sub">중직 · 듀얼</span></div>
+      <div class="card-desc">
+        <strong>같은 팀 플레이어를 지목하면 직업을 확인하고 정보를 전송</strong>받습니다.<br>
+        <strong>긴급</strong> 스킬로 지목 플레이어 정보를 즉시 파악할 수 있습니다.
+      </div></div>
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">💉</span><span class="card-title">의사</span><span class="card-sub">중직 · 모든 모드 필수</span></div>
+      <div class="card-desc">
+        <strong>밤에 한 명을 치료해 마피아 공격을 막습니다.</strong> 마피아와 함께 <em>모든 게임에 고정 배정되는 단 두 직업</em> 중 하나.<br>
+        치료 성공 시 <strong>조밤</strong>이 되고, 이를 <strong>힐배(힐 성공)</strong>라 합니다.<br>
+        의사가 둘 이상 주장(<strong>맞의</strong>)하면 서로 힐을 맡기는 <strong>지정힐</strong>을 씁니다.<br><br>
+        관련 스킬: <strong>검진</strong>(치료 대상 직업 파악) · <strong>박애</strong> · <strong>진정</strong>(해로운 효과 해제)
+      </div></div>
+  </div>
+
+  <h3 class="blk cit">🎖️ 특수직업 (특직) — 무작위 배정</h3>
+  <div class="tbl-wrap cit">
+    <div class="tbl-cap">전투·방어형 특직</div>
+    <table>
+      <tr><th>직업</th><th>능력</th><th>포인트</th></tr>
+      <tr><td><strong>군인</strong></td><td>마피아 처형을 <strong>1회 무시</strong>(방탄). 발동 시 정체가 공개된다</td><td>총을 맞고 살아나면 <strong>군크</strong>. 마피아를 알아낼 수 있다.<br><em>위장군인(위군)</em>은 특직들이 흔히 쓰는 위장</td></tr>
+      <tr><td><strong>정치인</strong></td><td><strong>투표 처형 면역</strong> + 투표권 2표</td><td>일부러 처형당해 보이며 인증하는 <strong>정인(정치인증)</strong>이 정석</td></tr>
+      <tr><td><strong>테러리스트</strong></td><td>자폭·산화 — 지목 대상을 <strong>함께 사망</strong>시킨다</td><td>마피아 확신 대상을 데리고 죽는 자폭 카드. <em>유폭</em> 스킬 보유</td></tr>
+      <tr><td><strong>용병</strong></td><td>낮에 <strong>의뢰인을 지정</strong>, 의뢰인이 살해되면 처형 능력을 얻는다</td><td>조건부 공격형. 의뢰 대상 선택이 핵심</td></tr>
+      <tr><td><strong>건달</strong></td><td>밤에 한 명을 <strong>공갈</strong> → 다음날 투표권 박탈</td><td>마피아 투표를 봉쇄하거나 의심 대상 견제</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap cit">
+    <div class="tbl-cap">정보·조사형 특직</div>
+    <table>
+      <tr><th>직업</th><th>능력</th><th>포인트</th></tr>
+      <tr><td><strong>사립탐정</strong></td><td>밤에 한 명이 <strong>누구에게 능력을 썼는지</strong> 확인</td><td>능력 사용 경로를 추적. 마피아 총구 방향을 잡는다.<br><em>루트(계획 조사)</em>로 탐정 조사를 회피하는 전략도 있다</td></tr>
+      <tr><td><strong>기자</strong></td><td>밤에 직업을 조사해 <strong>다음날 기사로 전체 공개</strong>(첫 낮 제외)</td><td>확직을 만들어 주는 강력한 특직. 그래서 마피아의 우선 처형 대상</td></tr>
+      <tr><td><strong>영매</strong></td><td>밤에 <strong>죽은 자와 대화</strong>. 성불 처리 가능</td><td>망자의 정보를 산 사람에게 전달. <em>성불</em>로 부활을 막는다.<br><strong>영퍼직</strong>(첫날 퍼블 직업 확인)이 기본 무브</td></tr>
+      <tr><td><strong>심리학자</strong></td><td>낮에 두 플레이어가 <strong>같은 팀인지</strong> 확인</td><td>마피아 여부가 아니라 <em>동일 팀 여부</em>. 대립 상황 정리에 강하다</td></tr>
+      <tr><td><strong>공무원</strong></td><td>밤에 <strong>특정 직업을 조사</strong>(경찰 계열 제외)</td><td>직업 탐색 전문. <em>색출</em> 스킬 보유</td></tr>
+      <tr><td><strong>점쟁이</strong></td><td>밤에 한 명을 선택하면 <strong>팀별 직업 2개를 제시</strong></td><td>확정이 아닌 후보 제시. 해석이 필요하다</td></tr>
+      <tr><td><strong>파파라치</strong></td><td>낮에 <strong>시민팀 정보를 공유받는다</strong></td><td>수동적 정보 수집형</td></tr>
+      <tr><td><strong>해커</strong></td><td>낮에 해킹을 걸어 <strong>밤에 직업 확인</strong></td><td>비교적 최신 직업. 해킹당한 대상은 불이익을 받는다</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap cit">
+    <div class="tbl-cap">지원·변수형 특직</div>
+    <table>
+      <tr><th>직업</th><th>능력</th><th>포인트</th></tr>
+      <tr><td><strong>성직자</strong></td><td>밤에 <strong>죽은 사람 1명을 부활</strong>(1회). 발동 시 정체 공개</td><td>판을 뒤집는 카드. 성불된 대상은 살릴 수 없다.<br><em>노살</em> = 짭직을 살리지 말라는 오더</td></tr>
+      <tr><td><strong>간호사</strong></td><td>밤에 <strong>의사를 조사</strong>하고 접선(협력) 가능</td><td>의사 보조. 맞의 상황을 정리해 준다</td></tr>
+      <tr><td><strong>마술사</strong></td><td>밤에 한 명에게 <strong>트릭</strong>을 설정. 자신이 죽으면 대상과 교체</td><td><em>트인(트릭 인증)</em> 관련 용어가 여기서 나온다. <em>조수</em> 스킬 보유</td></tr>
+      <tr><td><strong>최면술사</strong></td><td>낮·밤에 <strong>최면을 걸고 깨운다</strong></td><td>정신 조작형. 대상의 행동을 제약</td></tr>
+      <tr><td><strong>판사</strong></td><td>투표 결과가 어긋날 때 <strong>선고로 결과를 확정</strong>. 정체 공개</td><td>투갈을 뒤집는다. <em>불문율</em> 스킬 보유</td></tr>
+      <tr><td><strong>도굴꾼</strong></td><td><strong>첫날 마피아에게 죽은 사람의 직업을 획득</strong>. 이후 악인/시민으로 전환</td><td>퍼블 직업에 따라 완전히 다른 게임이 된다.<br><em>도경</em>(도굴경찰) · <em>도특</em>(도굴특직)으로 공개.<br><strong>도도</strong> = 0번째 밤에 도굴꾼에게 마피아 직업을 주는 상황</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap cit">
+    <div class="tbl-cap">특수 승리조건 · 기타</div>
+    <table>
+      <tr><th>직업</th><th>능력</th><th>포인트</th></tr>
+      <tr><td><strong>예언자</strong></td><td><strong>4번째 낮까지 생존하면 자기 팀이 승리</strong>. 정체 공개</td><td>생존만으로 이기는 카드. 공개 시 마피아의 최우선 표적이 된다.<br><em>선각자</em> 스킬 보유</td></tr>
+      <tr><td><strong>비밀결사</strong></td><td><strong>2인 배정.</strong> 해·달 문양으로 구분, 서로를 인지하는 조건이 있다</td><td>특수 승리조건(밀사). <em>결사</em> 스킬 관련</td></tr>
+      <tr><td><strong>연인</strong></td><td><strong>2인 배정.</strong> 밤에 서로 대화 가능. 희생 능력 보유</td><td>서로를 확신할 수 있는 유일한 관계. 한쪽이 마피아일 수도 있다</td></tr>
+      <tr><td><strong>시민</strong></td><td><strong>능력 없음.</strong> 마피아 전멸 시 승리</td><td><em>무직·백수</em>라 불린다. 말과 추리로만 기여한다</td></tr>
+      <tr><td><strong>백만장자</strong></td><td>이벤트 한정 직업</td><td>상시 배정되지 않는다</td></tr>
+      <tr><td><strong>화가</strong></td><td>화가 모드 전용</td><td>그림으로 소통하는 특수 모드</td></tr>
+      <tr><td><strong>물음표</strong></td><td>실험실·버그 상황에서만 등장</td><td>정식 직업이 아니다</td></tr>
+    </table>
+  </div>
+
+  <div class="callout acc"><span>🎯</span><div class="callout-body">
+    <strong>마피아가 우선 쏘는 순서(일반적):</strong> 확직 경찰 → 기자 → 영매 → 의사 → 정치인 → 나머지.
+    반대로 <em>군인처럼 보이는 사람</em>은 총을 아끼는 경향이 있어서, 특직들이 <strong>위군</strong>으로 위장해 밤을 넘깁니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 마피아팀 직업 ══════════════════ -->
+<div class="sec" id="sec-maf">
+  <div class="sec-hd">
+    <div class="sec-title">🔫 마피아팀 직업 <span class="tag a">머릿수 ≥ 시민팀이면 승리</span></div>
+    <div class="sec-sub">마피아(주직업) + 보조직업. 보조는 <strong>접선</strong>해야 마피아팀으로 완전히 편입됩니다.</div>
+  </div>
+
+  <h3 class="blk maf">🔗 접선(接線) 시스템 — 반드시 이해해야 하는 규칙</h3>
+  <div class="hi-card">
+    <div class="hi-title">✦ 접선이란</div>
+    <div class="hi-body">
+      마피아 <strong>보조직업</strong>은 시작할 때 마피아와 <em>대화할 수 없고</em>, 투표권도 <strong>시민팀으로 계산</strong>됩니다.<br>
+      각 직업마다 정해진 <strong>접선 조건</strong>을 달성하면 마피아팀에 합류해 밤 대화가 가능해집니다.<br><br>
+      <strong>왜 중요한가 — 머릿수 계산이 달라진다</strong><br>
+      마피아 2 : 보조 1 : 시민 2 상황에서 보조가 <em>미접선</em>이면 → <strong>마피아 2 : 시민 3</strong>으로 계산되어 게임이 계속됩니다.<br>
+      접선되는 순간 → <strong>마피아 3 : 시민 2</strong>가 되어 즉시 마피아팀 승리입니다.<br><br>
+      <strong>예외:</strong> <em>밀정</em> 스킬을 가지면 조건 없이 <strong>2번째 낮에 자동 접선</strong>됩니다.
+      단, 접선 전에 마피아가 전멸했다면 밀정은 발동하지 않고 시민팀이 승리합니다.
+    </div>
+  </div>
+
+  <h3 class="blk maf">🎩 마피아 (주직업)</h3>
+  <div class="grid-wide">
+    <div class="card"><div class="card-head"><span class="card-icon">🔫</span><span class="card-title">마피아</span><span class="card-sub">고정 배정</span></div>
+      <div class="card-desc">
+        <strong>밤마다 한 명을 처형</strong>합니다. 의사·군인 등 여러 변수에 막힐 수 있습니다.<br>
+        <strong>마피아끼리는 첫밤부터 대화 가능</strong>하며, 이것이 보조직업과의 결정적 차이입니다.<br>
+        의사와 함께 <em>모든 게임에 고정 배정되는 단 두 직업</em> 중 하나입니다.<br><br>
+        <strong>지령:</strong> 첫 낮에 <em>경찰 계열이 누구인지</em> 파악합니다. (보조·교주는 시민 1명 직업 파악)<br>
+        듀얼에서는 <strong>12가지 스킬</strong> 중 골라 조합할 수 있습니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk maf">🃏 보조직업 (보조)</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">접선 조건이 각각 다릅니다 — 이 표가 마피아팀 이해의 핵심</div>
+    <table>
+      <tr><th>직업</th><th>능력</th><th>접선 조건</th><th>고유 스킬</th></tr>
+      <tr><td><strong>스파이</strong></td><td>밤마다 플레이어를 조사. <strong>마피아를 발견하면 능력을 추가로 사용</strong></td><td><strong>마피아를 조사</strong>했을 때</td><td><em>미인계</em> — 시민 능력의 대상이 되면 그 직업 파악</td></tr>
+      <tr><td><strong>짐승인간</strong></td><td>지목한 대상이 마피아에게 처형되면 <strong>길들여진다</strong>. <strong>마피아 공격에 면역</strong></td><td>지목 대상이 처형되거나<br>자신이 처형 대상이 됐을 때</td><td><em>야만성</em> — 공격을 회피하면 접선</td></tr>
+      <tr><td><strong>마담</strong></td><td>투표 대상자를 <strong>유혹</strong> → 능력 사용·발언 불가</td><td><strong>마피아를 유혹</strong>했을 때</td><td><em>현혹</em> — 마담이 죽어도 유혹 유지</td></tr>
+      <tr><td><strong>도둑</strong></td><td>투표 시간에 <strong>타인의 고유 능력을 훔친다</strong></td><td><strong>마피아의 능력을 훔쳤을</strong> 때<br>(그 밤에 총구를 움직일 수 있다)</td><td><em>조문</em> — 최근 사망자의 능력도 절도 가능</td></tr>
+      <tr><td><strong>마녀</strong></td><td>밤마다 <strong>저주</strong> → 다음날 개구리로 변신(발언 제한)</td><td><strong>마피아를 저주</strong>했을 때</td><td><em>망각술</em> — 저주받은 사실을 대상이 모른다</td></tr>
+      <tr><td><strong>과학자</strong></td><td><strong>사망 시 다음날 부활</strong>(1회용)</td><td><strong>사망했을 때</strong>(부활과 동시에 접선)</td><td><em>분석</em> — 부활 후 투표자에게 2표 인정<br><em>영매에게 성불되면 부활 불가</em>(지박령 예외)</td></tr>
+      <tr><td><strong>사기꾼</strong></td><td>게임 시작 시 <strong>시민 직업을 파악하고 그 직업으로 변장</strong></td><td>해당 시민 또는 자신이<br>처형 대상으로 지목됐을 때</td><td><em>미인계</em></td></tr>
+      <tr><td><strong>청부업자</strong></td><td>2번째 밤부터 <strong>플레이어 2명의 직업을 맞히면 살해</strong>(1회용)</td><td><strong>마피아를 지목</strong>했을 때</td><td><em>직감</em> — 지목마다 정답 여부 확인<br><strong>난이도 최상.</strong> 일반겜에서 충분히 연습 후 사용 권장</td></tr>
+      <tr><td><strong>대부</strong></td><td>접선 후 <strong>능력을 무시하는 처형</strong> 가능</td><td><strong>3번째 밤 자동 접선</strong><br>또는 마피아 전멸 시</td><td><em>뒷처리</em> — 마피아 전멸 시에도 접선</td></tr>
+      <tr><td><strong>악인</strong></td><td><strong>시민팀을 전부 제거하면 단독 승리</strong></td><td><strong>접선 불가</strong> (독립 세력)</td><td>포교되면 교주팀으로 전환된다</td></tr>
+    </table>
+  </div>
+
+  <div class="callout gold"><span>💡</span><div class="callout-body">
+    <strong>보조직업의 딜레마:</strong> 접선하면 밤 대화로 정보를 얻지만, 동시에 <em>머릿수가 마피아팀으로 넘어가</em>
+    시민팀이 <strong>"아직 게임이 안 끝났다"는 사실로 미접선 보조의 존재를 추론</strong>할 수 있게 됩니다.
+    반대로 접선을 미루면 정보 없이 혼자 판을 읽어야 합니다.
+  </div></div>
+
+  <div class="callout acc"><span>🎭</span><div class="callout-body">
+    <strong>마피아팀 기본 전략 용어:</strong>
+    <em>팀경크</em>(마피아가 다른 마피아를 경찰인 척 지목) ·
+    <em>찍경크</em>(무작위 경크로 혼란 유도) ·
+    <em>고의대립</em>(마피아끼리 일부러 싸워 시민처럼 보이기) ·
+    <em>고조</em>(일부러 안 쏴서 의사 힐을 낭비시키기) ·
+    <em>물총</em>(처형 실패) ·
+    <em>자총</em>(마피아가 자기 팀을 쏘는 것)
+  </div></div>
+</div>
+
+<!-- ══════════════════ 교주팀 ══════════════════ -->
+<div class="sec" id="sec-cul">
+  <div class="sec-hd">
+    <div class="sec-title">🕯️ 교주팀 <span class="tag p">9인 이상 방에서만 등장</span></div>
+    <div class="sec-sub">포교로 세력을 늘리는 제3세력. 시민팀·마피아팀 모두와 적대합니다.</div>
+  </div>
+
+  <div class="grid-wide">
+    <div class="card c-cul"><div class="card-head"><span class="card-icon">🕯️</span><span class="card-title">교주</span><span class="card-sub">교주팀 주직업</span></div>
+      <div class="card-desc">
+        <strong>홀수번째 밤마다 포교</strong>합니다 — 마피아와 성직자를 제외한 플레이어를 자기 팀으로 끌어들입니다.<br>
+        포교된 사람은 <strong>무조건 교주팀으로 편입</strong>되며, 원래 직업 능력은 유지하지만 승리 조건이 바뀝니다.<br><br>
+        포교 가능한 밤을 <strong>교밤</strong>이라 하고, 포교가 성공하면 <strong>교종</strong>(종소리)이 울려
+        <em>시민들이 "누군가 포교됐다"는 사실을 알 수 있습니다.</em><br><br>
+        <strong>악인</strong>도 포교되면 교주팀으로 전환됩니다.
+      </div></div>
+    <div class="card c-cul"><div class="card-head"><span class="card-icon">🙏</span><span class="card-title">광신도</span><span class="card-sub">교주팀 보조</span></div>
+      <div class="card-desc">
+        <strong>밤마다 플레이어를 선택해 추종(포교) 상태인지 확인</strong>합니다.<br>
+        <strong>교주가 죽으면 그 능력을 물려받아 새 교주가 됩니다.</strong><br><br>
+        즉 교주를 죽였다고 교주팀이 끝나는 게 아닙니다. 이 점이 교주팀을 상대할 때 가장 까다로운 부분입니다.
+      </div></div>
+  </div>
+
+  <div class="callout pur"><span>⚔️</span><div class="callout-body">
+    <strong>3파전의 구조:</strong> 교주팀은 시민팀과 마피아팀 <em>양쪽 모두를 상대</em>합니다.
+    그래서 교주가 등장하는 판에서는 <strong>마피아와 시민이 일시적으로 협력하는 그림</strong>이 나오기도 합니다.
+    교주 승리 조건은 교주 생존 · 마피아 전멸 · 머릿수 등이 얽힌 복합 조건이라, 실제 판정은 인게임 안내를 확인하세요.
+  </div></div>
+
+  <div class="callout blu"><span>🛡️</span><div class="callout-body">
+    <strong>교주 대응법:</strong> <em>성직자는 포교 대상이 되지 않습니다.</em> 마피아도 포교되지 않습니다.
+    교종이 울리면 그 밤에 능력을 쓴 사람·조사 결과를 대조해 포교된 사람을 좁혀 나가는 게 기본입니다.
+    광신도 승계 때문에 <strong>교주 한 명만 잡고 안심하면 안 됩니다.</strong>
+  </div></div>
+</div>
+
+<!-- ══════════════════ 듀얼 스킬 ══════════════════ -->
+<div class="sec" id="sec-skill">
+  <div class="sec-hd">
+    <div class="sec-title">⚡ 듀얼 스킬 (고유능력)</div>
+    <div class="sec-sub">듀얼 모드에서 직업에 붙여 조합하는 능력. 같은 직업도 스킬에 따라 전혀 다르게 플레이됩니다.</div>
+  </div>
+
+  <div class="callout gold"><span>⚠</span><div class="callout-body">
+    <strong>스킬은 밸런스 패치가 가장 빈번한 영역입니다.</strong> 예를 들어 경찰의 <em>기밀</em>은
+    "한 명의 직업을 알고 시작" → "한 명을 조사하고 시작" → "2번째 밤 시작 시 조사"로 여러 차례 하향됐습니다.
+    <em>도주</em>도 발동 후 영구 투표 불가 페널티가 붙어 평가가 크게 떨어졌습니다.
+    <strong>반드시 인게임 최신 설명을 확인하세요.</strong>
+  </div></div>
+
+  <h3 class="blk gold">🌐 공용 스킬 (모든 직업)</h3>
+  <div class="tbl-wrap gold">
+    <table>
+      <tr><th>스킬</th><th>효과</th></tr>
+      <tr><td><strong>결백</strong></td><td>다른 팀 플레이어를 투표했는데 상대가 자신을 투표하지 않으면 <strong>처형이 무산</strong>된다</td></tr>
+      <tr><td><strong>도주</strong></td><td>투표 처형 시 도주하지만 <strong>다음날 투표 시작 시 사망</strong>. 발동 후 투표 불가 페널티가 붙어 평가가 낮다</td></tr>
+      <tr><td><strong>독심술</strong></td><td>투표 상황을 <strong>끝까지 지켜볼 수 있다</strong></td></tr>
+      <tr><td><strong>밀서</strong></td><td>게임 중 <strong>1회</strong> 비공개 편지 전송</td></tr>
+      <tr><td><strong>배심원</strong></td><td>최다 득표 동률일 때 <strong>배심원의 투표가 최후 반론 대상을 결정</strong></td></tr>
+      <tr><td><strong>위증</strong></td><td>매일 특정 플레이어에게 <strong>가짜 투표</strong>를 행사</td></tr>
+      <tr><td><strong>유언</strong></td><td>밤에 사망 시 <strong>최대 60자 유언</strong> 공개</td></tr>
+      <tr><td><strong>지박령</strong></td><td><strong>어떤 경우에도 성불되지 않는다</strong> (과학자·성직자와 시너지)</td></tr>
+      <tr><td><strong>확성기</strong></td><td>게임 중 1회, <strong>밤에 한 명의 채팅만 전체 공개</strong></td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk maf">🔫 마피아팀 · 교주팀 공용</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>스킬</th><th>효과</th></tr>
+      <tr><td><strong>지령</strong></td><td>마피아는 <strong>경찰 계열 직업</strong>, 보조직업·교주는 <strong>시민 1명의 직업</strong>을 파악</td></tr>
+      <tr><td><strong>시한부</strong></td><td><strong>생존자 절반 + 2번째 밤까지 생존</strong>하면 자기 팀 승리 (별도 승리 조건)</td></tr>
+      <tr><td><strong>암구호</strong></td><td><code>.</code>으로 시작하는 채팅이 <strong>자기 팀에게만 보인다</strong></td></tr>
+      <tr><td><strong>밀정</strong></td><td>조건 없이 <strong>2번째 낮에 자동 접선</strong>. 단 마피아가 먼저 전멸하면 발동하지 않는다.<br>보조직업 종류가 전부 접선으로 표시되어 <em>스파이에게는 정체가 드러나는 단점</em></td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk maf">🎩 마피아 전용 스킬</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>스킬</th><th>효과</th></tr>
+      <tr><td><strong>무법자</strong></td><td><strong>경찰 계열을 처형하면 무조건 성공</strong> (의사 치료·군인 방탄 무시)</td></tr>
+      <tr><td><strong>수배</strong></td><td>첫날 낮에 <strong>접선하지 않은 마피아팀을 파악</strong></td></tr>
+      <tr><td><strong>수습</strong></td><td>처형한 대상의 직업을 파악하고, <strong>시민팀이면 시민으로 표시를 바꾼다</strong></td></tr>
+      <tr><td><strong>승부수</strong></td><td>마피아가 <strong>혼자 남았을 때 지목자를 무조건 처형</strong></td></tr>
+      <tr><td><strong>야습</strong></td><td>첫날 밤 <strong>의사를 처형하면 치료를 무시</strong>하고 성공(정체 공개)</td></tr>
+      <tr><td><strong>위선</strong></td><td>첫날 밤 <strong>시민팀을 조사하면 의사로 판정</strong>되게 만든다 (경찰 교란)</td></tr>
+      <tr><td><strong>은폐</strong></td><td>처형 실패 시 <strong>"조용한 밤"으로 위장</strong>한다</td></tr>
+      <tr><td><strong>저격</strong></td><td>전날 처형 실패했다면 이번 밤 지목자에게 <strong>능력 무시 적용</strong></td></tr>
+      <tr><td><strong>퇴마</strong></td><td>시민팀 처형 후 <strong>그 대상을 성불</strong>시켜 부활을 막는다</td></tr>
+      <tr><td><strong>독살</strong></td><td>시민팀 처형이 실패하면 <strong>중독 상태</strong>로 만들어 하루 뒤 사망시킨다</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk cit">👮 시민팀 스킬</h3>
+  <div class="tbl-wrap cit">
+    <table>
+      <tr><th>스킬</th><th>직업</th><th>효과</th></tr>
+      <tr><td><strong>유품</strong></td><td>공용</td><td>사망 시 <strong>자기 직업을 전체 공개</strong></td></tr>
+      <tr><td><strong>정보원</strong></td><td>공용</td><td>매일 낮이 끝날 때 <strong>살아남은 마피아팀 수</strong>를 파악</td></tr>
+      <tr><td><strong>기밀</strong></td><td>경찰</td><td>조사를 1회 한 상태로 시작 (여러 차례 하향된 대표적 강력 스킬)</td></tr>
+      <tr><td><strong>영장</strong></td><td>경찰</td><td><strong>이미 조사한 플레이어를 재조사하면 직업을 파악</strong>. 기밀과 세트로 쓰인다</td></tr>
+      <tr><td><strong>부검</strong></td><td>경찰 / 스파이</td><td>플레이어가 사망하면 <strong>자동으로 조사·첩보 사용</strong></td></tr>
+      <tr><td><strong>휴민트</strong></td><td>요원</td><td>지령 대상이 요원에게 능력을 쓰면 정보가 전달된다</td></tr>
+      <tr><td><strong>긴급</strong></td><td>형사</td><td>지목 플레이어의 정보를 <strong>즉시</strong> 파악</td></tr>
+      <tr><td><strong>검진</strong></td><td>의사</td><td>치료한 사람의 <strong>직업을 파악</strong></td></tr>
+      <tr><td><strong>박애</strong></td><td>의사</td><td>경찰 계열을 제외한 대상을 치료할 때 <strong>부가 능력을 무시</strong></td></tr>
+      <tr><td><strong>진정</strong></td><td>의사</td><td>치료 대상의 <strong>해로운 효과(유혹·공갈·해킹 등)를 해제</strong></td></tr>
+      <tr><td><strong>성불 / 강령</strong></td><td>영매</td><td><strong>성불 상태 플레이어의 대화를 들을 수 있다</strong></td></tr>
+      <tr><td><strong>불침번</strong></td><td>군인</td><td>발동 시 <strong>스파이·도둑·청부업자를 밝혀낸다</strong> (군크의 한 종류)</td></tr>
+      <tr><td><strong>방탄</strong></td><td>군인</td><td>밤 처형을 막는다. 단 <em>반드시 처형</em> 계열 능력은 이를 무시한다</td></tr>
+      <tr><td><strong>불굴</strong></td><td>군인</td><td>군인 전용 스킬</td></tr>
+      <tr><td><strong>독재</strong></td><td>정치인</td><td>정치인 전용 스킬</td></tr>
+      <tr><td><strong>불문율</strong></td><td>판사</td><td>판사 전용 (여러 직업에 붙을 수 있는 형태도 존재)</td></tr>
+      <tr><td><strong>선각자</strong></td><td>예언자</td><td>예언자 전용 스킬</td></tr>
+      <tr><td><strong>유폭</strong></td><td>테러리스트</td><td>자폭 관련. <em>반드시 처형</em> 계열에는 무시된다</td></tr>
+      <tr><td><strong>조수</strong></td><td>마술사</td><td>마술사 전용 스킬</td></tr>
+      <tr><td><strong>색출</strong></td><td>공무원</td><td>공무원 전용 조사 강화</td></tr>
+      <tr><td><strong>결사</strong></td><td>비밀결사 등</td><td>여러 직업에 붙을 수 있는 스킬</td></tr>
+      <tr><td><strong>도청</strong></td><td>여러 직업</td><td>랭크 게임에서 상위 티어로 자주 추천되는 스킬</td></tr>
+      <tr><td><strong>후계자</strong></td><td>마녀</td><td>마녀 전용 스킬</td></tr>
+      <tr><td><strong>최면</strong></td><td>과학자</td><td>과학자 전용 스킬</td></tr>
+    </table>
+  </div>
+
+  <div class="callout grn"><span>🏆</span><div class="callout-body">
+    <strong>랭크에서 자주 추천되는 조합(커뮤니티 평가):</strong>
+    경찰은 <em>기밀 + 영장</em>(조사 효율 극대화), 시민팀 공통으로 <em>도청 · 확성기 · 유언 · 유품</em>,
+    마녀 계열은 <em>후계자 · 밀정 · 지령 · 확성기</em>. 다만 평가는 패치마다 바뀝니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 용어 사전 ══════════════════ -->
+<div class="sec" id="sec-term">
+  <div class="sec-hd">
+    <div class="sec-title">📚 용어 사전 <span class="tag g">112개</span></div>
+    <div class="sec-sub">이 게임은 은어 없이는 대화가 안 됩니다. 상단 검색창에 용어를 넣으면 바로 찾을 수 있습니다.</div>
+  </div>
+
+  <h3 class="blk gold">🎮 기본 · 시스템</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">n픽</div><div class="gl-d">플레이어의 자리 번호 (1픽, 2픽 …)</div></div>
+    <div class="gl-i"><div class="gl-t">직공 (직업 공개)</div><div class="gl-d">자신의 직업을 밝히는 행위</div></div>
+    <div class="gl-i"><div class="gl-t">풍지</div><div class="gl-d">12인 방에서의 직공</div></div>
+    <div class="gl-i"><div class="gl-t">조결</div><div class="gl-d">경찰·사립탐정의 조사 결과</div></div>
+    <div class="gl-i"><div class="gl-t">퍼블</div><div class="gl-d">첫 밤에 마피아가 죽인 첫 번째 대상</div></div>
+    <div class="gl-i"><div class="gl-t">퍼경</div><div class="gl-d">첫 밤에 경찰이 죽는 상황</div></div>
+    <div class="gl-i"><div class="gl-t">연퍼</div><div class="gl-d">연속된 판에서 계속 첫날 죽는 것</div></div>
+    <div class="gl-i"><div class="gl-t">노연퍼</div><div class="gl-d">연퍼가 없는 상태</div></div>
+    <div class="gl-i"><div class="gl-t">자투</div><div class="gl-d">자기 자신에게 투표하기</div></div>
+    <div class="gl-i"><div class="gl-t">무투</div><div class="gl-d">아무에게도 투표하지 않기</div></div>
+    <div class="gl-i"><div class="gl-t">시단 / 시증</div><div class="gl-d">낮 시간 단축 / 증가</div></div>
+    <div class="gl-i"><div class="gl-t">조밤</div><div class="gl-d">처형·치료·방탄이 모두 없어 조용히 지나간 밤</div></div>
+    <div class="gl-i"><div class="gl-t">고조</div><div class="gl-d">마피아가 의도적으로 처형하지 않아 만든 조밤</div></div>
+    <div class="gl-i"><div class="gl-t">교밤</div><div class="gl-d">교주가 포교할 수 있는 홀수날 밤</div></div>
+    <div class="gl-i"><div class="gl-t">교종</div><div class="gl-d">교주 포교 성공 시 울리는 종소리</div></div>
+    <div class="gl-i"><div class="gl-t">물총</div><div class="gl-d">마피아가 처형에 실패한 상황</div></div>
+    <div class="gl-i"><div class="gl-t">자총</div><div class="gl-d">마피아가 자기 팀을 쏘는 것</div></div>
+    <div class="gl-i"><div class="gl-t">도도</div><div class="gl-d">0번째 밤에 도굴꾼에게 마피아 직업을 넘기는 상황</div></div>
+    <div class="gl-i"><div class="gl-t">밤챗</div><div class="gl-d">밤에 주고받는 채팅</div></div>
+    <div class="gl-i"><div class="gl-t">홀○</div><div class="gl-d">어떤 직업을 주장하는 사람이 한 명뿐 (예: 홀경)</div></div>
+    <div class="gl-i"><div class="gl-t">맞○</div><div class="gl-d">같은 직업을 주장하는 사람이 둘 이상 (예: 맞경)</div></div>
+    <div class="gl-i"><div class="gl-t">확○</div><div class="gl-d">직업이 확실히 증명된 사람 (예: 확경)</div></div>
+    <div class="gl-i"><div class="gl-t">반확</div><div class="gl-d">확실하진 않지만 시민일 가능성이 높은 상태</div></div>
+    <div class="gl-i"><div class="gl-t">무직 / 백수</div><div class="gl-d">능력이 없거나 쓸 일 없는 직업 (주로 시민)</div></div>
+    <div class="gl-i"><div class="gl-t">몰투</div><div class="gl-d">한 명에게 투표가 몰리는 상황</div></div>
+    <div class="gl-i"><div class="gl-t">투갈</div><div class="gl-d">최다 득표자가 둘 이상이라 아무도 처형되지 않음</div></div>
+    <div class="gl-i"><div class="gl-t">물타기</div><div class="gl-d">이유 없이 남의 투표를 따라하기</div></div>
+    <div class="gl-i"><div class="gl-t">잠수</div><div class="gl-d">게임 내내 말도 행동도 안 함</div></div>
+    <div class="gl-i"><div class="gl-t">아봉</div><div class="gl-d">말만 안 하고 투표·능력은 정상 사용</div></div>
+    <div class="gl-i"><div class="gl-t">n손</div><div class="gl-d">n픽에게 능력을 사용한 것</div></div>
+  </div>
+
+  <h3 class="blk cit">🏷️ 직업 약어</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">맢 / ㅁ</div><div class="gl-d">마피아</div></div>
+    <div class="gl-i"><div class="gl-t">슾</div><div class="gl-d">스파이</div></div>
+    <div class="gl-i"><div class="gl-t">짐인</div><div class="gl-d">짐승인간</div></div>
+    <div class="gl-i"><div class="gl-t">경 / ㅈㄱ</div><div class="gl-d">경찰</div></div>
+    <div class="gl-i"><div class="gl-t">자경</div><div class="gl-d">자경단원</div></div>
+    <div class="gl-i"><div class="gl-t">의 / ㅇ</div><div class="gl-d">의사</div></div>
+    <div class="gl-i"><div class="gl-t">군 / 진군</div><div class="gl-d">군인 / 진짜 군인</div></div>
+    <div class="gl-i"><div class="gl-t">정 / 정치</div><div class="gl-d">정치인</div></div>
+    <div class="gl-i"><div class="gl-t">영 / ㅇㅁ</div><div class="gl-d">영매</div></div>
+    <div class="gl-i"><div class="gl-t">연</div><div class="gl-d">연인</div></div>
+    <div class="gl-i"><div class="gl-t">건 / ㄱ</div><div class="gl-d">건달</div></div>
+    <div class="gl-i"><div class="gl-t">기 / ㄱㅈ</div><div class="gl-d">기자</div></div>
+    <div class="gl-i"><div class="gl-t">탐 / 사탐</div><div class="gl-d">사립탐정</div></div>
+    <div class="gl-i"><div class="gl-t">도굴</div><div class="gl-d">도굴꾼</div></div>
+    <div class="gl-i"><div class="gl-t">테러</div><div class="gl-d">테러리스트</div></div>
+    <div class="gl-i"><div class="gl-t">성직 / ㅅㅈ</div><div class="gl-d">성직자</div></div>
+    <div class="gl-i"><div class="gl-t">술사 / 마술</div><div class="gl-d">마술사</div></div>
+    <div class="gl-i"><div class="gl-t">예자 / 예언</div><div class="gl-d">예언자</div></div>
+    <div class="gl-i"><div class="gl-t">판</div><div class="gl-d">판사</div></div>
+    <div class="gl-i"><div class="gl-t">간호 / 가노</div><div class="gl-d">간호사</div></div>
+    <div class="gl-i"><div class="gl-t">해</div><div class="gl-d">해커</div></div>
+    <div class="gl-i"><div class="gl-t">심리</div><div class="gl-d">심리학자</div></div>
+    <div class="gl-i"><div class="gl-t">교</div><div class="gl-d">교주</div></div>
+    <div class="gl-i"><div class="gl-t">광 / 광신</div><div class="gl-d">광신도</div></div>
+    <div class="gl-i"><div class="gl-t">중직 (중)</div><div class="gl-d">중요 직업 — 경찰 계열·의사. 무조건 존재</div></div>
+    <div class="gl-i"><div class="gl-t">특직 (특)</div><div class="gl-d">특수 직업 — 중직을 제외한 시민팀 직업 전부</div></div>
+    <div class="gl-i"><div class="gl-t">보조</div><div class="gl-d">마피아팀 보조 직업 (6인 이상에서 등장)</div></div>
+    <div class="gl-i"><div class="gl-t">맢팀 / 시팀</div><div class="gl-d">마피아 팀 / 시민 팀</div></div>
+  </div>
+
+  <h3 class="blk maf">🧠 전략 · 진행</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">어필</div><div class="gl-d">자신이 시민임을 강조하는 행동</div></div>
+    <div class="gl-i"><div class="gl-t">판읽기</div><div class="gl-d">전체 구도를 파악하고 추리하기</div></div>
+    <div class="gl-i"><div class="gl-t">시민티 / 마피아티</div><div class="gl-d">시민 같은 느낌 / 마피아 같은 느낌</div></div>
+    <div class="gl-i"><div class="gl-t">대립</div><div class="gl-d">둘 이상이 서로 모순되는 주장을 하는 상황</div></div>
+    <div class="gl-i"><div class="gl-t">고의대립</div><div class="gl-d">마피아끼리 일부러 대립을 만들어 시민처럼 보이기</div></div>
+    <div class="gl-i"><div class="gl-t">팀구도</div><div class="gl-d">대립에서 한쪽이 2명 이상인 상황</div></div>
+    <div class="gl-i"><div class="gl-t">오더</div><div class="gl-d">확직이 투표 대상을 지시하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">루트 / 루트온</div><div class="gl-d">사립탐정 조사를 피하려 계획적으로 조사 순서를 정하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">맞경 조사</div><div class="gl-d">맞경을 조사하는 것 (비효율적이라 지적됨)</div></div>
+    <div class="gl-i"><div class="gl-t">시체 조사</div><div class="gl-d">죽은 플레이어를 조사하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">지정힐</div><div class="gl-d">의사가 둘 이상일 때 서로 힐을 맡기는 것</div></div>
+    <div class="gl-i"><div class="gl-t">힐배 / 킬배</div><div class="gl-d">의사 힐 성공 여부로 판이 결정되는 것</div></div>
+    <div class="gl-i"><div class="gl-t">경크 (경찰 크리티컬)</div><div class="gl-d">경찰이 마피아를 찾아낸 상황. 기밀경크·영장경크 등 합성어로 쓰임</div></div>
+    <div class="gl-i"><div class="gl-t">특경 (특경크)</div><div class="gl-d">특직에게 경크를 내리는(마피아라고 지목하는) 행위</div></div>
+    <div class="gl-i"><div class="gl-t">팀경크</div><div class="gl-d">마피아가 다른 마피아에게 경크를 내는 것</div></div>
+    <div class="gl-i"><div class="gl-t">찍경크</div><div class="gl-d">마피아가 무작위로 경크를 내는 것</div></div>
+    <div class="gl-i"><div class="gl-t">군크</div><div class="gl-d">불침번 발동으로 스파이·도둑·청부업자를 밝히거나, 방탄으로 마피아를 알아낸 것</div></div>
+    <div class="gl-i"><div class="gl-t">맞군크</div><div class="gl-d">보조가 역으로 군인을 보조라 주장하며 자신이 군인이라 하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">위장군인 (위군, ㅇㄱ)</div><div class="gl-d">정확한 직업을 숨기고 특직이라는 사실만 밝힐 때 쓰는 말</div></div>
+    <div class="gl-i"><div class="gl-t">이중위장</div><div class="gl-d">위군에서 다른 직업으로 위장을 바꾸는 것</div></div>
+    <div class="gl-i"><div class="gl-t">위칸</div><div class="gl-d">특직이 너무 많을 때 진짜 직업을 공개하라는 요구</div></div>
+    <div class="gl-i"><div class="gl-t">정치인증 (정인)</div><div class="gl-d">정치인은 투표로 죽지 않으므로 일부러 처형을 시도해 인증하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">홀경작 / 홀의작</div><div class="gl-d">일부러 나가지 않아 홀경·홀의 구도를 만드는 전략</div></div>
+    <div class="gl-i"><div class="gl-t">픽자 / 역픽자</div><div class="gl-d">1픽부터(또는 끝픽부터 거꾸로) 순서대로 자투하게 해 미자투자를 골라내는 것</div></div>
+    <div class="gl-i"><div class="gl-t">교환</div><div class="gl-d">죽은 자와 산 자 중 마피아를 골라 처형하는 판단</div></div>
+    <div class="gl-i"><div class="gl-t">맞투</div><div class="gl-d">두 플레이어가 서로를 투표하게 만드는 것</div></div>
+    <div class="gl-i"><div class="gl-t">추리 미스 (추미)</div><div class="gl-d">투표로 시민팀을 잘못 처형한 것</div></div>
+    <div class="gl-i"><div class="gl-t">역추리</div><div class="gl-d">일반적 흐름과 반대되는 오더를 내리는 것</div></div>
+    <div class="gl-i"><div class="gl-t">3:3</div><div class="gl-d">시민 3 대 마피아 3 — 사실상 마피아 승리 구도</div></div>
+    <div class="gl-i"><div class="gl-t">노살</div><div class="gl-d">성직자에게 짭직을 살리지 말라고 지시하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">0포</div><div class="gl-d">특정 직업군에 투표를 집중(포커싱)하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">접선</div><div class="gl-d">보조직업이 조건을 달성해 마피아팀에 합류하는 것</div></div>
+  </div>
+
+  <h3 class="blk gold">💬 채팅 은어</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">n노맢 / nㄴㅁ</div><div class="gl-d">n픽은 마피아가 아니라는 조사 결과</div></div>
+    <div class="gl-i"><div class="gl-t">n맢 / nㅁ</div><div class="gl-d">n픽이 마피아라는 조사 결과</div></div>
+    <div class="gl-i"><div class="gl-t">늦경</div><div class="gl-d">늦게 나온 경찰</div></div>
+    <div class="gl-i"><div class="gl-t">눈치경</div><div class="gl-d">눈치를 본 뒤 나온 경찰</div></div>
+    <div class="gl-i"><div class="gl-t">진○</div><div class="gl-d">맞직 중 진짜 그 직업인 사람 (진경, 진의)</div></div>
+    <div class="gl-i"><div class="gl-t">짭○ / 구라○</div><div class="gl-d">맞직 중 그 직업이 아닌 사람</div></div>
+    <div class="gl-i"><div class="gl-t">맢표</div><div class="gl-d">마피아팀의 투표</div></div>
+    <div class="gl-i"><div class="gl-t">영퍼직</div><div class="gl-d">영매가 첫날 퍼블의 직업을 묻는 것</div></div>
+    <div class="gl-i"><div class="gl-t">성결</div><div class="gl-d">성불된 플레이어의 직업 정보</div></div>
+    <div class="gl-i"><div class="gl-t">칼성</div><div class="gl-d">밤이 되자마자 곧바로 성불하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">도경 / 도특</div><div class="gl-d">도굴꾼이 얻은 직업이 경찰 / 특직일 때의 공개 표현</div></div>
+    <div class="gl-i"><div class="gl-t">초성퀴즈 (초퀴)</div><div class="gl-d">유언·사망확인서에 초성을 써 정보를 전달하는 것. <strong>운영 정책상 벌점 대상이라 권장되지 않는다</strong></div></div>
+  </div>
+
+  <h3 class="blk maf">🚫 비매너 · 유저 관련</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">톡플</div><div class="gl-d">메신저로 직업을 알려주는 비매너 플레이</div></div>
+    <div class="gl-i"><div class="gl-t">친플</div><div class="gl-d">친구끼리 정보를 공유하며 하는 플레이</div></div>
+    <div class="gl-i"><div class="gl-t">투폰</div><div class="gl-d">휴대폰 2대로 같은 방에 들어가는 어뷰징</div></div>
+    <div class="gl-i"><div class="gl-t">감플</div><div class="gl-d">전 판의 감정을 가지고 하는 플레이</div></div>
+    <div class="gl-i"><div class="gl-t">욕플</div><div class="gl-d">욕설을 하며 하는 플레이</div></div>
+    <div class="gl-i"><div class="gl-t">엽플</div><div class="gl-d">엽서로 협박하며 하는 플레이</div></div>
+    <div class="gl-i"><div class="gl-t">아봉플</div><div class="gl-d">말을 하지 않고 게임하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">찍플</div><div class="gl-d">추리 없이 무작위로 투표하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">스킨플</div><div class="gl-d">스킨으로 시민티·마피아티를 판단하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">카드플 / 덱플</div><div class="gl-d">정해진 덱으로 직업을 추리하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">티어플</div><div class="gl-d">높은 티어를 근거로 어필하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">보석플</div><div class="gl-d">착용 보석으로 직업을 추리하는 것</div></div>
+    <div class="gl-i"><div class="gl-t">마명</div><div class="gl-d">명성이 마이너스인 유저</div></div>
+    <div class="gl-i"><div class="gl-t">자리 / ㅈㄹ</div><div class="gl-d">다른 유저가 들어올 자리를 예약해 두는 것</div></div>
+    <div class="gl-i"><div class="gl-t">강퇴 / 킥</div><div class="gl-d">방장이 강제 퇴장시키는 것</div></div>
+    <div class="gl-i"><div class="gl-t">자킥 / ㅊㅋ</div><div class="gl-d">방장 미응답으로 자동 강제 퇴장</div></div>
+    <div class="gl-i"><div class="gl-t">엽서 교환 (엽교)</div><div class="gl-d">엽서를 주고받아 명성을 올리는 것</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 모드·랭크 ══════════════════ -->
+<div class="sec" id="sec-mode">
+  <div class="sec-hd">
+    <div class="sec-title">🏆 게임 모드 · 랭크 · 재화</div>
+    <div class="sec-sub">모드마다 등장 직업과 규칙이 달라집니다.</div>
+  </div>
+
+  <h3 class="blk gold">🎲 게임 모드</h3>
+  <div class="tbl-wrap gold">
+    <table>
+      <tr><th>모드</th><th>설명</th></tr>
+      <tr><td><strong>클래식</strong></td><td>기본 마피아 규칙. 직업 능력이 고정되어 있어 <strong>입문에 가장 적합</strong></td></tr>
+      <tr><td><strong>듀얼</strong></td><td>직업 능력과 <strong>카드(스킬)를 조합</strong>해 자신만의 전략을 구성. 자경단원·요원·형사가 여기서 등장</td></tr>
+      <tr><td><strong>랭크 게임</strong></td><td>경쟁 모드. 시즌제로 운영되며 RP(랭크 포인트)로 티어가 갈린다</td></tr>
+      <tr><td><strong>컬풀</strong></td><td>컬러 닉네임 유저들의 풀방(정원 꽉 찬 방)</td></tr>
+      <tr><td><strong>컬침</strong></td><td>컬러 닉네임 침묵방 — 발언 제한 규칙이 있는 방</td></tr>
+      <tr><td><strong>포교된 도시의 밤</strong></td><td>특별 이벤트 모드</td></tr>
+      <tr><td><strong>화가 모드</strong></td><td>그림으로 소통. <em>화가 / 화가 마피아</em> 직업이 전용으로 등장</td></tr>
+    </table>
+  </div>
+
+  <div class="callout blu"><span>📖</span><div class="callout-body">
+    <strong>용어 참고:</strong> <em>풀방</em>은 정원이 다 찬 방을 뜻하고, <em>침묵방</em>은 발언에 제약을 두는 방식입니다.
+    이 페이지의 용어 대부분은 <strong>풀방 기준</strong>으로 쓰이며, 컬풀·랭크에서도 그대로 통용됩니다.
+  </div></div>
+
+  <h3 class="blk gold">📈 랭크 티어</h3>
+  <div class="diag">
+  우드      0 ~ 2,999 RP
+  브론즈    ↓
+  실버      ↓
+  골드      ↓
+  플래티넘  ↓
+  마스터    ↓
+  그랜드마스터   9,500 RP ~
+  </div>
+  <div class="callout acc"><span>⚠</span><div class="callout-body">
+    <strong>RP 감소 규칙:</strong> RP 4,500 이상이면서 <em>5일 연속 랭크게임에 참가하지 않으면 매일 1%가 감소</em>합니다.
+    상위 티어를 유지하려면 꾸준히 플레이해야 합니다.<br>
+    <strong>랭크 어뷰징은 단 한 번으로 영구 추방</strong>(RP 초기화 + 기기 차단)될 수 있습니다.
+  </div></div>
+
+  <h3 class="blk gold">💎 재화 · 아이템</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">엽서</span></div><div class="card-desc">확률형 보상 아이템. 유저 간 주고받아 <strong>명성</strong>을 올릴 수 있습니다(엽교).</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">스킨</span></div><div class="card-desc">캐릭터 외형 변경. <em>스킨플</em>(스킨으로 직업 추리)이라는 은어가 생길 정도로 심리적 영향이 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">카드</span></div><div class="card-desc">듀얼 모드의 스킬 조합에 쓰입니다. 다만 높은 점수대에서는 <strong>결국 판읽기 실력이 결정적</strong>입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">명패 · 테두리 · 보석</span></div><div class="card-desc">장식 및 일부 능력 강화. <em>보석플</em>처럼 추리 근거로 오용되기도 합니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">명성</span></div><div class="card-desc">매너 지표. 마이너스면 <strong>마명</strong>이라 불리며 방에서 기피됩니다.</div></div>
+  </div>
+
+  <h3 class="blk maf">🚨 제재 정책</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>행위</th><th>처리</th></tr>
+      <tr><td><strong>랭크 어뷰징</strong></td><td>한 번만으로도 <strong>영구 추방</strong> (RP 초기화, 기기 차단 포함)</td></tr>
+      <tr><td><strong>임의 물건 걸기</strong> 등 규정 위반</td><td>벌점 누적. <strong>5점이면 하루 정지</strong></td></tr>
+      <tr><td><strong>초성퀴즈</strong></td><td>정보 전달 방식 위반으로 <strong>벌점 부과 대상</strong></td></tr>
+      <tr><td><strong>톡플 · 친플 · 투폰</strong></td><td>외부 정보 공유·다중 계정 = 어뷰징. 신고 대상</td></tr>
+      <tr><td><strong>욕설 · 협박</strong></td><td>신고 시 제재</td></tr>
+      <tr><td>신고 경로</td><td>인게임 신고 기능 또는 공식 카페 접수</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════ 초보 가이드 ══════════════════ -->
+<div class="sec" id="sec-guide">
+  <div class="sec-hd">
+    <div class="sec-title">🎯 초보 가이드</div>
+    <div class="sec-sub">직업을 다 외우기 전에 알아야 할 실전 우선순위.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">✦ 순서대로 이것만 하세요</div>
+    <div class="hi-body">
+      <strong>1단계 — 클래식부터.</strong> 듀얼은 스킬 변수가 너무 많습니다. 클래식에서 직업 능력을 몸에 익히세요.<br>
+      <strong>2단계 — 자투를 습관화.</strong> 투표를 안 하면 즉시 의심받습니다. 판단이 안 서면 자투가 안전합니다.<br>
+      <strong>3단계 — 조밤 원인 6가지를 외우세요.</strong> 이걸 모르면 판을 계속 잘못 읽습니다.<br>
+      <strong>4단계 — 중직은 무조건 존재</strong>한다는 전제로 사고하세요. 경찰 계열 1명 + 의사 1명.<br>
+      <strong>5단계 — 접선 개념 이해.</strong> 게임이 안 끝났다면 <em>미접선 보조가 남아 있다</em>는 뜻일 수 있습니다.<br>
+      <strong>6단계 — 말을 하세요.</strong> 잠수·아봉은 실력과 무관하게 처형당합니다. 틀려도 말하는 게 낫습니다.
+    </div>
+  </div>
+
+  <h3 class="blk cit">👮 시민팀일 때</h3>
+  <div class="grid">
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">📢</span><span class="card-title">직공 타이밍</span></div>
+      <ul class="tips">
+        <li><strong>경찰은 경크가 나오면 바로 직공</strong>이 정석. 늦으면 <em>늦경·눈치경</em> 의심을 받는다</li>
+        <li>의사는 굳이 서둘러 나오지 않는다. 나오면 총구가 자기에게 온다</li>
+        <li>특직은 <strong>위군</strong>으로 위장해 밤을 넘기는 게 흔한 생존법</li>
+        <li>기자·영매는 정보 가치가 높아 <em>공개하면 최우선 표적</em>이 된다</li>
+      </ul></div>
+    <div class="card c-cit"><div class="card-head"><span class="card-icon">🔍</span><span class="card-title">추리 기본</span></div>
+      <ul class="tips">
+        <li><strong>투표 기록을 보라.</strong> 누가 누구를 지켜주고 누구를 몰았는지가 팀을 드러낸다</li>
+        <li><strong>대립이 생기면 둘 중 하나는 거짓</strong>이다. 둘 다 살려두면 안 된다</li>
+        <li>맞경(경찰 2명)이면 조결 <em>내용</em>보다 조결 <em>패턴</em>을 비교하라</li>
+        <li>확직의 <strong>오더</strong>는 따르되, 확직이 진짜인지 먼저 확인하라</li>
+        <li>조밤이 떴다고 무조건 의사 힐이라 단정하지 마라</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk maf">🔫 마피아팀일 때</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🎯</span><span class="card-title">총구 우선순위</span></div>
+      <ul class="tips">
+        <li><strong>확직 경찰 → 기자 → 영매 → 의사</strong> 순이 일반적</li>
+        <li><strong>군인처럼 보이는 사람은 피한다</strong> — 방탄에 맞으면 군크로 정체가 드러난다</li>
+        <li>짐승인간·사기꾼은 <em>마피아 공격 면역</em>이라 쏘면 조밤이 되어 총을 낭비한다</li>
+        <li>지령으로 파악한 경찰 계열을 최대한 빨리 제거</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎭</span><span class="card-title">속이는 법</span></div>
+      <ul class="tips">
+        <li><strong>고의대립</strong>으로 마피아끼리 싸우는 척한다 — 가장 강력한 위장</li>
+        <li><strong>팀경크·찍경크</strong>로 경찰 신뢰도를 흐린다</li>
+        <li>시민팀 오더에 <em>적당히 협조</em>하다가 결정적 순간에만 틀어라</li>
+        <li>말을 너무 안 하면 잠수로 의심받고, 너무 많이 하면 어필로 의심받는다</li>
+        <li><strong>고조</strong>로 의사 힐을 낭비시키는 것도 유효한 카드</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔗</span><span class="card-title">보조직업일 때</span></div>
+      <ul class="tips">
+        <li><strong>접선 조건을 정확히 알고 움직여라.</strong> 직업마다 완전히 다르다</li>
+        <li>접선 전에는 <em>시민팀 투표권</em>이므로 시민처럼 행동하는 게 자연스럽다</li>
+        <li><strong>청부업자는 난이도가 최상</strong>이다. 일반겜에서 충분히 연습한 뒤 랭크에서 쓰라</li>
+        <li>과학자는 <em>성불당하면 부활 불가</em> — 영매를 경계하라</li>
+        <li>마피아가 전멸하면 접선 자체가 불가능해질 수 있다(밀정 포함)</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk gold">✅ 매너</h3>
+  <div class="callout grn"><span>🤝</span><div class="callout-body">
+    <strong>이것만 지키면 됩니다:</strong> 욕하지 않기 · 전 판 감정 가져오지 않기(감플) ·
+    외부 메신저로 정보 흘리지 않기(톡플) · 죽었다고 판 망치지 않기 · 초보에게 훈수 대신 설명하기.<br>
+    반대로 <strong>스킨·보석·티어로 직업을 추리하는 것</strong>(스킨플·보석플·티어플)은 근거 없는 추리라 비판받습니다.
+  </div></div>
+
+  <div class="callout cyan"><span>📚</span><div class="callout-body">
+    <strong>더 깊이 파려면:</strong> 직업·스킬 세부 수치는 패치마다 바뀌므로
+    <strong>나무위키「마피아42」문서군</strong>과 <strong>아카라이브 마피아42 채널</strong>이 가장 빠르게 갱신됩니다.
+    인게임 직업 설명이 항상 최종 기준입니다.
+  </div></div>
+</div>
+
+<div class="footnote">
+  마피아42 — 직업(시민팀·마피아팀·교주팀) · 접선 시스템 · 듀얼 스킬 · 용어 112개 · 모드·랭크 · 초보 공략<br>
+  자료 출처: 나무위키 마피아42 문서군(직업/용어/스킬/게임 방법), 아카라이브 마피아42 채널, 에펨코리아 정리글<br>
+  ※ 업데이트가 잦은 게임이므로 세부 수치는 인게임 설명을 우선하세요.
+</div>
+
+</div><!-- /main -->
+
+<script src="app.js"></script>
+</body>
+</html>

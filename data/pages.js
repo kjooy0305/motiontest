@@ -515,5 +515,12 @@ const PAGES = {
     desc  : 'ChatGPT · Gemini · Claude · NotebookLM · Perplexity — 무료 계정 완전 공략, 프롬프트 기법, 용도별 추천, AI별 꿀팁 총정리',
   },
 
-  // 73 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
+  73: {
+    label : 'MythicCraft 통합 위키',
+    url   : 'pages/73/',
+    thumb : null,
+    desc  : 'MythicMobs · ModelEngine 4 · Crucible · Dungeons · RPG · Enchants · HUD · Cosmetics · Armors · Achievements — 공식 위키 문서 1,688개 전문 + 예시 구문 + 한글 요약',
+  },
+
+  // 74 ~ 100: 아직 미등록 — 번호 추가 시 위 형식으로 작성
 };

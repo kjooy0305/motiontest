@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blockbench 기능 & 단축키 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0e13;--bg2:#111620;--bg3:#161d29;--bg4:#1e2735;
+  --border:#242f40;--border2:#31405a;
+  --txt:#dde5f2;--txt2:#8b9bb4;--txt3:#586a85;
+  --mono:'Consolas','Menlo','Courier New',monospace;
+
+  --bb:#3ea6ff;--bb2:#79c4ff;--bb3:rgba(62,166,255,.13);
+  --ed:#4ade80;--ed3:rgba(74,222,128,.12);
+  --pt:#f472b6;--pt3:rgba(244,114,182,.12);
+  --an:#c084fc;--an3:rgba(192,132,252,.12);
+  --dp:#fbbf24;--dp3:rgba(251,191,36,.12);
+  --warn:#fb923c;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#080b10 0%,#0f1a2b 50%,#080b10 100%);border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--bb),var(--ed),var(--pt),var(--an)) 1;padding:11px 18px;position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr h1{font-size:17px;font-weight:700;white-space:nowrap;letter-spacing:.2px;}
+#hdr .sub{font-size:11px;color:var(--txt3);white-space:nowrap;}
+#search{flex:1;min-width:150px;max-width:330px;padding:6px 12px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;outline:none;font-family:inherit;}
+#search:focus{border-color:var(--bb);}
+#search::placeholder{color:var(--txt3);}
+#hit{font-size:11px;color:var(--txt3);white-space:nowrap;}
+mark{background:rgba(62,166,255,.32);color:#fff;border-radius:2px;}
+
+/* TABS */
+#tabs{display:flex;gap:3px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:51px;z-index:200;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 13px;border-radius:5px;border:1px solid transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--bb3);border-color:rgba(62,166,255,.4);color:var(--bb2);}
+
+/* MAIN */
+#main{padding:18px;max-width:1240px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+h2.st{font-size:20px;font-weight:700;margin-bottom:4px;}
+h2.st .en{font-size:12px;color:var(--txt3);font-weight:500;margin-left:8px;}
+p.lead{color:var(--txt2);font-size:13px;margin-bottom:18px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:14px;}
+.card > h3{font-size:14px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.card > h3 .badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;background:var(--bg4);color:var(--txt2);border:1px solid var(--border2);}
+.card.b-bb > h3{color:var(--bb2);} .card.b-ed > h3{color:var(--ed);}
+.card.b-pt > h3{color:var(--pt);} .card.b-an > h3{color:var(--an);}
+.card.b-dp > h3{color:var(--dp);}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;}
+
+ul.li{list-style:none;}
+ul.li > li{padding:3px 0 3px 14px;position:relative;color:var(--txt2);font-size:13px;}
+ul.li > li:before{content:'·';position:absolute;left:3px;color:var(--txt3);}
+ul.li > li b{color:var(--txt);font-weight:600;}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+table th{text-align:left;padding:6px 9px;background:var(--bg4);color:var(--txt2);font-weight:600;font-size:11.5px;border-bottom:1px solid var(--border2);white-space:nowrap;}
+table td{padding:6px 9px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--txt2);}
+table tr:last-child td{border-bottom:none;}
+table tr:hover td{background:rgba(62,166,255,.045);}
+td.nm{color:var(--txt);font-weight:600;white-space:nowrap;}
+td.dsc{font-size:12px;color:var(--txt3);line-height:1.5;}
+.tw{overflow-x:auto;}
+
+kbd{display:inline-block;font-family:var(--mono);font-size:11.5px;background:var(--bg4);border:1px solid var(--border2);border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:var(--bb2);white-space:nowrap;line-height:1.5;}
+kbd.opt{color:var(--txt3);}
+kbd.none{color:var(--txt3);border-style:dashed;}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:0 4px;color:var(--pt);}
+
+.note{border-left:3px solid var(--bb);background:var(--bb3);padding:8px 12px;border-radius:0 6px 6px 0;font-size:12.5px;color:var(--txt2);margin:10px 0;}
+.note.w{border-color:var(--warn);background:rgba(251,146,60,.1);}
+.note b{color:var(--txt);}
+
+/* keybind rows */
+.krow{display:grid;grid-template-columns:190px 1fr;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);align-items:start;}
+.krow:last-child{border-bottom:none;}
+.krow .kk{text-align:right;}
+.krow .kn{font-size:13px;color:var(--txt);}
+.krow .kd{font-size:11.5px;color:var(--txt3);line-height:1.45;}
+.krow .kv{font-size:11.5px;color:var(--txt2);margin-top:2px;}
+.krow .kv kbd{font-size:10.5px;}
+.kid{font-family:var(--mono);font-size:10px;color:var(--txt3);opacity:.6;}
+@media(max-width:620px){
+  .krow{grid-template-columns:1fr;}
+  .krow .kk{text-align:left;}
+}
+
+/* menu tree */
+.mt{font-size:13px;}
+.mt .g{margin:8px 0 4px;font-size:12px;font-weight:700;color:var(--bb2);}
+.mt .g:before{content:'▸ ';color:var(--txt3);}
+.mt .i{display:grid;grid-template-columns:1fr 130px;gap:8px;padding:3px 0 3px 12px;border-bottom:1px solid rgba(36,47,64,.55);}
+.mt .i .t{color:var(--txt);}
+.mt .i .t small{display:block;color:var(--txt3);font-size:11px;line-height:1.4;}
+.mt .i .k{text-align:right;}
+.mt .lvl2{padding-left:14px;border-left:1px solid var(--border);}
+@media(max-width:620px){ .mt .i{grid-template-columns:1fr;} .mt .i .k{text-align:left;} }
+
+.pill{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;margin-right:4px;}
+.p-ed{background:var(--ed3);color:var(--ed);} .p-pt{background:var(--pt3);color:var(--pt);}
+.p-an{background:var(--an3);color:var(--an);} .p-dp{background:var(--dp3);color:var(--dp);}
+.p-all{background:var(--bb3);color:var(--bb2);}
+
+.hidden{display:none !important;}
+#nohit{display:none;text-align:center;color:var(--txt3);padding:36px 0;font-size:13px;}
+footer{border-top:1px solid var(--border);margin-top:26px;padding:16px 18px 30px;color:var(--txt3);font-size:11.5px;text-align:center;line-height:1.8;}
+footer a{color:var(--txt2);text-decoration:none;border-bottom:1px dotted var(--txt3);}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <h1>🧱 Blockbench 완전 정리</h1>
+  <span class="sub" id="vertag"></span>
+  <input id="search" placeholder="기능·단축키 검색 (예: 회전, Ctrl, UV, 키프레임)">
+  <span id="hit"></span>
+</div>
+
+<div id="tabs"></div>
+
+<div id="main">
+
+<!-- ══════════ 개요 ══════════ -->
+<section class="sec" data-t="intro">
+  <h2 class="st">개요<span class="en">Overview</span></h2>
+  <p class="lead">Blockbench는 무료·오픈소스(GPL-3.0) 로우폴리 3D 모델링·텍스처링·애니메이션 편집기입니다. 마인크래프트 모델 제작의 사실상 표준 도구이며, 일반 게임 엔진용 모델 작업에도 쓰입니다.</p>
+
+  <div class="grid2">
+    <div class="card b-bb">
+      <h3>실행 방법 3가지</h3>
+      <ul class="li">
+        <li><b>웹 앱</b> — <code>blockbench.net/app</code>. 설치 없이 브라우저에서 바로 사용. 주소창의 설치 버튼으로 <b>PWA</b>(앱처럼 설치)도 가능.</li>
+        <li><b>데스크톱 앱</b> — Windows / macOS / Linux. 파일 시스템 직접 접근, 로컬 백업, 플러그인 개발에 유리.</li>
+        <li><b>모바일</b> — 웹 앱이 터치 UI로 전환됨(<code>UI 모드</code> 설정으로 강제 전환 가능).</li>
+      </ul>
+      <div class="note">데스크톱 앱만 되는 것: 파일 경로 기억(<kbd>Ctrl + S</kbd> 덮어쓰기 저장), 로컬 백업 폴더, 개발자 도구, 일부 파일 연동 플러그인.</div>
+    </div>
+
+    <div class="card b-bb">
+      <h3>화면 구성</h3>
+      <ul class="li">
+        <li><b>메뉴 바</b> — 파일·편집·변환·메쉬·UV·이미지·애니메이션·도구·보기·도움말</li>
+        <li><b>모드 탭</b> — 편집 / 칠하기 / 애니메이션 / 디스플레이 (포맷에 따라 표시되는 모드가 다름)</li>
+        <li><b>메인 툴바</b> — 현재 모드의 도구와 슬라이더</li>
+        <li><b>뷰포트</b> — 3D 작업 영역. 우하단 <b>오빗 기즈모</b>로 시점 회전·측면 전환</li>
+        <li><b>좌·우 사이드바</b> — 패널(아웃라이너·UV·텍스처·색상·타임라인 등). <kbd>Ctrl + B</kbd>로 접기</li>
+        <li><b>상태 바</b> — 포맷 아이콘, 모델 식별자, 지금 누르면 되는 <b>보조키 힌트</b>, 경고, FPS</li>
+      </ul>
+    </div>
+
+    <div class="card b-bb">
+      <h3>좌표계와 단위</h3>
+      <ul class="li">
+        <li>축: <b>X = 너비</b>, <b>Y = 높이</b>, <b>Z = 길이</b>. 원점은 <code>0, 0, 0</code>.</li>
+        <li>기본 단위 1 = 텍스처 1픽셀 = 블록의 1/16.</li>
+        <li>격자 스냅 단위는 <b>환경 설정 › 스냅</b>에서 조절. 보조키를 누르면 다른 단위로 스냅
+            (<kbd>Shift</kbd>·<kbd>Ctrl</kbd>·<kbd>Ctrl + Shift</kbd> 각각 별도 값).</li>
+        <li>자바 블록 모델은 <code>-16 ~ 32</code> 범위 제한이 있음 — <b>크기 제한 비활성화</b> 설정으로 해제 가능(단 게임에서 깨질 수 있음).</li>
+      </ul>
+    </div>
+
+    <div class="card b-bb">
+      <h3>파일과 안전장치</h3>
+      <ul class="li">
+        <li><b>.bbmodel</b> — Blockbench 프로젝트 파일(JSON). 텍스처를 안에 포함(임베드)할 수 있음.</li>
+        <li><b>.bbkeymap</b> — 단축키 세트 내보내기/가져오기 파일.</li>
+        <li><b>자동 백업</b> — 기본 10분 간격(<b>환경 설정 › 앱</b>에서 주기·보존 기간 변경). <b>도움말 › 백업 파일 보기</b>로 복구.</li>
+        <li><b>복구 지점</b> — 브라우저/앱이 강제 종료돼도 다음 실행 시 복구 제안.</li>
+        <li><b>모델 저장</b>(<kbd>Ctrl + S</kbd>)은 게임용 포맷으로 내보내기, <b>프로젝트 저장</b>(<kbd>Ctrl + Alt + S</kbd>)은 .bbmodel 저장 — 둘은 다릅니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card b-bb">
+    <h3>핵심 기능 한눈에</h3>
+    <div class="grid3">
+      <ul class="li">
+        <li><b>박스 모델링</b> — 큐브 단위 편집, 인플레이트/디플레이트, 정점 스냅</li>
+        <li><b>메쉬 모델링</b> — 압출·인셋·루프컷·정점 병합·나이프·솔리디파이</li>
+        <li><b>UV 편집</b> — 박스 UV / 페이스별 UV, 자동 UV, UV 잇기(seam)</li>
+      </ul>
+      <ul class="li">
+        <li><b>텍스처 페인팅</b> — 브러시·채우기·그라데이션·레이어·팔레트</li>
+        <li><b>이미지 편집</b> — 밝기/채도/커브/색 반전, 채널 분리, 잘라내기</li>
+        <li><b>애니메이션</b> — 키프레임, 그래프 에디터, Molang 수식, IK 베이크</li>
+      </ul>
+      <ul class="li">
+        <li><b>디스플레이 모드</b> — 자바 아이템의 손·머리·GUI 등 슬롯별 배치</li>
+        <li><b>렌더/공유</b> — 스크린샷, GIF 녹화, 타임랩스, Sketchfab 업로드, 링크 공유</li>
+        <li><b>확장</b> — 플러그인 스토어, 테마, 다국어(한국어 포함), 공동 편집 세션</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note w"><b>이 문서의 단축키 값은 Blockbench <span id="vertag2"></span> 기본 설정 기준</b>입니다. 사용자가 바꾼 단축키나 Blender/Maya 프리셋을 쓰는 경우 실제 키가 다릅니다. 앱에서 확인하려면 메뉴 항목에 마우스를 올리거나 <b>파일 › 사용자 설정 › 단축키 설정</b>을 여세요.</div>
+</section>
+
+<!-- ══════════ 포맷 ══════════ -->
+<section class="sec" data-t="format">
+  <h2 class="st">프로젝트 포맷<span class="en">Formats</span></h2>
+  <p class="lead">새 모델을 만들 때 고르는 포맷이 사용 가능한 모드·요소·내보내기 방식을 전부 결정합니다. 나중에 <b>파일 › 프로젝트 변환</b>으로 바꿀 수 있습니다.</p>
+  <div class="card"><div class="tw"><table id="t-format"></table></div></div>
+  <div class="note">포맷별 제약 예시 — <b>자바 블록/아이템</b>은 큐브만 허용(회전은 축 하나에 22.5° 배수), <b>베드락 엔티티</b>는 애니메이션·본 계층 지원, <b>자유 모델</b>은 제약 없이 메쉬·회전 자유(게임 엔진·렌더용).</div>
+</section>
+
+<!-- ══════════ 모드 & 도구 ══════════ -->
+<section class="sec" data-t="tool">
+  <h2 class="st">모드 &amp; 도구<span class="en">Modes &amp; Tools</span></h2>
+  <p class="lead">모드 탭으로 작업 종류를 바꾸면 툴바와 사이드바 패널이 함께 바뀝니다. 기본 단축키에는 모드 전환 키가 없고, Blender 프리셋에서만 <kbd>1</kbd>~<kbd>4</kbd>가 할당됩니다(직접 지정 가능).</p>
+
+  <div class="grid2">
+    <div class="card b-ed"><h3><span class="pill p-ed">모드</span>편집 <span class="badge">Edit</span></h3>
+      <ul class="li"><li>요소 추가·이동·크기·회전, 회전 중심(피벗) 설정, 메쉬 편집, UV 매핑.</li>
+      <li>메쉬 편집 시 <b>편집 모드</b>(정점 / 모서리 / 면)를 툴바에서 전환.</li>
+      <li><b>비율 편집</b>(소프트 선택)과 <b>미러 모델링</b>으로 대칭 작업을 자동화.</li></ul>
+    </div>
+    <div class="card b-pt"><h3><span class="pill p-pt">모드</span>칠하기 <span class="badge">Paint</span></h3>
+      <ul class="li"><li>3D 모델 표면이나 UV 에디터에서 텍스처를 직접 그림. 레이어·팔레트 지원.</li>
+      <li><kbd>Alt</kbd>를 누르고 있으면 임시로 <b>색 추출</b>, <kbd>Shift</kbd>는 직선 긋기.</li>
+      <li>기본값에서 <kbd>Shift</kbd>(마우스 프리셋은 우클릭)로 <b>보조 색</b>을 칠함.</li></ul>
+    </div>
+    <div class="card b-an"><h3><span class="pill p-an">모드</span>애니메이션 <span class="badge">Animate</span></h3>
+      <ul class="li"><li>타임라인·키프레임으로 본 단위 애니메이션 제작. 그래프 에디터로 보간 곡선 편집.</li>
+      <li>키프레임 값에 <b>Molang 수식</b>을 직접 입력할 수 있음.</li>
+      <li>이펙트 애니메이터로 파티클·사운드·타임라인 스크립트 배치(베드락).</li></ul>
+    </div>
+    <div class="card b-dp"><h3><span class="pill p-dp">모드</span>디스플레이 <span class="badge">Display</span></h3>
+      <ul class="li"><li>자바 아이템/블록 모델이 <b>손·머리·바닥·액자·GUI</b> 슬롯에서 어떻게 보일지 배치.</li>
+      <li>슬롯별 위치·회전·크기를 저장하고 프리셋으로 재사용.</li></ul>
+    </div>
+  </div>
+
+  <div class="card"><h3>도구 목록</h3>
+    <div class="tw"><table id="t-tool"></table></div>
+    <div class="note"><kbd>Space</kbd> <b>교환 도구</b> — 이동 ↔ 크기 조정처럼 짝지어진 도구를 번갈아 전환합니다(더블클릭으로도 동작, 설정에서 끌 수 있음).</div>
+  </div>
+</section>
+
+<!-- ══════════ 요소 & 패널 ══════════ -->
+<section class="sec" data-t="elem">
+  <h2 class="st">요소 &amp; 패널<span class="en">Elements &amp; Panels</span></h2>
+  <p class="lead">아웃라이너에 들어가는 요소 종류와, 사이드바에 붙는 패널 목록입니다. 포맷에 따라 사용할 수 없는 요소·패널이 있습니다.</p>
+  <div class="card"><h3>요소 종류</h3><div class="tw"><table id="t-elem"></table></div></div>
+  <div class="card"><h3>패널</h3><div class="tw"><table id="t-panel"></table></div>
+    <div class="note"><b>보기 › 패널</b>에서 개별 패널을 켜고 끌 수 있고, 패널 제목을 드래그해 좌/우 사이드바나 별도 창으로 옮길 수 있습니다. 배치가 망가지면 <b>도움말 › 레이아웃 초기화</b>.</div>
+  </div>
+</section>
+
+<!-- ══════════ 메뉴 ══════════ -->
+<section class="sec" data-t="menu">
+  <h2 class="st">메뉴별 기능<span class="en">Menu Reference</span></h2>
+  <p class="lead">메뉴 바 전체를 그대로 옮긴 목록입니다. 오른쪽에 기본 단축키가 있는 항목은 그 키로 바로 실행됩니다. 회색으로 표시된 항목은 현재 포맷·모드에서만 나타납니다.</p>
+  <div id="menus"></div>
+</section>
+
+<!-- ══════════ 단축키 ══════════ -->
+<section class="sec" data-t="key">
+  <h2 class="st">단축키 전체<span class="en">Keybindings</span></h2>
+  <p class="lead">기본값으로 지정돼 있는 단축키 <b id="kcount"></b>개입니다. <kbd class="opt">[Shift]</kbd>처럼 대괄호로 묶인 보조키는 <b>있어도 되고 없어도 되는</b>(무시되는) 키입니다.</p>
+
+  <div class="note"><b>바꾸는 곳</b> — 파일 › 사용자 설정 › 단축키 설정. 검색해서 찾고, 키를 눌러 지정하고, <code>.bbkeymap</code>으로 내보내 다른 PC와 공유합니다. 충돌하면 목록에 빨간 표시가 뜹니다. 단축키가 없는 기능도 대부분 여기서 직접 지정할 수 있습니다.</div>
+  <div class="note"><b>보조키 변형</b> — 같은 단축키에 <kbd>Shift</kbd>/<kbd>Ctrl</kbd>/<kbd>Alt</kbd>를 더하면 동작이 살짝 달라지는 항목들이 있습니다. 아래 목록에서 <span style="color:var(--bb2)">파란 줄</span>로 표시했습니다.</div>
+
+  <div id="keys"></div>
+
+  <div class="card"><h3>단축키 없이 쓰는 두 가지 지름길</h3>
+    <ul class="li">
+      <li><kbd>F</kbd> <b>액션 컨트롤</b> — 모든 명령을 이름으로 검색해 실행. 단축키를 외우지 않아도 되는 가장 빠른 길이며, 플러그인 설치도 여기서 됩니다.</li>
+      <li><b>우클릭 메뉴</b> — 뷰포트·아웃라이너·텍스처·타임라인 각각 전용 맥락 메뉴가 있어 해당 상황에 필요한 기능만 모여 있습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ 화면 조작 ══════════ -->
+<section class="sec" data-t="nav">
+  <h2 class="st">화면 조작 &amp; 키맵 프리셋<span class="en">Navigation &amp; Keymaps</span></h2>
+  <p class="lead">뷰포트 조작은 <b>파일 › 사용자 설정 › 단축키 설정 › 키맵 불러오기</b>에서 프리셋으로 통째로 바꿀 수 있습니다. 처음 실행할 때 나오는 시작 화면에서도 선택할 수 있습니다.</p>
+
+  <div class="card"><h3>프리셋 비교</h3>
+    <div class="tw"><table>
+      <tr><th>동작</th><th>기본 (트랙패드/마우스)</th><th>기본 (마우스)</th><th>Blender</th><th>Cinema 4D</th><th>Maya</th></tr>
+      <tr><td class="nm">시점 회전</td><td><kbd>좌클릭 드래그</kbd></td><td><kbd>휠클릭</kbd></td><td><kbd>휠클릭</kbd></td><td><kbd>Alt + 좌클릭</kbd></td><td><kbd>Alt + 좌클릭</kbd></td></tr>
+      <tr><td class="nm">화면 이동(패닝)</td><td><kbd>우클릭 드래그</kbd></td><td><kbd>Shift + 휠클릭</kbd></td><td><kbd>Shift + 휠클릭</kbd></td><td><kbd>Alt + 휠클릭</kbd></td><td><kbd>Alt + 휠클릭</kbd></td></tr>
+      <tr><td class="nm">드래그로 확대</td><td><kbd>Shift + 좌클릭</kbd></td><td><kbd>Ctrl + 휠클릭</kbd></td><td><kbd>Ctrl + 휠클릭</kbd></td><td><kbd>Shift + 좌클릭</kbd></td><td><kbd>Alt + 우클릭</kbd></td></tr>
+      <tr><td class="nm">휠로 확대</td><td colspan="5"><kbd>마우스 휠</kbd> — 모든 프리셋 공통. UV·2D 에디터는 <kbd>Ctrl + 마우스 휠</kbd></td></tr>
+      <tr><td class="nm">영역 선택</td><td><kbd>Ctrl + 좌클릭</kbd></td><td><kbd>좌클릭</kbd></td><td><kbd>좌클릭</kbd></td><td><kbd>좌클릭</kbd></td><td><kbd>좌클릭</kbd></td></tr>
+      <tr><td class="nm">보조 색으로 칠하기</td><td><kbd>Shift</kbd></td><td><kbd>우클릭</kbd></td><td colspan="3" style="color:var(--txt3)">기본값 유지</td></tr>
+      <tr><td class="nm">이동 도구</td><td><kbd>V</kbd></td><td><kbd>V</kbd></td><td><kbd>G</kbd></td><td><kbd>E</kbd></td><td><kbd>W</kbd></td></tr>
+      <tr><td class="nm">크기 조정 도구</td><td><kbd>S</kbd></td><td><kbd>S</kbd></td><td><kbd>S</kbd></td><td><kbd>T</kbd></td><td><kbd>R</kbd></td></tr>
+      <tr><td class="nm">회전 도구</td><td><kbd>R</kbd></td><td><kbd>R</kbd></td><td><kbd>R</kbd></td><td><kbd>R</kbd></td><td><kbd>E</kbd></td></tr>
+      <tr><td class="nm">복제</td><td><kbd>Ctrl + D</kbd></td><td><kbd>Ctrl + D</kbd></td><td><kbd>Shift + D</kbd></td><td><kbd class="none">없음</kbd></td><td><kbd>Ctrl + D</kbd></td></tr>
+      <tr><td class="nm">실행 취소(다시 실행)</td><td><kbd>Ctrl + Y</kbd></td><td><kbd>Ctrl + Y</kbd></td><td><kbd>Ctrl + Shift + Z</kbd></td><td><kbd>Shift + Z</kbd></td><td><kbd>Shift + Z</kbd></td></tr>
+      <tr><td class="nm">액션 컨트롤</td><td><kbd>F</kbd></td><td><kbd>F</kbd></td><td><kbd>F3</kbd></td><td><kbd>F1</kbd></td><td><kbd>F1</kbd></td></tr>
+      <tr><td class="nm">모드 전환</td><td><kbd class="none">없음</kbd></td><td><kbd class="none">없음</kbd></td><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></td><td><kbd class="none">없음</kbd></td><td><kbd class="none">없음</kbd></td></tr>
+      <tr><td class="nm">확대 / 축소(단계)</td><td><kbd class="none">없음</kbd></td><td><kbd class="none">없음</kbd></td><td><kbd class="none">없음</kbd></td><td><kbd>=</kbd> / <kbd>-</kbd></td><td><kbd class="none">없음</kbd></td></tr>
+      <tr><td class="nm">회전 중심 / 정점 스냅</td><td colspan="5"><kbd>P</kbd> / <kbd>X</kbd> — 모든 프리셋 공통. <kbd>Space</kbd> 교환 도구, <kbd>F2</kbd> 이름 바꾸기, <kbd>Delete</kbd> 삭제, <kbd>Ctrl + B</kbd> 사이드바, <kbd>F11</kbd> 전체 화면도 공통</td></tr>
+    </table></div>
+    <div class="note">기본값 두 종류는 <b>뷰포트 조작만</b> 다릅니다. Blender/C4D/Maya 프리셋은 그 프로그램에 맞춰 단축키 전반을 바꾸므로, 이미 익힌 Blockbench 키가 있으면 섞이지 않게 주의하세요.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card b-bb"><h3>선택 방법</h3>
+      <ul class="li">
+        <li><b>클릭</b> 하나 선택 / <kbd>Ctrl + 클릭</kbd> 여러 개 추가</li>
+        <li><b>아웃라이너</b>에서 <kbd>Shift + 클릭</kbd> — 범위 선택</li>
+        <li><b>뷰포트</b>에서 <kbd>Shift + 클릭</kbd> — 그룹(본) 전체 선택</li>
+        <li>메쉬에서 <kbd>Alt + 클릭</kbd> — 모서리 <b>루프 선택</b></li>
+        <li><kbd>Ctrl + Shift + 좌클릭 드래그</kbd> — 영역(박스) 선택</li>
+        <li>UV 패널에서 <kbd>Ctrl + 클릭</kbd> — 그 UV 조각을 쓰는 요소 선택</li>
+        <li><kbd>Ctrl + A</kbd> 모두 선택 / <kbd>Ctrl + I</kbd> 선택 반전 / <kbd>Ctrl + F</kbd> 조건으로 선택</li>
+        <li><kbd>I</kbd> 선택만 남기고 전부 숨기기 — 복잡한 모델에서 특히 유용</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>카메라 시점 (숫자 키패드)</h3>
+      <ul class="li">
+        <li><kbd>Numpad 1</kbd> 첫 각도(정면) · <kbd>Numpad 5</kbd> 원근/정사영 전환</li>
+        <li><kbd>Numpad 8</kbd> 위 · <kbd>Numpad 2</kbd> 아래</li>
+        <li><kbd>Numpad 4</kbd> 남 · <kbd>Numpad 6</kbd> 북 · <kbd>Numpad 7</kbd> 동 · <kbd>Numpad 9</kbd> 서</li>
+        <li>뷰포트 우클릭 › <b>각도</b>에서 아이소메트릭(2:1 / 30°) 프리셋 사용, 현재 각도 저장도 가능</li>
+        <li><b>선택 중심 보기</b> — <kbd>Shift</kbd> 추가하면 회전만, <kbd>Ctrl</kbd> 추가하면 화면에 맞게 확대</li>
+        <li>뷰포트 우클릭 › <b>사면 보기</b>로 정면·측면·위·투시 4분할</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 설정 ══════════ -->
+<section class="sec" data-t="pref">
+  <h2 class="st">환경 설정에서 챙길 것<span class="en">Preferences</span></h2>
+  <p class="lead"><b>파일 › 사용자 설정 › 설정</b>. 항목이 많지만 작업 속도를 실제로 바꾸는 것들만 골랐습니다.</p>
+  <div class="grid2">
+    <div class="card b-bb"><h3>일반 · 인터페이스</h3>
+      <ul class="li">
+        <li><b>언어</b> — 한국어 지원. 라벨 일부는 영문으로 남아 있음.</li>
+        <li><b>인터페이스 크기 / UI 모드</b> — 고해상도 화면이나 태블릿에서 조절.</li>
+        <li><b>상태바 보조키 제안</b> — 지금 <kbd>Shift</kbd>·<kbd>Ctrl</kbd>을 누르면 무엇이 달라지는지 하단에 표시. 켜 두면 학습에 도움.</li>
+        <li><b>외곽선 X-Ray</b> — 가려진 요소의 선택 윤곽을 뚫고 보여줌.</li>
+        <li><b>스트리머 모드</b> — 미공개 프로젝트 제목을 화면에서 가림.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>편집 · 스냅</h3>
+      <ul class="li">
+        <li><b>격자 크기 / Shift·Ctrl·Ctrl+Shift 단위</b> — 보조키별 스냅 값. 0.5픽셀 작업이 잦으면 여기부터.</li>
+        <li><b>실행 취소 한계</b> — 기본값보다 늘리면 긴 작업에서 안전.</li>
+        <li><b>정점 병합 거리</b> — <kbd>Shift + M</kbd> 병합이 너무 붙거나 안 붙을 때.</li>
+        <li><b>중심에서 크기 조정</b> — 큐브를 양쪽으로 동시에 키움.</li>
+        <li><b>크기 제한 비활성화</b> — 자바 모델 범위 제한 해제(게임에서 잘릴 수 있음).</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>칠하기</h3>
+      <ul class="li">
+        <li><b>투명한 픽셀 뒤로 그리기</b> — 껐다 켜는 것만으로 결과가 크게 달라짐.</li>
+        <li><b>브러시 옆으로 제한</b> — 3D에서 칠할 때 옆면으로 새는 것 방지.</li>
+        <li><b>브러시 크기·불투명 수정 키</b> — 어떤 보조키로 브러시를 조절할지 지정.</li>
+        <li><b>스타일러스펜으로만 칠하기</b> — 태블릿에서 손바닥 오작동 방지.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>뷰포트 · 격자 · 내보내기</h3>
+      <ul class="li">
+        <li><b>밝기 / 셰이딩 / 시야각(FOV) / 안티에일리어싱</b> — 렌더 느낌과 성능.</li>
+        <li><b>옆면 렌더</b> — 뒷면까지 보이게 할지(컬링 확인용).</li>
+        <li><b>격자류</b> — 작은 격자·블록 격자·픽셀 격자·바닥면을 개별 토글.</li>
+        <li><b>최소화된 내보내기 / 텍스처 임베드 / 모델 내보내기 크기</b> — 산출물 형태.</li>
+        <li><b>백업 주기·보존 기간</b>, <b>자동 업데이트</b>, <b>하드웨어 가속</b>(데스크톱).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">설정과 단축키는 <b>프로필</b>로 묶어 저장할 수 있습니다(파일 › 사용자 설정 › 프로필). 작업 종류별로 다른 세팅을 오갈 때 유용합니다.</div>
+</section>
+
+<!-- ══════════ 팁 ══════════ -->
+<section class="sec" data-t="tip">
+  <h2 class="st">실전 팁<span class="en">Tips</span></h2>
+  <p class="lead">공식 가이드와 앱 동작에서 확인한, 작업 속도에 실제로 영향을 주는 것들만 모았습니다.</p>
+
+  <div class="grid2">
+    <div class="card b-bb"><h3>입력 · 슬라이더</h3>
+      <ul class="li">
+        <li>사이드바의 숫자 슬라이더는 <b>드래그</b>, <b>화살표 클릭</b>, <b>직접 입력</b>이 모두 됩니다.</li>
+        <li><b>더블클릭</b>하면 기본값으로 초기화.</li>
+        <li>계산식 입력 가능 — <code>8/3</code>, <code>2+0.5</code> 같은 수식과 Molang 문법을 그대로 씁니다.</li>
+        <li>여러 요소를 선택한 상태에서 슬라이더를 움직이면 <b>상대값</b>으로 함께 이동합니다.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>모델링</h3>
+      <ul class="li">
+        <li><b>Z-파이팅</b>(면이 깜빡임)은 같은 평면에 겹친 면이 원인 — 살짝 띄우거나 <b>부풀리기(Inflate)</b> 값을 아주 작게 주면 해결.</li>
+        <li><b>부풀리기</b>는 UV를 유지하면서 크기를 키웁니다. 크기 조정과 달리 텍스처가 안 어긋남.</li>
+        <li><b>회전 중심 도구</b>(<kbd>P</kbd>)로 관절 위치를 먼저 잡아야 애니메이션이 자연스럽습니다.</li>
+        <li><b>꼭짓점 맞춤</b>(<kbd>X</kbd>) — 큐브의 한 꼭짓점을 다른 큐브 꼭짓점에 정확히 붙임.</li>
+        <li><b>뒤집기</b>는 이름의 left/right를 자동으로 바꿔 줍니다(대칭 파트 만들 때).</li>
+        <li>참조용 이미지(블루프린트)를 뷰포트에 깔고 그 위에서 모델링할 수 있습니다.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>덜 알려진 단축키</h3>
+      <ul class="li">
+        <li><kbd>Ctrl + Tab</kbd> 열린 프로젝트 탭 순환 (<kbd>Shift</kbd> 추가 시 역순)</li>
+        <li><kbd>Ctrl + Shift + G</kbd> 선택 항목을 새 그룹으로 감싸기</li>
+        <li><kbd>I</kbd> 선택만 남기고 숨기기 · <kbd>Z</kbd> 텍스처/단색/와이어프레임 전환</li>
+        <li><kbd>,</kbd> <kbd>.</kbd> 타임라인 1프레임 앞뒤 이동</li>
+        <li><kbd>Alt + Delete</kbd> 면만 지우고 정점·모서리는 남기기</li>
+        <li><kbd>Shift + Q</kbd> 키프레임을 기본값으로 강제 생성</li>
+        <li>UV 관련 버튼에 <kbd>Shift</kbd>를 더하면 <b>모든 면</b>에 적용</li>
+        <li><kbd>Ctrl + Shift + C</kbd>/<kbd>V</kbd> 전체(모든 요소·채널) 복사·붙여넣기</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>애니메이션</h3>
+      <ul class="li">
+        <li>키프레임 값 칸에 <b>Molang 수식</b>을 넣으면 절차적 움직임을 만들 수 있습니다(<code>Math.sin(query.anim_time*90)</code> 형태).</li>
+        <li><b>그래프 에디터</b>(<kbd>F3</kbd>)에서 베지어 핸들로 가감속을 다듬습니다.</li>
+        <li><b>애니메이션 최적화</b>로 불필요한 키프레임을 정리, <b>IK 베이크</b>로 역운동학을 일반 키프레임으로 변환.</li>
+        <li><b>애니메이션 좌우 반전</b>·<b>애니메이터 재지정</b>으로 다른 모델에 재활용.</li>
+        <li>어니언 스킨으로 앞뒤 프레임을 겹쳐 보며 타이밍 조정.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>내보내기 · 공유</h3>
+      <ul class="li">
+        <li>게임용 <b>모델 저장</b>과 작업용 <b>프로젝트 저장</b>을 구분해서 습관 들이기.</li>
+        <li>3D 범용 포맷: glTF · OBJ · FBX · Collada(dae) · STL.</li>
+        <li><b>공유하기</b>로 짧은 링크 생성, <b>Sketchfab</b>에 직접 업로드 가능.</li>
+        <li>렌더용 스크린샷은 <b>고급 스크린샷</b>에서 해상도·배경 투명도를 지정.</li>
+        <li>작업 과정은 <b>타임랩스</b>, 움직임은 <b>GIF로 녹화</b>.</li>
+      </ul>
+    </div>
+    <div class="card b-bb"><h3>확장</h3>
+      <ul class="li">
+        <li><b>플러그인</b> — 파일 › 플러그인. 스토어에서 바로 설치. <kbd>F</kbd> 액션 컨트롤에서도 설치 가능.</li>
+        <li><b>테마</b> — 색을 직접 만들고 파일로 공유.</li>
+        <li><b>공동 편집 세션</b> — 여러 사람이 같은 모델을 실시간으로 편집.</li>
+        <li>웹 앱은 URL 파라미터로 모델을 열도록 만들 수 있어 문서·위키에 링크로 붙이기 좋습니다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div id="nohit">검색 결과가 없습니다.</div>
+</div>
+
+<footer>
+  Blockbench <span id="vertag3"></span> 기준 · 액션 이름·기본 단축키는 앱 소스(GPL-3.0)와
+  <a href="https://www.blockbench.net/wiki/" target="_blank" rel="noopener">공식 위키</a>에서 확인해 정리했습니다.<br>
+  실제 키는 사용자 설정에 따라 달라질 수 있으니 앱의 <b>단축키 설정</b> 창을 기준으로 확인하세요.
+</footer>
+
+<script src="data.js"></script>
+<script>
+// ── 탭 ────────────────────────────────────────────────
+const TABS = [
+  ['intro','개요'],['format','포맷'],['tool','모드·도구'],['elem','요소·패널'],
+  ['menu','메뉴'],['key','단축키'],['nav','화면 조작'],['pref','설정'],['tip','팁'],
+];
+const tabbar = document.getElementById('tabs');
+TABS.forEach(([id,label],i) => {
+  const b = document.createElement('button');
+  b.className = 'tab' + (i===0?' on':'');
+  b.textContent = label; b.dataset.t = id;
+  b.onclick = () => show(id);
+  tabbar.appendChild(b);
+});
+function show(id){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.t===id));
+  document.querySelectorAll('.sec').forEach(s => s.classList.toggle('on', s.dataset.t===id));
+  window.scrollTo(0,0);
+  if (q.value) filter();
+}
+
+// ── 유틸 ──────────────────────────────────────────────
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function kbd(text){
+  if (!text) return '';
+  return text.split(' + ').map(p => {
+    const opt = /^\[.*\]$/.test(p);
+    return `<kbd${opt?' class="opt"':''}>${esc(p)}</kbd>`;
+  }).join(' <span style="color:#586a85">+</span> ');
+}
+const V = AUTO.ver;
+['vertag','vertag2','vertag3'].forEach(id => document.getElementById(id).textContent = 'v'+V);
+document.getElementById('vertag').textContent = 'v'+V+' 기준';
+
+// ── 포맷 표 ───────────────────────────────────────────
+document.getElementById('t-format').innerHTML =
+  '<tr><th>포맷</th><th>원문</th><th>설명</th></tr>' +
+  AUTO.formats.map(f =>
+    `<tr><td class="nm">${esc(f.n)}</td><td style="white-space:nowrap;font-size:12px">${esc(f.en)}</td><td class="dsc">${esc(f.d)}</td></tr>`
+  ).join('');
+
+// ── 도구 표 ───────────────────────────────────────────
+const MODEPILL = {edit:['p-ed','편집'],paint:['p-pt','칠하기'],all:['p-all','공통']};
+document.getElementById('t-tool').innerHTML =
+  '<tr><th>모드</th><th>도구</th><th>단축키</th><th>설명</th></tr>' +
+  AUTO.tools.map(t => {
+    const [cls,lab] = MODEPILL[t.m] || MODEPILL.edit;
+    return `<tr><td><span class="pill ${cls}">${lab}</span></td>` +
+      `<td class="nm">${esc(t.n)}</td>` +
+      `<td style="white-space:nowrap">${t.k?kbd(t.k):'<kbd class="none">없음</kbd>'}</td>` +
+      `<td class="dsc">${esc(t.d)}</td></tr>`;
+  }).join('');
+
+// ── 요소 표 ───────────────────────────────────────────
+document.getElementById('t-elem').innerHTML =
+  '<tr><th>요소</th><th>단축키</th><th>설명</th></tr>' +
+  AUTO.elems.map(e =>
+    `<tr><td class="nm">${esc(e.n)}</td>` +
+    `<td style="white-space:nowrap">${e.k?kbd(e.k):'<kbd class="none">없음</kbd>'}</td>` +
+    `<td class="dsc">${esc(e.d)}</td></tr>`).join('');
+
+// ── 패널 표 ───────────────────────────────────────────
+const PANELDESC = {
+  outliner:'모델의 요소·그룹(본) 계층 구조. 이름 바꾸기·숨기기·잠금·내보내기 토글',
+  element:'선택한 요소의 위치·크기·회전·회전 중심 수치 입력',
+  transform:'이동·크기·회전 슬라이더 모음',
+  uv:'선택한 면의 UV 좌표 편집. 텍스처 위에서 직접 드래그',
+  textures:'프로젝트에 들어 있는 텍스처 목록. 순서·기본 텍스처 지정',
+  layers:'텍스처의 레이어 목록(칠하기 모드)',
+  color:'주 색·보조 색 선택. RGB/HSV/HEX 입력',
+  palette:'자주 쓰는 색 모음. 텍스처에서 색 추출해 등록',
+  collections:'요소를 작업 단위로 묶어 한꺼번에 보이기/숨기기',
+  bone:'선택한 본(그룹)의 속성',
+  timeline:'키프레임 타임라인. 채널별 트랙, 마커, 재생 제어',
+  animations:'애니메이션 목록. 루프·길이·이름 설정',
+  keyframe:'선택한 키프레임의 값·보간 방식 편집(수식 입력 가능)',
+  animation_controllers:'상태와 전환 조건으로 애니메이션을 제어(베드락)',
+  variable_placeholders:'미리보기용 Molang 변수 값을 임시 지정',
+  display:'디스플레이 슬롯별 배치 조절',
+  skin_pose:'스킨 포즈 프리셋 선택',
+  chat:'공동 편집 세션 채팅',
+};
+document.getElementById('t-panel').innerHTML =
+  '<tr><th>패널</th><th>ID</th><th>역할</th></tr>' +
+  Object.entries(AUTO.panels).map(([id,n]) =>
+    `<tr><td class="nm">${esc(n)}</td><td class="kid">${esc(id)}</td>` +
+    `<td class="dsc">${esc(PANELDESC[id]||'')}</td></tr>`).join('');
+
+// ── 메뉴 ──────────────────────────────────────────────
+function renderItems(items, lvl){
+  return items.map(it => {
+    if (it.t === 'g'){
+      const body = it.c.length
+        ? renderItems(it.c, lvl+1)
+        : '<div class="i"><div class="t" style="color:var(--txt3);font-size:12px">상황에 따라 항목이 채워지는 하위 메뉴</div><div class="k"></div></div>';
+      return `<div class="g">${esc(it.n)}</div><div class="lvl2">${body}</div>`;
+    }
+    return `<div class="i"><div class="t">${esc(it.n)}` +
+           (it.d ? `<small>${esc(it.d)}</small>` : '') +
+           `</div><div class="k">${kbd(it.k)}</div></div>`;
+  }).join('');
+}
+document.getElementById('menus').innerHTML = AUTO.menus.map(m =>
+  `<div class="card"><h3>${esc(m.n)} <span class="badge">${esc(m.id)}</span></h3>` +
+  `<div class="mt">${renderItems(m.items,1)}</div></div>`).join('');
+
+// ── 단축키 ────────────────────────────────────────────
+let total = 0;
+document.getElementById('keys').innerHTML = AUTO.keys.map(cat => {
+  total += cat.items.length;
+  return `<div class="card"><h3>${esc(cat.ko)} <span class="badge">${cat.items.length}개</span></h3>` +
+    cat.items.map(k => {
+      const vars = k.v && k.v.length
+        ? `<div class="kv">${k.v.map(v => `+ <kbd>${esc(v.m==='ctrl'?'Ctrl':v.m==='shift'?'Shift':v.m==='alt'?'Alt':v.m)}</kbd> ${esc(v.n)}`).join(' · ')}</div>`
+        : '';
+      return `<div class="krow"${vars?' style="border-left:2px solid var(--bb);padding-left:8px;margin-left:-10px"':''}>` +
+        `<div class="kk">${kbd(k.k)}</div>` +
+        `<div><div class="kn">${esc(k.n)} <span class="kid">${esc(k.i)}</span></div>` +
+        (k.d ? `<div class="kd">${esc(k.d)}</div>` : '') + vars + `</div></div>`;
+    }).join('') + '</div>';
+}).join('');
+document.getElementById('kcount').textContent = total;
+
+// ── 검색 ──────────────────────────────────────────────
+const q = document.getElementById('search');
+const hit = document.getElementById('hit');
+const nohit = document.getElementById('nohit');
+const UNITS = () => [...document.querySelectorAll('.sec.on .card, .sec.on .krow, .sec.on table tr, .sec.on .mt .i')];
+
+function clearMarks(root){
+  root.querySelectorAll('mark').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
+}
+function markIn(el, term){
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const targets = [];
+  while (walk.nextNode()){
+    const n = walk.currentNode;
+    if (n.parentElement.tagName === 'MARK') continue;
+    if (n.nodeValue.toLowerCase().includes(term)) targets.push(n);
+  }
+  targets.forEach(n => {
+    const text = n.nodeValue, low = text.toLowerCase();
+    const frag = document.createDocumentFragment();
+    let i = 0, j;
+    while ((j = low.indexOf(term, i)) >= 0){
+      if (j > i) frag.appendChild(document.createTextNode(text.slice(i, j)));
+      const mk = document.createElement('mark');
+      mk.textContent = text.slice(j, j + term.length);
+      frag.appendChild(mk);
+      i = j + term.length;
+    }
+    if (i < text.length) frag.appendChild(document.createTextNode(text.slice(i)));
+    n.replaceWith(frag);
+  });
+}
+function filter(){
+  const term = q.value.trim().toLowerCase();
+  const sec = document.querySelector('.sec.on');
+  if (!sec) return;
+  clearMarks(sec);
+  sec.querySelectorAll('.hidden').forEach(e => e.classList.remove('hidden'));
+  if (!term){ hit.textContent = ''; nohit.style.display = 'none'; return; }
+
+  let n = 0;
+  // 표 행 / 단축키 행 / 메뉴 항목 단위로 필터
+  const rows = [...sec.querySelectorAll('.krow, table tr, .mt .i')];
+  rows.forEach(r => {
+    if (r.querySelector('th')) return;
+    const ok = r.textContent.toLowerCase().includes(term);
+    r.classList.toggle('hidden', !ok);
+    if (ok){ n++; markIn(r, term); }
+  });
+  // 행이 전혀 없는 카드(서술형)는 카드 단위로
+  sec.querySelectorAll('.card').forEach(c => {
+    const rowsIn = c.querySelectorAll('.krow, table tr, .mt .i');
+    if (rowsIn.length){
+      const anyVisible = [...rowsIn].some(r => !r.classList.contains('hidden') && !r.querySelector('th'));
+      c.classList.toggle('hidden', !anyVisible);
+      return;
+    }
+    const ok = c.textContent.toLowerCase().includes(term);
+    c.classList.toggle('hidden', !ok);
+    if (ok){ n++; markIn(c, term); }
+  });
+  sec.querySelectorAll('.grid2, .grid3').forEach(g => {
+    const kids = [...g.children];
+    g.classList.toggle('hidden', kids.length > 0 && kids.every(k => k.classList.contains('hidden')));
+  });
+  hit.textContent = n ? `${n}건` : '';
+  nohit.style.display = n ? 'none' : 'block';
+}
+q.addEventListener('input', filter);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ q.value = ''; filter(); q.blur(); }
+  if (e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+});
+
+show('intro');
+</script>
+</body>
+</html>

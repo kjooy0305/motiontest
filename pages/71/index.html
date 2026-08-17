@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API & 무료 에셋 완전 가이드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#060a12;--bg2:#0a1020;--bg3:#0e1828;--bg4:#152035;
+  --border:#1a2840;--border2:#305090;
+  --txt:#e0f0ff;--txt2:#7098c8;--txt3:#304870;
+  --cya:#00c8f0;--cya2:#40d8ff;--cyabg:rgba(0,200,240,.1);--cyabr:rgba(0,200,240,.28);
+  --pur:#7c5cff;--purbg:rgba(124,92,255,.1);--purbr:rgba(124,92,255,.3);
+  --grn:#22dd88;--grnbg:rgba(34,221,136,.1);--grnbr:rgba(34,221,136,.28);
+  --yel:#e8b820;--yelbg:rgba(232,184,32,.1);--yelbr:rgba(232,184,32,.28);
+  --ora:#f08020;--orabg:rgba(240,128,32,.1);--orabr:rgba(240,128,32,.28);
+  --red:#e05060;--redbg:rgba(224,80,96,.1);--redbr:rgba(224,80,96,.28);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#040810 0%,#0a0e1e 40%,#060e18 100%);
+  border-bottom:2px solid var(--cya);padding:12px 20px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr-ic{font-size:26px;filter:drop-shadow(0 0 12px var(--cya));}
+#hdr h1{font-size:18px;font-weight:800;
+  background:linear-gradient(90deg,var(--cya2),var(--pur));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#hdr-sub{font-size:11px;color:var(--txt3);margin-top:1px;}
+#hdr-badges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.hdr-b{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.hb-free{background:var(--grnbg);border:1px solid var(--grnbr);color:var(--grn);}
+.hb-fm{background:var(--yelbg);border:1px solid var(--yelbr);color:var(--yel);}
+.hb-cr{background:var(--orabg);border:1px solid var(--orabr);color:var(--ora);}
+.hb-pd{background:var(--redbg);border:1px solid var(--redbr);color:var(--red);}
+
+/* TAB NAV */
+#tnav{background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;gap:5px;flex-wrap:nowrap;
+  overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:54px;z-index:100;}
+#tnav::-webkit-scrollbar{display:none;}
+.tbtn{display:flex;flex-direction:column;align-items:center;
+  padding:7px 12px;border-radius:8px;border:1px solid transparent;
+  cursor:pointer;background:none;color:var(--txt2);
+  font-size:10px;font-weight:600;transition:.13s;
+  white-space:nowrap;font-family:inherit;gap:2px;min-width:52px;}
+.tbtn:hover{background:var(--bg3);color:var(--txt);}
+.tbtn.on{background:var(--cyabg);border-color:var(--cyabr);color:var(--cya2);}
+.tbtn .ti{font-size:17px;}
+
+/* MAIN */
+#main{padding:18px;max-width:1200px;margin:0 auto;}
+
+/* SECTION */
+.sec{background:var(--bg2);border:1px solid var(--border);
+  border-radius:9px;margin-bottom:14px;overflow:hidden;}
+.sec-hdr{padding:12px 16px;display:flex;align-items:center;gap:8px;
+  cursor:pointer;user-select:none;transition:.13s;}
+.sec-hdr:hover{background:var(--bg3);}
+.sec-hdr.op{border-bottom:1px solid var(--border);}
+.sec-hdr h3{font-size:13px;font-weight:700;color:var(--txt);}
+.sec-cnt{font-size:11px;color:var(--txt3);margin-left:4px;}
+.sec-arr{margin-left:auto;color:var(--txt3);transition:.2s;font-size:12px;}
+.sec-hdr.op .sec-arr{transform:rotate(180deg);}
+.sec-body{padding:14px;display:none;}
+.sec-body.op{display:block;}
+
+/* CARDS GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:13px;display:flex;flex-direction:column;gap:6px;
+  transition:.13s;position:relative;}
+.card:hover{border-color:var(--border2);background:var(--bg4);}
+.card-top{display:flex;align-items:flex-start;gap:8px;}
+.card-name{font-size:13px;font-weight:800;color:var(--txt);line-height:1.3;flex:1;}
+.card-tier{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;
+  white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.t-free{background:var(--grnbg);border:1px solid var(--grnbr);color:var(--grn);}
+.t-freemium{background:var(--yelbg);border:1px solid var(--yelbr);color:var(--yel);}
+.t-credit{background:var(--orabg);border:1px solid var(--orabr);color:var(--ora);}
+.t-paid{background:var(--redbg);border:1px solid var(--redbr);color:var(--red);}
+.card-desc{font-size:11px;color:var(--txt2);line-height:1.55;flex:1;}
+.card-free{font-size:10px;color:var(--txt3);padding:4px 7px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:5px;line-height:1.4;}
+.card-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.card-tag{font-size:9px;padding:1px 6px;border-radius:5px;
+  background:var(--cyabg);border:1px solid var(--cyabr);color:var(--cya2);}
+.card-url{font-size:10px;color:var(--cya2);text-decoration:none;
+  padding:4px 8px;border-radius:5px;
+  background:rgba(0,200,240,.07);border:1px solid var(--cyabr);
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:auto;transition:.13s;word-break:break-all;}
+.card-url:hover{background:var(--cyabg);}
+
+/* NOTE */
+.note{font-size:12px;color:var(--txt2);padding:9px 13px;border-radius:7px;
+  background:var(--bg3);border-left:3px solid var(--cya);margin-bottom:14px;line-height:1.6;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--bg2),var(--bg3));
+  border:1px solid var(--cyabr);border-radius:10px;padding:18px;margin-bottom:14px;
+  position:relative;overflow:hidden;}
+.hero::after{content:'🔌';position:absolute;right:-10px;top:-10px;
+  font-size:90px;opacity:.05;pointer-events:none;}
+.hero h2{font-size:18px;font-weight:800;
+  background:linear-gradient(90deg,var(--cya2),var(--pur));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px;}
+.hero p{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* TIER LEGEND */
+.tier-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.tl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);}
+.tl-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+@media(max-width:600px){
+  .card-grid{grid-template-columns:1fr;}
+  #hdr h1{font-size:15px;}
+  #hdr-badges{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <span id="hdr-ic">🔌</span>
+  <div>
+    <h1>API & 무료 에셋 완전 가이드</h1>
+    <div id="hdr-sub">디자인 · 아이콘 · 게임 에셋 · AI · 지도 · 날씨 · 결제 · 인증 · DB — 180+ 리소스 총정리</div>
+  </div>
+  <div id="hdr-badges">
+    <span class="hdr-b hb-free">🟢 완전무료</span>
+    <span class="hdr-b hb-fm">🟡 무료티어</span>
+    <span class="hdr-b hb-cr">🟠 무료크레딧</span>
+    <span class="hdr-b hb-pd">🔴 과금제</span>
+  </div>
+</header>
+
+<nav id="tnav"></nav>
+<main id="main"></main>
+
+<script>
+/* ─ 티어 뱃지 ─ */
+const TIER_LABEL = {free:'🟢 완전무료',freemium:'🟡 무료티어',credit:'🟠 무료크레딧',paid:'🔴 과금제'};
+const TIER_CLS   = {free:'t-free',freemium:'t-freemium',credit:'t-credit',paid:'t-paid'};
+
+function card(it) {
+  const tags = (it.tags||[]).map(t=>`<span class="card-tag">${t}</span>`).join('');
+  return `<div class="card">
+    <div class="card-top">
+      <span class="card-name">${it.name}</span>
+      <span class="card-tier ${TIER_CLS[it.tier]||'t-freemium'}">${TIER_LABEL[it.tier]||it.tier}</span>
+    </div>
+    <div class="card-desc">${it.desc}</div>
+    <div class="card-free">💡 ${it.free}</div>
+    ${tags?`<div class="card-tags">${tags}</div>`:''}
+    <a class="card-url" href="${it.url}" target="_blank" rel="noopener">🔗 ${it.url.replace(/^https?:\/\//,'')}</a>
+  </div>`;
+}
+function cards(list) {
+  return `<div class="card-grid">${list.map(card).join('')}</div>`;
+}
+function sec(title, count, body, open=true) {
+  return `<div class="sec">
+    <div class="sec-hdr${open?' op':''}" onclick="toggleSec(this)">
+      <h3>${title}</h3><span class="sec-cnt">${count}개</span>
+      <span class="sec-arr">▼</span>
+    </div>
+    <div class="sec-body${open?' op':''}">${body}</div>
+  </div>`;
+}
+function toggleSec(h){h.classList.toggle('op');h.nextElementSibling.classList.toggle('op');}
+
+/* ─ 탭 ─ */
+const TABS=[
+  {id:'game',    name:'게임 에셋', icon:'🎮'},
+  {id:'design',  name:'디자인 에셋',icon:'🎨'},
+  {id:'media',   name:'이미지·미디어',icon:'📸'},
+  {id:'ai',      name:'AI API',   icon:'🤖'},
+  {id:'data',    name:'공개 데이터',icon:'📡'},
+  {id:'social',  name:'소셜·알림', icon:'💬'},
+  {id:'infra',   name:'인프라·유틸',icon:'🔧'},
+];
+let curTab='game';
+
+function renderNav(){
+  document.getElementById('tnav').innerHTML=TABS.map(t=>
+    `<button class="tbtn${curTab===t.id?' on':''}" onclick="sel('${t.id}')">
+      <span class="ti">${t.icon}</span><span>${t.name}</span>
+    </button>`
+  ).join('');
+}
+function sel(id){
+  curTab=id;renderNav();
+  ({game:renderGame,design:renderDesign,media:renderMedia,ai:renderAI,
+    data:renderData,social:renderSocial,infra:renderInfra})[id]();
+  window.scrollTo(0,0);
+}
+
+/* ══════════════════════════════
+   데이터
+══════════════════════════════ */
+
+const D = {
+/* ── 게임 에셋 ── */
+game2d:[
+  {name:'Kenney.nl',desc:'퍼블릭 도메인 2D/3D 스프라이트·UI·타일·사운드 수백 팩. 게임 에셋 계의 국민 사이트.',free:'완전 무료 (CC0, 출처 불필요)',tier:'free',tags:['2D','3D','UI','사운드'],url:'https://kenney.nl'},
+  {name:'OpenGameArt',desc:'커뮤니티 업로드 스프라이트·애니메이션·배경 아카이브. 필터로 라이선스 선택 가능.',free:'무료 (라이선스 혼합, 확인 필요)',tier:'free',tags:['2D','타일','캐릭터'],url:'https://opengameart.org'},
+  {name:'itch.io Free Assets',desc:'인디 개발자 업로드 에셋. "Free" 필터로 무료만 검색 가능. 종류 다양.',free:'무료 (라이선스 창작자마다 상이)',tier:'free',tags:['2D','픽셀아트','UI'],url:'https://itch.io/game-assets/free'},
+  {name:'CraftPix.net',desc:'RPG·플랫포머·UI 키트 등 고품질 2D 에셋. 무료 팩 섹션 별도 제공.',free:'일부 무료 팩, 전체 구독 유료',tier:'freemium',tags:['2D','RPG','플랫포머'],url:'https://craftpix.net'},
+  {name:'GameArt2D',desc:'캐릭터·배경·GUI 카테고리별 무료 팩. 깔끔한 벡터 스타일.',free:'완전 무료',tier:'free',tags:['2D','캐릭터','배경'],url:'https://www.gameart2d.com'},
+  {name:'Pixel Frog',desc:'플랫포머용 캐릭터·타일 무료 팩. itch.io의 인기 픽셀아트 크리에이터.',free:'완전 무료',tier:'free',tags:['픽셀아트','플랫포머'],url:'https://pixelfrog-assets.itch.io'},
+  {name:'GDQuest Free Assets',desc:'Godot·게임 튜토리얼용 오픈소스 에셋. 교육 목적으로 최적화.',free:'완전 무료 (MIT/CC)',tier:'free',tags:['Godot','캐릭터'],url:'https://github.com/gdquest-demos'},
+  {name:'LPC (Liberated Pixel Cup)',desc:'CC-BY-SA 라이선스 RPG 스타일 스프라이트 세트. 탑다운 RPG 제작용.',free:'완전 무료 (CC-BY-SA)',tier:'free',tags:['RPG','탑다운','타일'],url:'https://lpc.opengameart.org'},
+  {name:'Lospec',desc:'픽셀아트 팔레트·스프라이트 커뮤니티. 팔레트 공유 및 픽셀아트 도구 제공.',free:'완전 무료',tier:'free',tags:['픽셀아트','팔레트'],url:'https://lospec.com'},
+],
+game3d:[
+  {name:'Poly Haven',desc:'CC0 3D 모델·HDRI·텍스처·머티리얼 고품질 라이브러리. 업계 최고 무료 3D 리소스.',free:'완전 무료 (CC0)',tier:'free',tags:['3D','HDRI','텍스처'],url:'https://polyhaven.com'},
+  {name:'Quaternius',desc:'로우폴리 캐릭터·환경·탈것 CC0 팩. 게임 개발 바로 적용 가능한 깔끔한 스타일.',free:'완전 무료 (CC0)',tier:'free',tags:['로우폴리','캐릭터','탈것'],url:'https://quaternius.com'},
+  {name:'Kay Lousberg',desc:'CC0 3D 게임 에셋 팩. Kenney와 함께 언급되는 CC0 에셋 메이커.',free:'완전 무료 (CC0)',tier:'free',tags:['3D','캐릭터','환경'],url:'https://kaylousberg.itch.io'},
+  {name:'Sketchfab Free',desc:'3D 모델 커뮤니티, 무료 필터로 다운로드 가능. 라이선스 모델마다 상이.',free:'일부 무료 (라이선스 혼합)',tier:'free',tags:['3D','다양한장르'],url:'https://sketchfab.com/store/free'},
+  {name:'Mixamo (Adobe)',desc:'캐릭터 자동 리깅 + 700+ 무료 애니메이션 라이브러리. FBX로 언리얼/유니티 적용.',free:'Adobe ID로 완전 무료',tier:'free',tags:['리깅','애니메이션','캐릭터'],url:'https://www.mixamo.com'},
+  {name:'ambientCG',desc:'CC0 PBR 텍스처·머티리얼·HDRI. Poly Haven과 함께 쓰는 텍스처 사이트.',free:'완전 무료 (CC0)',tier:'free',tags:['텍스처','PBR','머티리얼'],url:'https://ambientcg.com'},
+  {name:'Fab.com',desc:'에픽(Unreal) 소유 마켓. 무료 에셋·주간 무료 팩 제공. 구 퀵셀 브리지.',free:'일부 무료 / 주간 무료 팩',tier:'freemium',tags:['UE5','3D','환경'],url:'https://www.fab.com'},
+  {name:'TurboSquid Free',desc:'프로 3D 아티스트 업로드 무료 모델. 건축·제품·캐릭터 다양.',free:'일부 무료 (로열티프리)',tier:'free',tags:['3D','건축','제품'],url:'https://www.turbosquid.com/Search/3D-Models/free'},
+  {name:'NASA 3D Resources',desc:'우주선·행성·탐사선·소행성 고증 3D 모델 공식 공개.',free:'완전 무료',tier:'free',tags:['3D','우주','과학'],url:'https://nasa3d.arc.nasa.gov'},
+],
+sound:[
+  {name:'Freesound.org',desc:'CC 라이선스 사운드 이펙트·앰비언스 500만+ 클립. 게임 SFX의 성지.',free:'완전 무료 (라이선스 혼합)',tier:'free',tags:['SFX','앰비언스'],url:'https://freesound.org'},
+  {name:'Kenney Audio',desc:'CC0 UI 사운드·게임 음악 팩. Kenney 답게 깔끔하고 바로 사용 가능.',free:'완전 무료 (CC0)',tier:'free',tags:['SFX','UI','배경음'],url:'https://kenney.nl/assets?q=audio'},
+  {name:'OpenGameArt Audio',desc:'게임용 BGM·SFX 커뮤니티 아카이브. 픽셀 스타일부터 오케스트라까지.',free:'완전 무료 (CC)',tier:'free',tags:['BGM','SFX'],url:'https://opengameart.org/?field_art_type_tid=12'},
+  {name:'Pixabay Sound',desc:'로열티프리 SFX·음악 다운로드. 출처 표기 불필요.',free:'완전 무료',tier:'free',tags:['SFX','음악'],url:'https://pixabay.com/sound-effects'},
+  {name:'ZapSplat',desc:'게임·영상용 SFX 10만+ 클립. 무료 계정으로 이용 가능.',free:'무료 계정 제공 (고품질팩 유료)',tier:'freemium',tags:['SFX','폴리'],url:'https://www.zapsplat.com'},
+  {name:'Incompetech (Kevin MacLeod)',desc:'장르별 CC-BY 배경음악 200+ 곡. 수많은 유명 콘텐츠에서 사용.',free:'완전 무료 (CC-BY 출처 필요)',tier:'free',tags:['BGM','로열티프리'],url:'https://incompetech.com'},
+  {name:'Mixkit',desc:'무료 음악·SFX·영상 클립. 출처 표기 불필요. 고품질 선별 컬렉션.',free:'완전 무료',tier:'free',tags:['BGM','SFX','영상'],url:'https://mixkit.co'},
+  {name:'ccMixter',desc:'리믹스 가능 CC 음악 라이브러리. 창작자 커뮤니티 기반.',free:'완전 무료',tier:'free',tags:['BGM','CC'],url:'https://ccmixter.org'},
+  {name:'Sonniss GDC Bundle',desc:'매년 GDC 기간 수십 GB 전문 SFX 무료 제공. 로열티프리 상업용 사용 가능.',free:'기간 한정 완전 무료',tier:'free',tags:['SFX','전문','대용량'],url:'https://sonniss.com/gameaudiogdc'},
+  {name:'jsfxr (Bfxr)',desc:'레트로 8비트 SFX 브라우저 내 즉시 생성기. 코인·점프·폭발 등 랜덤 생성.',free:'완전 무료',tier:'free',tags:['8비트','레트로','생성기'],url:'https://sfxr.me'},
+],
+
+/* ── 디자인 에셋 ── */
+icon:[
+  {name:'Iconify',desc:'200,000+ 아이콘을 단일 API로 통합. Font Awesome·Heroicons·Material 등 모든 세트 포함.',free:'완전 무료 (오픈소스)',tier:'free',tags:['SVG','통합','React'],url:'https://iconify.design'},
+  {name:'Font Awesome',desc:'웹 최다 사용 아이콘셋. Free 플랜 2,000+ 아이콘 CDN 제공.',free:'Free 플랜 무료 / Pro 유료',tier:'freemium',tags:['SVG','CDN','브랜드'],url:'https://fontawesome.com'},
+  {name:'Heroicons',desc:'Tailwind CSS 팀 제작. 24×24 solid·outline 2가지 스타일, MIT 라이선스.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','Tailwind','미니멀'],url:'https://heroicons.com'},
+  {name:'Lucide',desc:'Feather 아이콘 포크 후 대폭 확장. 1,400+ 깔끔한 선형 아이콘.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','선형','React'],url:'https://lucide.dev'},
+  {name:'Tabler Icons',desc:'5,000+ 오픈소스 SVG 아이콘. 픽셀 퍼펙트 24px 그리드.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','5000+','픽셀퍼펙트'],url:'https://tabler.io/icons'},
+  {name:'Simple Icons',desc:'브랜드·기업 로고 SVG 아이콘 3,000+. GitHub·Discord·React 등 테크 브랜드 최적.',free:'완전 무료 (CC0)',tier:'free',tags:['브랜드','로고','테크'],url:'https://simpleicons.org'},
+  {name:'Phosphor Icons',desc:'thin~bold 6가지 웨이트 지원 유연한 아이콘 패밀리. 모든 프레임워크 지원.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','멀티웨이트'],url:'https://phosphoricons.com'},
+  {name:'Remix Icon',desc:'오픈소스 아이콘 2,800+ line·fill 2가지 스타일. Apache 2.0 라이선스.',free:'완전 무료 (Apache 2.0)',tier:'free',tags:['SVG','line','fill'],url:'https://remixicon.com'},
+  {name:'Bootstrap Icons',desc:'Bootstrap 공식 SVG 아이콘 2,000+. 독립 사용 가능.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','Bootstrap'],url:'https://icons.getbootstrap.com'},
+  {name:'Material Symbols',desc:'Google Material Design 공식 심볼 3,000+. Round·Sharp·Outlined 3스타일.',free:'완전 무료',tier:'free',tags:['SVG','Google','Material'],url:'https://fonts.google.com/icons'},
+  {name:'Radix Icons',desc:'Radix UI 공식, 미니멀 15px 그리드 아이콘. 접근성 고려 설계.',free:'완전 무료 (MIT)',tier:'free',tags:['SVG','미니멀','접근성'],url:'https://www.radix-ui.com/icons'},
+  {name:'Flaticon',desc:'최대 벡터 아이콘 DB. 무료 사용 시 출처 표기 필요.',free:'무료(출처표기) / 프리미엄 구독',tier:'freemium',tags:['SVG','대용량','다양'],url:'https://www.flaticon.com'},
+],
+font:[
+  {name:'Google Fonts API',desc:'1,500+ 폰트 CSS 한 줄로 적용. 한국어 폰트도 다수 포함.',free:'완전 무료',tier:'free',tags:['한국어','CDN','다국어'],url:'https://fonts.google.com'},
+  {name:'Fontsource',desc:'npm 패키지로 폰트 self-hosting. Next.js·Vite 등에서 성능 최적화.',free:'완전 무료 (오픈소스)',tier:'free',tags:['npm','셀프호스팅','성능'],url:'https://fontsource.org'},
+  {name:'Bunny Fonts',desc:'Google Fonts 완전 호환, GDPR 친화 EU 서버 운영. 드롭인 대체 가능.',free:'완전 무료',tier:'free',tags:['GDPR','프라이버시','CDN'],url:'https://fonts.bunny.net'},
+  {name:'Font Squirrel',desc:'상업용 무료 폰트 전용 사이트. 웹폰트 생성기 내장.',free:'완전 무료 (상업용)',tier:'free',tags:['상업용','웹폰트'],url:'https://www.fontsquirrel.com'},
+  {name:'DaFont',desc:'카테고리별 폰트 대규모 아카이브. 게임·손글씨·레트로 등 특수 폰트 다수.',free:'무료 (라이선스별 상이, 확인 필요)',tier:'free',tags:['게임체','손글씨','레트로'],url:'https://www.dafont.com'},
+  {name:'Noto Fonts',desc:'Google 제작, 전 언어 유니코드 지원. 국제화 서비스에 필수.',free:'완전 무료 (OFL)',tier:'free',tags:['다국어','유니코드','한국어'],url:'https://fonts.google.com/noto'},
+  {name:'Adobe Fonts',desc:'Adobe CC 구독 포함 고품질 프로 폰트. 개인 프로젝트용.',free:'Creative Cloud 구독 포함',tier:'freemium',tags:['프로','타이포그래피'],url:'https://fonts.adobe.com'},
+],
+
+/* ── 이미지 & 미디어 ── */
+photo:[
+  {name:'Unsplash API',desc:'고품질 사진 3M+ 검색·다운로드 API. 상업용 무료, 출처 표기 권장.',free:'시간당 50회 (데모) / 등록 후 5,000회',tier:'freemium',tags:['사진','상업용'],url:'https://unsplash.com/developers'},
+  {name:'Pexels API',desc:'로열티프리 사진·동영상 검색 API. 출처 표기 필요 없음.',free:'완전 무료 (등록 필요)',tier:'free',tags:['사진','영상','무귀속'],url:'https://www.pexels.com/api'},
+  {name:'Pixabay API',desc:'사진·일러스트·동영상·음악 통합 검색 API.',free:'완전 무료 (등록 필요)',tier:'free',tags:['사진','일러스트','영상'],url:'https://pixabay.com/api/docs'},
+  {name:'Lorem Picsum',desc:'랜덤 플레이스홀더 이미지 URL 생성. API키 불필요, 즉시 사용.',free:'완전 무료 (API키 불필요)',tier:'free',tags:['플레이스홀더','랜덤'],url:'https://picsum.photos'},
+  {name:'Placehold.co',desc:'커스텀 텍스트·색상·폰트로 플레이스홀더 이미지 생성. 모던 대체재.',free:'완전 무료',tier:'free',tags:['플레이스홀더','커스텀'],url:'https://placehold.co'},
+  {name:'Giphy API',desc:'GIF 검색·추천·트렌드 API. 소셜 앱·채팅 서비스에 필수.',free:'완전 무료 (등록 필요)',tier:'free',tags:['GIF','검색','소셜'],url:'https://developers.giphy.com'},
+  {name:'Tenor API',desc:'Google 운영 GIF 검색 API. 모바일 키보드·메시징 앱 표준.',free:'완전 무료',tier:'free',tags:['GIF','Google'],url:'https://tenor.com/gifapi'},
+  {name:'DiceBear',desc:'시드 기반 SVG 아바타 자동 생성 API. 애니메·로봇·픽셀 등 다양한 스타일.',free:'완전 무료 (MIT)',tier:'free',tags:['아바타','SVG','생성'],url:'https://www.dicebear.com'},
+  {name:'UI Avatars',desc:'이니셜 기반 아바타 이미지 생성 API. URL 파라미터로 색상·크기 설정.',free:'완전 무료',tier:'free',tags:['아바타','이니셜'],url:'https://ui-avatars.com'},
+  {name:'Remove.bg API',desc:'AI 자동 배경 제거 API. 이커머스·프로필 이미지 처리에 활용.',free:'월 50회 미리보기 무료',tier:'freemium',tags:['AI','배경제거','이미지'],url:'https://www.remove.bg/api'},
+  {name:'Cloudinary',desc:'이미지·동영상 업로드·변환·최적화·CDN 전달 올인원 서비스.',free:'월 25크레딧 (~25GB) 무료',tier:'freemium',tags:['CDN','변환','최적화'],url:'https://cloudinary.com'},
+],
+video:[
+  {name:'Pexels Videos',desc:'Pexels의 로열티프리 영상 API. 사진과 동일 키로 통합 사용.',free:'완전 무료',tier:'free',tags:['영상','스톡'],url:'https://www.pexels.com/api'},
+  {name:'Pixabay Videos',desc:'Pixabay 영상 검색 API.',free:'완전 무료',tier:'free',tags:['영상','스톡'],url:'https://pixabay.com/api/docs'},
+  {name:'Coverr',desc:'무료 배경 영상 클립. 랜딩 페이지용 고화질 루프 영상.',free:'완전 무료',tier:'free',tags:['배경영상','루프'],url:'https://coverr.co'},
+],
+
+/* ── AI API ── */
+ai:[
+  {name:'Google Gemini API',desc:'Gemini 1.5 Flash 무료 티어가 가장 관대. 텍스트·이미지·영상·코드 멀티모달.',free:'Flash: 분당 15회·일 1,500회 무료',tier:'freemium',tags:['LLM','멀티모달','무료티어'],url:'https://ai.google.dev'},
+  {name:'Groq API',desc:'LLaMA·Mixtral 초고속 추론. GroqChip 특수 하드웨어로 OpenAI보다 빠름.',free:'무료 티어 (일일 토큰 한도)',tier:'freemium',tags:['LLM','초고속','Llama'],url:'https://console.groq.com'},
+  {name:'Hugging Face Inference API',desc:'수십만 오픈소스 모델 직접 호출. 텍스트·이미지·음성·번역 모두 가능.',free:'무료 티어 있음 (속도 제한)',tier:'freemium',tags:['오픈소스','멀티모달'],url:'https://huggingface.co/inference-api'},
+  {name:'OpenAI API',desc:'GPT-4o·o1·DALL-E 3·Whisper 업계 표준. 가장 많이 사용되는 AI API.',free:'가입 시 $5 크레딧 (기간 한정)',tier:'credit',tags:['GPT','이미지생성','STT'],url:'https://platform.openai.com'},
+  {name:'Anthropic Claude API',desc:'Claude 3.5 Sonnet·Haiku. 긴 컨텍스트·코딩·분석에 강점.',free:'가입 시 소량 크레딧',tier:'credit',tags:['LLM','긴컨텍스트','분석'],url:'https://console.anthropic.com'},
+  {name:'Mistral AI API',desc:'오픈소스 모델 기반 유럽산 LLM. Codestral 코딩 특화 모델 포함.',free:'무료 실험 티어 (La Plateforme)',tier:'freemium',tags:['LLM','유럽','코딩'],url:'https://console.mistral.ai'},
+  {name:'Together AI',desc:'오픈소스 LLM API, LLaMA·FLUX 등 다양한 모델. $25 무료 크레딧.',free:'$25 무료 크레딧',tier:'credit',tags:['오픈소스','LLM','이미지'],url:'https://www.together.ai'},
+  {name:'OpenRouter',desc:'여러 LLM 통합 API 게이트웨이. Claude·GPT·Gemini 하나의 키로.',free:'$1 무료 크레딧 / 일부 모델 무료',tier:'credit',tags:['통합','멀티모델'],url:'https://openrouter.ai'},
+  {name:'Cohere API',desc:'텍스트 생성·임베딩·RAG·재랭킹 특화 LLM API.',free:'월 1,000회 Trial API',tier:'freemium',tags:['임베딩','RAG','검색'],url:'https://cohere.com'},
+  {name:'ElevenLabs',desc:'AI 텍스트-음성(TTS) 최고 품질. 음성 클로닝·다국어 지원.',free:'월 10,000자 무료',tier:'freemium',tags:['TTS','음성클로닝','다국어'],url:'https://elevenlabs.io'},
+  {name:'AssemblyAI',desc:'음성인식(STT)·화자분리·감정분석·요약 통합 API.',free:'$50 크레딧 무료',tier:'credit',tags:['STT','화자분리','요약'],url:'https://www.assemblyai.com'},
+  {name:'Deepgram',desc:'실시간 STT API. 낮은 지연시간·높은 정확도. 실시간 자막에 최적.',free:'$200 크레딧 무료',tier:'credit',tags:['STT','실시간','저지연'],url:'https://deepgram.com'},
+  {name:'Stability AI API',desc:'Stable Diffusion SDXL·SD3 이미지 생성 API.',free:'25크레딧 무료',tier:'credit',tags:['이미지생성','SD','SDXL'],url:'https://platform.stability.ai'},
+  {name:'Replicate',desc:'Stable Diffusion·LLaMA·Whisper 등 오픈소스 AI 실행 API.',free:'$5 크레딧 무료',tier:'credit',tags:['오픈소스','이미지','다양'],url:'https://replicate.com'},
+],
+
+/* ── 공개 데이터 ── */
+public:[
+  {name:'PokeAPI',desc:'포켓몬 전체 데이터(종류·스탯·이동기·진화·도감). API키 불필요.',free:'완전 무료 (키 불필요)',tier:'free',tags:['포켓몬','JSON'],url:'https://pokeapi.co'},
+  {name:'REST Countries',desc:'전 세계 국가 정보 — 국기·수도·언어·통화·인구·면적 등.',free:'완전 무료',tier:'free',tags:['국가','국기','지리'],url:'https://restcountries.com'},
+  {name:'NASA API',desc:'천문 사진(APOD)·화성 로버 사진·소행성 근접 데이터 등 NASA 공식 API.',free:'완전 무료 (데모 키 즉시 사용)',tier:'free',tags:['NASA','우주','과학'],url:'https://api.nasa.gov'},
+  {name:'TMDB API',desc:'영화·TV·배우 메타데이터·포스터 이미지. 스트리밍 앱 개발 표준.',free:'완전 무료 (등록 필요)',tier:'free',tags:['영화','TV','포스터'],url:'https://developer.themoviedb.org'},
+  {name:'Jikan API',desc:'MyAnimeList 비공식 API. 애니·만화·캐릭터·성우·스케줄 데이터.',free:'완전 무료',tier:'free',tags:['애니','만화','MAL'],url:'https://jikan.moe'},
+  {name:'IGDB API',desc:'Twitch 운영 게임 데이터베이스. 게임 정보·스크린샷·리뷰·플랫폼.',free:'완전 무료 (Twitch 계정 필요)',tier:'free',tags:['게임','DB'],url:'https://www.igdb.com/api'},
+  {name:'Open Library API',desc:'인터넷 아카이브 도서 데이터 수백만 건. 책 검색·표지·ISBN 조회.',free:'완전 무료',tier:'free',tags:['도서','ISBN','표지'],url:'https://openlibrary.org/developers'},
+  {name:'JSONPlaceholder',desc:'테스트용 가짜 REST API — Posts·Users·Comments·Albums·Todos.',free:'완전 무료 (키 불필요)',tier:'free',tags:['테스트','목업','REST'],url:'https://jsonplaceholder.typicode.com'},
+  {name:'DummyJSON',desc:'JSON 형식 가짜 데이터 제공. JSONPlaceholder보다 다양한 스키마.',free:'완전 무료',tier:'free',tags:['테스트','목업','더미'],url:'https://dummyjson.com'},
+  {name:'CoinGecko API',desc:'암호화폐 시세·거래량·시가총액·히스토리 데이터.',free:'분당 30회 무료',tier:'freemium',tags:['암호화폐','코인','시세'],url:'https://www.coingecko.com/en/api'},
+  {name:'Frankfurter API',desc:'ECB 기반 환율 데이터. 실시간·역사 환율, 기간별 조회 가능.',free:'완전 무료 (키 불필요)',tier:'free',tags:['환율','금융','ECB'],url:'https://www.frankfurter.app'},
+  {name:'Open-Meteo (날씨)',desc:'완전 무료 날씨 예보 API. API키 불필요. 7일 예보·기상 변수 풍부.',free:'완전 무료 (상업용 유료)',tier:'free',tags:['날씨','기상','예보'],url:'https://open-meteo.com'},
+  {name:'OpenWeatherMap',desc:'현재 날씨·5일 예보·대기질 글로벌 데이터. 가장 널리 쓰이는 날씨 API.',free:'분당 60회·월 100만 회 무료',tier:'freemium',tags:['날씨','기상','글로벌'],url:'https://openweathermap.org/api'},
+  {name:'WeatherAPI',desc:'현재·예보·대기·천문 데이터 통합. OpenWeatherMap 대체재.',free:'월 100만 회 무료',tier:'freemium',tags:['날씨','기상'],url:'https://www.weatherapi.com'},
+  {name:'기상청 공공 API',desc:'한국 기상청 공식 날씨·초단기예보·단기예보·특보 데이터.',free:'일 10,000회 무료 (공공데이터포털)',tier:'free',tags:['한국','날씨','기상청'],url:'https://www.data.go.kr'},
+  {name:'The Cat API',desc:'고양이 사진 랜덤 제공 + 품종 정보 API. 귀여운 예제 프로젝트용.',free:'완전 무료',tier:'free',tags:['고양이','랜덤','재미'],url:'https://thecatapi.com'},
+  {name:'Random User API',desc:'테스트용 가짜 유저 데이터 — 이름·사진·이메일·주소 생성.',free:'완전 무료 (키 불필요)',tier:'free',tags:['테스트','유저','목업'],url:'https://randomuser.me'},
+  {name:'Open Trivia DB',desc:'퀴즈 문제 API. 카테고리·난이도·문제 유형 설정 가능.',free:'완전 무료',tier:'free',tags:['퀴즈','게임','학습'],url:'https://opentdb.com/api_config.php'},
+  {name:'ZenQuotes',desc:'명언 랜덤 제공 API. 오늘의 명언 기능 포함.',free:'완전 무료',tier:'free',tags:['명언','랜덤'],url:'https://zenquotes.io'},
+],
+
+/* ── 소셜 & 알림 ── */
+social:[
+  {name:'Telegram Bot API',desc:'텔레그램 봇 — 메시지·파일·인라인 버튼·결제·게임 등 전기능 무료.',free:'완전 무료 (제한 없음)',tier:'free',tags:['봇','메시지','자동화'],url:'https://core.telegram.org/bots/api'},
+  {name:'Discord API',desc:'Discord 봇·서버·채널·웹훅·OAuth2 전기능. 커뮤니티 앱 표준.',free:'완전 무료',tier:'free',tags:['봇','웹훅','커뮤니티'],url:'https://discord.com/developers'},
+  {name:'GitHub API',desc:'레포·이슈·PR·사용자·Action 데이터 조회. REST + GraphQL 지원.',free:'인증 시 시간당 5,000회',tier:'free',tags:['코드','레포','DevOps'],url:'https://docs.github.com/en/rest'},
+  {name:'YouTube Data API v3',desc:'영상·채널·댓글·재생목록·검색 데이터 조회.',free:'일 10,000 단위 무료 (할당)',tier:'freemium',tags:['영상','채널','검색'],url:'https://console.cloud.google.com'},
+  {name:'Twitch API',desc:'스트림·게임·채널·클립·구독자 데이터. EventSub 웹훅 지원.',free:'완전 무료 (Twitch 앱 등록)',tier:'free',tags:['스트리밍','게임','채널'],url:'https://dev.twitch.tv'},
+  {name:'Slack API',desc:'봇·메시지·파일·채널·웹훅. 사내 도구·자동화에 필수.',free:'완전 무료',tier:'free',tags:['봇','웹훅','업무'],url:'https://api.slack.com'},
+  {name:'카카오 API',desc:'카카오 로그인·채널 메시지·알림톡·지도·번역 통합 플랫폼.',free:'로그인·일부 무료 / 알림톡 건당 과금',tier:'freemium',tags:['한국','로그인','알림'],url:'https://developers.kakao.com'},
+  {name:'네이버 API',desc:'네이버 로그인·지도·검색·파파고 번역·SENS SMS 통합 플랫폼.',free:'로그인·검색 무료 / SMS 유료',tier:'freemium',tags:['한국','로그인','지도'],url:'https://developers.naver.com'},
+],
+email:[
+  {name:'Resend',desc:'개발자 친화 이메일 API. React Email 컴포넌트 통합, Next.js 궁합 최상.',free:'월 3,000회·일 100회 무료',tier:'freemium',tags:['React','Next.js','트랜잭션'],url:'https://resend.com'},
+  {name:'SendGrid',desc:'Twilio 운영 대규모 이메일 서비스. 트랜잭션·마케팅 이메일 통합.',free:'일 100회 영구 무료',tier:'freemium',tags:['트랜잭션','마케팅'],url:'https://sendgrid.com'},
+  {name:'Brevo (Sendinblue)',desc:'이메일+SMS+마케팅 자동화 통합 플랫폼. 한국어 지원.',free:'일 300회 무료 (구독자 무제한)',tier:'freemium',tags:['마케팅','SMS','자동화'],url:'https://www.brevo.com'},
+  {name:'Mailgun',desc:'개발자용 이메일 전송·검증·분석 API.',free:'월 1,000회 3개월 무료 체험',tier:'credit',tags:['개발자','이메일검증'],url:'https://www.mailgun.com'},
+  {name:'EmailJS',desc:'프론트엔드에서 직접 이메일 발송. 서버 없이 contact form 구현.',free:'월 200회 무료',tier:'freemium',tags:['프론트엔드','서버불필요'],url:'https://www.emailjs.com'},
+  {name:'Loops',desc:'SaaS·앱 전용 이메일 자동화. 온보딩·웰컴·알림 시퀀스 특화.',free:'월 2,000회 무료',tier:'freemium',tags:['SaaS','자동화','온보딩'],url:'https://loops.so'},
+],
+push:[
+  {name:'Firebase Cloud Messaging',desc:'Android·iOS·웹 푸시 알림. Google 운영. 모바일 앱 필수.',free:'완전 무료',tier:'free',tags:['푸시','모바일','웹'],url:'https://firebase.google.com'},
+  {name:'OneSignal',desc:'앱·웹·이메일 크로스채널 푸시 알림. 세그멘테이션·A/B 테스트 지원.',free:'구독자 10,000명 무료',tier:'freemium',tags:['푸시','크로스채널','알림'],url:'https://onesignal.com'},
+  {name:'Pusher',desc:'실시간 웹소켓·이벤트 스트리밍 API. 채팅·라이브 피드 구현.',free:'200 연결·일 20만 메시지 무료',tier:'freemium',tags:['실시간','웹소켓','채팅'],url:'https://pusher.com'},
+  {name:'Ably',desc:'확장 가능 실시간 메시징·스트리밍 플랫폼.',free:'월 600만 메시지 무료',tier:'freemium',tags:['실시간','메시징'],url:'https://ably.com'},
+],
+
+/* ── 인프라 & 유틸 ── */
+auth:[
+  {name:'Firebase Authentication',desc:'이메일·소셜·전화·익명 인증 전기능. Flutter·React Native 최강 조합.',free:'완전 무료 (사용자 수 무제한)',tier:'free',tags:['이메일','소셜','전화'],url:'https://firebase.google.com/products/auth'},
+  {name:'Clerk',desc:'Next.js·React 특화 인증. UI 컴포넌트·MFA·조직 관리 포함.',free:'10,000 MAU 무료',tier:'freemium',tags:['Next.js','MFA','조직'],url:'https://clerk.com'},
+  {name:'Supabase Auth',desc:'Supabase 내장 JWT 인증. Row Level Security 연동.',free:'50,000 MAU 무료',tier:'freemium',tags:['JWT','RLS','오픈소스'],url:'https://supabase.com/auth'},
+  {name:'Auth0',desc:'엔터프라이즈급 인증 플랫폼. SAML·RBAC·MFA·소셜 로그인 풀패키지.',free:'25,000 MAU 무료',tier:'freemium',tags:['엔터프라이즈','SAML','RBAC'],url:'https://auth0.com'},
+  {name:'NextAuth.js / Auth.js',desc:'Next.js·SvelteKit 등 서버 인증 라이브러리. self-hosted 완전 무료.',free:'완전 무료 (오픈소스)',tier:'free',tags:['Next.js','self-hosted'],url:'https://authjs.dev'},
+  {name:'카카오 로그인',desc:'카카오 계정 OAuth2 소셜 로그인. 한국 서비스 필수.',free:'완전 무료',tier:'free',tags:['한국','OAuth2'],url:'https://developers.kakao.com/product/kakaoLogin'},
+  {name:'네이버 로그인',desc:'네이버 계정 OAuth2 소셜 로그인.',free:'완전 무료',tier:'free',tags:['한국','OAuth2'],url:'https://developers.naver.com/products/login/api'},
+],
+payment:[
+  {name:'Stripe',desc:'글로벌 결제 표준. 카드·구독·인보이스·웹훅 완벽 지원. 개발자 경험 최상.',free:'수수료 2.9%+$0.30/건 (월정액 없음)',tier:'paid',tags:['카드','구독','글로벌'],url:'https://stripe.com'},
+  {name:'Toss Payments',desc:'한국 결제 표준. 카드·계좌이체·간편결제·에스크로 통합.',free:'수수료율 협의 (월정액 없음)',tier:'paid',tags:['한국','카드','간편결제'],url:'https://developers.tosspayments.com'},
+  {name:'PortOne (I\'mport)',desc:'국내 모든 PG사 통합 결제 게이트웨이. 한 번에 여러 PG 연동.',free:'PG 수수료 별도 (통합 무료)',tier:'paid',tags:['한국','PG통합'],url:'https://portone.io'},
+  {name:'KakaoPay',desc:'카카오페이 QR·온라인 결제 API.',free:'수수료 협의',tier:'paid',tags:['한국','간편결제'],url:'https://developers.kakao.com/product/kakaoPay'},
+  {name:'Lemonsqueezy',desc:'개인 개발자 디지털 상품 판매 특화. 세금 처리 대행(MoR 모델).',free:'수수료 5%+$0.50/건',tier:'paid',tags:['디지털상품','MoR','구독'],url:'https://www.lemonsqueezy.com'},
+],
+db:[
+  {name:'Supabase',desc:'오픈소스 Firebase 대안. PostgreSQL + 실시간 + Auth + Storage + Edge Function.',free:'500MB DB·5GB 스토리지 무료',tier:'freemium',tags:['PostgreSQL','실시간','오픈소스'],url:'https://supabase.com'},
+  {name:'Firebase Firestore',desc:'Google NoSQL 실시간 DB. 오프라인 동기화·자동 스케일링.',free:'일 읽기 50,000·쓰기 20,000 무료',tier:'freemium',tags:['NoSQL','실시간','Google'],url:'https://firebase.google.com'},
+  {name:'MongoDB Atlas',desc:'글로벌 MongoDB 클라우드. M0 무료 클러스터 영구 제공.',free:'512MB 영구 무료 (M0)',tier:'freemium',tags:['MongoDB','NoSQL','클라우드'],url:'https://www.mongodb.com/atlas'},
+  {name:'Neon',desc:'서버리스 PostgreSQL. 브랜치 기능으로 개발/프로덕션 분리.',free:'0.5GB 영구 무료',tier:'freemium',tags:['PostgreSQL','서버리스','브랜치'],url:'https://neon.tech'},
+  {name:'Turso (libSQL)',desc:'엣지 SQLite. 전 세계 분산 배포, 100ms 이하 레이턴시.',free:'9GB·500 DB 무료',tier:'freemium',tags:['SQLite','엣지','분산'],url:'https://turso.tech'},
+  {name:'Upstash',desc:'서버리스 Redis + Kafka. 요청당 과금, Next.js Edge 최적.',free:'일 10,000 커맨드 무료',tier:'freemium',tags:['Redis','Kafka','엣지'],url:'https://upstash.com'},
+  {name:'PocketBase',desc:'Go 기반 경량 오픈소스 BaaS. 단일 바이너리 파일로 DB+인증+스토리지.',free:'완전 무료 (self-hosted)',tier:'free',tags:['self-hosted','Go','경량'],url:'https://pocketbase.io'},
+  {name:'Appwrite',desc:'오픈소스 BaaS — DB·인증·스토리지·함수 통합. 클라우드·셀프호스트 모두 지원.',free:'self-hosted 무료·클라우드 무료 티어',tier:'freemium',tags:['오픈소스','BaaS','통합'],url:'https://appwrite.io'},
+],
+storage:[
+  {name:'Cloudflare R2',desc:'S3 호환 오브젝트 스토리지. 이그레스(출력) 비용 없음이 핵심 장점.',free:'10GB·쓰기 100만 회 무료',tier:'freemium',tags:['S3호환','이그레스무료'],url:'https://www.cloudflare.com/products/r2'},
+  {name:'Supabase Storage',desc:'Supabase 내장 파일 스토리지. RLS 정책으로 세밀한 권한 제어.',free:'1GB 무료',tier:'freemium',tags:['RLS','통합'],url:'https://supabase.com/storage'},
+  {name:'Backblaze B2',desc:'S3 호환 저렴 스토리지. AWS S3보다 80% 저렴.',free:'10GB 무료',tier:'freemium',tags:['S3호환','저렴'],url:'https://www.backblaze.com/b2'},
+  {name:'ImgBB',desc:'무료 이미지 호스팅. API 업로드 지원. 간단한 프로젝트에 즉시 사용.',free:'완전 무료',tier:'free',tags:['이미지','무료호스팅'],url:'https://imgbb.com'},
+  {name:'Uploadthing',desc:'Next.js 특화 파일 업로드. 타입세이프 API.',free:'2GB 무료',tier:'freemium',tags:['Next.js','타입세이프'],url:'https://uploadthing.com'},
+],
+map:[
+  {name:'Leaflet + OpenStreetMap',desc:'오픈소스 지도 라이브러리 + 무료 타일. API 비용 없음. 가장 가성비 좋은 선택.',free:'완전 무료 (타일 정책 준수)',tier:'free',tags:['오픈소스','OpenStreetMap'],url:'https://leafletjs.com'},
+  {name:'Mapbox',desc:'커스텀 스타일 지도·3D 지형·내비게이션·데이터 시각화.',free:'월 50,000회 로드 무료',tier:'freemium',tags:['커스텀','3D','내비'],url:'https://www.mapbox.com'},
+  {name:'Google Maps Platform',desc:'지도·장소 검색·경로·스트리트뷰 업계 표준. 데이터 가장 풍부.',free:'월 $200 크레딧 (≈28,000 로드)',tier:'credit',tags:['장소검색','경로','스트리트뷰'],url:'https://developers.google.com/maps'},
+  {name:'카카오맵 API',desc:'국내 1위 지도. 장소 검색·로드뷰·길찾기. 한국 서비스 필수.',free:'일 300,000회 무료',tier:'freemium',tags:['한국','장소검색','로드뷰'],url:'https://apis.map.kakao.com'},
+  {name:'네이버 지도 API',desc:'국내 상세 POI·실내지도·NAVER 전용 장소 데이터.',free:'일 200,000회 무료',tier:'freemium',tags:['한국','POI','실내'],url:'https://navermaps.github.io/maps.js'},
+  {name:'Nominatim (OSM)',desc:'OpenStreetMap 기반 무료 지오코딩 API. 주소↔좌표 변환.',free:'완전 무료 (초당 1회 정책)',tier:'free',tags:['지오코딩','무료','OSM'],url:'https://nominatim.org'},
+],
+translate:[
+  {name:'DeepL API',desc:'한국어 포함 33개 언어 고품질 번역. Google·Papago보다 자연스럽다는 평.',free:'월 500,000자 무료',tier:'freemium',tags:['고품질','한국어','33개언어'],url:'https://www.deepl.com/pro-api'},
+  {name:'Papago API (네이버)',desc:'한국어 특화 번역. 한-영-일-중 품질 우수. 국내 서비스 표준.',free:'일 10,000자 무료',tier:'freemium',tags:['한국어','네이버','한-영-일-중'],url:'https://developers.naver.com/products/papago/nmt'},
+  {name:'Google Cloud Translation',desc:'133개 언어 지원 NMT 고품질 번역. 글로벌 서비스 표준.',free:'월 500,000자 무료',tier:'freemium',tags:['133개언어','글로벌'],url:'https://cloud.google.com/translate'},
+  {name:'LibreTranslate',desc:'오픈소스 번역 API. self-host 시 완전 무료. GDPR 친화.',free:'완전 무료 (self-hosted)',tier:'free',tags:['오픈소스','self-hosted','GDPR'],url:'https://libretranslate.com'},
+  {name:'Microsoft Translator',desc:'Azure 기반 번역. 100+ 언어, 실시간 STT 번역 지원.',free:'월 2,000,000자 무료',tier:'freemium',tags:['Azure','100+언어','STT'],url:'https://azure.microsoft.com/products/cognitive-services/translator'},
+],
+util:[
+  {name:'QRServer (goqr.me)',desc:'URL 파라미터로 QR코드 이미지 즉시 생성. API키 불필요.',free:'완전 무료 (키 불필요)',tier:'free',tags:['QR코드','생성'],url:'https://goqr.me/api'},
+  {name:'ip-api.com',desc:'IP 기반 국가·도시·위도경도·ISP 조회. HTTP는 무료.',free:'분당 45회 무료 (HTTP)',tier:'freemium',tags:['IP','지오로케이션'],url:'https://ip-api.com'},
+  {name:'DiceBear (유틸)',desc:'씨드 기반 SVG 아바타 API. Bottts·Pixel·Lorelei 등 다양한 스타일.',free:'완전 무료 (MIT)',tier:'free',tags:['아바타','SVG','씨드'],url:'https://www.dicebear.com'},
+  {name:'Faker.js',desc:'테스트용 가짜 데이터 생성 라이브러리. 이름·이메일·주소·상품 등.',free:'완전 무료 (오픈소스)',tier:'free',tags:['테스트','가짜데이터','라이브러리'],url:'https://fakerjs.dev'},
+  {name:'HaveIBeenPwned API',desc:'이메일 유출 여부 확인. 보안 서비스에 필수.',free:'완전 무료 (개인용)',tier:'free',tags:['보안','이메일','유출확인'],url:'https://haveibeenpwned.com/API'},
+  {name:'OCR.space API',desc:'이미지·PDF 텍스트 추출 OCR API. 25개 언어 지원.',free:'월 25,000회 무료',tier:'freemium',tags:['OCR','PDF','텍스트추출'],url:'https://ocr.space/ocrapi'},
+  {name:'Abstract API',desc:'이메일 검증·전화번호·IP·이름·VAT 검증 등 다양한 유틸 API.',free:'각 API 월 1,000회 무료',tier:'freemium',tags:['이메일검증','전화','유틸'],url:'https://www.abstractapi.com'},
+  {name:'Cron-job.org',desc:'무료 HTTP 크론잡 스케줄러. 서버리스 함수·웹훅 정기 호출에 사용.',free:'완전 무료',tier:'free',tags:['크론잡','스케줄러','자동화'],url:'https://cron-job.org'},
+  {name:'Webhook.site',desc:'웹훅 수신·디버그 URL. API 연동 테스트 필수 도구.',free:'완전 무료',tier:'free',tags:['웹훅','디버그','테스트'],url:'https://webhook.site'},
+  {name:'Is.gd',desc:'초간단 URL 단축 API. 파라미터 하나로 단축 URL 생성.',free:'완전 무료',tier:'free',tags:['URL단축','간단'],url:'https://is.gd/api.php'},
+],
+};
+
+/* ══════════════════════════════
+   탭 렌더 함수
+══════════════════════════════ */
+function legend() {
+  return `<div class="tier-legend">
+    <span class="tl-item"><span class="tl-badge t-free">🟢 완전무료</span> 키 없이도 사용 가능하거나 실용적 제한 없음</span>
+    <span class="tl-item"><span class="tl-badge t-freemium">🟡 무료티어</span> 일정 한도 내 무료</span>
+    <span class="tl-item"><span class="tl-badge t-credit">🟠 무료크레딧</span> 가입 시 크레딧 지급</span>
+    <span class="tl-item"><span class="tl-badge t-paid">🔴 과금제</span> 사용량 기반 유료 (월정액 없음)</span>
+  </div>`;
+}
+
+function renderGame() {
+  document.getElementById('main').innerHTML = legend() +
+    sec('🕹 2D 에셋 — 스프라이트·타일·캐릭터', D.game2d.length, cards(D.game2d)) +
+    sec('🏔 3D 에셋 — 모델·애니메이션·텍스처', D.game3d.length, cards(D.game3d)) +
+    sec('🎵 사운드 & 음악', D.sound.length, cards(D.sound));
+}
+
+function renderDesign() {
+  document.getElementById('main').innerHTML = legend() +
+    sec('🖼 아이콘 라이브러리', D.icon.length, cards(D.icon)) +
+    sec('🔤 폰트 & 타이포그래피', D.font.length, cards(D.font));
+}
+
+function renderMedia() {
+  document.getElementById('main').innerHTML = legend() +
+    sec('📷 사진·이미지 API', D.photo.length, cards(D.photo)) +
+    sec('🎬 영상 & GIF', D.video.length, cards(D.video));
+}
+
+function renderAI() {
+  document.getElementById('main').innerHTML = `
+    <div class="note">💡 AI API는 빠르게 변합니다. 무료 티어는 수시로 업데이트되므로 공식 페이지에서 최신 정보를 확인하세요.</div>` +
+    sec('🤖 AI·LLM·이미지·음성 API', D.ai.length, cards(D.ai));
+}
+
+function renderData() {
+  document.getElementById('main').innerHTML = `
+    <div class="note">💡 공개 데이터 API의 대부분은 완전 무료입니다. 토이 프로젝트·포트폴리오·연습용으로 바로 사용 가능합니다.</div>` +
+    sec('📡 공개 데이터 & 날씨 API — 전부 무료', D.public.length, cards(D.public));
+}
+
+function renderSocial() {
+  document.getElementById('main').innerHTML = legend() +
+    sec('💬 소셜 & 플랫폼 API', D.social.length, cards(D.social)) +
+    sec('📧 이메일 발송 API', D.email.length, cards(D.email)) +
+    sec('🔔 푸시 알림 & 실시간', D.push.length, cards(D.push));
+}
+
+function renderInfra() {
+  document.getElementById('main').innerHTML = legend() +
+    sec('🔐 인증 API', D.auth.length, cards(D.auth)) +
+    sec('💳 결제 API', D.payment.length, cards(D.payment), false) +
+    sec('🗄 DB & 백엔드 서비스', D.db.length, cards(D.db)) +
+    sec('📦 파일 스토리지', D.storage.length, cards(D.storage), false) +
+    sec('🗺 지도 API', D.map.length, cards(D.map), false) +
+    sec('🌐 번역 API', D.translate.length, cards(D.translate), false) +
+    sec('🔧 기타 유틸리티 API', D.util.length, cards(D.util), false);
+}
+
+/* ── 초기화 ── */
+renderNav();
+renderGame();
+</script>
+</body>
+</html>

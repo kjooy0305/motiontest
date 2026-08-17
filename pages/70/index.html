@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>컴퓨터활용능력 1·2급 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#06080a;--bg2:#0c1013;--bg3:#12181d;--bg4:#1a2229;
+  --border:#1c262e;--border2:#2c3d49;
+  --txt:#dfe8ec;--txt2:#8aa0ac;--txt3:#465a66;
+  --acc:#2ea86b;--acc2:#5ed99a;--acc3:rgba(46,168,107,.13);--acc4:rgba(46,168,107,.06);
+  --blu:#3d8fe0;--blu2:#69b3ff;--bluB:rgba(61,143,224,.12);
+  --grn:#44bb77;--grn2:#66dd99;--grnB:rgba(68,187,119,.12);
+  --red:#e2495a;--red2:#ff6b7b;--redB:rgba(226,73,90,.12);
+  --pur:#9161e3;--pur2:#b48cff;--purB:rgba(145,97,227,.12);
+  --org:#e0913a;--org2:#ffb861;--orgB:rgba(224,145,58,.12);
+  --teal:#2ca8bd;--teal2:#57d3e8;--tealB:rgba(44,168,189,.12);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;-webkit-text-size-adjust:100%;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#030507,#0a1014,#030507);
+  border-bottom:2px solid var(--acc);padding:9px 16px;position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#hdr-logo{font-size:19px;filter:drop-shadow(0 0 8px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 16px rgba(46,168,107,.4);}
+#hdr .badge{font-size:9px;padding:2px 6px;border-radius:2px;background:var(--acc3);
+  border:1px solid rgba(46,168,107,.3);color:var(--acc);font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+#search{flex:1;min-width:140px;max-width:300px;padding:6px 11px;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;
+  outline:none;font-family:inherit;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:2px;padding:6px 12px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:45px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 12px;border-radius:3px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(46,168,107,.4);color:var(--acc2);}
+.tab.g1{color:#c7a0ff;}
+.tab.g1.on{background:var(--purB);border-color:rgba(145,97,227,.45);color:var(--pur2);}
+.tab.pr{color:#ffbe72;}
+.tab.pr.on{background:var(--orgB);border-color:rgba(224,145,58,.45);color:var(--org2);}
+.tab.qz{color:#7ec6ff;}
+.tab.qz.on{background:var(--bluB);border-color:rgba(61,143,224,.45);color:var(--blu2);}
+
+/* MAIN */
+#main{padding:16px;max-width:1280px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 9px;
+  padding-left:9px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+h4.sub{font-size:12.5px;font-weight:700;color:var(--acc);margin:14px 0 7px;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:12px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:10px;margin-bottom:12px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;}
+.card.hidden{display:none;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.card-icon{font-size:15px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card-sub{font-size:9px;color:var(--txt3);margin-left:auto;padding:1px 5px;border-radius:5px;
+  background:var(--bg4);border:1px solid var(--border);white-space:nowrap;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.72;}
+.card-desc strong{color:var(--txt);}
+.card-desc em{color:var(--acc2);font-style:normal;}
+ul.tips{list-style:none;}
+ul.tips li{display:flex;gap:7px;padding:4px 0;border-bottom:1px solid rgba(28,38,46,.7);
+  font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--acc);flex-shrink:0;margin-top:1px;}
+ul.tips li strong{color:var(--txt);}
+ul.tips li code{color:var(--teal2);}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);}
+.tbl-wrap.hidden{display:none;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:420px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;padding:7px 10px;
+  border-bottom:1px solid var(--border2);white-space:nowrap;font-size:11.5px;}
+td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(46,168,107,.04);}
+td strong{color:var(--txt);}
+td code,th code{color:var(--teal2);}
+.tbl-cap{font-size:11px;color:var(--txt3);padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:600;}
+
+/* CODE */
+code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;font-size:11.5px;color:var(--teal2);}
+pre.code{background:#04070a;border:1px solid var(--border2);border-radius:5px;padding:10px 12px;
+  font-family:'Consolas','Courier New',monospace;font-size:11.5px;line-height:1.65;
+  color:var(--teal2);overflow-x:auto;white-space:pre;margin:7px 0;}
+pre.code .cm{color:var(--txt3);}
+pre.code .kw{color:var(--pur2);}
+pre.code .st{color:var(--org2);}
+
+/* HIGHLIGHT / CALLOUT */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(46,168,107,.2);border-radius:7px;padding:12px 15px;margin-bottom:12px;}
+.hi-card.hidden{display:none;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.75;}
+.hi-body strong{color:var(--txt);}
+.hi-body em{color:var(--acc2);font-style:normal;}
+.callout{border-radius:5px;padding:9px 12px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout.hidden{display:none;}
+.callout-body{color:var(--txt2);line-height:1.65;}
+.callout-body strong{color:var(--txt);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.org{background:var(--orgB);border-color:var(--org);}
+.callout.teal{background:var(--tealB);border-color:var(--teal);}
+
+/* TAG */
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(46,168,107,.35);background:var(--acc3);}
+.tag.b{color:var(--blu2);border-color:rgba(61,143,224,.35);background:var(--bluB);}
+.tag.r{color:var(--red2);border-color:rgba(226,73,90,.35);background:var(--redB);}
+.tag.p{color:var(--pur2);border-color:rgba(145,97,227,.35);background:var(--purB);}
+.tag.o{color:var(--org2);border-color:rgba(224,145,58,.35);background:var(--orgB);}
+
+/* QUIZ */
+#quiz-bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
+  padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;}
+#quiz-bar select,#quiz-bar button,#quiz-bar input{font-family:inherit;font-size:12px;
+  padding:6px 10px;border-radius:4px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);cursor:pointer;outline:none;}
+#quiz-bar button:hover{border-color:var(--acc);color:var(--acc2);}
+#quiz-bar input{width:66px;text-align:center;cursor:text;}
+#quiz-stat{margin-left:auto;font-size:11.5px;color:var(--txt2);display:flex;gap:10px;flex-wrap:wrap;}
+#quiz-stat b{color:var(--acc2);}
+#quiz-stat .wr{color:var(--red2);}
+#prog{height:4px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+#prog-in{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:.25s;}
+.q-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
+.q-meta{display:flex;gap:8px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
+.q-no{font-size:11px;font-weight:700;color:var(--acc);background:var(--acc3);
+  border:1px solid rgba(46,168,107,.3);padding:2px 8px;border-radius:10px;}
+.q-topic{font-size:10px;color:var(--txt3);padding:2px 7px;border-radius:9px;background:var(--bg4);border:1px solid var(--border);}
+.q-text{font-size:14px;color:var(--txt);line-height:1.75;margin-bottom:12px;font-weight:600;}
+.q-text code{font-size:12.5px;}
+.opt{display:flex;gap:9px;align-items:flex-start;padding:9px 12px;margin-bottom:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;
+  font-size:12.5px;color:var(--txt2);line-height:1.6;transition:.12s;}
+.opt:hover{border-color:var(--border2);background:var(--bg4);}
+.opt .num{flex-shrink:0;width:19px;height:19px;border-radius:50%;background:var(--bg4);
+  border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:700;color:var(--txt2);margin-top:1px;}
+.opt.ok{background:var(--grnB);border-color:var(--grn);color:var(--txt);}
+.opt.ok .num{background:var(--grn);border-color:var(--grn);color:#04120a;}
+.opt.no{background:var(--redB);border-color:var(--red);color:var(--txt);}
+.opt.no .num{background:var(--red);border-color:var(--red);color:#180406;}
+.opt.lock{cursor:default;}
+.q-exp{margin-top:11px;padding:11px 13px;background:var(--bg3);border-left:3px solid var(--acc);
+  border-radius:5px;font-size:12px;color:var(--txt2);line-height:1.75;display:none;}
+.q-exp.show{display:block;}
+.q-exp b{color:var(--acc2);}
+.q-exp strong{color:var(--txt);}
+#quiz-nav{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+#quiz-nav button{font-family:inherit;font-size:12.5px;padding:8px 16px;border-radius:5px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt2);cursor:pointer;}
+#quiz-nav button:hover:not(:disabled){border-color:var(--acc);color:var(--acc2);}
+#quiz-nav button:disabled{opacity:.32;cursor:not-allowed;}
+#quiz-nav .prim{background:var(--acc3);border-color:rgba(46,168,107,.4);color:var(--acc2);font-weight:700;}
+#dots{display:flex;flex-wrap:wrap;gap:3px;padding:11px 12px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:7px;}
+#dots span{width:22px;height:22px;border-radius:4px;background:var(--bg4);border:1px solid var(--border);
+  font-size:9.5px;display:flex;align-items:center;justify-content:center;color:var(--txt3);cursor:pointer;}
+#dots span:hover{border-color:var(--acc);}
+#dots span.cur{border-color:var(--acc2);color:var(--acc2);font-weight:700;}
+#dots span.ok{background:var(--grnB);border-color:var(--grn);color:var(--grn2);}
+#dots span.no{background:var(--redB);border-color:var(--red);color:var(--red2);}
+
+/* PRACTICAL */
+.pq{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:13px 15px;margin-bottom:10px;}
+.pq.hidden{display:none;}
+.pq-hd{display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap;}
+.pq-no{font-size:10.5px;font-weight:700;color:var(--org2);background:var(--orgB);
+  border:1px solid rgba(224,145,58,.32);padding:2px 8px;border-radius:10px;}
+.pq-cat{font-size:10px;color:var(--txt3);padding:2px 7px;border-radius:9px;background:var(--bg4);border:1px solid var(--border);}
+.pq-q{font-size:12.5px;color:var(--txt);line-height:1.72;margin-bottom:8px;}
+.pq-toggle{font-family:inherit;font-size:11px;padding:4px 11px;border-radius:4px;background:var(--bg3);
+  border:1px solid var(--border2);color:var(--txt2);cursor:pointer;}
+.pq-toggle:hover{border-color:var(--org);color:var(--org2);}
+.pq-a{margin-top:9px;padding:10px 12px;background:var(--bg3);border-left:3px solid var(--org);
+  border-radius:5px;font-size:12px;color:var(--txt2);line-height:1.75;display:none;}
+.pq-a.show{display:block;}
+.pq-a b{color:var(--org2);}
+.pq-a pre{font-family:'Consolas','Courier New',monospace;font-size:11.5px;color:var(--teal2);
+  background:#04070a;border:1px solid var(--border2);border-radius:4px;padding:9px 11px;
+  overflow-x:auto;white-space:pre;margin:6px 0;line-height:1.6;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:26px 10px 40px;line-height:1.8;}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid,.grid-sm,.grid-wide{grid-template-columns:1fr;}
+  #hdr h1{font-size:14px;}
+  .q-text{font-size:13px;}
+  #quiz-stat{width:100%;margin-left:0;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-logo">📊</span>
+  <h1>컴퓨터활용능력 1·2급</h1>
+  <span class="badge">필기 이론 + 500문제 + 실기</span>
+  <input id="search" type="text" placeholder="🔍 개념 검색 (예: 스풀, VLOOKUP, 정규화)">
+  <span id="hit-cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="guide">📋 시험 안내</button>
+  <button class="tab" data-tab="g2s1">2급 1과목·컴퓨터일반</button>
+  <button class="tab" data-tab="g2s2">2급 2과목·스프레드시트</button>
+  <button class="tab g1" data-tab="g1s1">1급 1과목·컴퓨터일반</button>
+  <button class="tab g1" data-tab="g1s2">1급 2과목·스프레드시트</button>
+  <button class="tab g1" data-tab="g1s3">1급 3과목·데이터베이스</button>
+  <button class="tab pr" data-tab="pr2">🖥️ 2급 실기</button>
+  <button class="tab pr" data-tab="pr1">🖥️ 1급 실기</button>
+  <button class="tab qz" data-tab="quiz">✍️ 퀴즈 500문제</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════════ 시험 안내 ══════════════════ -->
+<div class="sec on" id="sec-guide">
+  <div class="sec-hd">
+    <div class="sec-title">📋 컴퓨터활용능력 시험 개요</div>
+    <div class="sec-sub">시행처: 대한상공회의소 · 실기 프로그램: MS Office LTSC Professional Plus 2021 · 필기 합격 유효기간 2년</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🎯 한눈에 보는 구조</div>
+    <div class="hi-body">
+      <strong>2급</strong> = 필기 2과목(컴퓨터 일반 + 스프레드시트 일반) → 실기 1과목(엑셀).<br>
+      <strong>1급</strong> = 필기 3과목(컴퓨터 일반 + 스프레드시트 일반 + <em>데이터베이스 일반</em>) → 실기 2과목(엑셀 + <em>액세스</em>).<br>
+      1급은 2급 내용을 <em>전부 포함</em>하고 그 위에 심화 내용이 얹히는 구조라, 1급 준비 = 2급 내용 + α 입니다.
+    </div>
+  </div>
+
+  <h3 class="blk">🗓️ 필기 시험 구성</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구분</th><th>과목</th><th>문항</th><th>시간</th><th>합격 기준</th></tr>
+      <tr><td rowspan="2"><strong>2급</strong></td><td>1과목 컴퓨터 일반</td><td>20문항</td><td rowspan="2">40분</td>
+          <td rowspan="2">매 과목 <strong>40점 이상</strong>,<br>전 과목 평균 <strong>60점 이상</strong></td></tr>
+      <tr><td>2과목 스프레드시트 일반</td><td>20문항</td></tr>
+      <tr><td rowspan="3"><strong>1급</strong></td><td>1과목 컴퓨터 일반</td><td>20문항</td><td rowspan="3">60분</td>
+          <td rowspan="3">매 과목 <strong>40점 이상</strong>,<br>전 과목 평균 <strong>60점 이상</strong></td></tr>
+      <tr><td>2과목 스프레드시트 일반</td><td>20문항</td></tr>
+      <tr><td>3과목 데이터베이스 일반</td><td>20문항</td></tr>
+    </table>
+    <div class="tbl-cap">※ 객관식 4지선다, 문항당 5점. 한 과목이라도 40점 미만이면 <strong>과락 불합격</strong>.</div>
+  </div>
+
+  <h3 class="blk">💻 실기 시험 구성</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구분</th><th>과목</th><th>시간</th><th>합격 기준</th></tr>
+      <tr><td><strong>2급</strong></td><td>스프레드시트 실무 (엑셀)</td><td>40분</td><td>100점 만점 <strong>70점 이상</strong></td></tr>
+      <tr><td rowspan="2"><strong>1급</strong></td><td>스프레드시트 실무 (엑셀)</td><td>45분</td>
+          <td rowspan="2"><strong>매 과목 70점 이상</strong><br>(한 과목만 70점 넘어도 불합격)</td></tr>
+      <tr><td>데이터베이스 실무 (액세스)</td><td>45분</td></tr>
+    </table>
+    <div class="tbl-cap">※ 1급 실기는 엑셀·액세스를 연달아 90분간 치릅니다. 둘 다 70점을 넘겨야 합격입니다.</div>
+  </div>
+
+  <h3 class="blk">📌 응시 전 알아둘 것</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🎓</span><span class="card-title">응시 자격</span></div>
+      <div class="card-desc"><strong>제한 없음.</strong> 학력·연령·경력 무관. 2급을 건너뛰고 바로 1급에 응시해도 됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⏳</span><span class="card-title">필기 유효기간</span></div>
+      <div class="card-desc">필기 합격 발표일로부터 <strong>만 2년</strong>. 이 기간 안에 실기에 합격해야 하며, 그 안에는 실기를 <em>몇 번이든</em> 재응시할 수 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖥️</span><span class="card-title">시험 프로그램</span></div>
+      <div class="card-desc">MS Office <strong>LTSC Professional Plus 2021</strong> 기준. 실기 답안은 지정된 폴더(보통 <code>C:\OA</code>)에 저장하며, <em>자동 저장</em>이 아니므로 수시로 저장해야 합니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧮</span><span class="card-title">부분 점수</span></div>
+      <div class="card-desc">실기는 <strong>문항 단위 채점</strong>입니다. 한 문항 안에서 부분 점수는 원칙적으로 없으므로, 조건을 하나라도 빠뜨리면 그 배점 전체가 날아갑니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🚫</span><span class="card-title">실기 감점·실격</span></div>
+      <div class="card-desc">파일명 변경, 다른 폴더 저장, 시트 이름 변경, 셀 위치 임의 이동 등은 <strong>0점 처리</strong> 사유입니다. 문제에서 지정한 위치·이름을 그대로 지키세요.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📈</span><span class="card-title">난이도 체감</span></div>
+      <div class="card-desc">필기는 <em>암기 비중</em>이 높아 기출 반복이 가장 효율적이고, 실기는 <em>손에 익히는 것</em>이 전부입니다. 특히 1급 실기의 배열 수식·프로시저·액세스 쿼리가 당락을 가릅니다.</div></div>
+  </div>
+
+  <h3 class="blk">🧭 과목별 학습 전략</h3>
+  <div class="grid-wide">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">1️⃣</span><span class="card-title">컴퓨터 일반</span><span class="card-sub">1·2급 공통</span></div>
+      <div class="card-desc">
+        하드웨어·소프트웨어·Windows·인터넷·멀티미디어·보안이 고르게 출제됩니다. 개념 정의를 <strong>서로 헷갈리게 섞어놓은</strong> 문제가 많으므로(예: 스풀 vs 버퍼링, 디더링 vs 렌더링), 비슷한 용어를 <em>짝지어 외우는 것</em>이 핵심입니다. 1급은 여기에 프로그래밍 언어·OSI 계층·주소 지정 방식 같은 심화가 추가됩니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">2️⃣</span><span class="card-title">스프레드시트 일반</span><span class="card-sub">1·2급 공통</span></div>
+      <div class="card-desc">
+        엑셀을 직접 써 본 사람에게 가장 쉬운 과목입니다. 함수 결과 예측, 셀 서식 코드 해석, 차트·피벗·필터 옵션의 <strong>세부 동작</strong>을 묻습니다. 실기와 내용이 겹치므로 <em>필기 공부가 곧 실기 공부</em>가 됩니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">3️⃣</span><span class="card-title">데이터베이스 일반</span><span class="card-sub">1급 전용</span></div>
+      <div class="card-desc">
+        DB 이론(스키마·정규화·키·무결성)과 액세스 실무(테이블 속성·쿼리·폼·보고서)가 반반입니다. 액세스를 한 번도 안 써봤다면 <strong>이 과목이 최대 난관</strong>이므로, 개념 암기와 함께 액세스를 직접 열어 보는 것이 좋습니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout grn"><span>✅</span><div class="callout-body">
+    <strong>추천 순서:</strong> ① 이 페이지의 과목별 이론 훑기 → ② 과목당 퀴즈 100문제 풀며 약점 찾기 → ③ 틀린 개념만 이론으로 되돌아가기 → ④ 실기 탭의 문제 유형·예시문제로 손 익히기.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 2급 1과목 ══════════════════ -->
+<div class="sec" id="sec-g2s1">
+  <div class="sec-hd">
+    <div class="sec-title">1️⃣ 2급 1과목 — 컴퓨터 일반 <span class="tag a">20문항 / 100점</span></div>
+    <div class="sec-sub">한글 Windows 운영체제 · 컴퓨터 시스템 관리 · 인터넷 자료 활용 · 멀티미디어 활용 · 컴퓨터 시스템 보호</div>
+  </div>
+
+  <!-- ── A. 운영체제 ── -->
+  <h3 class="blk">🪟 A. 한글 Windows 운영체제</h3>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🎯</span><span class="card-title">운영체제의 목적 4가지</span></div>
+      <ul class="tips">
+        <li><strong>처리 능력(Throughput) 향상</strong> — 일정 시간에 처리하는 작업량 ↑</li>
+        <li><strong>응답 시간(Turnaround Time) 단축</strong> — 요청부터 결과까지 시간 ↓</li>
+        <li><strong>신뢰도(Reliability) 향상</strong> — 오류 없이 정확하게 처리</li>
+        <li><strong>사용 가능도(Availability) 향상</strong> — 필요할 때 즉시 사용 가능</li>
+      </ul>
+      <div class="card-desc" style="margin-top:6px">👉 <em>향상 3개 + 단축 1개</em>. "응답 시간 향상"이라 쓰면 틀린 지문입니다.</div></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">Windows의 주요 특징</span></div>
+      <ul class="tips">
+        <li><strong>선점형 멀티태스킹</strong> — OS가 CPU를 강제 회수. 특정 앱이 멈춰도 전체는 유지</li>
+        <li><strong>GUI</strong> — 그래픽 아이콘·마우스 기반 사용자 인터페이스</li>
+        <li><strong>PnP(Plug and Play)</strong> — 하드웨어 자동 인식·설치. <em>하드웨어와 OS 모두 지원해야</em> 동작</li>
+        <li><strong>OLE</strong> — 개체 연결 및 삽입. 원본을 고치면 삽입된 개체도 갱신(연결의 경우)</li>
+        <li><strong>64비트 지원 / 라이브러리 / 에어로 / 사용자 계정 컨트롤(UAC)</strong></li>
+        <li><strong>NTFS 파일 시스템</strong> — 보안·압축·암호화·대용량 지원</li>
+      </ul></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">🗂️</span><span class="card-title">파일·폴더 이름 규칙</span></div>
+      <ul class="tips">
+        <li>최대 <strong>255자</strong>(경로 포함), 공백 사용 가능</li>
+        <li>사용 불가 문자 9개: <code>\ / : * ? " &lt; &gt; |</code></li>
+        <li>대소문자를 구분하지 <strong>않음</strong>(표시는 유지)</li>
+        <li>같은 폴더 안에 <strong>동일 이름</strong> 파일·폴더 불가</li>
+        <li><code>CON, PRN, AUX, NUL</code> 등 예약어는 사용 불가</li>
+      </ul></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">🗑️</span><span class="card-title">휴지통 완전 정리</span></div>
+      <ul class="tips">
+        <li>드라이브마다 <strong>크기를 따로</strong> 지정 가능(기본 각 드라이브 용량의 일정 %)</li>
+        <li>휴지통 파일은 <strong>복원만</strong> 가능 — 실행·편집·이름 변경 불가</li>
+        <li><strong>휴지통에 가지 않고 즉시 삭제</strong>: <code>Shift+Delete</code> / USB·네트워크 드라이브 파일 / 휴지통 크기보다 큰 파일 / "휴지통 사용 안 함" 설정 시 / DOS 창에서 삭제</li>
+        <li>휴지통이 가득 차면 <strong>가장 오래된 항목부터</strong> 자동 삭제</li>
+      </ul></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">📎</span><span class="card-title">바로 가기(단축) 아이콘</span></div>
+      <ul class="tips">
+        <li>확장자는 <code>.LNK</code>, 아이콘 좌하단에 <strong>화살표</strong> 표시</li>
+        <li>원본 파일의 <strong>경로 정보만</strong> 담아 크기가 매우 작음</li>
+        <li>바로 가기를 지워도 <strong>원본은 그대로</strong>. 반대로 원본을 지우면 바로 가기는 작동 불가</li>
+        <li>하나의 원본에 <strong>여러 개</strong> 만들 수 있고, 폴더·드라이브·프린터에도 만들 수 있음</li>
+        <li>만들기: <code>Ctrl+Shift+드래그</code> 또는 마우스 오른쪽 드래그</li>
+      </ul></div>
+
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">드래그 시 복사 vs 이동</span></div>
+      <div class="card-desc">
+        <strong>같은 드라이브</strong> 드래그 → <em>이동</em> (복사하려면 <code>Ctrl</code>)<br>
+        <strong>다른 드라이브</strong> 드래그 → <em>복사</em> (이동하려면 <code>Shift</code>)<br>
+        <strong>프로그램(exe)</strong> 드래그 → 다른 드라이브면 <em>바로 가기 생성</em><br>
+        어느 경우든 <code>Ctrl+Shift</code> 드래그는 <em>바로 가기 생성</em>.
+      </div></div>
+  </div>
+
+  <h4 class="sub">⌨️ 자주 출제되는 Windows 바로 가기 키</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>키</th><th>기능</th><th>키</th><th>기능</th></tr>
+      <tr><td><code>F2</code></td><td>이름 바꾸기</td><td><code>F3</code></td><td>검색</td></tr>
+      <tr><td><code>F5</code></td><td>새로 고침</td><td><code>Alt+Enter</code></td><td>속성 대화상자</td></tr>
+      <tr><td><code>Alt+F4</code></td><td>프로그램 종료 / 시스템 종료</td><td><code>Alt+Tab</code></td><td>실행 중 창 전환</td></tr>
+      <tr><td><code>Ctrl+Esc</code></td><td>시작 메뉴 열기</td><td><code>Ctrl+Shift+Esc</code></td><td>작업 관리자</td></tr>
+      <tr><td><code>Shift+Delete</code></td><td>휴지통을 거치지 않고 삭제</td><td><code>Shift+CD삽입</code></td><td>자동 실행 방지</td></tr>
+      <tr><td><code>⊞+E</code></td><td>파일 탐색기</td><td><code>⊞+R</code></td><td>실행 대화상자</td></tr>
+      <tr><td><code>⊞+D</code></td><td>바탕 화면 표시/복원</td><td><code>⊞+L</code></td><td>컴퓨터 잠금</td></tr>
+      <tr><td><code>⊞+Pause</code></td><td>시스템 정보(속성)</td><td><code>PrintScreen</code></td><td>화면 전체 캡처 → 클립보드</td></tr>
+      <tr><td><code>Alt+PrintScreen</code></td><td>활성 창만 캡처</td><td><code>Ctrl+A</code></td><td>모두 선택</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub">🧰 Windows 설정 / 제어판 핵심</h4>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">디스플레이</span></div><div class="card-desc">해상도·배율·방향·다중 모니터. 해상도가 높을수록 <strong>화면 요소는 작아지고</strong> 선명해집니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">접근성</span></div><div class="card-desc">돋보기, 내레이터, 고대비, 화상 키보드, 고정키·필터키·토글키. <em>장애가 있는 사용자 지원</em>이 목적.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">프로그램 및 기능</span></div><div class="card-desc">설치된 앱 제거·변경, <strong>Windows 기능 켜기/끄기</strong>. 새 프로그램 <em>설치</em> 기능은 없음.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">사용자 계정</span></div><div class="card-desc">관리자/표준 계정. 표준 계정은 시스템 설정 변경·프로그램 설치가 제한됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">기본 프로그램</span></div><div class="card-desc">파일 형식(확장자)별 연결 앱 지정. 같은 확장자에 <strong>둘 이상</strong>을 동시에 연결할 수는 없음.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">장치 관리자</span></div><div class="card-desc">하드웨어 목록·드라이버 업데이트·사용 안 함. <strong>느낌표(!)</strong>는 문제 발생, <strong>X</strong>는 사용 안 함 상태.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">마우스</span></div><div class="card-desc">오른손/왼손 단추 바꾸기, 두 번 클릭 속도, 포인터 자국, 휠 스크롤 줄 수.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">키보드</span></div><div class="card-desc">재입력 시간(문자 반복 지연), 반복 속도, 커서 깜박임 속도.</div></div>
+  </div>
+
+  <h4 class="sub">🛠️ 시스템 유지 관리 도구</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>도구</th><th>역할</th><th>시험 포인트</th></tr>
+      <tr><td><strong>디스크 정리</strong></td><td>임시 파일·휴지통·다운로드한 프로그램 파일 등 <em>불필요한 파일 삭제</em></td><td>디스크 <strong>여유 공간을 늘림</strong>. 속도 향상이 주목적은 아님</td></tr>
+      <tr><td><strong>드라이브 조각 모음 및 최적화</strong></td><td>분산 저장된 파일을 <em>연속되게 재배치</em>해 <strong>접근 속도 향상</strong></td><td>공간이 늘어나지는 <strong>않음</strong>. <em>SSD·CD/DVD·네트워크 드라이브는 대상 아님</em></td></tr>
+      <tr><td><strong>드라이브 오류 검사</strong></td><td>파일 시스템 오류·불량 섹터 검사 및 복구</td><td>사용 중인 파일이 있으면 <em>재시작 후</em> 검사</td></tr>
+      <tr><td><strong>백업 및 복원</strong></td><td>파일·시스템 이미지 백업</td><td>복원 지점으로 되돌려도 <strong>개인 문서는 삭제되지 않음</strong></td></tr>
+      <tr><td><strong>작업 관리자</strong></td><td>실행 중인 앱·프로세스 종료, CPU/메모리 사용률, 시작 프로그램 관리</td><td>프로그램 <strong>설치·제거는 불가</strong></td></tr>
+      <tr><td><strong>레지스트리 편집기(regedit)</strong></td><td>하드웨어·소프트웨어·사용자 설정 <em>계층형 DB</em></td><td>잘못 고치면 시스템 부팅 불가 → 반드시 <strong>백업(내보내기)</strong> 후 수정</td></tr>
+    </table>
+  </div>
+
+  <!-- ── B. 하드웨어 ── -->
+  <h3 class="blk">🔌 B. 컴퓨터 시스템 — 하드웨어</h3>
+
+  <h4 class="sub">📏 자료의 표현 단위</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>단위</th><th>설명</th></tr>
+      <tr><td><strong>비트(Bit)</strong></td><td>0 또는 1, <em>정보 표현의 최소 단위</em></td></tr>
+      <tr><td><strong>니블(Nibble)</strong></td><td>4비트 = 16가지 표현</td></tr>
+      <tr><td><strong>바이트(Byte)</strong></td><td>8비트 = <em>문자 표현의 최소 단위</em>, 256가지</td></tr>
+      <tr><td><strong>워드(Word)</strong></td><td>CPU가 한 번에 처리하는 단위. Half(2B)/Full(4B)/Double(8B)</td></tr>
+      <tr><td><strong>필드(Field)</strong></td><td>파일 구성의 최소 단위(=항목)</td></tr>
+      <tr><td><strong>레코드(Record)</strong></td><td>여러 필드의 모임, <em>자료 처리의 기본 단위</em></td></tr>
+      <tr><td><strong>파일(File)</strong> → <strong>데이터베이스(DB)</strong></td><td>레코드의 모임 → 파일의 모임</td></tr>
+    </table>
+    <div class="tbl-cap">순서 암기: 비트 &lt; 니블 &lt; 바이트 &lt; 워드 &lt; 필드 &lt; 레코드 &lt; 파일 &lt; 데이터베이스</div>
+  </div>
+
+  <h4 class="sub">🔤 문자 표현 코드</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>코드</th><th>비트</th><th>표현 수</th><th>특징</th></tr>
+      <tr><td><strong>BCD</strong></td><td>6비트</td><td>64자</td><td>존2 + 디지트4. <em>소문자 표현 불가</em></td></tr>
+      <tr><td><strong>ASCII</strong></td><td>7비트</td><td>128자</td><td>존3 + 디지트4. <em>데이터 통신용·PC 표준</em></td></tr>
+      <tr><td><strong>EBCDIC</strong></td><td>8비트</td><td>256자</td><td>존4 + 디지트4. <em>대형 컴퓨터용</em></td></tr>
+      <tr><td><strong>유니코드</strong></td><td>16비트</td><td>65,536자</td><td>전 세계 모든 문자를 <em>2바이트로 통일</em>. 한글도 완성형·조합형 모두 표현</td></tr>
+      <tr><td><strong>해밍 코드</strong></td><td>—</td><td>—</td><td>오류 <em>검출 + 교정</em> 가능 (패리티는 검출만 가능)</td></tr>
+      <tr><td><strong>그레이 코드</strong></td><td>—</td><td>—</td><td>인접 값이 1비트만 바뀜. 아날로그-디지털 변환·입출력 장치에 사용</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub">🧠 중앙처리장치(CPU)</h4>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🎛️</span><span class="card-title">제어 장치(Control Unit)</span></div>
+      <ul class="tips">
+        <li><strong>PC(프로그램 카운터)</strong> — 다음에 실행할 <em>명령어의 주소</em>를 기억</li>
+        <li><strong>IR(명령 레지스터)</strong> — 현재 실행 중인 <em>명령어</em>를 기억</li>
+        <li><strong>명령 해독기(Decoder)</strong> — 명령어를 해독</li>
+        <li><strong>부호기(Encoder)</strong> — 해독된 명령을 제어 신호로 변환</li>
+        <li><strong>MAR(번지 레지스터)</strong> — 주소를 기억 / <strong>MBR(버퍼 레지스터)</strong> — 내용을 기억</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">➕</span><span class="card-title">연산 장치(ALU)</span></div>
+      <ul class="tips">
+        <li><strong>누산기(AC)</strong> — 연산의 <em>중간 결과</em>를 임시 저장 (가장 자주 출제)</li>
+        <li><strong>가산기(Adder)</strong> — 덧셈 수행 / <strong>보수기</strong> — 뺄셈을 위해 보수로 변환</li>
+        <li><strong>데이터 레지스터</strong> — 연산에 사용할 데이터 저장</li>
+        <li><strong>상태 레지스터(PSW)</strong> — 연산 결과의 부호·자리올림·오버플로 등 상태 기억</li>
+        <li><strong>인덱스 레지스터</strong> — 주소 변경(수정)에 사용</li>
+      </ul></div>
+  </div>
+
+  <h4 class="sub">💾 기억 장치 계층</h4>
+  <div class="callout teal"><span>📊</span><div class="callout-body">
+    속도 빠름·용량 작음·비쌈 → <strong>레지스터 &gt; 캐시 &gt; 주기억(RAM) &gt; 보조기억(SSD/HDD)</strong> ← 속도 느림·용량 큼·저렴
+  </div></div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구분</th><th>내용</th></tr>
+      <tr><td><strong>ROM</strong></td><td>비휘발성, 읽기 전용. <em>BIOS·펌웨어</em> 저장. 종류: 마스크 ROM → PROM(1회 기록) → EPROM(자외선 지움) → EEPROM(전기로 지움)</td></tr>
+      <tr><td><strong>RAM</strong></td><td>휘발성, 읽기·쓰기 가능. <strong>DRAM</strong>(콘덴서, 재충전 필요, 느림·저렴 → <em>주기억장치</em>) / <strong>SRAM</strong>(플립플롭, 재충전 불필요, 빠름·비쌈 → <em>캐시</em>)</td></tr>
+      <tr><td><strong>캐시 메모리</strong></td><td>CPU와 주기억장치 <em>속도 차이 완화</em>. <strong>SRAM</strong> 사용. <em>지역성(Locality)</em> 원리 이용. 적중률(Hit Ratio)이 높을수록 성능↑</td></tr>
+      <tr><td><strong>가상 메모리</strong></td><td><em>보조기억장치의 일부</em>를 주기억장치처럼 사용. 실제보다 큰 용량의 프로그램 실행 가능. 페이징/세그먼테이션 기법</td></tr>
+      <tr><td><strong>버퍼 메모리</strong></td><td>속도 차가 나는 <em>두 장치 사이</em>에서 데이터를 임시 저장</td></tr>
+      <tr><td><strong>연관(연상) 메모리</strong></td><td><em>주소가 아닌 내용</em>으로 접근. 캐시의 주소 변환 테이블(TLB)에 사용</td></tr>
+      <tr><td><strong>플래시 메모리</strong></td><td>EEPROM의 일종, <em>비휘발성</em>이면서 전기적으로 수정 가능. USB·SSD·스마트폰에 사용</td></tr>
+    </table>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">⚠️ 최다 출제 함정 — 스풀 vs 버퍼링 vs 채널 vs DMA</div>
+    <div class="hi-body">
+      <strong>스풀(SPOOL)</strong> — 인쇄할 내용을 <em>디스크</em>에 저장해두고 CPU는 다른 일을 함. <em>프린터 전용</em>, 인쇄 속도 자체는 <em>느려질 수</em> 있음.<br>
+      <strong>버퍼링(Buffering)</strong> — <em>메모리</em>를 이용해 속도 차이를 완충. 한 작업의 입출력과 연산을 중첩.<br>
+      <strong>채널(Channel)</strong> — CPU 대신 입출력을 <em>전담 관리</em>하는 장치. 완료되면 CPU에 인터럽트로 알림.<br>
+      <strong>DMA</strong> — CPU를 <em>거치지 않고</em> 메모리와 주변장치가 직접 데이터를 주고받음. CPU 부담 감소.
+    </div>
+  </div>
+
+  <h4 class="sub">🔗 포트·인터페이스</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>포트</th><th>특징</th></tr>
+      <tr><td><strong>USB</strong></td><td>직렬 포트, <em>핫 플러그인</em>·PnP 지원. 최대 <strong>127개</strong> 연결(허브 사용). USB 3.0은 파란색, 5Gbps</td></tr>
+      <tr><td><strong>HDMI</strong></td><td>고선명 멀티미디어 인터페이스. <em>영상 + 음성을 한 케이블</em>로, 압축 없이 전송</td></tr>
+      <tr><td><strong>DVI</strong></td><td>디지털 영상 전용(음성 X)</td></tr>
+      <tr><td><strong>IEEE 1394</strong></td><td>파이어와이어. 최대 63개 연결, 실시간 데이터 전송(캠코더)</td></tr>
+      <tr><td><strong>블루투스</strong></td><td>IEEE 802.15.1, 근거리 무선(10m 내외), 최대 8대</td></tr>
+      <tr><td><strong>직렬/병렬</strong></td><td>직렬=1비트씩(마우스·모뎀), 병렬=여러 비트 동시(구형 프린터)</td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🔧</span><span class="card-title">BIOS · POST · CMOS</span></div>
+      <div class="card-desc"><strong>BIOS</strong>는 ROM에 저장된 <em>기본 입출력 시스템</em>으로, 부팅 시 <strong>POST</strong>(자체 진단)를 수행합니다. <strong>CMOS 셋업</strong>에서는 날짜·시간, 부팅 순서, 하드디스크 종류, 암호, 칩셋 설정을 변경합니다. 최신 BIOS는 <em>플래시 메모리</em>에 저장되어 업그레이드가 가능합니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖨️</span><span class="card-title">프린터 단위</span></div>
+      <div class="card-desc"><strong>CPS</strong>(초당 문자, 도트) · <strong>LPM</strong>(분당 줄, 라인) · <strong>PPM</strong>(분당 페이지, 잉크젯·레이저) · <strong>DPI</strong>(인치당 점 = <em>해상도</em>)</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗄️</span><span class="card-title">RAID</span></div>
+      <div class="card-desc">여러 디스크를 묶어 <strong>안정성·속도</strong>를 높이는 기술. <em>RAID 0</em>=스트라이핑(속도↑, 안정성 없음), <em>RAID 1</em>=미러링(복제로 안정성↑), <em>RAID 5</em>=패리티 분산 저장.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚡</span><span class="card-title">인터럽트</span></div>
+      <div class="card-desc">프로그램 실행 중 <em>예기치 못한 상황</em>이 발생해 처리를 중단하고 그 상황을 먼저 처리하는 것. <strong>외부(전원·기계 착오)</strong>·<strong>내부(0으로 나누기·오버플로)</strong>·<strong>소프트웨어(SVC)</strong> 인터럽트로 구분.</div></div>
+  </div>
+
+  <!-- ── C. 소프트웨어 ── -->
+  <h3 class="blk">💿 C. 소프트웨어</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">사용권(저작권)에 따른 분류 — 거의 매회 출제</div>
+    <table>
+      <tr><th>구분</th><th>설명</th></tr>
+      <tr><td><strong>상용 소프트웨어</strong></td><td>정식 대가를 지불하고 사용, 모든 기능 제한 없음</td></tr>
+      <tr><td><strong>셰어웨어</strong></td><td>기능·기간을 <em>제한</em>해 무료 배포, 계속 쓰려면 구입</td></tr>
+      <tr><td><strong>프리웨어</strong></td><td>무료 사용·배포 가능. 단, <em>소스는 공개하지 않으며 상업적 이용은 제한</em>될 수 있음</td></tr>
+      <tr><td><strong>공개(오픈) 소프트웨어</strong></td><td><em>소스 코드까지 공개</em>되어 누구나 수정·재배포 가능 (리눅스 등)</td></tr>
+      <tr><td><strong>데모 버전</strong></td><td>홍보용, 주요 기능을 <em>맛보기</em>로만 제공</td></tr>
+      <tr><td><strong>알파 / 베타 버전</strong></td><td>알파=개발사 <em>내부</em> 테스트용 / 베타=정식 출시 전 <em>일반 사용자</em> 테스트용</td></tr>
+      <tr><td><strong>패치 버전</strong></td><td>오류 수정·기능 보완을 위해 <em>일부만</em> 제공하는 프로그램</td></tr>
+      <tr><td><strong>번들</strong></td><td>하드웨어·소프트웨어 구입 시 <em>끼워주는</em> 소프트웨어</td></tr>
+      <tr><td><strong>트라이얼</strong></td><td>정해진 <em>기간</em> 동안만 사용 가능한 체험판</td></tr>
+      <tr><td><strong>애드웨어</strong></td><td><em>광고를 보는 대가</em>로 무료 제공</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub">🔄 운영체제 운영 방식</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>방식</th><th>설명</th></tr>
+      <tr><td><strong>일괄 처리(Batch)</strong></td><td>일정 기간·수량을 모아 한꺼번에 처리 (급여 계산, 공과금)</td></tr>
+      <tr><td><strong>실시간 처리(Real Time)</strong></td><td>데이터 발생 즉시 처리 (좌석 예약, 은행 업무)</td></tr>
+      <tr><td><strong>다중 프로그래밍</strong></td><td>하나의 CPU로 <em>여러 프로그램</em>을 번갈아 처리</td></tr>
+      <tr><td><strong>시분할(Time Sharing)</strong></td><td>CPU 시간을 잘게 나눠 여러 사용자가 <em>동시에 쓰는 것처럼</em> 느끼게 함</td></tr>
+      <tr><td><strong>다중 처리(Multi-Processing)</strong></td><td><em>여러 개의 CPU</em>로 동시에 처리</td></tr>
+      <tr><td><strong>분산 처리</strong></td><td>네트워크로 연결된 여러 컴퓨터가 작업을 나눠 처리</td></tr>
+      <tr><td><strong>듀얼 시스템</strong></td><td>두 대가 <em>동시에 같은 작업</em>을 수행하며 결과를 비교 → 신뢰성↑</td></tr>
+      <tr><td><strong>듀플렉스 시스템</strong></td><td>한 대는 가동, 한 대는 <em>대기</em>하다 고장 시 투입 → 무중단</td></tr>
+    </table>
+  </div>
+
+  <!-- ── D. 인터넷 ── -->
+  <h3 class="blk">🌐 D. 인터넷 자료 활용</h3>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🔢</span><span class="card-title">IPv4 vs IPv6</span></div>
+      <ul class="tips">
+        <li><strong>IPv4</strong>: <em>32비트</em>, 8비트씩 4부분, <em>점(.)</em>으로 구분, 10진수 표기 (예 192.168.0.1)</li>
+        <li>A~E 클래스로 나뉘며 A는 대형망, C는 소규모망, D는 <em>멀티캐스트</em>용</li>
+        <li><strong>IPv6</strong>: <em>128비트</em>, 16비트씩 8부분, <em>콜론(:)</em>으로 구분, 16진수 표기</li>
+        <li>IPv6는 주소 고갈 해결 + <em>인증·암호화 기능 내장</em> + 실시간 QoS 지원</li>
+        <li>IPv6 주소 유형: <em>유니캐스트 / 멀티캐스트 / 애니캐스트</em> (브로드캐스트 <strong>없음</strong>)</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🏷️</span><span class="card-title">도메인 · DNS · URL</span></div>
+      <ul class="tips">
+        <li><strong>도메인</strong>: 숫자 IP를 사람이 읽기 쉽게 문자로 표현</li>
+        <li><strong>DNS</strong>: 도메인 ↔ IP를 <em>상호 변환</em>해주는 시스템/서버</li>
+        <li><strong>URL 구조</strong>: <code>프로토콜://호스트주소[:포트]/경로/파일명</code></li>
+        <li>기본 포트: HTTP <strong>80</strong>, HTTPS 443, FTP <strong>21</strong>, TELNET 23, SMTP 25, POP3 110, DNS 53</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🌍</span><span class="card-title">웹 브라우저 기능</span></div>
+      <ul class="tips">
+        <li><strong>즐겨찾기</strong>, <strong>방문 기록(히스토리)</strong>, 홈페이지 지정</li>
+        <li><strong>캐시(임시 인터넷 파일)</strong> — 방문한 페이지를 저장해 <em>재방문 속도 향상</em></li>
+        <li><strong>쿠키(Cookie)</strong> — 사이트가 사용자 <em>PC에 저장</em>하는 방문 정보(로그인·설정). 개인정보 유출 우려</li>
+        <li>플러그인·팝업 차단·자동 완성·소스 보기 지원</li>
+      </ul></div>
+  </div>
+
+  <h4 class="sub">📡 주요 프로토콜</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>프로토콜</th><th>역할</th></tr>
+      <tr><td><strong>TCP</strong></td><td>메시지를 패킷으로 분해·재조립, <em>연결형·신뢰성</em> 보장, 오류 검사</td></tr>
+      <tr><td><strong>IP</strong></td><td>패킷의 <em>주소 지정과 경로 설정(라우팅)</em>, 비연결형</td></tr>
+      <tr><td><strong>UDP</strong></td><td>비연결형, 신뢰성 낮지만 <em>빠름</em> (스트리밍·DNS)</td></tr>
+      <tr><td><strong>HTTP</strong></td><td>웹 문서(HTML) 송수신</td></tr>
+      <tr><td><strong>FTP</strong></td><td>파일 송수신. <em>Anonymous FTP</em>는 계정 없이 접속</td></tr>
+      <tr><td><strong>SMTP / POP3 / IMAP</strong></td><td>메일 <em>발송</em> / 메일 <em>수신·다운로드</em> / 서버에 두고 <em>동기화</em> 관리</td></tr>
+      <tr><td><strong>MIME</strong></td><td>메일에 첨부된 <em>이미지·동영상 등 멀티미디어</em>를 전송하기 위한 규약</td></tr>
+      <tr><td><strong>TELNET</strong></td><td>원격 컴퓨터에 접속해 자신의 컴퓨터처럼 사용</td></tr>
+      <tr><td><strong>DHCP</strong></td><td>IP 주소를 <em>자동으로 할당</em></td></tr>
+      <tr><td><strong>ARP / RARP</strong></td><td>IP→MAC 주소 변환 / MAC→IP 주소 변환</td></tr>
+      <tr><td><strong>ICMP</strong></td><td>오류 메시지·상태 전달 (ping이 사용)</td></tr>
+      <tr><td><strong>SNMP</strong></td><td>네트워크 장비 관리·감시</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub">🔀 네트워크 연결 장비</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>장비</th><th>기능</th><th>OSI 계층</th></tr>
+      <tr><td><strong>리피터</strong></td><td>약해진 신호를 <em>증폭·재생</em>해 전송 거리 연장</td><td>물리 계층</td></tr>
+      <tr><td><strong>허브</strong></td><td>여러 대의 컴퓨터를 <em>한 곳에 모아</em> 연결</td><td>물리 계층</td></tr>
+      <tr><td><strong>브리지</strong></td><td>같은 프로토콜의 두 <em>LAN을 연결</em>, 트래픽 분리</td><td>데이터 링크</td></tr>
+      <tr><td><strong>스위치</strong></td><td>브리지의 개선형, 포트별로 <em>독립 대역폭</em> 제공</td><td>데이터 링크</td></tr>
+      <tr><td><strong>라우터</strong></td><td>네트워크 간 <em>최적 경로 선택(라우팅)</em></td><td>네트워크</td></tr>
+      <tr><td><strong>게이트웨이</strong></td><td><em>서로 다른 프로토콜</em>의 네트워크를 연결하는 관문</td><td>전 계층</td></tr>
+      <tr><td><strong>NIC(랜카드)</strong></td><td>컴퓨터를 네트워크에 물리적으로 연결</td><td>물리/데이터 링크</td></tr>
+    </table>
+  </div>
+
+  <!-- ── E. 멀티미디어 ── -->
+  <h3 class="blk">🎬 E. 멀티미디어 활용</h3>
+  <div class="callout acc"><span>💡</span><div class="callout-body">
+    <strong>멀티미디어의 4대 특징:</strong> <em>디지털화</em>(모든 매체를 디지털로 변환) · <em>쌍방향성</em>(양방향 상호작용) · <em>비선형성</em>(사용자 선택에 따라 진행) · <em>통합성</em>(문자·소리·영상을 하나로)
+  </div></div>
+
+  <h4 class="sub">🎨 그래픽 기법 — 이름만 바꿔 내는 단골 문제</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>기법</th><th>설명</th></tr>
+      <tr><td><strong>디더링(Dithering)</strong></td><td>제한된 색으로 <em>새로운 색을 표현</em>하기 위해 점을 섞어 배치</td></tr>
+      <tr><td><strong>렌더링(Rendering)</strong></td><td>3차원 물체에 <em>색·명암·질감</em>을 입혀 사실감을 주는 작업</td></tr>
+      <tr><td><strong>모델링(Modeling)</strong></td><td>렌더링 <em>전 단계</em>로, 물체의 3차원 형태를 만드는 작업</td></tr>
+      <tr><td><strong>안티앨리어싱</strong></td><td>계단 현상(앨리어싱)을 <em>중간색을 넣어 부드럽게</em> 처리</td></tr>
+      <tr><td><strong>모핑(Morphing)</strong></td><td>두 이미지를 자연스럽게 <em>변환·합성</em> (사람 얼굴 → 동물)</td></tr>
+      <tr><td><strong>리터칭(Retouching)</strong></td><td>기존 이미지를 <em>수정·보정</em></td></tr>
+      <tr><td><strong>필터링(Filtering)</strong></td><td>이미 만든 그림에 <em>여러 효과·변화</em>를 적용</td></tr>
+      <tr><td><strong>메조틴트(Mezzotint)</strong></td><td>무수히 많은 <em>점·선으로 이미지를 조각</em>한 듯 표현</td></tr>
+      <tr><td><strong>인터레이싱(Interlacing)</strong></td><td>이미지가 <em>흐릿한 상태에서 점점 선명</em>해지며 나타남</td></tr>
+      <tr><td><strong>솔러리제이션</strong></td><td>필름의 <em>노출 과다</em> 상태처럼 반전된 이미지 효과</td></tr>
+    </table>
+  </div>
+
+  <div class="grid-wide">
+    <div class="card"><div class="card-head"><span class="card-icon">🖼️</span><span class="card-title">비트맵 vs 벡터</span></div>
+      <div class="card-desc">
+        <strong>비트맵(래스터)</strong> — 픽셀 집합. 사진처럼 <em>정교한 색 표현</em>에 유리하지만 확대하면 <em>계단 현상</em>이 생기고 <em>용량이 큼</em>. 형식: BMP·JPG·GIF·PNG·TIF·PCX. 프로그램: 포토샵·페인트샵.<br>
+        <strong>벡터</strong> — 점과 선의 <em>수학적 함수</em>로 표현. 확대·축소해도 <em>손상 없음</em>, 용량이 작음. 형식: WMF·AI·DXF·CDR. 프로그램: 일러스트레이터·코렐드로.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗜️</span><span class="card-title">파일 형식 핵심</span></div>
+      <ul class="tips">
+        <li><strong>BMP</strong> — Windows 표준, <em>압축하지 않아 용량이 큼</em></li>
+        <li><strong>GIF</strong> — <em>256색</em>, 무손실 압축, <em>투명·애니메이션</em> 지원</li>
+        <li><strong>JPEG(JPG)</strong> — <em>손실</em> 압축, 24비트 트루컬러, 압축률 조절 가능</li>
+        <li><strong>PNG</strong> — GIF 대체, <em>무손실</em>·투명 지원, 24비트 색상. <em>애니메이션은 불가</em></li>
+        <li><strong>WAVE</strong> — 실제 소리 파형을 <em>디지털로 샘플링</em>, 용량 큼 / <strong>MIDI</strong> — 연주 정보만 저장, 용량 작음, <em>사람 목소리 표현 불가</em></li>
+        <li><strong>MP3</strong> — MPEG-1 Layer 3 오디오 압축, 약 <em>1/10 압축</em></li>
+        <li><strong>MPEG</strong> — 동영상 표준. MPEG-1(CD), MPEG-2(DVD·디지털TV), MPEG-4(모바일·저속), MPEG-7(내용 검색), MPEG-21(전자상거래 관리)</li>
+        <li><strong>AVI</strong>(Windows 표준 동영상) · <strong>MOV</strong>(애플) · <strong>ASF/WMV</strong>(스트리밍) · <strong>DivX</strong>(MPEG-4 기반 고압축)</li>
+      </ul></div>
+  </div>
+
+  <div class="callout blu"><span>📶</span><div class="callout-body">
+    <strong>스트리밍(Streaming)</strong> — 파일을 <em>다운로드하면서 동시에 재생</em>하는 기술. 실시간 방송에 사용되며 ASF·WMV·RAM 형식이 대표적입니다. <strong>코덱(CODEC)</strong>은 아날로그↔디지털 변환 및 <em>압축(COmpress)/복원(DECompress)</em>을 담당합니다.
+  </div></div>
+
+  <!-- ── F. 보안 ── -->
+  <h3 class="blk">🔒 F. 컴퓨터 시스템 보호</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">보안 위협의 4가지 유형 — 침해되는 요소를 함께 외우세요</div>
+    <table>
+      <tr><th>유형</th><th>내용</th><th>침해 요소</th></tr>
+      <tr><td><strong>가로막기(Interruption)</strong></td><td>자료가 <em>목적지에 도달하지 못하게</em> 차단</td><td>가용성(Availability)</td></tr>
+      <tr><td><strong>가로채기(Interception)</strong></td><td>전송 중인 자료를 <em>몰래 열람</em></td><td>기밀성(Confidentiality)</td></tr>
+      <tr><td><strong>수정(Modification)</strong></td><td>원래 자료를 <em>다른 내용으로 변경</em></td><td>무결성(Integrity)</td></tr>
+      <tr><td><strong>위조(Fabrication)</strong></td><td>자료를 <em>없는 것을 만들어</em> 보냄</td><td>인증(Authenticity)</td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🦠</span><span class="card-title">악성 코드</span></div>
+      <ul class="tips">
+        <li><strong>바이러스</strong> — 다른 프로그램에 <em>기생</em>해 복제·감염</li>
+        <li><strong>웜(Worm)</strong> — <em>독립 실행</em>되며 네트워크로 스스로 전파, 시스템 부하 유발</li>
+        <li><strong>트로이 목마</strong> — 정상 프로그램으로 <em>위장</em>, <em>자기 복제는 하지 않음</em></li>
+        <li><strong>랜섬웨어</strong> — 파일을 암호화하고 <em>금전을 요구</em></li>
+        <li><strong>스파이웨어</strong> — 사용자 몰래 정보를 수집·전송</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎣</span><span class="card-title">해킹·공격 기법</span></div>
+      <ul class="tips">
+        <li><strong>스니핑</strong> — 네트워크 패킷을 <em>엿듣기</em>(수동적)</li>
+        <li><strong>스푸핑</strong> — IP·MAC 등을 <em>속여</em> 신뢰를 얻는 공격</li>
+        <li><strong>피싱</strong> — <em>가짜 메일·사이트</em>로 개인정보를 낚아챔</li>
+        <li><strong>파밍</strong> — DNS를 조작해 <em>정상 주소를 입력해도</em> 가짜 사이트로 이동</li>
+        <li><strong>키로거</strong> — 키보드 입력을 가로채 계정·카드 정보 탈취</li>
+        <li><strong>백도어</strong> — 인증을 우회하는 <em>비밀 통로</em></li>
+        <li><strong>DoS / DDoS</strong> — 과도한 트래픽으로 <em>서비스를 마비</em>. DDoS는 좀비 PC를 이용한 분산 공격</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔐</span><span class="card-title">암호화 방식</span></div>
+      <div class="card-desc">
+        <strong>비밀키(대칭키)</strong> — 암호화·복호화에 <em>같은 키</em> 사용. 속도가 <em>빠르지만</em> 사용자가 늘면 관리할 키가 많아짐. 대표: <em>DES</em>.<br>
+        <strong>공개키(비대칭키)</strong> — <em>공개키로 암호화, 개인키로 복호화</em>. 키 관리가 쉽고 <em>전자 서명</em>이 가능하나 속도가 느림. 대표: <em>RSA</em>.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧱</span><span class="card-title">방화벽 · 프록시</span></div>
+      <div class="card-desc"><strong>방화벽</strong>은 <em>외부의 불법 침입으로부터 내부를 보호</em>합니다. 다만 <em>내부에서 일어나는 해킹은 막지 못하고</em>, 바이러스 자체를 치료하지도 않습니다. <strong>프록시 서버</strong>는 방화벽·캐시 기능을 수행해 접근 속도를 높이고 유해 사이트를 차단합니다.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 2급 2과목 ══════════════════ -->
+<div class="sec" id="sec-g2s2">
+  <div class="sec-hd">
+    <div class="sec-title">2️⃣ 2급 2과목 — 스프레드시트 일반 <span class="tag a">20문항 / 100점</span></div>
+    <div class="sec-sub">입력 및 편집 · 수식 활용 · 데이터 관리 · 데이터 분석 · 차트 · 출력 · 매크로</div>
+  </div>
+
+  <h3 class="blk">⌨️ A. 데이터 입력과 편집</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">📝</span><span class="card-title">데이터 종류별 기본 정렬</span></div>
+      <ul class="tips">
+        <li><strong>문자</strong> — 셀 <em>왼쪽</em> 정렬. 숫자를 문자로 넣으려면 앞에 <code>'</code>(작은따옴표)</li>
+        <li><strong>숫자</strong> — 셀 <em>오른쪽</em> 정렬. 음수는 <code>-</code> 또는 <code>()</code>로 입력</li>
+        <li><strong>날짜</strong> — <code>-</code> 또는 <code>/</code>로 구분. 오늘 날짜 <code>Ctrl+;</code></li>
+        <li><strong>시간</strong> — <code>:</code>로 구분, 12시간제는 뒤에 <em>공백+AM/PM</em>. 현재 시각 <code>Ctrl+Shift+;</code></li>
+        <li><strong>분수</strong> — <code>0 1/2</code>처럼 <em>0과 공백</em>을 먼저 입력해야 날짜로 인식되지 않음</li>
+        <li>셀 안 줄 바꿈 <code>Alt+Enter</code> · 여러 셀에 동일 입력 <code>Ctrl+Enter</code></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔽</span><span class="card-title">채우기 핸들 규칙</span></div>
+      <ul class="tips">
+        <li><strong>숫자 1개</strong> 드래그 → <em>복사</em>. <code>Ctrl</code>과 함께 드래그 → <em>1씩 증가</em></li>
+        <li><strong>숫자 2개</strong> 선택 후 드래그 → 두 값의 <em>차이만큼 증가</em></li>
+        <li><strong>문자+숫자</strong>(A-1) → <em>숫자 부분만 1씩 증가</em>. <code>Ctrl</code>이면 복사</li>
+        <li><strong>날짜</strong> → 1일씩 증가. 오른쪽 단추 드래그로 <em>일·평일·월·연 단위</em> 선택</li>
+        <li><strong>사용자 지정 목록</strong>에 등록된 값(월요일, 1월…)은 목록 순서대로 채워짐</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">💬</span><span class="card-title">메모(노트)</span></div>
+      <div class="card-desc">단축키 <code>Shift+F2</code>. 셀 우측 상단에 <em>빨간 삼각형</em> 표시. 항상 표시/숨기기를 지정할 수 있고, <em>인쇄 시 시트 끝 또는 화면에 표시된 대로</em> 인쇄를 선택할 수 있습니다. 셀을 삭제하면 메모도 함께 삭제됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🏷️</span><span class="card-title">이름 정의 규칙</span></div>
+      <ul class="tips">
+        <li>첫 글자는 <em>문자·밑줄(_)·역슬래시(\)</em>만 가능 — <strong>숫자로 시작 불가</strong></li>
+        <li>공백 사용 불가(대신 <code>_</code> 또는 <code>.</code>)</li>
+        <li>셀 주소 형태(A1, R1C1)는 이름으로 사용 불가</li>
+        <li>대소문자를 구분하지 않으며, 같은 통합 문서에서 <em>중복 불가</em></li>
+        <li>최대 <strong>255자</strong></li>
+      </ul></div>
+  </div>
+
+  <h4 class="sub">🎨 사용자 지정 표시 형식 코드</h4>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>코드</th><th>의미</th><th>예 (값 → 결과)</th></tr>
+      <tr><td><code>#</code></td><td>유효한 자릿수만 표시, <em>0은 표시 안 함</em></td><td>0.5 → <code>#.#</code> → <strong>.5</strong></td></tr>
+      <tr><td><code>0</code></td><td>유효하지 않은 자리를 <em>0으로 채움</em></td><td>0.5 → <code>0.0</code> → <strong>0.5</strong></td></tr>
+      <tr><td><code>?</code></td><td>유효하지 않은 자리에 <em>공백</em>을 넣어 소수점 정렬</td><td>1.5 → <code>??.??</code> → <strong> 1.5 </strong></td></tr>
+      <tr><td><code>,</code></td><td>천 단위 구분. 코드 <em>끝</em>에 쓰면 천 단위 <em>생략</em></td><td>1500000 → <code>#,##0,</code> → <strong>1,500</strong></td></tr>
+      <tr><td><code>@</code></td><td>문자 데이터의 <em>위치</em>를 지정</td><td>한국 → <code>@"님"</code> → <strong>한국님</strong></td></tr>
+      <tr><td><code>;</code></td><td>구역 구분: <em>양수;음수;0;텍스트</em> (최대 4구역)</td><td><code>#,##0;[빨강]-#,##0;"-";@</code></td></tr>
+      <tr><td><code>[색]</code></td><td>글꼴 색 지정 — 검정·파랑·녹청·녹색·자홍·빨강·흰색·노랑</td><td><code>[빨강]0</code></td></tr>
+      <tr><td><code>[조건]</code></td><td>조건부 서식 — 조건은 <em>최대 2개</em>까지, 대괄호 안에 작성</td><td><code>[&gt;=90]"A";[&gt;=80]"B";"C"</code></td></tr>
+      <tr><td><code>yyyy/mm/dd</code></td><td>연/월/일 · <code>ddd</code>=Mon, <code>dddd</code>=Monday, <code>aaa</code>=월, <code>aaaa</code>=월요일</td><td>—</td></tr>
+      <tr><td><code>hh:mm:ss</code></td><td>시:분:초. <code>[h]</code>는 24를 넘는 <em>누적 시간</em> 표시</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <h4 class="sub">🖌️ 조건부 서식</h4>
+  <div class="grid">
+    <div class="card"><div class="card-desc">
+      조건을 만족하는 셀에만 <strong>글꼴·테두리·채우기</strong>를 적용합니다(글꼴 <em>크기·종류는 변경 불가</em>). 규칙이 여러 개면 <strong>위에 있는 규칙이 우선</strong>하며, 서로 충돌하지 않는 서식은 함께 적용됩니다. 조건을 만족하지 않게 되면 서식은 자동으로 해제되고, <em>서식만 지우려면</em> [규칙 지우기]를 사용합니다.
+    </div></div>
+    <div class="card"><div class="card-desc">
+      <strong>수식을 사용한 규칙</strong>이 실기의 단골입니다. 행 전체에 서식을 주려면 <em>열만 절대 참조</em>로 고정합니다. 예: A2:E20을 선택하고 <code>=$D2&gt;=90</code> → D열 값이 90 이상인 <em>행 전체</em>에 서식 적용. 결과는 반드시 <em>TRUE/FALSE</em>가 나와야 합니다.
+    </div></div>
+  </div>
+
+  <h3 class="blk">🧮 B. 수식과 셀 참조</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">📍</span><span class="card-title">참조 방식</span></div>
+      <ul class="tips">
+        <li><strong>상대 참조</strong> <code>A1</code> — 복사하면 행·열이 함께 바뀜</li>
+        <li><strong>절대 참조</strong> <code>$A$1</code> — 복사해도 고정</li>
+        <li><strong>혼합 참조</strong> <code>$A1</code>(열 고정) / <code>A$1</code>(행 고정)</li>
+        <li><code>F4</code>를 누를 때마다 A1 → $A$1 → A$1 → $A1 순으로 순환</li>
+        <li><strong>다른 시트</strong>: <code>Sheet2!A1</code>, 시트명에 공백이 있으면 <code>'매출 자료'!A1</code></li>
+        <li><strong>3차원 참조</strong>: <code>=SUM(Sheet1:Sheet3!A1)</code> — 여러 시트의 같은 셀 합계</li>
+        <li><strong>다른 통합 문서</strong>: <code>[Book1.xlsx]Sheet1!$A$1</code></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚠️</span><span class="card-title">오류 값의 의미</span></div>
+      <ul class="tips">
+        <li><code>#####</code> — 열 너비가 좁거나 <em>날짜/시간이 음수</em></li>
+        <li><code>#DIV/0!</code> — <em>0 또는 빈 셀</em>로 나눔</li>
+        <li><code>#N/A</code> — 값을 <em>찾을 수 없음</em>(찾기 함수)</li>
+        <li><code>#NAME?</code> — 함수명·이름을 <em>인식 못 함</em>(오타, 따옴표 누락)</li>
+        <li><code>#NULL!</code> — <em>교차하지 않는</em> 두 영역의 교점을 지정</li>
+        <li><code>#NUM!</code> — 숫자가 <em>너무 크거나 잘못된 인수</em></li>
+        <li><code>#REF!</code> — 참조하던 셀이 <em>삭제됨</em></li>
+        <li><code>#VALUE!</code> — <em>잘못된 자료형</em>(숫자 자리에 문자)</li>
+      </ul></div>
+  </div>
+
+  <h4 class="sub">📚 필수 함수 사전</h4>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">① 수학·삼각 / 통계</div>
+    <table>
+      <tr><th>함수</th><th>기능</th><th>예시</th></tr>
+      <tr><td><code>SUM(범위)</code></td><td>합계</td><td><code>=SUM(A1:A10)</code></td></tr>
+      <tr><td><code>ROUND(수,n)</code></td><td>반올림. n이 <em>음수면 정수 자리</em>에서 반올림</td><td><code>=ROUND(1234.5,-2)</code> → 1200</td></tr>
+      <tr><td><code>ROUNDUP / ROUNDDOWN</code></td><td>올림 / 내림</td><td><code>=ROUNDUP(3.14,1)</code> → 3.2</td></tr>
+      <tr><td><code>INT(수)</code></td><td>소수점 <em>버림(작은 정수)</em>. 음수 주의</td><td><code>=INT(-3.5)</code> → <strong>-4</strong></td></tr>
+      <tr><td><code>TRUNC(수,n)</code></td><td>지정 자리 <em>단순 절사</em></td><td><code>=TRUNC(-3.5)</code> → <strong>-3</strong></td></tr>
+      <tr><td><code>MOD(수,제수)</code></td><td>나머지. 결과 부호는 <em>제수를 따름</em></td><td><code>=MOD(-5,3)</code> → 1</td></tr>
+      <tr><td><code>ABS / POWER / SQRT</code></td><td>절대값 / 거듭제곱 / 제곱근</td><td><code>=POWER(2,3)</code> → 8</td></tr>
+      <tr><td><code>SUMIF(조건범위,조건,합계범위)</code></td><td>조건에 맞는 값의 합</td><td><code>=SUMIF(A:A,"서울",B:B)</code></td></tr>
+      <tr><td><code>AVERAGE / AVERAGEA</code></td><td>평균 / <em>문자·논리값 포함</em> 평균</td><td>—</td></tr>
+      <tr><td><code>COUNT / COUNTA / COUNTBLANK</code></td><td><em>숫자</em> 개수 / <em>비어있지 않은</em> 개수 / <em>빈</em> 셀 개수</td><td>—</td></tr>
+      <tr><td><code>COUNTIF(범위,조건)</code></td><td>조건에 맞는 셀 개수</td><td><code>=COUNTIF(A:A,"&gt;=80")</code></td></tr>
+      <tr><td><code>LARGE / SMALL(범위,k)</code></td><td>k번째로 큰 / 작은 값</td><td><code>=LARGE(A1:A10,2)</code></td></tr>
+      <tr><td><code>RANK.EQ(수,범위,[방법])</code></td><td>순위. 0·생략=내림차순, 1=오름차순</td><td><code>=RANK.EQ(A1,$A$1:$A$10)</code></td></tr>
+      <tr><td><code>MEDIAN / MODE.SNGL</code></td><td>중간값 / 최빈값</td><td>—</td></tr>
+      <tr><td><code>STDEV.S / VAR.S</code></td><td>표본 표준편차 / 분산</td><td>—</td></tr>
+    </table>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">② 논리 / 텍스트</div>
+    <table>
+      <tr><th>함수</th><th>기능</th><th>예시</th></tr>
+      <tr><td><code>IF(조건,참,거짓)</code></td><td>조건 분기. 중첩 가능</td><td><code>=IF(A1&gt;=60,"합격","불합격")</code></td></tr>
+      <tr><td><code>AND / OR / NOT</code></td><td>모두 참 / 하나라도 참 / 부정</td><td><code>=IF(AND(A1&gt;=80,B1&gt;=80),"우수","")</code></td></tr>
+      <tr><td><code>IFERROR(식,대체값)</code></td><td>오류일 때 대체값 표시</td><td><code>=IFERROR(A1/B1,0)</code></td></tr>
+      <tr><td><code>LEFT / RIGHT(문자,n)</code></td><td>왼쪽/오른쪽에서 n글자</td><td><code>=LEFT("대한상공",2)</code> → 대한</td></tr>
+      <tr><td><code>MID(문자,시작,개수)</code></td><td>중간에서 추출</td><td><code>=MID("980101-1",8,1)</code> → 1</td></tr>
+      <tr><td><code>LEN(문자)</code></td><td>글자 수</td><td>공백도 1자로 셈</td></tr>
+      <tr><td><code>UPPER / LOWER / PROPER</code></td><td>대문자 / 소문자 / <em>첫 글자만 대문자</em></td><td><code>=PROPER("hong gil")</code> → Hong Gil</td></tr>
+      <tr><td><code>TRIM(문자)</code></td><td>단어 사이 <em>한 칸만 남기고</em> 공백 제거</td><td>—</td></tr>
+      <tr><td><code>REPLACE / SUBSTITUTE</code></td><td><em>위치</em>로 바꾸기 / <em>문자열</em>로 바꾸기</td><td><code>=SUBSTITUTE("2024년","년","")</code></td></tr>
+      <tr><td><code>CONCAT / &amp;</code></td><td>문자 연결</td><td><code>=A1&amp;"님"</code></td></tr>
+      <tr><td><code>TEXT(값,서식)</code></td><td>값을 지정 <em>서식의 문자</em>로</td><td><code>=TEXT(0.5,"0%")</code> → 50%</td></tr>
+      <tr><td><code>REPT(문자,n)</code></td><td>문자를 n번 반복</td><td><code>=REPT("★",3)</code> → ★★★</td></tr>
+      <tr><td><code>FIND / SEARCH</code></td><td>위치 찾기. FIND는 <em>대소문자 구분</em>, SEARCH는 <em>구분 안 함·와일드카드 가능</em></td><td>—</td></tr>
+    </table>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">③ 날짜·시간 / 찾기·참조 / 데이터베이스</div>
+    <table>
+      <tr><th>함수</th><th>기능</th><th>예시</th></tr>
+      <tr><td><code>TODAY() / NOW()</code></td><td>오늘 날짜 / 현재 날짜+시각</td><td>인수 없음, 괄호는 필수</td></tr>
+      <tr><td><code>YEAR / MONTH / DAY</code></td><td>연 / 월 / 일 추출</td><td>—</td></tr>
+      <tr><td><code>WEEKDAY(날짜,[유형])</code></td><td>요일 번호. 1=일요일 시작(기본), 2=월요일 시작</td><td><code>=WEEKDAY(A1,2)</code></td></tr>
+      <tr><td><code>DATE / TIME</code></td><td>연월일·시분초로 값 만들기</td><td><code>=DATE(2024,3,1)</code></td></tr>
+      <tr><td><code>DAYS(끝,시작)</code></td><td>두 날짜 사이 일수</td><td>—</td></tr>
+      <tr><td><code>EDATE / EOMONTH</code></td><td>n개월 전후 날짜 / n개월 전후 <em>말일</em></td><td>—</td></tr>
+      <tr><td><code>WORKDAY(시작,일수,[휴일])</code></td><td><em>주말·휴일을 제외</em>한 날짜</td><td>—</td></tr>
+      <tr><td><code>VLOOKUP(값,범위,열번호,[옵션])</code></td><td>범위 <em>첫 열</em>에서 세로로 찾기. 옵션 <strong>FALSE(0)=정확히</strong>, TRUE(1)·생략=<em>비슷하게(범위는 오름차순 정렬 필수)</em></td><td><code>=VLOOKUP(A2,$F$2:$H$9,3,0)</code></td></tr>
+      <tr><td><code>HLOOKUP</code></td><td>범위 <em>첫 행</em>에서 가로로 찾기</td><td>—</td></tr>
+      <tr><td><code>INDEX(범위,행,열)</code></td><td>행·열 번호 위치의 값</td><td>—</td></tr>
+      <tr><td><code>MATCH(값,범위,[유형])</code></td><td>값의 <em>상대 위치(번호)</em>. 유형 0=정확히</td><td><code>=INDEX(A:C,MATCH("홍",A:A,0),3)</code></td></tr>
+      <tr><td><code>CHOOSE(번호,값1,값2…)</code></td><td>번호에 해당하는 값 선택</td><td><code>=CHOOSE(WEEKDAY(A1),"일","월"…)</code></td></tr>
+      <tr><td><code>DSUM / DAVERAGE / DCOUNT / DMAX / DMIN</code></td><td>데이터베이스 함수. <code>(전체범위, 필드, 조건범위)</code> — 조건 범위에는 <em>필드명과 조건</em>을 함께 적음</td><td><code>=DSUM(A1:D10,4,F1:F2)</code></td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">📋 C. 데이터 관리와 분석</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🔤</span><span class="card-title">정렬</span></div>
+      <ul class="tips">
+        <li>최대 <strong>64개</strong> 기준으로 정렬</li>
+        <li>오름차순 순서: <em>숫자 → 문자 → 논리값(FALSE→TRUE) → 오류값 → 빈 셀</em></li>
+        <li><strong>빈 셀은 항상 맨 마지막</strong>(오름·내림차순 모두)</li>
+        <li>글꼴 색·셀 색·조건부 서식 아이콘 기준 정렬 가능</li>
+        <li>왼쪽에서 오른쪽으로(행 기준) 정렬은 <em>[옵션]</em>에서 지정</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔍</span><span class="card-title">자동 필터 vs 고급 필터</span></div>
+      <ul class="tips">
+        <li><strong>자동 필터</strong> — 조건에 맞는 행만 표시, <em>같은 열에 최대 2개 조건</em>(AND/OR). 결과를 다른 곳에 복사 불가</li>
+        <li><strong>고급 필터</strong> — 조건을 <em>워크시트에 직접 작성</em>. <em>다른 장소에 복사</em> 가능, 중복 제거 가능</li>
+        <li>고급 필터 조건: <em>같은 행</em>=AND, <em>다른 행</em>=OR</li>
+        <li>수식을 조건으로 쓸 때는 필드명을 <em>원본과 다르게</em>(또는 비워두고) 작성</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">➗</span><span class="card-title">부분합</span></div>
+      <ul class="tips">
+        <li>실행 전 반드시 <strong>기준 필드로 정렬</strong>되어 있어야 함</li>
+        <li>합계·개수·평균·최대·최소·곱·표준편차 등 사용 가능</li>
+        <li>중첩하려면 두 번째부터 <em>[새로운 값으로 대치]를 해제</em></li>
+        <li>결과는 <em>윤곽(개요) 기호</em>로 수준별 표시/숨기기 가능</li>
+        <li>[모두 제거]로 원래 데이터로 복원</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📊</span><span class="card-title">피벗 테이블</span></div>
+      <ul class="tips">
+        <li>대량 데이터를 <em>요약·집계·분석</em>. 필터/열/행/값 영역으로 구성</li>
+        <li>원본이 바뀌어도 <em>자동 갱신되지 않음</em> → <strong>[새로 고침]</strong> 필요</li>
+        <li>값 요약 기준(합계·개수·평균)과 <em>값 표시 형식(비율·누계)</em> 변경 가능</li>
+        <li><strong>피벗 차트</strong>를 함께 만들 수 있으나 <em>분산형·주식형·거품형은 불가</em></li>
+        <li>슬라이서·시간 표시 막대로 시각적 필터링</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎯</span><span class="card-title">목표값 찾기</span></div>
+      <div class="card-desc">수식의 <em>결과값을 알고 있을 때</em> 그 결과를 만드는 <strong>입력값 하나</strong>를 역산합니다. [수식 셀]에는 반드시 <em>수식</em>이, [값을 바꿀 셀]에는 반드시 <em>값(상수)</em>이 있어야 하며, 값을 바꿀 셀은 수식 셀에 <em>영향을 주는 셀</em>이어야 합니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎭</span><span class="card-title">시나리오 · 데이터 표 · 통합</span></div>
+      <ul class="tips">
+        <li><strong>시나리오</strong> — 여러 변수 값 조합에 따른 결과를 비교. 요약 보고서는 <em>새 워크시트</em>에 생성되며 원본이 바뀌어도 <em>자동 갱신 안 됨</em></li>
+        <li><strong>데이터 표</strong> — 하나(행/열) 또는 두 개 변수의 변화에 따른 결과를 한 번에. 결과는 <em>배열 수식</em>이라 <em>일부만 삭제 불가</em></li>
+        <li><strong>통합</strong> — 여러 시트의 데이터를 하나로 요약. <em>원본 데이터에 연결</em> 옵션 체크 시 자동 갱신</li>
+      </ul></div>
+  </div>
+
+  <div class="callout org"><span>✅</span><div class="callout-body">
+    <strong>데이터 유효성 검사</strong> — 셀에 입력할 수 있는 값을 제한합니다(정수·소수점·목록·날짜·시간·텍스트 길이·사용자 지정). <em>설명 메시지</em>와 <em>오류 메시지(중지/경고/정보)</em>를 지정할 수 있으며, [잘못된 데이터]로 이미 입력된 위반 값에 <em>동그라미</em>를 칠 수 있습니다.
+  </div></div>
+
+  <h3 class="blk">📈 D. 차트</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🧩</span><span class="card-title">차트 구성 요소</span></div>
+      <div class="card-desc">차트 영역 · 그림 영역 · 차트 제목 · 축 제목 · <strong>범례</strong> · <strong>데이터 계열</strong>(같은 색 막대 모음) · <strong>데이터 요소</strong>(계열 안의 막대 하나) · 데이터 레이블 · 눈금선 · 축 · <em>추세선</em> · <em>오차 막대</em>.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚡</span><span class="card-title">차트 기본 동작</span></div>
+      <ul class="tips">
+        <li><code>F11</code> → <em>새 시트에 차트</em> 생성 / <code>Alt+F1</code> → <em>현재 시트에 차트</em></li>
+        <li>원본 데이터를 수정하면 차트는 <strong>자동 반영</strong></li>
+        <li>차트 종류는 언제든 변경 가능하며, <em>계열별로 다른 종류</em>를 줄 수 있음(혼합 차트)</li>
+        <li>숨겨진 행·열의 데이터는 기본적으로 <em>차트에 표시되지 않음</em></li>
+      </ul></div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>차트</th><th>용도 / 특징</th></tr>
+      <tr><td><strong>세로 막대형</strong></td><td>항목 간 <em>값 비교</em>. 가장 일반적</td></tr>
+      <tr><td><strong>가로 막대형</strong></td><td>항목 이름이 길 때. <em>시간 흐름 표현에는 부적합</em></td></tr>
+      <tr><td><strong>꺾은선형</strong></td><td>시간에 따른 <em>추세·변화</em></td></tr>
+      <tr><td><strong>원형</strong></td><td>전체에 대한 각 항목의 <em>비율</em>. <strong>데이터 계열 1개만</strong> 표시, 축이 없음. 쪼개진 원형 가능</td></tr>
+      <tr><td><strong>도넛형</strong></td><td>원형과 비슷하나 <em>여러 계열</em> 표시 가능. 구멍 크기 조절</td></tr>
+      <tr><td><strong>분산형(XY)</strong></td><td>두 값의 <em>상관관계</em>. <em>가로축도 값 축</em>이며 <em>항목 축이 없음</em>. 과학·공학 데이터</td></tr>
+      <tr><td><strong>영역형</strong></td><td>시간에 따른 <em>변화량의 크기</em>를 강조</td></tr>
+      <tr><td><strong>방사형</strong></td><td>여러 계열의 <em>총 값을 비교</em>. 각 항목이 중심에서 뻗은 축</td></tr>
+      <tr><td><strong>주식형</strong></td><td>고가·저가·종가 등. <em>데이터 배치 순서가 정해져 있음</em></td></tr>
+      <tr><td><strong>거품형</strong></td><td>분산형 + 세 번째 값을 <em>거품 크기</em>로 표현</td></tr>
+      <tr><td><strong>표면형</strong></td><td>두 데이터 집합의 <em>최적 조합</em>을 색·무늬로</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">🖨️ E. 출력(페이지 설정과 인쇄)</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">📄</span><span class="card-title">페이지 탭</span></div>
+      <div class="card-desc">용지 방향(세로/가로), <strong>배율</strong>(10~400%), <em>자동 맞춤</em>(용지 너비·높이 지정), 용지 크기, 인쇄 품질, 시작 페이지 번호.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📐</span><span class="card-title">여백 탭</span></div>
+      <div class="card-desc">위·아래·왼쪽·오른쪽 여백과 <em>머리글·바닥글 여백</em>. <strong>페이지 가운데 맞춤</strong>(가로·세로) 지정 가능.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📑</span><span class="card-title">머리글/바닥글 탭</span></div>
+      <div class="card-desc">왼쪽·가운데·오른쪽 세 구역. 페이지 번호(<code>&amp;[페이지]</code>), 전체 페이지 수, 날짜, 시간, 파일 경로·이름, 시트 이름, <em>그림</em> 삽입 가능. <strong>첫 페이지를 다르게</strong>·<em>짝수와 홀수 페이지를 다르게</em> 지정할 수 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗒️</span><span class="card-title">시트 탭</span></div>
+      <ul class="tips">
+        <li><strong>인쇄 영역</strong> — 지정한 범위만 인쇄</li>
+        <li><strong>반복할 행/열</strong> — 모든 페이지에 제목 행을 반복(<em>페이지 설정 화면에서만</em> 지정 가능)</li>
+        <li>눈금선, <em>행/열 머리글</em>, 흑백으로, 간단하게 인쇄, 메모 인쇄 위치</li>
+        <li>페이지 순서: <em>행 우선</em> / <em>열 우선</em></li>
+      </ul></div>
+  </div>
+  <div class="callout blu"><span>✂️</span><div class="callout-body">
+    <strong>페이지 나누기 미리 보기</strong>에서는 파란 실선(수동)·점선(자동)을 드래그해 나눌 위치를 바꿀 수 있고, 데이터 <em>입력·편집도 가능</em>합니다. 수동으로 삽입한 구분선만 제거할 수 있습니다.
+  </div></div>
+
+  <h3 class="blk">🤖 F. 매크로</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⏺️</span><span class="card-title">매크로 기록</span></div>
+      <ul class="tips">
+        <li>이름 첫 글자는 <strong>반드시 문자</strong>, 공백 사용 불가(<code>_</code>로 대체)</li>
+        <li><code>/</code> <code>?</code> <code>-</code> <code>.</code> 등 특수문자와 <em>셀 주소 형태</em> 이름 불가</li>
+        <li>바로 가기 키는 <em>영문자 1자</em>. 대문자를 지정하면 <code>Ctrl+Shift+문자</code></li>
+        <li>매크로 바로 가기 키가 <strong>엑셀 기본 단축키보다 우선</strong></li>
+        <li>저장 위치: <em>현재 통합 문서 / 새 통합 문서 / 개인용 매크로 통합 문서</em>(모든 문서에서 사용)</li>
+        <li>기록된 코드는 <strong>VBA 모듈</strong>에 저장되며 <code>Alt+F11</code>로 편집</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">▶️</span><span class="card-title">실행과 저장</span></div>
+      <ul class="tips">
+        <li>실행: <code>Alt+F8</code> 매크로 대화상자, 바로 가기 키, <em>도형·단추·그림에 지정</em>, 빠른 실행 도구 모음</li>
+        <li>한 단계씩 실행은 <code>F8</code></li>
+        <li>매크로 포함 파일은 <strong>.xlsm</strong>(매크로 사용 통합 문서)으로 저장해야 함</li>
+        <li>기록 중에는 <em>절대 참조가 기본</em>. [상대 참조로 기록]을 켜면 선택 위치 기준으로 동작</li>
+      </ul></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 1급 1과목 ══════════════════ -->
+<div class="sec" id="sec-g1s1">
+  <div class="sec-hd">
+    <div class="sec-title">1️⃣ 1급 1과목 — 컴퓨터 일반 <span class="tag p">20문항 / 100점</span></div>
+    <div class="sec-sub">2급 1과목 전체 범위 + 심화(마이크로프로세서·주소 지정·프로그래밍 언어·OSI 7계층·정보 보안 심화)</div>
+  </div>
+
+  <div class="callout pur"><span>📌</span><div class="callout-body">
+    1급 1과목은 <strong>2급 1과목의 모든 내용을 포함</strong>합니다. 먼저 「2급 1과목」 탭을 완전히 익힌 뒤, 아래 심화 내용을 얹으세요.
+  </div></div>
+
+  <h3 class="blk">🧠 A. 마이크로프로세서와 명령어</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">CISC vs RISC</span></div>
+      <div class="card-desc">
+        <strong>CISC</strong> — 명령어 <em>많고 복잡</em>, 길이 가변, 레지스터 <em>적음</em>, 주소 지정 방식 <em>다양</em>, 회로 복잡·전력 소모 큼, 프로그래밍 <em>쉬움</em>. (인텔 x86)<br>
+        <strong>RISC</strong> — 명령어 <em>적고 단순</em>, 길이 고정, 레지스터 <em>많음</em>, 주소 지정 <em>단순</em>, 처리 속도 <em>빠름</em>, 컴파일러가 복잡. (ARM, 워크스테이션)
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔁</span><span class="card-title">병렬 처리 기법</span></div>
+      <ul class="tips">
+        <li><strong>파이프라이닝</strong> — 명령어를 여러 단계로 나눠 <em>겹쳐서</em> 실행. 처리량↑</li>
+        <li><strong>슈퍼스칼라</strong> — 여러 개의 파이프라인으로 <em>클럭당 여러 명령</em> 처리</li>
+        <li><strong>슈퍼파이프라인</strong> — 파이프라인 단계를 더 <em>잘게</em> 나눔</li>
+        <li><strong>VLIW</strong> — 여러 명령을 하나의 <em>긴 명령어</em>로 묶어 동시 실행</li>
+        <li>분류(플린): <em>SISD / SIMD / MISD / MIMD</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📮</span><span class="card-title">주소 지정 방식</span></div>
+      <ul class="tips">
+        <li><strong>즉시(Immediate)</strong> — 오퍼랜드에 <em>데이터가 직접</em> 들어 있음. 가장 빠름</li>
+        <li><strong>직접(Direct)</strong> — 오퍼랜드가 <em>데이터의 주소</em></li>
+        <li><strong>간접(Indirect)</strong> — 오퍼랜드가 <em>주소가 저장된 주소</em>. 메모리 접근이 2회 이상</li>
+        <li><strong>상대(Relative)</strong> — <em>PC + 오퍼랜드</em></li>
+        <li><strong>인덱스</strong> — <em>인덱스 레지스터 + 오퍼랜드</em> (배열 처리에 유리)</li>
+        <li><strong>레지스터 / 레지스터 간접</strong> — 데이터·주소가 레지스터에 있음</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📏</span><span class="card-title">시스템 성능 단위</span></div>
+      <div class="card-desc">
+        속도: <strong>MIPS</strong>(초당 백만 명령), <strong>FLOPS</strong>(초당 부동소수점 연산), <strong>Hz</strong>(클럭).<br>
+        시간: ms(10⁻³) &gt; μs(10⁻⁶) &gt; ns(10⁻⁹) &gt; ps(10⁻¹²) &gt; fs(10⁻¹⁵) &gt; as(10⁻¹⁸).<br>
+        용량: KB &lt; MB &lt; GB &lt; TB &lt; PB &lt; EB &lt; ZB &lt; YB.
+      </div></div>
+  </div>
+
+  <h3 class="blk">💻 B. 프로그래밍 언어</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구분</th><th>내용</th></tr>
+      <tr><td><strong>저급 언어</strong></td><td>기계어(0·1) · 어셈블리어(니모닉). 기계 종속적, 실행 속도 빠름</td></tr>
+      <tr><td><strong>고급 언어</strong></td><td>C, JAVA, Python 등. 사람 친화적, 기계 <em>독립적</em>, 번역기 필요</td></tr>
+      <tr><td><strong>컴파일러</strong></td><td>원시 프로그램 <em>전체</em>를 한 번에 번역해 <em>목적 프로그램 생성</em>. 번역은 느리나 <em>실행은 빠름</em></td></tr>
+      <tr><td><strong>인터프리터</strong></td><td><em>행 단위</em>로 번역·즉시 실행. 목적 프로그램을 <em>만들지 않음</em>. 실행이 느림 (BASIC, Python)</td></tr>
+      <tr><td><strong>어셈블러</strong></td><td>어셈블리어 → 기계어 번역</td></tr>
+      <tr><td><strong>링커(연계 편집)</strong></td><td>여러 목적 프로그램·라이브러리를 묶어 <em>실행 가능한 파일</em> 생성</td></tr>
+      <tr><td><strong>로더</strong></td><td>실행 파일을 <em>주기억장치에 적재</em>. 할당·연결·재배치·적재 기능</td></tr>
+      <tr><td><strong>디버거</strong></td><td>프로그램의 오류를 찾아 수정</td></tr>
+    </table>
+    <div class="tbl-cap">번역 순서: 원시 프로그램 → (컴파일러) → 목적 프로그램 → (링커) → 로드 모듈 → (로더) → 실행</div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🧱</span><span class="card-title">객체 지향의 4대 특징</span></div>
+      <ul class="tips">
+        <li><strong>캡슐화</strong> — 데이터와 메서드를 <em>하나로 묶고</em> 내부를 감춤 → 재사용성·정보 은닉</li>
+        <li><strong>상속성</strong> — 상위 클래스의 속성·메서드를 <em>물려받음</em></li>
+        <li><strong>다형성</strong> — 같은 메시지에 객체마다 <em>다르게 반응</em></li>
+        <li><strong>추상화</strong> — 공통 속성만 뽑아 <em>모델링</em></li>
+        <li>대표 언어: <em>C++, JAVA, C#, Smalltalk</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🌐</span><span class="card-title">웹 프로그래밍 언어</span></div>
+      <ul class="tips">
+        <li><strong>HTML</strong> — 웹 문서 표준. <strong>DHTML</strong>은 <em>동적</em> HTML(CSS+스크립트)</li>
+        <li><strong>SGML</strong> — 문서 구조 표준의 원조 / <strong>XML</strong> — <em>사용자가 태그를 정의</em>, 데이터 교환에 유리</li>
+        <li><strong>VRML</strong> — 3차원 <em>가상 공간</em> 기술 언어</li>
+        <li><strong>WML</strong> — 무선 단말기용(WAP) 마크업 언어</li>
+        <li><strong>ASP / JSP / PHP</strong> — <em>서버 측</em> 스크립트 (ASP=윈도 전용, JSP·PHP=플랫폼 독립)</li>
+        <li><strong>JavaScript</strong> — <em>클라이언트 측</em> 스크립트, 컴파일 불필요</li>
+        <li><strong>JAVA</strong> — 객체 지향·플랫폼 독립(JVM)·애플릿·분산 처리 지원</li>
+        <li><strong>UML</strong> — 시스템을 <em>시각적으로 모델링</em>하는 표준 표기법</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">📡 C. 네트워크 심화</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">OSI 7계층 — 아래에서 위로</div>
+    <table>
+      <tr><th>계층</th><th>역할</th><th>장비·프로토콜</th></tr>
+      <tr><td>7 <strong>응용</strong></td><td>사용자에게 서비스 제공</td><td>HTTP, FTP, SMTP, DNS</td></tr>
+      <tr><td>6 <strong>표현</strong></td><td>코드 변환·<em>암호화·압축</em>·형식 변환</td><td>JPEG, MPEG, ASCII</td></tr>
+      <tr><td>5 <strong>세션</strong></td><td><em>대화(세션) 설정·유지·종료</em>, 동기점</td><td>—</td></tr>
+      <tr><td>4 <strong>전송</strong></td><td><em>종단 간</em> 신뢰성 있는 데이터 전달, 흐름·오류 제어</td><td>TCP, UDP</td></tr>
+      <tr><td>3 <strong>네트워크</strong></td><td><em>경로 설정(라우팅)</em>·논리 주소 지정</td><td>IP, ICMP / <em>라우터</em></td></tr>
+      <tr><td>2 <strong>데이터 링크</strong></td><td>인접 노드 간 <em>오류 검출·흐름 제어</em>, 프레임</td><td>HDLC, MAC / <em>브리지·스위치</em></td></tr>
+      <tr><td>1 <strong>물리</strong></td><td>비트를 <em>전기 신호</em>로 변환·전송</td><td>RS-232C / <em>리피터·허브</em></td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🔧</span><span class="card-title">프로토콜의 3요소 · 기능</span></div>
+      <div class="card-desc">
+        <strong>3요소</strong>: <em>구문(Syntax)</em>·<em>의미(Semantics)</em>·<em>순서(Timing)</em>.<br>
+        <strong>주요 기능</strong>: 단편화와 재조합, 캡슐화, <em>흐름 제어</em>, <em>오류 제어</em>, 동기화, 순서 제어, 주소 지정, 다중화, 경로 제어.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">💻</span><span class="card-title">네트워크 명령어</span></div>
+      <ul class="tips">
+        <li><code>ipconfig</code> — 내 컴퓨터의 <em>IP·서브넷·게이트웨이·MAC</em> 확인</li>
+        <li><code>ping</code> — 상대 호스트와의 <em>연결 상태·응답 시간</em> 확인(ICMP)</li>
+        <li><code>tracert</code> — 목적지까지 <em>거쳐 가는 경로</em> 추적</li>
+        <li><code>netstat</code> — 현재 <em>연결 상태·포트</em> 확인</li>
+        <li><code>nslookup</code> — 도메인의 <em>IP 주소</em> 조회</li>
+        <li><code>finger</code> — 사용자 정보 확인</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📶</span><span class="card-title">전송 방식·통신망</span></div>
+      <ul class="tips">
+        <li><strong>회선 교환</strong> — 통신 전에 <em>물리적 경로를 확보</em>(전화). 실시간에 유리</li>
+        <li><strong>패킷 교환</strong> — 데이터를 <em>패킷으로 나눠</em> 전송, 회선 이용률 높음</li>
+        <li><strong>유니캐스트</strong>(1:1) / <strong>멀티캐스트</strong>(1:다수 그룹) / <strong>브로드캐스트</strong>(1:전체)</li>
+        <li><strong>단방향(Simplex)</strong>·<strong>반이중(Half-duplex, 무전기)</strong>·<strong>전이중(Full-duplex, 전화)</strong></li>
+        <li>망 구성: <em>성형·링형·버스형·트리형·망형</em>. 망형은 <em>회선 수 n(n-1)/2</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">☁️</span><span class="card-title">최신 기술 용어</span></div>
+      <ul class="tips">
+        <li><strong>클라우드 컴퓨팅</strong> — 인터넷 서버에 자원을 두고 필요할 때 사용(IaaS·PaaS·SaaS)</li>
+        <li><strong>그리드 컴퓨팅</strong> — 분산된 컴퓨터를 묶어 <em>하나의 슈퍼컴퓨터처럼</em></li>
+        <li><strong>유비쿼터스 / IoT</strong> — 언제 어디서나 접속 / 사물 간 인터넷 연결</li>
+        <li><strong>텔레매틱스</strong>(자동차+통신) · <strong>RFID</strong>(무선 인식 태그) · <strong>블록체인</strong>(분산 원장)</li>
+        <li><strong>빅데이터 / 머신러닝 / 메타버스</strong></li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">🔐 D. 정보 보안 심화</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">✍️</span><span class="card-title">전자 서명</span></div>
+      <div class="card-desc"><em>송신자의 개인키로 서명</em>하고 <em>공개키로 검증</em>합니다. 이를 통해 위조 불가·변경 불가·<strong>부인 방지</strong>·서명자 인증을 보장합니다. 암호화(기밀성)와는 키 사용 순서가 <em>반대</em>라는 점이 자주 출제됩니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🛡️</span><span class="card-title">보안 요건 6가지</span></div>
+      <div class="card-desc"><strong>기밀성</strong>(인가된 자만 열람) · <strong>무결성</strong>(변조되지 않음) · <strong>가용성</strong>(필요할 때 사용) · <strong>인증</strong>(정당한 사용자 확인) · <strong>부인 방지</strong>(행위를 부인하지 못함) · <strong>접근 제어</strong>.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧯</span><span class="card-title">보안 시스템</span></div>
+      <ul class="tips">
+        <li><strong>방화벽</strong> — 외부 침입 차단. <em>내부자 공격은 못 막음</em></li>
+        <li><strong>침입 탐지 시스템(IDS)</strong> — 침입 시도를 <em>탐지·경고</em></li>
+        <li><strong>침입 방지 시스템(IPS)</strong> — 탐지 후 <em>능동적으로 차단</em></li>
+        <li><strong>VPN</strong> — 공중망에 <em>가상의 전용 회선</em>을 구성</li>
+        <li><strong>SSL/TLS</strong> — 전송 구간 암호화(HTTPS)</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">기타 공격 용어</span></div>
+      <ul class="tips">
+        <li><strong>제로데이 공격</strong> — 취약점이 <em>알려지기 전·패치 전</em>에 이루어지는 공격</li>
+        <li><strong>스미싱</strong> — 문자 메시지 링크를 이용한 사기</li>
+        <li><strong>봇넷</strong> — 악성코드에 감염된 <em>좀비 PC의 집합</em></li>
+        <li><strong>버퍼 오버플로</strong> — 할당된 메모리를 넘겨 코드를 실행시키는 공격</li>
+        <li><strong>사회 공학</strong> — 기술이 아닌 <em>사람의 심리</em>를 이용</li>
+      </ul></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 1급 2과목 ══════════════════ -->
+<div class="sec" id="sec-g1s2">
+  <div class="sec-hd">
+    <div class="sec-title">2️⃣ 1급 2과목 — 스프레드시트 일반 <span class="tag p">20문항 / 100점</span></div>
+    <div class="sec-sub">2급 2과목 전체 범위 + 심화(배열 수식·고급 분석 도구·VBA 프로시저·시트 보호·데이터 유효성 심화)</div>
+  </div>
+
+  <div class="callout pur"><span>📌</span><div class="callout-body">
+    1급 2과목은 <strong>2급 2과목의 모든 내용을 포함</strong>합니다. 표시 형식 코드, 함수 사전, 차트 종류는 「2급 2과목」 탭을 그대로 사용하세요.
+  </div></div>
+
+  <h3 class="blk">🧬 A. 배열 수식 — 1급의 핵심</h3>
+  <div class="hi-card">
+    <div class="hi-title">📐 배열 수식의 원리</div>
+    <div class="hi-body">
+      여러 셀을 한꺼번에 계산하는 수식으로, 입력을 마칠 때 <strong>Ctrl+Shift+Enter</strong>를 누르면 수식이 <code>{ }</code>(중괄호)로 묶입니다. 이 중괄호는 <em>직접 입력할 수 없습니다</em>. 배열 수식의 결과 범위는 <em>일부만 수정·삭제할 수 없고</em>, 전체를 선택해야 합니다.<br><br>
+      핵심 아이디어: 조건식 <code>(A1:A10="서울")</code>은 TRUE/FALSE 배열을 만들고, 이것을 <strong>곱하면 AND</strong>, <strong>더하면 OR</strong>가 되며, TRUE는 1·FALSE는 0으로 계산됩니다.
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">시험에 그대로 나오는 배열 수식 패턴</div>
+    <table>
+      <tr><th>용도</th><th>수식</th></tr>
+      <tr><td>조건에 맞는 <strong>개수</strong></td><td><code>=SUM((조건1)*(조건2))</code> 또는 <code>=COUNT(IF((조건1)*(조건2),1))</code></td></tr>
+      <tr><td>조건에 맞는 <strong>합계</strong></td><td><code>=SUM((조건)*(합계범위))</code> 또는 <code>=SUM(IF(조건,합계범위))</code></td></tr>
+      <tr><td>조건에 맞는 <strong>평균</strong></td><td><code>=AVERAGE(IF(조건,평균범위))</code></td></tr>
+      <tr><td>조건에 맞는 <strong>최대·최소</strong></td><td><code>=MAX((조건)*(범위))</code> / <code>=MIN(IF(조건,범위))</code></td></tr>
+      <tr><td>조건에 맞는 값의 <strong>순위</strong></td><td><code>=SUM((조건)*(범위&gt;해당값))+1</code></td></tr>
+      <tr><td>조건에 맞는 <strong>값 찾기</strong></td><td><code>=INDEX(반환범위,MATCH(1,(조건1)*(조건2),0))</code></td></tr>
+      <tr><td>k번째 큰 값의 위치</td><td><code>=INDEX(범위,MATCH(LARGE(값범위,k),값범위,0))</code></td></tr>
+      <tr><td>텍스트 결합</td><td><code>=TEXTJOIN(구분자,TRUE,IF(조건,범위,""))</code></td></tr>
+    </table>
+  </div>
+  <div class="callout teal"><span>🧠</span><div class="callout-body">
+    <strong>FREQUENCY·MDETERM·MINVERSE·MMULT·TRANSPOSE</strong>는 원래부터 배열을 다루는 함수입니다. <code>TRANSPOSE</code>는 행과 열을 바꾸며, 붙여넣을 범위를 <em>미리 정확한 크기로</em> 선택해야 합니다.
+  </div></div>
+
+  <h3 class="blk">🔬 B. 고급 분석·데이터 도구</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🔎</span><span class="card-title">해 찾기(Solver)</span></div>
+      <div class="card-desc">목표값 찾기가 <em>변수 1개</em>만 다루는 데 비해, 해 찾기는 <strong>여러 개의 변수 셀</strong>과 <strong>제한 조건</strong>을 두고 목표 셀을 최대/최소/특정 값으로 만듭니다. [데이터]-[분석] 그룹의 <em>추가 기능</em>으로 설치해야 나타납니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📉</span><span class="card-title">분석 도구(Analysis ToolPak)</span></div>
+      <div class="card-desc">기술 통계법, 히스토그램, 상관 분석, 회귀 분석, 분산 분석, t-검정, 이동 평균 등 <em>통계 분석</em>을 제공하는 추가 기능입니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧹</span><span class="card-title">데이터 도구</span></div>
+      <ul class="tips">
+        <li><strong>텍스트 나누기</strong> — 구분 기호(탭·쉼표·공백) 또는 <em>너비가 일정함</em>으로 한 열을 여러 열로. 특정 열은 <em>가져오지 않음</em> 지정 가능</li>
+        <li><strong>중복된 항목 제거</strong> — 선택한 열 기준으로 <em>완전히 동일한 행</em>을 삭제(원본이 바뀜)</li>
+        <li><strong>빠른 채우기</strong>(<code>Ctrl+E</code>) — 입력 패턴을 인식해 나머지를 자동 완성</li>
+        <li><strong>통합</strong> — 위치·항목 기준 병합, <em>원본 데이터에 연결</em> 시 자동 갱신</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔐</span><span class="card-title">시트 보호 vs 통합 문서 보호</span></div>
+      <div class="card-desc">
+        <strong>시트 보호</strong> — 셀 편집을 막습니다. 단, <em>[셀 서식]-[보호]의 「잠금」이 해제된 셀은 편집 가능</em>합니다. 즉 <em>잠금 해제 → 시트 보호</em> 순서가 핵심입니다. 「숨김」을 체크하면 수식이 수식 입력줄에 보이지 않습니다.<br>
+        <strong>통합 문서 보호</strong> — <em>시트의 삽입·삭제·이동·이름 바꾸기·숨기기</em>를 막습니다. 셀 내용은 보호하지 않습니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">📊 C. 피벗 테이블·차트 심화</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🧊</span><span class="card-title">피벗 심화</span></div>
+      <ul class="tips">
+        <li><strong>그룹화</strong> — 날짜는 <em>일·월·분기·연</em> 단위, 숫자는 <em>구간</em> 단위로 묶기</li>
+        <li><strong>계산 필드 / 계산 항목</strong> — 원본을 건드리지 않고 <em>수식 필드</em>를 추가</li>
+        <li><strong>값 표시 형식</strong> — 총합계 비율, 열/행 합계 비율, 누계, 순위 등</li>
+        <li>보고서 레이아웃: <em>압축·개요·테이블 형식</em></li>
+        <li>피벗 테이블을 삭제해도 <em>연결된 피벗 차트는 일반 차트로 남음</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📈</span><span class="card-title">차트 심화 요소</span></div>
+      <ul class="tips">
+        <li><strong>추세선</strong> — 선형·로그·다항식·거듭제곱·지수·이동 평균 6종. <em>원형·도넛형·방사형·표면형·3차원 차트에는 추가 불가</em></li>
+        <li><strong>보조 축</strong> — 값의 범위가 크게 다른 계열에 사용</li>
+        <li><strong>오차 막대</strong> — 표준 편차·표준 오차·백분율·사용자 지정</li>
+        <li><strong>이중 축 혼합 차트</strong> — 계열별 차트 종류 변경 + 보조 축</li>
+        <li>데이터 계열 <em>겹치기(-100~100)</em>·<em>간격 너비(0~500)</em></li>
+        <li>빈 셀 처리: <em>간격으로 표시 / 0으로 표시 / 선으로 연결</em></li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">⌨️ D. VBA 프로시저 (실기 직결)</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>구분</th><th>설명</th></tr>
+      <tr><td><strong>Sub 프로시저</strong></td><td>실행 후 <em>값을 반환하지 않음</em>. <code>Sub 이름() … End Sub</code></td></tr>
+      <tr><td><strong>Function 프로시저</strong></td><td><em>값을 반환</em>(사용자 정의 함수). <code>Function 이름(인수) … 이름 = 값 … End Function</code></td></tr>
+      <tr><td><strong>이벤트 프로시저</strong></td><td>특정 사건 발생 시 자동 실행. <code>Private Sub 개체_이벤트()</code></td></tr>
+      <tr><td><strong>주요 이벤트</strong></td><td><code>Click</code>(클릭) · <code>DblClick</code> · <code>Initialize</code>(폼 초기화) · <code>Activate</code> · <code>Change</code> · <code>KeyPress</code></td></tr>
+      <tr><td><strong>폼 제어</strong></td><td><code>폼이름.Show</code>(열기) · <code>Unload Me</code>(닫기) · <code>Me.Hide</code>(숨기기)</td></tr>
+      <tr><td><strong>메시지</strong></td><td><code>MsgBox "내용"</code> · <code>InputBox("질문")</code></td></tr>
+      <tr><td><strong>제어문</strong></td><td><code>If~Then~Else~End If</code>, <code>Select Case</code>, <code>For~Next</code>, <code>Do While~Loop</code></td></tr>
+      <tr><td><strong>개체 참조</strong></td><td><code>Range("A1")</code>, <code>Cells(행,열)</code>, <code>Worksheets("Sheet1")</code>, <code>ActiveCell</code></td></tr>
+      <tr><td><strong>워크시트 함수 호출</strong></td><td><code>WorksheetFunction.Sum(Range("A1:A10"))</code></td></tr>
+    </table>
+  </div>
+  <pre class="code"><span class="cm">' 목록 상자에 데이터를 채우는 폼 초기화 프로시저</span>
+<span class="kw">Private Sub</span> UserForm_Initialize()
+    cmb분류.RowSource = <span class="st">"H4:H8"</span>
+    txt날짜.Value = Date
+<span class="kw">End Sub</span>
+
+<span class="cm">' 입력 단추 — 마지막 행 다음에 값 기록</span>
+<span class="kw">Private Sub</span> cmd입력_Click()
+    i = Range(<span class="st">"A4"</span>).CurrentRegion.Rows.Count + 3
+    Cells(i, 1) = txt성명.Value
+    Cells(i, 2) = cmb분류.Value
+    Cells(i, 3) = Val(txt수량.Value)
+<span class="kw">End Sub</span>
+
+<span class="cm">' 종료 단추 — 폼 닫기</span>
+<span class="kw">Private Sub</span> cmd종료_Click()
+    <span class="kw">Unload Me</span>
+<span class="kw">End Sub</span></pre>
+</div>
+
+<!-- ══════════════════ 1급 3과목 ══════════════════ -->
+<div class="sec" id="sec-g1s3">
+  <div class="sec-hd">
+    <div class="sec-title">3️⃣ 1급 3과목 — 데이터베이스 일반 <span class="tag p">20문항 / 100점</span></div>
+    <div class="sec-sub">DB 개념 · 데이터 모델링 · 관계 데이터베이스 · 정규화 · SQL · 액세스 실무(테이블·쿼리·폼·보고서)</div>
+  </div>
+
+  <h3 class="blk">🗃️ A. 데이터베이스 개념</h3>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">📚</span><span class="card-title">데이터베이스의 4대 특징</span></div>
+      <ul class="tips">
+        <li><strong>실시간 접근성</strong> — 사용자 질의에 즉시 응답</li>
+        <li><strong>계속적인 변화</strong> — 삽입·삭제·갱신으로 항상 최신 상태 유지</li>
+        <li><strong>동시 공용</strong> — 여러 사용자가 동시에 이용</li>
+        <li><strong>내용에 의한 참조</strong> — 주소가 아닌 <em>데이터 값</em>으로 검색</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">DBMS 장단점</span></div>
+      <div class="card-desc">
+        <strong>장점</strong> — 데이터 중복 <em>최소화</em>, 일관성·무결성 유지, 공유·표준화, 보안 유지, 논리적·물리적 <em>독립성</em>.<br>
+        <strong>단점</strong> — 전문가 필요, 전산화 비용 증가, <em>백업·회복이 어려움</em>, 시스템이 복잡함, 파일의 <em>예비·회복 기법이 복잡</em>.
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🏛️</span><span class="card-title">3단계 스키마</span></div>
+      <ul class="tips">
+        <li><strong>외부 스키마</strong> — <em>개별 사용자·응용 프로그램</em> 관점(서브 스키마). 여러 개 존재</li>
+        <li><strong>개념 스키마</strong> — 조직 <em>전체</em>의 논리적 구조. <em>하나만</em> 존재</li>
+        <li><strong>내부 스키마</strong> — <em>물리적 저장 구조</em>(인덱스·저장 방식)</li>
+        <li><strong>논리적 독립성</strong> = 개념↔외부 / <strong>물리적 독립성</strong> = 내부↔개념</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗣️</span><span class="card-title">데이터 언어</span></div>
+      <ul class="tips">
+        <li><strong>DDL(정의어)</strong> — <code>CREATE, ALTER, DROP</code> : 구조 정의</li>
+        <li><strong>DML(조작어)</strong> — <code>SELECT, INSERT, UPDATE, DELETE</code> : 데이터 처리</li>
+        <li><strong>DCL(제어어)</strong> — <code>GRANT, REVOKE, COMMIT, ROLLBACK</code> : 권한·트랜잭션</li>
+        <li><strong>DBA</strong> — DB 설계·운영·보안·백업을 총괄하는 관리자</li>
+      </ul></div>
+  </div>
+
+  <h3 class="blk">🔗 B. 관계형 데이터베이스와 키</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>용어</th><th>의미</th></tr>
+      <tr><td><strong>릴레이션(Relation)</strong></td><td>2차원 표 = 테이블</td></tr>
+      <tr><td><strong>튜플(Tuple)</strong></td><td><em>행(Row) = 레코드</em>. 튜플의 개수 = <strong>카디널리티</strong></td></tr>
+      <tr><td><strong>속성(Attribute)</strong></td><td><em>열(Column) = 필드</em>. 속성의 개수 = <strong>디그리(차수)</strong></td></tr>
+      <tr><td><strong>도메인(Domain)</strong></td><td>한 속성이 가질 수 있는 <em>값의 집합</em></td></tr>
+    </table>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">키(Key)의 종류 — 매회 출제</div>
+    <table>
+      <tr><th>키</th><th>설명</th></tr>
+      <tr><td><strong>후보키</strong></td><td>튜플을 유일하게 식별하는 속성(집합). <em>유일성 + 최소성</em>을 모두 만족</td></tr>
+      <tr><td><strong>기본키(PK)</strong></td><td>후보키 중 <em>선택</em>한 하나. <strong>NULL 불가·중복 불가</strong></td></tr>
+      <tr><td><strong>대체키</strong></td><td>후보키 중 기본키로 선택되지 <em>않은</em> 나머지</td></tr>
+      <tr><td><strong>슈퍼키</strong></td><td><em>유일성만</em> 만족(최소성 X). 후보키에 아무 속성이나 더한 것</td></tr>
+      <tr><td><strong>외래키(FK)</strong></td><td>다른 릴레이션의 <em>기본키를 참조</em>하는 속성. <em>NULL 허용·중복 허용</em></td></tr>
+    </table>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">✅</span><span class="card-title">무결성 제약</span></div>
+      <ul class="tips">
+        <li><strong>개체 무결성</strong> — 기본키는 <em>NULL이거나 중복될 수 없음</em></li>
+        <li><strong>참조 무결성</strong> — 외래키 값은 <em>참조하는 테이블의 기본키에 존재</em>하거나 NULL이어야 함</li>
+        <li><strong>도메인 무결성</strong> — 속성 값은 <em>정의된 도메인</em>에 속해야 함</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📐</span><span class="card-title">E-R 다이어그램 기호</span></div>
+      <ul class="tips">
+        <li><strong>□ 사각형</strong> — 개체(Entity)</li>
+        <li><strong>◇ 마름모</strong> — 관계(Relationship)</li>
+        <li><strong>○ 타원</strong> — 속성(Attribute)</li>
+        <li><strong>밑줄 친 타원</strong> — 기본키 속성</li>
+        <li><strong>선(─)</strong> — 개체와 속성·관계의 연결</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧼</span><span class="card-title">정규화</span></div>
+      <div class="card-desc">
+        중복을 줄이고 <strong>이상 현상(삽입·삭제·갱신 이상)</strong>을 없애기 위해 릴레이션을 분해하는 과정입니다.<br>
+        <strong>1NF</strong> 모든 속성이 <em>원자값</em> → <strong>2NF</strong> <em>부분 함수 종속 제거</em> → <strong>3NF</strong> <em>이행적 함수 종속 제거</em> → <strong>BCNF</strong> <em>모든 결정자가 후보키</em>.<br>
+        정규화를 지나치게 하면 조인이 늘어 <em>검색 성능이 떨어질 수</em> 있습니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">💬 C. SQL</h3>
+  <pre class="code"><span class="kw">SELECT</span> [DISTINCT] 필드목록
+<span class="kw">FROM</span>   테이블
+<span class="kw">WHERE</span>  조건
+<span class="kw">GROUP BY</span> 그룹기준
+<span class="kw">HAVING</span> 그룹조건
+<span class="kw">ORDER BY</span> 정렬기준 [ASC | DESC];</pre>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>요소</th><th>설명 / 예</th></tr>
+      <tr><td><code>DISTINCT</code></td><td>중복 행을 <em>한 번만</em> 표시</td></tr>
+      <tr><td><code>WHERE</code> vs <code>HAVING</code></td><td>WHERE는 <em>개별 행</em> 조건, HAVING은 <em>그룹(집계) 조건</em></td></tr>
+      <tr><td><code>LIKE</code></td><td>액세스 와일드카드: <code>*</code>(여러 문자) <code>?</code>(한 문자) <code>#</code>(숫자 한 자리). 표준 SQL은 <code>%</code>, <code>_</code></td></tr>
+      <tr><td><code>BETWEEN A AND B</code></td><td>A 이상 B 이하(양 끝 포함)</td></tr>
+      <tr><td><code>IN (값1,값2)</code></td><td>목록 중 하나와 일치</td></tr>
+      <tr><td><code>IS NULL / IS NOT NULL</code></td><td>NULL 비교는 <code>=</code>가 아니라 <em>IS</em>를 사용</td></tr>
+      <tr><td>집계 함수</td><td><code>COUNT, SUM, AVG, MAX, MIN</code>. <code>COUNT(*)</code>는 NULL 포함, <code>COUNT(필드)</code>는 <em>NULL 제외</em></td></tr>
+      <tr><td><code>INNER JOIN</code></td><td>양쪽 모두 일치하는 행만</td></tr>
+      <tr><td><code>LEFT / RIGHT JOIN</code></td><td>한쪽 테이블의 <em>모든 행</em> + 일치하는 상대 행</td></tr>
+      <tr><td><code>UNION</code></td><td>두 쿼리 결과를 <em>합침</em>(중복 제거). <code>UNION ALL</code>은 중복 포함</td></tr>
+      <tr><td><code>INSERT INTO … VALUES</code></td><td>레코드 추가</td></tr>
+      <tr><td><code>UPDATE … SET … WHERE</code></td><td>레코드 수정. WHERE를 빠뜨리면 <em>전체가 수정</em>됨</td></tr>
+      <tr><td><code>DELETE FROM … WHERE</code></td><td>레코드 삭제(구조는 남음). <code>DROP TABLE</code>은 <em>테이블 자체 삭제</em></td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">🧰 D. 액세스 실무 — 테이블</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">주요 데이터 형식</div>
+    <table>
+      <tr><th>형식</th><th>설명</th></tr>
+      <tr><td><strong>짧은 텍스트</strong></td><td>최대 255자</td></tr>
+      <tr><td><strong>긴 텍스트</strong></td><td>최대 약 64,000자. <em>인덱스·정렬 제한</em></td></tr>
+      <tr><td><strong>숫자</strong></td><td>바이트·정수·정수(Long)·실수(Single/Double) 등 필드 크기 선택</td></tr>
+      <tr><td><strong>날짜/시간</strong></td><td>8바이트</td></tr>
+      <tr><td><strong>통화</strong></td><td>8바이트, 소수점 이하 4자리까지 정확</td></tr>
+      <tr><td><strong>일련 번호</strong></td><td>레코드 추가 시 <em>자동 증가</em>. 사용자가 수정 불가, 삭제해도 <em>번호는 재사용되지 않음</em></td></tr>
+      <tr><td><strong>Yes/No</strong></td><td>1비트(참/거짓)</td></tr>
+      <tr><td><strong>OLE 개체 / 첨부 파일 / 하이퍼링크 / 계산</strong></td><td>이미지·문서 삽입, 링크, 다른 필드로 계산한 값</td></tr>
+    </table>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">필드 속성</span></div>
+      <ul class="tips">
+        <li><strong>형식</strong> — 화면 <em>표시 방법</em>(저장 값은 그대로)</li>
+        <li><strong>입력 마스크</strong> — 입력 <em>형태를 강제</em></li>
+        <li><strong>기본값</strong> — 새 레코드에 자동으로 들어가는 값</li>
+        <li><strong>유효성 검사 규칙 / 텍스트</strong> — 조건 위반 시 <em>메시지</em> 표시</li>
+        <li><strong>필수</strong> — Yes면 NULL 불가 / <strong>빈 문자열 허용</strong> — <code>""</code> 허용 여부</li>
+        <li><strong>인덱스</strong> — 아니오 / 예(중복 가능) / 예(중복 불가). <em>검색·정렬은 빨라지고 갱신은 느려짐</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔠</span><span class="card-title">입력 마스크 문자</span></div>
+      <ul class="tips">
+        <li><code>0</code> 숫자 <em>필수</em>(+, - 불가) / <code>9</code> 숫자·공백 <em>선택</em></li>
+        <li><code>#</code> 숫자·공백 선택(+,- 가능)</li>
+        <li><code>L</code> 영문·한글 <em>필수</em> / <code>?</code> 영문·한글 <em>선택</em></li>
+        <li><code>A</code> 영문·한글·숫자 필수 / <code>a</code> 선택</li>
+        <li><code>&amp;</code> 모든 문자·공백 필수 / <code>C</code> 선택</li>
+        <li><code>&gt;</code> 대문자 변환 / <code>&lt;</code> 소문자 변환 / <code>\</code> 다음 문자를 그대로 표시</li>
+        <li>예: <code>000\-0000</code> → 123-4567</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔗</span><span class="card-title">관계 설정</span></div>
+      <div class="card-desc">
+        <strong>항상 참조 무결성 유지</strong>를 체크하면 부모에 없는 값을 자식에 넣을 수 없습니다. 여기에 <em>관련 필드 모두 업데이트</em>(부모 키를 고치면 자식도 자동 수정), <em>관련 레코드 모두 삭제</em>(부모를 지우면 자식도 삭제)를 함께 지정할 수 있습니다. 관계 종류는 <strong>일대다(가장 일반적)</strong>·일대일·다대다(연결 테이블 필요)입니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">🔍 E. 액세스 실무 — 쿼리·폼·보고서</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">쿼리의 종류</div>
+    <table>
+      <tr><th>종류</th><th>설명</th></tr>
+      <tr><td><strong>선택 쿼리</strong></td><td>가장 기본. 조건에 맞는 데이터를 조회·계산</td></tr>
+      <tr><td><strong>매개 변수 쿼리</strong></td><td>실행할 때 <em>값을 물어보는</em> 쿼리. 조건에 <code>[조회할 이름]</code>처럼 <em>대괄호</em>로 작성</td></tr>
+      <tr><td><strong>크로스탭 쿼리</strong></td><td>엑셀 피벗처럼 <em>행 머리글·열 머리글·값</em>으로 요약. 열 머리글은 <em>하나만</em> 지정</td></tr>
+      <tr><td><strong>실행(액션) 쿼리</strong></td><td><em>테이블 만들기·추가·업데이트·삭제</em> 쿼리. 실행하면 원본이 바뀜</td></tr>
+      <tr><td><strong>통합(UNION) 쿼리</strong></td><td>여러 테이블·쿼리의 결과를 하나로. <em>SQL 보기에서만</em> 작성 가능</td></tr>
+      <tr><td><strong>불일치 검색 / 중복 데이터 검색</strong></td><td>마법사로 생성하는 특수 선택 쿼리</td></tr>
+    </table>
+    <div class="tbl-cap">쿼리 디자인 조건: <em>같은 행</em>에 쓰면 AND, <em>다른 행</em>에 쓰면 OR</div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">🖼️</span><span class="card-title">폼(Form)</span></div>
+      <ul class="tips">
+        <li>데이터 <em>입력·수정·조회</em>를 편하게 하는 화면. 원본은 테이블 또는 쿼리</li>
+        <li>구성: <em>폼 머리글 / 페이지 머리글 / 본문 / 페이지 바닥글 / 폼 바닥글</em></li>
+        <li>페이지 머리글·바닥글은 <strong>인쇄할 때만</strong> 나타남</li>
+        <li>컨트롤: <strong>바운드</strong>(필드와 연결) · <strong>언바운드</strong>(연결 없음) · <strong>계산</strong>(수식, <code>=</code>로 시작)</li>
+        <li>종류: 텍스트 상자, 레이블, 콤보 상자(목록+입력), 목록 상자(목록만), 확인란, 옵션 그룹, 명령 단추, 하위 폼</li>
+        <li><strong>하위 폼</strong>은 일대다 관계에서 <em>‘다’쪽</em>을 표시. 연결 필드는 [기본 필드 연결]·[하위 필드 연결]</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧾</span><span class="card-title">보고서(Report)</span></div>
+      <ul class="tips">
+        <li><em>출력·인쇄</em> 전용. 원칙적으로 <strong>데이터 입력·수정 불가</strong></li>
+        <li>구역과 출력 시점: <em>보고서 머리글</em>(맨 처음 1회) · <em>페이지 머리글</em>(매 페이지 위) · <em>그룹 머리글</em>(그룹마다) · <em>본문</em>(레코드마다) · <em>그룹 바닥글</em>(그룹 요약) · <em>페이지 바닥글</em>(매 페이지 아래) · <em>보고서 바닥글</em>(맨 끝 1회, 총합계)</li>
+        <li>그룹은 최대 <strong>10단계</strong>까지, 정렬은 필드·식 기준</li>
+        <li>일련번호: 컨트롤 원본 <code>=1</code>, 누적 합계 <em>모두</em>(전체) 또는 <em>그룹</em></li>
+        <li>페이지 번호: <code>=[Page] &amp; "/" &amp; [Pages]</code></li>
+        <li><em>중복 내용 숨기기</em>·<em>반복 실행 구역</em> 속성으로 출력 형태 조절</li>
+      </ul></div>
+  </div>
+
+  <div class="callout pur"><span>⌨️</span><div class="callout-body">
+    <strong>매크로·모듈</strong> — 매크로는 코드를 몰라도 자동화를 만드는 도구이고, 모듈은 VBA 코드를 담습니다. 대표 명령: <code>OpenForm</code>(폼 열기) · <code>OpenReport</code>(보고서 열기) · <code>RunSQL</code> · <code>Requery</code>(원본 다시 읽기) · <code>Close</code> · <code>MsgBox</code>. VBA에서는 <code>DoCmd.OpenForm "폼이름"</code> 형태로 호출합니다.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 2급 실기 ══════════════════ -->
+<div class="sec" id="sec-pr2">
+  <div class="sec-hd">
+    <div class="sec-title">🖥️ 2급 실기 — 스프레드시트 실무 <span class="tag o">40분 / 100점 만점 70점 이상</span></div>
+    <div class="sec-sub">엑셀 한 과목만 치릅니다. 4개 문제, 총 배점 100점. 부분 점수가 없으므로 조건을 빠짐없이 지키는 것이 전부입니다.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">문제 구성과 배점</div>
+    <table>
+      <tr><th>문제</th><th>세부 작업</th><th>배점</th></tr>
+      <tr><td rowspan="3"><strong>문제 1<br>기본작업</strong></td><td>① 자료 입력 — 주어진 표를 그대로 타이핑</td><td>5점</td></tr>
+      <tr><td>② 서식 설정 — 병합, 글꼴, 맞춤, 사용자 지정 표시 형식, 테두리, 이름 정의</td><td>10점</td></tr>
+      <tr><td>③ 조건부 서식 / 고급 필터 / 자동 필터 중 1개</td><td>5점</td></tr>
+      <tr><td><strong>문제 2<br>계산작업</strong></td><td>함수를 이용한 수식 작성 <strong>5문항</strong></td><td>40점<br>(각 8점)</td></tr>
+      <tr><td><strong>문제 3<br>분석작업</strong></td><td>부분합 / 피벗 테이블 / 목표값 찾기 / 시나리오 / 데이터 표 / 통합 / 정렬 / 텍스트 나누기 / 데이터 유효성 검사 중 <strong>2문항</strong></td><td>20점<br>(각 10점)</td></tr>
+      <tr><td rowspan="2"><strong>문제 4<br>기타작업</strong></td><td>① 매크로 — 2개 작성 후 도형·단추에 연결</td><td>10점</td></tr>
+      <tr><td>② 차트 — 지시된 5가지 요소 수정</td><td>10점</td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⏱️</span><span class="card-title">40분 시간 배분</span></div>
+      <div class="card-desc">기본작업 <strong>7분</strong> → 계산작업 <strong>15분</strong> → 분석작업 <strong>8분</strong> → 기타작업 <strong>8분</strong> → 검토 <strong>2분</strong>.<br>계산작업에서 막히면 <em>과감히 넘기고</em> 나머지를 먼저 끝내세요. 계산 1문항(8점)보다 분석 1문항(10점)이 배점이 큽니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🚨</span><span class="card-title">0점·감점 주의</span></div>
+      <ul class="tips">
+        <li>답안 파일을 <em>지정 폴더·지정 이름</em>이 아닌 곳에 저장 → 미채점</li>
+        <li>시트 이름·순서를 임의로 변경</li>
+        <li>수식 대신 <em>값을 직접 입력</em>(계산작업은 반드시 함수·수식)</li>
+        <li>문제에 명시된 함수를 <em>쓰지 않고</em> 다른 방법으로 풀기</li>
+        <li>매크로 이름·차트 제목의 <em>오타</em></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎯</span><span class="card-title">자주 나오는 함수 조합</span></div>
+      <ul class="tips">
+        <li><code>IF</code> 중첩 / <code>IF+AND/OR</code> — 등급·판정</li>
+        <li><code>VLOOKUP</code> — 코드로 항목명·단가 찾기 (범위는 <em>절대 참조</em>)</li>
+        <li><code>SUMIF · COUNTIF · AVERAGEIF</code> — 조건별 집계</li>
+        <li><code>RANK.EQ</code> — 순위 (범위 절대 참조)</li>
+        <li><code>LEFT/MID/RIGHT + IF</code> — 코드 자릿수로 분류</li>
+        <li><code>ROUND/ROUNDUP/ROUNDDOWN</code> — 자릿수 지정</li>
+        <li><code>DSUM/DAVERAGE/DCOUNT</code> — 조건 범위 사용</li>
+        <li><code>INDEX+MATCH</code> · <code>CHOOSE+WEEKDAY/MID</code></li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🤖</span><span class="card-title">매크로 문제 정석 순서</span></div>
+      <div class="card-desc">① [개발 도구]-[매크로 기록] → ② <strong>이름을 문제 그대로</strong> 입력 → ③ 지시된 작업 수행 → ④ 기록 중지 → ⑤ [삽입]-[도형/단추] 그리기 → ⑥ 도형 <em>텍스트 편집</em>으로 이름 입력 → ⑦ 오른쪽 클릭-[매크로 지정]. <em>도형을 먼저 그리고 매크로를 기록하면 도형까지 기록</em>되니 주의하세요.</div></div>
+  </div>
+
+  <h3 class="blk">📝 2급 실기 예시문제 20제</h3>
+  <div class="callout org"><span>💡</span><div class="callout-body">실제 시험과 같은 형식의 지시문입니다. 먼저 스스로 수식을 세워 본 뒤 정답을 확인하세요.</div></div>
+  <div id="pr2-list"></div>
+</div>
+
+<!-- ══════════════════ 1급 실기 ══════════════════ -->
+<div class="sec" id="sec-pr1">
+  <div class="sec-hd">
+    <div class="sec-title">🖥️ 1급 실기 — 스프레드시트 + 데이터베이스 <span class="tag o">각 45분 / 두 과목 모두 70점 이상</span></div>
+    <div class="sec-sub">엑셀 45분, 액세스 45분을 연달아 치릅니다. <strong>한 과목만 70점을 넘겨도 불합격</strong>이므로 두 과목을 균형 있게 준비해야 합니다.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">① 스프레드시트 실무 (엑셀) — 45분 / 100점</div>
+    <table>
+      <tr><th>문제</th><th>세부 작업</th><th>배점</th></tr>
+      <tr><td rowspan="3"><strong>문제 1<br>기본작업</strong></td><td>① 고급 필터 — 조건을 직접 작성해 다른 위치에 추출</td><td>5점</td></tr>
+      <tr><td>② 조건부 서식 — <em>수식을 사용한 규칙</em>으로 행 전체 서식</td><td>5점</td></tr>
+      <tr><td>③ 페이지 레이아웃 / 시트 보호 / 통합 문서 보기</td><td>5점</td></tr>
+      <tr><td><strong>문제 2<br>계산작업</strong></td><td>수식 <strong>6문항</strong> — 배열 수식과 <em>사용자 정의 함수(VBA)</em>가 반드시 포함</td><td>30점<br>(각 5점)</td></tr>
+      <tr><td rowspan="2"><strong>문제 3<br>분석작업</strong></td><td>① 피벗 테이블 — 그룹화·값 표시 형식·레이아웃·필드 설정</td><td>10점</td></tr>
+      <tr><td>② 데이터 도구 — 통합 / 데이터 표 / 시나리오 / 목표값 / 정렬·부분합 / 중복 제거 / 유효성 검사</td><td>10점</td></tr>
+      <tr><td rowspan="3"><strong>문제 4<br>기타작업</strong></td><td>① 차트 — 5가지 지시 사항(계열 추가, 보조 축, 추세선, 레이블, 서식)</td><td>10점</td></tr>
+      <tr><td>② 매크로 — 2개</td><td>10점</td></tr>
+      <tr><td>③ <strong>프로시저</strong> — 폼 보이기 / 폼 초기화·입력 / 종료·기타</td><td>15점<br>(각 5점)</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">② 데이터베이스 실무 (액세스) — 45분 / 100점</div>
+    <table>
+      <tr><th>문제</th><th>세부 작업</th><th>배점</th></tr>
+      <tr><td rowspan="3"><strong>문제 1<br>DB 구축</strong></td><td>① 테이블 완성 — 필드 속성 5가지 설정(기본키·형식·입력 마스크·유효성 검사·인덱스 등)</td><td>15점</td></tr>
+      <tr><td>② 관계 설정 — 참조 무결성 및 연쇄 업데이트·삭제</td><td>5점</td></tr>
+      <tr><td>③ 외부 데이터 가져오기·연결 / 조회 속성</td><td>5점</td></tr>
+      <tr><td rowspan="2"><strong>문제 2<br>입력·수정 기능</strong></td><td>① 폼 완성 — 폼·컨트롤 속성 3가지</td><td>9점</td></tr>
+      <tr><td>② 조건부 서식 / 콤보 상자 / 이벤트 프로시저</td><td>11점</td></tr>
+      <tr><td rowspan="2"><strong>문제 3<br>조회·출력 기능</strong></td><td>① 보고서 완성 — 그룹·정렬·컨트롤 원본·중복 숨기기 등 5가지</td><td>15점</td></tr>
+      <tr><td>② 조회 이벤트 프로시저 (Filter / RecordSource)</td><td>5점</td></tr>
+      <tr><td><strong>문제 4<br>처리 기능</strong></td><td>쿼리 작성 <strong>5문항</strong> — 선택·매개변수·크로스탭·요약·실행 쿼리</td><td>35점<br>(각 7점)</td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="card-head"><span class="card-icon">⏱️</span><span class="card-title">엑셀 45분 배분</span></div>
+      <div class="card-desc">기본작업 <strong>8분</strong> → 계산작업 <strong>13분</strong> → 분석작업 <strong>8분</strong> → 차트 <strong>6분</strong> → 매크로 <strong>4분</strong> → 프로시저 <strong>5분</strong> → 저장·검토 <strong>1분</strong>.<br>계산작업 6문항 중 <em>2문항은 버려도</em> 나머지를 다 맞히면 70점을 넘길 수 있습니다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⏱️</span><span class="card-title">액세스 45분 배분</span></div>
+      <div class="card-desc">쿼리(35점)를 <strong>가장 먼저</strong> 푸는 전략이 유리합니다. 쿼리 <strong>18분</strong> → DB 구축 <strong>10분</strong> → 보고서 <strong>9분</strong> → 폼 <strong>7분</strong> → 검토 <strong>1분</strong>.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🧬</span><span class="card-title">엑셀 최다 출제 유형</span></div>
+      <ul class="tips">
+        <li><strong>배열 수식</strong> — 조건부 개수·합계·평균·최대·순위</li>
+        <li><strong>사용자 정의 함수</strong> — <code>Function</code>으로 등급 판정</li>
+        <li><code>INDEX+MATCH</code> 조합, <code>LARGE/SMALL</code> 조합</li>
+        <li>날짜 함수(<code>WORKDAY, EOMONTH, WEEKDAY</code>) + <code>CHOOSE</code></li>
+        <li>문자 함수 중첩(<code>MID, REPLACE, TEXT</code>)</li>
+      </ul></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🗄️</span><span class="card-title">액세스 최다 출제 유형</span></div>
+      <ul class="tips">
+        <li><strong>요약(그룹) 쿼리</strong> + 조건 — <code>Group By</code>, <code>Count</code>, <code>Avg</code></li>
+        <li><strong>매개 변수 쿼리</strong> — <code>Like "*" &amp; [검색어] &amp; "*"</code></li>
+        <li><strong>크로스탭 쿼리</strong> — 행/열 머리글 + 값</li>
+        <li><strong>불일치 검색</strong> — <code>Is Null</code> + 외부 조인</li>
+        <li><strong>업데이트·테이블 만들기 쿼리</strong></li>
+        <li>조회 프로시저 — <code>Me.Filter = "…"</code> + <code>Me.FilterOn = True</code></li>
+      </ul></div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 1급 실기 합격 공식</div>
+    <div class="hi-body">
+      엑셀은 <strong>기본작업 15 + 분석 20 + 차트 10 + 매크로 10 = 55점</strong>이 비교적 쉬운 구간입니다. 여기에 계산 6문항 중 3개(15점)만 맞혀도 70점입니다.<br>
+      액세스는 <strong>쿼리 35 + DB 구축 25 = 60점</strong>이 핵심이며, 보고서·폼에서 10점만 더하면 70점입니다. <em>쿼리를 놓치면 사실상 합격이 불가능</em>합니다.
+    </div>
+  </div>
+
+  <h3 class="blk">📝 1급 실기 예시문제 20제</h3>
+  <div class="callout org"><span>💡</span><div class="callout-body">엑셀 12문제 + 액세스 8문제로 구성했습니다. 배열 수식은 입력 후 <strong>Ctrl+Shift+Enter</strong>를 눌러야 합니다.</div></div>
+  <div id="pr1-list"></div>
+</div>
+
+<!-- ══════════════════ 퀴즈 ══════════════════ -->
+<div class="sec" id="sec-quiz">
+  <div class="sec-hd">
+    <div class="sec-title">✍️ 퀴즈 — 과목당 100문제 (총 500문제)</div>
+    <div class="sec-sub">과목을 고르고 보기를 클릭하면 즉시 정답과 해설이 표시됩니다. 오답은 자동으로 기록되어 [오답만 다시]로 재도전할 수 있습니다.</div>
+  </div>
+
+  <div id="quiz-bar">
+    <select id="q-subject">
+      <option value="g2s1">2급 1과목 · 컴퓨터 일반 (100)</option>
+      <option value="g2s2">2급 2과목 · 스프레드시트 일반 (100)</option>
+      <option value="g1s1">1급 1과목 · 컴퓨터 일반 (100)</option>
+      <option value="g1s2">1급 2과목 · 스프레드시트 일반 (100)</option>
+      <option value="g1s3">1급 3과목 · 데이터베이스 일반 (100)</option>
+    </select>
+    <button id="q-shuffle">🔀 문제 섞기</button>
+    <button id="q-wrong">🔁 오답만 다시</button>
+    <button id="q-reset">↺ 초기화</button>
+    <input id="q-jump" type="number" min="1" placeholder="번호">
+    <button id="q-go">이동</button>
+    <span id="quiz-stat"></span>
+  </div>
+  <div id="prog"><div id="prog-in"></div></div>
+  <div id="q-area"></div>
+  <div id="quiz-nav">
+    <button id="q-prev">‹ 이전</button>
+    <button id="q-next" class="prim">다음 ›</button>
+  </div>
+  <div id="dots"></div>
+</div>
+
+<div class="footnote">
+  컴퓨터활용능력 1·2급 필기 이론 + 과목별 100문제(총 500문제) + 실기 가이드 및 예시문제 40제<br>
+  시행처: 대한상공회의소 · 실기 기준 프로그램: MS Office LTSC Professional Plus 2021
+</div>
+
+</div><!-- /main -->
+
+<script src="quiz-g2s1.js"></script>
+<script src="quiz-g2s2.js"></script>
+<script src="quiz-g1s1.js"></script>
+<script src="quiz-g1s2.js"></script>
+<script src="quiz-g1s3.js"></script>
+<script src="practical.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

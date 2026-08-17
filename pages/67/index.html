@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소설 작법 완전 가이드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080709;--bg2:#0f0d11;--bg3:#171418;--bg4:#211d25;
+  --border:#272030;--border2:#3d3450;
+  --txt:#e8e0f0;--txt2:#a89ec0;--txt3:#5e5678;
+  --gold:#c8902a;--gold2:#e8b040;--gold3:rgba(200,144,42,.13);
+  --gold4:rgba(200,144,42,.06);
+  --acc:#d4a040;--acc2:#f0c060;
+  --grn:#44aa77;--grn2:#66cc99;--grnB:rgba(68,170,119,.12);
+  --red:#cc3344;--red2:#ee4455;--redB:rgba(204,51,68,.12);
+  --blu:#4488cc;--blu2:#66aaee;--bluB:rgba(68,136,204,.12);
+  --pur:#8855cc;--pur2:#aa77ee;--purB:rgba(136,85,204,.12);
+  --teal:#339988;--teal2:#55bbaa;--tealB:rgba(51,153,136,.12);
+  --rose:#cc4477;--rose2:#ee6699;--roseB:rgba(204,68,119,.12);
+  --ghost:#445566;--ghost2:#667788;--ghostB:rgba(68,85,102,.15);
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;
+}
+
+/* HEADER */
+#hdr{
+  background:linear-gradient(135deg,#050407 0%,#0c0a10 50%,#050407 100%);
+  border-bottom:2px solid var(--gold);padding:11px 20px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+#hdr-logo{font-size:20px;filter:drop-shadow(0 0 8px var(--gold));}
+#hdr h1{font-size:17px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 20px rgba(200,144,42,.4);letter-spacing:.5px;}
+#hdr .badge{font-size:9px;padding:2px 7px;border-radius:2px;
+  background:var(--gold3);border:1px solid rgba(200,144,42,.35);color:var(--acc);
+  font-weight:700;letter-spacing:.8px;white-space:nowrap;}
+#search{flex:1;min-width:160px;max-width:320px;padding:6px 12px;
+  border-radius:4px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);font-size:13px;outline:none;font-family:inherit;}
+#search:focus{border-color:var(--gold);}
+#search::placeholder{color:var(--txt3);}
+
+/* TABS */
+#tabs{display:flex;gap:2px;padding:6px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:48px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 13px;border-radius:3px;border:1px solid transparent;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);
+  white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--gold3);border-color:rgba(200,144,42,.4);color:var(--acc2);}
+
+/* MAIN */
+#main{padding:16px;max-width:1260px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+
+/* SECTION HEADING */
+.sec-hd{margin-bottom:16px;}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:14px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:10px;margin-bottom:14px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:13px 15px;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.card-icon{font-size:16px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card-badge{font-size:9px;padding:1px 6px;border-radius:7px;margin-left:auto;
+  background:var(--gold3);border:1px solid rgba(200,144,42,.3);color:var(--gold2);}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* TIPS LIST */
+ul.tips{list-style:none;display:flex;flex-direction:column;gap:0;}
+ul.tips li{display:flex;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(39,32,48,.7);font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--gold);flex-shrink:0;margin-top:2px;}
+ul.tips li strong{color:var(--txt);}
+
+/* RULE CARD */
+.rule-card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:13px 15px;margin-bottom:10px;}
+.rule-title{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:7px;
+  display:flex;align-items:center;gap:6px;letter-spacing:.3px;}
+.rule-body{font-size:12px;color:var(--txt2);line-height:1.7;}
+.rule-body strong{color:var(--txt);}
+
+/* EXAMPLE BOX */
+.ex-wrap{margin-bottom:14px;}
+.ex-label{font-size:10px;font-weight:700;color:var(--gold2);letter-spacing:.8px;
+  text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);}
+.ex-box{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
+  padding:16px 18px;position:relative;}
+.ex-box::before{content:'예시';position:absolute;top:-1px;right:12px;
+  font-size:9px;font-weight:700;color:var(--txt3);background:var(--bg3);
+  padding:0 6px;letter-spacing:.5px;}
+.ex-txt{font-size:13px;color:var(--txt);line-height:2;white-space:pre-wrap;
+  font-family:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;}
+.ex-txt em{color:var(--gold2);font-style:normal;font-weight:600;}
+.ex-note{font-size:11px;color:var(--txt3);margin-top:10px;padding-top:8px;
+  border-top:1px dashed var(--border);line-height:1.65;}
+.ex-note strong{color:var(--txt2);}
+
+/* DIVIDER */
+.div-title{font-size:10px;font-weight:700;color:var(--gold2);
+  letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;}
+
+/* HIGHLIGHT CARD */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(200,144,42,.22);border-radius:7px;padding:13px 16px;margin-bottom:12px;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.75;}
+.hi-body strong{color:var(--txt);}
+
+/* CALLOUT */
+.callout{border-radius:5px;padding:9px 13px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout-body{color:var(--txt2);line-height:1.65;}
+.callout-body strong{color:var(--txt);}
+.callout.gold{background:var(--gold4);border-color:var(--gold);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.ghost{background:var(--ghostB);border-color:var(--ghost);}
+
+/* DO / DON'T */
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.do-box{background:rgba(68,170,119,.07);border:1px solid rgba(68,170,119,.25);
+  border-radius:6px;padding:10px 13px;}
+.dont-box{background:rgba(204,51,68,.07);border:1px solid rgba(204,51,68,.25);
+  border-radius:6px;padding:10px 13px;}
+.do-label{font-size:9px;font-weight:700;letter-spacing:.8px;margin-bottom:6px;}
+.do-label.ok{color:var(--grn2);}
+.do-label.no{color:var(--red2);}
+.do-item{font-size:11.5px;color:var(--txt2);line-height:1.6;padding:3px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);}
+.do-item:last-child{border-bottom:none;}
+
+/* TECHNIQUE TAG */
+.tech-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.tech{font-size:10px;padding:2px 8px;border-radius:10px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt3);}
+.tech.red{background:var(--redB);border-color:rgba(204,51,68,.3);color:var(--red2);}
+.tech.grn{background:var(--grnB);border-color:rgba(68,170,119,.3);color:var(--grn2);}
+.tech.gold{background:var(--gold3);border-color:rgba(200,144,42,.3);color:var(--gold2);}
+.tech.blu{background:var(--bluB);border-color:rgba(68,136,204,.3);color:var(--blu2);}
+.tech.pur{background:var(--purB);border-color:rgba(136,85,204,.3);color:var(--pur2);}
+.tech.ghost{background:var(--ghostB);border-color:rgba(68,85,102,.3);color:var(--ghost2);}
+.tech.rose{background:var(--roseB);border-color:rgba(204,68,119,.3);color:var(--rose2);}
+.tech.teal{background:var(--tealB);border-color:rgba(51,153,136,.3);color:var(--teal2);}
+
+/* STEP LIST */
+.steps{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.step{display:flex;gap:10px;align-items:flex-start;}
+.step-num{min-width:22px;height:22px;border-radius:50%;background:var(--gold3);
+  border:1px solid rgba(200,144,42,.4);display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;color:var(--gold2);flex-shrink:0;margin-top:1px;}
+.step-txt{font-size:12px;color:var(--txt2);line-height:1.65;}
+.step-txt strong{color:var(--txt);}
+
+/* SEARCH HL */
+.hl{background:rgba(200,144,42,.22);border-radius:2px;color:var(--acc2);}
+
+@media(max-width:640px){
+  .grid,.grid-wide{grid-template-columns:1fr;}
+  .do-dont{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">✍️</div>
+  <h1>소설 작법 완전 가이드</h1>
+  <span class="badge">전투 · 로맨스 · 세계관 · 괴담 · 기타</span>
+  <input id="search" type="text" placeholder="기법, 장르, 키워드 검색...">
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="battle">⚔️ 전투</button>
+  <button class="tab" data-tab="love">💕 사랑/로맨스</button>
+  <button class="tab" data-tab="world">🌍 세계관</button>
+  <button class="tab" data-tab="monster">👹 몬스터 창조</button>
+  <button class="tab" data-tab="rank">🏛️ 계급·조직</button>
+  <button class="tab" data-tab="calm">🌊 잔잔한 글</button>
+  <button class="tab" data-tab="dynamic">⚡ 역동적 글</button>
+  <button class="tab" data-tab="horror">👻 괴담·공포</button>
+  <button class="tab" data-tab="etc">📖 기타 기법</button>
+</div>
+
+<div id="main">
+
+<!-- ===== 전투 ===== -->
+<div class="sec on" id="sec-battle">
+  <div class="sec-hd">
+    <div class="sec-title">⚔️ 전투 장면 묘사</div>
+    <div class="sec-sub">전투는 소설에서 가장 빠른 속도감을 요구하는 장면이다. 리듬, 감각, 심리를 동시에 살려야 한다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 전투 묘사의 3대 핵심 원칙</div>
+    <div class="hi-body">
+      <strong>① 문장을 짧게</strong> — 긴 문장은 박자를 죽인다. 전투 장면에서 쉼표는 숨 고르기, 마침표는 일격이다.<br>
+      <strong>② 감각을 구체적으로</strong> — 시각에만 의존하지 말 것. 금속 냄새, 피의 철 냄새, 흙먼지, 땀, 뼈가 울리는 충격음을 써라.<br>
+      <strong>③ 캐릭터의 심리를 빼지 말 것</strong> — 전투 장면도 결국 캐릭터의 이야기다. 공포, 분노, 집중, 절망이 독자를 몸속으로 끌어당긴다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">구성: 전투의 3막 구조</span></div>
+      <ul class="tips">
+        <li><strong>도입 (긴장)</strong> — 전투 직전의 침묵. 감각이 예민해지는 순간 묘사. 독자의 심장을 죄어야 한다.</li>
+        <li><strong>본격 전투 (절정)</strong> — 짧은 문장, 강한 동사 중심. 행동과 반응의 교차.</li>
+        <li><strong>결말 (여운)</strong> — 끝난 후의 정적. 통증, 떨리는 손, 거친 숨이 살아 있음을 증명한다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✏️</span><span class="card-title">동사 선택이 전부다</span></div>
+      <ul class="tips">
+        <li><strong>약한 동사 피하기</strong> — "공격했다" 대신 "검날을 뻗었다", "몸통을 박았다"</li>
+        <li><strong>강한 동사 목록</strong> — 찼다, 박았다, 후볐다, 짓눌렀다, 밀쳐냈다, 구겼다, 뚫었다</li>
+        <li><strong>의성어·의태어</strong> — 퍽, 철컥, 쨍, 쿵. 한 단어가 열 문장보다 강하다.</li>
+        <li><strong>수동태 금지</strong> — "공격 당했다" 보다 "검이 허벅지를 파고들었다"가 더 생생하다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">신체 묘사의 구체성</span></div>
+      <ul class="tips">
+        <li><strong>부위를 명확히</strong> — "맞았다"가 아니라 "쇄골 아래 3cm"처럼 정확하게</li>
+        <li><strong>통증의 질감</strong> — 찌르는 통증, 터지는 열감, 뼈가 울리는 진동을 구분하여 서술</li>
+        <li><strong>신체 반응</strong> — 무릎이 꺾이는 것, 시야가 흔들리는 것, 귀가 먹먹해지는 것</li>
+        <li><strong>반사와 본능</strong> — 생각 이전에 몸이 먼저 반응하는 장면은 캐릭터의 훈련도를 보여준다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⏱️</span><span class="card-title">시간 조작 테크닉</span></div>
+      <ul class="tips">
+        <li><strong>슬로우 모션</strong> — 결정적 순간을 느리게 묘사. 독자가 숨을 참게 만든다.</li>
+        <li><strong>시간 압축</strong> — 일반 장면을 한 문장으로 건너뛰어 속도감 유지</li>
+        <li><strong>반복과 리듬</strong> — "찼다. 막았다. 찼다." 반복 구조로 전투의 박자를 만든다</li>
+        <li><strong>예상과 배반</strong> — "피하려 했다. 하지만 늦었다." — 이 패턴이 긴장을 만든다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">😰</span><span class="card-title">심리 묘사 — 피하지 마라</span></div>
+      <ul class="tips">
+        <li><strong>공포</strong> — 손이 덜리고, 소변이 마렵고, 심장이 귀에서 들리는 느낌</li>
+        <li><strong>분노</strong> — 생각이 좁아지고, 통증이 사라지고, 시야가 붉어지는 순간</li>
+        <li><strong>집중</strong> — 반대로 주변이 조용해지고, 상대의 근육 하나하나가 눈에 들어오는 경지</li>
+        <li><strong>포기 직전</strong> — 이 순간을 '살아있음'의 역설로 뒤집어라</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚫</span><span class="card-title">흔한 실수 피하기</span></div>
+      <ul class="tips">
+        <li><strong>설명 과잉</strong> — 전투 중 기술 설명 문단 금지. 사전에 설명하거나 사후에 처리</li>
+        <li><strong>지나친 화려함</strong> — 회오리 참격·궁극기·오버킬 묘사는 클라이맥스에만</li>
+        <li><strong>무적 주인공</strong> — 한 번은 반드시 맞아야 한다. 통증이 있어야 전투다</li>
+        <li><strong>지루한 1:1 교환</strong> — A가 공격, B가 막음의 반복은 독자를 잠재운다. 환경, 제3자를 개입시켜라</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="do-dont">
+    <div class="do-box">
+      <div class="do-label ok">✓ 좋은 예</div>
+      <div class="do-item">검날이 허공을 갈랐다. 카이는 이미 물러서 있었다.</div>
+      <div class="do-item">숨이 끊겼다. 다시 쉬었다. 옆구리가 타들어 갔다.</div>
+      <div class="do-item">쨍 — 손이 저렸다. 막아냈다. 그게 전부였다.</div>
+    </div>
+    <div class="dont-box">
+      <div class="do-label no">✗ 나쁜 예</div>
+      <div class="do-item">카이는 화염 검기 회오리 참을 시전하였으며, 상대는 그것을 보고 놀라 회피를 시도했다.</div>
+      <div class="do-item">그 공격은 매우 강력하고 위험한 것이었다.</div>
+      <div class="do-item">A가 공격했다. B가 막았다. A가 다시 공격했다. B가 다시 막았다.</div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">⚔️ 전투 묘사 예시 (근접전 — 1,000자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">검날이 허공을 갈랐다.
+
+카이는 이미 한 발 물러서 있었다. 금속이 금속을 스치는 소리가 고막을 찢었다. 숨을 쉴 틈도 없었다. 상대의 두 번째 공격이 왼쪽 허벅지를 노렸다. 카이는 이빨을 악물고 체중을 오른발에 싣는 동시에 팔꿈치를 턱에 가져다 박았다.
+
+둔탁한 충격음.
+
+뼈가 울리는 진동이 팔을 타고 올라왔다. 상대가 비틀거렸다. 찰나였다. 카이는 그 찰나를 놓치지 않았다.
+
+발이 옆구리를 파고들었다. 퍽. 공기가 터지는 소리. 남자가 벽으로 날아가 등을 박았다. 미끄러지는 소리. 무너지는 몸.
+
+카이는 숨을 골랐다. 목구멍으로 피 냄새가 올라왔다 — 자신의 것인지, 상대의 것인지 알 수 없었다. 오른쪽 옆구리가 타들어 갔다. 방금 전 그것이 스쳤다는 걸, 그제야 깨달았다.
+
+손이 덜렸다.
+
+<em>'무서웠나.'</em>
+
+다 끝난 뒤에야 공포가 올라왔다. 전투 중에는 없던 것이 지금 두 다리를 흔들고 있었다. 카이는 벽에 등을 기댔다. 쓰러진 남자가 바닥에서 신음했다. 죽지는 않았다. 죽이지 않았다.
+
+그게 오늘의 전부였다.
+
+창밖에서 새가 울었다. 세상은 아무 일도 없었다는 듯 흘러갔고, 카이는 덜리는 손으로 검집을 더듬었다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 짧은 문장·단독 문장으로 박자 조절 / "둔탁한 충격음" 단독 문장으로 정점 강조 / 전투 후 공포 묘사로 캐릭터를 인간적으로 / 끝의 새 소리로 세상의 무관심과 대비
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">⚔️ 전투 묘사 예시 (마법전 — 600자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">공기가 탔다.
+
+루안이 손을 뻗는 순간, 이미 불꽃은 그의 손바닥을 뚫고 나오고 있었다. 열이 아니었다 — 빛이었다. 눈이 녹는 것 같은 하얀 빛. 상대가 팔을 교차해 막으려 했지만 늦었다. 파열음과 함께 지면이 패였다.
+
+연기 속에서 루안은 기침을 참았다. 마력이 끊겼다. 손 끝이 얼음처럼 차가워졌다. <em>다음 한 발은 없다.</em>
+
+상대가 연기 속에서 걸어 나왔다. 그을음이 묻은 옷 위로, 아무 상처도 없었다.
+
+"인상적이었다."
+
+루안의 목구멍에서 웃음인지 신음인지 모를 소리가 새어 나왔다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 마법의 감각(열이 아니라 빛, 손 끝이 차가워짐)을 구체화 / 마력 고갈 = 극적 긴장 / 상대의 무상함으로 반전 / 대사 한 마디로 절망 표현
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 사랑/로맨스 ===== -->
+<div class="sec" id="sec-love">
+  <div class="sec-hd">
+    <div class="sec-title">💕 사랑·로맨스 묘사</div>
+    <div class="sec-sub">로맨스는 전투보다 어렵다. 감정을 직접 쓰면 식고, 간접적으로 써야 독자가 두근거린다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 로맨스의 황금 법칙</div>
+    <div class="hi-body">
+      <strong>"감정을 쓰지 말고 장면을 써라."</strong><br>
+      "그녀를 사랑했다"가 아니라, 그녀가 웃을 때 그가 말을 잃는 장면을 써라.<br>
+      독자가 감정을 스스로 느껴야 한다. 작가가 느끼라고 강요하는 순간 독자는 느끼지 않는다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌱</span><span class="card-title">감정의 단계적 축적</span></div>
+      <ul class="tips">
+        <li><strong>인지</strong> — 상대의 존재를 처음 의식하는 순간. 작은 디테일이 눈에 들어오기 시작한다.</li>
+        <li><strong>당김</strong> — 이유 없이 신경 쓰이는 단계. 피하려 하지만 자꾸 보게 된다.</li>
+        <li><strong>충돌과 근접</strong> — 가까워지는 사건. 로맨스의 핵심 엔진.</li>
+        <li><strong>자각</strong> — 자신의 감정을 인식하는 순간. 보통 가장 두근거리는 장면.</li>
+        <li><strong>고백 또는 행동</strong> — 마지막 장벽이 무너지는 장면.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">간접 묘사 테크닉</span></div>
+      <ul class="tips">
+        <li><strong>시선의 머묾</strong> — "눈을 떼야 한다는 걸 알았다. 하지만 시선이 말을 듣지 않았다."</li>
+        <li><strong>작은 행동</strong> — 머리카락을 쓸어주는 것, 손이 닿을 뻔한 순간, 외투를 건네는 장면</li>
+        <li><strong>신체 반응</strong> — 귀가 달아오르는 것, 말이 막히는 것, 숨이 조금 빨라지는 것</li>
+        <li><strong>생각의 침범</strong> — 전혀 관계 없는 상황에서 갑자기 그 사람이 떠오른다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💬</span><span class="card-title">대화 속 감정 숨기기</span></div>
+      <ul class="tips">
+        <li><strong>말과 속마음의 불일치</strong> — 차갑게 말하지만 손이 먼저 움직인다</li>
+        <li><strong>피하는 주제</strong> — 정작 하고 싶은 말을 못 하고 빙 돌아간다</li>
+        <li><strong>말 끊기</strong> — "나는 네가... 아니, 됐어." 이 단 한 줄로 독자는 모든 걸 안다</li>
+        <li><strong>농담 뒤의 진심</strong> — 웃으며 던지는 말 속에 진짜가 담긴다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌹</span><span class="card-title">로맨스 장르별 특징</span></div>
+      <ul class="tips">
+        <li><strong>순정</strong> — 감정의 설렘과 순수함. 손 한 번 잡는 것이 클라이맥스가 될 수 있다</li>
+        <li><strong>성인 로맨스</strong> — 감정과 욕망이 뒤섞인다. 분위기, 온도, 거리감이 핵심</li>
+        <li><strong>로맨스 판타지</strong> — 세계관의 장벽(신분, 종족, 저주)이 감정의 장벽을 대신한다</li>
+        <li><strong>비극 로맨스</strong> — 사랑을 이루는 것이 아니라, 사랑했다는 것 자체가 목적</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">❄️</span><span class="card-title">밀당(당김과 밀기)의 구조</span></div>
+      <ul class="tips">
+        <li><strong>가까워지면 멀어진다</strong> — 감정이 깊어질수록 두려워서 밀어내는 캐릭터</li>
+        <li><strong>한쪽이 먼저 안다</strong> — 독자는 알고 캐릭터는 모르는 상황 → 독자를 답답하게 만든다(핵심)</li>
+        <li><strong>오해의 삽입</strong> — 진심이 왜곡되어 전달될 때. 단, 너무 길면 독자가 지친다</li>
+        <li><strong>위기가 감정을 드러낸다</strong> — 위험한 순간에 비로소 진짜 감정이 튀어나온다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚫</span><span class="card-title">로맨스의 흔한 실수</span></div>
+      <ul class="tips">
+        <li><strong>감정 직접 서술</strong> — "나는 그를 사랑했다"는 독자를 배제한다</li>
+        <li><strong>첫눈에 사랑</strong> — 근거 없이 강렬한 감정은 설득력이 없다. 디테일로 쌓아야 한다</li>
+        <li><strong>감정 과잉 반응</strong> — 모든 장면을 두근두근 하면 클라이맥스가 사라진다</li>
+        <li><strong>상대방이 완벽한 사람</strong> — 결점이 없으면 사랑이 아니라 숭배가 된다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">💕 로맨스 묘사 예시 (자각 장면 — 900자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">서연이 웃었다.
+
+그것뿐이었다. 누군가의 농담에 반응한 것뿐이었다. 고개를 약간 젖히고, 입가에 보조개가 생기고, 눈이 가늘어지는 — 그것뿐이었다.
+
+민준은 자신이 말을 멈췄다는 것을 몇 초 뒤에야 깨달았다.
+
+<em>"왜요?"</em>
+
+서연이 그를 봤다. 민준은 뭔가 말해야 한다는 걸 알았다. 뭔가 자연스러운 것을. 하지만 머릿속에서 적당한 말을 찾는 동안, 서연이 고개를 약간 기울였다. 그 동작이 또 문제였다.
+
+"아무것도 아니야."
+
+웃음을 완전히 감추지는 못했다. 서연은 의심스러운 눈으로 그를 봤지만 더 묻지는 않았다. 다시 대화가 이어졌다. 누군가 뭐라고 했고, 웃음이 터졌고, 잔이 부딪혔다.
+
+민준은 그 자리에 앉아 있으면서, 자신이 그 소음들을 하나도 듣지 않고 있다는 것을 알았다.
+
+듣고 있던 것은 서연의 목소리뿐이었다.
+
+<em>언제부터였을까.</em>
+
+알 수 없었다. 되감아봐도 시작점이 없었다. 처음부터 그랬던 것 같기도 하고, 아주 최근인 것 같기도 했다. 그냥 어느 순간부터 세상이 조금 기울어 있었고, 그 기울어진 방향에 서연이 있었다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 감정을 한 번도 직접 쓰지 않음 / 웃음 하나를 세밀하게 묘사하여 설렘 유발 / 말이 막히는 신체 반응으로 간접 표현 / 마지막 문장 "세상이 기울어졌다"로 감정을 은유
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">💕 로맨스 예시 (비극 로맨스 — 600자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">그는 마지막으로 한 번만 더 보고 싶었다.
+
+그게 전부였다. 아무것도 바라지 않았다. 손을 잡거나, 이름을 부르거나, 남아달라고 하지 않을 것이었다. 그냥 한 번만.
+
+유리 너머로 그녀가 짐을 들었다. 가벼운 가방 하나. 그 안에 무엇이 들었는지 그는 알았다. 책 두 권, 파란 머그컵, 그리고 그가 처음 생일에 사줬던 작은 토끼 인형.
+
+토끼 인형을 챙겼다는 걸 알았을 때, 그는 돌아섰다.
+
+더 보면 안 될 것 같았다.
+
+걷기 시작했다. 발소리가 났다. 그뿐이었다. 사랑이 끝나는 방식이 이렇게 조용해도 되는지 그는 알 수 없었다. 어딘가가 폭발하거나, 울거나, 무너져야 하는 것 아닌가. 그런데 그저 발소리만 났다.
+
+그리고 그는 걸었다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 토끼 인형 하나의 디테일로 모든 감정을 담음 / "더 보면 안 될 것 같았다" — 직접적 감정 묘사 없이 독자가 가슴을 조임 / 결말의 반복 구조로 공허함 표현
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 세계관 ===== -->
+<div class="sec" id="sec-world">
+  <div class="sec-hd">
+    <div class="sec-title">🌍 세계관 구성</div>
+    <div class="sec-sub">세계관은 독자가 믿어야 한다. 설득력 있는 세계는 법칙, 역사, 대가(代價)가 있다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 세계관 구성의 핵심 원칙</div>
+    <div class="hi-body">
+      <strong>① 일관성이 전부다</strong> — 세계의 법칙이 한 번 깨지면 독자의 신뢰가 무너진다.<br>
+      <strong>② 보여주지 말고 느끼게 하라</strong> — "이 세계에는 마법이 있습니다" 대신, 상인이 마법 등불을 무심히 켜는 장면을 써라.<br>
+      <strong>③ 대가(Cost)가 있어야 한다</strong> — 마법이든 기술이든 힘이든, 공짜인 것은 독자를 지루하게 만든다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏗️</span><span class="card-title">세계관 설계 순서</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-txt"><strong>물리 법칙 결정</strong> — 마법이 있는가? 신이 존재하는가? 무엇이 가능하고 불가능한가?</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>역사와 상처</strong> — 이 세계는 어떤 전쟁을 겪었는가? 어떤 사건이 현재를 만들었는가?</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-txt"><strong>권력 구조</strong> — 누가 지배하는가? 그 권력은 어디서 오는가?</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-txt"><strong>일상의 풍경</strong> — 사람들은 무엇을 먹고, 어떻게 자고, 무엇을 두려워하는가?</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-txt"><strong>모순과 균열</strong> — 완벽한 세계는 없다. 어디에 균열이 있는가?</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">마법·능력 시스템의 대가</span></div>
+      <ul class="tips">
+        <li><strong>신체적 대가</strong> — 피를 흘린다, 수명이 깎인다, 실명한다</li>
+        <li><strong>심리적 대가</strong> — 사용할수록 감정이 사라진다, 기억을 잃는다</li>
+        <li><strong>사회적 대가</strong> — 마법사는 결혼 금지, 능력자는 격리</li>
+        <li><strong>이야기적 대가</strong> — 강한 능력은 반드시 이야기 안에서 대가를 치러야 한다</li>
+        <li><strong>비용의 공개</strong> — 독자가 규칙을 알아야 서스펜스가 작동한다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🗺️</span><span class="card-title">역사를 살아있게 만들기</span></div>
+      <ul class="tips">
+        <li><strong>상처의 흔적</strong> — 폐허, 금기어, 편견은 과거 사건의 흔적이다</li>
+        <li><strong>왜곡된 역사</strong> — 승자가 쓴 역사는 언제나 왜곡된다. 이 왜곡이 플롯이 된다</li>
+        <li><strong>살아있는 전통</strong> — 사람들이 이유를 모르는 채 지키는 관습에 역사가 숨어있다</li>
+        <li><strong>세대 갈등</strong> — 과거를 아는 세대와 모르는 세대의 충돌이 세계를 입체적으로 만든다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">세계관을 자연스럽게 전달하는 법</span></div>
+      <ul class="tips">
+        <li><strong>설명하지 말고 보여줘라</strong> — 독자가 세계를 경험하게 하라. 설명은 몰입을 깬다</li>
+        <li><strong>캐릭터의 반응을 통해</strong> — 캐릭터가 놀라는 것, 당연하게 여기는 것으로 세계를 전달</li>
+        <li><strong>작은 디테일에 담아라</strong> — 가게 간판, 욕설, 속담 하나에 문화가 담긴다</li>
+        <li><strong>떡밥처럼 흘려라</strong> — 세계관 정보는 조금씩, 자연스럽게, 필요할 때 준다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏙️</span><span class="card-title">장소 묘사의 법칙</span></div>
+      <ul class="tips">
+        <li><strong>감각 5개를 활용</strong> — 보이는 것만 쓰면 밋밋하다. 냄새, 소리, 온도, 촉감을 넣어라</li>
+        <li><strong>장소의 성격</strong> — 장소는 캐릭터의 감정을 반영해야 한다 (병치법, 대비법)</li>
+        <li><strong>사람이 있어야 한다</strong> — 빈 무대보다 사람들의 일상이 세계를 살아있게 만든다</li>
+        <li><strong>첫인상을 구체적으로</strong> — 독자가 처음 그 공간을 '보는' 순간을 선명하게</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧭</span><span class="card-title">문화·종교·정치의 활용</span></div>
+      <ul class="tips">
+        <li><strong>문화는 갈등의 씨앗</strong> — 다른 문화가 만나는 순간 이야기가 생긴다</li>
+        <li><strong>종교는 권력이다</strong> — 신을 통제하는 자가 사람을 통제한다</li>
+        <li><strong>경제를 잊지 마라</strong> — 누가 부자고 누가 가난한지가 세계를 설명한다</li>
+        <li><strong>차별과 편견</strong> — 세계의 어두운 면이 캐릭터의 상처를 만들고 이야기를 만든다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🌍 세계관 묘사 예시 (도시 진입 장면 — 800자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">성문을 지나는 순간, 냄새가 달라졌다.
+
+기름과 향신료. 누군가 끓이고 있는 무언가. 짐승의 냄새, 사람의 냄새, 그리고 그 아래에 깔린 미묘한 쇠 냄새 — 아마 정제소 때문일 것이었다. 레나는 어릴 때 한 번 본 적 있는 마나 정제소를 떠올렸다. 그때는 그게 얼마나 드문 것인지 몰랐다.
+
+<em>이 도시에는 세 곳이 있다고 했다.</em>
+
+거리는 좁고 복잡했다. 간판들이 겹쳐 달려 있었는데, 절반은 그림이었다. 글을 모르는 사람들을 위한 것이었다. 붉은 잎사귀 그림 — 약방. 망치와 불꽃 — 대장간. 세 개의 눈 — 레나는 그것이 무엇을 뜻하는지 몰랐지만 직감적으로 가까이 가고 싶지 않았다.
+
+아이들이 달렸다. 짐마차를 피하며, 골목으로 사라졌다. 마차 위의 상인은 아무도 죽지 않은 것에 만족한 듯 욕도 하지 않았다.
+
+한쪽 벽에는 공고문이 붙어 있었다. 레나는 그것을 읽었다.
+
+<em>〔은결사 등록 의무화 — 4월 1일부로 시행. 미등록 각성자는 추방 또는 격리〕</em>
+
+지나가는 사람들 중 아무도 그것을 보지 않았다. 이미 아는 것이거나, 자신과 상관없는 것이거나.
+
+레나는 소매를 조금 더 내려 왼손 등을 가렸다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 감각 묘사(냄새)로 장소 시작 / 간판 묘사로 문화와 격차 자연스럽게 삽입 / 공고문 하나로 세계의 갈등 구조(각성자 차별) 설명 없이 전달 / 마지막 행동으로 주인공이 각성자임을 암시
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 몬스터 창조 ===== -->
+<div class="sec" id="sec-monster">
+  <div class="sec-hd">
+    <div class="sec-title">👹 새로운 몬스터 창조</div>
+    <div class="sec-sub">진짜 무서운 몬스터는 외형이 아니라 원리에서 나온다. 독자가 '왜'를 이해할 때 가장 무섭다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 몬스터 창조의 핵심</div>
+    <div class="hi-body">
+      <strong>공포의 3원칙:</strong><br>
+      <strong>① 알 수 없음 (Unknown)</strong> — 모르는 것이 아는 것보다 무섭다. 전부 보여주지 마라.<br>
+      <strong>② 규칙이 있다 (Rules)</strong> — 완전히 무작위적인 위협은 공포가 아니라 혼란이다. 규칙이 있어야 독자가 두려워한다.<br>
+      <strong>③ 인간과 닿아있다 (Humanity)</strong> — 가장 무서운 몬스터는 인간을 흉내 낸다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧬</span><span class="card-title">몬스터 설계 체크리스트</span></div>
+      <ul class="tips">
+        <li><strong>기원</strong> — 이 몬스터는 어디서 왔는가? 자연 발생인가, 인공인가, 저주인가?</li>
+        <li><strong>목적/동기</strong> — 왜 공격하는가? 배고파서인가, 두려워서인가, 지능이 있는가?</li>
+        <li><strong>능력의 한계</strong> — 무엇을 할 수 없는가? 약점이 있어야 이야기가 된다</li>
+        <li><strong>감각 체계</strong> — 눈이 있는가? 냄새로 추적하는가? 진동으로 감지하는가?</li>
+        <li><strong>사회성</strong> — 혼자인가, 군집인가? 위계가 있는가?</li>
+        <li><strong>인간과의 접점</strong> — 과거에 인간이었는가? 인간을 흉내 내는가?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">외형 묘사의 기술</span></div>
+      <ul class="tips">
+        <li><strong>인체의 변형</strong> — 알아볼 수 있지만 뭔가 잘못된 것이 가장 무섭다 (언캐니 밸리)</li>
+        <li><strong>비율의 왜곡</strong> — 팔이 너무 길다. 눈이 너무 많다. 입이 귀까지 찢어진다.</li>
+        <li><strong>부분만 보여줘라</strong> — 전체가 아니라 그림자, 윤곽, 일부분이 더 무섭다</li>
+        <li><strong>소리를 외형처럼</strong> — 관절이 꺾이는 소리, 이상한 호흡, 움직임의 리듬이 외형보다 강하다</li>
+        <li><strong>냄새와 온도</strong> — 가까이 오면 차가워지거나, 구린내가 나거나, 달콤한 냄새가 나거나</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">새로운 몬스터를 위한 소재</span></div>
+      <ul class="tips">
+        <li><strong>인간의 집착을 의인화</strong> — 집착 자체가 물질로 굳어진 존재</li>
+        <li><strong>자연 현상의 인격화</strong> — 침묵, 어둠, 망각, 소음이 몸을 가진다면?</li>
+        <li><strong>관계의 왜곡</strong> — 부모가 아이를, 친구가 서로를 먹는 존재</li>
+        <li><strong>감각의 무기화</strong> — 보면 죽는다, 들으면 감염된다, 만지면 교환된다</li>
+        <li><strong>생존 본능의 역이용</strong> — 도망치면 나타나고, 숨으면 찾아오고, 울면 더 온다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">몬스터의 위협을 단계별로 쌓기</span></div>
+      <ul class="tips">
+        <li><strong>1단계: 낌새</strong> — 뭔가 이상하다. 동물이 없다. 소리가 이상하다.</li>
+        <li><strong>2단계: 흔적</strong> — 피, 부서진 것, 설명되지 않는 것이 남아있다</li>
+        <li><strong>3단계: 목격</strong> — 전체가 아닌 일부분만 보인다. 실루엣, 그림자</li>
+        <li><strong>4단계: 조우</strong> — 완전한 등장. 이때 이미 독자는 충분히 겁먹어 있어야 한다</li>
+        <li><strong>5단계: 이해</strong> — 몬스터의 본질이 드러나는 순간. 가장 무서울 수도, 슬플 수도.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">👹 몬스터 등장 묘사 예시 (오리지널 몬스터 — 900자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">마을 사람들은 그것을 <em>거울 어머니</em>라고 불렀다.
+
+형태는 여자였다. 정확히는, 여자였을 무언가였다. 키가 너무 컸다 — 문틀을 지날 때 허리를 접어야 하는 정도가 아니라, 지붕을 지날 때 허리를 접어야 하는 높이였다. 손가락이 열두 개였다. 양쪽 모두.
+
+그것은 소리를 냈다. 엄밀히는 소리를 내는 것이 아니라, 다른 이의 소리를 돌려주었다. 두 달 전 저수지에서 빠진 어린아이의 마지막 울음. 올겨울 얼어 죽은 노인의 가래 끓는 숨. 그것이 걸어올 때, 그 소리들이 함께 왔다.
+
+<em>그래서 마을 사람들은 고요한 밤이 무서웠다.</em>
+
+고요하면, 들렸다. 멀리서 아이가 우는 소리. 하지만 이 마을에 그 나이대 아이는 이미 없었다.
+
+허와는 창문을 닫았다. 빗장을 질렀다. 램프도 껐다.
+
+그것은 빛을 따라온다는 말이 있었다. 어둠이 아니라 빛을. 빛이 있는 곳에 살아있는 것이 있다는 걸 아는 것처럼.
+
+창밖이 조용했다.
+
+너무 조용했다.
+
+<em>그리고 바로 그때, 죽은 어머니의 목소리로 자신의 이름을 부르는 소리가 들렸다.</em></div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 외형의 왜곡(높이·손가락)으로 언캐니 밸리 / 소리를 능력으로 설정 — 죽은 자의 소리를 돌려줌 / 조용함을 공포로 전환 / 빛을 따라온다는 규칙 설정으로 독자가 두려움을 논리화 / 마지막 죽은 어머니 목소리로 개인화
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 계급·조직 ===== -->
+<div class="sec" id="sec-rank">
+  <div class="sec-hd">
+    <div class="sec-title">🏛️ 계급·조직 서열 표현</div>
+    <div class="sec-sub">힘의 차이는 직접 말하면 안 된다. 주변의 반응, 공간, 태도로 보여줘야 한다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 서열을 보여주는 법</div>
+    <div class="hi-body">
+      <strong>"그는 3등급 기사였다"</strong>는 아무것도 전달하지 않는다.<br>
+      대신: <strong>"복도에서 그가 지나가자 두 명의 기사가 고개를 숙였다. 세 번째는 눈을 피했다."</strong><br>
+      서열은 주변 사람들의 반응으로 보여라.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👥</span><span class="card-title">주변의 반응으로 표현하기</span></div>
+      <ul class="tips">
+        <li><strong>시선의 방향</strong> — 낮은 서열은 눈을 피하고, 같은 서열은 마주 보고, 높은 서열은 내려다본다</li>
+        <li><strong>자리의 배치</strong> — 누가 상석에 앉는지, 누가 서서 기다리는지</li>
+        <li><strong>침묵의 질</strong> — 높은 자가 말을 멈추면 방 전체가 멈춘다</li>
+        <li><strong>농담의 방향</strong> — 윗사람의 농담엔 웃고, 아랫사람의 농담은 무시된다</li>
+        <li><strong>호칭의 변화</strong> — 같은 사람이지만 누가 부르느냐에 따라 호칭이 달라진다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏢</span><span class="card-title">공간으로 서열 표현하기</span></div>
+      <ul class="tips">
+        <li><strong>층과 위치</strong> — 높은 곳에 높은 사람이 있다. 물리적 높이가 권력의 은유다</li>
+        <li><strong>방의 크기와 장식</strong> — 집무실의 크기, 가구의 질, 창문의 유무</li>
+        <li><strong>접근의 장벽</strong> — 몇 개의 문을 통과해야 만날 수 있는지</li>
+        <li><strong>대기 시간</strong> — 누가 얼마나 기다려야 하는지가 서열을 말한다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🗣️</span><span class="card-title">말투와 태도로 표현하기</span></div>
+      <ul class="tips">
+        <li><strong>말투의 변화</strong> — 윗사람 앞에서 짧아지고, 아랫사람 앞에서 길어지거나 불필요하게 설명한다</li>
+        <li><strong>끊는 권리</strong> — 말을 끊을 수 있는 사람이 높은 사람이다</li>
+        <li><strong>이름의 사용</strong> — 이름을 부를 수 있는 관계와 아닌 관계</li>
+        <li><strong>몸의 방향</strong> — 높은 사람을 향해 몸을 틀고, 낮은 사람 쪽엔 옆을 보인다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚔️</span><span class="card-title">압도적 차이 표현하기</span></div>
+      <ul class="tips">
+        <li><strong>주인공의 시점으로</strong> — 같은 공간에 있는 것만으로 숨이 막히는 느낌</li>
+        <li><strong>능력의 부산물</strong> — 강한 자가 움직일 때 공기가 바뀌거나, 바닥이 내려앉거나, 주변이 조용해진다</li>
+        <li><strong>피아 구분 없는 반응</strong> — 적조차 잠깐 멈추는 순간으로 표현</li>
+        <li><strong>비교 대상을 써라</strong> — 이 조직의 최강자를 이긴 자. 그 숫자가 서열을 말한다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🏛️ 서열 표현 예시 (기업·기관 환경 — 800자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">회의실에 들어선 순간, 대화가 멈췄다.
+
+도현은 그것을 익숙하게 무시하며 상석으로 걸어갔다. 열두 명이 앉아 있었다. 도현이 자리에 앉기 전까지 아무도 자리를 잡지 않았다 — 그중 세 명은 이미 앉아 있었지만, 반사적으로 일어선 것이었다. 그 사실을 도현도, 그들도, 알고 있었다.
+
+<em>"시작하죠."</em>
+
+그 두 마디로 충분했다. 팀장급 여섯 명이 일제히 자료를 폈다. 그 중 한 명 — 서 부장 — 이 먼저 말을 꺼내려 했다. 도현의 시선이 잠깐 그쪽으로 갔다.
+
+서 부장이 자료를 다시 내려봤다.
+
+"3분기 수치가 예상 대비 11% 하락했습니다." 다른 사람이 말했다.
+
+"원인은요?"
+
+"현재 분석 중에—"
+
+"언제 나옵니까?"
+
+"...48시간 내로."
+
+"24시간."
+
+반론은 없었다. 누군가 무언가를 적었다. 회의실에는 그 소리만 남았다.
+
+도현은 창밖을 봤다. 20층 아래로 도시가 펼쳐져 있었다. 그는 그것에 특별한 감흥을 느끼지 않았다. 여기 있는 사람 중 누구도 이 자리에 오르기 위해 얼마나 오래 싸웠는지 그만큼 아는 사람은 없었다.
+
+그리고 그는 그것을 원하지도 않았다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 대화 멈춤 → 서 있기 → 앉지 않기로 서열 시각화 / "시작하죠" 두 마디로 지배력 표현 / 말 끊기 권리(반론 없음)로 권위 표현 / 창밖 시점과 마지막 내면으로 권력의 고독감 추가
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🏛️ 서열 표현 예시 (판타지 기사단 — 700자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">단장이 훈련장에 나타났을 때, 가장 먼저 반응한 건 말들이었다.
+
+마구간 쪽 말들이 일제히 귀를 세웠다. 그다음 병사들이었다. 누군가 외친 것도 아니었다. 그냥 공기가 바뀌었다. 훈련 중이던 기사 스물두 명이 하나씩 멈췄다.
+
+단장은 걷는 속도를 바꾸지 않았다. 시선을 특별히 어디에 두지도 않았다. 그런데 그 앞에서 자동으로 길이 열렸다.
+
+에란은 그것을 보면서 칼을 거뒀다. 3년 동안 이 기사단에 있었지만, 단장이 직접 나타날 때마다 아직도 위가 조여들었다. 두려움인지 경외인지 구분이 안 됐다. 어쩌면 같은 것이었다.
+
+<em>"에란."</em>
+
+열두 명 중에서 그 이름을 불렀다. 에란은 무릎을 꿇을까 잠깐 고민했다가, 그냥 차렷 자세를 잡았다.
+
+"네."
+
+"따라와."
+
+이유를 묻는 사람은 없었다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 말(동물)의 반응을 먼저 써서 압도적 존재감 강조 / 길이 열리는 것을 수동적으로 묘사(능동적 회피 없이) / 에란의 내면으로 압박감 표현 / 이유 묻지 않는 마지막 줄로 절대적 서열 완성
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 잔잔한 글 ===== -->
+<div class="sec" id="sec-calm">
+  <div class="sec-hd">
+    <div class="sec-title">🌊 잔잔한 글쓰기</div>
+    <div class="sec-sub">잔잔한 글은 조용하지만 무力하지 않다. 작은 것들의 무게를 느끼게 하는 것이 목표다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 잔잔한 글의 핵심</div>
+    <div class="hi-body">
+      잔잔한 글은 <strong>속도를 늦추는 것</strong>이다. 평소엔 그냥 지나치는 것들 — 커피의 온기, 창밖의 빗소리, 오래된 냄새 — 에 머무는 것이 잔잔한 글쓰기의 본질이다.<br>
+      독자가 숨을 깊이 들이쉬게 만드는 글.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌿</span><span class="card-title">잔잔한 글의 문장 구조</span></div>
+      <ul class="tips">
+        <li><strong>긴 문장을 허용하라</strong> — 쉼표가 많은 길고 느린 문장이 호흡을 늦춘다</li>
+        <li><strong>접속사를 적절히</strong> — "그리고", "하지만" 없이 문장을 이어 흐름을 만든다</li>
+        <li><strong>반복을 두려워하지 마라</strong> — 같은 단어의 반복이 리듬과 여운을 만든다</li>
+        <li><strong>여백을 남겨라</strong> — 모든 것을 설명하지 않는다. 독자가 채울 공간을 줘라</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">☕</span><span class="card-title">일상의 디테일 활용</span></div>
+      <ul class="tips">
+        <li><strong>감각적 소도구</strong> — 식어가는 차, 비 오는 창, 먼지 속 햇빛, 헌 책 냄새</li>
+        <li><strong>시간의 흐름 표현</strong> — 빛이 바뀌는 것, 그림자가 길어지는 것으로 시간을 나타낸다</li>
+        <li><strong>반복되는 일상</strong> — 같은 것이 반복되는 것이 삶이다. 그 반복 안의 미묘한 변화가 감동이 된다</li>
+        <li><strong>말하지 않은 것</strong> — 두 캐릭터가 같은 공간에서 각자 다른 생각을 하는 장면</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🖼️</span><span class="card-title">분위기 쌓기</span></div>
+      <ul class="tips">
+        <li><strong>날씨와 계절</strong> — 시대·감정과 날씨를 자연스럽게 연결하라. 강요하지 말고 배경에 녹여라</li>
+        <li><strong>소리의 층</strong> — 먼 소리, 가까운 소리, 실내 소리를 겹쳐 공간을 입체화</li>
+        <li><strong>빛과 어둠</strong> — 오후 4시의 금빛, 형광등의 차가운 빛, 창에 번지는 새벽빛</li>
+        <li><strong>침묵을 묘사하라</strong> — 조용한 장면도 침묵의 질을 구체적으로 써야 한다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🌊 잔잔한 글 예시 (일상 장면 — 800자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">비가 왔다.
+
+세게 오지 않았다. 올 듯 말 듯, 창유리를 간질이는 정도였다. 유진은 창가 의자에 앉아 그것을 보고 있었다. 무언가를 해야 한다는 생각이 있었는데, 그것이 무엇이었는지 잊어버렸다.
+
+커피가 식어 있었다. 두 번째 모금부터 이미 식어 있었는데, 그것을 알면서도 계속 마셨다. 식은 커피에는 식은 커피의 맛이 있었다. 처음 것보다 씁쓸했고, 쓴 것이 오히려 더 솔직한 것 같았다.
+
+빗소리가 조금 세어졌다.
+
+유진은 담요를 끌어당겼다. 이 담요는 오래된 것이었다. 몇 번이나 빨아도 사라지지 않는 냄새가 있었다 — 아주 옛날 집의 냄새 같은, 정확히는 뭐라 할 수 없지만 맡으면 어딘가 가슴이 느슨해지는 그런 냄새.
+
+밖에서 발소리가 났다. 지나가는 사람. 잠시 멈췄다가 다시 멀어졌다. 아마 비를 피하려 했던 것 같았다.
+
+유진은 그 사람이 잘 들어갔을까 생각했다. 모르는 사람이었다. 아마 다시 만나지 않을 것이었다. 그래도 잠깐 생각했다.
+
+빗소리가 다시 잦아들었다.
+
+오늘도 이렇게 가겠구나, 하고 유진은 생각했다. 나쁘지 않았다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 사건 없이 감각과 내면만으로 800자 구성 / "식은 커피의 맛" — 감각에 철학을 담음 / 담요 냄새로 nostalgia를 자극 / 모르는 행인에 대한 배려로 캐릭터 성격 표현 / 마지막 "나쁘지 않았다"의 절제된 긍정
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 역동적 글 ===== -->
+<div class="sec" id="sec-dynamic">
+  <div class="sec-hd">
+    <div class="sec-title">⚡ 역동적 글쓰기</div>
+    <div class="sec-sub">역동적인 글은 독자가 앞으로 쏠리게 만든다. 페이지를 넘기는 손이 멈추지 않아야 한다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 역동적 글의 핵심 엔진</div>
+    <div class="hi-body">
+      <strong>속도 = 짧은 문장 + 강한 동사 + 생략</strong><br>
+      모든 장면에서 다음 두 가지를 자문하라: <strong>①이 문장이 없어도 되는가? ②더 짧게 쓸 수 있는가?</strong><br>
+      쓸데없는 단어 하나가 속도를 죽인다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏃</span><span class="card-title">문장 속도 높이는 법</span></div>
+      <ul class="tips">
+        <li><strong>형용사·부사 줄이기</strong> — "매우 빠르게 달렸다" → "달렸다." 동사만으로 충분할 때가 많다</li>
+        <li><strong>수동태 제거</strong> — "~에 의해 ~되었다"를 모두 능동으로 바꿔라</li>
+        <li><strong>동사를 문장 앞으로</strong> — "그는 뛰기 시작했다" → "뛰었다."</li>
+        <li><strong>단독 문장 활용</strong> — 한 단어 또는 두 단어짜리 문장이 리듬을 끊고 강조한다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎢</span><span class="card-title">긴장의 파도 만들기</span></div>
+      <ul class="tips">
+        <li><strong>고점과 저점의 반복</strong> — 긴장을 풀었다가 다시 조이는 리듬</li>
+        <li><strong>작은 성공 후 더 큰 문제</strong> — 해결하는 순간 더 큰 것이 나타난다</li>
+        <li><strong>시간 압박</strong> — 카운트다운, 마감, 쫓기는 느낌이 속도를 만든다</li>
+        <li><strong>예상을 배반하라</strong> — 독자가 예상한 것을 주지 말고, 한 발 더 비틀어라</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔥</span><span class="card-title">클리프행어 기술</span></div>
+      <ul class="tips">
+        <li><strong>장 끝에서 끊어라</strong> — 해결 직전에 끊는 것이 기본. 독자가 다음을 안 볼 수 없게</li>
+        <li><strong>정보 노출</strong> — 독자에게만 위험을 알려주고 캐릭터는 모르게 한다</li>
+        <li><strong>질문으로 끝내라</strong> — 명백히 설명하지 말고 의문을 남겨라</li>
+        <li><strong>반전 직전에 끊기</strong> — 반전이 일어나기 0.5초 전에 장을 끝낸다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">⚡ 역동적 글 예시 (추격 장면 — 900자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">뛰었다.
+
+뒤에서 발소리가 들렸다. 셋. 아니, 넷. 어쩌면 다섯. 셀 시간이 없었다. 소유는 골목으로 꺾었다. 발이 물웅덩이를 밟았다. 튀겼다. 상관없었다.
+
+오른쪽. 또 골목.
+
+좁았다. 너무 좁았다. 양쪽 벽이 팔꿈치를 긁었다. 어둠 속에서 계단이 나왔다. 올라갔다. 세지 않았다. 그냥 올라갔다.
+
+뒤에서 욕설이 터졌다.
+
+<em>가깝다.</em>
+
+문이 있었다. 잠겨 있었다. 소유는 어깨로 박았다. 한 번. 두 번. 세 번째에 열렸다. 아니, 부서졌다. 들어갔다.
+
+창고였다. 상자들. 선반. 냄새. 기름인지 먼지인지 구분이 안 됐다. 소유는 뒤를 봤다. 발소리가 계단을 올라오고 있었다. 빠르게.
+
+숨을 곳이 필요했다. 5초.
+
+선반 뒤로 들어갔다. 웅크렸다. 숨을 참았다.
+
+문이 열렸다.
+
+발소리 둘이 들어왔다. 멈췄다. 불이 켜졌다. 형광등이 깜빡이다가 자리를 잡았다.
+
+<em>"없어?"</em>
+
+<em>"창문."</em>
+
+발소리가 창문 쪽으로 갔다. 소유는 선반 뒤에서 움직이지 않았다. 무릎이 떨렸다. 그것을 손으로 눌렀다.
+
+창문이 열렸다. 바람이 들어왔다.
+
+<em>"나갔겠지."</em>
+
+침묵.
+
+소유는 숨을 참은 채, 그 침묵이 끝나기를 기다렸다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> "뛰었다." 단 한 문장으로 시작 / 숫자 세기로 혼란 표현 / 단독 단어 문장("좁았다", "가깝다")으로 리듬 변주 / 마지막을 "기다렸다"로 끝내 긴장 유지 / 독자는 발각 여부를 모른 채 장 종료
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 괴담·공포 ===== -->
+<div class="sec" id="sec-horror">
+  <div class="sec-hd">
+    <div class="sec-title">👻 괴담·공포 글쓰기</div>
+    <div class="sec-sub">괴담은 설명하면 무너진다. 독자의 상상이 작가의 묘사보다 항상 더 무섭다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 공포 글쓰기의 황금 법칙</div>
+    <div class="hi-body">
+      <strong>"보여주지 마라. 느끼게 하라."</strong><br>
+      괴물을 직접 보여주면 독자는 판단한다: "무섭냐, 무섭지 않냐."<br>
+      보여주지 않으면 독자가 자신만의 괴물을 상상한다. 그리고 그것은 항상 더 무섭다.<br>
+      공포의 진짜 대상은 <strong>알 수 없음 그 자체</strong>다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌑</span><span class="card-title">공포의 층위</span></div>
+      <ul class="tips">
+        <li><strong>공포 (Terror)</strong> — 뭔가 있다는 걸 아는 상태. 기다림. 가장 순수한 공포.</li>
+        <li><strong>전율 (Horror)</strong> — 마주했을 때의 충격. 비명이 나오는 순간.</li>
+        <li><strong>혐오 (Revulsion/Gore)</strong> — 시각적·감각적 역겨움. 가장 쉽지만 가장 얕은 공포.</li>
+        <li><strong>심리적 공포</strong> — 자신이 이상한 건지 모르는 상태. 고립, 가스라이팅.</li>
+        <li><strong>실존적 공포</strong> — 우주적 무관심, 의미 없음, 인간의 취약성.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🕯️</span><span class="card-title">괴담 구조 (정석)</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-txt"><strong>일상의 균열</strong> — 처음에는 아주 작고 설명 가능한 이상함</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>점진적 악화</strong> — 부정하려 하지만 계속 이상한 것들이 쌓인다</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-txt"><strong>돌아올 수 없는 순간</strong> — 현실로 돌아가기 어렵다는 걸 깨닫는 순간</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-txt"><strong>절정</strong> — 가장 무서운 것이 드러나거나, 가장 무서운 것이 끝내 드러나지 않거나</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-txt"><strong>여운</strong> — 끝난 것 같지만 끝나지 않은 느낌. 독자를 밤새 붙잡아야 한다</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📍</span><span class="card-title">공포의 구체적 기법들</span></div>
+      <ul class="tips">
+        <li><strong>정상의 역설</strong> — 무서운 것을 태연하게 묘사할 때 더 무섭다</li>
+        <li><strong>숫자의 불일치</strong> — "사진 속 사람이 한 명 더 있었다"</li>
+        <li><strong>기억의 왜곡</strong> — 분명히 했는데 하지 않았거나, 없었는데 있거나</li>
+        <li><strong>주변 사람의 반응</strong> — 아무도 이상하게 생각하지 않는다는 것 자체가 이상하다</li>
+        <li><strong>로그 형식</strong> — 일기, 메모, 대화 기록 형식이 리얼리티를 높인다</li>
+        <li><strong>생략된 설명</strong> — 분명히 뭔가 있는데 설명되지 않는 부분이 공포를 만든다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎭</span><span class="card-title">괴담의 장르별 변형</span></div>
+      <ul class="tips">
+        <li><strong>도시 괴담</strong> — 현실에 기반. "그 아파트에는 가지 마세요"처럼 구체적 장소</li>
+        <li><strong>인터넷 공포</strong> — 익명성, 링크, 게시물 형식 활용. 독자가 직접 조사하는 느낌</li>
+        <li><strong>고어/슬래셔</strong> — 신체 훼손 중심. 공포보다 충격과 생존 본능 자극</li>
+        <li><strong>심리 공포</strong> — 현실과 망상의 경계. 주인공이 믿을 수 없는 화자</li>
+        <li><strong>우주 공포 (코즈믹)</strong> — 인간이 이해할 수 없는 것. 크툴루 신화 계열</li>
+        <li><strong>사회 공포</strong> — 공동체, 가족, 제도 자체가 공포의 원천</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚠️</span><span class="card-title">공포 글의 흔한 실수</span></div>
+      <ul class="tips">
+        <li><strong>점프 스케어식 묘사</strong> — "갑자기 손이 내 어깨를 잡았다!" — 글에서 이 방식은 효과가 낮다</li>
+        <li><strong>너무 빠른 설명</strong> — 괴물의 정체를 일찍 밝히면 공포가 해소된다</li>
+        <li><strong>어리석은 주인공</strong> — 아무 이유 없이 어두운 곳에 혼자 가는 주인공에 독자는 공감 못 한다</li>
+        <li><strong>모든 것을 무섭게</strong> — 모든 것이 무서우면 아무것도 무섭지 않다. 일상과 공포를 대비하라</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌀</span><span class="card-title">한국 괴담 특유의 정서</span></div>
+      <ul class="tips">
+        <li><strong>한(恨)의 공포</strong> — 억울하게 죽은 존재, 이루지 못한 것이 남아서 온다</li>
+        <li><strong>금기와 터부</strong> — 하면 안 되는 것을 했을 때의 대가. "그 산에는 가면 안 돼"</li>
+        <li><strong>공동체의 침묵</strong> — 마을 전체가 알면서 말하지 않는 비밀</li>
+        <li><strong>일상 속 비일상</strong> — 구미호, 도깨비, 처녀귀신이 현대 배경에 있을 때의 충돌</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">👻 괴담 예시 — 도시 괴담 형식 (1,100자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">저는 작년에 이사를 왔어요. 3층짜리 빌라였는데, 집주인 아주머니가 계약할 때 딱 한 가지만 부탁하셨어요.
+
+<em>"301호는 쓰지 마세요."</em>
+
+무슨 이유냐고 물었더니 그냥 웃으셨어요. 그러니까 안 쓰면 되는 거잖아요. 짐을 안 두면 그만인 거니까.
+
+근데 이상한 건, 그 방 앞에 자꾸 뭔가가 생긴다는 거였어요. 처음에는 작은 종이컵 하나였어요. 깨끗한 걸로. 누가 뒀나 싶어서 치웠는데, 다음 날 또 있었어요. 조금 다른 위치에.
+
+그다음엔 신발이었어요.
+
+어린아이 신발. 한 짝만.
+
+저는 그때 처음으로 주인 아주머니한테 물어봤어요. 예전에 그 방에 누가 살았냐고. 아주머니가 한참 있다가 그러셨어요.
+
+"아이가 있는 가족이 살았었는데..."
+
+거기서 말을 끊으셨어요. 더 물어볼 수가 없었어요. 표정이 그렇게 생겼었거든요.
+
+저는 그날부터 신발이 생기면 그냥 방 문 앞에 뒀어요. 치우지 않고. 왜인지 모르지만, 그게 더 맞는 것 같았어요.
+
+그리고 어느 날 아침에 일어났더니 신발 두 짝이 있었어요.
+
+짝이 맞는 한 켤레.
+
+그 이후로는 아무것도 생기지 않았어요. 저도 그냥 잘 살고 있어요.
+
+<em>근데 가끔 새벽에 복도에서 작은 발소리가 들려요.</em>
+
+빠르고 가벼운, 어린애 발소리 같은 게요.
+
+저는 그냥 이불을 덮어요. 무섭다기보다는... 괜찮으면 됐다 싶어서요.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 1인칭 구어체로 실제 경험 리얼리티 극대화 / 금기(301호)를 먼저 설정 / 점진적 증거 축적(종이컵 → 신발 한 짝 → 신발 한 켤레) / 말을 끊는 아주머니로 설명 생략 / 한국 괴담 특유의 한(恨) 정서(아이가 원하는 것을 이루어줌) / 마지막 발소리의 양면성(공포와 안도)
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">👻 괴담 예시 — 심리 공포 형식 (800자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">처음 이상하다고 느낀 건 사진 때문이었다.
+
+가족사진이었다. 오래된 것으로, 엄마가 앨범 맨 뒤에 끼워둔 것들 중 하나. 거기에 우리 네 식구가 찍혀 있었다.
+
+문제는, 우리 식구가 셋이라는 거다.
+
+나는 그 사진을 오래 봤다. 분명히 세 명인데, 넷처럼 보이는 건 빛 때문인가 했다. 한쪽 구석이 약간 흐릿하게 처리된 것처럼 보였으니까.
+
+엄마한테 물어봤다.
+
+엄마는 사진을 한참 보다가, 웃었다.
+
+"여기 사람이 몇 명이야?"
+
+나는 말했다. 셋이요.
+
+엄마가 고개를 끄덕였다. "그래."
+
+그게 끝이었다.
+
+나는 그 사진을 다시 꺼내봤다. 세 명이었다. 분명히 세 명이었다. 그런데 왼쪽 끝에, 누군가가 있던 것처럼 비어있는 공간이 있었다. 아무것도 없는데, 뭔가가 서 있었을 것 같은 크기의 여백이.
+
+나는 엄마한테 다시 묻지 않았다.
+
+묻고 싶지 않았다. 답이 무서운 게 아니라, <em>엄마가 뭘 알고 있는지</em>가 무서워서.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 숫자 불일치(셋/넷)로 인지 혼란 유발 / 엄마의 태연함이 정보 차를 만들고 공포를 증폭 / "묻고 싶지 않았다" — 알고 싶지 않음 자체가 공포 / 마지막 줄을 이탤릭으로 처리해 핵심 공포 강조
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 기타 기법 ===== -->
+<div class="sec" id="sec-etc">
+  <div class="sec-hd">
+    <div class="sec-title">📖 기타 핵심 기법들</div>
+    <div class="sec-sub">소설을 완성하는 나머지 필수 기술들 — 감정, 대화, 복선, 죽음, 악당, 시점 등.</div>
+  </div>
+
+  <div class="div-title">🎭 감정 묘사</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">😢</span><span class="card-title">울음 장면 쓰는 법</span></div>
+      <ul class="tips">
+        <li><strong>울기 직전이 더 강하다</strong> — 참는 장면, 입술이 떨리는 순간이 우는 장면보다 강렬하다</li>
+        <li><strong>신체로 표현</strong> — "눈물이 났다" 대신: 목이 조여들었다, 코가 시려왔다, 눈이 뜨거워졌다</li>
+        <li><strong>부적절한 순간</strong> — 울어서는 안 되는 상황에서 울음이 터질 때가 가장 강하다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">😡</span><span class="card-title">분노 묘사</span></div>
+      <ul class="tips">
+        <li><strong>차가운 분노가 뜨거운 분노보다 무섭다</strong> — 소리 지르는 것보다 조용히 말하는 것이 더 위협적</li>
+        <li><strong>신체화</strong> — 손이 떨린다, 이가 갈린다, 시야가 좁아진다</li>
+        <li><strong>억누르는 과정</strong> — 분노를 통제하려는 노력 자체가 캐릭터를 보여준다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🎭 감정 묘사 예시 — 슬픔 장면 (700자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">오빠의 방에 들어갔다.
+
+냄새가 아직 남아 있었다. 샴푸인지 뭔지 모를 것이. 지은은 숨을 한 번 크게 들이쉬었다가, 참았다. 그 냄새를 다 써버리면 안 될 것 같았다.
+
+책상 위에 컵라면이 있었다. 다 먹은 것. 뚜껑이 옆에 놓여 있었다. 오빠는 항상 뚜껑을 옆에 놓았다. 지은은 그것을 알고 있었다. 오빠가 그렇게 하는 걸 귀찮아한다고 생각했었는데.
+
+입술이 떨렸다. 입을 꾹 눌렀다.
+
+울면 안 됐다. 엄마가 부엌에 있었다. 엄마 앞에서 울면, 엄마가 따라 울 것이었다. 그러면 엄마를 달래야 했다. 그러면 지은이 울 수 없었다.
+
+그래서 참았다.
+
+컵라면 뚜껑을 집어 들었다. 들고 있었다. 어쩌면 됐는지 모르겠지만, 들고 있다 보니 조금 나아졌다.
+
+<em>창문 밖으로 바람이 지나갔다. 오빠 방에는 항상 바람이 잘 들어왔었다.</em></div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 냄새를 소중히 여기는 것으로 상실감 표현 / 컵라면 뚜껑 디테일로 생전 일상을 환기 / "울면 안 됐다"의 이유로 캐릭터 관계 설명 / 이탤릭 마지막 문장으로 조용한 여운
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">💬 대화 씬 작성법</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💬</span><span class="card-title">대화의 핵심 원칙</span></div>
+      <ul class="tips">
+        <li><strong>사람은 직접적으로 말하지 않는다</strong> — 하고 싶은 말의 80%만 한다. 나머지는 행동과 침묵이다</li>
+        <li><strong>모든 대화에 서브텍스트를</strong> — 말 아래에 숨겨진 의도, 감정, 두려움</li>
+        <li><strong>"라고 말했다" 최소화</strong> — 행동과 반응으로 대신할 수 있으면 대신하라</li>
+        <li><strong>각 캐릭터의 목소리를 다르게</strong> — 말투, 어휘, 문장 길이가 달라야 한다</li>
+        <li><strong>침묵도 대화다</strong> — 대답하지 않는 것이 가장 강한 대사가 될 때가 있다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎪</span><span class="card-title">대화 흐름의 기술</span></div>
+      <ul class="tips">
+        <li><strong>빗나가는 대화</strong> — 상대방 질문에 정면으로 답하지 않는 것이 긴장을 만든다</li>
+        <li><strong>말 끊기</strong> — "—" 또는 "..." 로 말이 끊기는 것을 표현</li>
+        <li><strong>행동 태그</strong> — "라고 말했다" 대신 행동을 넣는다: 그는 컵을 내려놓았다. "괜찮아."</li>
+        <li><strong>대화 속 정보</strong> — 자연스럽게 세계관·캐릭터 정보를 대화에 녹여라</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">🎭 죽음 장면 쓰는 법</div>
+  <div class="hi-card" style="border-color:rgba(204,51,68,.25);">
+    <div class="hi-title" style="color:var(--red2);">💀 죽음 장면의 원칙</div>
+    <div class="hi-body">
+      <strong>① 죽음은 느리게 와야 한다</strong> — 갑작스러운 죽음은 독자에게 상실감을 주지 않는다. 마지막 순간을 늘려라.<br>
+      <strong>② 주변 사람의 반응이 죽음을 완성한다</strong> — 죽는 사람보다 옆에서 보는 사람의 묘사가 더 강하다.<br>
+      <strong>③ 사소한 디테일을 넣어라</strong> — 신발 끈이 풀려있었다. 손에 커피가 묻어 있었다. 이런 것들이 죽음을 인간적으로 만든다.<br>
+      <strong>④ 울지 않는 것이 더 슬프다</strong> — 너무 충격적이면 눈물이 나지 않는다. 그 멍한 상태가 진짜 슬픔이다.
+    </div>
+  </div>
+
+  <div class="div-title">🦹 악당 캐릭터 만들기</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🦹</span><span class="card-title">설득력 있는 악당의 조건</span></div>
+      <ul class="tips">
+        <li><strong>자기 논리가 있다</strong> — 악당은 자신이 악하다고 생각하지 않는다. 그 논리가 설득력 있을수록 좋은 악당이다</li>
+        <li><strong>공감 가능한 동기</strong> — 순수한 악 보다 이해할 수 있는 이유를 가진 악이 더 강렬하다</li>
+        <li><strong>주인공의 거울</strong> — 같은 출발점에서 다른 선택을 한 존재일 때 가장 강렬하다</li>
+        <li><strong>약점을 가져라</strong> — 완벽한 악당은 무섭지 않다. 약점이 악당을 인간적으로 만든다</li>
+        <li><strong>사랑하는 무언가</strong> — 악당도 소중한 것이 있을 때 이야기가 풍부해진다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">복선과 떡밥 심기</span></div>
+      <ul class="tips">
+        <li><strong>3회 법칙</strong> — 중요한 것은 세 번 등장시켜라. 한 번은 소개, 두 번은 강화, 세 번은 결실</li>
+        <li><strong>자연스럽게 묻어라</strong> — 복선은 티가 나면 안 된다. 그냥 지나치는 묘사처럼 보여야 한다</li>
+        <li><strong>회수 타이밍</strong> — 너무 빠르면 허망하고, 너무 늦으면 잊혀진다</li>
+        <li><strong>반전을 위한 복선</strong> — 반전 후 다시 읽었을 때 "거기 있었구나" 싶어야 한다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👤</span><span class="card-title">시점 선택</span></div>
+      <ul class="tips">
+        <li><strong>1인칭</strong> — 몰입감 최강. 하지만 주인공이 모르는 것은 독자도 모른다</li>
+        <li><strong>3인칭 한정</strong> — 한 캐릭터의 시점이지만 거리가 있다. 가장 유연한 선택</li>
+        <li><strong>3인칭 전지</strong> — 모든 것을 안다. 여러 캐릭터를 다루지만 몰입이 약해진다</li>
+        <li><strong>2인칭</strong> — "당신은 문을 열었다." 매우 독특하고 실험적. 공포·게임 문학에서 효과적</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌱</span><span class="card-title">주인공 성장 서사</span></div>
+      <ul class="tips">
+        <li><strong>결점에서 시작하라</strong> — 완벽한 주인공은 성장할 곳이 없다</li>
+        <li><strong>성장은 사건에서 나온다</strong> — 가르침이 아니라 경험이 사람을 바꾼다</li>
+        <li><strong>두 번 실패</strong> — 한 번의 실패로는 부족하다. 같은 실수를 두 번 하고 세 번째에 달라져야 한다</li>
+        <li><strong>대가를 치러라</strong> — 성장에는 잃는 것이 있어야 한다. 공짜 성장은 설득력이 없다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">자연 묘사 활용</span></div>
+      <ul class="tips">
+        <li><strong>캐릭터 감정과 연결</strong> — 강요하지 말고 자연스럽게. "폭풍 = 분노"는 너무 직접적</li>
+        <li><strong>대비로 쓰기</strong> — 가장 아름다운 날에 가장 슬픈 일이 일어날 때 더 강렬하다</li>
+        <li><strong>계절의 의미</strong> — 봄=시작, 겨울=끝이지만 뒤집으면 더 신선하다</li>
+        <li><strong>감각을 다 쓰기</strong> — 빛깔만이 아니라 온도, 냄새, 소리가 있는 자연</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✂️</span><span class="card-title">편집의 기술</span></div>
+      <ul class="tips">
+        <li><strong>킬 유어 달링</strong> — 내가 가장 좋아하는 문장이 때로는 가장 빼야 할 것이다</li>
+        <li><strong>첫 단락을 마지막에 써라</strong> — 첫 문장은 이야기가 끝난 후에 가장 잘 쓸 수 있다</li>
+        <li><strong>소리 내어 읽기</strong> — 이상한 리듬은 읽으면 바로 느껴진다</li>
+        <li><strong>하루 이상 두기</strong> — 쓴 날 바로 편집하지 마라. 다음 날 보면 전혀 다르게 보인다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">📖 대화 씬 예시 — 서브텍스트 (700자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">테이블 위에 봉투가 있었다.
+
+지현은 그것을 봤고, 재현도 그것을 봤다. 아무도 먼저 손을 대지 않았다.
+
+"밥은 먹었어요?"
+
+재현이 먼저 말했다. 지현은 고개를 끄덕였다. 재현은 커피를 마셨다. 식은 것이었다.
+
+"오래 기다렸어요?"
+
+"아니요."
+
+기다렸다. 이십 분. 그것은 말하지 않았다.
+
+잠시 침묵이 있었다. 창 밖에서 버스가 지나갔다. 두 사람 모두 그쪽을 봤다.
+
+"그거..."
+
+지현이 봉투 쪽으로 시선을 줬다. 재현이 커피잔을 내려놓았다.
+
+"필요한 거 다 들어있어요. 도장이랑."
+
+지현은 고개를 끄덕였다.
+
+"감사해요."
+
+"아니에요."
+
+<em>재현은 자리에서 일어났다. 지현은 그대로 앉아 있었다.</em>
+
+"잘 지내요."
+
+"네."
+
+문이 닫혔다. 지현은 봉투를 집어 들었다. 가볍다고 생각했다. 이것이 팔 년이라는 것이.
+
+<em>가방에 넣었다. 커피를 마셨다. 그것도 식어 있었다.</em></div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 이혼 서류 봉투를 직접 언급하지 않음 / "기다렸다. 이십 분." — 내면을 말 아래에 숨김 / "잘 지내요"가 작별 인사임을 맥락으로만 전달 / 마지막 식은 커피가 처음 식은 커피와 대응되며 여운 형성
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-wrap">
+    <div class="ex-label">🦹 악당 독백 예시 (600자+)</div>
+    <div class="ex-box">
+      <div class="ex-txt">"나는 처음부터 이러고 싶었던 게 아니야."
+
+하윤은 그 말을 믿지 않았다. 믿을 수 없었다.
+
+"진짜야. 나도 한때는 이 도시가 더 나아질 거라고 생각했어. 사람들이 배우면, 충분히 설명해 주면, 언젠가는 이해할 거라고."
+
+그는 창밖을 봤다. 아래에서 불꽃이 올라오고 있었다.
+
+"얼마나 기다렸는지 알아? 이십 년이야. 이십 년을 기다렸는데도, 아무것도 변하지 않았어. 그래서 나는 결론을 내렸어."
+
+그가 하윤을 봤다.
+
+"사람은 겪어야 알아. 가르쳐서 아는 게 아니라."
+
+<em>하윤은 대답하지 않았다.</em>
+
+가장 무서운 것은 그가 틀리지 않았다는 것이었다. 그것이 가장 무서운 것이었다.</div>
+      <div class="ex-note">
+        <strong>기법 분석:</strong> 악당의 논리가 반박하기 어려운 수준으로 설정 / 이십 년이라는 구체적 시간으로 공감 유도 / 마지막 주인공의 내면("틀리지 않았다")으로 독자에게 윤리적 질문을 던짐
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">✍️ 문장 레벨 업 체크리스트</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">동사부터 확인</span></div><div class="card-desc">모든 문장의 동사가 충분히 강한가? "했다"를 더 구체적으로 바꿀 수 있는가?</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">감각 점검</span></div><div class="card-desc">시각에만 의존하지 않는가? 냄새, 소리, 촉감, 온도가 있는가?</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">필요 없는 단어 제거</span></div><div class="card-desc">"매우", "정말", "아주"는 대부분 없애도 된다. 오히려 더 강해진다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">수동태 제거</span></div><div class="card-desc">"~에 의해", "~되었다"를 모두 능동으로 전환</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">감정 직접 서술 점검</span></div><div class="card-desc">"슬펐다", "행복했다"를 행동과 감각으로 바꿀 수 있는가?</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">첫 문장과 마지막 문장</span></div><div class="card-desc">첫 문장이 독자를 끌어당기는가? 마지막 문장이 여운을 남기는가?</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">리듬 점검</span></div><div class="card-desc">소리 내어 읽었을 때 막히거나 어색한 곳이 없는가?</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">설명 vs 묘사</span></div><div class="card-desc">설명(tell)한 것을 묘사(show)로 바꿀 수 있는가?</div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    tab.classList.add('on');
+    const s=document.getElementById('sec-'+tab.dataset.tab);
+    if(s) s.classList.add('on');
+  });
+});
+
+// Search
+const searchEl=document.getElementById('search');
+searchEl.addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  if(!q){
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    const at=document.querySelector('.tab.on');
+    if(at){const s=document.getElementById('sec-'+at.dataset.tab);if(s)s.classList.add('on');}
+    return;
+  }
+  document.querySelectorAll('.sec').forEach(s=>s.classList.add('on'));
+  // highlight
+  document.querySelectorAll('.card,.rule-card,.ex-box,.hi-card,.callout').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+});
+</script>
+</body>
+</html>

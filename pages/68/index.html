@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>그림 구도 & 요소 완전 가이드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07080a;--bg2:#0d0f12;--bg3:#141720;--bg4:#1c2030;
+  --border:#1e2236;--border2:#303860;
+  --txt:#e4e8f8;--txt2:#8898c8;--txt3:#3a4870;
+  --acc:#e8a040;--acc2:#ffc060;--acc3:rgba(232,160,64,.13);
+  --acc4:rgba(232,160,64,.06);
+  --blu:#4488ee;--blu2:#66aaff;--bluB:rgba(68,136,238,.12);
+  --grn:#44bb77;--grn2:#66dd99;--grnB:rgba(68,187,119,.12);
+  --red:#ee4455;--red2:#ff6677;--redB:rgba(238,68,85,.12);
+  --pur:#9955ee;--pur2:#bb88ff;--purB:rgba(153,85,238,.12);
+  --teal:#33aacc;--teal2:#55ccee;--tealB:rgba(51,170,204,.12);
+  --rose:#dd4488;--rose2:#ff66aa;--roseB:rgba(221,68,136,.12);
+  --rust:#cc6633;--rust2:#ee8855;--rustB:rgba(204,102,51,.12);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#040508,#0a0c16,#040508);
+  border-bottom:2px solid var(--acc);padding:10px 18px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr-logo{font-size:20px;filter:drop-shadow(0 0 8px var(--acc));}
+#hdr h1{font-size:17px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 18px rgba(232,160,64,.4);}
+#hdr .badge{font-size:9px;padding:2px 7px;border-radius:2px;
+  background:var(--acc3);border:1px solid rgba(232,160,64,.3);color:var(--acc);
+  font-weight:700;letter-spacing:.8px;white-space:nowrap;}
+#search{flex:1;min-width:150px;max-width:320px;padding:6px 12px;
+  border-radius:4px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--txt);font-size:13px;outline:none;font-family:inherit;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* TABS */
+#tabs{display:flex;gap:2px;padding:6px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:47px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 13px;border-radius:3px;border:1px solid transparent;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--txt2);
+  white-space:nowrap;background:none;transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(232,160,64,.4);color:var(--acc2);}
+
+/* MAIN */
+#main{padding:16px;max-width:1280px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:14px;}
+.sec-title{font-size:16px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:14px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:10px;margin-bottom:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:12px;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:13px 15px;}
+.card.hidden{display:none;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.card-icon{font-size:16px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card-sub{font-size:9px;color:var(--txt3);margin-left:auto;padding:1px 5px;
+  border-radius:5px;background:var(--bg4);border:1px solid var(--border);}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.7;}
+ul.tips{list-style:none;}
+ul.tips li{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(30,34,54,.7);
+  font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--acc);flex-shrink:0;margin-top:2px;}
+ul.tips li strong{color:var(--txt);}
+
+/* DIAGRAM CARD — ASCII 구도 표현 */
+.diag-card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:12px 14px;font-family:'Consolas','Courier New',monospace;}
+.diag-card.hidden{display:none;}
+.diag-title{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:8px;}
+.diag-box{background:var(--bg);border:1px solid var(--border2);border-radius:4px;
+  padding:10px;font-size:11px;line-height:1.6;color:var(--teal2);white-space:pre;overflow-x:auto;}
+.diag-note{font-size:11px;color:var(--txt2);margin-top:8px;line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;}
+.diag-note strong{color:var(--txt);}
+
+/* HIGHLIGHT CARD */
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(232,160,64,.2);border-radius:7px;padding:13px 16px;margin-bottom:12px;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.75;}
+.hi-body strong{color:var(--txt);}
+.hi-body em{color:var(--acc2);font-style:normal;}
+
+/* CALLOUT */
+.callout{border-radius:5px;padding:9px 13px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout-body{color:var(--txt2);line-height:1.65;}
+.callout-body strong{color:var(--txt);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.rust{background:var(--rustB);border-color:var(--rust);}
+.callout.rose{background:var(--roseB);border-color:var(--rose);}
+
+/* DIVIDER */
+.div-title{font-size:10px;font-weight:700;color:var(--acc2);
+  letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;}
+
+/* STEP */
+.steps{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.step{display:flex;gap:10px;align-items:flex-start;}
+.step-num{min-width:22px;height:22px;border-radius:50%;background:var(--acc3);
+  border:1px solid rgba(232,160,64,.4);display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;color:var(--acc2);flex-shrink:0;margin-top:1px;}
+.step-txt{font-size:12px;color:var(--txt2);line-height:1.65;}
+.step-txt strong{color:var(--txt);}
+
+/* YT CARD */
+.yt-card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:12px 14px;position:relative;overflow:hidden;}
+.yt-card.hidden{display:none;}
+.yt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.yt-card.c-red::before{background:linear-gradient(90deg,#cc2222,#ee4444);}
+.yt-card.c-blu::before{background:linear-gradient(90deg,var(--blu),var(--teal));}
+.yt-card.c-grn::before{background:linear-gradient(90deg,var(--grn),var(--teal2));}
+.yt-card.c-pur::before{background:linear-gradient(90deg,var(--pur),var(--rose));}
+.yt-card.c-acc::before{background:linear-gradient(90deg,var(--acc),var(--acc2));}
+.yt-card.c-rust::before{background:linear-gradient(90deg,var(--rust),var(--acc));}
+.yt-name{font-size:13px;font-weight:700;color:var(--acc);margin-bottom:3px;}
+.yt-en{font-size:10px;color:var(--txt3);margin-bottom:6px;font-style:italic;}
+.yt-topics{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;}
+.yt-topic{font-size:9px;padding:1px 6px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);}
+.yt-desc{font-size:11.5px;color:var(--txt2);line-height:1.6;}
+.yt-search{margin-top:8px;padding:7px 10px;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:5px;}
+.yt-search-label{font-size:9px;font-weight:700;color:var(--txt3);letter-spacing:.5px;margin-bottom:3px;}
+.yt-search-q{font-size:11px;color:var(--teal2);font-family:'Consolas',monospace;}
+
+/* TECHNIQUE TAG */
+.tech-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.tech{font-size:9px;padding:2px 7px;border-radius:8px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt3);}
+.tech.acc{background:var(--acc3);border-color:rgba(232,160,64,.3);color:var(--acc2);}
+.tech.blu{background:var(--bluB);border-color:rgba(68,136,238,.3);color:var(--blu2);}
+.tech.grn{background:var(--grnB);border-color:rgba(68,187,119,.3);color:var(--grn2);}
+.tech.red{background:var(--redB);border-color:rgba(238,68,85,.3);color:var(--red2);}
+.tech.pur{background:var(--purB);border-color:rgba(153,85,238,.3);color:var(--pur2);}
+.tech.teal{background:var(--tealB);border-color:rgba(51,170,204,.3);color:var(--teal2);}
+.tech.rust{background:var(--rustB);border-color:rgba(204,102,51,.3);color:var(--rust2);}
+.tech.rose{background:var(--roseB);border-color:rgba(221,68,136,.3);color:var(--rose2);}
+
+/* BODY DIAGRAM */
+.body-diag{background:var(--bg);border:1px solid var(--border2);border-radius:5px;
+  padding:12px;font-size:11px;font-family:'Consolas',monospace;
+  color:var(--grn2);line-height:1.55;white-space:pre;overflow-x:auto;}
+
+/* COLOR PALETTE SWATCH */
+.swatch-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.swatch{width:36px;height:36px;border-radius:4px;border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:flex-end;padding:2px;cursor:default;position:relative;flex-shrink:0;}
+.swatch-label{font-size:8px;color:rgba(255,255,255,.7);line-height:1;}
+
+/* HL */
+.hl{background:rgba(232,160,64,.22);border-radius:2px;color:var(--acc2);}
+
+@media(max-width:640px){
+  .grid,.grid-wide,.grid-4{grid-template-columns:1fr;}
+  .grid-sm{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">🎨</div>
+  <h1>그림 구도 &amp; 요소 완전 가이드</h1>
+  <span class="badge">인체 · 배경 · 자연 · 기계 · 참고 채널</span>
+  <input id="search" type="text" placeholder="기법, 요소, 채널명 검색...">
+  <span id="hit-cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="comp">🎯 구도 기초</button>
+  <button class="tab" data-tab="body">👤 인체 비례</button>
+  <button class="tab" data-tab="muscle">💪 근육·체형</button>
+  <button class="tab" data-tab="ruins">🏚️ 폐허 배경</button>
+  <button class="tab" data-tab="mech">⚙️ 기계·미래</button>
+  <button class="tab" data-tab="nature">🌳 자연 요소</button>
+  <button class="tab" data-tab="light">💡 빛과 색</button>
+  <button class="tab" data-tab="ref">📺 참고 채널</button>
+</div>
+
+<div id="main">
+
+<!-- ===== 구도 기초 ===== -->
+<div class="sec on" id="sec-comp">
+  <div class="sec-hd">
+    <div class="sec-title">🎯 구도(Composition) 기초 완전 정리</div>
+    <div class="sec-sub">구도는 시선을 유도하는 설계도다. 잘 짜인 구도는 보는 사람이 의식하지 않아도 그림을 이해하게 만든다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 구도의 목적</div>
+    <div class="hi-body">
+      구도의 역할은 하나다: <em>시선을 원하는 곳으로 이끄는 것.</em><br>
+      독자(관람자)의 눈이 그림을 어떤 순서로 읽는지를 설계하는 작업이다.<br>
+      <strong>좋은 구도 = 주제가 명확 + 시선이 자연스럽게 흐름 + 여백이 숨 쉼</strong>
+    </div>
+  </div>
+
+  <div class="div-title">📐 핵심 구도 법칙 8가지</div>
+  <div class="grid">
+    <div class="diag-card">
+      <div class="diag-title">① 3분할 법칙 (Rule of Thirds)</div>
+      <div class="diag-box">┌───┬───┬───┐
+│   │ ● │   │  ← 강조점
+├───┼───┼───┤
+│   │   │   │
+├───┼───┼───┤
+│   │   │ ● │  ← 주제 배치
+└───┴───┴───┘
+  교차점 = 시선 집중 최적 위치</div>
+      <div class="diag-note">화면을 가로·세로 3등분. <strong>4개의 교차점</strong>에 주제를 배치하면 안정적이면서 생동감 있는 구도가 완성된다. 정중앙 배치는 정적이고 무거운 느낌.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">② 황금비율 / 황금 나선 (Golden Ratio)</div>
+      <div class="diag-box">╔══════════╗
+║ ╔══════╗ ║
+║ ║ ╔══╗ ║ ║
+║ ║ ║●↖║ ║ ║  ← 시선의 종착점
+║ ║ ╚══╝ ║ ║
+║ ╚══════╝ ║
+╚══════════╝
+  나선의 중심 = 핵심 피사체</div>
+      <div class="diag-note">자연에서 발견되는 1:1.618 비율. <strong>피보나치 나선</strong>이 끝나는 지점에 가장 중요한 요소를 배치. 3분할보다 더 유기적이고 자연스러운 느낌.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">③ 삼각형 구도 (Triangle Composition)</div>
+      <div class="diag-box">        ★         ← 정점(주제)
+       ╱ ╲
+      ╱   ╲
+     ╱     ╲
+    ◆───────◆  ← 안정적 기반
+  안정감·권위·웅장함을 표현</div>
+      <div class="diag-note">주제가 꼭짓점, 나머지 요소들이 아래를 채우는 구도. <strong>안정감과 권위</strong>를 주며 인물의 존재감을 강조할 때 효과적. 역삼각형은 불안정·긴장감.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">④ 프레이밍 (Framing)</div>
+      <div class="diag-box">█████████████
+█╔═════════╗█
+█║         ║█
+█║  ★주제  ║█
+█║         ║█
+█╚═════════╝█
+█████████████
+  주변 요소가 액자 역할</div>
+      <div class="diag-note">문틀, 나뭇가지, 동굴 입구, 창문 등으로 주제를 <strong>액자처럼 둘러싸는</strong> 기법. 시선이 자연스럽게 안쪽으로 유도되며 깊이감이 생긴다.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">⑤ 선 유도 (Leading Lines)</div>
+      <div class="diag-box">┌─────────────┐
+│            ★│
+│         ╱  │
+│       ╱    │
+│     ╱      │
+│   ╱        │
+│ ╱          │
+└─────────────┘
+  선이 눈을 주제로 이끈다</div>
+      <div class="diag-note">도로, 강, 울타리, 건물 선 등을 활용해 <strong>시선을 주제까지 자연스럽게 이끄는</strong> 기법. 투시선 자체가 유도선이 된다. 가장 강력한 구도 기법 중 하나.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">⑥ 대비 구도 (Contrast Composition)</div>
+      <div class="diag-box">████████████░░
+████████████░░
+████████████░░  ← 어두운 배경
+░░░░░░░░░░░░██
+░░░╔══╗░░░░██  ← 밝은 인물
+░░░║★ ║░░░░██
+░░░╚══╝░░░░██</div>
+      <div class="diag-note">밝음vs어둠, 크기vs작음, 복잡vs단순의 대비로 주제를 돋보이게 한다. <strong>실루엣 구도</strong>가 대표적: 어두운 인물을 밝은 배경에, 또는 그 반대로.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">⑦ S자·C자 구도 (Dynamic Lines)</div>
+      <div class="diag-box">   ╭──────╮
+  ╱        ╲
+ │  (공간)  │    S자:
+  ╲        ╱    역동성, 흐름
+   ╰──────╯    우아함
+      │         리듬감
+   ╭──╯
+  ╱
+╱   인물/강/도로가 S/C형태</div>
+      <div class="diag-note">인물의 포즈, 강의 흐름, 도로가 S자나 C자를 그릴 때 <strong>리듬과 역동성</strong>이 생긴다. 정적인 구도에 생명력을 불어넣는 방법.</div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">⑧ 네거티브 스페이스 (Negative Space)</div>
+      <div class="diag-box">▓▓▓▓▓▓▓▓▓▓▓▓▓
+▓▓▓▓▓▓▓▓▓▓▓▓▓
+▓▓▓        ▓▓▓
+▓▓▓  (여백) ▓▓▓  ← 여백이 주제를 숨쉬게
+▓▓▓        ▓▓▓
+▓▓▓▓▓▓★▓▓▓▓▓▓
+▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
+      <div class="diag-note">주제 주변의 <strong>빈 공간(여백)을 의도적으로 설계</strong>하는 기법. 여백이 크면 고독감·광활함, 작으면 압박감·긴장감. 여백 자체가 메시지가 된다.</div>
+    </div>
+  </div>
+
+  <div class="div-title">📷 카메라 앵글과 시점 (앵글별 효과)</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">로우 앵글 (개구리 시점)</span><span class="card-sub">권위·웅장</span></div>
+      <div class="card-desc">카메라가 아래에서 위로 올려다봄. 인물이나 건물이 크고 강렬하게 보임. 주인공의 등장, 빌런의 압도감, 건축물의 웅장함 표현에 최적.</div>
+      <div class="tech-row"><span class="tech acc">웅장함</span><span class="tech acc">권위</span><span class="tech acc">압도감</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">하이 앵글 (새 시점)</span><span class="card-sub">취약·고독</span></div>
+      <div class="card-desc">카메라가 위에서 아래로 내려다봄. 인물이 작고 취약해 보임. 고독감, 넓은 세계 속 작은 존재를 표현할 때 사용. 군중 장면에도 효과적.</div>
+      <div class="tech-row"><span class="tech blu">고독</span><span class="tech blu">취약</span><span class="tech blu">광활</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">아이 레벨 (눈높이)</span><span class="card-sub">자연·공감</span></div>
+      <div class="card-desc">인물의 눈높이와 같은 카메라. 가장 자연스럽고 공감가는 시점. 일상적 장면, 대화 씬, 독자를 인물과 동등하게 만들 때 사용.</div>
+      <div class="tech-row"><span class="tech grn">자연스러움</span><span class="tech grn">공감</span><span class="tech grn">일상</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">더치 앵글 (기울기)</span><span class="card-sub">불안·긴장</span></div>
+      <div class="card-desc">카메라를 기울여 화면 자체가 대각선으로 기우는 기법. 심리적 불안정, 혼란, 공포, 긴박한 상황에서 사용. 과하면 진부해지므로 절제 필요.</div>
+      <div class="tech-row"><span class="tech red">불안</span><span class="tech red">공포</span><span class="tech red">긴장</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">오버 더 숄더 (어깨 너머)</span><span class="card-sub">관계·대화</span></div>
+      <div class="card-desc">한 인물의 어깨 너머로 다른 인물을 보는 시점. 두 인물의 관계와 대화를 효과적으로 표현. 관람자를 대화에 끌어들이는 효과.</div>
+      <div class="tech-row"><span class="tech pur">관계</span><span class="tech pur">대화</span><span class="tech pur">몰입</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📷</span><span class="card-title">클로즈업 / 익스트림 클로즈업</span><span class="card-sub">감정·디테일</span></div>
+      <div class="card-desc">얼굴이나 특정 부위를 크게 담는 구도. 감정 강조, 중요한 디테일 부각, 긴장감 고조에 사용. 눈의 클로즈업은 가장 강력한 감정 전달 수단.</div>
+      <div class="tech-row"><span class="tech rust">감정</span><span class="tech rust">강조</span><span class="tech rust">디테일</span></div>
+    </div>
+  </div>
+
+  <div class="div-title">🎭 구도에서 자주 쓰는 심리 법칙</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👁️</span><span class="card-title">시선 방향 (Look Room)</span></div>
+      <ul class="tips">
+        <li>인물이 바라보는 방향으로 <strong>여백을 더 주면</strong> 자연스럽다</li>
+        <li>인물이 화면 끝을 향해 보면 <strong>긴장감·갑갑함</strong>이 생긴다 (의도적 연출 가능)</li>
+        <li>두 인물의 시선이 서로를 향하면 <strong>관계와 긴장</strong>이 형성된다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📏</span><span class="card-title">크기 = 중요도 (Size = Importance)</span></div>
+      <ul class="tips">
+        <li>화면에서 <strong>크게 그려진 것</strong>이 중요하다는 인식이 자동으로 생긴다</li>
+        <li>조연은 주인공보다 작거나 뒤에 배치한다</li>
+        <li>적이 주인공보다 크면 <strong>압도감</strong>이, 작으면 <strong>여유</strong>가 표현된다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌓</span><span class="card-title">명암 대비 (Value Contrast)</span></div>
+      <ul class="tips">
+        <li>가장 밝은 곳과 가장 어두운 곳의 경계에 <strong>시선이 집중</strong>된다</li>
+        <li>주제는 배경과 명도 차이가 커야 잘 읽힌다</li>
+        <li>전체를 중간 톤으로 유지하다가 주제만 밝게 = <strong>스포트라이트 효과</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔺</span><span class="card-title">홀수 법칙 (Rule of Odds)</span></div>
+      <ul class="tips">
+        <li>요소를 <strong>홀수(1, 3, 5개)</strong>로 배치하면 짝수보다 시각적으로 자연스럽다</li>
+        <li>3인 구도에서 중앙 인물이 자동으로 주인공처럼 보인다</li>
+        <li>나무도 한 그루, 세 그루가 두 그루보다 더 균형 있어 보인다</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 인체 비례 ===== -->
+<div class="sec" id="sec-body">
+  <div class="sec-hd">
+    <div class="sec-title">👤 인체 비례 &amp; 해부학 기초</div>
+    <div class="sec-sub">인체는 암기가 아니라 이해로 그린다. 뼈대와 근육의 원리를 알면 모든 포즈를 그릴 수 있다.</div>
+  </div>
+
+  <div class="div-title">📏 기본 비례 시스템</div>
+  <div class="grid-wide">
+    <div class="diag-card">
+      <div class="diag-title">8등신 비례 (이상적 인체 — 만화·일러스트 표준)</div>
+      <div class="body-diag">    ╔═══╗   ← 1등신: 머리 (기준 단위)
+    ╚═╤═╝
+    ╔═╧═╗   ← 2등신: 가슴 상부 (턱~젖꼭지)
+    ║   ║
+    ╚═╤═╝   ← 3등신: 가슴 하부 (배꼽 위)
+    ╔═╧═╗
+    ║   ║   ← 4등신: 골반 (배꼽~사타구니)
+    ╚═╤═╝
+    ╔═╧════╗
+    ║ 허벅지║  ← 5등신
+    ╚══════╝
+    ╔══════╗
+    ║  무릎 ║  ← 6등신
+    ╠══════╣
+    ║  종아리║ ← 7등신
+    ╚══════╝
+    ╔══════╗  ← 8등신: 발끝</div>
+      <div class="diag-note">
+        <strong>핵심 랜드마크:</strong> 배꼽 = 4등신 / 손목 = 4등신과 같은 높이 / 팔꿈치 = 배꼽 높이 / 손 끝 = 사타구니 중간 / 무릎 = 6등신 / 발목 = 7.5등신
+      </div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">장르별 등신 차이</div>
+      <div class="diag-box"> 리얼  만화  슈퍼 SD   치비
+  8등신  7등신  9등신  4등신  2~3등신
+
+  ┌─┐   ┌─┐   ┌─┐   ┌──┐  ┌──┐
+  │ │   │ │   │ │   │  │  │  │ ← 머리
+  ├─┤   ├─┤   ├─┤   └─┬┘  └┬─┘
+  │ │   │ │   │ │     │     │  ← 몸통
+  │ │   │ │   │ │    ─┴─   ─┴─ ← 다리
+  │ │   │ │   │ │
+  │ │   │ │   │ │
+  │ │   ├─┤   │ │
+  ├─┤   │ │   ├─┤
+  │ │   │ │   │ │
+  └─┘   └─┘   └─┘</div>
+      <div class="diag-note">
+        <strong>리얼 (8등신)</strong>: 실사 풍 / <strong>일반 만화 (7등신)</strong>: 웹툰, 일반 만화 표준 / <strong>슈퍼 히어로 (9~10등신)</strong>: 과장된 이상적 신체 / <strong>SD/치비 (2~4등신)</strong>: 귀엽고 과장된 표현
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">🦴 제스처 드로잉 (Gesture Drawing)</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✍️</span><span class="card-title">제스처란?</span></div>
+      <ul class="tips">
+        <li>인체의 <strong>전체적인 흐름과 무게 중심</strong>을 먼저 포착하는 기법</li>
+        <li>세부 묘사보다 <strong>동세(動勢)와 리듬</strong>을 먼저 잡는다</li>
+        <li>30초~2분의 짧은 스케치 연습으로 실력이 급상승</li>
+        <li>인물의 감정과 의도가 포즈에 담겨야 한다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">제스처 그리는 순서</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-txt"><strong>척추선 (Action Line)</strong> — 머리부터 골반까지의 곡선. 포즈의 핵심 흐름.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>어깨선·골반선</strong> — 두 선의 기울기가 역방향이면 자연스러운 포즈.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-txt"><strong>팔·다리 방향</strong> — 무게 중심을 지탱하는 방향으로 자연스럽게.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-txt"><strong>볼륨 블록</strong> — 가슴·골반을 상자(박스)로 단순화해 형태 잡기.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-txt"><strong>세부 추가</strong> — 비례와 포즈가 맞은 후에 디테일 작업.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚖️</span><span class="card-title">무게 중심 (Balance)</span></div>
+      <ul class="tips">
+        <li><strong>균형선</strong>: 목 아래 중심 → 수직으로 내린 선이 발바닥 안에 있어야 선다</li>
+        <li><strong>콘트라포스토</strong>: 한쪽 무릎을 구부려 어깨와 골반이 반대로 기울어지는 자연스러운 자세</li>
+        <li><strong>역동적 포즈</strong>: 무게 중심이 발바닥 밖에 있을 때 → 움직임이나 지지대가 필요</li>
+        <li><strong>무거운 물체 들기</strong>: 반대 방향으로 몸이 기울어져 균형을 맞춘다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🖐️</span><span class="card-title">손 그리기 핵심</span></div>
+      <ul class="tips">
+        <li><strong>손바닥 = 사각형 블록</strong>으로 먼저 잡는다</li>
+        <li><strong>손가락 마디</strong>: 1마디&gt;2마디&gt;3마디 순으로 길이가 짧아진다</li>
+        <li>4손가락은 거의 <strong>평행</strong>하게 움직인다 (함께 묶어서 생각)</li>
+        <li>엄지는 <strong>45도 방향</strong>으로 독립적으로 움직인다</li>
+        <li>손등 힘줄: 손가락 뻗을 때 <strong>V자 형태</strong>로 보인다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">👣</span><span class="card-title">발 그리기 핵심</span></div>
+      <ul class="tips">
+        <li><strong>쐐기 형태</strong>로 단순화: 뒤꿈치는 넓고, 앞부분은 좁아진다</li>
+        <li>발목 안쪽이 바깥쪽보다 <strong>높이 있다</strong> (내측 복사뼈 &gt; 외측)</li>
+        <li>발바닥은 평평하지 않고 <strong>아치</strong>가 있다 (안쪽이 들린다)</li>
+        <li>엄지발가락이 나머지보다 <strong>가장 크고 독립적</strong>이다</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">😊</span><span class="card-title">얼굴 비례 기초</span></div>
+      <ul class="tips">
+        <li><strong>눈</strong>: 얼굴 높이의 정중앙 (생각보다 낮다)</li>
+        <li><strong>눈 간격</strong>: 눈 한 개 너비만큼 떨어진다</li>
+        <li><strong>코 끝</strong>: 눈~턱의 중간</li>
+        <li><strong>입</strong>: 코~턱의 1/3 위치</li>
+        <li><strong>귀</strong>: 눈썹~코 끝 사이 높이</li>
+        <li>3/4 각도: 코가 얼굴 윤곽 밖으로 살짝 튀어나온다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout acc">
+    <span>💡</span>
+    <div class="callout-body"><strong>연습 방법:</strong> Line of Action (lineofaction.com), Quickposes, SenshiStock 참조 이미지로 매일 30분 제스처 드로잉. 처음엔 30초씩, 익숙해지면 5분, 10분으로 늘릴 것.</div>
+  </div>
+</div>
+
+<!-- ===== 근육·체형 ===== -->
+<div class="sec" id="sec-muscle">
+  <div class="sec-hd">
+    <div class="sec-title">💪 근육·체형 상세 가이드</div>
+    <div class="sec-sub">근육은 단순 암기가 아니다. 어떤 동작에서 어떤 근육이 수축·이완되는지의 원리를 이해해야 한다.</div>
+  </div>
+
+  <div class="div-title">🏋️ 남성 근육 묘사</div>
+  <div class="grid-wide">
+    <div class="diag-card">
+      <div class="diag-title">전면 근육 구조 (앞면)</div>
+      <div class="body-diag">       흉쇄유돌근
+          ╱╲
+  삼각근  ╱  ╲  삼각근
+   ╱──  ╱    ╲  ──╲
+  ║   ██████████   ║
+  ║   ██ 대흉근 ██  ║  ← 가슴 근육 (가장 눈에 띄는)
+  ║   ██████████   ║
+  ║  / 복직근  \   ║
+  ║ ├──────────┤  ║  ← 복근 6~8칸
+  ║ ├──────────┤  ║
+  ║ ├──────────┤  ║
+  ║ └──────────┘  ║
+    전거근(옆구리)
+     이두박근         이두박근
+    (팔 앞면)         (팔 앞면)</div>
+      <div class="diag-note">
+        <strong>대흉근</strong>: 가슴 전체를 덮는 부채꼴 근육. 팔을 들면 위쪽이 강조, 팔을 내리면 아래쪽 곡선이 강조.<br>
+        <strong>복직근</strong>: 6~8칸으로 나뉨. 칸의 크기가 균등하지 않고 위쪽이 더 큰 게 자연스러움.<br>
+        <strong>전거근</strong>: 옆구리 갈비뼈 따라 지그재그로 삐져나온 근육. 역동적 포즈에서 강조.
+      </div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">후면 근육 구조 (뒷면)</div>
+      <div class="body-diag">  삼각근(후면)  삼각근(후면)
+     ╲              ╱
+      ╲  승모근    ╱   ← V자 형태, 어깨~등 중앙
+       ████████████
+       ██ 능형근 ██    ← 날개뼈 사이
+       ████████████
+      ╱            ╲
+     ╱  광배근      ╲  ← 등 가장 넓은 근육 (역삼각형)
+    ╱                ╲
+   ╱  척추기립근      ╲ ← 등 중앙 세로 두 줄
+  ╱════════════════════╲
+         대둔근           ← 엉덩이 근육
+     삼두박근(팔 뒷면)</div>
+      <div class="diag-note">
+        <strong>광배근</strong>: 등을 역삼각형으로 만드는 핵심. 겨드랑이에서 허리까지 부채꼴로 펼쳐짐.<br>
+        <strong>승모근</strong>: 목~어깨 부분을 덮는 마름모꼴 근육. 긴장하거나 어깨를 올리면 더 강조됨.<br>
+        <strong>대둔근</strong>: 엉덩이의 큰 둥근 형태를 만드는 근육.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💪</span><span class="card-title">팔 근육 상세</span></div>
+      <ul class="tips">
+        <li><strong>이두박근 (앞)</strong> — 팔꿈치를 구부릴 때 튀어오르는 근육. 두 갈래(이두). 팔 안쪽이 더 높이 솟는다.</li>
+        <li><strong>삼두박근 (뒤)</strong> — 팔 뒤면 전체. 세 갈래(삼두). 팔 펼 때 강조. U자 홈이 팔꿈치 위에 생긴다.</li>
+        <li><strong>전완근 (아래팔)</strong> — 아래팔을 여러 개 근육이 꼬이듯 덮음. 주먹 쥐거나 손목 움직일 때 강조.</li>
+        <li><strong>팔꿈치</strong> — 삼두박근 힘줄이 뼈를 감싸는 형태. 각지게 표현해야 자연스럽다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🦵</span><span class="card-title">다리 근육 상세</span></div>
+      <ul class="tips">
+        <li><strong>대퇴사두근 (허벅지 앞)</strong> — 4개 근육 묶음. 무릎을 펼 때 강조. 내측광근이 무릎 안쪽에 물방울처럼 튀어나온다.</li>
+        <li><strong>햄스트링 (허벅지 뒤)</strong> — 두 갈래 근육. 무릎 아래에서 두 선으로 갈라진다.</li>
+        <li><strong>비복근/가자미근 (종아리)</strong> — 하트 형태의 비복근이 위, 그 아래 가자미근이 받쳐준다.</li>
+        <li><strong>무릎 표현</strong> — 슬개골(무릎뼈)을 표현하면 리얼해짐. 구부릴수록 아래로 당겨진다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚡</span><span class="card-title">근육 강조 포즈 팁</span></div>
+      <ul class="tips">
+        <li><strong>수축근육 강조</strong> — 굽히는 쪽 근육이 수축·팽창. 피는 쪽은 늘어나고 평평해진다.</li>
+        <li><strong>무게 지탱</strong> — 바닥을 짚거나 무게를 들 때 힘줄과 혈관이 강조된다.</li>
+        <li><strong>3/4 각도</strong> — 정면보다 3/4 각도에서 근육의 입체감이 더 잘 보인다.</li>
+        <li><strong>그림자 활용</strong> — 근육 사이 V자 홈에 그림자를 주면 입체감이 급상승.</li>
+        <li><strong>과장</strong> — 만화/웹툰에서는 30~50% 과장이 더 멋있어 보인다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">👙 여성 체형 묘사 (거유 포함)</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✏️</span><span class="card-title">여성 체형의 기본 이해</span></div>
+      <ul class="tips">
+        <li><strong>무게 중심</strong> — 남성보다 골반이 넓고 무게 중심이 낮다. 허리의 곡선이 더 두드러진다.</li>
+        <li><strong>모래시계 비율</strong> — 어깨-허리-골반이 모래시계 형태. 허리의 잘록함이 핵심.</li>
+        <li><strong>근육의 차이</strong> — 같은 근육이지만 지방이 위에 덮여 더 부드럽고 둥글게 표현.</li>
+        <li><strong>골반</strong> — 남성보다 넓고 천골이 뒤로 더 많이 기울어진다 (엉덩이가 더 뒤로 나온다).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">가슴(흉부) 해부학적 이해</span></div>
+      <ul class="tips">
+        <li><strong>기반 구조</strong> — 대흉근 위에 지방 조직이 올라앉은 형태. 대흉근의 경사를 따라 형태가 결정된다.</li>
+        <li><strong>흉골 위치</strong> — 두 가슴 사이(데콜테)의 경계는 흉골이 만든다. 갈비뼈 위에 얹힌 형태.</li>
+        <li><strong>중력 방향</strong> — 서 있을 때는 아래로, 누울 때는 옆으로 퍼진다. 크기가 클수록 중력의 영향이 크다.</li>
+        <li><strong>자세에 따른 변화</strong> — 팔을 들면 위로 당겨지고, 앞으로 숙이면 앞으로 흘러내린다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">거유 표현의 핵심 포인트</span></div>
+      <ul class="tips">
+        <li><strong>무게감 표현</strong> — 크기가 클수록 중력의 영향을 크게 받는다. 아래쪽이 더 무겁게 처진다.</li>
+        <li><strong>옷과의 상호작용</strong> — 옷감이 당겨지고 주름이 가슴 위를 향해 방사형으로 모인다.</li>
+        <li><strong>접촉면의 변형</strong> — 팔로 누르거나 바닥에 닿을 때 눌리고 퍼지는 형태 변화.</li>
+        <li><strong>측면 라인</strong> — 정면에서도 옆면이 보이는 측면 라인이 크기를 자연스럽게 암시.</li>
+        <li><strong>비율 균형</strong> — 어깨와 골반의 비율에 맞게 가슴 크기를 조절해야 자연스럽다.</li>
+        <li><strong>흔한 실수</strong> — 완전한 원구체처럼 그리면 부자연스럽다. 항상 대흉근 위에 얹혀 있음을 기억.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🩺</span><span class="card-title">체형 유형별 차이</span></div>
+      <ul class="tips">
+        <li><strong>슬림형</strong> — 어깨-허리-골반 차이가 적고 전체적으로 균일. 뼈대 라인이 더 보인다.</li>
+        <li><strong>모래시계형</strong> — 풍성한 가슴과 골반, 잘록한 허리. 이상적 비율로 자주 표현.</li>
+        <li><strong>근육형</strong> — 광배근, 승모근이 보이며 어깨가 넓다. 가슴 근육이 더 각지게 보임.</li>
+        <li><strong>통통형</strong> — 전체적으로 곡선이 강하고 뼈 랜드마크가 덜 보인다. 부드럽고 둥근 실루엣.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 폐허 배경 ===== -->
+<div class="sec" id="sec-ruins">
+  <div class="sec-hd">
+    <div class="sec-title">🏚️ 폐허·포스트아포칼립스 배경</div>
+    <div class="sec-sub">폐허는 '과거'를 담아야 한다. 한때 살아있던 것이 무너진 이야기가 보여야 진짜 폐허다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 폐허의 핵심 — "시간의 흔적"</div>
+    <div class="hi-body">
+      좋은 폐허 배경은 <em>"이곳이 어떤 곳이었는가"</em>를 보여준다.<br>
+      단순히 부서진 것들을 그리는 게 아니라, <strong>과거의 구조물이 어떻게 무너지는지의 물리적 논리</strong>를 담아야 한다.<br>
+      <strong>핵심 3요소: 과거의 질서 + 시간의 파괴 + 자연의 침식</strong>
+    </div>
+  </div>
+
+  <div class="div-title">🏗️ 폐허의 물리적 원리</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🧱</span><span class="card-title">건물이 무너지는 방식</span></div>
+      <ul class="tips">
+        <li><strong>수직 붕괴</strong> — 기둥이 무너지면 윗층이 그 자리에서 아래로 꺼진다. 파편이 아래에 쌓임.</li>
+        <li><strong>수평 붕괴</strong> — 폭발·충격으로 벽이 옆으로 날아가면 파편이 넓게 퍼진다.</li>
+        <li><strong>부분 붕괴</strong> — 일부만 남아 있는 경우. 구조적으로 강한 부분(기둥, 내력벽)이 남는다.</li>
+        <li><strong>균열 패턴</strong> — 콘크리트는 충격점에서 방사형으로 균열. 벽돌은 모르타르 선을 따라 분리.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌿</span><span class="card-title">자연의 침식 묘사</span></div>
+      <ul class="tips">
+        <li><strong>식물 침입 순서</strong> — 이끼→잡초→덩굴→관목→나무. 시간 경과가 보인다.</li>
+        <li><strong>덩굴의 물리</strong> — 균열과 틈새를 따라 자라고, 구조물을 감싸며 올라간다.</li>
+        <li><strong>부식과 녹</strong> — 금속은 모서리에서 안쪽으로 부식. 녹은 갈색-주황에서 검게 변한다.</li>
+        <li><strong>물과 흙</strong> — 물이 고이는 곳에 흙이 쌓이고 풀이 자란다. 낮은 곳이 가장 먼저 흙에 덮인다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔦</span><span class="card-title">폐허의 빛과 분위기</span></div>
+      <ul class="tips">
+        <li><strong>하늘이 열린다</strong> — 지붕이 없으면 빛이 안쪽으로 쏟아진다. 가장 극적인 구도.</li>
+        <li><strong>먼지와 연무</strong> — 폐허 안은 먼지가 빛을 산란시켜 희뿌연 분위기를 만든다.</li>
+        <li><strong>그림자의 날카로움</strong> — 구멍을 통해 들어오는 빛은 선명한 광선(Volumetric Light)을 만든다.</li>
+        <li><strong>녹과 이끼의 색</strong> — 회색 콘크리트, 주황 녹, 초록 이끼의 3색이 폐허의 팔레트.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📐</span><span class="card-title">폐허 구도 & 레이어링</span></div>
+      <ul class="tips">
+        <li><strong>전경-중경-원경</strong> — 전경에 잡초/파편, 중경에 건물, 원경에 스카이라인을 배치.</li>
+        <li><strong>프레이밍 활용</strong> — 무너진 문틀이나 창문 프레임으로 안쪽 장면을 프레이밍.</li>
+        <li><strong>수직선 기울기</strong> — 완벽한 수직이 아닌 약간 기울어진 선으로 불안정감을 표현.</li>
+        <li><strong>시선 유도</strong> — 도로, 철로, 부서진 계단을 화면 안쪽으로 뻗게 해 깊이감을 준다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌆</span><span class="card-title">도시 폐허 vs 자연 폐허</span></div>
+      <ul class="tips">
+        <li><strong>도시 폐허</strong> — 콘크리트, 철근, 유리, 아스팔트. 직선과 기하학이 기본.</li>
+        <li><strong>자연 폐허</strong> — 돌, 목재, 흙. 곡선이 많고 더 유기적.</li>
+        <li><strong>혼합형</strong> — 도시 건물이 자연에 삼켜지는 것. 가장 극적이고 인기 있는 유형.</li>
+        <li><strong>시대 표현</strong> — 어떤 시대의 건축 양식을 부수냐에 따라 세계관이 달라진다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">폐허 채색 팁</span></div>
+      <ul class="tips">
+        <li><strong>채도를 낮춰라</strong> — 폐허는 전체적으로 채도가 낮다. 선명한 색은 생명(식물)에만.</li>
+        <li><strong>색온도 대비</strong> — 차가운 그림자 + 따뜻한 빛이 폐허에 드라마를 준다.</li>
+        <li><strong>노이즈와 텍스처</strong> — 균일한 면은 없다. 모든 표면에 불규칙한 텍스처.</li>
+        <li><strong>에어리얼 퍼스펙티브</strong> — 먼 거리 건물은 안개에 가려 채도가 낮고 파란빛이 돈다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout rust">
+    <span>🎬</span>
+    <div class="callout-body"><strong>참고 작품:</strong> 게임 The Last of Us, Fallout 4 / 애니 진격의 거인, 비포 유어 아이즈 / 영화 I Am Legend, Mad Max / 그림 작가: Simon Stålenhag (레트로 폐허+SF), Craig Mullins (콘셉트 아트)</div>
+  </div>
+</div>
+
+<!-- ===== 기계·미래 ===== -->
+<div class="sec" id="sec-mech">
+  <div class="sec-hd">
+    <div class="sec-title">⚙️ 기계·오버테크놀로지 배경</div>
+    <div class="sec-sub">미래 기계는 기능에서 형태가 나와야 설득력이 있다. 멋을 위한 디자인보다 '왜 이 모양인가'가 먼저다.</div>
+  </div>
+
+  <div class="hi-card">
+    <div class="hi-title">🔑 기계 디자인의 핵심 원칙</div>
+    <div class="hi-body">
+      <strong>형태는 기능을 따른다 (Form follows function)</strong><br>
+      진짜 기계는 목적이 있기 때문에 그 모양이다. 실제 기계(항공기, 엔진, 굴삭기)를 관찰하면<br>
+      <em>모든 형태에 이유가 있다</em>는 것을 알 수 있다. 이것이 설득력 있는 기계 디자인의 시작점.
+    </div>
+  </div>
+
+  <div class="div-title">🤖 하드 서피스 디자인 기초</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📦</span><span class="card-title">실루엣부터 시작하라</span></div>
+      <ul class="tips">
+        <li><strong>실루엣이 읽혀야 한다</strong> — 검은 실루엣만 봐도 무엇인지 알 수 있어야 좋은 디자인.</li>
+        <li><strong>큰 형태 → 중간 형태 → 세부</strong> — 이 순서를 지키지 않으면 세부가 아무리 좋아도 흔들린다.</li>
+        <li><strong>기본 도형으로 분해</strong> — 어떤 기계도 박스·실린더·구·원뿔의 조합이다.</li>
+        <li><strong>비율의 변주</strong> — 같은 모양이라도 비율을 극단적으로 바꾸면 다른 느낌이 난다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">기계 디테일의 원리</span></div>
+      <ul class="tips">
+        <li><strong>패널 라인</strong> — 큰 면을 패널로 나누는 선. 제작·분해·수리 가능성을 암시.</li>
+        <li><strong>볼트와 리벳</strong> — 패널 모서리에 규칙적으로 배치. 비규칙적이면 어색하다.</li>
+        <li><strong>파이프와 케이블</strong> — 한쪽에서 다른 쪽으로 연결되어야 한다. 목적 없이 끝나면 안 된다.</li>
+        <li><strong>환기구와 그릴</strong> — 발열 부품 근처에 환기구가 있어야 논리적이다.</li>
+        <li><strong>마모와 손상</strong> — 자주 쓰는 부분(손잡이, 발판, 관절)이 더 마모된다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚀</span><span class="card-title">SF 기계 분위기별 유형</span></div>
+      <ul class="tips">
+        <li><strong>밀리터리 SF</strong> — 각진 형태, 모듈화, 카키·검정·회색, 실용적 디자인</li>
+        <li><strong>사이버펑크</strong> — 노출된 배선, 네온 LED, 낡고 개조된 것, 아날로그+디지털 혼합</li>
+        <li><strong>클린 SF</strong> — 매끄러운 표면, 최소화된 세부, 흰색·은색, 인터페이스 UI 강조</li>
+        <li><strong>바이오메카</strong> — 유기적 곡선과 기계의 결합. 뼈·근육 같은 형태에 기계가 이식된 것</li>
+        <li><strong>스팀펑크</strong> — 황동·구리·목재, 기어·증기관, 빅토리아 시대 미학</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏙️</span><span class="card-title">미래 도시 배경 구성</span></div>
+      <ul class="tips">
+        <li><strong>수직성</strong> — 미래 도시는 위로 뻗는다. 고층 건물들이 뷰를 지배.</li>
+        <li><strong>레이어 구조</strong> — 지상층·중간층·상층의 다층 구조. 각 층에 다른 문명 수준.</li>
+        <li><strong>홀로그램과 광고</strong> — 건물 표면과 공중의 빛나는 광고판이 분위기를 만든다.</li>
+        <li><strong>교통 시스템</strong> — 공중 차량, 자기부상 열차, 파이프형 이동 수단이 입체감을 준다.</li>
+        <li><strong>인간 스케일</strong> — 반드시 인물을 넣어라. 거대한 기계 옆의 작은 인간이 스케일을 전달.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">💡</span><span class="card-title">기계 채색 &amp; 재질 표현</span></div>
+      <ul class="tips">
+        <li><strong>금속 반사</strong> — 환경을 반사한다. 하이라이트가 강하고 어두운 부분은 매우 어둡다.</li>
+        <li><strong>매트 금속</strong> — 반사가 약하고 넓게 퍼진다. 환경색이 약하게 물든다.</li>
+        <li><strong>발광 요소</strong> — 엔진, 에너지 소스, 화면이 빛난다. 주변에 색빛이 퍼진다(Rim Light).</li>
+        <li><strong>오염과 기름때</strong> — 파이프 연결부, 환기구, 관절에 먼지와 기름이 축적된다.</li>
+        <li><strong>앰비언트 오클루전</strong> — 맞닿는 두 면의 경계에 어두운 그림자가 생긴다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title">로봇·메카 디자인 팁</span></div>
+      <ul class="tips">
+        <li><strong>인체 비례를 기반으로</strong> — 아무리 추상적인 로봇도 머리·몸통·팔다리의 구분이 있으면 읽힌다.</li>
+        <li><strong>관절 표현</strong> — 구면 관절(볼소켓)이나 힌지 관절로 움직임 방향을 암시.</li>
+        <li><strong>무게감</strong> — 무거운 로봇은 두껍고 짧은 다리. 빠른 로봇은 길고 가는 다리.</li>
+        <li><strong>무기 배치 논리</strong> — 무기는 적을 향하기 쉬운 곳에. 어깨·팔·등에 배치가 논리적.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 자연 요소 ===== -->
+<div class="sec" id="sec-nature">
+  <div class="sec-hd">
+    <div class="sec-title">🌳 자연 요소 완전 가이드</div>
+    <div class="sec-sub">자연은 무작위처럼 보이지만 규칙이 있다. 그 규칙을 이해하면 어떤 자연도 그릴 수 있다.</div>
+  </div>
+
+  <div class="div-title">🌲 나무 그리기</div>
+  <div class="grid">
+    <div class="diag-card">
+      <div class="diag-title">나무 구조의 원리 (프랙탈 분기)</div>
+      <div class="diag-box">           ╱ ╲           ← 최종 가지 (가장 얇음)
+          ╱   ╲
+        ╱╲     ╱╲         ← 2차 분기
+       ╱  ╲   ╱  ╲
+      ╱    ╲ ╱    ╲
+    ╱╲      ╲      ╱╲     ← 1차 분기
+   ╱  ╲      ║      ╱╲
+  ╱    ╲     ║     ╱  ╲
+ ╱      ╲    ║    ╱    ╲
+════════════████════════   ← 줄기 (가장 굵음)
+     가지는 위로 갈수록 가늘고 많아진다</div>
+      <div class="diag-note">
+        <strong>분기 법칙</strong>: 가지가 갈라질 때 두 가지의 굵기 합이 원래 가지의 굵기와 같다. 위로 올라갈수록 가늘어진다.<br>
+        <strong>수종별 특징</strong>: 소나무(위로 뾰족), 참나무(넓게 퍼짐), 수양버들(아래로 늘어짐), 대나무(마디 없으면 어색)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌿</span><span class="card-title">잎 표현 기법</span></div>
+      <ul class="tips">
+        <li><strong>그룹으로 그려라</strong> — 잎 한 장씩이 아니라 잎 뭉치를 덩어리로 표현한다.</li>
+        <li><strong>빛 방향</strong> — 윗면(빛 받음)이 밝고, 아랫면(그림자)이 어둡다. 뭉치도 동일.</li>
+        <li><strong>3개의 값</strong> — 밝은 면·중간 면·그림자 면, 3단계만 있어도 입체감이 생긴다.</li>
+        <li><strong>실루엣의 불규칙성</strong> — 완벽한 원이 아니라 들쭉날쭉한 외곽선이 자연스럽다.</li>
+        <li><strong>원거리는 단순화</strong> — 멀리 있는 나무는 텍스처 없이 실루엣과 값으로만 표현.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌳</span><span class="card-title">수종별 실루엣 특징</span></div>
+      <ul class="tips">
+        <li><strong>소나무</strong> — 역삼각형 실루엣. 가지가 층층이 수평으로 퍼진다. 잎은 침엽.</li>
+        <li><strong>참나무·느티나무</strong> — 둥글고 넓게 퍼지는 수관. 한국 배경에 가장 자주 등장.</li>
+        <li><strong>자작나무</strong> — 흰 껍질에 검은 반점. 여러 개가 군락으로 자라는 경우 많음.</li>
+        <li><strong>야자수</strong> — 긴 직선 줄기 + 꼭대기에만 잎. 잎이 아래로 쳐진다.</li>
+        <li><strong>벚꽃나무</strong> — 봄에 꽃이 잎보다 먼저. 분홍/흰 덩어리로 표현.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">💧 물 표현</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌊</span><span class="card-title">물의 기본 원리</span></div>
+      <ul class="tips">
+        <li><strong>물은 반사한다</strong> — 하늘색을 반사. 잔잔할수록 거울처럼, 파도가 칠수록 흐려진다.</li>
+        <li><strong>수평선이 중요</strong> — 물의 수면은 항상 수평. 기울어진 수면선은 어색하다.</li>
+        <li><strong>빛의 굴절</strong> — 맑은 얕은 물에서는 바닥이 보이고, 깊어질수록 어두워진다.</li>
+        <li><strong>물결 = 원의 변형</strong> — 돌을 던지면 동심원. 바람에 의한 물결은 줄무늬.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏄</span><span class="card-title">파도·급류 표현</span></div>
+      <ul class="tips">
+        <li><strong>파도의 구조</strong> — 뒤쪽(높음)→앞쪽(낮음)으로 이어지는 곡선. 끝에서 부서지며 흰 거품.</li>
+        <li><strong>투명도</strong> — 파도 꼭대기는 빛을 통과시켜 초록/청록색. 그림자 부분은 짙은 파란.</li>
+        <li><strong>거품 표현</strong> — 흰 덩어리로 단순화. 완전한 흰색보다 약간의 그림자가 입체감을 준다.</li>
+        <li><strong>급류</strong> — 바위 주변에서 물이 튀기고 갈라진다. 흰 거품이 많아진다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏞️</span><span class="card-title">폭포·강 표현</span></div>
+      <ul class="tips">
+        <li><strong>폭포</strong> — 떨어지는 부분: 수직 흰 선들. 아래 수면: 거품과 원형 파동.</li>
+        <li><strong>폭포 스프레이</strong> — 주변 공기가 뿌옇게 된다. 빛이 산란해 무지개가 생기기도.</li>
+        <li><strong>강 반사</strong> — 하늘을 수평 방향 줄무늬로 반사. 잔물결이 반사를 흔든다.</li>
+        <li><strong>강의 흐름</strong> — 좁은 곳에서 빠르고, 넓어지면 느려진다. 흐름 방향에 식물이 쓸린다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌧️</span><span class="card-title">비·눈 표현</span></div>
+      <ul class="tips">
+        <li><strong>빗줄기</strong> — 바람 방향으로 기울어진 평행선. 앞쪽(크고 밝음)과 뒤쪽(작고 흐림).</li>
+        <li><strong>빗방울 충돌</strong> — 수면에서 원형 파동 + 작은 물기둥이 순간 솟는다.</li>
+        <li><strong>눈송이</strong> — 개별 묘사 대신 덩어리로. 앞쪽은 크고 뒤쪽은 작게.</li>
+        <li><strong>쌓인 눈</strong> — 부드러운 곡면. 모서리가 둥글어진다. 그림자는 차가운 파란색.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">⛰️ 바위·지형 표현</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🪨</span><span class="card-title">바위의 원리</span></div>
+      <ul class="tips">
+        <li><strong>면으로 이루어져 있다</strong> — 바위는 곡선이 아니라 <strong>평평한 면들의 집합</strong>. 각진 면들이 빛을 받는 방식이 다르다.</li>
+        <li><strong>균열선</strong> — 지질학적 균열이 있다. 비교적 직선적이며 일관된 방향성을 가진다.</li>
+        <li><strong>무게감</strong> — 바위는 무겁다. 아래쪽이 두껍고 안정적으로 그려야 한다.</li>
+        <li><strong>표면 텍스처</strong> — 이끼, 습기, 긁힌 자국으로 텍스처를 넣는다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏔️</span><span class="card-title">산과 절벽</span></div>
+      <ul class="tips">
+        <li><strong>에어리얼 퍼스펙티브</strong> — 먼 산일수록 파란빛, 채도 낮음, 대비 약함.</li>
+        <li><strong>레이어 겹치기</strong> — 앞 산→중간 산→뒷 산을 겹쳐 깊이감을 만든다.</li>
+        <li><strong>절벽의 수직선</strong> — 균열이 수직으로 나있다. 전체는 각진 형태.</li>
+        <li><strong>식생 경계선</strong> — 고도에 따라 숲→관목→풀→바위의 변화가 있다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">☁️</span><span class="card-title">구름 표현</span></div>
+      <ul class="tips">
+        <li><strong>입체구름(적운)</strong> — 솜사탕처럼 볼록한 구름. 위는 밝고 아래는 어두운 평평한 바닥.</li>
+        <li><strong>층구름</strong> — 수평으로 퍼지는 층. 얇고 넓다. 일몰 시 색이 든다.</li>
+        <li><strong>권운</strong> — 높은 고도. 새털처럼 가늘고 흩어진 형태.</li>
+        <li><strong>뇌운</strong> — 거대하고 수직으로 발달. 꼭대기가 모루 형태로 퍼진다.</li>
+        <li><strong>구름의 빛</strong> — 일몰 시 위쪽은 주황, 아래쪽은 보라+파랑. 이 대비가 핵심.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌾</span><span class="card-title">풀·식물 군락</span></div>
+      <ul class="tips">
+        <li><strong>실루엣을 먼저</strong> — 개별 풀잎이 아니라 군락의 실루엣을 그린다.</li>
+        <li><strong>바람의 방향</strong> — 모든 풀이 같은 방향으로 쏠린다. 무작위로 그리면 어색하다.</li>
+        <li><strong>앞뒤 구분</strong> — 전경 풀(밝고 디테일 있음) vs 배경 풀(어둡고 단순).</li>
+        <li><strong>색의 변화</strong> — 빛 받는 끝부분은 밝고, 밑동 쪽은 어둡고 초록이 진하다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">🌅 자연광과 시간대</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-icon">🌄</span><span class="card-title">새벽 (Golden Hour)</span></div><div class="card-desc">낮은 각도의 따뜻한 주황·금색 빛. 긴 그림자. 분위기 있는 연무. 실루엣 구도에 최적.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">☀️</span><span class="card-title">한낮</span></div><div class="card-desc">수직에 가까운 빛. 선명한 대비. 그림자가 짧고 강하다. 색이 선명하고 채도가 높다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🌇</span><span class="card-title">황혼 (Magic Hour)</span></div><div class="card-desc">새벽보다 더 붉은 빛. 보라·분홍·주황의 그라데이션 하늘. 가장 극적이고 드라마틱.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🌙</span><span class="card-title">밤</span></div><div class="card-desc">달빛은 차가운 파란/흰 빛. 인공광(창문, 가로등)이 따뜻한 대비를 만든다. 대비가 강하다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">☁️</span><span class="card-title">흐린 날</span></div><div class="card-desc">구름이 광원이 된다. 부드럽고 그림자가 약하다. 채도가 낮고 분위기가 잔잔하다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🌫️</span><span class="card-title">안개/비</span></div><div class="card-desc">거리에 따라 흐려진다. 에어리얼 퍼스펙티브가 극단적으로 강하다. 신비·우울·공포의 분위기.</div></div>
+  </div>
+</div>
+
+<!-- ===== 빛과 색 ===== -->
+<div class="sec" id="sec-light">
+  <div class="sec-hd">
+    <div class="sec-title">💡 빛과 색 이론</div>
+    <div class="sec-sub">그림에서 형태는 구조이고, 빛과 색은 생명이다. 이 둘을 이해하면 어떤 장면도 설득력 있게 만들 수 있다.</div>
+  </div>
+
+  <div class="div-title">🌓 빛과 그림자의 5단계</div>
+  <div class="grid-wide">
+    <div class="diag-card">
+      <div class="diag-title">구체(球體)에서의 빛 분포</div>
+      <div class="diag-box">        하이라이트 ← 빛이 직접 닿는 최고 밝기점
+           ★
+        ╭──●──╮
+      ╭─╯ 밝은면 ╰─╮
+     ╱  (Light area)  ╲
+    │    중간값 면      │  ← 빛이 비스듬히 닿는 면
+    │   (Midtone)      │
+     ╲                ╱
+      ╰─╮  그림자 ╭─╯  ← 빛이 닿지 않는 면
+         ╰────────╯
+              │
+    반사광 →  │  ← 바닥·주변에서 반사된 빛이 그림자 안을 밝힌다
+         (Reflected Light)</div>
+      <div class="diag-note">
+        <strong>핵심 5단계:</strong> ① 하이라이트 (가장 밝음) → ② 밝은 면 → ③ 중간값 → ④ 그림자 → ⑤ 반사광 (그림자 안의 약한 밝음)<br>
+        <strong>흔한 실수:</strong> 반사광을 너무 밝게 그리면 형태가 무너진다. 반사광은 항상 하이라이트보다 어두워야 한다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎨</span><span class="card-title">색온도 이해</span></div>
+      <ul class="tips">
+        <li><strong>따뜻한 빛 → 차가운 그림자</strong> — 햇빛(따뜻)이면 그림자는 차갑게(파랗게). 반대도 성립.</li>
+        <li><strong>빛이 따뜻할수록</strong> — 황금시간대(일출/일몰): 주황·금색. 낮: 흰색에 가까운 노란빛.</li>
+        <li><strong>그림자의 색</strong> — 단순한 어두운 색이 아니다. 주변 색을 흡수하고 하늘빛을 반영한다.</li>
+        <li><strong>색온도 대비</strong> — 따뜻+차가운 대비를 넣으면 그림이 살아난다. 단색 빛은 밋밋하다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div-title">🎨 색 이론 핵심</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔴</span><span class="card-title">색의 3속성</span></div>
+      <ul class="tips">
+        <li><strong>색상 (Hue)</strong> — 빨강, 파랑, 녹색 등 색의 종류. 색환에서의 위치.</li>
+        <li><strong>채도 (Saturation)</strong> — 색의 선명도. 높을수록 선명하고, 낮을수록 회색에 가까워진다.</li>
+        <li><strong>명도 (Value)</strong> — 밝기. 가장 중요한 속성. 명도가 맞으면 채도가 틀려도 읽힌다.</li>
+        <li><strong>우선순위</strong> — 명도 &gt; 채도 &gt; 색상. 명도 연습이 가장 기초이자 가장 중요.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🌈</span><span class="card-title">색 조합 (Color Harmony)</span></div>
+      <ul class="tips">
+        <li><strong>보색 (Complementary)</strong> — 색환 반대편 색. 강한 대비와 활력. 주목도가 높다.</li>
+        <li><strong>유사색 (Analogous)</strong> — 색환에서 인접한 3색. 자연스럽고 조화롭다.</li>
+        <li><strong>삼색 (Triadic)</strong> — 120도 간격 3색. 활기 있고 다채롭다.</li>
+        <li><strong>60/30/10 법칙</strong> — 주 색 60%, 보조색 30%, 강조색 10%로 배분하면 안정적.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🖌️</span><span class="card-title">색 선택 실전 팁</span></div>
+      <ul class="tips">
+        <li><strong>먼저 회색조로</strong> — 채색 전에 명도만으로 완성해보면 빛과 그림자가 잡힌다.</li>
+        <li><strong>팔레트 제한</strong> — 처음에는 색을 3~5개로 제한하라. 색이 많을수록 정리가 어렵다.</li>
+        <li><strong>채도 누르기</strong> — 배경과 중간 요소의 채도를 낮추면 주제가 자연스럽게 돋보인다.</li>
+        <li><strong>색 픽킹</strong> — 명작 그림, 영화 스틸, 사진에서 팔레트를 추출해서 연습하라.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">✨</span><span class="card-title">특수 빛 효과</span></div>
+      <ul class="tips">
+        <li><strong>림 라이트 (Rim Light)</strong> — 인물 뒤에서 오는 빛이 외곽선을 밝게 만든다. 인물을 배경에서 분리.</li>
+        <li><strong>볼류메트릭 라이트</strong> — 먼지·안개·연기 속을 통과하는 빛줄기. 극적인 분위기.</li>
+        <li><strong>서브서피스 스캐터링</strong> — 피부·잎·석재 등이 빛을 반투명하게 통과시키는 효과. 귀, 손가락이 빛에서 붉게 빛남.</li>
+        <li><strong>앰비언트 오클루전</strong> — 두 면이 맞닿는 틈에 생기는 어두운 그림자. 현실감의 핵심.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 참고 채널 ===== -->
+<div class="sec" id="sec-ref">
+  <div class="sec-hd">
+    <div class="sec-title">📺 참고 유튜브 채널 &amp; 학습 자료</div>
+    <div class="sec-sub">아래 채널명을 YouTube에서 직접 검색하세요. 각 채널의 대표 검색어도 함께 제공합니다.<br>
+    <span style="color:var(--acc);font-size:11px;">⚠️ URL 직접 제공 대신 채널명 + 검색어로 안내합니다 (링크 오류 방지)</span></div>
+  </div>
+
+  <div class="div-title">👤 인체 해부학 &amp; 피겨 드로잉</div>
+  <div class="grid" id="ref-grid">
+    <div class="yt-card c-red">
+      <div class="yt-name">Proko</div>
+      <div class="yt-en">Stan Prokopenko</div>
+      <div class="yt-topics">
+        <span class="yt-topic">인체 해부학</span><span class="yt-topic">피겨 드로잉</span><span class="yt-topic">근육</span><span class="yt-topic">얼굴</span>
+      </div>
+      <div class="yt-desc">세계 최고의 인체 해부학 유튜브 채널. 근육·뼈대·포즈를 3D 모델과 함께 설명. 완전 초보부터 전문가까지 모두에게 필수.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Proko figure drawing / Proko anatomy</div>
+      </div>
+    </div>
+    <div class="yt-card c-blu">
+      <div class="yt-name">Sinix Design</div>
+      <div class="yt-en">Sinix Design</div>
+      <div class="yt-topics">
+        <span class="yt-topic">캐릭터 디자인</span><span class="yt-topic">디지털 페인팅</span><span class="yt-topic">인체</span>
+      </div>
+      <div class="yt-desc">캐릭터 중심의 디지털 아트. "Anatomy for Artists" 시리즈가 특히 유명. 인체를 간단하게 이해하는 방식으로 설명.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Sinix Design anatomy for artists</div>
+      </div>
+    </div>
+    <div class="yt-card c-grn">
+      <div class="yt-name">Vilppu Drawing</div>
+      <div class="yt-en">Glenn Vilppu</div>
+      <div class="yt-topics">
+        <span class="yt-topic">제스처 드로잉</span><span class="yt-topic">전통 해부학</span><span class="yt-topic">포즈</span>
+      </div>
+      <div class="yt-desc">수십 년 경력의 전통 미술 교육자. 제스처와 형태의 본질을 다루는 클래식한 방식. 기초를 완벽히 잡고 싶다면 필수.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Vilppu gesture drawing</div>
+      </div>
+    </div>
+    <div class="yt-card c-pur">
+      <div class="yt-name">DrawlikeaSir</div>
+      <div class="yt-en">DrawlikeaSir</div>
+      <div class="yt-topics">
+        <span class="yt-topic">만화 인체</span><span class="yt-topic">포즈</span><span class="yt-topic">표현</span>
+      </div>
+      <div class="yt-desc">만화/웹툰 스타일 인체 드로잉에 특화. 과장된 포즈와 표현력 있는 캐릭터 드로잉 방법을 재미있게 설명.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">DrawlikeaSir figure drawing tutorial</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">🎨 디지털 페인팅 &amp; 색채</div>
+  <div class="grid">
+    <div class="yt-card c-acc">
+      <div class="yt-name">Marco Bucci Art</div>
+      <div class="yt-en">Marco Bucci</div>
+      <div class="yt-topics">
+        <span class="yt-topic">색채 이론</span><span class="yt-topic">빛과 그림자</span><span class="yt-topic">디지털 페인팅</span>
+      </div>
+      <div class="yt-desc">색채 이론과 빛을 가장 체계적으로 설명하는 채널. "10 Minutes to Better Painting" 시리즈가 입문에 최적.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Marco Bucci 10 minutes better painting</div>
+      </div>
+    </div>
+    <div class="yt-card c-red">
+      <div class="yt-name">Ctrl+Paint</div>
+      <div class="yt-en">Matt Kohr</div>
+      <div class="yt-topics">
+        <span class="yt-topic">디지털 페인팅 기초</span><span class="yt-topic">명도</span><span class="yt-topic">색</span>
+      </div>
+      <div class="yt-desc">디지털 페인팅 완전 기초부터 체계적으로. 특히 명도 이해 강의가 탁월. 웹사이트에서 무료 강의도 제공.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Ctrl+Paint digital painting fundamentals</div>
+      </div>
+    </div>
+    <div class="yt-card c-blu">
+      <div class="yt-name">Tyler Edlin Art</div>
+      <div class="yt-en">Tyler Edlin</div>
+      <div class="yt-topics">
+        <span class="yt-topic">환경 페인팅</span><span class="yt-topic">자연</span><span class="yt-topic">판타지 배경</span>
+      </div>
+      <div class="yt-desc">자연 환경과 판타지 배경 전문. 나무, 물, 바위, 구름을 그리는 과정을 라이브로 보여준다. 배경 작업에 특화.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Tyler Edlin Art environment painting</div>
+      </div>
+    </div>
+    <div class="yt-card c-grn">
+      <div class="yt-name">Sycra</div>
+      <div class="yt-en">Sycra Yasin</div>
+      <div class="yt-topics">
+        <span class="yt-topic">색채 이론</span><span class="yt-topic">캐릭터</span><span class="yt-topic">구도</span>
+      </div>
+      <div class="yt-desc">색채 이론을 캐릭터 아트에 적용하는 방법. 비전문가도 이해하기 쉽게 설명. 초중급 학습자에게 추천.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Sycra color theory painting</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">🏗️ 콘셉트 아트 &amp; 환경 디자인</div>
+  <div class="grid">
+    <div class="yt-card c-rust">
+      <div class="yt-name">FZDSCHOOL</div>
+      <div class="yt-en">Feng Zhu Design</div>
+      <div class="yt-topics">
+        <span class="yt-topic">콘셉트 아트</span><span class="yt-topic">기계·산업</span><span class="yt-topic">환경 디자인</span>
+      </div>
+      <div class="yt-desc">게임/영화 콘셉트 아트의 레전드 Feng Zhu의 무료 강의. 산업 기계, 미래 도시, 무기 디자인 등. 전문 수준의 콘셉트 작업 과정을 실시간으로 보여준다.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">FZDSCHOOL concept art / Feng Zhu design</div>
+      </div>
+    </div>
+    <div class="yt-card c-pur">
+      <div class="yt-name">Scott Robertson</div>
+      <div class="yt-en">Scott Robertson</div>
+      <div class="yt-topics">
+        <span class="yt-topic">하드서피스</span><span class="yt-topic">투시법</span><span class="yt-topic">차량·기계</span>
+      </div>
+      <div class="yt-desc">"How to Draw" 책 저자. 투시법과 기계 디자인의 바이블. 차량, 비행체, 로봇을 정확한 투시법으로 그리는 방법.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Scott Robertson how to draw perspective</div>
+      </div>
+    </div>
+    <div class="yt-card c-acc">
+      <div class="yt-name">Peter Han</div>
+      <div class="yt-en">Peter Han (Dynamic Sketching)</div>
+      <div class="yt-topics">
+        <span class="yt-topic">드로잉 기초</span><span class="yt-topic">라인 컨트롤</span><span class="yt-topic">기계 스케치</span>
+      </div>
+      <div class="yt-desc">다이나믹 스케칭의 대가. 선 긋기부터 복잡한 기계 형태까지 체계적으로 가르친다. Art Center College of Design 교수 출신.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Peter Han dynamic sketching</div>
+      </div>
+    </div>
+    <div class="yt-card c-red">
+      <div class="yt-name">Jazza</div>
+      <div class="yt-en">Josiah Brooks</div>
+      <div class="yt-topics">
+        <span class="yt-topic">디지털 아트</span><span class="yt-topic">캐릭터</span><span class="yt-topic">애니메이션</span>
+      </div>
+      <div class="yt-desc">다양한 스타일의 디지털 아트와 애니메이션. 재미있고 접근하기 쉬운 튜토리얼. 초보자 친화적이고 동기 부여에 탁월.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">Jazza how to draw character design</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">🇰🇷 한국어 채널 추천</div>
+  <div class="grid">
+    <div class="yt-card c-blu">
+      <div class="yt-name">다보 Dabo</div>
+      <div class="yt-en">Dabo / 다보</div>
+      <div class="yt-topics">
+        <span class="yt-topic">디지털 일러스트</span><span class="yt-topic">캐릭터</span><span class="yt-topic">한국어</span>
+      </div>
+      <div class="yt-desc">한국어로 디지털 일러스트를 가르치는 채널. 클립스튜디오·포토샵 활용법과 캐릭터 일러스트 과정을 한국어로 설명.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">다보 일러스트 그리기</div>
+      </div>
+    </div>
+    <div class="yt-card c-grn">
+      <div class="yt-name">이지원의 그림 이야기</div>
+      <div class="yt-en">Korean Art Tutorial</div>
+      <div class="yt-topics">
+        <span class="yt-topic">배경</span><span class="yt-topic">자연</span><span class="yt-topic">한국어</span>
+      </div>
+      <div class="yt-desc">배경과 자연 요소 중심의 한국어 그림 강의. 나무, 하늘, 건물 등의 디지털 배경 작업을 상세히 설명한다.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">이지원 그림 배경 그리기</div>
+      </div>
+    </div>
+    <div class="yt-card c-pur">
+      <div class="yt-name">빅픽처타입 BigPicturetype</div>
+      <div class="yt-en">BigPicturetype</div>
+      <div class="yt-topics">
+        <span class="yt-topic">웹툰 작법</span><span class="yt-topic">캐릭터</span><span class="yt-topic">한국어</span>
+      </div>
+      <div class="yt-desc">웹툰과 만화 작법 전문. 한국 웹툰 스타일의 캐릭터와 배경 작업. 실제 작가의 작업 과정을 보여준다.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">빅픽처타입 웹툰 그리기</div>
+      </div>
+    </div>
+    <div class="yt-card c-rust">
+      <div class="yt-name">ARTificial</div>
+      <div class="yt-en">ARTificial</div>
+      <div class="yt-topics">
+        <span class="yt-topic">AI 활용</span><span class="yt-topic">콘셉트 아트</span><span class="yt-topic">한국어</span>
+      </div>
+      <div class="yt-desc">콘셉트 아트와 AI 도구 활용을 다루는 한국어 채널. 미래 기계, SF 배경, 캐릭터 디자인 관련 콘텐츠.</div>
+      <div class="yt-search">
+        <div class="yt-search-label">YouTube 검색어</div>
+        <div class="yt-search-q">ARTificial 콘셉트 아트</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-title">📚 무료 연습 사이트</div>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">Line of Action</span></div><div class="card-desc"><strong>lineofaction.com</strong> — 시간 제한 제스처 드로잉. 인체/손/발/얼굴/동물 선택 가능. 완전 무료.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">Quickposes</span></div><div class="card-desc"><strong>quickposes.com</strong> — 비슷한 타이머 드로잉. 필터 옵션이 더 다양함. 포즈 갤러리도 제공.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">SenshiStock</span></div><div class="card-desc"><strong>DeviantArt의 SenshiStock</strong> — 방대한 무료 포즈 레퍼런스 사진. 일상 포즈부터 전투 포즈까지.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">SketchFab</span></div><div class="card-desc"><strong>sketchfab.com</strong> — 3D 모델을 어떤 각도에서든 볼 수 있다. 건물, 기계, 인체 레퍼런스로 활용.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">PureRef</span></div><div class="card-desc"><strong>pureref.com</strong> (무료) — 레퍼런스 이미지 관리 프로그램. 화면 위에 항상 떠 있게 할 수 있다.</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🖱️</span><span class="card-title">Drawabox</span></div><div class="card-desc"><strong>drawabox.com</strong> — 완전 무료 드로잉 기초 커리큘럼. 선 긋기부터 3D 형태까지 체계적.</div></div>
+  </div>
+
+  <div class="callout grn">
+    <span>💡</span>
+    <div class="callout-body"><strong>학습 순서 추천:</strong> ① Drawabox(선·형태 기초) → ② Ctrl+Paint(명도·디지털) → ③ Proko(인체 해부학) → ④ Marco Bucci(색채) → ⑤ Tyler Edlin(배경) → ⑥ FZDSCHOOL(콘셉트 아트)</div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    tab.classList.add('on');
+    const s=document.getElementById('sec-'+tab.dataset.tab);
+    if(s) s.classList.add('on');
+  });
+});
+
+// Search
+const searchEl=document.getElementById('search');
+const hitCnt=document.getElementById('hit-cnt');
+let cards=[];
+
+function initCards(){
+  cards=[...document.querySelectorAll('.card,.diag-card,.yt-card')];
+}
+
+searchEl.addEventListener('input',function(){
+  if(!cards.length) initCards();
+  const q=this.value.trim().toLowerCase();
+  if(!q){
+    cards.forEach(c=>c.classList.remove('hidden'));
+    hitCnt.textContent='';
+    const at=document.querySelector('.tab.on');
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    if(at){const s=document.getElementById('sec-'+at.dataset.tab);if(s)s.classList.add('on');}
+    return;
+  }
+  document.querySelectorAll('.sec').forEach(s=>s.classList.add('on'));
+  let hits=0;
+  cards.forEach(c=>{
+    const match=c.textContent.toLowerCase().includes(q);
+    c.classList.toggle('hidden',!match);
+    if(match) hits++;
+  });
+  hitCnt.textContent=hits?hits+'개 결과':'결과 없음';
+});
+
+initCards();
+</script>
+</body>
+</html>

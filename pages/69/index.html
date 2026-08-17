@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마작 완전 가이드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07050c;--bg2:#100e18;--bg3:#181524;--bg4:#201d30;
+  --border:#251f38;--border2:#403060;
+  --txt:#f4eeff;--txt2:#b090d0;--txt3:#60487a;
+  --red:#c83050;--red2:#e85070;--redbg:rgba(200,48,80,.12);--redbr:rgba(200,48,80,.3);
+  --gld:#d4a820;--gldbg:rgba(212,168,32,.1);--gldbr:rgba(212,168,32,.3);
+  --grn:#22aa44;--blu:#3a88ff;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,#060310 0%,#0e0820 40%,#180d08 100%);
+  border-bottom:2px solid var(--red);padding:12px 20px;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr-ic{font-size:26px;filter:drop-shadow(0 0 12px var(--red));}
+#hdr h1{font-size:18px;font-weight:800;color:var(--red2);
+  text-shadow:0 0 20px rgba(200,48,80,.4);}
+#hdr-sub{font-size:11px;color:var(--txt3);margin-top:1px;}
+#hdr-badges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
+.hdr-b{font-size:10px;padding:2px 8px;border-radius:10px;
+  background:var(--redbg);border:1px solid var(--redbr);color:var(--red2);
+  font-weight:600;white-space:nowrap;}
+
+/* TAB NAV */
+#tnav{background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;gap:5px;flex-wrap:nowrap;
+  overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:54px;z-index:100;}
+#tnav::-webkit-scrollbar{display:none;}
+.tbtn{display:flex;flex-direction:column;align-items:center;
+  padding:7px 12px;border-radius:8px;border:1px solid transparent;
+  cursor:pointer;background:none;color:var(--txt2);
+  font-size:10px;font-weight:600;transition:.13s;
+  white-space:nowrap;font-family:inherit;gap:2px;min-width:52px;}
+.tbtn:hover{background:var(--bg3);color:var(--txt);}
+.tbtn.on{background:var(--redbg);border-color:var(--redbr);color:var(--red2);}
+.tbtn .ti{font-size:17px;}
+
+/* MAIN */
+#main{padding:18px;max-width:1100px;margin:0 auto;}
+
+/* SECTION */
+.sec{background:var(--bg2);border:1px solid var(--border);
+  border-radius:9px;margin-bottom:14px;overflow:hidden;}
+.sec-hdr{padding:12px 16px;display:flex;align-items:center;gap:8px;
+  cursor:pointer;user-select:none;transition:.13s;}
+.sec-hdr:hover{background:var(--bg3);}
+.sec-hdr.op{border-bottom:1px solid var(--border);}
+.sec-hdr h3{font-size:13px;font-weight:700;color:var(--txt);}
+.sec-arr{margin-left:auto;color:var(--txt3);transition:.2s;font-size:12px;}
+.sec-hdr.op .sec-arr{transform:rotate(180deg);}
+.sec-body{padding:16px;display:none;}
+.sec-body.op{display:block;}
+
+/* TILES */
+.tl{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:26px;height:34px;
+  background:linear-gradient(145deg,#fffcf5,#efe5c8);
+  border:1px solid #c09050;border-radius:3px;
+  font-size:11px;font-weight:900;
+  box-shadow:1px 2px 3px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.85);
+  margin:1px;user-select:none;line-height:1.1;vertical-align:middle;flex-shrink:0;}
+.tl small{font-size:7px;line-height:1;}
+.tm{color:#cc2020;}.tp{color:#1133cc;}.ts{color:#208830;}.tj{color:#7a5818;}
+.tlhaku{color:#999;border:2px solid #aaa;}
+.tlhatsu{color:#208830;}
+.tlchun{color:#cc2020;}
+.tile-grp{display:inline-flex;gap:1px;padding:4px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:4px;margin:3px;vertical-align:middle;}
+.tile-row{display:flex;flex-wrap:wrap;gap:2px;align-items:center;margin:4px 0;}
+
+/* INFO CARDS */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.ic{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.ic h4{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.ic p,.ic li{font-size:12px;color:var(--txt2);line-height:1.65;}
+.ic ul{padding-left:16px;}
+.ic-accent{border-color:var(--redbr);background:var(--redbg);}
+.ic-gold{border-color:var(--gldbr);background:var(--gldbg);}
+.ic-blue{border-color:rgba(58,136,255,.3);background:rgba(58,136,255,.08);}
+.ic-green{border-color:rgba(34,170,68,.3);background:rgba(34,170,68,.07);}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th,.tbl td{padding:7px 11px;border:1px solid var(--border);text-align:left;}
+.tbl th{background:var(--bg4);color:var(--txt2);font-weight:600;font-size:11px;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.tbl .tc{text-align:center;}
+.tbl .hi{background:var(--redbg)!important;color:var(--red2);font-weight:600;}
+.tbl .gi{background:var(--gldbg)!important;color:var(--gld);font-weight:600;}
+
+/* YAKU CARDS */
+.yaku-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.yk{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:12px;}
+.yk-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.yk-han{font-size:11px;padding:2px 9px;border-radius:8px;font-weight:800;white-space:nowrap;}
+.yk-name{font-size:14px;font-weight:800;color:var(--txt);}
+.yk-jp{font-size:10px;color:var(--txt3);margin-bottom:6px;}
+.yk-cond{font-size:12px;color:var(--txt2);margin-bottom:5px;line-height:1.6;}
+.yk-tiles{margin:5px 0;}
+.yk-note{font-size:11px;color:var(--txt3);border-top:1px solid var(--border);
+  padding-top:5px;margin-top:5px;line-height:1.55;}
+.yk-closed{font-size:10px;color:var(--red2);font-weight:600;padding:1px 6px;
+  border:1px solid var(--redbr);border-radius:6px;}
+.han1{background:rgba(58,136,255,.15);color:#6ab0ff;border-color:rgba(58,136,255,.3);}
+.han2{background:rgba(34,170,68,.15);color:#44dd80;border-color:rgba(34,170,68,.3);}
+.han3{background:rgba(212,168,32,.15);color:#e8c040;border-color:rgba(212,168,32,.3);}
+.han6{background:rgba(200,48,80,.15);color:#e85070;border-color:rgba(200,48,80,.3);}
+.hanY{background:linear-gradient(135deg,rgba(200,48,80,.2),rgba(212,168,32,.2));
+  color:#f0a030;border-color:rgba(212,168,32,.4);}
+
+/* GLOSSARY */
+.glos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;}
+.gl{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px;}
+.gl-term{font-size:13px;font-weight:700;color:var(--red2);margin-bottom:2px;}
+.gl-jp{font-size:10px;color:var(--txt3);margin-bottom:4px;}
+.gl-def{font-size:12px;color:var(--txt2);line-height:1.55;}
+
+/* FLOW STEPS */
+.flow-steps{display:flex;flex-direction:column;gap:8px;}
+.flow-step{display:flex;gap:12px;align-items:flex-start;
+  padding:11px 13px;border-radius:7px;
+  background:var(--bg3);border:1px solid var(--border);}
+.flow-num{width:24px;height:24px;border-radius:50%;background:var(--red);
+  color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px;}
+.flow-body h4{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.flow-body p{font-size:12px;color:var(--txt2);line-height:1.6;}
+
+/* ACTION CARDS */
+.act-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.act{border-radius:8px;padding:14px;border:1px solid;}
+.act-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.act-icon{font-size:20px;}
+.act-name{font-size:15px;font-weight:800;}
+.act-jp{font-size:10px;color:var(--txt3);margin-bottom:6px;}
+.act-desc{font-size:12px;color:var(--txt2);line-height:1.65;margin-bottom:8px;}
+.act-ex{font-size:11px;color:var(--txt3);line-height:1.6;}
+
+/* NOTE */
+.note{font-size:12px;color:var(--txt2);padding:9px 12px;border-radius:6px;
+  background:var(--bg3);border-left:3px solid var(--gld);margin:8px 0;line-height:1.6;}
+.note.warn{border-left-color:var(--red);background:var(--redbg);color:var(--txt);}
+
+/* OVERVIEW HERO */
+.ov-hero{background:linear-gradient(135deg,var(--bg2),var(--bg3));
+  border:1px solid var(--redbr);border-radius:10px;padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden;}
+.ov-hero::after{content:'🀄';position:absolute;right:-10px;top:-10px;
+  font-size:100px;opacity:.06;pointer-events:none;}
+.ov-hero h2{font-size:20px;font-weight:800;color:var(--red2);margin-bottom:8px;}
+.ov-hero p{font-size:13px;color:var(--txt2);line-height:1.7;}
+
+/* WAIT TYPE */
+.wait-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.wait-card{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:12px;}
+.wait-name{font-size:13px;font-weight:700;color:var(--gld);margin-bottom:4px;}
+.wait-jp{font-size:10px;color:var(--txt3);margin-bottom:6px;}
+.wait-ex{font-size:12px;color:var(--txt2);margin-top:6px;line-height:1.55;}
+.wait-fu{font-size:10px;color:var(--red2);font-weight:600;margin-top:4px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+@media(max-width:600px){
+  .info-grid,.yaku-grid,.act-grid,.glos-grid,.wait-grid{grid-template-columns:1fr;}
+  #hdr h1{font-size:15px;}
+  #hdr-badges{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <span id="hdr-ic">🀄</span>
+  <div>
+    <h1>마작 완전 가이드</h1>
+    <div id="hdr-sub">일본 리치 마작 (麻雀) 규칙 · 역 목록 · 점수 계산 완전 정리</div>
+  </div>
+  <div id="hdr-badges">
+    <span class="hdr-b">리치 마작</span>
+    <span class="hdr-b">역 목록 포함</span>
+    <span class="hdr-b">점수 계산</span>
+  </div>
+</header>
+
+<nav id="tnav"></nav>
+<main id="main"></main>
+
+<script>
+/* ─ 타일 헬퍼 ─ */
+function T(n, suit) {
+  if (suit === 'haku') return '<span class="tl tlhaku">白</span>';
+  if (suit === 'hatsu') return '<span class="tl tlhatsu">發</span>';
+  if (suit === 'chun') return '<span class="tl tlchun">中</span>';
+  const chars = {E:'東',S:'南',W:'西',N:'北'};
+  if (chars[suit]) return `<span class="tl tj">${chars[suit]}</span>`;
+  const cls = {m:'tm',p:'tp',s:'ts'}[suit];
+  const su = {m:'万',p:'筒',s:'索'}[suit];
+  return `<span class="tl ${cls}">${n}<small>${su}</small></span>`;
+}
+function Tg(arr) {
+  return '<span class="tile-grp">' + arr.map(([n,s])=>T(n,s)).join('') + '</span>';
+}
+
+/* ─ 섹션 ─ */
+function sec(title, body, open=true) {
+  return `<div class="sec">
+    <div class="sec-hdr${open?' op':''}" onclick="toggleSec(this)">
+      <h3>${title}</h3><span class="sec-arr">▼</span>
+    </div>
+    <div class="sec-body${open?' op':''}">${body}</div>
+  </div>`;
+}
+function toggleSec(hdr) {
+  hdr.classList.toggle('op');
+  hdr.nextElementSibling.classList.toggle('op');
+}
+
+/* ─ 탭 ─ */
+const TABS = [
+  {id:'overview', name:'개요', icon:'🀄'},
+  {id:'tiles',    name:'패 종류', icon:'🃏'},
+  {id:'flow',     name:'게임 흐름', icon:'♟'},
+  {id:'actions',  name:'특수 액션', icon:'⚡'},
+  {id:'yaku',     name:'역(役) 목록', icon:'📋'},
+  {id:'scoring',  name:'점수 계산', icon:'🔢'},
+  {id:'glossary', name:'용어 사전', icon:'📖'},
+];
+let curTab = 'overview';
+
+function renderNav() {
+  document.getElementById('tnav').innerHTML = TABS.map(t =>
+    `<button class="tbtn${curTab===t.id?' on':''}" onclick="sel('${t.id}')">
+      <span class="ti">${t.icon}</span><span>${t.name}</span>
+    </button>`
+  ).join('');
+}
+
+function sel(id) {
+  curTab = id;
+  renderNav();
+  ({overview:renderOverview,tiles:renderTiles,flow:renderFlow,
+    actions:renderActions,yaku:renderYaku,scoring:renderScoring,
+    glossary:renderGlossary})[id]();
+  window.scrollTo(0,0);
+}
+
+/* ══════════════════════════════
+   개요
+══════════════════════════════ */
+function renderOverview() {
+  document.getElementById('main').innerHTML = `
+    <div class="ov-hero">
+      <h2>🀄 마작 (麻雀) 이란?</h2>
+      <p>4명의 플레이어가 136장의 패(牌)를 사용해 특정 형태를 가장 먼저 완성하는 전략 보드게임입니다.<br>
+      중국에서 기원해 일본에서 독자 발전한 <strong style="color:var(--red2);">일본 리치 마작(リーチ麻雀)</strong>이 현재 전 세계 표준입니다.<br>
+      온라인 게임 <strong style="color:var(--gld);">작혼(雀魂/Mahjong Soul)</strong>이 한국에서의 진입 경로로 많이 활용됩니다.</p>
+    </div>
+    ${sec('🎯 기본 목표 & 화료', `
+      <div class="info-grid">
+        <div class="ic ic-accent">
+          <h4>🏆 승리 조건</h4>
+          <p>손패 13장 + 1장 = 14장으로 <strong>화료(和了/あがり)</strong> 형태를 완성합니다.</p>
+          <p style="margin-top:8px;"><strong>기본 형태: 4멘쯔 + 1쌍(머리)</strong></p>
+          <div style="margin-top:8px;">
+            ${Tg([[1,'m'],[2,'m'],[3,'m']])} ${Tg([[4,'p'],[5,'p'],[6,'p']])} ${Tg([[7,'s'],[8,'s'],[9,'s']])} ${Tg([[2,'m'],[3,'m'],[4,'m']])} ${Tg([[8,'p'],[8,'p']])}
+          </div>
+          <p style="font-size:11px;color:var(--txt3);margin-top:6px;">순자×3 + 순자×1 + 머리 = 화료</p>
+        </div>
+        <div class="ic">
+          <h4>⚠️ 역(役) 필수</h4>
+          <p>화료 형태를 완성해도 <strong style="color:var(--red2);">역(役)이 1개 이상</strong> 없으면 화료 불가.</p>
+          <p style="margin-top:6px;">역이란 화료를 인정받기 위한 조건 패턴. 리치, 탕야오, 핀후 등 다양한 역이 있으며, 각각 판수(판수)를 제공합니다.</p>
+        </div>
+        <div class="ic">
+          <h4>📌 화료 2가지 방법</h4>
+          <ul>
+            <li><strong>론(ロン)</strong>: 타가가 버린 패로 화료 → 버린 사람이 점수 전액 지불</li>
+            <li><strong>쯔모(ツモ)</strong>: 패산에서 직접 뽑아 화료 → 3명이 분산 지불 (동가는 2배)</li>
+          </ul>
+        </div>
+        <div class="ic ic-gold">
+          <h4>⏱ 게임 단위</h4>
+          <ul>
+            <li><strong>1국(局)</strong>: 화료 또는 패산 소진까지</li>
+            <li><strong>동장(東場)</strong>: 동1~4국 (4국)</li>
+            <li><strong>반장(半荘)</strong>: 동장+남장 = 총 8국 (표준)</li>
+            <li><strong>시작 점수</strong>: 보통 25,000점씩</li>
+          </ul>
+        </div>
+      </div>
+    `)}
+    ${sec('⚖️ 일본 마작 vs 중국 마작', `
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>항목</th><th>일본 리치 마작</th><th>중국 마작 (마작)</th></tr></thead>
+          <tbody>
+            <tr><td>사용 패</td><td>136장 (아카도라 포함 시 139장)</td><td>144장 (꽃패 8장 포함)</td></tr>
+            <tr><td>역 시스템</td><td>역(役) 필수 — 없으면 화료 불가</td><td>판(番) 축적 방식, 역 없이도 화료 가능</td></tr>
+            <tr><td>리치(立直)</td><td>✅ 핵심 규칙</td><td>❌ 없음</td></tr>
+            <tr><td>도라</td><td>✅ 있음 (보너스 판수)</td><td>❌ 없음 (일부 변형은 있음)</td></tr>
+            <tr><td>특수 액션</td><td>치·폰·깡·리치·론·쯔모</td><td>펑·강·치·후 등</td></tr>
+            <tr><td>점수 계산</td><td>부(符)×판(飜) 방식 — 정교함</td><td>번(番) 방식 — 역 종류 합산</td></tr>
+            <tr><td>대표 플랫폼</td><td>작혼(雀魂), 텐호우(天鳳), MahjongSoul</td><td>월드 마작 오픈</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note" style="margin-top:10px;">이 가이드는 전체가 <strong>일본 리치 마작</strong> 기준입니다.</div>
+    `)}
+  `;
+}
+
+/* ══════════════════════════════
+   패 종류
+══════════════════════════════ */
+function renderTiles() {
+  const mRow = [1,2,3,4,5,6,7,8,9].map(n=>T(n,'m')).join('');
+  const pRow = [1,2,3,4,5,6,7,8,9].map(n=>T(n,'p')).join('');
+  const sRow = [1,2,3,4,5,6,7,8,9].map(n=>T(n,'s')).join('');
+
+  document.getElementById('main').innerHTML = `
+    ${sec('🃏 패 종류 전체 (34종 136장)', `
+      <div class="info-grid">
+        <div class="ic ic-accent">
+          <h4><span style="color:#cc2020;">■</span> 만수패 (万/マン)</h4>
+          <p style="margin-bottom:8px;">한자 숫자 1~9. 붉은 색. 한국에서 "만(万)"이라 부름.</p>
+          <div class="tile-row">${mRow}</div>
+          <p style="font-size:11px;color:var(--txt3);margin-top:4px;">1万~9万 각 4장 = 36장</p>
+        </div>
+        <div class="ic ic-blue">
+          <h4><span style="color:#1133cc;">■</span> 통수패 (筒/ピン)</h4>
+          <p style="margin-bottom:8px;">원형 문양 1~9. 파란 색. "핀(ピン)" 또는 "통"이라 부름.</p>
+          <div class="tile-row">${pRow}</div>
+          <p style="font-size:11px;color:var(--txt3);margin-top:4px;">1筒~9筒 각 4장 = 36장</p>
+        </div>
+        <div class="ic ic-green">
+          <h4><span style="color:#208830;">■</span> 삭수패 (索/ソー)</h4>
+          <p style="margin-bottom:8px;">대나무 막대 1~9. 초록 색. "소(ソー)" 또는 "삭"이라 부름.</p>
+          <div class="tile-row">${sRow}</div>
+          <p style="font-size:11px;color:var(--txt3);margin-top:4px;">1索~9索 각 4장 = 36장</p>
+        </div>
+        <div class="ic ic-gold">
+          <h4><span style="color:#d4a820;">■</span> 자패 (字牌/じはい)</h4>
+          <p style="margin-bottom:8px;"><strong>풍패:</strong> 동·남·서·북 (각 4장 = 16장)<br><strong>삼원패:</strong> 백·발·중 (각 4장 = 12장)</p>
+          <div class="tile-row">
+            ${T(0,'E')}${T(0,'S')}${T(0,'W')}${T(0,'N')}
+            &nbsp;
+            ${T(0,'haku')}${T(0,'hatsu')}${T(0,'chun')}
+          </div>
+          <p style="font-size:11px;color:var(--txt3);margin-top:4px;">총 28장. 자패끼리는 순자(연속 조합) 불가</p>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px;">총 34종 × 4장 = <strong>136장</strong>. 아카도라(붉은 5패) 포함 시 139장.</div>
+    `)}
+    ${sec('📌 중요 분류', `
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>분류</th><th>해당 패</th><th>의미</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>야오쿠패 (幺九牌)</strong></td>
+              <td>${T(1,'m')}${T(9,'m')} ${T(1,'p')}${T(9,'p')} ${T(1,'s')}${T(9,'s')} ${T(0,'E')}${T(0,'S')}${T(0,'W')}${T(0,'N')} ${T(0,'haku')}${T(0,'hatsu')}${T(0,'chun')}</td>
+              <td>수패 1·9 + 전 자패. 탕야오에서 사용 불가</td>
+            </tr>
+            <tr>
+              <td><strong>중장패 (中張牌)</strong></td>
+              <td>${[2,3,4,5,6,7,8].map(n=>T(n,'m')).join('')} 등 (3패종 공통)</td>
+              <td>수패 2~8. 탕야오에서 사용 가능</td>
+            </tr>
+            <tr>
+              <td><strong>삼원패 (三元牌)</strong></td>
+              <td>${T(0,'haku')}${T(0,'hatsu')}${T(0,'chun')}</td>
+              <td>백(白)·발(發)·중(中). 각자 완성 시 역패(1판) 성립</td>
+            </tr>
+            <tr>
+              <td><strong>풍패 (風牌)</strong></td>
+              <td>${T(0,'E')}${T(0,'S')}${T(0,'W')}${T(0,'N')}</td>
+              <td>자풍(자신 자리) 또는 장풍(현재 장) 각자 시 역패 1판</td>
+            </tr>
+            <tr>
+              <td><strong>도라 (ドラ)</strong></td>
+              <td colspan="2">도라 표시패의 <strong>다음 패</strong>. 화료 시 보유 수만큼 +1판씩 (역은 아님)</td>
+            </tr>
+            <tr>
+              <td><strong>아카도라 (赤ドラ)</strong></td>
+              <td>${T(5,'m')}${T(5,'p')}${T(5,'s')} <span style="color:var(--red2);font-size:11px;">(붉은 5패)</span></td>
+              <td>각 패종 5패 중 1장이 붉은색. 그 자체로 도라 1장. 총 3장</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `)}
+    ${sec('🔄 멘쯔(面子) 종류', `
+      <div class="info-grid">
+        <div class="ic">
+          <h4>순자 (順子/シュンツ)</h4>
+          <p style="margin-bottom:8px;">같은 패종의 연속 3장</p>
+          ${Tg([[1,'m'],[2,'m'],[3,'m']])} ${Tg([[4,'p'],[5,'p'],[6,'p']])} ${Tg([[7,'s'],[8,'s'],[9,'s']])}
+          <p style="font-size:11px;color:var(--txt3);margin-top:6px;">자패로는 순자 불가. 수패만 가능</p>
+        </div>
+        <div class="ic">
+          <h4>각자 (刻子/コーツ)</h4>
+          <p style="margin-bottom:8px;">같은 패 3장</p>
+          ${Tg([[3,'m'],[3,'m'],[3,'m']])} ${Tg([[7,'p'],[7,'p'],[7,'p']])} ${Tg([[0,'chun'],[0,'chun'],[0,'chun']])}
+          <p style="font-size:11px;color:var(--txt3);margin-top:6px;">수패·자패 모두 가능</p>
+        </div>
+        <div class="ic">
+          <h4>깡쯔 (槓子/カンツ)</h4>
+          <p style="margin-bottom:8px;">같은 패 4장 (깡 선언 필수)</p>
+          ${Tg([[2,'s'],[2,'s'],[2,'s'],[2,'s']])} ${Tg([[0,'E'],[0,'E'],[0,'E'],[0,'E']])}
+          <p style="font-size:11px;color:var(--txt3);margin-top:6px;">깡 후 영상패(추가 패) 뽑기. 손패 13장 유지</p>
+        </div>
+        <div class="ic">
+          <h4>머리 (雀頭/ジャントウ)</h4>
+          <p style="margin-bottom:8px;">같은 패 2장 (쌍)</p>
+          ${Tg([[5,'m'],[5,'m']])} ${Tg([[0,'haku'],[0,'haku']])} ${Tg([[9,'p'],[9,'p']])}
+          <p style="font-size:11px;color:var(--txt3);margin-top:6px;">화료 형태당 정확히 1개 필요</p>
+        </div>
+      </div>
+    `)}
+  `;
+}
+
+/* ══════════════════════════════
+   게임 흐름
+══════════════════════════════ */
+function renderFlow() {
+  document.getElementById('main').innerHTML = `
+    ${sec('🗺 자리 배치 & 장(場)', `
+      <div class="info-grid">
+        <div class="ic">
+          <h4>📍 자풍 (자리)</h4>
+          <ul>
+            <li><strong>동가(東家)</strong>: 그 국의 親(치). 화료 점수 1.5배 수취, 패산 제작·배패 담당</li>
+            <li><strong>남가(南家)</strong>: 동가의 오른쪽</li>
+            <li><strong>서가(西家)</strong>: 동가의 맞은편</li>
+            <li><strong>북가(北家)</strong>: 동가의 왼쪽</li>
+          </ul>
+          <div class="note" style="margin-top:8px;">턴 진행: 동가→남가→서가→북가 (반시계 방향)</div>
+        </div>
+        <div class="ic ic-gold">
+          <h4>🎲 장(場)과 국(局)</h4>
+          <ul>
+            <li><strong>1국</strong>이 끝나면 자리가 반시계로 이동 (동가가 바뀜)</li>
+            <li><strong>동장(東場)</strong>: 동1~4국, 장풍 = 東</li>
+            <li><strong>남장(南場)</strong>: 남1~4국, 장풍 = 南</li>
+            <li><strong>반장(半荘)</strong>: 동장+남장 = 총 8국</li>
+          </ul>
+        </div>
+        <div class="ic ic-accent">
+          <h4>🔄 연장 (本場)</h4>
+          <ul>
+            <li>동가가 화료하거나 유국 시 <strong>연장</strong> (자리 이동 없음)</li>
+            <li>연장수 × 300점이 화료 시 추가 지급</li>
+            <li>리치 공탁금도 화료자에게 이전</li>
+          </ul>
+        </div>
+      </div>
+    `)}
+    ${sec('🔢 배패 (配牌) 과정', `
+      <div class="flow-steps">
+        <div class="flow-step"><div class="flow-num">1</div>
+          <div class="flow-body"><h4>패 섞기 & 쌓기</h4>
+          <p>136장을 엎어서 섞은 뒤 4방향으로 34장씩 (17열 × 2단) 쌓습니다.</p></div></div>
+        <div class="flow-step"><div class="flow-num">2</div>
+          <div class="flow-body"><h4>왕패 분리</h4>
+          <p>주사위 2개를 굴려 나온 합계 위치부터 오른쪽 14장을 <strong>왕패(王牌)</strong>로 분리합니다. 왕패에는 도라 표시패와 영상패가 포함되며 게임 중 일반 패로 사용할 수 없습니다.</p></div></div>
+        <div class="flow-step"><div class="flow-num">3</div>
+          <div class="flow-body"><h4>도라 표시패 개방</h4>
+          <p>왕패 오른쪽에서 3번째 위 패를 뒤집어 <strong>도라 표시패</strong>를 공개합니다. 표시패의 <em>다음 패</em>가 도라입니다 (1→2→…→9→1, 동→남→서→북→동, 백→발→중→백).</p></div></div>
+        <div class="flow-step"><div class="flow-num">4</div>
+          <div class="flow-body"><h4>배패</h4>
+          <p>동가부터 반시계로 4장씩 3번 (12장) 받고, 마지막에 동가는 2장·나머지는 1장씩 추가로 받아 <strong>각자 13장</strong>을 갖습니다. (동가는 먼저 버릴 수 있도록 14장에서 시작)</p></div></div>
+      </div>
+    `)}
+    ${sec('♟ 1국 진행 흐름', `
+      <div class="flow-steps">
+        <div class="flow-step"><div class="flow-num" style="background:var(--gld);">▶</div>
+          <div class="flow-body"><h4>패 뽑기 (드로우)</h4>
+          <p>차례가 되면 패산에서 1장을 뽑아 손패를 14장으로 만듭니다.</p></div></div>
+        <div class="flow-step"><div class="flow-num" style="background:var(--gld);">▶</div>
+          <div class="flow-body"><h4>화료 또는 버리기</h4>
+          <p>뽑은 패로 <strong>쯔모(자모) 화료</strong>가 가능하면 선언합니다. 아니면 1장을 <strong>버려서</strong> 손패를 13장으로 유지합니다.</p></div></div>
+        <div class="flow-step"><div class="flow-num" style="background:var(--gld);">▶</div>
+          <div class="flow-body"><h4>타가의 반응</h4>
+          <p>버려진 패를 보고 다른 플레이어가 <strong>론 · 폰 · 치 · 깡</strong>을 선언할 수 있습니다. 우선순위: <strong>론 > 폰·깡 > 치</strong>. 아무도 선언 없으면 다음 플레이어 차례.</p></div></div>
+        <div class="flow-step"><div class="flow-num" style="background:var(--gld);">▶</div>
+          <div class="flow-body"><h4>반복 → 화료 또는 유국</h4>
+          <p>화료가 나오거나 패산(왕패 제외)이 소진될 때까지 반복합니다. 패산 소진 시 <strong>유국(流局)</strong> — 텐파이/노텐 정산 후 다음 국으로 넘어갑니다.</p></div></div>
+      </div>
+    `)}
+    ${sec('🎯 기다리기 (待ち/まち) 형태', `
+      <div class="wait-grid">
+        <div class="wait-card">
+          <div class="wait-name">양면 (両面)</div>
+          <div class="wait-jp">リャンメン</div>
+          ${Tg([[4,'m'],[5,'m']])} <span style="font-size:11px;color:var(--txt3);">→ 3万 또는 6万</span>
+          <div class="wait-ex">연속 2장에서 양쪽 끝을 기다림. 가장 기다리기 좋은 형태 (2가지)</div>
+          <div class="wait-fu">부(符) +0</div>
+        </div>
+        <div class="wait-card">
+          <div class="wait-name">깐짱 (嵌張)</div>
+          <div class="wait-jp">カンチャン</div>
+          ${Tg([[4,'m'],[6,'m']])} <span style="font-size:11px;color:var(--txt3);">→ 5万</span>
+          <div class="wait-ex">가운데 빠진 패를 기다림. 1가지만 완성 가능</div>
+          <div class="wait-fu">부(符) +2</div>
+        </div>
+        <div class="wait-card">
+          <div class="wait-name">변짱 (辺張)</div>
+          <div class="wait-jp">ペンチャン</div>
+          ${Tg([[1,'p'],[2,'p']])} <span style="font-size:11px;color:var(--txt3);">→ 3筒만</span>
+          <div class="wait-ex">1-2 또는 8-9 상태. 끝쪽만 완성 가능 (1가지)</div>
+          <div class="wait-fu">부(符) +2</div>
+        </div>
+        <div class="wait-card">
+          <div class="wait-name">단기 (単騎)</div>
+          <div class="wait-jp">タンキ</div>
+          <span style="font-size:11px;color:var(--txt2);">4멘쯔 완성 후</span> ${T(7,'s')} <span style="font-size:11px;color:var(--txt3);">→ 7索 1장</span>
+          <div class="wait-ex">머리(쌍) 1장만 남은 상태. 같은 패 1장을 기다림</div>
+          <div class="wait-fu">부(符) +2</div>
+        </div>
+        <div class="wait-card">
+          <div class="wait-name">샨폰 (双碰)</div>
+          <div class="wait-jp">シャンポン</div>
+          ${Tg([[5,'m'],[5,'m']])}${Tg([[8,'p'],[8,'p']])} <span style="font-size:11px;color:var(--txt3);">→ 5万 또는 8筒</span>
+          <div class="wait-ex">2쌍 중 하나로 각자, 나머지로 머리. 2가지 완성 가능</div>
+          <div class="wait-fu">부(符) +0</div>
+        </div>
+      </div>
+    `)}
+    ${sec('⚠️ 텐파이 & 후리텐', `
+      <div class="info-grid">
+        <div class="ic ic-accent">
+          <h4>🎯 텐파이 (聴牌)</h4>
+          <p>13장에서 1장만 더 있으면 화료 가능한 상태. 론·리치 선언의 전제조건.<br><br>
+          <strong>유국 시:</strong> 텐파이 플레이어는 손패를 공개해 노텐 플레이어에게서 점수를 수취합니다.</p>
+        </div>
+        <div class="ic">
+          <h4>🔚 유국 (流局) 정산</h4>
+          <p>총 3,000점을 텐파이 수에 따라 분배:</p>
+          <ul style="margin-top:6px;">
+            <li>텐파이 1명: 3,000점 수취</li>
+            <li>텐파이 2명: 각 1,500점</li>
+            <li>텐파이 3명: 각 1,000점</li>
+            <li>전원 텐파이 또는 전원 노텐: 점수 이동 없음</li>
+          </ul>
+        </div>
+        <div class="ic warn" style="background:var(--redbg);border-left:3px solid var(--red);border-radius:8px;padding:14px;">
+          <h4>⚠️ 후리텐 (フリテン)</h4>
+          <p><strong style="color:var(--red2);">론 화료 불가</strong> 상태. 3가지 케이스:</p>
+          <ul style="margin-top:6px;">
+            <li>자신이 버린 패 중에 화료 패가 있을 때</li>
+            <li>텐파이 후 타가의 론 가능 패를 넘겼을 때 (다음 버림까지)</li>
+            <li>리치 후 론 가능 패를 넘겼을 때 (영구)</li>
+          </ul>
+          <p style="margin-top:6px;font-size:11px;">후리텐 상태에서 쯔모 화료는 가능합니다.</p>
+        </div>
+      </div>
+    `)}
+  `;
+}
+
+/* ══════════════════════════════
+   특수 액션
+══════════════════════════════ */
+function renderActions() {
+  const acts = [
+    {icon:'🔴',name:'론 (ロン)',jp:'RON',
+     color:'rgba(200,48,80,.12)',border:'rgba(200,48,80,.3)',nc:'var(--red2)',
+     desc:'다른 플레이어가 버린 패로 화료 선언. 버린 사람(방총자)이 점수 전액 지불. <strong>역이 반드시 필요.</strong>',
+     ex:'우선순위: 론 > 폰·깡 > 치. 동시 론 발생 시 버린 플레이어 기준 가까운 순.'},
+    {icon:'🟡',name:'쯔모 (ツモ)',jp:'TSUMO',
+     color:'rgba(212,168,32,.1)',border:'rgba(212,168,32,.3)',nc:'var(--gld)',
+     desc:'패산에서 직접 뽑은 패로 화료 선언. 나머지 3명이 분산 지불. 동가는 3명 모두 균등, 비동가는 동가가 2배 지불.',
+     ex:'역이 반드시 필요. 멘쯔모(문전 쯔모)는 쯔모 전용 1판 역.'},
+    {icon:'🔵',name:'리치 (リーチ)',jp:'RIICHI',
+     color:'rgba(58,136,255,.1)',border:'rgba(58,136,255,.3)',nc:'#6ab0ff',
+     desc:'<strong>문전(치·폰·명깡 없는)</strong> 텐파이 상태에서 1,000점을 공탁하고 선언. 이후 손패 변경 불가. 화료 시 우라도라 개방.',
+     ex:'이파츠(一発): 리치 후 첫 순전 내 화료 시 +1판. 공탁금은 화료자가 전액 수취.'},
+    {icon:'🟢',name:'치 (チー)',jp:'CHI',
+     color:'rgba(32,170,68,.1)',border:'rgba(32,170,68,.3)',nc:'#44dd80',
+     desc:'<strong>왼쪽 플레이어(상가)</strong>가 버린 패로만 순자를 완성할 수 있음. 치 후 1장 버려야 함.',
+     ex:`예: ${T(3,'m')}${T(4,'m')} 보유 시 상가가 ${T(2,'m')} 또는 ${T(5,'m')} 버리면 치 가능.<br>론·폰보다 우선순위 낮음. 치 후 역 조건이 더 엄격.`},
+    {icon:'🟠',name:'폰 (ポン)',jp:'PON',
+     color:'rgba(255,136,32,.1)',border:'rgba(255,136,32,.3)',nc:'#ff9944',
+     desc:'<strong>어느 플레이어든</strong> 버린 패로 각자(3장 같은 패)를 완성. 1장 버려야 함. 론이 있으면 폰보다 우선.',
+     ex:`예: ${T(6,'p')}${T(6,'p')} 보유 시 누구든 ${T(6,'p')} 버리면 폰 가능. 폰 후 자풍·장풍이면 역패 성립.`},
+    {icon:'⚫',name:'깡 (カン)',jp:'KAN',
+     color:'rgba(160,112,255,.1)',border:'rgba(160,112,255,.3)',nc:'#bb88ff',
+     desc:'4장 같은 패를 모아 선언. 깡 후 <strong>영상패</strong>(왕패에서 추가 드로우) 1장을 뽑고, <strong>도라 1개 추가 개방</strong>.',
+     ex:'<strong>명깡(明槓)</strong>: 타가 버린 패+손패 3장<br><strong>암깡(暗槓)</strong>: 직접 4장(리치 중 대기 변동 없는 경우 가능)<br><strong>가깡(加槓)</strong>: 폰 상태에서 같은 패 1장 추가 — 타가가 챤찬(槍槓)으로 론 가능'},
+  ];
+
+  document.getElementById('main').innerHTML = `
+    ${sec('⚡ 주요 액션', `
+      <div class="act-grid">${acts.map(a=>`
+        <div class="act" style="background:${a.color};border-color:${a.border};">
+          <div class="act-hdr">
+            <span class="act-icon">${a.icon}</span>
+            <span class="act-name" style="color:${a.nc};">${a.name}</span>
+            <span style="font-size:10px;color:var(--txt3);margin-left:auto;">${a.jp}</span>
+          </div>
+          <div class="act-desc">${a.desc}</div>
+          <div class="act-ex">💡 ${a.ex}</div>
+        </div>`).join('')}
+      </div>
+    `)}
+    ${sec('📌 우선순위 & 주의사항', `
+      <div class="info-grid">
+        <div class="ic ic-accent">
+          <h4>⚖️ 액션 우선순위</h4>
+          <p style="font-size:15px;font-weight:800;color:var(--red2);margin-bottom:6px;">론 &gt; 폰·깡 &gt; 치</p>
+          <ul>
+            <li>치는 상가(왼쪽) 패에만 가능</li>
+            <li>치·폰 후 반드시 1장 버려야 함</li>
+            <li>폰 선언 시 차례가 그 플레이어로 건너뜀</li>
+          </ul>
+        </div>
+        <div class="ic ic-gold">
+          <h4>🔔 깡 특칙</h4>
+          <ul>
+            <li>깡 1회당 도라 1장 추가 개방</li>
+            <li>깡 후 왕패에서 영상패 1장 추가 드로우</li>
+            <li>4회 깡 시 서로 다른 플레이어가 2명 이상이면 유국</li>
+            <li>가깡 패는 타가가 챤찬(槍槓) 론 가능</li>
+          </ul>
+        </div>
+        <div class="ic">
+          <h4>⚠️ 후리텐 정리</h4>
+          <ul>
+            <li>자신이 버린 패 = 론 불가</li>
+            <li>텐파이 후 화료 패 넘기면 다음 버림까지 임시 후리텐</li>
+            <li>리치 중 화료 패 넘기면 영구 후리텐</li>
+            <li>후리텐 상태에서 쯔모는 가능</li>
+          </ul>
+        </div>
+      </div>
+    `)}
+  `;
+}
+
+/* ══════════════════════════════
+   역 목록 데이터
+══════════════════════════════ */
+const YAKU = {
+  h1:[
+    {name:'리치',jp:'立直 / リーチ',
+     cond:'문전 텐파이 상태에서 1,000점 공탁 선언',tiles:'',
+     note:'선언 후 패 교체 불가. 화료 시 우라도라 개방. 리치 공탁금은 화료자에게',closed:true},
+    {name:'이파츠',jp:'一発 / イッパツ',
+     cond:'리치 선언 후 첫 순전(한 바퀴) 내에 화료',tiles:'',
+     note:'리치 선언 후 치·폰·깡이 끼면 이파츠 소멸. 리치와 항상 함께 성립',closed:true},
+    {name:'멘쯔모',jp:'門前清自摸和 / メンゼンツモ',
+     cond:'문전(치·폰 없이) 상태에서 쯔모 화료',tiles:'',
+     note:'쯔모 전용. 론으로는 성립 불가. 가장 기본적인 비역패 역',closed:true},
+    {name:'탕야오',jp:'断幺九 / タンヤオ',
+     cond:'패 전체에 1·9·자패가 하나도 없는 구성',
+     tiles:Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[5,'p'],[6,'p'],[7,'p']])+Tg([[3,'s'],[4,'s'],[5,'s']])+Tg([[6,'m'],[7,'m'],[8,'m']])+Tg([[2,'s'],[2,'s']]),
+     note:'치 후에도 성립. 가장 자주 등장하는 역 중 하나',closed:false},
+    {name:'핀후',jp:'平和 / ピンフ',
+     cond:'전 멘쯔가 순자 + 양면 대기 + 역패 아닌 머리',
+     tiles:Tg([[1,'m'],[2,'m'],[3,'m']])+Tg([[4,'p'],[5,'p'],[6,'p']])+Tg([[7,'s'],[8,'s'],[9,'s']])+Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[8,'p'],[8,'p']]),
+     note:'론=30부 고정, 쯔모=20부 고정. 문전 한정',closed:true},
+    {name:'이뻬이코',jp:'一盃口 / イーペーコー',
+     cond:'완전히 같은 순자 2조',
+     tiles:Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[5,'p'],[6,'p'],[7,'p']])+Tg([[9,'s'],[9,'s']]),
+     note:'문전 한정. 겉보기에 도이또이처럼 보이는 착각 주의',closed:true},
+    {name:'야쿠하이',jp:'役牌 / ヤクハイ',
+     cond:'삼원패(백·발·중) 또는 자풍·장풍 각자',
+     tiles:Tg([[0,'chun'],[0,'chun'],[0,'chun']])+' 또는 '+Tg([[0,'E'],[0,'E'],[0,'E']])+' (동가/동장)',
+     note:'삼원패는 항상 역, 풍패는 자풍 또는 장풍과 일치할 때만 역',closed:false},
+    {name:'링샹카이화',jp:'嶺上開花 / リンシャンカイホウ',
+     cond:'깡 후 뽑은 영상패(嶺上牌)로 쯔모 화료',tiles:'',
+     note:'깡 시 뽑는 특수 패로 화료. 쯔모 화료',closed:false},
+    {name:'챤찬',jp:'槍槓 / チャンカン',
+     cond:'타가가 가깡(加槓) 선언한 패로 론 화료',tiles:'',
+     note:'가깡 순간에만 가능. 론 화료. 명깡·암깡 패로는 불가',closed:false},
+    {name:'해저로월',jp:'海底摸月 / ハイテイモーユエ',
+     cond:'패산 마지막 패를 뽑아서 쯔모 화료',tiles:'',
+     note:'패산이 소진되는 마지막 1장 드로우로 화료. 쯔모 전용',closed:false},
+    {name:'하저로어',jp:'河底撈魚 / ホウテイラオユイ',
+     cond:'마지막 버려진 패로 론 화료',tiles:'',
+     note:'해저로월로 나온 쯔모 후 마지막 버린 패로 론. 론 전용',closed:false},
+  ],
+  h2:[
+    {name:'산쇼쿠도조',jp:'三色同順 / サンショクドウジュン',
+     cond:'만수·통수·삭수 3패종에서 같은 숫자의 순자',
+     tiles:Tg([[4,'m'],[5,'m'],[6,'m']])+Tg([[4,'p'],[5,'p'],[6,'p']])+Tg([[4,'s'],[5,'s'],[6,'s']]),
+     note:'문전 2판, 치 시 1판으로 감소',closed:false},
+    {name:'이쯔',jp:'一気通貫 / イッキツウカン',
+     cond:'같은 패종에서 1-2-3, 4-5-6, 7-8-9 완성',
+     tiles:Tg([[1,'p'],[2,'p'],[3,'p']])+Tg([[4,'p'],[5,'p'],[6,'p']])+Tg([[7,'p'],[8,'p'],[9,'p']]),
+     note:'문전 2판, 치 시 1판',closed:false},
+    {name:'도이또이',jp:'対々和 / トイトイ',
+     cond:'전 멘쯔가 각자 (순자 없음)',
+     tiles:Tg([[3,'m'],[3,'m'],[3,'m']])+Tg([[7,'p'],[7,'p'],[7,'p']])+Tg([[1,'s'],[1,'s'],[1,'s']])+Tg([[9,'m'],[9,'m'],[9,'m']])+Tg([[5,'p'],[5,'p']]),
+     note:'치 없이만 가능. 산안커와 조합 시 강력',closed:false},
+    {name:'산안커',jp:'三暗刻 / サンアンコウ',
+     cond:'암각자(직접 뽑은 각자) 3개',tiles:'',
+     note:'론으로 완성한 멘쯔는 명각자. 3개 모두 자력 완성 필요',closed:false},
+    {name:'치또이쯔',jp:'七対子 / チートイツ',
+     cond:'서로 다른 쌍 7개로 구성 (14장)',
+     tiles:Tg([[1,'m'],[1,'m']])+Tg([[5,'p'],[5,'p']])+Tg([[9,'s'],[9,'s']])+Tg([[0,'E'],[0,'E']])+Tg([[0,'chun'],[0,'chun']])+Tg([[3,'m'],[3,'m']])+Tg([[7,'p'],[7,'p']]),
+     note:'25부 고정. 문전 한정. 같은 쌍 4장을 2쌍으로 보지 않음',closed:true},
+    {name:'혼전',jp:'混全帯么九 / チャンタ',
+     cond:'모든 멘쯔와 머리에 야오쿠패(1·9·자패) 포함',
+     tiles:Tg([[1,'m'],[2,'m'],[3,'m']])+Tg([[7,'p'],[8,'p'],[9,'p']])+Tg([[0,'chun'],[0,'chun'],[0,'chun']])+Tg([[0,'E'],[0,'E'],[0,'E']])+Tg([[1,'s'],[1,'s']]),
+     note:'문전 2판, 치 시 1판',closed:false},
+    {name:'삼쇼쿠도코',jp:'三色同刻 / サンショクドウコウ',
+     cond:'만수·통수·삭수 3패종에서 같은 번호의 각자',
+     tiles:Tg([[5,'m'],[5,'m'],[5,'m']])+Tg([[5,'p'],[5,'p'],[5,'p']])+Tg([[5,'s'],[5,'s'],[5,'s']]),
+     note:'드문 역. 산쇼쿠도조와 혼동 주의',closed:false},
+    {name:'쇼산겐',jp:'小三元 / ショウサンゲン',
+     cond:'삼원패(백·발·중) 2종 각자 + 1종 머리',
+     tiles:Tg([[0,'haku'],[0,'haku'],[0,'haku']])+Tg([[0,'hatsu'],[0,'hatsu'],[0,'hatsu']])+Tg([[0,'chun'],[0,'chun']]),
+     note:'야쿠하이 2개(2판)가 자동 포함되어 실질 4판',closed:false},
+  ],
+  h3:[
+    {name:'혼이색',jp:'混一色 / ホンイツ',
+     cond:'1종류 수패 + 자패만으로 구성',
+     tiles:Tg([[1,'m'],[2,'m'],[3,'m']])+Tg([[5,'m'],[6,'m'],[7,'m']])+Tg([[9,'m'],[9,'m'],[9,'m']])+Tg([[0,'E'],[0,'E'],[0,'E']])+Tg([[8,'m'],[8,'m']]),
+     note:'문전 3판, 치 시 2판',closed:false},
+    {name:'준찬타',jp:'純全帯幺九 / ジュンチャン',
+     cond:'모든 멘쯔에 1·9패 포함 (자패 없이)',
+     tiles:Tg([[1,'m'],[2,'m'],[3,'m']])+Tg([[7,'p'],[8,'p'],[9,'p']])+Tg([[1,'s'],[1,'s'],[1,'s']])+Tg([[9,'m'],[9,'m'],[9,'m']])+Tg([[9,'s'],[9,'s']]),
+     note:'혼전의 자패 없는 버전. 문전 3판, 치 시 2판',closed:false},
+    {name:'료뻬이코',jp:'二盃口 / リャンペーコー',
+     cond:'이뻬이코 2세트 (같은 순자 2조가 2쌍)',
+     tiles:Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[2,'m'],[3,'m'],[4,'m']])+Tg([[6,'p'],[7,'p'],[8,'p']])+Tg([[6,'p'],[7,'p'],[8,'p']])+Tg([[5,'s'],[5,'s']]),
+     note:'문전 한정. 겉으로 치또이쯔처럼 보이지만 멘쯔 방식으로 해석',closed:true},
+  ],
+  h6:[
+    {name:'청이색',jp:'清一色 / チンイツ',
+     cond:'1종류 수패만으로 구성 (자패 없음)',
+     tiles:Tg([[1,'p'],[2,'p'],[3,'p']])+Tg([[4,'p'],[5,'p'],[6,'p']])+Tg([[7,'p'],[8,'p'],[9,'p']])+Tg([[1,'p'],[2,'p'],[3,'p']])+Tg([[5,'p'],[5,'p']]),
+     note:'문전 6판, 치 시 5판. 화료 시 거의 항상 만관 이상',closed:false},
+  ],
+  yakuman:[
+    {name:'천화',jp:'天和 / テンホウ',
+     cond:'동가가 배패 받은 상태 그대로 화료 (쯔모 전용)',tiles:'',
+     note:'배패 14장이 이미 화료 형태. 역이 없어도 성립. 역만 중 가장 희귀',closed:true},
+    {name:'지화',jp:'地和 / チーホウ',
+     cond:'비동가가 첫 드로우(치·폰·깡 없이)로 쯔모 화료',tiles:'',
+     note:'동가 첫 버리기 전에 뽑은 패로 화료. 쯔모 전용',closed:true},
+    {name:'국사무쌍',jp:'国士無双 / コクシムソウ',
+     cond:'1万9万1筒9筒1索9索東南西北白發中 각 1장 + 그 중 1장 머리',
+     tiles:T(1,'m')+T(9,'m')+T(1,'p')+T(9,'p')+T(1,'s')+T(9,'s')+T(0,'E')+T(0,'S')+T(0,'W')+T(0,'N')+T(0,'haku')+T(0,'hatsu')+T(0,'chun')+' +1장',
+     note:'13면 대기(국사무쌍 13면) 성립 시 더블 역만 취급 규칙 있음',closed:true},
+    {name:'쯔안커',jp:'四暗刻 / スーアンコウ',
+     cond:'암각자(직접 뽑은 각자) 4개',
+     tiles:Tg([[2,'m'],[2,'m'],[2,'m']])+Tg([[5,'p'],[5,'p'],[5,'p']])+Tg([[8,'s'],[8,'s'],[8,'s']])+Tg([[0,'N'],[0,'N'],[0,'N']])+Tg([[7,'m'],[7,'m']]),
+     note:'탕키(단기) 대기 론으로 화료 시 더블 역만. 샨폰 론은 세 번째 각자가 명각자가 되어 성립 불가',closed:true},
+    {name:'다이산겐',jp:'大三元 / ダイサンゲン',
+     cond:'白·發·中 3종 모두 각자',
+     tiles:Tg([[0,'haku'],[0,'haku'],[0,'haku']])+Tg([[0,'hatsu'],[0,'hatsu'],[0,'hatsu']])+Tg([[0,'chun'],[0,'chun'],[0,'chun']]),
+     note:'야쿠하이도 자동 포함. 가장 노리기 쉬운 역만 중 하나',closed:false},
+    {name:'자일색',jp:'字一色 / ツーイーソー',
+     cond:'자패(동남서북백발중)만으로 구성',
+     tiles:Tg([[0,'E'],[0,'E'],[0,'E']])+Tg([[0,'S'],[0,'S'],[0,'S']])+Tg([[0,'haku'],[0,'haku'],[0,'haku']])+Tg([[0,'chun'],[0,'chun'],[0,'chun']])+Tg([[0,'N'],[0,'N']]),
+     note:'치또이쯔 형태도 인정',closed:false},
+    {name:'녹일색',jp:'緑一色 / リューイーソー',
+     cond:'2·3·4·6·8索 + 발(發)로만 구성',
+     tiles:T(2,'s')+T(3,'s')+T(4,'s')+T(6,'s')+T(8,'s')+T(0,'hatsu'),
+     note:'발 없이도 성립 가능 (규칙마다 다름). 2·3·4·6·8索은 모두 초록빛',closed:false},
+    {name:'청노두',jp:'清老頭 / チンロウトウ',
+     cond:'1·9패만으로 구성 (도이또이 + 준찬타 조합)',
+     tiles:Tg([[1,'m'],[1,'m'],[1,'m']])+Tg([[9,'m'],[9,'m'],[9,'m']])+Tg([[1,'p'],[1,'p'],[1,'p']])+Tg([[9,'s'],[9,'s'],[9,'s']])+Tg([[9,'p'],[9,'p']]),
+     note:'자패 없이 수패 1·9만 허용',closed:false},
+    {name:'다이쓰이',jp:'大四喜 / ダイスーシー',
+     cond:'東·南·西·北 4종 모두 각자',
+     tiles:Tg([[0,'E'],[0,'E'],[0,'E']])+Tg([[0,'S'],[0,'S'],[0,'S']])+Tg([[0,'W'],[0,'W'],[0,'W']])+Tg([[0,'N'],[0,'N'],[0,'N']])+Tg([[5,'m'],[5,'m']]),
+     note:'더블 역만 취급 규칙 있음. 쇼쓰이(소사희)보다 더 희귀',closed:false},
+    {name:'쇼쓰이',jp:'小四喜 / ショウスーシー',
+     cond:'東·南·西·北 3종 각자 + 1종 머리',
+     tiles:Tg([[0,'E'],[0,'E'],[0,'E']])+Tg([[0,'S'],[0,'S'],[0,'S']])+Tg([[0,'W'],[0,'W'],[0,'W']])+Tg([[0,'N'],[0,'N']]),
+     note:'규칙에 따라 역만 또는 더블 역만. 작혼 등 대부분의 온라인은 역만으로 취급',closed:false},
+    {name:'쓰깡쯔',jp:'四槓子 / スーカンツ',
+     cond:'깡(槓) 4회',tiles:'',
+     note:'1명이 깡 4번. 극도로 희귀. 깡쯔 4개+머리 1개로 구성',closed:false},
+    {name:'구련보등',jp:'九蓮宝燈 / チューレンポウトウ',
+     cond:'같은 패종 1-1-1-2-3-4-5-6-7-8-9-9-9 + 임의 1장',
+     tiles:T(1,'m')+T(1,'m')+T(1,'m')+T(2,'m')+T(3,'m')+T(4,'m')+T(5,'m')+T(6,'m')+T(7,'m')+T(8,'m')+T(9,'m')+T(9,'m')+T(9,'m'),
+     note:'9면 대기. 더블 역만 취급 규칙 있음. 문전 한정',closed:true},
+  ],
+};
+
+function renderYaku() {
+  function cards(list, label, cls) {
+    return `<div class="yaku-grid">${list.map(y=>`
+      <div class="yk">
+        <div class="yk-hdr">
+          <span class="yk-han ${cls}">${label}</span>
+          <span class="yk-name">${y.name}</span>
+          ${y.closed?'<span class="yk-closed">문전한정</span>':''}
+        </div>
+        <div class="yk-jp">${y.jp}</div>
+        <div class="yk-cond">📌 ${y.cond}</div>
+        ${y.tiles?`<div class="yk-tiles">${y.tiles}</div>`:''}
+        <div class="yk-note">💡 ${y.note}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  document.getElementById('main').innerHTML = `
+    <div class="note">⚠️ 역(役)이 없으면 화료 불가. 역 판수 + 도라 수 = 총 판수로 점수 계산. 도라는 역이 아닙니다.</div>
+    ${sec('1판 역 (1飜) — 11종', cards(YAKU.h1,'1판','han1'))}
+    ${sec('2판 역 (2飜) — 8종', cards(YAKU.h2,'2판','han2'))}
+    ${sec('3판 역 (3飜) — 3종', cards(YAKU.h3,'3판','han3'))}
+    ${sec('6판 역 (6飜) — 1종', cards(YAKU.h6,'6판','han6'))}
+    ${sec('역만 (役満) — 12종 · 32,000점 (동가 48,000점)', cards(YAKU.yakuman,'역만','hanY'))}
+  `;
+}
+
+/* ══════════════════════════════
+   점수 계산
+══════════════════════════════ */
+function renderScoring() {
+  document.getElementById('main').innerHTML = `
+    ${sec('📐 점수 계산 원리', `
+      <div class="info-grid">
+        <div class="ic ic-accent">
+          <h4>🔢 기본 공식</h4>
+          <p style="font-size:15px;font-weight:800;color:var(--red2);margin:8px 0;">
+            점수 = 부(符) × 2<sup>판(飜)+2</sup>
+          </p>
+          <p>계산 결과를 100 단위 올림. 비동가 론 기준.<br>동가는 ×1.5배, 쯔모는 여러 명이 나눠 지불.</p>
+          <div class="note" style="margin-top:8px;">예: 30부 3판 → 30 × 2<sup>5</sup> = 960 → <strong>1,000점</strong></div>
+        </div>
+        <div class="ic">
+          <h4>📊 기본 부(符)</h4>
+          <ul>
+            <li>일반 화료 기본: <strong>30부</strong></li>
+            <li>쯔모 추가: <strong>+2부</strong></li>
+            <li>핀후 론: <strong>30부 고정</strong></li>
+            <li>핀후 쯔모: <strong>20부 고정</strong></li>
+            <li>치또이쯔: <strong>25부 고정</strong></li>
+            <li>치로 화료 시: 최소 30부</li>
+          </ul>
+        </div>
+        <div class="ic">
+          <h4>🧩 멘쯔별 부(符)</h4>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>종류</th><th class="tc">명(치/폰)</th><th class="tc">암</th></tr></thead>
+              <tbody>
+                <tr><td>순자</td><td class="tc">0</td><td class="tc">0</td></tr>
+                <tr><td>각자 (중장패)</td><td class="tc">2</td><td class="tc">4</td></tr>
+                <tr><td>각자 (야오쿠패)</td><td class="tc">4</td><td class="tc">8</td></tr>
+                <tr><td>깡 (중장패)</td><td class="tc">8</td><td class="tc">16</td></tr>
+                <tr><td>깡 (야오쿠패)</td><td class="tc">16</td><td class="tc">32</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="ic">
+          <h4>🎯 대기·머리 부(符)</h4>
+          <ul>
+            <li>양면·샨폰 대기: <strong>+0부</strong></li>
+            <li>깐짱·변짱·단기 대기: <strong>+2부</strong></li>
+            <li>역패 머리 (삼원패·자풍·장풍): <strong>+2부</strong></li>
+            <li>일반 머리: <strong>+0부</strong></li>
+          </ul>
+        </div>
+      </div>
+    `)}
+    ${sec('💰 점수 상한표 (만관 이상)', `
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>판수</th><th>이름</th>
+              <th>서가 론</th><th>서가 쯔모 (비동:동)</th>
+              <th>동가 론</th><th>동가 쯔모 (전원)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hi"><td>5판+</td><td><strong>만관 (満貫)</strong></td>
+              <td>8,000</td><td>2,000 / 4,000</td><td>12,000</td><td>4,000</td></tr>
+            <tr><td>6~7판</td><td><strong>하네만 (跳満)</strong></td>
+              <td>12,000</td><td>3,000 / 6,000</td><td>18,000</td><td>6,000</td></tr>
+            <tr><td>8~10판</td><td><strong>배만 (倍満)</strong></td>
+              <td>16,000</td><td>4,000 / 8,000</td><td>24,000</td><td>8,000</td></tr>
+            <tr><td>11~12판</td><td><strong>삼배만 (三倍満)</strong></td>
+              <td>24,000</td><td>6,000 / 12,000</td><td>36,000</td><td>12,000</td></tr>
+            <tr class="gi"><td>13판+</td><td><strong>역만 (役満)</strong></td>
+              <td>32,000</td><td>8,000 / 16,000</td><td>48,000</td><td>16,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note" style="margin-top:10px;">5판 미만이라도 계산 점수가 만관 이상이면 만관 적용 (예: 4판 30부 → 7,700 → 만관은 아니지만 4판 75부 → 만관).</div>
+    `)}
+    ${sec('🔮 도라 (ドラ) 시스템', `
+      <div class="info-grid">
+        <div class="ic">
+          <h4>🎲 도라 확인법</h4>
+          <p>도라 표시패의 <strong>다음 패</strong>가 도라.</p>
+          <ul style="margin-top:6px;">
+            <li>수패: 1→2→…→9→<strong>1</strong> (순환)</li>
+            <li>풍패: 동→남→서→북→<strong>동</strong></li>
+            <li>삼원패: 백→발→중→<strong>백</strong></li>
+          </ul>
+          <div class="note" style="margin-top:8px;">도라는 <strong>역이 아닙니다</strong>. 역이 없으면 도라가 아무리 많아도 화료 불가.</div>
+        </div>
+        <div class="ic ic-gold">
+          <h4>🌟 도라 종류</h4>
+          <ul>
+            <li><strong>도라</strong>: 기본 (표시패의 다음 패)</li>
+            <li><strong>우라도라</strong>: 리치 화료 시, 도라 표시패 아래 패 추가 공개</li>
+            <li><strong>아카도라</strong>: 붉은 5패. 그 자체로 도라 1장</li>
+            <li><strong>깡도라</strong>: 깡할 때마다 1장 추가 개방</li>
+          </ul>
+        </div>
+        <div class="ic ic-accent">
+          <h4>⚡ 계산 예시</h4>
+          <p><strong>리치(1)+탕야오(1)+이파츠(1)+도라1 = 4판</strong><br>30부 4판 → 비동가 론 = 7,700점</p>
+          <br>
+          <p><strong>리치(1)+핀후(1)+탕야오(1)+도라2 = 5판</strong><br>만관 → 비동가 론 = 8,000점</p>
+          <br>
+          <p><strong>멘쯔모(1)+도이또이(2)+삼안커(2) = 5판</strong><br>만관 → 비동가 쯔모 = 2,000/4,000점</p>
+        </div>
+      </div>
+    `)}
+    ${sec('🏁 게임 종료 & 순위 정산', `
+      <div class="info-grid">
+        <div class="ic">
+          <h4>📊 반장 종료</h4>
+          <ul>
+            <li>남4국 정규 종료</li>
+            <li>30,000점 미만 발생 시 즉시 종료 (규칙마다 다름)</li>
+            <li>마이너스 점수 발생 시 즉시 종료 (일부 규칙)</li>
+          </ul>
+        </div>
+        <div class="ic ic-gold">
+          <h4>🏆 순위 정산 (우마/オカ)</h4>
+          <p>기본 점수 25,000점 기준, 반환점 30,000점과의 차이로 최종 점수 계산.</p>
+          <ul style="margin-top:6px;">
+            <li>25,000점으로 시작 → 30,000점 이상이면 +점수</li>
+            <li>1위 +30pt, 2위 +10pt, 3위 −10pt, 4위 −30pt (예시)</li>
+          </ul>
+        </div>
+        <div class="ic ic-accent">
+          <h4>💴 점봉 (供託)</h4>
+          <ul>
+            <li>리치 선언: 1,000점 공탁</li>
+            <li>유국 시: 공탁금 다음 국으로 이월</li>
+            <li>화료자: 모든 공탁금 수취</li>
+          </ul>
+        </div>
+      </div>
+    `)}
+  `;
+}
+
+/* ══════════════════════════════
+   용어 사전
+══════════════════════════════ */
+function renderGlossary() {
+  const terms = [
+    {t:'가깡 (加槓)',j:'カカン',d:'폰으로 완성한 각자에 같은 패 1장 추가해 깡으로 전환. 타가가 챤찬 론 가능'},
+    {t:'국사무쌍 (国士無双)',j:'コクシムソウ',d:'13종 야오쿠패 전부+1장으로 구성하는 역만'},
+    {t:'깡 (槓)',j:'カン',d:'같은 패 4장을 모아 선언. 영상패 추가 드로우 및 도라 1개 추가 개방'},
+    {t:'깐짱 (嵌張)',j:'カンチャン',d:'가운데 빠진 패를 기다리는 형태. 예: 4-6에서 5 기다리기. +2부'},
+    {t:'노텐 (ノーテン)',j:'ノーテン',d:'텐파이가 아닌 상태. 유국 시 텐파이 플레이어에게 점수 지불'},
+    {t:'도라 (ドラ)',j:'ドラ',d:'화료 시 판수 +1을 주는 보너스 패. 도라 표시패의 다음 패. 역이 아님'},
+    {t:'도이또이 (対々和)',j:'トイトイ',d:'전 멘쯔가 각자인 2판 역'},
+    {t:'동가 (東家)',j:'とうちゃ',d:'그 국의 親(치). 화료 점수 1.5배 수취, 지불 시 2배 지불. 연장 조건'},
+    {t:'론 (ロン)',j:'ロン',d:'타가가 버린 패로 화료. 버린 사람이 점수 전액 지불'},
+    {t:'료뻬이코 (二盃口)',j:'リャンペーコー',d:'이뻬이코 2세트. 3판 역. 문전 한정'},
+    {t:'리치 (立直)',j:'リーチ',d:'문전 텐파이 선언. 1,000점 공탁. 화료 시 우라도라 개방. 1판 역'},
+    {t:'링샹카이화 (嶺上開花)',j:'リンシャンカイホウ',d:'깡 후 뽑은 영상패로 쯔모 화료. 1판 역'},
+    {t:'만관 (満貫)',j:'マンガン',d:'5판 이상 또는 일정 기준 이상. 비동가 론 8,000점 고정'},
+    {t:'멘쯔 (面子)',j:'メンツ',d:'3장으로 이루어진 조합. 순자·각자·깡쯔의 3종류'},
+    {t:'머리 (雀頭)',j:'ジャントウ',d:'화료 형태에서 2장짜리 쌍. 형태당 정확히 1개 필요'},
+    {t:'문전 (門前)',j:'メンゼン',d:'치·폰·명깡을 하지 않은 상태. 리치·핀후·멘쯔모 등의 조건'},
+    {t:'방총 (放銃)',j:'ほうじゅう',d:'타가에게 론 화료를 당함. 화료 점수 전액 지불'},
+    {t:'변짱 (辺張)',j:'ペンチャン',d:'끝 패 기다리기. 1-2에서 3, 또는 8-9에서 7 기다리기. +2부'},
+    {t:'부 (符)',j:'ふ',d:'점수 계산 기본 단위. 화료 방법·멘쯔 종류·대기 형태에 따라 결정'},
+    {t:'산안커 (三暗刻)',j:'サンアンコウ',d:'암각자 3개. 2판 역'},
+    {t:'샨폰 (双碰)',j:'シャンポン',d:'2쌍 중 하나를 각자, 나머지를 머리로 기다리는 형태. +0부'},
+    {t:'순자 (順子)',j:'シュンツ',d:'같은 패종 3장 연속. 예: 3-4-5万'},
+    {t:'아카도라 (赤ドラ)',j:'アカドラ',d:'붉은 5패. 그 자체로 도라 1장. 각 패종에 보통 1장씩'},
+    {t:'암깡 (暗槓)',j:'あんかん',d:'직접 뽑아 손패에서만 깡. 타가에게 비공개. 리치 중에도 조건부 가능'},
+    {t:'야오쿠패 (幺九牌)',j:'ヤオチューパイ',d:'수패 1·9 + 전 자패. 탕야오 등에서 사용 금지'},
+    {t:'역 (役)',j:'やく',d:'화료를 인정받기 위한 조건 패턴. 최소 1개 이상 필요'},
+    {t:'영상패 (嶺上牌)',j:'リンシャンパイ',d:'깡 후 왕패에서 추가로 뽑는 패'},
+    {t:'왕패 (王牌)',j:'おうぱい',d:'마지막 14장. 도라 표시패와 영상패 포함. 일반 패로 소진 불가'},
+    {t:'우라도라 (裏ドラ)',j:'うらドラ',d:'리치 화료 시 도라 표시패 아래 패를 추가 도라로 개방'},
+    {t:'이뻬이코 (一盃口)',j:'イーペーコー',d:'완전히 같은 순자 2조. 1판 역. 문전 한정'},
+    {t:'이쯔 (一気通貫)',j:'イッキツウカン',d:'같은 패종으로 1-2-3, 4-5-6, 7-8-9 완성. 2판 역'},
+    {t:'이파츠 (一発)',j:'イッパツ',d:'리치 후 첫 순전 내 화료. +1판. 리치와 항상 함께'},
+    {t:'자패 (字牌)',j:'じはい',d:'풍패(동남서북)+삼원패(백발중). 수패와 달리 순자 불가'},
+    {t:'장풍 (場風)',j:'ばかぜ',d:'현재 장. 동장이면 東. 해당 풍패 각자 시 역패 1판'},
+    {t:'점봉 (供託)',j:'きょうたく',d:'리치 공탁금 등 테이블에 올려진 점수. 화료자가 수취'},
+    {t:'준찬타 (純全帯幺九)',j:'ジュンチャン',d:'모든 멘쯔에 1·9 포함 (자패 없이). 3판 역'},
+    {t:'쯔모 (ツモ)',j:'ツモ',d:'직접 뽑아 화료. 3명이 분산 지불. 문전 쯔모는 1판 역'},
+    {t:'치 (チー)',j:'チー',d:'왼쪽(상가) 플레이어 버린 패로 순자 완성'},
+    {t:'치또이쯔 (七対子)',j:'チートイツ',d:'서로 다른 쌍 7개로 구성. 2판 역. 25부 고정. 문전 한정'},
+    {t:'텐파이 (聴牌)',j:'テンパイ',d:'화료 1장 전 상태. 유국 시 텐파이면 점수 수취'},
+    {t:'탕야오 (断幺九)',j:'タンヤオ',d:'1·9·자패 없는 구성. 1판 역. 가장 흔한 역'},
+    {t:'폰 (ポン)',j:'ポン',d:'누구든 버린 패로 각자 완성. 치보다 우선'},
+    {t:'판 (飜)',j:'はん',d:'역의 세기 단위. 역+도라의 판수 합산으로 점수 결정'},
+    {t:'핀후 (平和)',j:'ピンフ',d:'전 순자+양면 대기+역패 아닌 머리. 1판 역. 문전 한정'},
+    {t:'후리텐 (フリテン)',j:'フリテン',d:'자신이 버린 패 또는 넘긴 화료 패로 인해 론 불가 상태'},
+    {t:'혼이색 (混一色)',j:'ホンイツ',d:'1패종 수패+자패만으로 구성. 3판 역 (치 시 2판)'},
+    {t:'화료 (和了)',j:'あがり',d:'패를 완성해 승리 선언. 론 또는 쯔모로 가능. 역 필수'},
+  ].sort((a,b)=>a.t.localeCompare(b.t,'ko'));
+
+  document.getElementById('main').innerHTML = `
+    <div class="note" style="margin-bottom:14px;">가나다 순 정렬. 일본어 발음(JP) 포함.</div>
+    ${sec('📖 용어 사전 전체', `
+      <div class="glos-grid">${terms.map(t=>`
+        <div class="gl">
+          <div class="gl-term">${t.t}</div>
+          <div class="gl-jp">${t.j}</div>
+          <div class="gl-def">${t.d}</div>
+        </div>`).join('')}
+      </div>
+    `)}
+  `;
+}
+
+/* ── 초기화 ── */
+renderNav();
+renderOverview();
+</script>
+</body>
+</html>

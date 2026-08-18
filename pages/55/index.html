@@ -671,6 +671,27 @@ const SOUNDS = [
 ];
 const SND_MAP = new Map(SOUNDS.map(s => [s.id, s]));
 
+// v1(초기 믹서)의 트랙 id → 현재 100 사운드 라이브러리 id.
+// 초기 버전은 slot.id에 사운드 id를 저장했고, v2부터는 slot.soundId를
+// 사용한다. 이 대응표가 없으면 예전 저장곡을 불러올 때 트랙이 전부
+// 제거되어 "빈 곡"처럼 보이게 된다.
+const LEGACY_SOUND_MAP = Object.freeze({
+  kick_hard:'edm_kick', kick_soft:'jz_kick', kick_808:'hh_808k',
+  snare:'edm_snr', snare_ghost:'jz_brsh', hihat_cl:'edm_chh',
+  hihat_op:'edm_ohh', clap:'edm_clap', rimshot:'mc_gear',
+  tom_hi:'oc_timp', conga:'jz_shk', cowbell:'fy_bell',
+  bass_sub:'hh_sub', bass_deep:'hh_808b', bass_walk:'jz_bass',
+  bass_funk:'jz_bass', bass_synth:'edm_wob', bass_drop:'edm_drop',
+  bass_pulse:'cp_bass', bass_acid:'cp_nbas',
+  lead_saw:'edm_lead', lead_sq:'cp_dist', pad:'edm_pad',
+  arp:'edm_arp', piano:'jz_pno', strings:'oc_str', brass:'hh_bras',
+  flute:'jz_flt', guitar:'jz_gtr', marimba:'fy_harp', bells:'fy_bell',
+  scratch:'hh_scr', vinyl:'cp_stat', laser:'cp_scan', sweep_up:'edm_bld',
+  glitch:'cp_dist', rev_cym:'oc_tam', vox_hey:'cp_vox',
+  vox_yeah:'cp_vox', scat:'jz_uke', breath:'am_brth',
+  vox_chop:'hh_pno', hum:'am_drn',
+});
+
 // ─── GENRES ───────────────────────────────────────────
 const GENRES = {
   fantasy:    {name:'판타지',     color:'#c09af5', emoji:'🧙', bpm:100},
@@ -698,6 +719,7 @@ let palCat = 'all';
 let palQ = '';
 let curBeatId = null;  // 스테이지에 불러온 저장 항목 id
 let curName = '새 비트';
+let recoveredLegacyTracks = 0;
 let playlist = loadPlaylist();
 let exportQueue = [];
 let expSelIdx = -1;
@@ -714,20 +736,37 @@ function normBeat(b) {
     name: String(b.name || '이름 없음').slice(0, 40),
     bpm: clamp(parseInt(b.bpm) || 120, 40, 300),
     slots: (Array.isArray(b.slots) ? b.slots : [])
-      .filter(s => s && SND_MAP.has(s.soundId))
-      .map(s => ({
-        soundId: s.soundId,
-        label: s.label ? String(s.label).slice(0, 24) : '',
-        pattern: normPattern(s.pattern),
-        vol: clamp(parseFloat(s.vol) || 0.8, 0, 1),
-        mute: !!s.mute,
-      })),
+      .map(s => {
+        if (!s) return null;
+        // v1은 id, v2+는 soundId를 사용한다. 기존 v2/v3 곡은 그대로 둔다.
+        const sourceId = s.soundId || s.id;
+        const soundId = SND_MAP.has(sourceId) ? sourceId : LEGACY_SOUND_MAP[sourceId];
+        if (!soundId) return null;
+        if (soundId !== sourceId) recoveredLegacyTracks++;
+        return {
+          soundId,
+          label: s.label ? String(s.label).slice(0, 24) : '',
+          pattern: normPattern(s.pattern),
+          vol: clamp(parseFloat(s.vol) || 0.8, 0, 1),
+          mute: !!s.mute,
+        };
+      })
+      .filter(Boolean),
   };
 }
 function loadPlaylist() {
   try {
     const raw = JSON.parse(localStorage.getItem('incx2_playlist') || '[]');
-    return Array.isArray(raw) ? raw.map(normBeat) : [];
+    if (!Array.isArray(raw)) return [];
+    // 원본을 별도 키에 남겨 두어, 마이그레이션 중에도 사용자의 예전 곡을 보존한다.
+    const hasLegacyTrack = raw.some(b => Array.isArray(b?.slots) && b.slots.some(s =>
+      s && !s.soundId && typeof s.id === 'string' && LEGACY_SOUND_MAP[s.id]
+    ));
+    if (hasLegacyTrack && !localStorage.getItem('incx2_playlist_v1_backup')) {
+      try { localStorage.setItem('incx2_playlist_v1_backup', JSON.stringify(raw)); }
+      catch (e) { /* 저장 공간이 부족해도 원래 곡은 계속 불러온다. */ }
+    }
+    return raw.map(normBeat);
   } catch { return []; }
 }
 function persist() {
@@ -1613,6 +1652,9 @@ const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(
   renderPalTabs();
   renderRuler();
   renderLib();
+  if (recoveredLegacyTracks) {
+    toast(`이전 버전 트랙 ${recoveredLegacyTracks}개를 현재 사운드로 복구했습니다`);
+  }
 
   // Transport
   $('playBtn').onclick = togglePlay;

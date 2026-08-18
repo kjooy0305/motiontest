@@ -64,11 +64,14 @@ input{outline:none;font-family:inherit;}
 .snd-card{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:5px;border:1px solid transparent;cursor:pointer;transition:.1s;margin-bottom:1px;}
 .snd-card:hover{background:var(--s3);border-color:var(--bd);}
 .snd-card:active{transform:translateX(3px);}
+.snd-card.in-use{background:rgba(26,240,154,.08);border-color:rgba(26,240,154,.34);}
+.snd-card.in-use .sc-name{color:var(--pr);}
 .sc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .sc-name{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);}
 .sc-genre{font-size:9.5px;color:var(--txt3);}
 .sc-plus{font-size:15px;color:var(--txt3);margin-left:auto;flex-shrink:0;}
 .snd-card:hover .sc-plus{color:var(--pr);}
+.snd-card.in-use .sc-plus{color:var(--pr);}
 
 /* 저장 목록 (약식) */
 .lib{border-top:1px solid var(--bd);background:var(--s2);display:flex;flex-direction:column;flex-shrink:0;max-height:46%;min-height:112px;}
@@ -692,6 +695,30 @@ const LEGACY_SOUND_MAP = Object.freeze({
   vox_chop:'hh_pno', hum:'am_drn',
 });
 
+// da09f4d의 42개 원본 음색을 보존한다. 이전 저장곡은 이 라이브러리를
+// 우선 사용하므로, 이름만 비슷한 새 사운드로 바뀌지 않는다.
+async function installLegacySoundLibrary() {
+  try {
+    const bytes = Uint8Array.from(atob('SDRzSUFBQUFBQUFDQTgxYmJXL2J4aDEvNzA4aGRCZ3MyUnpET3o2SXNxY1ZTWnNPQmRvR2JiSUNSUkFZRkVWS1JHUlNGU2tsUnBEQmFkUFdTRHkzU1ozRzZOdzJSZlBVSXNPQzFsMmROdHUraS9ldWtyQitoTjBkbjQ3U1VTSmxkeTJjMkNKNUpQOFB2Ly96eWV6YXVtYzVkbUgxL0NsWEwrcmVSYzViYXh1YzJUSGVMRjNTSGR2MUNrNFZuZWIxanFGNUJscGt0VnFhNTNTS3BXV0h4MnVyK0JmNmpHL3BHcmEreHZlMFZ0ZW80dVBsanVGMU8zYkJXYjQ4WjhhditxTm0yZVJkdmZBZERlb2Q1R3BwdWNFMzBJZmdZYjN3U1kza2sxNndXbDZTYXU3VktnaWZhbEpQUFdHOTJkWHFlTDJCYVRjcDJrMDI3U2IvYW5ENGF2aDJFNzA5ZnIxN3dURGFSWS9ENzY4YnJoY1FBVGdUY2oybnhkVzdIYzY5MEQ1VHVqUlhLSVN5SEJVMEtIR05LaVVTb2JTTVZ0UGlkQTN2ZFV6R2NlK010V29VMGZPOXNUWEd4YlpqRzdabmFhM1h0TlgyR1llKzQyWE5hL0tyMnNVaW9vc1gwQXU5UlVJV2ZrZ2c1WkYzWU9vOSt2ckU1L09DZ0doYVJPd0dkQ0ZlYlVQM2lnMnN4ZkFBU3lpNDducGF4eXQ2R0VHdTV5QVI0bnNYZVFHaTY1UjYyODU1WTF5OFdNZVlQczA3ajA3ckU0V0xVWndVTDZhVlpxeGwyWWJXR2VlSlNHQVJ2U092Rk5BdGk1aXNXU1VSM0wvSUV6b3BhZGlPNVNiRVlkZTRacHRydFgyc0pTVGgwc0R2bXFiUk9lMTBPN3FCZ08veU5YS2lhdGVXby9WbXMwclowbnpUYWpUYm11dk9veGVVT0xPVnVOaHlMdmpYV3UwUjJTSTZjbU1ta0pRYkNjZHNJdU5zeG9mb2tXWnJpaHpkV0k1dWhDaEtoblBIamhVT2JuM3c2L21IQ1RwOTZrK3ZQRjk0NmNVVHJ4MS83WTNDd2ZwMlFZSUYxK25hZGZmWFI2OFBrOU92UEYrOU5IZHNvWEN3dlU3L0s1dzRlZnpNMk1tRlkzUG5MZjM4U2xQcjFKY3UyZHFxc1RRL2ZPdGVvVGk4dGRQL2NMYzB6K21hdHpSZlF5QkZINTJXMDFtYS80MXBpblZabnVjczNWbWEvK216N2IxNWJxNXVtRXRuQVNlUW41Uy81N2c1MHc2dEE1dEdENGNCakEzYVNYUHpMckwzZVE1SUFnZFZEdkRpUW8vakpabmpmYWVRc0RIOEZJaGVvQW9jRDJXOFVGQXduQzV6UGwrdVkzb0p2Z2J2Ymc2M3J3NnY3YWV4cGlqbDhnVFc2Qi9xWEU3V0JJRVRNV3NDcGxqR3JFbnB2S0gvUElDRU41WG1UUlhVa0RYMHNZRFlTMkVKQUZITXdOTEljVDZXRklIUXloTWRWQ2hTWFZ2ckdDR2RnMnQzKzFmdkRqN2FTNkZVVlN1VmlOS2I5MEpLVXlpY2lxc3hjUUlaU1Y0VjBDOWV4WVFDa1lpZERtTGN2TmV4Tkx2UlFreEJ2RkQwWVlWY0lTOVVhS1pXR2szSGpkRDE0emQzRUhjSVdJVnBUR3BhclJZeGVlTUhta2t3d2laMW5JTkp6SjlDbUlReGJOSzVKTVlUQUl4d0dWcFEwMnBxM29yZWlnem8xczdnazczaFIrOGg5M0Jsci8vNTd1RCtSaW1WU1FnakpyZStwREUzNFg5Mkpva1NnYTlLa2VoU2tCSmtPMjBHMllPZHU4UHRWSnAxWFpJWU5COForaFNNUHVCclJpVHlocUdvOVpZVzA0dGsrK21YS1RRYUF1VjViN3gvOUJhQ01WOGhKTW95Qlo1Z0lRclhRb1c1V2lLcndjaGlvRElYRTVjT1lNQjh4MXAxbTA1a1NmMzdUd2R2ZjVmQ2Y3MU8rYkt0djQ4YkQvTnZLdjlKbTNCUitkRkJGaUZScUNJV2tlS2RzVDVGMzlDU0VQU2MxWldtRlNuMDdROUlRRVVvWkVQUE1DUkpVU0syN2wxaHVXaVFRNjFNRncyUm5RT0FYUjlSbFlnTGpYSmEyRUh1SEhQSEE1OHhPY1NwWXplMHlKdi84OHNmSDY4ek9kSjFVYVNBK3RWT3JLaUpTVUkramlRbytEN2FoeXFFQ1VvdjFJeFc1THNHVC9ZR0h6L3VmLzJRU2E2bUFVRFovdmIycUYzbGpaRnNYTWtLREMyZjRBcXdISE80V0NVcFR3eENFSExHVE82T256N05TdTVxcUFwWWNidTFTQXhYZC92N200WCsxM2NRR0ZHZ0NxVkJpb1ZRR2hWTk5FMHprTVovMWgvL2QvLzl3K1lNSXl3UzdhRzhCL0NBOElmWUM3a2pGTmVSc2lOM3NIMXZDcjJhSnNzUnZVaDcxNUxVeHI5SGpsT3BIUzlWNTEzdGd1YzRYaE5sT2pJcXQ5alZGakdiR1l0WjN5cTlvTUxPVmFBaFNJMlVzaVp1bnJEck1iK01IYTFvZVZHaTVYOUJhNTJQSVBQWHplRmJUNmFvb0ZaVEZFb0ZILy9qRUFHZmN6MmpYUlVvVGRqVnM0ck1sVVZPaFp4YWpqOVUxSE9URWh2N0xIN1NiOVZ6SEYrV1E1d0JsV1lVVmU0Um84T3RHOE1yajZZd3F1dmxNc1hvMXY0NDFwaW9tdzFyYWprZGF5VDRwSUhOVE85TlFSeXd2TEZWRTRFbTRsc1d3MXhnR3BMTElaS0pNODRINWFBUU9neVVnVUpyMkYyenZXYUU1ZXM0U1oraTRucGRWV2tWUDJHVnQzbVNESmFLQXllUDRuR3Foa1dzWVdrR0RaTWJjMnBZOWpVTXNtbFlDVFVNOHZzcTlkQUtUcmlxZWlmTzlDTzlGdm9mN3ZZLy94dFR2WW9Db1dFRTZqMTQ5QjRWM1FSdTBnL0lXZVNyUWYrQ3hIc0ZKeWswM2UxdXl6WEdDUjl1WFUzRFpia3NpaFF1Yis3R3VBeWREZk52cnFDTUhHdVFIeUxyOWZQNWlHUk50NkltMGVEV25jSDFYU1RtS2Nha3FwSVVTZnVueng1OE5lb3Z3VWlwT3kyMW5lZ3ZKNW1UUktvdk9JTTlTVFBZRTA2MnNUM0JuOXVlNE9GalA1UW1aSll2bjN6cDFQTnZzSExMbHFIVlY1RHM0N3J0RWNaRGNmRCtUbGptckJvdEo4WUNVR3UwWTkzKzloQmxEak5Ka0tHSTByTUtWMVlsVHNYVmppQ1Z5UUUraVM2ZW83cnBTSTNWS0VHSXp6dUFqU3gvVE9IQTlLc0xBS2xFbVRYN0l3VWtpWmxxZmdqNHQ1eDFBQ0x3SEc4Nm5aT2EzaXc2MVQ5Y1NrdzMySWxmYWZseThFWUtKd1FPdm9MZkhOUHZ0YnZEOVozQlIzdHNMWXVpcnROYS9pNnRPNXloaGNyVXNpUUozS2ltQXdWejZCcXRURmJJalpRK0tZMUhsTTJzU1RoN2JEeDhHaC8yVk5wYTNNL2ZmSWoweHRRVmhKcEdlZWZOYTVQYTNWbnF2TE5RQVp3SUs1eFlnY1RpSWpRV1RjNHFJVVNpUld6MWtQQmpMaFRCb3JXQUJBSkx6S0hyZFBrTEZWLytjbkw5aUU4UGw0SFJkZW5QSlRxQ1FZc3JmWERJMWd6a2ZUOTlPZENQMW1uSG9mUnEvOTdlY0d0bjhHQjlzSE9YcVNoSnF0ZFRjOUtqcUs5b2d5SnVFMXZWcU90a055cW9NaXRzVjBoVWQ2K055akVud3VMMlU4enVPL3RNTG1YWk1DWm0zcVBaZHg0NFpvZGlYRUdhYVU1Z0tseXdSLzhkQm5LNWxIQUgrUnlDZ20xaE5zRHhhZ0p2TG1MS2JyalVJR1o0YmIvLzRFcWN0NDNFYWxDcDZIcXNpaCtPeGpQNFhnR0RLbGFIT2NrcnhDRTJrSUsvcUdmVnhwMkhqR3laNnlVVUprYm1qZTZJUk5aREF1ekZFcVEyYVNSZU1wdjdDWE01Y1pvRENoYitIQjRvNGppQmkrQ2pmejcyU3FrK3F0WkI0VENLL3Z1Yi9VK2Vwc0ZGRUpKdytUN2JZQUxNbHVaRFVVd1AzcEFSdklWTWtWc01jekJ4d3JhYktGUDdSVXRmczlYMWpOaXBidmEvZUlqc09jV1NkYjFlajFVejFwcExhV2xrRGgxajJUWkp5Q29xVjFGVmZKd2w2MlprQXVQN2dvVFVLWXlBZHd2Z1FZRGdUenpGZkptYWZIaFY1dEplbzJ1aGk5SGtlUC94OE8zMUZMTlNWV3BZek9vMlp1NXNNM1VIS2dxMkdBNGkxV0VIRFNzU0o0cm9HZjc1aWFwRFJFQU9wZHhVWUcxbURxeTRZR3FtUjlmQXl6dXRsU3JXMDdGaXM0VGphS0Z1NkZXK2ZLeVp5V0hpMittYWFxWmRUM21WSE85cDhoMXB5blNOREVONXdjK1h3bFJwVmV0WXE3Vm92dFovc05HLy83VC9lRHNGRytXeXBqRkdiR0FzU1VvY3pad1Nwb0JCQ3NHQVYxRllhR2ZLOXpFTzJwbHdZRldyVmVGWlpIbEwrQk40Rm1Yd1M3d2cwZXN3T29KbEVneVhBUmt0SzJjR1RMSjEvWXRBaHNSZW85V0tZMjgwdGh5RmdLSlFFSWpIbG9CUllJUEpqVXkyZThBdUhZaWd3Z0ZaVVJGd0sySndtSTRISlhJT2ZGbFdVRkltQ2JTTDZHU0dSU2NQTEdDc2I2UnVPYmU2cGZ6cUJyeUNNM3h4SnAwRHZwelFONnYxZHZLRkYwNCt4OXl6NStvZHpkT2JkRFovNVZILzA1M0JrNTBBS0laNU1iR3hTZ2N4VG03K2UzcDJsbVZvWlUvWXdtcXo5N0FtY3JhYVp0ZURwRTNGazFPY3ZpYzFqdWY2V1VKNW51bVVKTSthdndYREVkdk5sc0RaMUpaWDI0MjdyWUhHZTVhOUZtMVBRRTUrOE1sZS8vb0hCVlFiNDNiNi9RMjJJaXNWYXYvTGgrdUhyY3FRV1JaYmhsZXdxc0t5OVh0cDJWcGNMTkcyV2ZlcVpHZDZCNm5LV1MyV1VEWHFvejNjNGxPbkhpcFJpUmpPclJZU3R5TDdEVXFpeTM1M1VYT05LQWZxMzluQVhOOVpaM090YWRIdWpJT1BQei9zNW95MDdhWUNWNDcza3NpYzMxb254VE8rWWFYYnB1eHRzSHVyTUxqOURwdmNXaTNhKzNMdzd1MGpHREFkdWIweFpzZENoc0Z4M2lrSTJlMFY5ZUt5MWw5aWJzdVU0VkZZcGh6bDV5Mkw4cTQvN3EvMzd6OUtkYTI2VG0zZHV2R3Y1RkFPTUxQMDZjTmlFbENCTEN3bXJROFAvZE1iY2VSckYrRldOTEp2TFRBNGFqOGVqTjlJZ2l3diszK2xxSGtId3pGbHgraXQ2R3VyZFB2L2F6eWNMQXl1bzArYkxHa1lCcXI5aERnaHVmcnJBSDc4WFFsY0s4N2EyQS9oS1IwSjJLUkpRN2ZYVDczNDNFbFc0Tzg1RjFlYXhscW9rMmVHdCs4aXYvbE1vQXQwbGFyN05WT294RUgvOWhkSHNJMXI4dkJWOHRFV2FBQ2srQjRjNmttbnJnR1lhZ2h1aCttdVMrQWtjajlrcXhGa0hiVkppZlY1cHEwTlNIL3hEWlVZQ3ozNjlJeURXMFMvQ1dJY29jTUdHT25xVWF2UjdTYU1WNlBEQmh4YlBXbmFpN0cwWm1pUm4zdG1zTFB4WnlhVThMNERhbVArMXQxcCtlUGhjS1JNL1g0ZEtNdDV2MkFIUkpYYUtqY0ZvMlc4ZzM0VW9VSW1lT0lvcVk2QkUwU0piR1owS29uMVkxM0lvSGNGbGZ3Z2xwSWd6blBQL3gydGtadDBNU3lwL092N0wxaElsU1NjTE1aSS9YYTgyY244bmJraUpzMnljcGsweWFMR1dkQTBnNG1hT0FYZDFQaDV0akFFMUpubnkyQ1dwbVUweUt2aDhCdlhuQnNQQis5dW9xU0FwUWE4SDVmcVc5NThlTmc2aGRWREU4ZzNYYUp2dVVDWnRaazYydmtlOXRwd1hrODVRTDFKYlIvN1ptL3d3NlBDNE52OUljNWN4dG5DZTF5aktjZkI3bHVKekg3aUpIYW16UTFSVTUzYTRYQXVqVWRxQ2h0ODYwZUlOL2hQdkdGQnhPdmlXOEw4cjltTmNyL2g3WTMrNDc4d3N3eGdHTlFYNXJhZS9od3BocTlFU0R2Z2xBRWdIQjBBK3Z6bkdQNU5McHdrTlV4ZThvK1hRc05ON2drYmRlemhxbksybWlsc1JRWDl5b3l6cGJsTTAwR0FIWWFUT0NMQXVMdzg5ejkxZWc2V2xFQUFBQT09'), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const source = await new Response(stream).text();
+    const original = Function(`${source}\nreturn SND;`)();
+    Object.entries(original).forEach(([id, sound]) => {
+      SND_MAP.set(id, {
+        id, name: sound.name, genre: 'legacy', cat: sound.cat,
+        fn: (C, t, D, v = 1, step = 0) => sound.fn(t, C, D, noiseBuf(C), v, step),
+      });
+    });
+    recoveredLegacyTracks = 0;
+    playlist = loadPlaylist();
+    renderLib();
+    if (recoveredLegacyTracks) toast(`초기 버전 음원 ${recoveredLegacyTracks}개를 원래 소리로 복구했습니다`);
+  } catch (err) {
+    console.warn('초기 음원 복구에 실패했습니다.', err);
+  }
+}
+
+
 // ─── GENRES ───────────────────────────────────────────
 const GENRES = {
   fantasy:    {name:'판타지',     color:'#c09af5', emoji:'🧙', bpm:100},
@@ -965,6 +992,15 @@ function generateRandom(genre) {
 
 // ─── SLOT 관리 ─────────────────────────────────────────
 function addSound(soundId) {
+  // 한 사운드는 스테이지에 하나만 둘 수 있다. 팔레트에서는 이 함수를
+  // 토글로 사용하므로, 이미 있으면 기존 트랙을 제거한다.
+  const existing = slots.findIndex(slot => slot.soundId === soundId);
+  if (existing !== -1) {
+    slots.splice(existing, 1);
+    renderStage();
+    toast(`"${sndName(soundId)}" 트랙을 뺐습니다`);
+    return;
+  }
   const p = new Array(STEPS).fill(false);
   [0, 4, 8, 12].forEach(i => p[i] = true);
   slots.push({id: uid(), soundId, label: '', pattern: p, vol: 0.8, mute: false});
@@ -1071,15 +1107,16 @@ function renderPalette() {
   if (!found.length) { list.innerHTML = '<div class="lib-empty">검색 결과가 없습니다.</div>'; return; }
   found.forEach(snd => {
     const gc = GENRES[snd.genre]?.color || '#888';
+    const inUse = slots.some(slot => slot.soundId === snd.id);
     const el = document.createElement('div');
-    el.className = 'snd-card';
-    el.title = `${GENRES[snd.genre]?.name || snd.genre} · ${snd.cat} — 클릭해서 트랙 추가`;
+    el.className = `snd-card${inUse ? ' in-use' : ''}`;
+    el.title = `${GENRES[snd.genre]?.name || snd.genre} · ${snd.cat} — 클릭해서 ${inUse ? '트랙 제거' : '트랙 추가'}`;
     el.innerHTML =
       `<div class="sc-dot" style="background:${gc}"></div>` +
       `<div style="flex:1;min-width:0;">` +
         `<div class="sc-name">${esc(snd.name)}</div>` +
         `<div class="sc-genre" style="color:${gc}">${GENRES[snd.genre]?.emoji || ''} ${esc(GENRES[snd.genre]?.name || snd.genre)}</div>` +
-      `</div><span class="sc-plus">+</span>`;
+      `</div><span class="sc-plus">${inUse ? '−' : '+'}</span>`;
     el.onclick = () => addSound(snd.id);
     list.appendChild(el);
   });
@@ -1767,6 +1804,8 @@ const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(
 
   // 기본 프리셋 (오디오 컨텍스트는 사용자 동작 전까지 생성하지 않음)
   loadPreset('hiphop', false);
+  // 저장 목록은 초기 버전의 합성 엔진이 준비된 뒤 원본 음색으로 다시 읽는다.
+  installLegacySoundLibrary();
 })();
 </script>
 </body>

@@ -64,7 +64,7 @@ input{outline:none;font-family:inherit;}
 .main{display:flex;flex:1;min-height:0;}
 .side{width:214px;min-width:214px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
 
-.pal{display:flex;flex-direction:column;flex:1 1 auto;min-height:132px;}
+.pal{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;}
 .pal-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:6px 6px 5px;border-bottom:1px solid var(--bd);}
 .pal-tab{padding:3px 7px;border-radius:4px;font-size:10.5px;font-weight:700;border:1px solid transparent;color:var(--txt3);transition:.1s;}
 .pal-tab:hover{background:var(--s3);color:var(--txt);}
@@ -73,7 +73,7 @@ input{outline:none;font-family:inherit;}
 .pal-search input{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:4px;padding:4px 8px;color:var(--txt);font-size:12px;}
 .pal-search input:focus{border-color:var(--pr);}
 .pal-search input::placeholder{color:var(--txt3);}
-.snd-list{flex:1 1 auto;min-height:80px;padding:4px 5px;}
+.snd-list{flex:1 1 auto;min-height:0;padding:4px 5px;}
 /* 스크롤 영역 — 스크롤바를 눈에 보이고 잡을 수 있는 굵기로 */
 .scrollY{overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#3f5a70 transparent;overscroll-behavior:contain;}
 .scrollY::-webkit-scrollbar{width:10px;}
@@ -99,15 +99,15 @@ input{outline:none;font-family:inherit;}
 .snd-card:hover .sc-plus{color:var(--pr);}
 .snd-card.in-use .sc-plus{color:var(--beat);}
 
-.lib{border-top:1px solid var(--bd);flex:0 1 190px;min-height:126px;display:flex;flex-direction:column;}
-.lib-hd{display:flex;align-items:center;gap:5px;padding:6px 9px;border-bottom:1px solid var(--bd);}
+.lib{border-top:1px solid var(--bd);flex:0 0 auto;max-height:190px;display:flex;flex-direction:column;}
+.lib-hd{display:flex;align-items:center;gap:5px;padding:6px 9px;border-bottom:1px solid var(--bd);flex-shrink:0;}
 .lib-ttl{font-size:11px;font-weight:700;color:var(--txt2);}
 .lib-cnt{font-size:10px;color:var(--pr);font-weight:800;margin-left:auto;}
-.lib-btns{display:flex;gap:3px;padding:5px 6px;border-bottom:1px solid var(--bd);}
+.lib-btns{display:flex;gap:3px;padding:5px 6px;border-bottom:1px solid var(--bd);flex-shrink:0;}
 .ib{flex:1;padding:4px 2px;border-radius:4px;font-size:10.5px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;}
 .ib:hover{color:var(--pr);border-color:rgba(24,184,255,.4);}
 .ib.pri{color:var(--pr);border-color:rgba(24,184,255,.4);}
-.lib-list{flex:1 1 auto;min-height:52px;padding:4px 5px;}
+.lib-list{flex:1 1 auto;min-height:44px;padding:4px 5px;}
 .lib-empty{color:var(--txt3);font-size:11px;padding:10px 8px;line-height:1.6;text-align:center;}
 .lib-item{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;border:1px solid transparent;cursor:pointer;transition:.1s;margin-bottom:1px;flex-shrink:0;}
 .lib-item:hover{background:var(--s3);border-color:var(--bd);}
@@ -137,10 +137,10 @@ input{outline:none;font-family:inherit;}
 .ch:hover .ch-x{display:flex;}
 .ch-x:hover{color:var(--rd);border-color:var(--rd);}
 
-.stage-hd{background:var(--s1);border-bottom:1px solid var(--bd);padding:6px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
-.stage-name{background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:4px 9px;color:var(--txt);font-size:12px;font-weight:700;width:170px;}
+.stage-hd{background:var(--s1);border-bottom:1px solid var(--bd);padding:6px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:nowrap;}
+.stage-name{background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:4px 9px;color:var(--txt);font-size:12px;font-weight:700;width:170px;min-width:120px;flex-shrink:1;}
 .stage-name:focus{border-color:var(--pr);}
-.btn-sm{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;}
+.btn-sm{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;flex-shrink:0;white-space:nowrap;}
 .btn-sm:hover{color:var(--pr);border-color:rgba(24,184,255,.4);}
 .btn-sm:disabled{opacity:.4;cursor:default;}
 .btn-sm:disabled:hover{color:var(--txt2);border-color:var(--bd2);}
@@ -355,10 +355,12 @@ body.mini{overflow:auto;}
 
   <div class="stage">
     <div class="crew scrollX" id="crew"></div>
-    <div class="stage-hd">
+    <div class="stage-hd scrollX">
       <input type="text" class="stage-name" id="stageName" placeholder="비트 이름" maxlength="40" title="현재 비트 이름">
       <button class="btn-sm btn-pri" id="quickSaveBtn" title="새 항목으로 저장">💾 저장</button>
       <button class="btn-sm" id="overwriteBtn" title="불러온 항목에 덮어쓰기" disabled>⤴ 덮어쓰기</button>
+      <button class="btn-sm" id="mgrBtn2" title="저장 목록 관리 — 이름·BPM·트랙·패턴 수정">⚙ 관리</button>
+      <button class="btn-sm" id="exportAudioBtn2" title="WAV 음원 내보내기">🎵 음원</button>
       <button class="btn-sm" id="sendMiniBtn" title="열려 있는 팝업 플레이어로 현재 비트 보내기">📡 팝업으로 보내기</button>
       <button class="btn-sm btn-danger" id="clearBtn">🗑 전체 지우기</button>
     </div>
@@ -2423,6 +2425,8 @@ function initMain() {
   $('saveBeatBtn').onclick = openSave;
   $('quickSaveBtn').onclick = openSave;
   $('mgrBtn').onclick = () => openManager();
+  $('mgrBtn2').onclick = () => openManager();
+  $('exportAudioBtn2').onclick = openAudioModal;
   $('exportAudioBtn').onclick = openAudioModal;
   $('exportJsonBtn').onclick = exportJSON;
   $('importJsonBtn').onclick = () => $('jsonImport').click();

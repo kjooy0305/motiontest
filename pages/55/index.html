@@ -960,6 +960,74 @@ function genRhyPat(genre, isBeat, isBass) {
 
 function shuf(arr) { return [...arr].sort(() => Math.random() - .5); }
 
+// da09f4d에서 쓰던 원본 시작 패턴. 예전 사운드는 이 리듬을 그대로
+// 유지하고, v3에서 늘어난 사운드만 아래 장르별 그루브로 채운다.
+const LEGACY_PATTERNS = Object.freeze({
+  kick_hard:'1000100010001000', kick_soft:'1000000000100000', kick_808:'1000000010000000',
+  snare:'0000100000001000', snare_ghost:'0010010000100100', hihat_cl:'1010101010101010',
+  hihat_op:'0000100000001000', clap:'0000100000001000', rimshot:'0010001000100010',
+  tom_hi:'1000001000001000', conga:'0100010001000100', cowbell:'0000000010000000',
+  bass_sub:'1000000010000000', bass_deep:'1001001010010010', bass_walk:'1010101010101010',
+  bass_funk:'1001010010010100', bass_synth:'1000101000100010', bass_drop:'0000000000000001',
+  bass_pulse:'1100110011001100', bass_acid:'1001100010011000', lead_saw:'1000001000001000',
+  lead_sq:'1000100000100000', pad:'1000000000000000', arp:'1010101010101010',
+  piano:'1000001010000000', strings:'1000000000000000', brass:'0000100000001001',
+  flute:'1010001010001000', guitar:'1001001010010010', marimba:'1010100001000000',
+  bells:'1000010000100001', scratch:'0000100000001100', vinyl:'1000000000000000',
+  laser:'0000000010000000', sweep_up:'0000000000000001', glitch:'1101010010100110',
+  rev_cym:'0000000000000001', vox_hey:'1000000010000000', vox_yeah:'0000100000000000',
+  scat:'1010010010010010', breath:'1000000000000000', vox_chop:'0101010101010101',
+  hum:'1000000010000000',
+});
+
+// 현재 팔레트의 대응 음색에는 원본 구조를 우선 적용한다.
+const LEGACY_PATTERN_FOR_SOUND = Object.freeze({
+  edm_kick:'kick_hard', jz_kick:'kick_soft', hh_808k:'kick_808', edm_snr:'snare',
+  jz_brsh:'snare_ghost', edm_chh:'hihat_cl', edm_ohh:'hihat_op', edm_clap:'clap',
+  mc_gear:'rimshot', oc_timp:'tom_hi', jz_shk:'conga', fy_bell:'cowbell',
+  hh_sub:'bass_sub', hh_808b:'bass_deep', jz_bass:'bass_walk', edm_wob:'bass_synth',
+  edm_drop:'bass_drop', cp_bass:'bass_pulse', cp_nbas:'bass_acid', edm_lead:'lead_saw',
+  cp_dist:'lead_sq', edm_pad:'pad', edm_arp:'arp', jz_pno:'piano', oc_str:'strings',
+  hh_bras:'brass', jz_flt:'flute', jz_gtr:'guitar', fy_harp:'marimba', hh_scr:'scratch',
+  cp_stat:'vinyl', cp_scan:'laser', edm_bld:'sweep_up', oc_tam:'rev_cym',
+  cp_vox:'vox_hey', jz_uke:'scat', am_brth:'breath', hh_pno:'vox_chop', am_drn:'hum',
+});
+
+const GROOVE_BANKS = {
+  beat: ['1000100010001000', '1000001001001000', '1010001010001010', '1001000010010010'],
+  bass: ['1000001010001000', '1001000010010010', '1010001010100000', '1000101001001010'],
+  melo: ['1000001000100001', '0010001000001010', '1000100000100100', '0001001001000001'],
+  efx:  ['0000000000000001', '0000100000001000', '1000000000000000', '0000000010000000'],
+};
+
+function patternFromBits(bits) { return [...bits].map(bit => bit === '1'); }
+function patternIndex(id, count) {
+  let n = 0;
+  for (let i = 0; i < id.length; i++) n = (n * 31 + id.charCodeAt(i)) >>> 0;
+  return n % count;
+}
+function soundRole(sound) {
+  const n = sound.name.toLowerCase();
+  if (/킥|kick|피스톤|펌프/.test(n)) return 'kick';
+  if (/스네어|snare|클랩|clap|브러쉬/.test(n)) return 'snare';
+  if (/hh|하이햇|셰이커|심벌|라이드|리벳|기어|철길/.test(n)) return 'hat';
+  return sound.cat;
+}
+function starterPattern(soundId) {
+  const legacyId = LEGACY_PATTERNS[soundId] ? soundId : LEGACY_PATTERN_FOR_SOUND[soundId];
+  if (legacyId) return patternFromBits(LEGACY_PATTERNS[legacyId]);
+
+  const sound = SND_MAP.get(soundId);
+  if (!sound) return new Array(STEPS).fill(false);
+  const role = soundRole(sound);
+  // 드럼의 역할은 고정해 두어, 아무 조합으로 넣어도 박의 중심이 흐트러지지 않는다.
+  if (role === 'kick') return patternFromBits('1000100010001000');
+  if (role === 'snare') return patternFromBits('0000100000001000');
+  if (role === 'hat') return patternFromBits('1010101010101010');
+  const bank = GROOVE_BANKS[sound.cat] || GROOVE_BANKS.melo;
+  return patternFromBits(bank[patternIndex(sound.id, bank.length)]);
+}
+
 function generateRandom(genre) {
   const gs = SOUNDS.filter(s => s.genre === genre);
   if (!gs.length) return;
@@ -1001,9 +1069,7 @@ function addSound(soundId) {
     toast(`"${sndName(soundId)}" 트랙을 뺐습니다`);
     return;
   }
-  const p = new Array(STEPS).fill(false);
-  [0, 4, 8, 12].forEach(i => p[i] = true);
-  slots.push({id: uid(), soundId, label: '', pattern: p, vol: 0.8, mute: false});
+  slots.push({id: uid(), soundId, label: '', pattern: starterPattern(soundId), vol: 0.8, mute: false});
   renderStage();
   preview(soundId, 0.7);
 }

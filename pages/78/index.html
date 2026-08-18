@@ -236,6 +236,17 @@ input{outline:none;font-family:inherit;}
 .eq-pl-add{font-size:10px;color:var(--txt3);}
 .eq-pl-item:hover .eq-pl-add{color:var(--pr);}
 .eq-empty{color:var(--txt3);font-size:11.5px;padding:8px;}
+.eq-item.playing{border-color:var(--pr);box-shadow:0 0 0 1px rgba(24,184,255,.35) inset;}
+.row-play{width:22px;height:22px;border-radius:50%;background:var(--s3);border:1px solid var(--bd2);color:var(--pr);font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.row-play:hover{border-color:var(--pr);background:rgba(24,184,255,.12);}
+.pv-bar{display:flex;align-items:center;gap:9px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:8px 11px;margin-bottom:10px;}
+.pv-btn{padding:5px 13px;border-radius:16px;font-size:11.5px;font-weight:700;background:rgba(24,184,255,.1);border:1px solid rgba(24,184,255,.45);color:var(--pr);flex-shrink:0;white-space:nowrap;}
+.pv-btn:hover{background:rgba(24,184,255,.2);}
+.pv-btn.on{background:rgba(255,61,85,.14);border-color:rgba(255,61,85,.5);color:var(--beat);}
+.pv-prog{flex:1;height:6px;background:var(--s4);border-radius:3px;overflow:hidden;min-width:40px;}
+.pv-fill{height:100%;width:0;background:var(--pr);transition:width .08s linear;}
+.pv-time{font-size:10.5px;color:var(--txt3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0;}
+.pv-now{font-size:10.5px;color:var(--pr);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
 .save-input{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:8px 11px;color:var(--txt);font-size:13px;margin:4px 0 9px;}
 .save-input:focus{border-color:var(--pr);}
 .save-hint{font-size:11px;color:var(--txt3);line-height:1.6;}
@@ -430,6 +441,12 @@ body.mini{overflow:auto;}
       <div class="note">저장된 비트를 아래에서 추가하세요. 같은 비트를 여러 번 넣을 수 있으며, 순서대로 이어붙여 하나의 WAV 파일로 내보냅니다.</div>
       <div class="sec-lbl">내보내기 대기열 <span id="expTotal" style="color:var(--txt3);font-weight:400;"></span></div>
       <div class="exp-q" id="expQ"></div>
+      <div class="pv-bar">
+        <button class="pv-btn" id="pvBtn" title="내보낼 결과를 그대로 들어봅니다">▶ 미리듣기</button>
+        <div class="pv-prog"><div class="pv-fill" id="pvFill"></div></div>
+        <span class="pv-time" id="pvTime">0:00 / 0:00</span>
+        <span class="pv-now" id="pvNow"></span>
+      </div>
       <div class="sec-lbl" style="margin-top:10px;">비트 목록</div>
       <div class="eq-pl-list scrollY" id="eqPlList"></div>
     </div>
@@ -438,6 +455,7 @@ body.mini{overflow:auto;}
       <button class="btn-sm" id="expDn">↓ 아래로</button>
       <button class="btn-sm btn-danger" id="expRemove">제거</button>
       <span style="flex:1;"></span>
+      <span style="font-size:10.5px;color:var(--txt3);">미리듣기로 확인한 그대로 저장됩니다</span>
       <button class="btn-sm btn-pri" id="doExportBtn" style="font-size:12px;">🎵 WAV 내보내기</button>
     </div>
   </div>
@@ -1314,7 +1332,7 @@ function setPlaying(on) {
   const b = $(IS_MINI ? 'mPlay' : 'playBtn');
   if (b) { b.textContent = isPlaying ? '⏸' : '▶'; b.classList.toggle('on', isPlaying); }
 }
-function togglePlay() { getAC(); setPlaying(!isPlaying); }
+function togglePlay() { getAC(); if (PV.on) stopPreview(true); setPlaying(!isPlaying); }
 
 function preview(soundId, vol = 0.7) {
   const C = getAC();
@@ -2194,10 +2212,15 @@ function renderExpQueue() {
     const el = document.createElement('div');
     el.className = 'eq-item' + (expSelIdx === i ? ' sel' : '');
     el.innerHTML =
+      `<button class="row-play" title="이 항목만 미리듣기">▶</button>` +
       `<div class="eq-name">${i + 1}. ${esc(beat ? beat.name : '(삭제됨)')}</div>` +
       `<span class="eq-bars-lbl">바:</span>` +
       `<input type="number" class="eq-bars-input" min="1" max="64" value="${item.bars}">` +
       `<button class="eq-del" title="제거">✕</button>`;
+    el.querySelector('.row-play').onclick = e => {
+      e.stopPropagation();
+      startPreview([{beatId: item.beatId, bars: item.bars}], '♪ ' + (beat ? beat.name : ''));
+    };
     const barsIn = el.querySelector('.eq-bars-input');
     barsIn.onchange = () => { item.bars = clamp(parseInt(barsIn.value) || 1, 1, 64); barsIn.value = item.bars; updateExpTotal(); };
     el.querySelector('.eq-del').onclick = e => {
@@ -2207,7 +2230,7 @@ function renderExpQueue() {
       renderExpQueue();
     };
     el.onclick = e => {
-      if (e.target.closest('.eq-del') || e.target.tagName === 'INPUT') return;
+      if (e.target.closest('.eq-del') || e.target.closest('.row-play') || e.target.tagName === 'INPUT') return;
       expSelIdx = i; renderExpQueue();
     };
     cont.appendChild(el);
@@ -2220,6 +2243,10 @@ function updateExpTotal() {
   const el = $('expTotal');
   el.textContent = exportQueue.length ? `(총 ${bars}바 · 약 ${sec.toFixed(1)}초)` : '';
   el.style.color = sec > MAX_EXPORT_SEC ? 'var(--rd)' : 'var(--txt3)';
+  if (!PV.on) {
+    const t = $('pvTime'); if (t) t.textContent = '0:00 / ' + fmtSec(sec);
+    const f = $('pvFill'); if (f) f.style.width = '0%';
+  }
 }
 function renderEqPlList() {
   const cont = $('eqPlList');
@@ -2232,13 +2259,155 @@ function renderEqPlList() {
     const el = document.createElement('div');
     el.className = 'eq-pl-item';
     el.innerHTML =
+      `<button class="row-play" title="1바만 들어보기">▶</button>` +
       `<div class="eq-pl-name">${esc(beat.name)} <span style="color:var(--txt3);font-size:10px;">(${beat.bpm}BPM · ${beat.slots.length}트랙)</span></div>` +
       `<span class="eq-pl-add">+ 추가</span>`;
-    el.onclick = () => { exportQueue.push({beatId: beat.id, bars: 4}); expSelIdx = exportQueue.length - 1; renderExpQueue(); };
+    el.querySelector('.row-play').onclick = e => {
+      e.stopPropagation();
+      startPreview([{beatId: beat.id, bars: 1}], '♪ ' + beat.name);
+    };
+    el.onclick = e => {
+      if (e.target.closest('.row-play')) return;
+      exportQueue.push({beatId: beat.id, bars: 4}); expSelIdx = exportQueue.length - 1; renderExpQueue();
+    };
     cont.appendChild(el);
   });
 }
+// ─── 내보내기 미리듣기 ─────────────────────────────────
+// 오프라인 렌더와 같은 계산으로 이벤트를 만들고, 시퀀서와 같은
+// 룩어헤드 방식으로 실시간 재생한다 → 저장될 결과와 소리가 같다.
+const PV = {on:false, tid:null, raf:null, gain:null, plan:[], i:0, t0:0, total:0, marks:[], label:''};
+
+function buildPlan(queue) {
+  const plan = [], marks = [];
+  let t = 0;
+  for (const item of queue) {
+    const beat = playlist.find(b => b.id === item.beatId);
+    if (!beat) continue;
+    marks.push({t, name: beat.name});
+    const sd = 60 / (beat.bpm || 120) / 4;
+    for (let bar = 0; bar < item.bars; bar++) {
+      beat.slots.forEach(slot => {
+        if (slot.mute || !SND_MAP.has(slot.soundId)) return;
+        slot.pattern.forEach((on, step) => {
+          if (on) plan.push({t: t + step * sd, id: slot.soundId, vol: slot.vol, step});
+        });
+      });
+      t += sd * STEPS;
+    }
+  }
+  plan.sort((a, b) => a.t - b.t);
+  return {plan, marks, total: t};
+}
+
+function stopPreview(silent) {
+  if (PV.tid) { clearTimeout(PV.tid); PV.tid = null; }
+  if (PV.raf) { cancelAnimationFrame(PV.raf); PV.raf = null; }
+  if (PV.gain && AC) {
+    const now = AC.currentTime;
+    try {
+      PV.gain.gain.cancelScheduledValues(now);
+      PV.gain.gain.setValueAtTime(PV.gain.gain.value, now);
+      PV.gain.gain.linearRampToValueAtTime(0, now + 0.05);
+      const g = PV.gain;
+      setTimeout(() => { try { g.disconnect(); } catch (e) {} }, 400);
+    } catch (e) {}
+  }
+  PV.gain = null; PV.on = false; PV.plan = []; PV.i = 0;
+  const btn = $('pvBtn');
+  if (btn) { btn.textContent = '▶ 미리듣기'; btn.classList.remove('on'); }
+  const fill = $('pvFill'); if (fill) fill.style.width = '0%';
+  const now = $('pvNow'); if (now) now.textContent = '';
+  const tm = $('pvTime'); if (tm) tm.textContent = '0:00 / ' + fmtSec(PV.total || 0);
+  document.querySelectorAll('.eq-item.playing').forEach(e => e.classList.remove('playing'));
+  if (!silent) renderExpQueue();
+}
+
+const fmtSec = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const PV_MAX_SEC = 300;
+
+function startPreview(queue, label) {
+  stopPreview(true);
+  const built = buildPlan(queue);
+  if (!built.plan.length) { toast('재생할 내용이 없습니다'); return; }
+  if (built.total > PV_MAX_SEC) { toast(`미리듣기는 ${PV_MAX_SEC}초까지만 지원합니다`); return; }
+  const C = getAC();
+  if (isPlaying) setPlaying(false);          // 스테이지 재생과 겹치지 않게
+  PV.gain = C.createGain(); PV.gain.gain.value = 1; PV.gain.connect(MASTER);
+  PV.plan = built.plan; PV.marks = built.marks; PV.total = built.total;
+  PV.i = 0; PV.on = true; PV.t0 = C.currentTime + 0.14; PV.label = label || '';
+  const btn = $('pvBtn');
+  if (btn) { btn.textContent = '⏹ 정지'; btn.classList.add('on'); }
+  pvTick(); pvFrame();
+}
+
+function pvTick() {
+  if (!PV.on) return;
+  const C = getAC();
+  const until = C.currentTime + 0.25;
+  while (PV.i < PV.plan.length && PV.t0 + PV.plan[PV.i].t < until) {
+    const ev = PV.plan[PV.i++];
+    const snd = SND_MAP.get(ev.id);
+    if (snd) {
+      const g = C.createGain(); g.gain.value = ev.vol; g.connect(PV.gain);
+      try { snd.fn(C, PV.t0 + ev.t, g, 1, ev.step); } catch (e) {}
+      setTimeout(() => { try { g.disconnect(); } catch (e) {} }, (ev.t + 5) * 1000);
+    }
+  }
+  if (PV.i >= PV.plan.length && C.currentTime > PV.t0 + PV.total + 0.4) { stopPreview(); toast('미리듣기 끝'); return; }
+  PV.tid = setTimeout(pvTick, 40);
+}
+
+function pvFrame() {
+  if (!PV.on) return;
+  PV.raf = requestAnimationFrame(pvFrame);
+  if (!AC) return;
+  const el = clamp(AC.currentTime - PV.t0, 0, PV.total);
+  const fill = $('pvFill'); if (fill) fill.style.width = (PV.total ? el / PV.total * 100 : 0) + '%';
+  const tm = $('pvTime'); if (tm) tm.textContent = `${fmtSec(el)} / ${fmtSec(PV.total)}`;
+  let idx = -1;
+  for (let i = 0; i < PV.marks.length; i++) if (el >= PV.marks[i].t - 0.01) idx = i;
+  const nw = $('pvNow');
+  if (nw) nw.textContent = PV.label || (idx >= 0 ? '♪ ' + PV.marks[idx].name : '');
+  if (!PV.label) {
+    document.querySelectorAll('.eq-item').forEach((e, i) => e.classList.toggle('playing', i === idx));
+  }
+}
+
 function openAudioModal() { renderExpQueue(); renderEqPlList(); $('audioModal').classList.remove('hidden'); }
+
+// 목록 높이를 화면 기준으로 직접 계산해 못박는다.
+// 부모 레이아웃이 어떻든 목록은 화면 안에 갇히므로 항상 스크롤된다.
+function fitLayout() {
+  const side = $('side');
+  if (!side || IS_MINI) return;
+  const vh = window.innerHeight;
+  const pal = side.querySelector('.pal'), lib = side.querySelector('.lib');
+  if (!pal || !lib) return;
+
+  const H = Math.max(200, Math.round(vh - side.getBoundingClientRect().top));
+  side.style.height = H + 'px';
+  const libH = clamp(Math.round(H * 0.34), 118, 190);
+  [pal, lib].forEach(e => { e.style.flex = 'none'; });
+  pal.style.height = (H - libH) + 'px';
+  lib.style.height = libH + 'px';
+
+  const tabsH   = side.querySelector('.pal-tabs').offsetHeight;
+  const searchH = side.querySelector('.pal-search').offsetHeight;
+  const libHdH  = side.querySelector('.lib-hd').offsetHeight;
+  const libBtnH = side.querySelector('.lib-btns').offsetHeight;
+  const sl = $('sndList'), ll = $('libList');
+  sl.style.flex = 'none'; ll.style.flex = 'none';
+  sl.style.height = Math.max(60, H - libH - tabsH - searchH) + 'px';
+  ll.style.height = Math.max(44, libH - libHdH - libBtnH) + 'px';
+
+  const list = $('slotList');
+  if (list) {
+    const infoH = document.querySelector('.info-bar')?.offsetHeight || 0;
+    list.style.flex = 'none';
+    list.style.height = Math.max(120, Math.round(vh - list.getBoundingClientRect().top - infoH)) + 'px';
+  }
+}
 
 function clearAll() {
   if (!slots.length) return;
@@ -2442,12 +2611,20 @@ function initMain() {
     if (e.key === 'Enter') { e.preventDefault(); $('saveConfirmBtn').click(); }
   };
 
+  const hideModal = el => { if (!el) return; el.classList.add('hidden'); if (el.id === 'audioModal') stopPreview(true); };
   document.querySelectorAll('[data-close]').forEach(b => {
-    b.onclick = () => $(b.dataset.close).classList.add('hidden');
+    b.onclick = () => hideModal($(b.dataset.close));
   });
   document.querySelectorAll('.modal-bg').forEach(bg => {
-    bg.onmousedown = e => { if (e.target === bg) bg.classList.add('hidden'); };
+    bg.onmousedown = e => { if (e.target === bg) hideModal(bg); };
   });
+
+  // 미리듣기
+  $('pvBtn').onclick = () => {
+    if (PV.on) { stopPreview(); return; }
+    if (!exportQueue.length) { toast('대기열에 비트를 먼저 추가해주세요'); return; }
+    startPreview(exportQueue, '');
+  };
 
   // 음원 내보내기 모달
   $('expUp').onclick = () => {
@@ -2470,6 +2647,7 @@ function initMain() {
     if (!exportQueue.length) { toast('내보내기 목록에 비트를 추가해주세요'); return; }
     const sec = queueDuration();
     if (sec > MAX_EXPORT_SEC) { alert(`너무 깁니다 (${sec.toFixed(0)}초). ${MAX_EXPORT_SEC}초 이하로 줄여주세요.`); return; }
+    stopPreview(true);
     $('audioModal').classList.add('hidden');
     showLoad('WAV 렌더링 중... 잠시 기다려 주세요.');
     await nextFrame();
@@ -2490,6 +2668,7 @@ function initMain() {
     const tag = e.target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
     if (e.key === 'Escape') {
+      stopPreview(true);
       document.querySelectorAll('.modal-bg:not(.hidden)').forEach(m => m.classList.add('hidden'));
       return;
     }
@@ -2503,6 +2682,14 @@ function initMain() {
 
   loadPreset('p_hiphop', false);
   drawViz(); animCursor();
+
+  // 목록 높이 확정 — 로드·리사이즈·아이프레임 크기 변화 모두 반영
+  fitLayout();
+  window.addEventListener('resize', fitLayout);
+  window.addEventListener('load', fitLayout);
+  if (window.ResizeObserver) new ResizeObserver(fitLayout).observe(document.documentElement);
+  setTimeout(fitLayout, 80);
+  setTimeout(fitLayout, 400);
 }
 
 if (IS_MINI) initMini(); else initMain();

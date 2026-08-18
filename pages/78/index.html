@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인크레디믹스 v4 — 뮤직 믹서</title>
+<style>
+:root{
+  --bg:#07090f;--s1:#0c1018;--s2:#12181f;--s3:#181f28;--s4:#1e2830;
+  --bd:#1d2b38;--bd2:#253544;
+  --txt:#ccdde8;--txt2:#6a9ab5;--txt3:#3a5a72;
+  --pr:#18b8ff;--rd:#f26464;
+  --beat:#ff3d55;--bass:#9a3fff;--melo:#18b8ff;--efx:#ff8c1a;--vox:#1af09a;
+  --core:#18b8ff;--plus:#1af09a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;display:flex;flex-direction:column;user-select:none;}
+button{border:none;cursor:pointer;font-family:inherit;font-size:inherit;background:none;color:inherit;outline:none;}
+input{outline:none;font-family:inherit;}
+
+/* ── HEADER ─────────────────────────────── */
+.hdr{background:var(--s1);border-bottom:2px solid var(--pr);padding:0 12px;height:52px;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.side-tgl{display:none;width:28px;height:28px;border-radius:5px;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);font-size:14px;}
+.logo{font-size:15px;font-weight:800;color:var(--pr);white-space:nowrap;letter-spacing:-.4px;}
+.logo span{opacity:.5;font-weight:400;font-size:11px;margin-left:3px;}
+.play-btn{width:36px;height:36px;border-radius:50%;background:var(--pr);color:#000;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:.12s;flex-shrink:0;}
+.play-btn:hover{filter:brightness(1.15);}
+.play-btn.on{background:var(--beat);color:#fff;}
+.beat-dot{width:8px;height:8px;border-radius:50%;background:var(--txt3);flex-shrink:0;transition:.05s;}
+.beat-dot.on{background:var(--pr);box-shadow:0 0 7px var(--pr);}
+.bpm-grp{display:flex;align-items:center;gap:4px;}
+.bpm-btn{width:23px;height:23px;background:var(--s3);border:1px solid var(--bd2);border-radius:4px;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--txt2);}
+.bpm-btn:hover{color:var(--pr);border-color:var(--pr);}
+.bpm-val{font-size:15px;font-weight:800;color:var(--pr);min-width:34px;text-align:center;}
+.bpm-lbl{font-size:10px;color:var(--txt3);font-weight:700;}
+.vol-grp{display:flex;align-items:center;gap:5px;}
+.vol-grp input[type=range]{width:66px;accent-color:var(--pr);cursor:pointer;}
+.sep{width:1px;height:24px;background:var(--bd2);flex-shrink:0;}
+.hdr canvas{margin-left:auto;border-radius:3px;background:var(--s2);flex-shrink:0;}
+.mini-btn{padding:5px 10px;border-radius:14px;font-size:11px;font-weight:700;background:rgba(26,240,154,.08);border:1px solid rgba(26,240,154,.45);color:var(--vox);white-space:nowrap;flex-shrink:0;}
+.mini-btn:hover{background:rgba(26,240,154,.18);}
+
+/* ── BARS ───────────────────────────────── */
+.bar{background:var(--s1);border-bottom:1px solid var(--bd);padding:5px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+.bar-lbl{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.5px;white-space:nowrap;}
+.pack-btn{padding:4px 12px;border-radius:14px;font-size:11.5px;font-weight:700;border:1.5px solid var(--bd2);color:var(--txt3);background:var(--s2);transition:.12s;white-space:nowrap;}
+.pack-btn:hover{color:var(--txt);}
+.pack-btn.on{color:#000;}
+.pack-btn .cnt{opacity:.65;font-size:10px;margin-left:3px;}
+.preset-btn{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;white-space:nowrap;}
+.preset-btn:hover{color:var(--pr);border-color:rgba(24,184,255,.45);}
+.preset-btn.core{border-color:rgba(24,184,255,.22);}
+.preset-btn.plus{border-color:rgba(26,240,154,.22);}
+.preset-btn.plus:hover{color:var(--vox);border-color:rgba(26,240,154,.5);}
+.genre-btn{padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;border:1.5px solid;transition:.12s;white-space:nowrap;}
+.genre-btn:hover{filter:brightness(1.25);transform:translateY(-1px);}
+
+/* ── MAIN ───────────────────────────────── */
+.main{display:flex;flex:1;min-height:0;}
+.side{width:214px;min-width:214px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+
+.pal{display:flex;flex-direction:column;flex:1;min-height:0;}
+.pal-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:6px 6px 5px;border-bottom:1px solid var(--bd);}
+.pal-tab{padding:3px 7px;border-radius:4px;font-size:10.5px;font-weight:700;border:1px solid transparent;color:var(--txt3);transition:.1s;}
+.pal-tab:hover{background:var(--s3);color:var(--txt);}
+.pal-tab.on{border-color:currentColor;background:rgba(255,255,255,.04);}
+.pal-search{padding:5px 6px;border-bottom:1px solid var(--bd);}
+.pal-search input{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:4px;padding:4px 8px;color:var(--txt);font-size:12px;}
+.pal-search input:focus{border-color:var(--pr);}
+.pal-search input::placeholder{color:var(--txt3);}
+.snd-list{flex:1;overflow-y:auto;padding:4px 5px;}
+.snd-list::-webkit-scrollbar,.lib-list::-webkit-scrollbar,.slot-list::-webkit-scrollbar,.modal-body::-webkit-scrollbar,.mgr-list::-webkit-scrollbar,.eq-pl-list::-webkit-scrollbar{width:3px;}
+.snd-list::-webkit-scrollbar-thumb,.lib-list::-webkit-scrollbar-thumb,.slot-list::-webkit-scrollbar-thumb,.modal-body::-webkit-scrollbar-thumb,.mgr-list::-webkit-scrollbar-thumb,.eq-pl-list::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+.pack-head{font-size:9.5px;font-weight:800;letter-spacing:.6px;padding:7px 6px 3px;display:flex;align-items:center;gap:5px;}
+.pack-head i{flex:1;height:1px;background:var(--bd);font-style:normal;}
+.snd-card{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:5px;border:1px solid transparent;cursor:grab;transition:.1s;margin-bottom:1px;}
+.snd-card:hover{background:var(--s3);border-color:var(--bd);}
+.snd-card:active{cursor:grabbing;transform:translateX(2px);}
+.snd-card.in-use{background:var(--s2);border-color:var(--bd);}
+.sc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sc-ico{font-size:13px;flex-shrink:0;}
+.sc-name{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);}
+.sc-sub{font-size:9.5px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-plus{font-size:14px;color:var(--txt3);margin-left:auto;flex-shrink:0;font-weight:700;}
+.snd-card:hover .sc-plus{color:var(--pr);}
+.snd-card.in-use .sc-plus{color:var(--beat);}
+
+.lib{border-top:1px solid var(--bd);height:186px;display:flex;flex-direction:column;flex-shrink:0;}
+.lib-hd{display:flex;align-items:center;gap:5px;padding:6px 9px;border-bottom:1px solid var(--bd);}
+.lib-ttl{font-size:11px;font-weight:700;color:var(--txt2);}
+.lib-cnt{font-size:10px;color:var(--pr);font-weight:800;margin-left:auto;}
+.lib-btns{display:flex;gap:3px;padding:5px 6px;border-bottom:1px solid var(--bd);}
+.ib{flex:1;padding:4px 2px;border-radius:4px;font-size:10.5px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;}
+.ib:hover{color:var(--pr);border-color:rgba(24,184,255,.4);}
+.ib.pri{color:var(--pr);border-color:rgba(24,184,255,.4);}
+.lib-list{flex:1;overflow-y:auto;padding:4px 5px;}
+.lib-empty{color:var(--txt3);font-size:11px;padding:10px 8px;line-height:1.6;text-align:center;}
+.lib-item{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;border:1px solid transparent;cursor:pointer;transition:.1s;margin-bottom:1px;}
+.lib-item:hover{background:var(--s3);border-color:var(--bd);}
+.lib-item.cur{background:rgba(24,184,255,.07);border-color:rgba(24,184,255,.35);}
+.li-n{font-size:9.5px;color:var(--txt3);min-width:13px;font-weight:700;}
+.li-name{flex:1;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-meta{font-size:9.5px;color:var(--txt3);white-space:nowrap;}
+.li-go{font-size:11px;color:var(--txt3);padding:0 2px;}
+.li-go:hover{color:var(--pr);}
+.li-edit{flex:1;min-width:0;background:var(--s4);border:1px solid var(--pr);border-radius:3px;padding:2px 5px;color:var(--txt);font-size:11.5px;}
+
+/* ── STAGE ──────────────────────────────── */
+.stage{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* 크루(인크레디믹스풍 캐릭터 줄) */
+.crew{background:linear-gradient(180deg,var(--s2),var(--s1));border-bottom:1px solid var(--bd);padding:8px 12px;display:flex;gap:8px;align-items:flex-end;overflow-x:auto;min-height:104px;flex-shrink:0;transition:background .15s;}
+.crew::-webkit-scrollbar{height:3px;}
+.crew::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+.crew.drop{background:rgba(24,184,255,.07);box-shadow:inset 0 0 0 2px rgba(24,184,255,.4);}
+.crew-empty{color:var(--txt3);font-size:12px;line-height:1.7;align-self:center;margin:auto;text-align:center;pointer-events:none;}
+.ch{width:62px;min-width:62px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;position:relative;}
+.ch-body{width:52px;height:62px;border-radius:26px 26px 9px 9px;background:var(--s3);border:2px solid currentColor;display:flex;align-items:flex-start;justify-content:center;padding-top:9px;font-size:20px;position:relative;transition:transform .09s,box-shadow .12s;overflow:hidden;}
+.ch-body::after{content:'';position:absolute;left:9px;right:9px;bottom:8px;height:12px;border-radius:6px;background:currentColor;opacity:.22;}
+.ch.hit .ch-body{transform:translateY(-6px) scale(1.05);box-shadow:0 0 16px 2px currentColor;}
+.ch.muted{opacity:.34;}
+.ch.muted .ch-body{border-style:dashed;}
+.ch-name{font-size:9.5px;color:var(--txt2);max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+.ch-x{position:absolute;top:-3px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--s4);border:1px solid var(--bd2);color:var(--txt3);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;}
+.ch:hover .ch-x{display:flex;}
+.ch-x:hover{color:var(--rd);border-color:var(--rd);}
+
+.stage-hd{background:var(--s1);border-bottom:1px solid var(--bd);padding:6px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+.stage-name{background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:4px 9px;color:var(--txt);font-size:12px;font-weight:700;width:170px;}
+.stage-name:focus{border-color:var(--pr);}
+.btn-sm{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);color:var(--txt2);transition:.1s;}
+.btn-sm:hover{color:var(--pr);border-color:rgba(24,184,255,.4);}
+.btn-sm:disabled{opacity:.4;cursor:default;}
+.btn-sm:disabled:hover{color:var(--txt2);border-color:var(--bd2);}
+.btn-pri{color:var(--pr);border-color:rgba(24,184,255,.4);}
+.btn-danger{border-color:rgba(242,100,100,.3);color:var(--rd);}
+.btn-danger:hover{background:rgba(242,100,100,.12);border-color:var(--rd);color:var(--rd);}
+
+.slot-list{flex:1;overflow-y:auto;padding:6px 10px 40px;}
+.ruler-row{display:flex;padding-left:170px;margin-bottom:3px;}
+.steps-ruler{display:flex;gap:2px;}
+.ruler-cell{width:24px;font-size:9px;text-align:center;color:var(--txt3);}
+.ruler-cell.beat{color:var(--pr);font-weight:700;}
+.hint{color:var(--txt3);text-align:center;padding:34px 20px;font-size:12.5px;line-height:2;}
+
+.slot-card{display:flex;align-items:center;gap:7px;background:var(--s1);border:1px solid var(--bd);border-left-width:3px;border-radius:7px;padding:6px 9px;margin-bottom:4px;transition:box-shadow .1s,border-color .1s;}
+.slot-card:hover{border-color:var(--bd2);}
+.slot-card.fire{box-shadow:0 0 14px -2px currentColor;}
+.slot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.slot-ico{font-size:13px;flex-shrink:0;width:15px;text-align:center;}
+.slot-name{font-size:11px;font-weight:700;width:112px;min-width:112px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;}
+.slot-name-edit{width:112px;min-width:112px;background:var(--s4);border:1px solid var(--pr);border-radius:3px;padding:2px 5px;color:var(--txt);font-size:11px;}
+.steps{display:flex;gap:2px;flex-shrink:0;}
+.step{width:22px;height:26px;border-radius:3px;border:1px solid var(--bd2);background:var(--s3);cursor:pointer;flex-shrink:0;transition:.07s;position:relative;}
+.step:hover{filter:brightness(1.4);}
+.step.on{border-color:transparent;}
+.step.beat-mark{border-color:var(--bd);box-shadow:inset 1px 0 0 rgba(255,255,255,.09);}
+.step.cur::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.28);border-radius:2px;pointer-events:none;}
+.slot-right{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.vol-sl{width:56px;accent-color:var(--pr);cursor:pointer;}
+.mute-btn{width:22px;height:22px;border-radius:3px;background:var(--s3);border:1px solid var(--bd2);font-size:10px;font-weight:700;color:var(--txt3);transition:.1s;}
+.mute-btn:hover{color:var(--txt);}
+.mute-btn.muted{background:rgba(242,100,100,.15);color:var(--rd);border-color:rgba(242,100,100,.5);}
+.del-btn{font-size:14px;color:var(--txt3);padding:2px 4px;}
+.del-btn:hover{color:var(--rd);}
+
+.info-bar{background:var(--s2);border-top:1px solid var(--bd);padding:4px 12px;font-size:10px;color:var(--txt3);display:flex;gap:14px;flex-shrink:0;flex-wrap:wrap;}
+.info-bar b{color:var(--pr);}
+
+/* ── MODAL ──────────────────────────────── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);padding:12px;}
+.modal-bg.hidden{display:none;}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:min(520px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.6);}
+.modal.wide{width:min(900px,100%);}
+.modal-hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.modal-ttl{font-size:14px;font-weight:700;}
+.modal-close{margin-left:auto;font-size:17px;color:var(--txt3);padding:2px 6px;}
+.modal-close:hover{color:var(--txt);}
+.modal-body{padding:13px 16px;overflow-y:auto;flex:1;}
+.modal-body.flat{padding:0;}
+.modal-ft{padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.6px;margin-bottom:5px;}
+.note{background:rgba(24,184,255,.05);border:1px solid rgba(24,184,255,.2);border-radius:5px;padding:8px 11px;font-size:11.5px;color:var(--txt2);margin-bottom:10px;line-height:1.6;}
+
+.mgr{display:flex;min-height:0;height:min(520px,68vh);}
+.mgr-l{width:250px;min-width:250px;border-right:1px solid var(--bd);display:flex;flex-direction:column;}
+.mgr-l-hd{padding:8px 11px;font-size:11px;font-weight:700;color:var(--txt2);border-bottom:1px solid var(--bd);}
+.mgr-list{flex:1;overflow-y:auto;padding:5px;}
+.mgr-item{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:5px;border:1px solid transparent;cursor:pointer;margin-bottom:2px;}
+.mgr-item:hover{background:var(--s3);}
+.mgr-item.sel{background:rgba(24,184,255,.08);border-color:rgba(24,184,255,.35);}
+.mi-name{font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mi-meta{font-size:9.5px;color:var(--txt3);}
+.mi-btn{width:19px;height:19px;border-radius:3px;background:var(--s3);border:1px solid var(--bd2);font-size:10px;color:var(--txt3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mi-btn:hover{color:var(--pr);border-color:var(--pr);}
+.mgr-r{flex:1;overflow-y:auto;padding:12px 14px;min-width:0;}
+.mgr-empty{color:var(--txt3);font-size:12px;text-align:center;padding:50px 10px;line-height:1.8;}
+.fld-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end;}
+.fld label{display:block;font-size:10px;color:var(--txt3);font-weight:700;margin-bottom:3px;}
+.fi{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:4px;padding:5px 8px;color:var(--txt);font-size:12px;}
+.fi:focus{border-color:var(--pr);}
+.trk{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;margin-bottom:3px;flex-wrap:wrap;}
+.trk-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.trk-name{width:100px;background:var(--s3);border:1px solid var(--bd2);border-radius:3px;padding:2px 6px;color:var(--txt);font-size:11px;}
+.trk-src{font-size:9.5px;color:var(--txt3);width:78px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.msteps{display:flex;gap:1px;}
+.mstep{width:14px;height:18px;border-radius:2px;border:1px solid var(--bd2);background:var(--s3);cursor:pointer;}
+.mstep.bm{border-color:var(--bd);}
+.trk-right{display:flex;align-items:center;gap:4px;margin-left:auto;}
+
+.exp-q{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;min-height:52px;}
+.eq-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--s2);border:1px solid var(--bd2);border-radius:6px;cursor:pointer;}
+.eq-item:hover{border-color:var(--bd);}
+.eq-item.sel{border-color:var(--pr);background:rgba(24,184,255,.05);}
+.eq-name{flex:1;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.eq-bars-lbl{font-size:10px;color:var(--txt3);}
+.eq-bars-input{width:46px;background:var(--s3);border:1px solid var(--bd2);border-radius:3px;padding:2px 5px;color:var(--txt);font-size:12px;text-align:center;}
+.eq-del{font-size:14px;color:var(--txt3);}
+.eq-del:hover{color:var(--rd);}
+.eq-pl-list{display:flex;flex-direction:column;gap:3px;max-height:190px;overflow-y:auto;}
+.eq-pl-item{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--s3);border:1px solid var(--bd);border-radius:5px;cursor:pointer;}
+.eq-pl-item:hover{border-color:var(--bd2);}
+.eq-pl-name{flex:1;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.eq-pl-add{font-size:10px;color:var(--txt3);}
+.eq-pl-item:hover .eq-pl-add{color:var(--pr);}
+.eq-empty{color:var(--txt3);font-size:11.5px;padding:8px;}
+.save-input{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:5px;padding:8px 11px;color:var(--txt);font-size:13px;margin:4px 0 9px;}
+.save-input:focus{border-color:var(--pr);}
+.save-hint{font-size:11px;color:var(--txt3);line-height:1.6;}
+.help-h{font-size:12px;font-weight:800;color:var(--pr);margin:12px 0 5px;}
+.help-h:first-child{margin-top:0;}
+.help-p{font-size:12px;color:var(--txt2);line-height:1.85;}
+.help-p b{color:var(--txt);}
+.kbd{display:inline-block;background:var(--s3);border:1px solid var(--bd2);border-radius:3px;padding:0 5px;font-size:11px;color:var(--txt);}
+
+.loading-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;}
+.loading-bg.hidden{display:none;}
+.spinner{width:42px;height:42px;border:3px solid var(--bd2);border-top-color:var(--pr);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-msg{font-size:13px;color:var(--txt2);}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,14px);background:var(--s4);border:1px solid var(--bd2);border-radius:20px;padding:7px 16px;font-size:12px;color:var(--txt);opacity:0;pointer-events:none;transition:.18s;z-index:400;box-shadow:0 8px 26px rgba(0,0,0,.5);}
+.toast.on{opacity:1;transform:translate(-50%,0);}
+
+/* ── MINI PLAYER ────────────────────────── */
+body.mini{overflow:auto;}
+.mini-wrap{display:flex;flex-direction:column;height:100vh;}
+.mini-hd{background:var(--s1);border-bottom:2px solid var(--vox);padding:9px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.mini-ttl{font-size:12px;font-weight:800;color:var(--vox);}
+.mini-body{flex:1;overflow-y:auto;padding:10px 12px;}
+.mini-name{font-size:14px;font-weight:800;margin-bottom:2px;}
+.mini-meta{font-size:11px;color:var(--txt3);margin-bottom:10px;}
+.mini-trk{display:flex;align-items:center;gap:7px;padding:5px 8px;background:var(--s2);border:1px solid var(--bd);border-radius:5px;margin-bottom:3px;cursor:pointer;}
+.mini-trk.muted{opacity:.4;}
+.mini-trk-name{flex:1;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini-ft{padding:8px 12px;border-top:1px solid var(--bd);background:var(--s1);font-size:10.5px;color:var(--txt3);line-height:1.6;flex-shrink:0;}
+.mini-gate{position:fixed;inset:0;background:rgba(7,9,15,.94);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;}
+.mini-gate.hidden{display:none;}
+.mini-gate .g-ico{font-size:44px;}
+.mini-gate .g-txt{font-size:13px;color:var(--txt2);}
+
+@media(max-width:760px){
+  .side{position:absolute;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);transition:.18s;box-shadow:8px 0 24px rgba(0,0,0,.5);}
+  .side.open{transform:none;}
+  .side-tgl{display:flex;align-items:center;justify-content:center;}
+  .hdr canvas{display:none;}
+  .ruler-row{display:none;}
+  .slot-name,.slot-name-edit{width:74px;min-width:74px;}
+  .step{width:17px;height:23px;}
+  .vol-sl{display:none;}
+  .mgr{flex-direction:column;height:auto;}
+  .mgr-l{width:auto;min-width:0;max-height:180px;border-right:none;border-bottom:1px solid var(--bd);}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ 메인 믹서 ══ -->
+<div id="app">
+<header class="hdr">
+  <button class="side-tgl" id="sideToggle" title="사운드 · 저장 목록">☰</button>
+  <div class="logo">🎵 인크레디믹스<span>v4</span></div>
+  <button class="play-btn" id="playBtn" title="재생/정지 (Space)">▶</button>
+  <div class="beat-dot" id="beatDot"></div>
+  <div class="sep"></div>
+  <div class="bpm-grp">
+    <button class="bpm-btn" id="bpmDn">−</button>
+    <span class="bpm-val" id="bpmVal">120</span>
+    <button class="bpm-btn" id="bpmUp">+</button>
+    <span class="bpm-lbl">BPM</span>
+  </div>
+  <div class="sep"></div>
+  <div class="vol-grp"><span style="font-size:15px;">🔊</span><input type="range" id="masterVol" min="0" max="1" step="0.01" value="0.82"></div>
+  <button class="mini-btn" id="miniBtn" title="팝업 창에서 계속 재생 — 다른 사이트로 이동해도 음악이 끊기지 않습니다">🎧 팝업 플레이어</button>
+  <button class="btn-sm" id="helpBtn" title="사용법">?</button>
+  <canvas id="viz" width="180" height="34"></canvas>
+</header>
+
+<!-- 비트 묶음 -->
+<div class="bar">
+  <span class="bar-lbl">비트 묶음</span>
+  <button class="pack-btn" data-pack="core">🎛 초기 비트 모음<span class="cnt" id="cntCore"></span></button>
+  <button class="pack-btn" data-pack="plus">✨ 추가 비트 모음<span class="cnt" id="cntPlus"></span></button>
+  <button class="pack-btn on" data-pack="all">전체<span class="cnt" id="cntAll"></span></button>
+  <span class="sep" style="height:18px;"></span>
+  <span class="bar-lbl">랜덤 생성</span>
+  <span id="genreBar" style="display:flex;gap:5px;flex-wrap:wrap;"></span>
+</div>
+
+<!-- 프리셋 -->
+<div class="bar">
+  <span class="bar-lbl">프리셋</span>
+  <span id="presetBar" style="display:flex;gap:5px;flex-wrap:wrap;"></span>
+</div>
+
+<div class="main">
+  <div class="side" id="side">
+    <div class="pal">
+      <div class="pal-tabs" id="palTabs">
+        <button class="pal-tab on" data-cat="all" style="color:var(--txt2)">전체</button>
+        <button class="pal-tab" data-cat="beat" style="color:var(--beat)">비트</button>
+        <button class="pal-tab" data-cat="bass" style="color:var(--bass)">베이스</button>
+        <button class="pal-tab" data-cat="melo" style="color:var(--melo)">멜로디</button>
+        <button class="pal-tab" data-cat="efx" style="color:var(--efx)">이펙트</button>
+        <button class="pal-tab" data-cat="vox" style="color:var(--vox)">보이스</button>
+      </div>
+      <div class="pal-search"><input type="text" id="palSearch" placeholder="사운드 검색..."></div>
+      <div class="snd-list" id="sndList"></div>
+    </div>
+    <div class="lib">
+      <div class="lib-hd"><span class="lib-ttl">💾 저장 목록</span><span class="lib-cnt" id="libCnt">0</span></div>
+      <div class="lib-btns">
+        <button class="ib pri" id="saveBeatBtn" title="현재 비트를 새 이름으로 저장">＋ 저장</button>
+        <button class="ib" id="mgrBtn" title="이름·패턴·순서 수정">⚙ 관리</button>
+        <button class="ib" id="exportAudioBtn" title="WAV 음원 내보내기">🎵 음원</button>
+      </div>
+      <div class="lib-list" id="libList"></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="crew" id="crew"></div>
+    <div class="stage-hd">
+      <input type="text" class="stage-name" id="stageName" placeholder="비트 이름" maxlength="40" title="현재 비트 이름">
+      <button class="btn-sm btn-pri" id="quickSaveBtn" title="새 항목으로 저장">💾 저장</button>
+      <button class="btn-sm" id="overwriteBtn" title="불러온 항목에 덮어쓰기" disabled>⤴ 덮어쓰기</button>
+      <button class="btn-sm" id="sendMiniBtn" title="열려 있는 팝업 플레이어로 현재 비트 보내기">📡 팝업으로 보내기</button>
+      <button class="btn-sm btn-danger" id="clearBtn">🗑 전체 지우기</button>
+    </div>
+    <div class="slot-list" id="slotList">
+      <div class="ruler-row"><div class="steps-ruler" id="ruler"></div></div>
+      <div id="slotWrap"></div>
+      <div class="hint" id="hint">← 왼쪽에서 사운드를 클릭하거나 위쪽 크루 자리로 <b>드래그</b>해 넣으세요<br><span class="kbd">Space</span> 재생/정지 · <span class="kbd">↑</span><span class="kbd">↓</span> BPM · 트랙 이름 클릭 시 이름 지정</div>
+    </div>
+    <div class="info-bar">
+      <span>트랙 <b id="infoSlots">0</b>개</span>
+      <span>스텝 <b id="infoStep">-</b> / 16</span>
+      <span>사운드 총 <b id="infoSnd">0</b>종 (초기 <b id="infoCore">0</b> + 추가 <b id="infoPlus">0</b>)</span>
+      <span>크루 클릭: 뮤트 · 드래그: 추가</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ 미니 플레이어 ══ -->
+<div class="mini-wrap" id="miniApp" style="display:none;">
+  <div class="mini-hd">
+    <button class="play-btn" id="mPlay" style="width:32px;height:32px;background:var(--vox);">▶</button>
+    <div style="flex:1;min-width:0;">
+      <div class="mini-ttl">🎧 인크레디믹스 미니</div>
+      <div class="mini-meta" id="mBpm" style="margin:0;">120 BPM</div>
+    </div>
+    <button class="btn-sm" id="mPrev" title="이전 저장 비트">◀</button>
+    <button class="btn-sm" id="mNext" title="다음 저장 비트">▶</button>
+  </div>
+  <div class="mini-body">
+    <div class="mini-name" id="mName">비트 없음</div>
+    <div class="mini-meta" id="mMeta">메인 창에서 비트를 보내주세요</div>
+    <div class="vol-grp" style="margin-bottom:10px;"><span style="font-size:14px;">🔊</span><input type="range" id="mVol" min="0" max="1" step="0.01" value="0.82" style="flex:1;accent-color:var(--vox);"></div>
+    <div id="mTrks"></div>
+  </div>
+  <div class="mini-ft">이 창을 열어 두면 <b>다른 사이트로 이동해도</b> 음악이 계속 재생됩니다.<br>메인 창에서 <b>📡 팝업으로 보내기</b>를 누르면 이 창의 비트가 바뀝니다.</div>
+</div>
+<div class="mini-gate hidden" id="miniGate"><div class="g-ico">🎧</div><div class="g-txt">클릭하면 재생을 시작합니다</div></div>
+
+<!-- ══ 모달 ══ -->
+<div class="modal-bg hidden" id="mgrModal">
+  <div class="modal wide">
+    <div class="modal-hd"><span>⚙</span><span class="modal-ttl">저장 목록 관리</span><button class="modal-close" data-close="mgrModal">✕</button></div>
+    <div class="modal-body flat">
+      <div class="mgr">
+        <div class="mgr-l">
+          <div class="mgr-l-hd">저장된 비트 <span id="mgrCnt" style="color:var(--pr);"></span></div>
+          <div class="mgr-list" id="mgrList"></div>
+        </div>
+        <div class="mgr-r" id="mgrDetail"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-sm" id="importJsonBtn">📥 JSON 가져오기</button>
+      <button class="btn-sm" id="exportJsonBtn">📤 JSON 내보내기</button>
+      <span style="flex:1;"></span>
+      <span style="font-size:10.5px;color:var(--txt3);">수정은 자동 저장됩니다</span>
+      <button class="btn-sm" data-close="mgrModal">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="audioModal">
+  <div class="modal">
+    <div class="modal-hd"><span>🎵</span><span class="modal-ttl">음원 내보내기 (WAV)</span><button class="modal-close" data-close="audioModal">✕</button></div>
+    <div class="modal-body">
+      <div class="note">저장된 비트를 아래에서 추가하세요. 같은 비트를 여러 번 넣을 수 있으며, 순서대로 이어붙여 하나의 WAV 파일로 내보냅니다.</div>
+      <div class="sec-lbl">내보내기 대기열 <span id="expTotal" style="color:var(--txt3);font-weight:400;"></span></div>
+      <div class="exp-q" id="expQ"></div>
+      <div class="sec-lbl" style="margin-top:10px;">비트 목록</div>
+      <div class="eq-pl-list" id="eqPlList"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-sm" id="expUp">↑ 위로</button>
+      <button class="btn-sm" id="expDn">↓ 아래로</button>
+      <button class="btn-sm btn-danger" id="expRemove">제거</button>
+      <span style="flex:1;"></span>
+      <button class="btn-sm btn-pri" id="doExportBtn" style="font-size:12px;">🎵 WAV 내보내기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="saveModal">
+  <div class="modal" style="width:min(360px,100%);">
+    <div class="modal-hd"><span>💾</span><span class="modal-ttl">비트 저장</span><button class="modal-close" data-close="saveModal">✕</button></div>
+    <div class="modal-body">
+      <div class="sec-lbl">비트 이름</div>
+      <input type="text" class="save-input" id="beatNameInput" placeholder="내 비트 이름" maxlength="40">
+      <div class="save-hint">저장 후 왼쪽 목록에서 바로 불러올 수 있고,<br>⚙ 관리에서 이름·패턴·순서를 수정할 수 있습니다.</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-sm" data-close="saveModal">취소</button>
+      <span style="flex:1;"></span>
+      <button class="btn-sm btn-pri" id="saveConfirmBtn">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="helpModal">
+  <div class="modal">
+    <div class="modal-hd"><span>❓</span><span class="modal-ttl">사용법</span><button class="modal-close" data-close="helpModal">✕</button></div>
+    <div class="modal-body">
+      <div class="help-h">비트 묶음</div>
+      <div class="help-p">
+        <b>🎛 초기 비트 모음 43종</b> — 첫 버전에 있던 원본 음색 그대로입니다. 비트·베이스·멜로디·이펙트·<b>보이스</b> 5계열.<br>
+        <b>✨ 추가 비트 모음 100종</b> — 이후 추가된 8장르(판타지·사이버펑크·기계풍·재즈·EDM·힙합·앰비언트·오케스트라) 음색입니다.<br>
+        위쪽 <b>비트 묶음</b> 버튼으로 팔레트에 보일 묶음을 고릅니다.
+      </div>
+      <div class="help-h">만들기</div>
+      <div class="help-p">
+        사운드를 <b>클릭</b>하면 트랙으로 들어가고 다시 누르면 빠집니다. 위쪽 <b>크루 자리로 드래그</b>해도 됩니다.<br>
+        크루 캐릭터를 클릭하면 뮤트, ✕로 제거합니다. 스텝 칸을 눌러 리듬을 직접 편집하세요.<br>
+        모든 <b>프리셋은 고정 패턴</b>입니다 — 같은 버튼은 언제 눌러도 같은 비트가 나옵니다. 매번 다른 결과를 원하면 <b>🎲 랜덤 생성</b> 버튼을 쓰세요.
+      </div>
+      <div class="help-h">다른 페이지로 넘어가도 계속 듣기</div>
+      <div class="help-p">
+        헤더의 <b>🎧 팝업 플레이어</b>를 누르면 작은 창이 열립니다. 그 창은 이 페이지를 떠나도 살아 있으므로,
+        <b>다른 사이트로 이동해도 음악이 계속 재생</b>됩니다. 메인 창에서 비트를 바꾼 뒤 <b>📡 팝업으로 보내기</b>를 누르면 즉시 반영됩니다.<br>
+        탭을 전환하거나 배경으로 내려도 재생은 멈추지 않습니다.
+      </div>
+      <div class="help-h">저장 · 내보내기</div>
+      <div class="help-p">
+        <b>＋ 저장</b>으로 목록에 담고, <b>⚙ 관리</b>에서 이름·BPM·트랙·패턴을 직접 고칩니다.<br>
+        <b>🎵 음원</b>에서 저장한 비트를 순서대로 이어붙여 <b>WAV</b>로 내보낼 수 있습니다. JSON으로 백업·복원도 됩니다.
+      </div>
+      <div class="help-h">단축키</div>
+      <div class="help-p">
+        <span class="kbd">Space</span> 재생/정지 · <span class="kbd">↑</span><span class="kbd">↓</span> BPM ±5 · <span class="kbd">Esc</span> 창 닫기
+      </div>
+    </div>
+    <div class="modal-ft"><span style="flex:1;"></span><button class="btn-sm btn-pri" data-close="helpModal">확인</button></div>
+  </div>
+</div>
+
+<div class="loading-bg hidden" id="loadingBg"><div class="spinner"></div><div class="loading-msg" id="loadingMsg">렌더링 중...</div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="jsonImport" accept=".json,application/json" style="display:none">
+
+<script>
+'use strict';
+
+// ─── UTIL ──────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const STEPS = 16;
+const EPS = 0.0001;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const IS_MINI = new URLSearchParams(location.search).get('mini') === '1';
+
+let toastTid = null;
+function toast(msg) {
+  const el = $('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTid);
+  toastTid = setTimeout(() => el.classList.remove('on'), 1600);
+}
+
+// 고정 난수 — 같은 (씨앗) 이면 항상 같은 값.
+// v3까지는 소리 안에서 Math.random()을 써서 같은 스텝이 매번 다르게 들렸다.
+function hash32(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+function rnd01(seed) {
+  let x = (typeof seed === 'string' ? hash32(seed) : seed >>> 0) || 1;
+  x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0;
+  return x / 4294967296;
+}
+// 사운드별·스텝별 고정 흔들림
+const fixedRand = (id, step, k) => rnd01(id + '#' + step + '#' + k);
+
+// ─── AUDIO ENGINE ─────────────────────────────────────
+// MASTER ← COMP → ANA → dest.  시퀀서 보이스는 SEQ 버스를 거쳐 정지 시 페이드아웃.
+let AC = null, MASTER = null, COMP = null, ANA = null, SEQ = null;
+let masterVolume = 0.82;
+
+function getAC() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    COMP = AC.createDynamicsCompressor();
+    COMP.threshold.value = -12; COMP.ratio.value = 3.5; COMP.knee.value = 6;
+    MASTER = AC.createGain(); MASTER.gain.value = masterVolume;
+    ANA = AC.createAnalyser(); ANA.fftSize = 1024;
+    SEQ = AC.createGain(); SEQ.gain.value = 1;
+    SEQ.connect(MASTER);
+    MASTER.connect(COMP); COMP.connect(ANA); ANA.connect(AC.destination);
+  }
+  if (AC.state === 'suspended') AC.resume().catch(() => {});
+  return AC;
+}
+
+// 노이즈 버퍼 — 고정 시드로 만들어 매번 같은 음색이 나온다.
+const _noiseCache = new WeakMap();
+function noiseBuf(C) {
+  let b = _noiseCache.get(C);
+  if (!b) {
+    const n = Math.floor(C.sampleRate * 2);
+    b = C.createBuffer(1, n, C.sampleRate);
+    const d = b.getChannelData(0);
+    let x = 987654321;
+    for (let i = 0; i < n; i++) {
+      x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0;
+      d[i] = x / 2147483648 - 1;
+    }
+    _noiseCache.set(C, b);
+  }
+  return b;
+}
+
+function decayEnv(g, t, v, d) {
+  const v0 = Math.max(EPS, v);
+  g.gain.setValueAtTime(v0, t);
+  g.gain.exponentialRampToValueAtTime(EPS, t + Math.max(0.02, d));
+}
+
+// ─── 추가 묶음용 합성 팩토리 ─────────────────────────
+function _dc(amt) {
+  const n = 256, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c[i] = x * (3 + amt) / (1 + amt * Math.abs(x)) / 1.5; }
+  return c;
+}
+const _dcCache = new Map();
+function distCurve(amt) {
+  let c = _dcCache.get(amt);
+  if (!c) { c = _dc(amt); _dcCache.set(amt, c); }
+  return c;
+}
+
+const _k = (f0, f1, d, dist) => (C, t, D, v = 1) => {
+  const o = C.createOscillator(), g = C.createGain();
+  o.frequency.setValueAtTime(Math.max(1, f0), t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + d * 0.4);
+  decayEnv(g, t, v, d);
+  if (dist) { const ws = C.createWaveShaper(); ws.curve = distCurve(dist); o.connect(ws); ws.connect(g); }
+  else o.connect(g);
+  g.connect(D); o.start(t); o.stop(t + d + 0.06);
+};
+
+// 노이즈 재생 위치를 주파수에서 고정 계산 → 같은 소리는 항상 같은 결
+const _h = (fq, Q, d, ft = 'bandpass') => {
+  const off = rnd01(fq * 7 + Q * 13 + d * 101) * 1.5;
+  return (C, t, D, v = 1) => {
+    const src = C.createBufferSource();
+    src.buffer = noiseBuf(C); src.loop = true;
+    const f = C.createBiquadFilter(); f.type = ft; f.frequency.value = fq; f.Q.value = Q;
+    const g = C.createGain(); decayEnv(g, t, v, d);
+    src.connect(f); f.connect(g); g.connect(D);
+    src.start(t, off); src.stop(t + d + 0.06);
+  };
+};
+
+const _t = (wt, fr, atk, dcy) => (C, t, D, v = 1) => {
+  const o = C.createOscillator(), g = C.createGain();
+  o.type = wt; o.frequency.value = fr;
+  g.gain.setValueAtTime(EPS, t);
+  g.gain.linearRampToValueAtTime(Math.max(EPS, v * 0.9), t + atk);
+  g.gain.exponentialRampToValueAtTime(EPS, t + atk + Math.max(0.02, dcy));
+  o.connect(g); g.connect(D); o.start(t); o.stop(t + atk + dcy + 0.06);
+};
+
+const _fm = (cf, mf, mi, d, atk = 0.002) => (C, t, D, v = 1) => {
+  const md = C.createOscillator(), mg = C.createGain();
+  const cr = C.createOscillator(), cg = C.createGain();
+  md.frequency.value = mf; mg.gain.value = mi; cr.frequency.value = cf;
+  md.connect(mg); mg.connect(cr.frequency);
+  cg.gain.setValueAtTime(EPS, t);
+  cg.gain.linearRampToValueAtTime(Math.max(EPS, v), t + atk);
+  cg.gain.exponentialRampToValueAtTime(EPS, t + Math.max(atk + 0.02, d));
+  cr.connect(cg); cg.connect(D);
+  [md, cr].forEach(o => { o.start(t); o.stop(t + d + 0.06); });
+};
+
+const _plk = (fr, d) => (C, t, D, v = 1) => {
+  const o = C.createOscillator(), g = C.createGain();
+  const f = C.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = Math.min(18000, fr * 8); f.Q.value = 2;
+  o.type = 'triangle'; o.frequency.value = fr;
+  decayEnv(g, t, v, d);
+  o.connect(f); f.connect(g); g.connect(D); o.start(t); o.stop(t + d + 0.06);
+};
+
+const _pad = (fr, d, n = 3, dt = 15) => (C, t, D, v = 1) => {
+  const g = C.createGain();
+  const f = C.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = Math.min(18000, fr * 5);
+  const atk = Math.min(0.18, d * 0.35);
+  g.gain.setValueAtTime(EPS, t);
+  g.gain.linearRampToValueAtTime(Math.max(EPS, v * 0.3), t + atk);
+  g.gain.exponentialRampToValueAtTime(EPS, t + Math.max(atk + 0.05, d));
+  f.connect(g); g.connect(D);
+  for (let i = 0; i < n; i++) {
+    const o = C.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fr;
+    o.detune.value = (i - (n - 1) / 2) * dt;
+    o.connect(f); o.start(t); o.stop(t + d + 0.06);
+  }
+};
+
+const _swp = (f0, f1, d) => (C, t, D, v = 1) => {
+  const o = C.createOscillator(), g = C.createGain();
+  o.frequency.setValueAtTime(Math.max(1, f0), t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + d * 0.8);
+  decayEnv(g, t, v * 0.5, d);
+  o.connect(g); g.connect(D); o.start(t); o.stop(t + d + 0.06);
+};
+
+const _mhit = (f1, f2, d) => (C, t, D, v = 1) => {
+  [f1, f2, f1 * 1.73].forEach(fr => {
+    const o = C.createOscillator(), g = C.createGain();
+    o.frequency.value = fr;
+    decayEnv(g, t, v * 0.36, d);
+    o.connect(g); g.connect(D); o.start(t); o.stop(t + d + 0.06);
+  });
+};
+
+const _chord = (frs, wt, d) => (C, t, D, v = 1) => {
+  const mg = C.createGain();
+  mg.gain.setValueAtTime(EPS, t);
+  mg.gain.linearRampToValueAtTime(Math.max(EPS, v * 0.32), t + 0.02);
+  mg.gain.exponentialRampToValueAtTime(EPS, t + Math.max(0.06, d));
+  mg.connect(D);
+  frs.forEach(fr => {
+    const o = C.createOscillator(); o.type = wt || 'sine'; o.frequency.value = fr;
+    o.connect(mg); o.start(t); o.stop(t + d + 0.06);
+  });
+};
+
+// ─── 초기 묶음용 합성 헬퍼 (첫 버전 음색 그대로) ─────
+function mkOsc(C, type, freq) { const o = C.createOscillator(); o.type = type; o.frequency.value = Math.max(1, freq); return o; }
+function mkGain(C, v) { const g = C.createGain(); g.gain.value = v; return g; }
+function mkFilt(C, type, freq, Q = 1) { const f = C.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = Q; return f; }
+
+function cSweep(C, t, D, type, f1, f2, vol, dur, swpT) {
+  const o = mkOsc(C, type, f1), g = mkGain(C, 0);
+  o.frequency.setValueAtTime(Math.max(1, f1), t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(1, f2), t + swpT);
+  decayEnv(g, t, vol, dur);
+  o.connect(g); g.connect(D);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+function cPoke(C, t, D, type, freq, vol, atk, dec) {
+  const o = mkOsc(C, type, freq), g = mkGain(C, EPS);
+  g.gain.setValueAtTime(EPS, t);
+  g.gain.linearRampToValueAtTime(Math.max(EPS, vol), t + atk);
+  g.gain.exponentialRampToValueAtTime(EPS, t + atk + Math.max(0.02, dec));
+  o.connect(g); g.connect(D);
+  o.start(t); o.stop(t + atk + dec + 0.01);
+}
+function cNoise(C, t, D, hp, lp, vol, dec, off = 0.13) {
+  const s = C.createBufferSource(); s.buffer = noiseBuf(C); s.loop = true;
+  const fh = mkFilt(C, 'highpass', hp), fl = mkFilt(C, 'lowpass', lp), g = mkGain(C, Math.max(EPS, vol));
+  decayEnv(g, t, vol, dec);
+  s.connect(fh); fh.connect(fl); fl.connect(g); g.connect(D);
+  s.start(t, off % 1.8); s.stop(t + dec + 0.01);
+}
+
+// ═══════════════════════════════════════════════════════
+// 사운드 라이브러리 ①  초기 비트 모음 (42종)
+// 첫 버전(ab)의 음색·기본 패턴을 그대로 옮겼다. 소리 안에서
+// Math.random()을 쓰던 자리는 fixedRand로 바꿔 항상 같은 결이 난다.
+// ═══════════════════════════════════════════════════════
+const CORE_SOUNDS = [
+/* ── 비트 12 ── */
+{id:'kick_hard',name:'킥 (하드)',cat:'beat',color:'#ff3d55',ico:'🔴',def:'1000100010001000',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',140,28,1.3*v,.45,.1); cNoise(C,t,D,20,180,.25*v,.06,.02); }},
+{id:'kick_soft',name:'킥 (소프트)',cat:'beat',color:'#ff6677',ico:'🔴',def:'1000000000100000',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',100,38,1.0*v,.55,.14); cNoise(C,t,D,20,120,.12*v,.08,.05); }},
+{id:'kick_808',name:'808 킥',cat:'beat',color:'#ff1133',ico:'🔴',def:'1000000010000000',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',60,20,1.5*v,.9,.08); }},
+{id:'snare',name:'스네어',cat:'beat',color:'#ff8899',ico:'💥',def:'0000100000001000',
+ fn(C,t,D,v=1){ cNoise(C,t,D,1500,8000,.8*v,.13,.21); cPoke(C,t,D,'triangle',200,.35*v,.001,.09); }},
+{id:'snare_ghost',name:'고스트 스네어',cat:'beat',color:'#ffaabb',ico:'👻',def:'0010010000100100',
+ fn(C,t,D,v=1){ cNoise(C,t,D,1000,6000,.22*v,.08,.34); cPoke(C,t,D,'triangle',180,.12*v,.001,.06); }},
+{id:'hihat_cl',name:'하이햇 (클로즈)',cat:'beat',color:'#ffaa22',ico:'🎩',def:'1010101010101010',
+ fn(C,t,D,v=1){ cNoise(C,t,D,8000,18000,.38*v,.04,.47); }},
+{id:'hihat_op',name:'하이햇 (오픈)',cat:'beat',color:'#ffcc44',ico:'🎩',def:'0000100000001000',
+ fn(C,t,D,v=1){ cNoise(C,t,D,6500,16000,.32*v,.26,.58); }},
+{id:'clap',name:'클랩',cat:'beat',color:'#ffe055',ico:'👏',def:'0000100000001000',
+ fn(C,t,D,v=1){ cNoise(C,t,D,1200,9000,.55*v,.08,.63); cNoise(C,t+.009,D,1200,9000,.45*v,.1,.71); cNoise(C,t+.018,D,1200,9000,.3*v,.12,.79); }},
+{id:'rimshot',name:'림샷',cat:'beat',color:'#ffdd33',ico:'🎯',def:'0010001000100010',
+ fn(C,t,D,v=1){ cPoke(C,t,D,'square',400,.38*v,.001,.04); cNoise(C,t,D,500,3000,.28*v,.04,.86); }},
+{id:'tom_hi',name:'탐 (하이)',cat:'beat',color:'#ee4466',ico:'🥁',def:'1000001000001000',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',280,110,.85*v,.32,.07); cNoise(C,t,D,200,2500,.18*v,.05,.94); }},
+{id:'conga',name:'콩가',cat:'beat',color:'#cc3355',ico:'🪘',def:'0100010001000100',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',420,200,.55*v,.22,.05); }},
+{id:'cowbell',name:'카우벨',cat:'beat',color:'#aa1144',ico:'🔔',def:'0000000010000000',
+ fn(C,t,D,v=1){ cPoke(C,t,D,'square',562,.32*v,.001,.18); cPoke(C,t,D,'square',845,.18*v,.001,.15); }},
+
+/* ── 베이스 8 ── */
+{id:'bass_sub',name:'서브 베이스',cat:'bass',color:'#9a3fff',ico:'〰️',def:'1000000010000000',
+ fn(C,t,D,v=1){ cPoke(C,t,D,'sine',55,1.1*v,.01,.5); }},
+{id:'bass_deep',name:'딥 베이스',cat:'bass',color:'#aa55ff',ico:'🔊',def:'1001001010010010',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',65),f=mkFilt(C,'lowpass',200,2),g=mkGain(C,EPS);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.85*v,t+.02);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.32);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.34); }},
+{id:'bass_walk',name:'워킹 베이스',cat:'bass',color:'#bb66ff',ico:'🚶',def:'1010101010101010',
+ fn(C,t,D,v=1,step=0){ const n=[65,73,82,87,73,82,87,98]; cPoke(C,t,D,'triangle',n[step%8],.75*v,.01,.18); }},
+{id:'bass_funk',name:'펑크 베이스',cat:'bass',color:'#cc77ff',ico:'🎸',def:'1001010010010100',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',87),f=mkFilt(C,'lowpass',2500,3),g=mkGain(C,EPS);
+   f.frequency.setValueAtTime(2000,t); f.frequency.exponentialRampToValueAtTime(300,t+.08);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.75*v,t+.005);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.14);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.16); }},
+{id:'bass_synth',name:'신스 베이스',cat:'bass',color:'#dd88ff',ico:'🎹',def:'1000101000100010',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'square',110),f=mkFilt(C,'lowpass',3500,4),g=mkGain(C,EPS);
+   f.frequency.setValueAtTime(3500,t); f.frequency.exponentialRampToValueAtTime(500,t+.18);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.65*v,t+.01);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.38);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.4); }},
+{id:'bass_drop',name:'베이스 드롭',cat:'bass',color:'#6622ee',ico:'⬇️',def:'0000000000000001',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',180,28,1.2*v,.6,.55); }},
+{id:'bass_pulse',name:'베이스 펄스',cat:'bass',color:'#7733ff',ico:'💜',def:'1100110011001100',
+ fn(C,t,D,v=1){ cPoke(C,t,D,'sine',82,.85*v,.005,.1); }},
+{id:'bass_acid',name:'애시드 베이스',cat:'bass',color:'#8844ee',ico:'🧪',def:'1001100010011000',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',110),f=mkFilt(C,'lowpass',4500,12),g=mkGain(C,EPS);
+   f.frequency.setValueAtTime(4500,t); f.frequency.exponentialRampToValueAtTime(280,t+.12);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.65*v,t+.01);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.22);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.24); }},
+
+/* ── 멜로디 10 ── */
+{id:'lead_saw',name:'리드 (쏘)',cat:'melo',color:'#18b8ff',ico:'🔵',def:'1000001000001000',
+ fn(C,t,D,v=1,step=0){
+   const n=[523,659,784,880,1047,784,659,523], fq=n[step%8];
+   const o1=mkOsc(C,'sawtooth',fq),o2=mkOsc(C,'sawtooth',fq*1.006),g=mkGain(C,EPS);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.28*v,t+.008);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.28);
+   [o1,o2].forEach(o=>{o.connect(g);o.start(t);o.stop(t+.3);}); g.connect(D); }},
+{id:'lead_sq',name:'리드 (스퀘어)',cat:'melo',color:'#33ccff',ico:'🔷',def:'1000100000100000',
+ fn(C,t,D,v=1,step=0){
+   const n=[440,523,659,784,880,659,523,440];
+   const o=mkOsc(C,'square',n[step%8]),f=mkFilt(C,'lowpass',2000,1),g=mkGain(C,EPS);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.22*v,t+.01);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.3);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.32); }},
+{id:'pad',name:'패드',cat:'melo',color:'#22aaee',ico:'🌊',def:'1000000000000000',
+ fn(C,t,D,v=1){
+   [261,329,392,523].forEach((fr,i)=>{
+     const o=mkOsc(C,'sine',fr*(1+i*.002)),g=mkGain(C,0);
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.09*v,t+.5);
+     g.gain.setValueAtTime(.09*v,t+1.5); g.gain.linearRampToValueAtTime(EPS,t+2.1);
+     o.connect(g);g.connect(D);o.start(t);o.stop(t+2.2); }); }},
+{id:'arp',name:'아르페지오',cat:'melo',color:'#44ddff',ico:'🎹',def:'1010101010101010',
+ fn(C,t,D,v=1,step=0){ const n=[523,659,784,1047,880,784,659,523]; cPoke(C,t,D,'square',n[step%8],.18*v,.004,.12); }},
+{id:'piano',name:'피아노',cat:'melo',color:'#55eeff',ico:'🎹',def:'1000001010000000',
+ fn(C,t,D,v=1){
+   [261,329,392].forEach((fr,i)=>{
+     const o=mkOsc(C,'triangle',fr),g=mkGain(C,EPS);
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime((.28-i*.07)*v,t+.01);
+     g.gain.exponentialRampToValueAtTime(EPS,t+.6+i*.1);
+     o.connect(g);g.connect(D);o.start(t);o.stop(t+.8); }); }},
+{id:'strings',name:'스트링스',cat:'melo',color:'#1199cc',ico:'🎻',def:'1000000000000000',
+ fn(C,t,D,v=1){
+   [261,392,523,659].forEach(fr=>{
+     const o=mkOsc(C,'sawtooth',fr);
+     const vib=mkOsc(C,'sine',5.5),vg=mkGain(C,3.5);
+     vib.connect(vg);vg.connect(o.frequency);
+     const g=mkGain(C,0);
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.065*v,t+.35);
+     g.gain.setValueAtTime(.065*v,t+1.5); g.gain.linearRampToValueAtTime(EPS,t+2.1);
+     o.connect(g);g.connect(D);
+     vib.start(t);o.start(t);vib.stop(t+2.2);o.stop(t+2.2); }); }},
+{id:'brass',name:'브라스',cat:'melo',color:'#0099cc',ico:'🎺',def:'0000100000001001',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',233),f=mkFilt(C,'lowpass',2200,1),g=mkGain(C,0);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.38*v,t+.03);
+   g.gain.setValueAtTime(.28*v,t+.1); g.gain.exponentialRampToValueAtTime(EPS,t+.38);
+   o.connect(f);f.connect(g);g.connect(D);o.start(t);o.stop(t+.4); }},
+{id:'flute',name:'플루트',cat:'melo',color:'#11ccdd',ico:'🎶',def:'1010001010001000',
+ fn(C,t,D,v=1,step=0){
+   const n=[784,880,1047,784,880,698,988,784];
+   const o=mkOsc(C,'sine',n[step%8]),g=mkGain(C,0);
+   cNoise(C,t,D,5000,14000,.022*v,.3,.31);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.22*v,t+.05);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.38);
+   o.connect(g);g.connect(D);o.start(t);o.stop(t+.4); }},
+{id:'guitar',name:'기타',cat:'melo',color:'#0088bb',ico:'🎸',def:'1001001010010010',
+ fn(C,t,D,v=1,step=0){
+   const n=[196,220,247,261,294,330,196,220], fq=n[step%8];
+   [1,2,3,4].forEach(h=>{
+     const o=mkOsc(C,'triangle',fq*h),g=mkGain(C,EPS);
+     const vol=(.22/h)*v, dec=.7/h;
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(vol,t+.008);
+     g.gain.exponentialRampToValueAtTime(EPS,t+dec);
+     o.connect(g);g.connect(D);o.start(t);o.stop(t+dec+.01); });
+   cNoise(C,t,D,200,1200,.08*v,.02,.44); }},
+{id:'marimba',name:'마림바',cat:'melo',color:'#0077aa',ico:'🪘',def:'1010100001000000',
+ fn(C,t,D,v=1,step=0){
+   const n=[523,659,784,1047], fq=n[step%4];
+   [1,4,10].forEach((p,i)=>{
+     const o=mkOsc(C,'sine',fq*p),g=mkGain(C,EPS);
+     const vol=i===0?.38:i===1?.09:.04, dec=i===0?.42:i===1?.15:.07;
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(vol*v,t+.005);
+     g.gain.exponentialRampToValueAtTime(EPS,t+dec);
+     o.connect(g);g.connect(D);o.start(t);o.stop(t+dec+.01); }); }},
+{id:'bells',name:'벨',cat:'melo',color:'#0066aa',ico:'🔔',def:'1000010000100001',
+ fn(C,t,D,v=1,step=0){
+   const n=[1047,1319,1568,2093,1319,1047], fq=n[step%6];
+   [1,2.756,5.404].forEach((r,i)=>{
+     const o=mkOsc(C,'sine',fq*r),g=mkGain(C,EPS);
+     const vol=i===0?.22:i===1?.1:.05;
+     g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(vol*v,t+.004);
+     g.gain.exponentialRampToValueAtTime(EPS,t+1.6-i*.3);
+     o.connect(g);g.connect(D);o.start(t);o.stop(t+1.7); }); }},
+
+/* ── 이펙트 6 ── */
+{id:'scratch',name:'스크래치',cat:'efx',color:'#ff8c1a',ico:'💿',def:'0000100000001100',
+ fn(C,t,D,v=1){
+   const ns=C.createBufferSource();ns.buffer=noiseBuf(C);ns.loop=true;
+   const f=mkFilt(C,'bandpass',2800,2.5),g=mkGain(C,.55*v);
+   g.gain.setValueAtTime(.55*v,t);
+   g.gain.linearRampToValueAtTime(EPS,t+.08);
+   g.gain.linearRampToValueAtTime(.45*v,t+.1);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.18);
+   ns.connect(f);f.connect(g);g.connect(D);ns.start(t,.27);ns.stop(t+.2); }},
+{id:'vinyl',name:'바이닐 노이즈',cat:'efx',color:'#ff9933',ico:'📀',def:'1000000000000000',
+ fn(C,t,D,v=1,step=0){
+   // 예전에는 알갱이 위치·세기가 Math.random이라 매 마디 달랐다 → 스텝 고정
+   for(let i=0;i<4;i++){
+     const dt=fixedRand('vinyl',step,i)*.1;
+     const amp=.08+fixedRand('vinyl',step,i+9)*.14;
+     cNoise(C,t+dt,D,4000,14000,amp*v,.035,.05+i*.19); } }},
+{id:'laser',name:'레이저',cat:'efx',color:'#ffaa44',ico:'⚡',def:'0000000010000000',
+ fn(C,t,D,v=1){ cSweep(C,t,D,'sine',1400,70,.55*v,.25,.22); }},
+{id:'sweep_up',name:'스윕 업',cat:'efx',color:'#ffbb55',ico:'↗️',def:'0000000000000001',
+ fn(C,t,D,v=1){
+   const ns=C.createBufferSource();ns.buffer=noiseBuf(C);ns.loop=true;
+   const f=mkFilt(C,'bandpass',200,3),g=mkGain(C,0);
+   f.frequency.setValueAtTime(200,t); f.frequency.exponentialRampToValueAtTime(9000,t+.5);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.38*v,t+.3);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.52);
+   ns.connect(f);f.connect(g);g.connect(D);ns.start(t,.61);ns.stop(t+.54); }},
+{id:'glitch',name:'글리치',cat:'efx',color:'#ffcc66',ico:'👾',def:'1101010010100110',
+ fn(C,t,D,v=1,step=0){
+   // 예전에는 주파수가 완전 랜덤 → 스텝마다 고정된 값으로 변경
+   const fq=150+fixedRand('glitch',step,0)*2500;
+   cPoke(C,t,D,'square',fq,.28*v,.001,.035);
+   cNoise(C,t+.012,D,fq*.5,Math.min(18000,fq*4),.18*v,.025,.09+step*.07); }},
+{id:'rev_cym',name:'리버스 심벌',cat:'efx',color:'#ee8800',ico:'🔄',def:'0000000000000001',
+ fn(C,t,D,v=1){
+   const ns=C.createBufferSource();ns.buffer=noiseBuf(C);ns.loop=true;
+   const f=mkFilt(C,'highpass',5000),g=mkGain(C,EPS);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.38*v,t+.42);
+   g.gain.linearRampToValueAtTime(EPS,t+.44);
+   ns.connect(f);f.connect(g);g.connect(D);ns.start(t,.83);ns.stop(t+.44); }},
+
+/* ── 보이스 6 ── */
+{id:'vox_hey',name:'"헤이"',cat:'vox',color:'#1af09a',ico:'🗣️',def:'1000000010000000',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',145);
+   const f1=mkFilt(C,'bandpass',800,5.5),g1=mkGain(C,EPS);
+   const f2=mkFilt(C,'bandpass',2000,4.5),g2=mkGain(C,EPS);
+   g1.gain.setValueAtTime(EPS,t); g1.gain.linearRampToValueAtTime(.28*v,t+.04);
+   g1.gain.exponentialRampToValueAtTime(EPS,t+.22);
+   g2.gain.setValueAtTime(.15*v,t); g2.gain.exponentialRampToValueAtTime(EPS,t+.22);
+   o.connect(f1);f1.connect(g1);g1.connect(D);
+   o.connect(f2);f2.connect(g2);g2.connect(D);
+   o.start(t);o.stop(t+.24); }},
+{id:'vox_yeah',name:'"예~"',cat:'vox',color:'#33ff99',ico:'🎤',def:'0000100000000000',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sawtooth',160);
+   o.frequency.setValueAtTime(175,t); o.frequency.exponentialRampToValueAtTime(138,t+.32);
+   const f1=mkFilt(C,'bandpass',700,6),g1=mkGain(C,0);
+   const f2=mkFilt(C,'bandpass',2200,8),g2=mkGain(C,.15*v);
+   g1.gain.setValueAtTime(EPS,t); g1.gain.linearRampToValueAtTime(.28*v,t+.06);
+   g1.gain.setValueAtTime(.22*v,t+.26); g1.gain.exponentialRampToValueAtTime(EPS,t+.42);
+   g2.gain.exponentialRampToValueAtTime(EPS,t+.42);
+   o.connect(f1);f1.connect(g1);g1.connect(D);
+   o.connect(f2);f2.connect(g2);g2.connect(D);
+   o.start(t);o.stop(t+.44); }},
+{id:'scat',name:'스캣',cat:'vox',color:'#44ffaa',ico:'🎵',def:'1010010010010010',
+ fn(C,t,D,v=1,step=0){
+   const n=[220,277,330,220,247,294,330,247];
+   const o=mkOsc(C,'sawtooth',n[step%8]),g=mkGain(C,EPS);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.18*v,t+.01);
+   g.gain.exponentialRampToValueAtTime(EPS,t+.1);
+   o.connect(g);g.connect(D);o.start(t);o.stop(t+.12); }},
+{id:'breath',name:'숨소리',cat:'vox',color:'#55ffbb',ico:'💨',def:'1000000000000000',
+ fn(C,t,D,v=1){ cNoise(C,t,D,2000,10000,.22*v,.25,.37); cPoke(C,t,D,'sine',280,.08*v,.05,.2); }},
+{id:'vox_chop',name:'보컬 쵸프',cat:'vox',color:'#66ffcc',ico:'✂️',def:'0101010101010101',
+ fn(C,t,D,v=1,step=0){
+   const n=[440,523,659,880,1047,880,659,523], fq=n[step%8];
+   cPoke(C,t,D,'sine',fq,.22*v,.002,.07);
+   cPoke(C,t,D,'sine',fq*3,.07*v,.002,.05); }},
+{id:'hum',name:'허밍',cat:'vox',color:'#11ee77',ico:'🎼',def:'1000000010000000',
+ fn(C,t,D,v=1){
+   const o=mkOsc(C,'sine',220);
+   const vib=mkOsc(C,'sine',5.2),vg=mkGain(C,7);
+   vib.connect(vg);vg.connect(o.frequency);
+   const f=mkFilt(C,'bandpass',480,5.5),g=mkGain(C,0);
+   g.gain.setValueAtTime(EPS,t); g.gain.linearRampToValueAtTime(.18*v,t+.12);
+   g.gain.setValueAtTime(.18*v,t+.75); g.gain.linearRampToValueAtTime(EPS,t+1.05);
+   o.connect(f);f.connect(g);g.connect(D);
+   vib.start(t);o.start(t);vib.stop(t+1.1);o.stop(t+1.1); }},
+];
+
+// ═══════════════════════════════════════════════════════
+// 사운드 라이브러리 ②  추가 비트 모음 (100종 · 8장르)
+// ═══════════════════════════════════════════════════════
+const PLUS_SOUNDS = [
+  // ── 판타지 13 ──
+  {id:'fy_kick', name:'판타지 킥',    genre:'fantasy',    cat:'beat', ico:'🥁', fn:_k(140,45,0.55)},
+  {id:'fy_drum', name:'전투 드럼',    genre:'fantasy',    cat:'beat', ico:'🥁', fn:_h(220,7,0.35,'bandpass')},
+  {id:'fy_bell', name:'마법 종',      genre:'fantasy',    cat:'melo', ico:'🔔', fn:_fm(880,1760,220,1.2)},
+  {id:'fy_harp', name:'하프',         genre:'fantasy',    cat:'melo', ico:'🎼', fn:_plk(440,0.7)},
+  {id:'fy_cry',  name:'크리스탈',     genre:'fantasy',    cat:'melo', ico:'💎', fn:_fm(2200,4400,60,0.7)},
+  {id:'fy_elf',  name:'엘프 멜로',    genre:'fantasy',    cat:'melo', ico:'🧝', fn:_t('sine',660,0.01,0.8)},
+  {id:'fy_bass', name:'마법 베이스',  genre:'fantasy',    cat:'bass', ico:'🪄', fn:_k(70,32,1.0)},
+  {id:'fy_orc',  name:'오크 드럼',    genre:'fantasy',    cat:'beat', ico:'👹', fn:_h(120,9,0.4,'lowpass')},
+  {id:'fy_pad',  name:'신비 패드',    genre:'fantasy',    cat:'efx',  ico:'🌌', fn:_pad(220,1.5,4,20)},
+  {id:'fy_lute', name:'류트',         genre:'fantasy',    cat:'melo', ico:'🪕', fn:_plk(330,0.6)},
+  {id:'fy_swp',  name:'마법진 스윕',  genre:'fantasy',    cat:'efx',  ico:'✨', fn:_swp(400,2000,0.8)},
+  {id:'fy_sym',  name:'룬 심벌',      genre:'fantasy',    cat:'beat', ico:'🔯', fn:_h(800,3,0.7,'bandpass')},
+  {id:'fy_horn', name:'판타지 호른',  genre:'fantasy',    cat:'melo', ico:'📯', fn:_t('sawtooth',220,0.05,0.6)},
+
+  // ── 사이버펑크 13 ──
+  {id:'cp_kick', name:'사이버 킥',    genre:'cyberpunk',  cat:'beat', ico:'🔻', fn:_k(80,35,0.5,150)},
+  {id:'cp_snr',  name:'글리치 스네어',genre:'cyberpunk',  cat:'beat', ico:'💥', fn:_h(2500,2,0.12,'highpass')},
+  {id:'cp_hh',   name:'디지털 HH',    genre:'cyberpunk',  cat:'beat', ico:'🎩', fn:_h(9000,0.4,0.04,'highpass')},
+  {id:'cp_bass', name:'네온 베이스',  genre:'cyberpunk',  cat:'bass', ico:'🟣', fn:_k(55,40,0.8,200)},
+  {id:'cp_lead', name:'사이버 리드',  genre:'cyberpunk',  cat:'melo', ico:'🔷', fn:_t('sawtooth',440,0.001,0.35)},
+  {id:'cp_arp',  name:'데이터 아르페',genre:'cyberpunk',  cat:'melo', ico:'💠', fn:_fm(440,880,90,0.2)},
+  {id:'cp_dist', name:'글리치 톤',    genre:'cyberpunk',  cat:'efx',  ico:'👾', fn:_t('square',220,0.001,0.28)},
+  {id:'cp_stat', name:'정적 노이즈',  genre:'cyberpunk',  cat:'efx',  ico:'📺', fn:_h(3500,0.3,0.18,'bandpass')},
+  {id:'cp_scan', name:'스캐너 빔',    genre:'cyberpunk',  cat:'efx',  ico:'🔦', fn:_swp(300,4000,0.5)},
+  {id:'cp_perc', name:'사이버 퍼쿠션',genre:'cyberpunk',  cat:'beat', ico:'⚡', fn:_mhit(1200,1800,0.15)},
+  {id:'cp_nbas', name:'뉴로 베이스',  genre:'cyberpunk',  cat:'bass', ico:'🧠', fn:_k(60,45,0.9,300)},
+  {id:'cp_vox',  name:'사이버 보이스',genre:'cyberpunk',  cat:'melo', ico:'🤖', fn:_fm(440,220,160,0.45)},
+  {id:'cp_ohh',  name:'오픈 사이버HH',genre:'cyberpunk',  cat:'beat', ico:'🎩', fn:_h(11000,0.3,0.25,'highpass')},
+
+  // ── 기계풍 12 ──
+  {id:'mc_gear', name:'기어 클릭',    genre:'mechanical', cat:'beat', ico:'⚙️', fn:_h(5000,25,0.018,'bandpass')},
+  {id:'mc_pist', name:'스팀 피스톤',  genre:'mechanical', cat:'beat', ico:'🔧', fn:_h(300,5,0.28,'lowpass')},
+  {id:'mc_meta', name:'금속 타격',    genre:'mechanical', cat:'beat', ico:'🔨', fn:_mhit(220,370,0.3)},
+  {id:'mc_kick', name:'공장 킥',      genre:'mechanical', cat:'beat', ico:'🏭', fn:_k(100,40,0.42,100)},
+  {id:'mc_rvt',  name:'리벳 건',      genre:'mechanical', cat:'beat', ico:'🔩', fn:_h(400,2,0.07,'highpass')},
+  {id:'mc_stm',  name:'증기 방출',    genre:'mechanical', cat:'efx',  ico:'💨', fn:_h(1500,0.4,0.4,'bandpass')},
+  {id:'mc_drl',  name:'드릴',         genre:'mechanical', cat:'efx',  ico:'🪛', fn:_t('sawtooth',80,0.001,0.22)},
+  {id:'mc_rail', name:'철길',         genre:'mechanical', cat:'beat', ico:'🛤️', fn:_mhit(3000,3500,0.06)},
+  {id:'mc_bass', name:'공장 베이스',  genre:'mechanical', cat:'bass', ico:'🛢️', fn:_k(80,38,0.55,120)},
+  {id:'mc_chn',  name:'체인',         genre:'mechanical', cat:'beat', ico:'⛓️', fn:_h(2000,10,0.04,'bandpass')},
+  {id:'mc_boil', name:'보일러 드론',  genre:'mechanical', cat:'efx',  ico:'🔥', fn:_pad(55,1.5,2,30)},
+  {id:'mc_pump', name:'펌프',         genre:'mechanical', cat:'beat', ico:'🫧', fn:_k(120,55,0.35,60)},
+
+  // ── 재즈 12 ──
+  {id:'jz_kick', name:'재즈 킥',      genre:'jazz',       cat:'beat', ico:'🥁', fn:_k(110,50,0.45)},
+  {id:'jz_brsh', name:'브러쉬 스네어',genre:'jazz',       cat:'beat', ico:'🧹', fn:_h(900,1.5,0.22,'bandpass')},
+  {id:'jz_swhh', name:'스윙 HH',      genre:'jazz',       cat:'beat', ico:'🎩', fn:_h(10000,0.4,0.07,'highpass')},
+  {id:'jz_ride', name:'라이드 심벌',  genre:'jazz',       cat:'beat', ico:'🥽', fn:_h(6500,0.7,0.45,'highpass')},
+  {id:'jz_bass', name:'재즈 베이스',  genre:'jazz',       cat:'bass', ico:'🎻', fn:_plk(82,0.85)},
+  {id:'jz_pno',  name:'피아노 코드',  genre:'jazz',       cat:'melo', ico:'🎹', fn:_chord([261,330,392],'sine',0.4)},
+  {id:'jz_tpt',  name:'트럼펫',       genre:'jazz',       cat:'melo', ico:'🎺', fn:_t('sawtooth',440,0.02,0.45)},
+  {id:'jz_flt',  name:'플루트',       genre:'jazz',       cat:'melo', ico:'🎶', fn:_t('sine',880,0.05,0.5)},
+  {id:'jz_gtr',  name:'재즈 기타',    genre:'jazz',       cat:'melo', ico:'🎸', fn:_plk(196,0.65)},
+  {id:'jz_org',  name:'오르간',       genre:'jazz',       cat:'melo', ico:'🎛️', fn:_chord([220,277,330,415],'sine',0.9)},
+  {id:'jz_uke',  name:'우쿨렐레',     genre:'jazz',       cat:'melo', ico:'🪕', fn:_plk(392,0.5)},
+  {id:'jz_shk',  name:'셰이커',       genre:'jazz',       cat:'beat', ico:'🥤', fn:_h(7000,0.5,0.1,'highpass')},
+
+  // ── EDM 13 ──
+  {id:'edm_kick',name:'EDM 킥',       genre:'edm',        cat:'beat', ico:'🔴', fn:_k(100,38,0.62,60)},
+  {id:'edm_clap',name:'클랩',         genre:'edm',        cat:'beat', ico:'👏', fn:_h(1200,2,0.11,'bandpass')},
+  {id:'edm_snr', name:'EDM 스네어',   genre:'edm',        cat:'beat', ico:'💥', fn:_h(1500,3,0.14,'bandpass')},
+  {id:'edm_chh', name:'클로즈 HH',    genre:'edm',        cat:'beat', ico:'🎩', fn:_h(12000,0.5,0.03,'highpass')},
+  {id:'edm_ohh', name:'오픈 HH',      genre:'edm',        cat:'beat', ico:'🎩', fn:_h(11000,0.4,0.3,'highpass')},
+  {id:'edm_lead',name:'신스 리드',    genre:'edm',        cat:'melo', ico:'🔵', fn:_t('sawtooth',440,0.01,0.28)},
+  {id:'edm_saw', name:'슈퍼소',       genre:'edm',        cat:'melo', ico:'🌈', fn:_pad(440,0.8,5,20)},
+  {id:'edm_arp', name:'아르페',       genre:'edm',        cat:'melo', ico:'🎹', fn:_fm(880,440,80,0.15)},
+  {id:'edm_drop',name:'드롭 베이스',  genre:'edm',        cat:'bass', ico:'⬇️', fn:_k(55,43,0.9,80)},
+  {id:'edm_wob', name:'워블 베이스',  genre:'edm',        cat:'bass', ico:'🌊', fn:_k(60,45,0.7,200)},
+  {id:'edm_plk', name:'플럭 신스',    genre:'edm',        cat:'melo', ico:'💫', fn:_plk(880,0.35)},
+  {id:'edm_bld', name:'빌드 노이즈',  genre:'edm',        cat:'efx',  ico:'↗️', fn:_swp(200,4000,0.9)},
+  {id:'edm_pad', name:'신스 패드',    genre:'edm',        cat:'efx',  ico:'🌫️', fn:_pad(220,0.85,4,18)},
+
+  // ── 힙합 12 ──
+  {id:'hh_808k', name:'808 킥',       genre:'hiphop',     cat:'beat', ico:'🔴', fn:_k(80,38,1.05)},
+  {id:'hh_snap', name:'스냅',         genre:'hiphop',     cat:'beat', ico:'🫰', fn:_h(5000,15,0.035,'bandpass')},
+  {id:'hh_trhh', name:'트랩 HH',      genre:'hiphop',     cat:'beat', ico:'🎩', fn:_h(16000,0.3,0.03,'highpass')},
+  {id:'hh_808b', name:'808 베이스',   genre:'hiphop',     cat:'bass', ico:'〰️', fn:_k(55,48,1.4)},
+  {id:'hh_snr',  name:'힙합 스네어',  genre:'hiphop',     cat:'beat', ico:'💥', fn:_h(1000,2,0.19,'bandpass')},
+  {id:'hh_chh',  name:'클로즈 HH',    genre:'hiphop',     cat:'beat', ico:'🎩', fn:_h(13000,0.6,0.025,'highpass')},
+  {id:'hh_bbk',  name:'붐뱁 킥',      genre:'hiphop',     cat:'beat', ico:'🥊', fn:_k(90,35,0.55)},
+  {id:'hh_pno',  name:'피아노 찹',    genre:'hiphop',     cat:'melo', ico:'🎹', fn:_plk(523,0.2)},
+  {id:'hh_bras', name:'브라스 히트',  genre:'hiphop',     cat:'melo', ico:'🎺', fn:_chord([440,550,660],'sawtooth',0.25)},
+  {id:'hh_scr',  name:'스크래치',     genre:'hiphop',     cat:'efx',  ico:'💿', fn:_swp(800,200,0.3)},
+  {id:'hh_ohh',  name:'오픈 HH 트랩', genre:'hiphop',     cat:'beat', ico:'🎩', fn:_h(13000,0.3,0.2,'highpass')},
+  {id:'hh_sub',  name:'서브 베이스',  genre:'hiphop',     cat:'bass', ico:'🔊', fn:_k(41,35,1.8)},
+
+  // ── 앰비언트 12 ──
+  {id:'am_drn',  name:'드론 패드',    genre:'ambient',    cat:'efx',  ico:'🌫️', fn:_pad(110,4,5,18)},
+  {id:'am_rain', name:'레인 드롭',    genre:'ambient',    cat:'efx',  ico:'🌧️', fn:_h(4000,0.3,0.55,'bandpass')},
+  {id:'am_wind', name:'윈드',         genre:'ambient',    cat:'efx',  ico:'🍃', fn:_h(800,0.5,1.1,'lowpass')},
+  {id:'am_spc',  name:'딥 스페이스',  genre:'ambient',    cat:'efx',  ico:'🪐', fn:_pad(55,3,5,25)},
+  {id:'am_auro', name:'오로라',       genre:'ambient',    cat:'melo', ico:'🌌', fn:_pad(1320,2,4,22)},
+  {id:'am_cave', name:'동굴 에코',    genre:'ambient',    cat:'efx',  ico:'🕳️', fn:_fm(220,440,55,2)},
+  {id:'am_rvr',  name:'강물',         genre:'ambient',    cat:'efx',  ico:'🏞️', fn:_h(2000,0.2,1.4,'bandpass')},
+  {id:'am_bell', name:'명상 벨',      genre:'ambient',    cat:'melo', ico:'🔔', fn:_fm(440,880,70,2.5)},
+  {id:'am_upad', name:'우주 패드',    genre:'ambient',    cat:'efx',  ico:'🚀', fn:_pad(165,3,6,28)},
+  {id:'am_cry',  name:'크리스탈 볼',  genre:'ambient',    cat:'melo', ico:'🔮', fn:_fm(528,1056,90,3)},
+  {id:'am_brth', name:'명상 호흡',    genre:'ambient',    cat:'efx',  ico:'💨', fn:_swp(200,800,1.2)},
+  {id:'am_drop', name:'물방울',       genre:'ambient',    cat:'beat', ico:'💧', fn:_fm(1200,2400,40,0.4)},
+
+  // ── 오케스트라 13 ──
+  {id:'oc_timp', name:'팀파니',       genre:'orchestral', cat:'beat', ico:'🥁', fn:_k(180,80,0.65)},
+  {id:'oc_str',  name:'현악 트레몰로',genre:'orchestral', cat:'melo', ico:'🎻', fn:_t('sawtooth',330,0.03,0.8)},
+  {id:'oc_brs',  name:'금관 팡파르',  genre:'orchestral', cat:'melo', ico:'🎺', fn:_chord([220,275,330,440],'sawtooth',0.7)},
+  {id:'oc_ww',   name:'목관 멜로디',  genre:'orchestral', cat:'melo', ico:'🎶', fn:_t('sawtooth',523,0.05,0.55)},
+  {id:'oc_cel',  name:'첼로',         genre:'orchestral', cat:'bass', ico:'🎻', fn:_t('sawtooth',165,0.08,0.85)},
+  {id:'oc_vln',  name:'바이올린',     genre:'orchestral', cat:'melo', ico:'🎻', fn:_t('sawtooth',660,0.03,0.55)},
+  {id:'oc_piz',  name:'피치카토',     genre:'orchestral', cat:'melo', ico:'🤏', fn:_plk(220,0.4)},
+  {id:'oc_hrn',  name:'프렌치 호른',  genre:'orchestral', cat:'melo', ico:'📯', fn:_t('sawtooth',220,0.06,0.65)},
+  {id:'oc_flt',  name:'팬플루트',     genre:'orchestral', cat:'melo', ico:'🎼', fn:_t('sine',440,0.09,0.55)},
+  {id:'oc_harp', name:'하프 글리산도',genre:'orchestral', cat:'melo', ico:'🎼', fn:_plk(523,0.45)},
+  {id:'oc_drl',  name:'오케 드럼롤',  genre:'orchestral', cat:'beat', ico:'🥁', fn:_h(400,4,0.6,'bandpass')},
+  {id:'oc_tam',  name:'탐탐',         genre:'orchestral', cat:'beat', ico:'🔆', fn:(C,t,D,v=1)=>{_mhit(150,225,1.2)(C,t,D,v);_h(400,3,0.5,'lowpass')(C,t,D,v*0.5);}},
+  {id:'oc_ob',   name:'오보에',       genre:'orchestral', cat:'melo', ico:'🎵', fn:_chord([440,880,1320],'sine',0.5)},
+];
+
+// ─── 장르 / 계열 ──────────────────────────────────────
+const GENRES = {
+  fantasy:    {name:'판타지',     color:'#c09af5', emoji:'🧙', bpm:100},
+  cyberpunk:  {name:'사이버펑크', color:'#00ffd5', emoji:'🤖', bpm:128},
+  mechanical: {name:'기계풍',     color:'#ff8c1a', emoji:'⚙️', bpm:118},
+  jazz:       {name:'재즈',       color:'#f5cc60', emoji:'🎷', bpm:104},
+  edm:        {name:'EDM',        color:'#ff3d55', emoji:'🎧', bpm:128},
+  hiphop:     {name:'힙합',       color:'#9a3fff', emoji:'🎤', bpm:90},
+  ambient:    {name:'앰비언트',   color:'#18b8ff', emoji:'🌊', bpm:72},
+  orchestral: {name:'오케스트라', color:'#f5a340', emoji:'🎻', bpm:96},
+};
+const CATS = {
+  beat:{name:'비트',   color:'#ff3d55'},
+  bass:{name:'베이스', color:'#9a3fff'},
+  melo:{name:'멜로디', color:'#18b8ff'},
+  efx: {name:'이펙트', color:'#ff8c1a'},
+  vox: {name:'보이스', color:'#1af09a'},
+};
+const PACKS = {
+  core:{name:'초기 비트 모음', short:'초기', color:'#18b8ff', emoji:'🎛'},
+  plus:{name:'추가 비트 모음', short:'추가', color:'#1af09a', emoji:'✨'},
+};
+
+// ─── 기본 패턴 ────────────────────────────────────────
+const patternFromBits = bits => [...bits].map(b => b === '1');
+const GROOVE_BANKS = {
+  beat: ['1000100010001000','1000001001001000','1010001010001010','1001000010010010'],
+  bass: ['1000001010001000','1001000010010010','1010001010100000','1000101001001010'],
+  melo: ['1000001000100001','0010001000001010','1000100000100100','0001001001000001'],
+  efx:  ['0000000000000001','0000100000001000','1000000000000000','0000000010000000'],
+  vox:  ['1000000010000000','0000100000001000','1010010010010010','0101010101010101'],
+};
+function bankIndex(id, count) {
+  let n = 0;
+  for (let i = 0; i < id.length; i++) n = (n * 31 + id.charCodeAt(i)) >>> 0;
+  return n % count;
+}
+function roleOf(s) {
+  const n = s.name.toLowerCase();
+  if (/킥|kick|피스톤|펌프|팀파니/.test(n)) return 'kick';
+  if (/스네어|snare|클랩|clap|브러쉬|스냅/.test(n)) return 'snare';
+  if (/hh|하이햇|셰이커|심벌|라이드|리벳|기어|철길|체인/.test(n)) return 'hat';
+  return '';
+}
+// 추가 묶음 사운드의 기본 리듬 — 사운드 id에서 정해지므로 항상 같다
+function defaultBits(s) {
+  const role = roleOf(s);
+  if (role === 'kick')  return '1000100010001000';
+  if (role === 'snare') return '0000100000001000';
+  if (role === 'hat')   return '1010101010101010';
+  const bank = GROOVE_BANKS[s.cat] || GROOVE_BANKS.melo;
+  return bank[bankIndex(s.id, bank.length)];
+}
+
+// ─── 통합 라이브러리 ──────────────────────────────────
+const SOUNDS = [
+  ...CORE_SOUNDS.map(s => ({
+    ...s, pack:'core', genre:'core',
+    color: s.color || CATS[s.cat].color,
+    sub: '초기 · ' + CATS[s.cat].name,
+  })),
+  ...PLUS_SOUNDS.map(s => ({
+    ...s, pack:'plus',
+    color: GENRES[s.genre].color,
+    ico: s.ico || '🎵',
+    def: defaultBits(s),
+    sub: GENRES[s.genre].emoji + ' ' + GENRES[s.genre].name,
+  })),
+];
+const SND_MAP = new Map(SOUNDS.map(s => [s.id, s]));
+const sndColor = id => SND_MAP.get(id)?.color || '#888';
+const sndName  = id => SND_MAP.get(id)?.name || '(없는 사운드)';
+const sndIco   = id => SND_MAP.get(id)?.ico || '🎵';
+const starterPattern = id => patternFromBits(SND_MAP.get(id)?.def || '1000100010001000');
+const COUNT_CORE = CORE_SOUNDS.length, COUNT_PLUS = PLUS_SOUNDS.length;
+
+// ═══════════════════════════════════════════════════════
+// 상태 · 저장소
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'incx4_playlist';
+const OLD_KEYS = ['incx2_playlist'];      // v2·v3에서 저장한 목록
+const NOW_KEY = 'incx4_now';              // 팝업 플레이어로 넘기는 현재 비트
+
+let slots = [];
+let bpm = 120;
+let isPlaying = false;
+let curStep = -1;      // 스케줄러가 마지막으로 예약한 스텝
+let dispStep = -1;     // 화면에 표시 중인 스텝 (실제 소리와 동기)
+let schedQ = [];
+let nextTime = 0;
+let schedTid = null;
+let palCat = 'all';
+let palPack = 'all';
+let palQ = '';
+let curBeatId = null;
+let curName = '새 비트';
+let playlist = [];
+let exportQueue = [];
+let expSelIdx = -1;
+let mgrSel = null;
+let miniWin = null;
+
+function normPattern(p) {
+  const out = new Array(STEPS).fill(0);
+  if (Array.isArray(p)) for (let i = 0; i < STEPS; i++) out[i] = p[i] ? 1 : 0;
+  else if (typeof p === 'string') for (let i = 0; i < STEPS; i++) out[i] = p[i] === '1' ? 1 : 0;
+  return out;
+}
+function normBeat(b) {
+  return {
+    id: typeof b.id === 'string' && b.id ? b.id : uid(),
+    name: String(b.name || '이름 없음').slice(0, 40),
+    bpm: clamp(parseInt(b.bpm) || 120, 40, 300),
+    slots: (Array.isArray(b.slots) ? b.slots : []).map(s => {
+      if (!s) return null;
+      // v1은 slot.id에 사운드 id를 넣었고 v2+는 soundId를 쓴다.
+      // 초기 42종이 그대로 살아 있으므로 v1 곡도 원래 음색으로 열린다.
+      const soundId = s.soundId && SND_MAP.has(s.soundId) ? s.soundId
+                    : (SND_MAP.has(s.id) ? s.id : null);
+      if (!soundId) return null;
+      return {
+        soundId,
+        label: s.label ? String(s.label).slice(0, 24) : '',
+        pattern: normPattern(s.pattern),
+        vol: clamp(parseFloat(s.vol) || 0.8, 0, 1),
+        mute: !!s.mute,
+      };
+    }).filter(Boolean),
+  };
+}
+function readList(key) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || '[]');
+    const arr = Array.isArray(raw) ? raw : (Array.isArray(raw.playlist) ? raw.playlist : []);
+    return arr.map(normBeat);
+  } catch { return []; }
+}
+function loadPlaylist() {
+  const mine = readList(STORE_KEY);
+  if (mine.length) return mine;
+  // 예전 버전에서 저장한 목록을 그대로 이어받는다 (원본 키는 건드리지 않음)
+  for (const k of OLD_KEYS) {
+    const old = readList(k);
+    if (old.length) return old;
+  }
+  return [];
+}
+function persist() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(playlist)); }
+  catch (e) { toast('저장 공간이 부족합니다'); }
+}
+playlist = loadPlaylist();
+
+// ═══════════════════════════════════════════════════════
+// 시퀀서
+// ═══════════════════════════════════════════════════════
+const AHEAD = 0.12, LOOK_MS = 22;
+const slotGains = new Map();
+
+function stepDur() { return 60 / bpm / 4; }
+
+function slotGain(slot) {
+  let g = slotGains.get(slot.id);
+  if (!g) { g = getAC().createGain(); g.connect(SEQ); slotGains.set(slot.id, g); }
+  return g;
+}
+function pruneSlotGains() {
+  const ids = new Set(slots.map(s => s.id));
+  slotGains.forEach((g, id) => {
+    if (!ids.has(id)) { try { g.disconnect(); } catch (e) {} slotGains.delete(id); }
+  });
+}
+
+function schedStep(step, t) {
+  const C = getAC();
+  for (const slot of slots) {
+    if (slot.mute || !slot.pattern[step]) continue;
+    const snd = SND_MAP.get(slot.soundId);
+    if (!snd) continue;
+    const g = slotGain(slot);
+    g.gain.value = slot.vol;
+    try { snd.fn(C, t, g, 1, step); } catch (e) {}
+  }
+  schedQ.push({ step, t });
+  if (schedQ.length > 200) schedQ.splice(0, schedQ.length - 200);
+}
+
+function scheduler() {
+  const C = getAC();
+  let guard = 0;
+  while (nextTime < C.currentTime + AHEAD && guard++ < 64) {
+    const step = (curStep + 1) % STEPS;
+    schedStep(step, nextTime);
+    curStep = step;
+    nextTime += stepDur();
+  }
+  schedTid = setTimeout(scheduler, LOOK_MS);
+}
+
+function startSeq() {
+  const C = getAC();
+  const now = C.currentTime;
+  SEQ.gain.cancelScheduledValues(now);
+  SEQ.gain.setValueAtTime(0, now);
+  SEQ.gain.linearRampToValueAtTime(1, now + 0.02);
+  curStep = -1; schedQ = []; nextTime = now + 0.06;
+  clearTimeout(schedTid);
+  scheduler();
+}
+
+function stopSeq() {
+  clearTimeout(schedTid); schedTid = null;
+  if (AC && SEQ) {
+    const now = AC.currentTime;
+    SEQ.gain.cancelScheduledValues(now);
+    SEQ.gain.setValueAtTime(SEQ.gain.value, now);
+    SEQ.gain.linearRampToValueAtTime(0, now + 0.05);
+  }
+  curStep = -1; schedQ = [];
+  setCursor(-1);
+}
+
+function setPlaying(on) {
+  if (on === isPlaying) return;
+  isPlaying = on;
+  if (isPlaying) startSeq(); else stopSeq();
+  const b = $(IS_MINI ? 'mPlay' : 'playBtn');
+  if (b) { b.textContent = isPlaying ? '⏸' : '▶'; b.classList.toggle('on', isPlaying); }
+}
+function togglePlay() { getAC(); setPlaying(!isPlaying); }
+
+function preview(soundId, vol = 0.7) {
+  const C = getAC();
+  const snd = SND_MAP.get(soundId);
+  if (!snd) return;
+  const g = C.createGain(); g.gain.value = vol; g.connect(MASTER);
+  try { snd.fn(C, C.currentTime + 0.02, g, 1, 0); } catch (e) {}
+  setTimeout(() => { try { g.disconnect(); } catch (e) {} }, 4500);
+}
+
+// ═══════════════════════════════════════════════════════
+// 비주얼라이저 · 커서
+// ═══════════════════════════════════════════════════════
+let vizData = null;
+function drawViz() {
+  requestAnimationFrame(drawViz);
+  const cv = $('viz');
+  if (!cv || !ANA) return;
+  const g2 = cv.getContext('2d');
+  if (!vizData || vizData.length !== ANA.frequencyBinCount) vizData = new Uint8Array(ANA.frequencyBinCount);
+  ANA.getByteFrequencyData(vizData);
+  g2.clearRect(0, 0, cv.width, cv.height);
+  const n = Math.floor(vizData.length / 3);
+  const bw = cv.width / n;
+  for (let i = 0; i < n; i++) {
+    const h = (vizData[i] / 255) * cv.height;
+    if (h < 0.5) continue;
+    g2.fillStyle = `hsl(${185 + i * 1.6}, 80%, ${45 + (vizData[i] / 255) * 25}%)`;
+    g2.fillRect(i * bw, cv.height - h, Math.max(1, bw - 1), h);
+  }
+}
+
+function setCursor(step) {
+  if (dispStep === step) return;
+  document.querySelectorAll('.step.cur').forEach(e => e.classList.remove('cur'));
+  dispStep = step;
+  if (step < 0) {
+    document.querySelectorAll('.ch.hit').forEach(e => e.classList.remove('hit'));
+    document.querySelectorAll('.slot-card.fire').forEach(e => e.classList.remove('fire'));
+    const si = $('infoStep'); if (si) si.textContent = '-';
+    return;
+  }
+  document.querySelectorAll(`.step[data-s="${step}"]`).forEach(e => e.classList.add('cur'));
+
+  // 크루 · 카드 반응 (인크레디믹스처럼 소리 나는 캐릭터가 움직인다)
+  slots.forEach(slot => {
+    const hit = !slot.mute && !!slot.pattern[step];
+    const ch = document.querySelector(`.ch[data-id="${slot.id}"]`);
+    if (ch) ch.classList.toggle('hit', hit);
+    const card = document.querySelector(`.slot-card[data-id="${slot.id}"]`);
+    if (card) card.classList.toggle('fire', hit);
+  });
+  const dot = $('beatDot');
+  if (dot && step % 4 === 0) { dot.classList.add('on'); setTimeout(() => dot.classList.remove('on'), 70); }
+  const si = $('infoStep'); if (si) si.textContent = step + 1;
+}
+
+function animCursor() {
+  requestAnimationFrame(animCursor);
+  if (!isPlaying || !AC) { if (dispStep !== -1) setCursor(-1); return; }
+  const now = AC.currentTime;
+  let s = dispStep;
+  while (schedQ.length && schedQ[0].t <= now) s = schedQ.shift().step;
+  if (s !== dispStep) setCursor(s);
+}
+
+// ═══════════════════════════════════════════════════════
+// 프리셋 — 전부 고정 패턴
+// (예전에는 판타지·사이버펑크·오케스트라·기계풍·앰비언트가
+//  누를 때마다 랜덤이었다. 이제 같은 버튼은 항상 같은 비트다.)
+// ═══════════════════════════════════════════════════════
+const PRESETS = [
+  {key:'p_hiphop', label:'힙합', pack:'core', bpm:92, tracks:[
+    ['kick_hard','1000001000100000',0.95],
+    ['snare',    '0000100000001000',0.85],
+    ['hihat_cl', '1010101010101010',0.55],
+    ['hihat_op', '0000000000100000',0.5],
+    ['bass_deep','1000001010000010',0.8],
+    ['lead_saw', '0000001000001000',0.5],
+    ['vox_hey',  '1000000000000000',0.55],
+  ]},
+  {key:'p_edm', label:'EDM', pack:'core', bpm:128, tracks:[
+    ['kick_hard','1000100010001000',0.95],
+    ['clap',     '0000100000001000',0.8],
+    ['hihat_cl', '0010001000100010',0.5],
+    ['hihat_op', '0000000000001000',0.45],
+    ['bass_synth','1000101000101000',0.75],
+    ['arp',      '1010101010101010',0.45],
+    ['pad',      '1000000000000000',0.4],
+    ['sweep_up', '0000000000000001',0.5],
+  ]},
+  {key:'p_jazz', label:'재즈', pack:'core', bpm:104, tracks:[
+    ['kick_soft',   '1000000000100000',0.75],
+    ['snare_ghost', '0010010000100100',0.5],
+    ['hihat_cl',    '1010101010101010',0.42],
+    ['bass_walk',   '1010101010101010',0.75],
+    ['piano',       '0000001000001010',0.5],
+    ['strings',     '1000000000000000',0.35],
+    ['hum',         '1000000010000000',0.4],
+  ]},
+  {key:'p_latin', label:'라틴', pack:'core', bpm:110, tracks:[
+    ['conga',    '0100010001000100',0.7],
+    ['clap',     '0000100000001000',0.7],
+    ['rimshot',  '0010001000100010',0.5],
+    ['bass_sub', '1000000010000000',0.8],
+    ['bass_funk','1001010010010100',0.6],
+    ['marimba',  '1010100001000000',0.55],
+    ['vox_yeah', '0000100000000000',0.5],
+  ]},
+  {key:'p_trap', label:'트랩', pack:'core', bpm:140, tracks:[
+    ['kick_808', '1000000010000000',0.95],
+    ['snare',    '0000000010000000',0.8],
+    ['hihat_cl', '1010101010111010',0.5],
+    ['hihat_op', '0000000000001000',0.45],
+    ['bass_acid','1001100010011000',0.7],
+    ['lead_sq',  '1000100000100000',0.45],
+    ['vox_chop', '0101010101010101',0.4],
+  ]},
+  {key:'p_fantasy', label:'판타지', pack:'plus', bpm:100, tracks:[
+    ['fy_kick','1000001010000000',0.9],
+    ['fy_drum','0000100000001000',0.7],
+    ['fy_sym', '0000000000000010',0.45],
+    ['fy_bass','1000000010000010',0.75],
+    ['fy_harp','1010001000101000',0.55],
+    ['fy_bell','0000000010000000',0.45],
+    ['fy_pad', '1000000000000000',0.4],
+  ]},
+  {key:'p_cyber', label:'사이버펑크', pack:'plus', bpm:128, tracks:[
+    ['cp_kick','1000000010100000',0.95],
+    ['cp_snr', '0000100000001000',0.8],
+    ['cp_hh',  '1010101010101110',0.5],
+    ['cp_bass','1000001010000010',0.8],
+    ['cp_arp', '0010001000100010',0.5],
+    ['cp_lead','0000000010000100',0.45],
+    ['cp_stat','0000000000000001',0.35],
+  ]},
+  {key:'p_orch', label:'오케스트라', pack:'plus', bpm:96, tracks:[
+    ['oc_timp','1000000010000000',0.9],
+    ['oc_drl', '0000000000001000',0.5],
+    ['oc_cel', '1000001010000000',0.7],
+    ['oc_str', '1000000000100000',0.5],
+    ['oc_brs', '0000100000001001',0.55],
+    ['oc_vln', '0010001000001000',0.45],
+    ['oc_tam', '0000000000000001',0.5],
+  ]},
+  {key:'p_mech', label:'기계풍', pack:'plus', bpm:118, tracks:[
+    ['mc_kick','1000100010001000',0.9],
+    ['mc_meta','0000100000001000',0.7],
+    ['mc_gear','1010101010101010',0.45],
+    ['mc_bass','1001001010010010',0.75],
+    ['mc_pist','0010000000100000',0.55],
+    ['mc_chn', '0001000100010001',0.4],
+    ['mc_boil','1000000000000000',0.4],
+  ]},
+  {key:'p_ambient', label:'앰비언트', pack:'plus', bpm:72, tracks:[
+    ['am_drn', '1000000000000000',0.55],
+    ['am_upad','0000000010000000',0.45],
+    ['am_bell','1000000000100000',0.45],
+    ['am_drop','0010000000001000',0.4],
+    ['am_wind','1000000000000000',0.35],
+    ['am_rain','0000100000000010',0.3],
+  ]},
+  {key:'p_mix', label:'믹스 (초기+추가)', pack:'plus', bpm:112, tracks:[
+    ['kick_hard','1000100010001000',0.9],
+    ['edm_clap', '0000100000001000',0.75],
+    ['hihat_cl', '1010101010101010',0.45],
+    ['hh_808b',  '1000001010000000',0.75],
+    ['marimba',  '1010100001000000',0.5],
+    ['fy_harp',  '0010001000001000',0.45],
+    ['vox_hey',  '1000000000000000',0.5],
+    ['cp_stat',  '0000000000000001',0.3],
+  ]},
+];
+
+function loadPreset(key, userAction) {
+  const p = PRESETS.find(x => x.key === key);
+  if (!p) return;
+  if (userAction) getAC();
+  slots = p.tracks
+    .filter(([id]) => SND_MAP.has(id))
+    .map(([id, bits, vol]) => ({
+      id: uid(), soundId: id, label: '',
+      pattern: patternFromBits(bits || SND_MAP.get(id).def),
+      vol: vol == null ? 0.8 : vol, mute: false,
+    }));
+  setBPM(p.bpm);
+  setCurBeat(null, p.label + ' 프리셋');
+  renderStage();
+}
+
+// ═══════════════════════════════════════════════════════
+// 랜덤 생성 — 명시적으로 🎲 버튼을 눌렀을 때만 동작
+// ═══════════════════════════════════════════════════════
+const RHYTH_RULES = {
+  fantasy:    {kick:[[0,1],[8,0.85],[4,0.3],[12,0.5]], snare:[[4,0.7],[12,0.8]], ex:0.12},
+  cyberpunk:  {kick:[[0,1],[4,0.4],[8,0.9],[10,0.55],[14,0.6]], snare:[[4,0.9],[12,0.9],[2,0.3],[6,0.3]], ex:0.2},
+  mechanical: {kick:[[0,1],[4,1],[8,1],[12,1]], snare:[[4,1],[12,1]], ex:0.05},
+  jazz:       {kick:[[0,0.9],[6,0.6],[10,0.7],[14,0.5]], snare:[[4,0.8],[12,0.8],[7,0.5],[15,0.5]], ex:0.1},
+  edm:        {kick:[[0,1],[4,1],[8,1],[12,1]], snare:[[4,1],[12,1],[2,0.4],[6,0.4],[10,0.4],[14,0.4]], ex:0.15},
+  hiphop:     {kick:[[0,1],[6,0.8],[10,0.7]], snare:[[4,1],[12,1],[8,0.3]], ex:0.18},
+  ambient:    {kick:[[0,0.35],[8,0.35]], snare:[[8,0.25]], ex:0.04},
+  orchestral: {kick:[[0,1],[8,0.9],[4,0.5]], snare:[[4,0.7],[12,0.8],[2,0.3]], ex:0.1},
+  core:       {kick:[[0,1],[4,0.5],[8,0.95],[12,0.5]], snare:[[4,0.9],[12,0.9]], ex:0.14},
+};
+
+function genRhyPat(key, isBeat, isBass) {
+  const r = RHYTH_RULES[key] || RHYTH_RULES.edm;
+  const p = new Array(STEPS).fill(false);
+  if (isBass) {
+    (r.kick || []).forEach(([s, pr]) => { if (Math.random() < pr * 0.65) p[s] = true; });
+    for (let i = 0; i < STEPS; i++) if (!p[i] && Math.random() < 0.04) p[i] = true;
+  } else if (isBeat) {
+    [...(r.kick || []), ...(r.snare || [])].forEach(([s, pr]) => {
+      if (s !== undefined && Math.random() < pr) p[s] = true;
+    });
+    for (let i = 0; i < STEPS; i++) if (!p[i] && Math.random() < (r.ex || 0.1)) p[i] = true;
+  } else {
+    const dens = key === 'ambient' ? 0.07 : key === 'orchestral' ? 0.22 : 0.18;
+    for (let i = 0; i < STEPS; i++) if (Math.random() < dens) p[i] = true;
+    if (!p.some(Boolean)) p[Math.floor(Math.random() * STEPS)] = true;
+  }
+  return p;
+}
+const shuf = arr => [...arr].sort(() => Math.random() - .5);
+const pickOne = arr => arr[Math.floor(Math.random() * arr.length)];
+
+function generateRandom(key) {
+  const pool = key === 'core' ? SOUNDS.filter(s => s.pack === 'core') : SOUNDS.filter(s => s.genre === key);
+  if (!pool.length) return;
+  const by = c => pool.filter(s => s.cat === c);
+  const picks = [];
+  shuf(by('beat')).slice(0, Math.min(2 + Math.floor(Math.random() * 2), by('beat').length)).forEach(s =>
+    picks.push({soundId: s.id, pattern: genRhyPat(key, true, false), vol: 0.7 + Math.random() * 0.25}));
+  if (by('bass').length) {
+    const s = pickOne(by('bass'));
+    picks.push({soundId: s.id, pattern: genRhyPat(key, false, true), vol: 0.65 + Math.random() * 0.25});
+  }
+  shuf(by('melo')).slice(0, Math.min(1 + Math.floor(Math.random() * 2), by('melo').length)).forEach(s =>
+    picks.push({soundId: s.id, pattern: genRhyPat(key, false, false), vol: 0.5 + Math.random() * 0.3}));
+  if (by('efx').length && Math.random() < 0.55) {
+    const s = pickOne(by('efx'));
+    picks.push({soundId: s.id, pattern: genRhyPat(key, false, false), vol: 0.35 + Math.random() * 0.3});
+  }
+  if (by('vox').length && Math.random() < 0.6) {
+    const s = pickOne(by('vox'));
+    picks.push({soundId: s.id, pattern: genRhyPat(key, false, false), vol: 0.4 + Math.random() * 0.25});
+  }
+  slots = picks.map(p => ({id: uid(), label: '', mute: false, ...p}));
+  setBPM(key === 'core' ? 112 : (GENRES[key]?.bpm || 120));
+  setCurBeat(null, `${key === 'core' ? '초기 묶음' : GENRES[key]?.name || key} 랜덤`);
+  renderStage();
+}
+
+function setBPM(v) {
+  bpm = clamp(parseInt(v) || 120, 40, 300);
+  const el = $('bpmVal'); if (el) el.textContent = bpm;
+  const m = $('mBpm'); if (m) m.textContent = bpm + ' BPM';
+}
+
+// ═══════════════════════════════════════════════════════
+// 트랙(슬롯) 관리
+// ═══════════════════════════════════════════════════════
+function addSound(soundId, silent) {
+  const i = slots.findIndex(s => s.soundId === soundId);
+  if (i !== -1) {           // 팔레트에서는 토글로 동작한다
+    slots.splice(i, 1);
+    renderStage();
+    if (!silent) toast(`"${sndName(soundId)}" 트랙을 뺐습니다`);
+    return;
+  }
+  slots.push({id: uid(), soundId, label: '', pattern: starterPattern(soundId), vol: 0.8, mute: false});
+  renderStage();
+  preview(soundId, 0.7);
+}
+function removeSlot(slotId) {
+  slots = slots.filter(s => s.id !== slotId);
+  renderStage();
+}
+function toggleMute(slotId) {
+  const slot = slots.find(s => s.id === slotId);
+  if (!slot) return;
+  slot.mute = !slot.mute;
+  renderStage();
+}
+function setCurBeat(id, name) {
+  curBeatId = id;
+  if (name != null) curName = name;
+  const n = $('stageName'); if (n) n.value = curName;
+  const o = $('overwriteBtn'); if (o) o.disabled = !(curBeatId && playlist.some(b => b.id === curBeatId));
+  renderLib();
+}
+
+// ═══════════════════════════════════════════════════════
+// 렌더 — 크루 (인크레디믹스풍 캐릭터 줄)
+// ═══════════════════════════════════════════════════════
+function renderCrew() {
+  const crew = $('crew');
+  crew.innerHTML = '';
+  if (!slots.length) {
+    crew.innerHTML = '<div class="crew-empty">🎤 여기로 사운드를 드래그하세요<br><span style="font-size:11px;">캐릭터 클릭 = 뮤트 · ✕ = 빼기</span></div>';
+    return;
+  }
+  slots.forEach(slot => {
+    const color = sndColor(slot.soundId);
+    const el = document.createElement('div');
+    el.className = 'ch' + (slot.mute ? ' muted' : '');
+    el.dataset.id = slot.id;
+    el.style.color = color;
+    el.title = `${sndName(slot.soundId)} — 클릭: ${slot.mute ? '뮤트 해제' : '뮤트'}`;
+    el.innerHTML =
+      `<div class="ch-body">${sndIco(slot.soundId)}</div>` +
+      `<div class="ch-name">${esc(slot.label || sndName(slot.soundId))}</div>` +
+      `<button class="ch-x" title="빼기">✕</button>`;
+    el.onclick = e => {
+      if (e.target.closest('.ch-x')) { removeSlot(slot.id); return; }
+      toggleMute(slot.id);
+    };
+    crew.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// 렌더 — 스테이지
+// ═══════════════════════════════════════════════════════
+function renderStage() {
+  renderCrew();
+  const wrap = $('slotWrap');
+  $('hint').style.display = slots.length ? 'none' : '';
+  $('infoSlots').textContent = slots.length;
+  wrap.innerHTML = '';
+  pruneSlotGains();
+
+  slots.forEach(slot => {
+    const color = sndColor(slot.soundId);
+    const disp = slot.label || sndName(slot.soundId);
+    const el = document.createElement('div');
+    el.className = 'slot-card';
+    el.dataset.id = slot.id;
+    el.style.color = color;
+    el.style.borderLeftColor = color;
+
+    const stepHtml = Array.from({length: STEPS}, (_, i) => {
+      const on = slot.pattern[i];
+      return `<div class="step${on ? ' on' : ''}${i % 4 === 0 ? ' beat-mark' : ''}" data-s="${i}" style="${on ? 'background:' + color : ''}"></div>`;
+    }).join('');
+
+    el.innerHTML =
+      `<div class="slot-dot" style="background:${color}"></div>` +
+      `<div class="slot-ico">${sndIco(slot.soundId)}</div>` +
+      `<div class="slot-name" title="클릭해서 이름 지정 · 원본: ${esc(sndName(slot.soundId))}">${esc(disp)}</div>` +
+      `<div class="steps">${stepHtml}</div>` +
+      `<div class="slot-right">` +
+        `<input type="range" class="vol-sl" min="0" max="1" step="0.01" value="${slot.vol}" style="accent-color:${color}" title="볼륨">` +
+        `<button class="mute-btn${slot.mute ? ' muted' : ''}" title="음소거">${slot.mute ? 'U' : 'M'}</button>` +
+        `<button class="del-btn" title="삭제">✕</button>` +
+      `</div>`;
+
+    el.querySelectorAll('.step').forEach(btn => {
+      btn.onclick = () => {
+        const si = parseInt(btn.dataset.s);
+        slot.pattern[si] = !slot.pattern[si];
+        btn.classList.toggle('on', slot.pattern[si]);
+        btn.style.background = slot.pattern[si] ? color : '';
+        if (slot.pattern[si]) { btn.style.borderColor = 'transparent'; preview(slot.soundId, 0.6); }
+        else btn.style.removeProperty('border-color');
+      };
+    });
+
+    const nameEl = el.querySelector('.slot-name');
+    nameEl.onclick = () => {
+      const inp = document.createElement('input');
+      inp.className = 'slot-name-edit';
+      inp.value = slot.label || sndName(slot.soundId);
+      inp.maxLength = 24;
+      nameEl.replaceWith(inp); inp.focus(); inp.select();
+      const done = () => {
+        const v = inp.value.trim();
+        slot.label = (!v || v === sndName(slot.soundId)) ? '' : v;
+        renderStage();
+      };
+      inp.onblur = done;
+      inp.onkeydown = e => {
+        e.stopPropagation();
+        if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+        if (e.key === 'Escape') { inp.onblur = null; renderStage(); }
+      };
+    };
+
+    el.querySelector('.vol-sl').oninput = e => {
+      slot.vol = parseFloat(e.target.value);
+      const g = slotGains.get(slot.id);
+      if (g) g.gain.value = slot.vol;
+    };
+    el.querySelector('.mute-btn').onclick = () => toggleMute(slot.id);
+    el.querySelector('.del-btn').onclick = () => removeSlot(slot.id);
+    wrap.appendChild(el);
+  });
+
+  renderPalette();
+  if (dispStep >= 0) document.querySelectorAll(`.step[data-s="${dispStep}"]`).forEach(e => e.classList.add('cur'));
+}
+
+// ═══════════════════════════════════════════════════════
+// 렌더 — 팔레트
+// ═══════════════════════════════════════════════════════
+function renderPalette() {
+  const list = $('sndList');
+  if (!list) return;
+  list.innerHTML = '';
+  const q = palQ.trim().toLowerCase();
+  const found = SOUNDS.filter(s => {
+    if (palPack !== 'all' && s.pack !== palPack) return false;
+    if (palCat !== 'all' && s.cat !== palCat) return false;
+    if (q && !s.name.toLowerCase().includes(q) && !s.sub.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!found.length) { list.innerHTML = '<div class="lib-empty">검색 결과가 없습니다.</div>'; return; }
+
+  let lastPack = null;
+  found.forEach(snd => {
+    if (snd.pack !== lastPack) {
+      lastPack = snd.pack;
+      const h = document.createElement('div');
+      h.className = 'pack-head';
+      h.style.color = PACKS[snd.pack].color;
+      h.innerHTML = `${PACKS[snd.pack].emoji} ${PACKS[snd.pack].name}<i></i>`;
+      list.appendChild(h);
+    }
+    const inUse = slots.some(slot => slot.soundId === snd.id);
+    const el = document.createElement('div');
+    el.className = `snd-card${inUse ? ' in-use' : ''}`;
+    el.draggable = true;
+    el.title = `${snd.sub} · ${CATS[snd.cat].name} — 클릭해서 ${inUse ? '빼기' : '넣기'} · 크루로 드래그 가능`;
+    el.innerHTML =
+      `<div class="sc-dot" style="background:${snd.color}"></div>` +
+      `<div class="sc-ico">${snd.ico}</div>` +
+      `<div style="flex:1;min-width:0;">` +
+        `<div class="sc-name">${esc(snd.name)}</div>` +
+        `<div class="sc-sub" style="color:${snd.color}">${esc(snd.sub)}</div>` +
+      `</div><span class="sc-plus">${inUse ? '−' : '＋'}</span>`;
+    el.onclick = () => { getAC(); addSound(snd.id); };
+    el.ondragstart = e => { e.dataTransfer.setData('text/plain', snd.id); e.dataTransfer.effectAllowed = 'copy'; };
+    list.appendChild(el);
+  });
+}
+
+function renderPalTabs() {
+  document.querySelectorAll('.pal-tab').forEach(tab => {
+    tab.classList.toggle('on', tab.dataset.cat === palCat);
+    tab.onclick = () => { palCat = tab.dataset.cat; renderPalette(); renderPalTabs(); };
+  });
+  document.querySelectorAll('.pack-btn').forEach(btn => {
+    const on = btn.dataset.pack === palPack;
+    btn.classList.toggle('on', on);
+    const col = btn.dataset.pack === 'core' ? PACKS.core.color : btn.dataset.pack === 'plus' ? PACKS.plus.color : 'var(--txt2)';
+    btn.style.background = on ? col : 'var(--s2)';
+    btn.style.borderColor = on ? col : 'var(--bd2)';
+    btn.style.color = on ? '#04121a' : 'var(--txt3)';
+    btn.onclick = () => { palPack = btn.dataset.pack; renderPalette(); renderPalTabs(); };
+  });
+}
+
+function renderRuler() {
+  $('ruler').innerHTML = Array.from({length: STEPS}, (_, i) =>
+    `<div class="ruler-cell${i % 4 === 0 ? ' beat' : ''}">${i % 4 === 0 ? i / 4 + 1 : ''}</div>`).join('');
+}
+
+function renderBars() {
+  // 🎲 랜덤 생성
+  const gb = $('genreBar');
+  gb.innerHTML = '';
+  const mk = (key, label, color, emoji) => {
+    const b = document.createElement('button');
+    b.className = 'genre-btn';
+    b.style.cssText = `color:${color};border-color:${color}55;`;
+    b.textContent = `🎲 ${emoji} ${label}`;
+    b.title = `${label} 사운드로 매번 새로운 조합을 만듭니다`;
+    b.onclick = () => { getAC(); generateRandom(key); };
+    gb.appendChild(b);
+  };
+  mk('core', '초기 묶음', PACKS.core.color, '🎛');
+  Object.entries(GENRES).forEach(([k, g]) => mk(k, g.name, g.color, g.emoji));
+
+  // 프리셋 (고정)
+  const pb = $('presetBar');
+  pb.innerHTML = '';
+  PRESETS.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'preset-btn ' + p.pack;
+    b.textContent = (p.pack === 'core' ? '🎛 ' : '✨ ') + p.label;
+    b.title = `${p.bpm}BPM · ${p.tracks.length}트랙 — 항상 같은 고정 비트`;
+    b.onclick = () => loadPreset(p.key, true);
+    pb.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// 렌더 — 저장 목록
+// ═══════════════════════════════════════════════════════
+function renderLib() {
+  const list = $('libList');
+  if (!list) return;
+  $('libCnt').textContent = playlist.length;
+  list.innerHTML = '';
+  if (!playlist.length) {
+    list.innerHTML = '<div class="lib-empty">저장된 비트가 없습니다.<br>＋ 저장으로 현재 비트를 담아보세요.</div>';
+    return;
+  }
+  playlist.forEach((beat, i) => {
+    const el = document.createElement('div');
+    el.className = 'lib-item' + (beat.id === curBeatId ? ' cur' : '');
+    el.title = `${beat.name} — 클릭: 불러오기 / 이름 더블클릭: 이름 변경`;
+    el.innerHTML =
+      `<span class="li-n">${i + 1}</span>` +
+      `<div class="li-name">${esc(beat.name)}</div>` +
+      `<span class="li-meta">${beat.bpm}·${beat.slots.length}트랙</span>` +
+      `<button class="li-go" title="자세히 수정">⚙</button>`;
+    el.onclick = e => { if (e.target.closest('.li-go')) return; loadBeat(beat.id); };
+    el.querySelector('.li-go').onclick = e => { e.stopPropagation(); openManager(beat.id); };
+    el.querySelector('.li-name').ondblclick = e => { e.stopPropagation(); inlineRename(beat, el.querySelector('.li-name')); };
+    list.appendChild(el);
+  });
+}
+
+function inlineRename(beat, nameEl) {
+  const inp = document.createElement('input');
+  inp.className = 'li-edit'; inp.value = beat.name; inp.maxLength = 40;
+  nameEl.replaceWith(inp);
+  inp.focus(); inp.select();
+  inp.onclick = e => e.stopPropagation();
+  const done = ok => {
+    if (ok) {
+      const v = inp.value.trim();
+      if (v && v !== beat.name) { beat.name = v.slice(0, 40); persist(); toast('이름 변경됨'); }
+      if (beat.id === curBeatId) { curName = beat.name; $('stageName').value = curName; }
+    }
+    renderLib(); renderManager();
+  };
+  inp.onblur = () => done(true);
+  inp.onkeydown = e => {
+    e.stopPropagation();
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { inp.onblur = null; done(false); }
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// 저장 · 불러오기
+// ═══════════════════════════════════════════════════════
+function stageToSlots() {
+  return slots.map(s => ({
+    soundId: s.soundId, label: s.label || '',
+    pattern: s.pattern.map(v => v ? 1 : 0),
+    vol: s.vol, mute: s.mute,
+  }));
+}
+function uniqueName(base) {
+  const names = new Set(playlist.map(b => b.name));
+  if (!names.has(base)) return base;
+  let n = 2;
+  while (names.has(`${base} ${n}`)) n++;
+  return `${base} ${n}`;
+}
+function saveBeat(name) {
+  const beat = normBeat({id: uid(), name, bpm, slots: stageToSlots()});
+  playlist.push(beat);
+  persist();
+  setCurBeat(beat.id, beat.name);
+  renderLib();
+  toast(`"${beat.name}" 저장됨`);
+}
+function overwriteBeat() {
+  const beat = playlist.find(b => b.id === curBeatId);
+  if (!beat) { toast('덮어쓸 항목이 없습니다'); return; }
+  if (!confirm(`"${beat.name}"에 현재 비트를 덮어쓸까요?`)) return;
+  beat.name = ($('stageName').value.trim() || beat.name).slice(0, 40);
+  beat.bpm = bpm;
+  beat.slots = normBeat({slots: stageToSlots()}).slots;
+  persist(); curName = beat.name;
+  renderLib(); renderManager();
+  toast('덮어썼습니다');
+}
+function loadBeat(beatId) {
+  const beat = playlist.find(b => b.id === beatId);
+  if (!beat) return;
+  setBPM(beat.bpm);
+  slots = beat.slots.map(s => ({
+    id: uid(), soundId: s.soundId, label: s.label || '',
+    pattern: s.pattern.map(v => !!v), vol: s.vol, mute: s.mute,
+  }));
+  setCurBeat(beat.id, beat.name);
+  renderStage();
+  toast(`"${beat.name}" 불러옴`);
+}
+function deleteBeat(beatId, silent) {
+  const beat = playlist.find(b => b.id === beatId);
+  if (!beat) return false;
+  if (!silent && !confirm(`"${beat.name}"를 삭제할까요?`)) return false;
+  playlist = playlist.filter(b => b.id !== beatId);
+  exportQueue = exportQueue.filter(q => q.beatId !== beatId);
+  expSelIdx = Math.min(expSelIdx, exportQueue.length - 1);
+  if (curBeatId === beatId) { curBeatId = null; $('overwriteBtn').disabled = true; }
+  if (mgrSel === beatId) mgrSel = playlist.length ? playlist[0].id : null;
+  persist(); renderLib(); renderManager();
+  if (!$('audioModal').classList.contains('hidden')) { renderExpQueue(); renderEqPlList(); }
+  return true;
+}
+function duplicateBeat(beatId) {
+  const beat = playlist.find(b => b.id === beatId);
+  if (!beat) return;
+  const copy = normBeat(JSON.parse(JSON.stringify(beat)));
+  copy.id = uid();
+  copy.name = uniqueName((beat.name + ' 복사본').slice(0, 40));
+  playlist.splice(playlist.indexOf(beat) + 1, 0, copy);
+  mgrSel = copy.id;
+  persist(); renderLib(); renderManager();
+  toast('복제됨');
+}
+function moveBeat(beatId, dir) {
+  const i = playlist.findIndex(b => b.id === beatId);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= playlist.length) return;
+  [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+  persist(); renderLib(); renderManager();
+}
+
+// ═══════════════════════════════════════════════════════
+// 관리 모달
+// ═══════════════════════════════════════════════════════
+function openManager(selId) {
+  mgrSel = selId || mgrSel || (playlist[0] ? playlist[0].id : null);
+  renderManager();
+  $('mgrModal').classList.remove('hidden');
+}
+
+function renderManager() {
+  if ($('mgrModal').classList.contains('hidden')) return;
+  const list = $('mgrList');
+  $('mgrCnt').textContent = playlist.length ? `(${playlist.length})` : '';
+  list.innerHTML = '';
+  if (!playlist.length) list.innerHTML = '<div class="lib-empty">저장된 비트가 없습니다.</div>';
+  if (mgrSel && !playlist.some(b => b.id === mgrSel)) mgrSel = playlist[0] ? playlist[0].id : null;
+
+  playlist.forEach((beat, i) => {
+    const el = document.createElement('div');
+    el.className = 'mgr-item' + (beat.id === mgrSel ? ' sel' : '');
+    el.innerHTML =
+      `<span class="li-n">${i + 1}</span>` +
+      `<div style="flex:1;min-width:0;">` +
+        `<div class="mi-name">${esc(beat.name)}</div>` +
+        `<div class="mi-meta">${beat.bpm}BPM · ${beat.slots.length}트랙</div>` +
+      `</div>` +
+      `<button class="mi-btn" data-a="up" title="위로">↑</button>` +
+      `<button class="mi-btn" data-a="dn" title="아래로">↓</button>` +
+      `<button class="mi-btn" data-a="dup" title="복제">⧉</button>` +
+      `<button class="mi-btn" data-a="del" title="삭제" style="color:var(--rd)">✕</button>`;
+    el.onclick = e => {
+      const a = e.target.closest('.mi-btn')?.dataset.a;
+      if (a === 'up') return moveBeat(beat.id, -1);
+      if (a === 'dn') return moveBeat(beat.id, 1);
+      if (a === 'dup') return duplicateBeat(beat.id);
+      if (a === 'del') return void deleteBeat(beat.id);
+      mgrSel = beat.id; renderManager();
+    };
+    list.appendChild(el);
+  });
+  renderMgrDetail();
+}
+
+function renderMgrDetail() {
+  const box = $('mgrDetail');
+  const beat = playlist.find(b => b.id === mgrSel);
+  if (!beat) {
+    box.innerHTML = '<div class="mgr-empty">왼쪽에서 비트를 선택하면<br>이름 · BPM · 트랙 · 패턴을 직접 수정할 수 있습니다.</div>';
+    return;
+  }
+  box.innerHTML =
+    `<div class="fld-row">` +
+      `<div class="fld" style="flex:1;"><label>이름</label><input type="text" class="fi" id="mgrName" maxlength="40" value="${esc(beat.name)}"></div>` +
+      `<div class="fld" style="width:92px;"><label>BPM</label><input type="number" class="fi" id="mgrBpm" min="40" max="300" value="${beat.bpm}"></div>` +
+    `</div>` +
+    `<div class="fld-row" style="margin-bottom:12px;flex-wrap:wrap;">` +
+      `<button class="btn-sm btn-pri" id="mgrLoad">▶ 스테이지로 불러오기</button>` +
+      `<button class="btn-sm" id="mgrOver">⤴ 현재 스테이지로 덮어쓰기</button>` +
+      `<button class="btn-sm" id="mgrDup">⧉ 복제</button>` +
+      `<button class="btn-sm btn-danger" id="mgrDel">🗑 삭제</button>` +
+    `</div>` +
+    `<div class="sec-lbl">트랙 ${beat.slots.length}개 — 이름·패턴·볼륨 수정</div>` +
+    `<div id="mgrTrks"></div>` +
+    (beat.slots.length ? '' : '<div class="lib-empty">트랙이 없습니다.</div>');
+
+  const nameIn = $('mgrName');
+  nameIn.onchange = () => {
+    const v = nameIn.value.trim();
+    if (!v) { nameIn.value = beat.name; return; }
+    beat.name = v.slice(0, 40); persist();
+    if (beat.id === curBeatId) { curName = beat.name; $('stageName').value = curName; }
+    renderLib(); renderManager(); toast('이름 변경됨');
+  };
+  const bpmIn = $('mgrBpm');
+  bpmIn.onchange = () => {
+    beat.bpm = clamp(parseInt(bpmIn.value) || 120, 40, 300);
+    bpmIn.value = beat.bpm; persist(); renderLib(); toast('BPM 변경됨');
+  };
+  $('mgrLoad').onclick = () => { loadBeat(beat.id); $('mgrModal').classList.add('hidden'); };
+  $('mgrOver').onclick = () => {
+    if (!slots.length) { toast('스테이지가 비어 있습니다'); return; }
+    if (!confirm(`"${beat.name}"를 현재 스테이지 내용으로 덮어쓸까요?`)) return;
+    beat.bpm = bpm; beat.slots = normBeat({slots: stageToSlots()}).slots;
+    persist(); renderLib(); renderManager(); toast('덮어썼습니다');
+  };
+  $('mgrDup').onclick = () => duplicateBeat(beat.id);
+  $('mgrDel').onclick = () => deleteBeat(beat.id);
+
+  const trks = $('mgrTrks');
+  beat.slots.forEach((s, si) => {
+    const color = sndColor(s.soundId);
+    const el = document.createElement('div');
+    el.className = 'trk';
+    el.innerHTML =
+      `<div class="trk-dot" style="background:${color}"></div>` +
+      `<input type="text" class="trk-name" maxlength="24" placeholder="${esc(sndName(s.soundId))}" value="${esc(s.label || '')}" title="트랙 이름 지정">` +
+      `<span class="trk-src" title="${esc(sndName(s.soundId))}">${esc(sndName(s.soundId))}</span>` +
+      `<div class="msteps">` + Array.from({length: STEPS}, (_, i) =>
+        `<div class="mstep${s.pattern[i] ? ' on' : ''}${i % 4 === 0 ? ' bm' : ''}" data-s="${i}" style="${s.pattern[i] ? 'background:' + color : ''}"></div>`).join('') +
+      `</div>` +
+      `<div class="trk-right">` +
+        `<input type="range" class="vol-sl" min="0" max="1" step="0.01" value="${s.vol}" style="accent-color:${color}" title="볼륨">` +
+        `<button class="mute-btn${s.mute ? ' muted' : ''}" title="음소거">${s.mute ? 'U' : 'M'}</button>` +
+        `<button class="del-btn" title="트랙 삭제">✕</button>` +
+      `</div>`;
+
+    el.querySelector('.trk-name').onchange = e => {
+      const v = e.target.value.trim();
+      s.label = (!v || v === sndName(s.soundId)) ? '' : v.slice(0, 24);
+      e.target.value = s.label; persist(); toast('트랙 이름 저장됨');
+    };
+    el.querySelectorAll('.mstep').forEach(c => {
+      c.onclick = () => {
+        const i = parseInt(c.dataset.s);
+        s.pattern[i] = s.pattern[i] ? 0 : 1;
+        c.classList.toggle('on', !!s.pattern[i]);
+        c.style.background = s.pattern[i] ? color : '';
+        if (s.pattern[i]) preview(s.soundId, 0.55);
+        persist();
+      };
+    });
+    el.querySelector('.vol-sl').oninput = e => { s.vol = parseFloat(e.target.value); };
+    el.querySelector('.vol-sl').onchange = () => persist();
+    el.querySelector('.mute-btn').onclick = ev => {
+      s.mute = !s.mute;
+      ev.currentTarget.textContent = s.mute ? 'U' : 'M';
+      ev.currentTarget.classList.toggle('muted', s.mute);
+      persist();
+    };
+    el.querySelector('.del-btn').onclick = () => {
+      if (!confirm(`트랙 "${s.label || sndName(s.soundId)}"을 삭제할까요?`)) return;
+      beat.slots.splice(si, 1); persist(); renderLib(); renderManager();
+    };
+    trks.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// JSON 내보내기 · 가져오기
+// ═══════════════════════════════════════════════════════
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function exportJSON() {
+  if (!playlist.length) { toast('저장된 비트가 없습니다'); return; }
+  download(new Blob([JSON.stringify({v: 4, playlist}, null, 2)], {type: 'application/json'}), 'incx_beats.json');
+}
+function importJSON(file) {
+  const r = new FileReader();
+  r.onerror = () => toast('파일을 읽을 수 없습니다');
+  r.onload = e => {
+    let d;
+    try { d = JSON.parse(e.target.result); } catch { toast('JSON 형식이 아닙니다'); return; }
+    const arr = Array.isArray(d) ? d : (Array.isArray(d.playlist) ? d.playlist : null);
+    if (!arr) { toast('유효하지 않은 파일 형식입니다'); return; }
+    const ids = new Set(playlist.map(b => b.id));
+    let added = 0;
+    arr.forEach(raw => {
+      if (!raw || typeof raw !== 'object') return;
+      const b = normBeat(raw);
+      if (ids.has(b.id)) b.id = uid();
+      ids.add(b.id);
+      b.name = uniqueName(b.name);
+      playlist.push(b); added++;
+    });
+    persist(); renderLib(); renderManager();
+    toast(`${added}개 비트를 가져왔습니다`);
+  };
+  r.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════
+// WAV 내보내기
+// ═══════════════════════════════════════════════════════
+const MAX_EXPORT_SEC = 600;
+
+function encodeWAV(buf) {
+  const nCh = 2, sr = buf.sampleRate, n = buf.length, blk = nCh * 2;
+  const ab = new ArrayBuffer(44 + n * blk);
+  const dv = new DataView(ab);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); dv.setUint32(4, 36 + n * blk, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, nCh, true);
+  dv.setUint32(24, sr, true); dv.setUint32(28, sr * blk, true);
+  dv.setUint16(32, blk, true); dv.setUint16(34, 16, true);
+  ws(36, 'data'); dv.setUint32(40, n * blk, true);
+  const L = buf.getChannelData(0);
+  const R = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L;
+  let off = 44;
+  for (let i = 0; i < n; i++) {
+    const l = clamp(L[i], -1, 1), r = clamp(R[i], -1, 1);
+    dv.setInt16(off, l < 0 ? l * 32768 : l * 32767, true); off += 2;
+    dv.setInt16(off, r < 0 ? r * 32768 : r * 32767, true); off += 2;
+  }
+  return new Blob([ab], {type: 'audio/wav'});
+}
+
+function queueDuration() {
+  let d = 0;
+  exportQueue.forEach(item => {
+    const beat = playlist.find(b => b.id === item.beatId);
+    if (beat) d += (60 / (beat.bpm || 120) / 4) * STEPS * item.bars;
+  });
+  return d;
+}
+
+async function renderWAV(queue) {
+  if (!window.OfflineAudioContext) throw new Error('이 브라우저는 OfflineAudioContext를 지원하지 않습니다.');
+  const SR = 44100;
+  const offCtx = new OfflineAudioContext(2, Math.ceil(SR * (queueDuration() + 1.2)), SR);
+  const mg = offCtx.createGain(); mg.gain.value = 0.8;
+  const comp = offCtx.createDynamicsCompressor();
+  comp.threshold.value = -12; comp.ratio.value = 3.5; comp.knee.value = 6;
+  mg.connect(comp); comp.connect(offCtx.destination);
+
+  let t = 0.05;
+  for (const item of queue) {
+    const beat = playlist.find(b => b.id === item.beatId);
+    if (!beat) continue;
+    const sd = 60 / (beat.bpm || 120) / 4;
+    for (let bar = 0; bar < item.bars; bar++) {
+      beat.slots.forEach(slot => {
+        if (slot.mute) return;
+        const snd = SND_MAP.get(slot.soundId);
+        if (!snd) return;
+        const sg = offCtx.createGain(); sg.gain.value = slot.vol; sg.connect(mg);
+        slot.pattern.forEach((on, step) => {
+          if (on) { try { snd.fn(offCtx, t + step * sd, sg, 1, step); } catch (e) {} }
+        });
+      });
+      t += sd * STEPS;
+    }
+  }
+  return encodeWAV(await offCtx.startRendering());
+}
+
+function renderExpQueue() {
+  const cont = $('expQ');
+  cont.innerHTML = '';
+  if (!exportQueue.length) {
+    cont.innerHTML = '<div class="eq-empty">아래 비트 목록에서 + 추가를 눌러주세요.</div>';
+    updateExpTotal(); return;
+  }
+  expSelIdx = clamp(expSelIdx, -1, exportQueue.length - 1);
+  exportQueue.forEach((item, i) => {
+    const beat = playlist.find(b => b.id === item.beatId);
+    const el = document.createElement('div');
+    el.className = 'eq-item' + (expSelIdx === i ? ' sel' : '');
+    el.innerHTML =
+      `<div class="eq-name">${i + 1}. ${esc(beat ? beat.name : '(삭제됨)')}</div>` +
+      `<span class="eq-bars-lbl">바:</span>` +
+      `<input type="number" class="eq-bars-input" min="1" max="64" value="${item.bars}">` +
+      `<button class="eq-del" title="제거">✕</button>`;
+    const barsIn = el.querySelector('.eq-bars-input');
+    barsIn.onchange = () => { item.bars = clamp(parseInt(barsIn.value) || 1, 1, 64); barsIn.value = item.bars; updateExpTotal(); };
+    el.querySelector('.eq-del').onclick = e => {
+      e.stopPropagation();
+      exportQueue.splice(i, 1);
+      if (expSelIdx > i) expSelIdx--;
+      renderExpQueue();
+    };
+    el.onclick = e => {
+      if (e.target.closest('.eq-del') || e.target.tagName === 'INPUT') return;
+      expSelIdx = i; renderExpQueue();
+    };
+    cont.appendChild(el);
+  });
+  updateExpTotal();
+}
+function updateExpTotal() {
+  const bars = exportQueue.reduce((a, i) => a + i.bars, 0);
+  const sec = queueDuration();
+  const el = $('expTotal');
+  el.textContent = exportQueue.length ? `(총 ${bars}바 · 약 ${sec.toFixed(1)}초)` : '';
+  el.style.color = sec > MAX_EXPORT_SEC ? 'var(--rd)' : 'var(--txt3)';
+}
+function renderEqPlList() {
+  const cont = $('eqPlList');
+  cont.innerHTML = '';
+  if (!playlist.length) {
+    cont.innerHTML = '<div class="eq-empty">저장된 비트가 없습니다. 먼저 비트를 저장하세요.</div>';
+    return;
+  }
+  playlist.forEach(beat => {
+    const el = document.createElement('div');
+    el.className = 'eq-pl-item';
+    el.innerHTML =
+      `<div class="eq-pl-name">${esc(beat.name)} <span style="color:var(--txt3);font-size:10px;">(${beat.bpm}BPM · ${beat.slots.length}트랙)</span></div>` +
+      `<span class="eq-pl-add">+ 추가</span>`;
+    el.onclick = () => { exportQueue.push({beatId: beat.id, bars: 4}); expSelIdx = exportQueue.length - 1; renderExpQueue(); };
+    cont.appendChild(el);
+  });
+}
+function openAudioModal() { renderExpQueue(); renderEqPlList(); $('audioModal').classList.remove('hidden'); }
+
+function clearAll() {
+  if (!slots.length) return;
+  if (!confirm('모든 트랙을 지울까요?')) return;
+  slots = [];
+  setCurBeat(null, '새 비트');
+  renderStage();
+}
+function showLoad(msg) { $('loadingMsg').textContent = msg || '처리 중...'; $('loadingBg').classList.remove('hidden'); }
+function hideLoad() { $('loadingBg').classList.add('hidden'); }
+const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
+
+// ═══════════════════════════════════════════════════════
+// 팝업 플레이어 — 이 페이지를 떠나도 계속 재생된다
+// ═══════════════════════════════════════════════════════
+function currentBeatObj() {
+  return {name: curName, bpm, slots: stageToSlots(), ts: Date.now()};
+}
+function pushToMini(silent) {
+  if (!slots.length) { if (!silent) toast('보낼 트랙이 없습니다'); return false; }
+  try { localStorage.setItem(NOW_KEY, JSON.stringify(currentBeatObj())); }
+  catch (e) { toast('저장 공간이 부족합니다'); return false; }
+  if (!silent) toast(miniWin && !miniWin.closed ? '팝업 플레이어로 보냈습니다' : '팝업을 열면 이 비트로 재생됩니다');
+  return true;
+}
+function openMini() {
+  pushToMini(true);
+  const url = location.pathname + '?mini=1';
+  miniWin = window.open(url, 'incx_mini', 'width=350,height=580,menubar=no,toolbar=no,location=no,status=no');
+  if (!miniWin) { toast('팝업이 차단되었습니다 — 팝업 허용 후 다시 눌러주세요'); return; }
+  if (isPlaying) setPlaying(false);          // 소리가 겹치지 않게 메인은 멈춘다
+  toast('팝업 플레이어에서 재생됩니다 — 이 창을 떠나도 계속 들립니다');
+}
+
+// ─── 미니 플레이어 화면 ────────────────────────────────
+let miniIdx = -1;
+function miniLoadNow() {
+  let b = null;
+  try { b = JSON.parse(localStorage.getItem(NOW_KEY) || 'null'); } catch (e) {}
+  if (!b) return false;
+  const n = normBeat({id: uid(), name: b.name || '보낸 비트', bpm: b.bpm, slots: b.slots});
+  applyMiniBeat(n);
+  return true;
+}
+function applyMiniBeat(beat) {
+  slotGains.forEach(g => { try { g.disconnect(); } catch (e) {} });
+  slotGains.clear();
+  setBPM(beat.bpm);
+  curName = beat.name;
+  slots = beat.slots.map(s => ({
+    id: uid(), soundId: s.soundId, label: s.label || '',
+    pattern: s.pattern.map(v => !!v), vol: s.vol, mute: s.mute,
+  }));
+  renderMini();
+}
+function renderMini() {
+  $('mName').textContent = curName || '비트 없음';
+  $('mMeta').textContent = slots.length ? `${bpm} BPM · ${slots.length}트랙` : '메인 창에서 비트를 보내주세요';
+  const box = $('mTrks');
+  box.innerHTML = '';
+  slots.forEach(slot => {
+    const color = sndColor(slot.soundId);
+    const el = document.createElement('div');
+    el.className = 'mini-trk' + (slot.mute ? ' muted' : '');
+    el.innerHTML =
+      `<span class="slot-dot" style="background:${color}"></span>` +
+      `<span>${sndIco(slot.soundId)}</span>` +
+      `<span class="mini-trk-name">${esc(slot.label || sndName(slot.soundId))}</span>` +
+      `<span style="font-size:10px;color:var(--txt3);">${slot.mute ? '뮤트' : ''}</span>`;
+    el.onclick = () => { slot.mute = !slot.mute; renderMini(); };
+    box.appendChild(el);
+  });
+}
+function miniStep(dir) {
+  const list = loadPlaylist();
+  if (!list.length) { toast('저장된 비트가 없습니다'); return; }
+  miniIdx = (miniIdx + dir + list.length) % list.length;
+  applyMiniBeat(list[miniIdx]);
+  // 버튼을 누른 것 자체가 사용자 동작이므로 바로 재생을 이어간다
+  getAC();
+  if (!isPlaying) setPlaying(true);
+  $('miniGate').classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function initMini() {
+  document.body.classList.add('mini');
+  $('app').style.display = 'none';
+  $('miniApp').style.display = 'flex';
+  document.title = '🎧 인크레디믹스 미니';
+
+  if (!miniLoadNow()) {
+    const list = loadPlaylist();
+    if (list.length) { miniIdx = 0; applyMiniBeat(list[0]); }
+    else renderMini();
+  }
+
+  $('mPlay').onclick = togglePlay;
+  $('mPrev').onclick = () => miniStep(-1);
+  $('mNext').onclick = () => miniStep(1);
+  $('mVol').oninput = e => { masterVolume = parseFloat(e.target.value); if (MASTER) MASTER.gain.value = masterVolume; };
+
+  // 메인 창에서 📡 보내기를 누르면 즉시 반영
+  window.addEventListener('storage', e => {
+    if (e.key !== NOW_KEY || !e.newValue) return;
+    miniLoadNow();
+    toast('새 비트를 받았습니다');
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  });
+
+  // 자동 재생 시도 — 브라우저가 막으면 클릭 한 번을 받는다
+  const gate = $('miniGate');
+  const start = () => { getAC(); setPlaying(true); gate.classList.add('hidden'); };
+  gate.onclick = start;
+  if (slots.length) {
+    getAC();
+    if (AC.state === 'running') setPlaying(true);
+    else { gate.classList.remove('hidden'); AC.resume().then(() => { if (AC.state === 'running') start(); }).catch(() => {}); }
+  }
+  drawViz(); animCursor();
+}
+
+function initMain() {
+  $('cntCore').textContent = ` ${COUNT_CORE}`;
+  $('cntPlus').textContent = ` ${COUNT_PLUS}`;
+  $('cntAll').textContent = ` ${SOUNDS.length}`;
+  $('infoSnd').textContent = SOUNDS.length;
+  $('infoCore').textContent = COUNT_CORE;
+  $('infoPlus').textContent = COUNT_PLUS;
+
+  renderBars();
+  renderPalTabs();
+  renderPalette();
+  renderRuler();
+  renderLib();
+
+  // 트랜스포트
+  $('playBtn').onclick = togglePlay;
+  $('bpmDn').onclick = () => setBPM(bpm - 5);
+  $('bpmUp').onclick = () => setBPM(bpm + 5);
+  $('masterVol').oninput = e => {
+    masterVolume = parseFloat(e.target.value);
+    if (MASTER) MASTER.gain.value = masterVolume;
+  };
+  $('miniBtn').onclick = openMini;
+  $('sendMiniBtn').onclick = () => pushToMini(false);
+  $('helpBtn').onclick = () => $('helpModal').classList.remove('hidden');
+  $('sideToggle').onclick = () => $('side').classList.toggle('open');
+  $('palSearch').oninput = e => { palQ = e.target.value; renderPalette(); };
+
+  // 크루 드래그 앤 드롭 (인크레디믹스처럼 끌어다 놓기)
+  const crew = $('crew');
+  crew.ondragover = e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; crew.classList.add('drop'); };
+  crew.ondragleave = () => crew.classList.remove('drop');
+  crew.ondrop = e => {
+    e.preventDefault(); crew.classList.remove('drop');
+    const id = e.dataTransfer.getData('text/plain');
+    if (!SND_MAP.has(id)) return;
+    getAC();
+    if (slots.some(s => s.soundId === id)) { toast('이미 들어 있는 사운드입니다'); return; }
+    addSound(id);
+  };
+
+  // 스테이지
+  $('clearBtn').onclick = clearAll;
+  $('stageName').onchange = e => {
+    curName = e.target.value.trim().slice(0, 40) || '새 비트';
+    e.target.value = curName;
+  };
+  $('overwriteBtn').onclick = overwriteBeat;
+
+  const openSave = () => {
+    if (!slots.length) { toast('저장할 트랙이 없습니다'); return; }
+    const inp = $('beatNameInput');
+    inp.value = uniqueName($('stageName').value.trim() || '내 비트');
+    $('saveModal').classList.remove('hidden');
+    setTimeout(() => { inp.focus(); inp.select(); }, 60);
+  };
+  $('saveBeatBtn').onclick = openSave;
+  $('quickSaveBtn').onclick = openSave;
+  $('mgrBtn').onclick = () => openManager();
+  $('exportAudioBtn').onclick = openAudioModal;
+  $('exportJsonBtn').onclick = exportJSON;
+  $('importJsonBtn').onclick = () => $('jsonImport').click();
+  $('jsonImport').onchange = e => { if (e.target.files[0]) importJSON(e.target.files[0]); e.target.value = ''; };
+
+  $('saveConfirmBtn').onclick = () => {
+    const name = $('beatNameInput').value.trim().slice(0, 40) || '내 비트';
+    saveBeat(name);
+    $('saveModal').classList.add('hidden');
+  };
+  $('beatNameInput').onkeydown = e => {
+    e.stopPropagation();
+    if (e.key === 'Enter') { e.preventDefault(); $('saveConfirmBtn').click(); }
+  };
+
+  document.querySelectorAll('[data-close]').forEach(b => {
+    b.onclick = () => $(b.dataset.close).classList.add('hidden');
+  });
+  document.querySelectorAll('.modal-bg').forEach(bg => {
+    bg.onmousedown = e => { if (e.target === bg) bg.classList.add('hidden'); };
+  });
+
+  // 음원 내보내기 모달
+  $('expUp').onclick = () => {
+    if (expSelIdx <= 0) return;
+    [exportQueue[expSelIdx], exportQueue[expSelIdx - 1]] = [exportQueue[expSelIdx - 1], exportQueue[expSelIdx]];
+    expSelIdx--; renderExpQueue();
+  };
+  $('expDn').onclick = () => {
+    if (expSelIdx < 0 || expSelIdx >= exportQueue.length - 1) return;
+    [exportQueue[expSelIdx], exportQueue[expSelIdx + 1]] = [exportQueue[expSelIdx + 1], exportQueue[expSelIdx]];
+    expSelIdx++; renderExpQueue();
+  };
+  $('expRemove').onclick = () => {
+    if (expSelIdx < 0 || expSelIdx >= exportQueue.length) return;
+    exportQueue.splice(expSelIdx, 1);
+    expSelIdx = Math.min(expSelIdx, exportQueue.length - 1);
+    renderExpQueue();
+  };
+  $('doExportBtn').onclick = async () => {
+    if (!exportQueue.length) { toast('내보내기 목록에 비트를 추가해주세요'); return; }
+    const sec = queueDuration();
+    if (sec > MAX_EXPORT_SEC) { alert(`너무 깁니다 (${sec.toFixed(0)}초). ${MAX_EXPORT_SEC}초 이하로 줄여주세요.`); return; }
+    $('audioModal').classList.add('hidden');
+    showLoad('WAV 렌더링 중... 잠시 기다려 주세요.');
+    await nextFrame();
+    try {
+      const wav = await renderWAV(exportQueue);
+      hideLoad();
+      download(wav, `incx_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.wav`);
+      toast('WAV 내보내기 완료');
+    } catch (err) {
+      hideLoad();
+      alert('렌더링 실패: ' + (err && err.message ? err.message : err));
+    }
+  };
+
+  // 키보드
+  document.addEventListener('keydown', e => {
+    if (e.repeat) return;
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-bg:not(.hidden)').forEach(m => m.classList.add('hidden'));
+      return;
+    }
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    else if (e.code === 'ArrowUp') { e.preventDefault(); setBPM(bpm + 5); }
+    else if (e.code === 'ArrowDown') { e.preventDefault(); setBPM(bpm - 5); }
+  });
+
+  // ※ v3에는 탭이 가려지면 재생을 멈추는 visibilitychange 처리가 있었다.
+  //    다른 탭·사이트로 넘어가도 계속 듣고 싶다는 요청이라 넣지 않는다.
+
+  loadPreset('p_hiphop', false);
+  drawViz(); animCursor();
+}
+
+if (IS_MINI) initMini(); else initMain();
+</script>
+</body>
+</html>

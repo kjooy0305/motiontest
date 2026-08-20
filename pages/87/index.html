@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계급 표 틀 — 소설 설정 자료실</title>
+<style>
+:root{
+  --bg:#0d0b12;--s1:#151221;--s2:#1c1830;--s3:#241f3c;--s4:#2e2749;
+  --bd:#332b52;--bd2:#443a68;
+  --gold:#e0b74a;--gold2:#f5d98a;--gold-d:#8a6f22;
+  --txt:#e8e2d5;--txt2:#a99fc4;--txt3:#6f6690;
+  --red:#d4574e;--grn:#5fbf87;--blu:#5aa9e6;--pur:#a97fe0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Noto Serif KR','Nanum Myeongjo',Georgia,'Apple SD Gothic Neo',serif;
+  font-size:14px;display:flex;flex-direction:column;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(224,183,74,.06),transparent 55%),
+                   radial-gradient(ellipse at 85% 100%,rgba(169,127,224,.06),transparent 55%);
+}
+#app{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
+button{border:none;cursor:pointer;font-family:inherit;font-size:inherit;background:none;color:inherit;outline:none;}
+input,textarea,select{outline:none;font-family:inherit;}
+
+/* 스크롤 */
+.scrollY{overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#4d4270 transparent;overscroll-behavior:contain;}
+.scrollY::-webkit-scrollbar{width:10px;}
+.scrollY::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:5px;}
+.scrollY::-webkit-scrollbar-thumb{background:#4d4270;border-radius:5px;border:2px solid transparent;background-clip:content-box;}
+.scrollY::-webkit-scrollbar-thumb:hover{background:#6b5c99;background-clip:content-box;}
+.scrollX{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#4d4270 transparent;}
+.scrollX::-webkit-scrollbar{height:9px;}
+.scrollX::-webkit-scrollbar-thumb{background:#4d4270;border-radius:5px;border:2px solid transparent;background-clip:content-box;}
+
+/* ── 헤더 ── */
+.hdr{background:linear-gradient(180deg,#191430,#12101d);border-bottom:2px solid var(--gold-d);
+     padding:0 16px;height:58px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+     box-shadow:0 2px 18px rgba(0,0,0,.5);}
+.logo{font-size:18px;font-weight:700;color:var(--gold);white-space:nowrap;letter-spacing:1px;
+      text-shadow:0 0 14px rgba(224,183,74,.35);}
+.logo span{font-size:11px;color:var(--txt3);margin-left:7px;letter-spacing:0;font-weight:400;}
+.tabs{display:flex;gap:4px;margin-left:auto;flex-shrink:0;}
+.tab{padding:7px 15px;border-radius:5px 5px 0 0;font-size:13px;font-weight:700;color:var(--txt3);
+     border:1px solid transparent;border-bottom:none;transition:.13s;white-space:nowrap;}
+.tab:hover{color:var(--txt);background:rgba(255,255,255,.04);}
+.tab.on{color:var(--gold);background:var(--s2);border-color:var(--bd2);}
+
+/* ── 본문 ── */
+.main{display:flex;flex:1;min-height:0;}
+.view{display:none;flex:1;min-height:0;}
+.view.on{display:flex;}
+
+/* 왼쪽 목록 */
+.side{width:236px;min-width:236px;background:var(--s1);border-right:1px solid var(--bd);
+      display:flex;flex-direction:column;flex-shrink:0;}
+.side-search{padding:9px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.side-search input{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:5px;
+                   padding:7px 10px;color:var(--txt);font-size:13px;}
+.side-search input:focus{border-color:var(--gold);}
+.side-search input::placeholder{color:var(--txt3);}
+.side-list{flex:1 1 auto;min-height:0;padding:7px 6px 14px;}
+.cat-head{font-size:10.5px;font-weight:700;letter-spacing:2px;color:var(--gold-d);
+          padding:11px 8px 5px;display:flex;align-items:center;gap:7px;}
+.cat-head i{flex:1;height:1px;background:linear-gradient(90deg,var(--bd2),transparent);font-style:normal;}
+.sys-btn{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:6px;
+         border:1px solid transparent;text-align:left;transition:.12s;margin-bottom:2px;color:var(--txt2);}
+.sys-btn:hover{background:var(--s3);color:var(--txt);}
+.sys-btn.on{background:linear-gradient(90deg,rgba(224,183,74,.14),rgba(224,183,74,.03));
+            border-color:rgba(224,183,74,.4);color:var(--gold2);}
+.sys-ico{font-size:17px;flex-shrink:0;width:22px;text-align:center;}
+.sys-nm{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sys-ct{font-size:10px;color:var(--txt3);flex-shrink:0;}
+.empty-note{color:var(--txt3);font-size:12.5px;padding:16px 10px;text-align:center;line-height:1.8;}
+
+/* 오른쪽 본문 */
+.doc{flex:1;min-width:0;display:flex;flex-direction:column;}
+.doc-body{flex:1 1 auto;min-height:0;padding:20px 26px 60px;}
+.doc-hd{border-bottom:1px solid var(--bd);padding-bottom:14px;margin-bottom:18px;}
+.doc-ttl{font-size:26px;font-weight:700;color:var(--gold);letter-spacing:1px;display:flex;align-items:center;gap:11px;}
+.doc-ttl .badge{font-size:11px;padding:3px 9px;border-radius:11px;border:1px solid var(--bd2);
+                color:var(--txt3);letter-spacing:0;font-weight:400;background:var(--s2);}
+.doc-desc{font-size:13.5px;color:var(--txt2);line-height:1.95;margin-top:9px;}
+.sec-ttl{font-size:14px;font-weight:700;color:var(--gold2);margin:26px 0 11px;
+         display:flex;align-items:center;gap:9px;letter-spacing:1px;}
+.sec-ttl::before{content:'◆';color:var(--gold-d);font-size:11px;}
+
+/* 피라미드 */
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0 4px;}
+.pyr-row{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;}
+.pyr-bar{border-radius:5px;padding:7px 14px;font-size:12.5px;font-weight:700;text-align:center;
+         color:#120f1c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+         box-shadow:0 2px 9px rgba(0,0,0,.4);transition:.14s;cursor:default;}
+.pyr-bar:hover{filter:brightness(1.18);transform:translateY(-1px);}
+.pyr-lv{font-size:10.5px;color:var(--txt3);width:34px;text-align:right;flex-shrink:0;}
+.pyr-en{font-size:10.5px;color:var(--txt3);width:120px;flex-shrink:0;white-space:nowrap;
+        overflow:hidden;text-overflow:ellipsis;font-style:italic;}
+
+/* 표 */
+.tbl-wrap{border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:var(--s1);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:var(--s3);color:var(--gold2);font-weight:700;text-align:left;
+         padding:9px 12px;font-size:11.5px;letter-spacing:1px;border-bottom:1px solid var(--bd2);white-space:nowrap;}
+tbody td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;line-height:1.75;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.028);}
+.td-lv{color:var(--txt3);font-size:11px;width:34px;text-align:center;}
+.td-nm{font-weight:700;white-space:nowrap;}
+.td-nm .en{display:block;font-size:10.5px;color:var(--txt3);font-weight:400;font-style:italic;margin-top:2px;}
+.td-style{color:var(--gold2);font-size:12.5px;white-space:nowrap;}
+.td-rule{color:var(--txt2);font-size:12.5px;min-width:150px;}
+.td-note{color:var(--txt3);font-size:12px;min-width:190px;}
+.rank-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle;}
+
+/* 팁 카드 */
+.tips{display:flex;flex-direction:column;gap:8px;}
+.tip{background:linear-gradient(90deg,rgba(224,183,74,.07),transparent);
+     border-left:3px solid var(--gold-d);border-radius:0 7px 7px 0;padding:11px 15px;
+     font-size:13px;color:var(--txt2);line-height:1.9;}
+.tip b{color:var(--gold2);font-weight:700;}
+.hint-box{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:13px 16px;
+          font-size:12.5px;color:var(--txt2);line-height:1.9;}
+.hint-box b{color:var(--gold2);}
+
+/* ── 빌더 ── */
+.b-side{width:250px;min-width:250px;background:var(--s1);border-right:1px solid var(--bd);
+        display:flex;flex-direction:column;flex-shrink:0;}
+.b-sec{padding:10px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.b-sec-t{font-size:10.5px;font-weight:700;letter-spacing:1.5px;color:var(--gold-d);margin-bottom:7px;}
+.fi{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:5px;
+    padding:7px 10px;color:var(--txt);font-size:13px;margin-bottom:6px;}
+.fi:focus{border-color:var(--gold);}
+.fi::placeholder{color:var(--txt3);}
+textarea.fi{resize:vertical;min-height:52px;line-height:1.7;font-size:12.5px;}
+.btn{padding:7px 12px;border-radius:5px;font-size:12px;font-weight:700;background:var(--s3);
+     border:1px solid var(--bd2);color:var(--txt2);transition:.12s;white-space:nowrap;flex-shrink:0;}
+.btn:hover{color:var(--gold2);border-color:var(--gold-d);background:var(--s4);}
+.btn.pri{color:var(--gold);border-color:rgba(224,183,74,.45);background:rgba(224,183,74,.09);}
+.btn.pri:hover{background:rgba(224,183,74,.18);}
+.btn.danger{color:var(--red);border-color:rgba(212,87,78,.35);}
+.btn.danger:hover{background:rgba(212,87,78,.14);border-color:var(--red);color:var(--red);}
+.btn:disabled{opacity:.38;cursor:default;}
+.btn:disabled:hover{color:var(--txt2);border-color:var(--bd2);background:var(--s3);}
+.btn-row{display:flex;gap:5px;flex-wrap:wrap;}
+.btn-row .btn{flex:1;text-align:center;}
+.saved-list{flex:1 1 auto;min-height:60px;padding:6px;}
+.saved-item{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:5px;
+            border:1px solid transparent;cursor:pointer;margin-bottom:2px;transition:.12s;}
+.saved-item:hover{background:var(--s3);border-color:var(--bd);}
+.saved-item.cur{background:rgba(224,183,74,.1);border-color:rgba(224,183,74,.4);}
+.sv-nm{flex:1;min-width:0;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sv-meta{font-size:10px;color:var(--txt3);flex-shrink:0;}
+.sv-del{font-size:13px;color:var(--txt3);padding:0 3px;flex-shrink:0;}
+.sv-del:hover{color:var(--red);}
+
+.b-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.b-bar{background:var(--s1);border-bottom:1px solid var(--bd);padding:8px 12px;
+       display:flex;align-items:center;gap:7px;flex-shrink:0;flex-wrap:nowrap;}
+.b-body{flex:1 1 auto;min-height:0;padding:16px 20px 60px;}
+.seg{display:flex;background:var(--s3);border:1px solid var(--bd2);border-radius:6px;overflow:hidden;flex-shrink:0;}
+.seg button{padding:6px 13px;font-size:12px;font-weight:700;color:var(--txt3);transition:.12s;}
+.seg button.on{background:rgba(224,183,74,.16);color:var(--gold2);}
+
+/* 빌더 계급 행 */
+.tier-row{display:flex;align-items:flex-start;gap:8px;background:var(--s1);border:1px solid var(--bd);
+          border-left-width:4px;border-radius:8px;padding:10px 12px;margin-bottom:7px;}
+.tier-lv{font-size:11px;color:var(--txt3);width:26px;text-align:center;padding-top:9px;flex-shrink:0;font-weight:700;}
+.tier-fields{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tier-fields .fi{margin-bottom:0;}
+.tier-fields .wide{grid-column:1 / -1;}
+.tier-ops{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.iop{width:26px;height:24px;border-radius:4px;background:var(--s3);border:1px solid var(--bd2);
+     color:var(--txt3);font-size:11px;display:flex;align-items:center;justify-content:center;transition:.12s;}
+.iop:hover{color:var(--gold2);border-color:var(--gold-d);}
+.iop.del:hover{color:var(--red);border-color:var(--red);}
+.color-dot{width:26px;height:24px;border-radius:4px;border:1px solid var(--bd2);cursor:pointer;padding:0;}
+.add-tier{width:100%;padding:11px;border-radius:8px;border:1.5px dashed var(--bd2);color:var(--txt3);
+          font-size:13px;font-weight:700;transition:.12s;margin-top:4px;}
+.add-tier:hover{border-color:var(--gold-d);color:var(--gold2);background:rgba(224,183,74,.05);}
+.b-empty{text-align:center;color:var(--txt3);padding:44px 20px;font-size:13.5px;line-height:2.1;}
+
+/* 모달 */
+.modal-bg{position:fixed;inset:0;background:rgba(5,4,10,.8);z-index:200;display:flex;
+          align-items:center;justify-content:center;backdrop-filter:blur(5px);padding:14px;}
+.modal-bg.hidden{display:none;}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;width:min(680px,100%);
+       max-height:88vh;display:flex;flex-direction:column;box-shadow:0 26px 70px rgba(0,0,0,.7);}
+.modal-hd{display:flex;align-items:center;gap:9px;padding:14px 18px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.modal-ttl{font-size:15px;font-weight:700;color:var(--gold);}
+.modal-x{margin-left:auto;font-size:18px;color:var(--txt3);padding:2px 6px;}
+.modal-x:hover{color:var(--txt);}
+.modal-body{padding:15px 18px;flex:1;min-height:0;}
+.modal-ft{padding:11px 18px;border-top:1px solid var(--bd);display:flex;gap:7px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.out-area{width:100%;min-height:300px;background:var(--s2);border:1px solid var(--bd2);border-radius:7px;
+          padding:12px;color:var(--txt);font-size:12.5px;line-height:1.75;resize:vertical;
+          font-family:'D2Coding','Consolas',monospace;}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:7px;}
+.preset-card{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:11px 13px;
+             cursor:pointer;transition:.13s;text-align:left;}
+.preset-card:hover{border-color:var(--gold-d);background:var(--s3);transform:translateY(-1px);}
+.pc-nm{font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:3px;}
+.pc-ct{font-size:11px;color:var(--txt3);}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--s4);
+       border:1px solid var(--gold-d);border-radius:22px;padding:8px 18px;font-size:13px;color:var(--gold2);
+       opacity:0;pointer-events:none;transition:.19s;z-index:400;box-shadow:0 9px 30px rgba(0,0,0,.6);}
+.toast.on{opacity:1;transform:translate(-50%,0);}
+
+@media(max-height:470px){
+  html,body{overflow:auto;}
+  #app{height:auto;min-height:470px;}
+}
+@media(max-width:820px){
+  .side,.b-side{position:absolute;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);
+                transition:.19s;box-shadow:10px 0 30px rgba(0,0,0,.6);}
+  .side.open,.b-side.open{transform:none;}
+  .side-tgl{display:flex!important;}
+  .main{position:relative;}
+  .doc-body,.b-body{padding:14px 13px 60px;}
+  .doc-ttl{font-size:20px;}
+  .tier-fields{grid-template-columns:1fr;}
+  .pyr-en{display:none;}
+  .logo span{display:none;}
+}
+.side-tgl{display:none;width:30px;height:30px;border-radius:6px;background:var(--s3);
+          border:1px solid var(--bd2);color:var(--txt2);font-size:15px;align-items:center;justify-content:center;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header class="hdr">
+  <button class="side-tgl" id="sideTgl" title="목록">☰</button>
+  <div class="logo">📜 계급 표 틀<span>소설 설정 자료실 &amp; 제작기</span></div>
+  <div class="tabs">
+    <button class="tab on" data-view="ref">📚 자료실</button>
+    <button class="tab" data-view="build">🛠 내 계급표</button>
+    <button class="tab" data-view="guide">📖 작법 팁</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ══ 자료실 ══ -->
+  <div class="view on" id="v-ref">
+    <aside class="side" id="refSide">
+      <div class="side-search"><input type="text" id="refSearch" placeholder="계급·체계 검색 (예: 공작, 마법사)"></div>
+      <div class="side-list scrollY" id="sysList"></div>
+    </aside>
+    <div class="doc">
+      <div class="doc-body scrollY" id="docBody"></div>
+    </div>
+  </div>
+
+  <!-- ══ 빌더 ══ -->
+  <div class="view" id="v-build">
+    <aside class="b-side" id="buildSide">
+      <div class="b-sec">
+        <div class="b-sec-t">계급표 정보</div>
+        <input type="text" class="fi" id="bTitle" placeholder="계급표 이름 (예: 아르헨 제국 서열)" maxlength="60">
+        <textarea class="fi" id="bDesc" placeholder="세계관 메모 — 어떤 나라·조직인지, 어떤 규칙이 있는지" maxlength="600"></textarea>
+        <div class="btn-row">
+          <button class="btn pri" id="bSave">💾 저장</button>
+          <button class="btn" id="bNew">＋ 새로</button>
+        </div>
+      </div>
+      <div class="b-sec">
+        <div class="b-sec-t">불러오기</div>
+        <div class="btn-row">
+          <button class="btn" id="bPreset">📚 자료실에서</button>
+          <button class="btn" id="bImport">📥 JSON</button>
+        </div>
+      </div>
+      <div class="b-sec" style="border-bottom:none;padding-bottom:4px;">
+        <div class="b-sec-t">저장한 계급표 <span id="bCount" style="color:var(--gold);">0</span></div>
+      </div>
+      <div class="saved-list scrollY" id="savedList"></div>
+    </aside>
+
+    <div class="b-main">
+      <div class="b-bar scrollX">
+        <div class="seg">
+          <button class="on" data-bview="edit">✏️ 편집</button>
+          <button data-bview="table">📋 표</button>
+          <button data-bview="pyr">🔺 피라미드</button>
+        </div>
+        <span style="flex:1;"></span>
+        <button class="btn" id="bMd">📄 마크다운</button>
+        <button class="btn" id="bTxt">📝 텍스트</button>
+        <button class="btn" id="bJson">📤 JSON</button>
+        <button class="btn danger" id="bClear">🗑 비우기</button>
+      </div>
+      <div class="b-body scrollY" id="bBody"></div>
+    </div>
+  </div>
+
+  <!-- ══ 작법 팁 ══ -->
+  <div class="view" id="v-guide">
+    <div class="doc">
+      <div class="doc-body scrollY" id="guideBody"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- 내보내기 모달 -->
+<div class="modal-bg hidden" id="outModal">
+  <div class="modal">
+    <div class="modal-hd"><span id="outIcon">📄</span><span class="modal-ttl" id="outTtl">내보내기</span>
+      <button class="modal-x" data-close="outModal">✕</button></div>
+    <div class="modal-body"><textarea class="out-area scrollY" id="outArea" spellcheck="false"></textarea></div>
+    <div class="modal-ft">
+      <span style="font-size:11.5px;color:var(--txt3);" id="outHint">그대로 복사해서 원고나 설정 노트에 붙여넣으세요.</span>
+      <span style="flex:1;"></span>
+      <button class="btn" data-close="outModal">닫기</button>
+      <button class="btn pri" id="outCopy">📋 전체 복사</button>
+    </div>
+  </div>
+</div>
+
+<!-- 프리셋 모달 -->
+<div class="modal-bg hidden" id="presetModal">
+  <div class="modal">
+    <div class="modal-hd"><span>📚</span><span class="modal-ttl">자료실에서 가져오기</span>
+      <button class="modal-x" data-close="presetModal">✕</button></div>
+    <div class="modal-body scrollY">
+      <div class="hint-box" style="margin-bottom:12px;">
+        고른 체계가 <b>편집 화면으로 그대로 복사</b>됩니다. 가져온 뒤 이름·권한·메모를 내 세계관에 맞게 고쳐 쓰세요.
+        원본 자료는 그대로 남습니다.
+      </div>
+      <div class="preset-grid" id="presetGrid"></div>
+    </div>
+    <div class="modal-ft">
+      <label style="font-size:12px;color:var(--txt2);display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="presetAppend"> 지금 목록 <b style="color:var(--gold2);">아래에 이어붙이기</b>
+      </label>
+      <span style="flex:1;"></span>
+      <button class="btn" data-close="presetModal">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="fileIn" accept=".json,application/json" style="display:none">
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-3);
+
+let toastTid = null;
+function toast(msg){
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTid);
+  toastTid = setTimeout(() => el.classList.remove('on'), 1700);
+}
+
+// ═══════════════════════════════════════════════════════
+// 계급 체계 자료 — 위가 높고 아래로 갈수록 낮다
+//   n: 계급명 / en: 원어·영문 / style: 부르는 말(호칭)
+//   rule: 관할·권한 / note: 소설에 쓸 때 참고할 점
+// ═══════════════════════════════════════════════════════
+const SYSTEMS = [
+/* ─────────── 현실 · 역사 ─────────── */
+{
+  id:'eu_noble', name:'서양 귀족', ico:'👑', cat:'현실 · 역사', hue:45,
+  desc:'중세~근세 유럽의 봉건 귀족 서열. 판타지 왕국 설정의 기본 뼈대로 가장 널리 쓰인다. 핵심은 “땅을 얼마나, 누구에게 받아 다스리는가”이며, 작위는 명예가 아니라 통치권과 세금 징수권이 따라붙는 실권이다.',
+  tiers:[
+    {n:'황제', en:'Emperor / Imperator', style:'폐하', rule:'여러 왕국·속국을 아우르는 제국 전체', note:'왕 위에 서려면 명분이 필요하다. 보통 교황의 대관, 고대 제국의 계승 주장, 또는 압도적 정복이 근거가 된다.'},
+    {n:'국왕', en:'King', style:'폐하', rule:'왕국 하나', note:'실제 중세 왕은 생각보다 약했다. 대귀족의 병력을 빌려야 전쟁이 가능한 구조가 갈등을 만들기 좋다.'},
+    {n:'대공', en:'Grand Duke / Archduke', style:'전하', rule:'왕에 준하는 독립 영역(대공국)', note:'왕가의 방계나 사실상 독립한 세력. “왕은 아니지만 왕에게 고개를 숙이지 않는다”는 위치가 극적이다.'},
+    {n:'공작', en:'Duke', style:'각하 / 공작님', rule:'여러 주(州)에 걸친 최대 영지, 사병 보유', note:'왕가의 혈족이거나 건국공신. 왕권을 위협하는 1순위이자 반란·후계 다툼의 단골.'},
+    {n:'후작', en:'Marquess / Margrave', style:'각하 / 후작님', rule:'국경 지대 방어권, 전시 재량권', note:'어원이 “변경(mark)”. 국경을 지키는 대가로 큰 군사권을 받는다. 야만족·적국과 맞닿은 전방 서사에 딱 맞는다.'},
+    {n:'백작', en:'Count / Earl', style:'각하 / 백작님', rule:'한 주(州)의 통치·재판·징세', note:'실무 통치자의 표준. 주인공의 후원자나 첫 상대역으로 가장 쓰기 좋은 규모.'},
+    {n:'자작', en:'Viscount', style:'자작님', rule:'백작을 보좌하거나 그 일부를 위임받음', note:'원래 백작의 대리인. 실권은 애매하고 자존심은 높은 인물로 그리기 좋다.'},
+    {n:'남작', en:'Baron', style:'남작님', rule:'성 하나와 주변 마을 몇 개', note:'귀족의 최하단이자 가장 흔한 작위. 시골 영주의 소소한 사건이 이야기의 출발점이 된다.'},
+    {n:'준남작', en:'Baronet', style:'경(Sir)', rule:'세습되지만 영지는 없음', note:'후대에 생긴 명예 작위. 돈으로 산 신흥 계층을 묘사할 때 유용하다.'},
+    {n:'기사', en:'Knight', style:'경(Sir)', rule:'봉토 또는 봉급, 종군 의무', note:'세습되지 않는 1대 작위. 평민이 신분을 넘을 수 있는 거의 유일한 통로라 성장물의 목표로 자주 쓰인다.'},
+    {n:'향사 · 종자', en:'Esquire / Squire', style:'이름으로 부름', rule:'기사 수행, 무구 관리', note:'기사 지망생. 10대 소년이 주인공일 때의 출발점.'},
+    {n:'자유민', en:'Freeman / Yeoman', style:'이름으로 부름', rule:'자기 땅이나 기술을 가짐, 이동 자유', note:'상인·장인·자영농. 세금은 내지만 예속되지 않아 이야기를 굴리기 편한 신분.'},
+    {n:'농노', en:'Serf', style:'이름으로 부름', rule:'토지에 묶여 경작, 이동 불가', note:'노예는 아니지만 땅과 함께 매매된다. “도망친 농노가 1년 1일간 도시에 살면 자유민”이라는 관습은 좋은 장치.'},
+  ],
+  tips:[
+    '작위는 <b>사람이 아니라 땅에 붙는다</b>. 공작 영지를 잃으면 공작이 아니게 되는 설정이 갈등을 만든다.',
+    '같은 백작이라도 <b>비옥한 평야의 백작과 척박한 산지의 백작</b>은 국력이 다르다. 서열보다 실제 재력을 따로 정해두면 훨씬 입체적이다.',
+    '호칭을 틀리는 것은 중대한 결례다. 주인공이 예법을 몰라 실수하는 장면은 신분 격차를 보여주는 손쉬운 방법이다.',
+  ]
+},
+{
+  id:'joseon', name:'조선 품계 · 관직', ico:'🏛', cat:'현실 · 역사', hue:20,
+  desc:'조선의 관리 서열은 정1품부터 종9품까지 18단계다. 품계는 “등급”이고 관직은 “자리”라서, 같은 품계라도 어느 자리에 앉느냐로 실권이 갈렸다. 동양풍·무협·대체역사물의 기틀로 쓸 수 있다.',
+  tiers:[
+    {n:'정1품', en:'영의정 · 좌의정 · 우의정', style:'대감', rule:'의정부 최고위, 국정 총괄', note:'삼정승. 왕과 직접 논쟁할 수 있는 유일한 층이다.'},
+    {n:'종1품', en:'좌찬성 · 우찬성', style:'대감', rule:'정승 보좌, 주요 국사 심의', note:'정승 바로 아래 대기 자리. 야심가를 배치하기 좋다.'},
+    {n:'정2품', en:'판서 · 대제학 · 좌참찬', style:'대감', rule:'육조의 장관, 한 부처 전체', note:'이·호·예·병·형·공조의 판서. 실무 권력의 정점이라 파벌 다툼의 중심.'},
+    {n:'종2품', en:'참판 · 관찰사 · 부윤', style:'영감', rule:'차관, 또는 한 도(道)의 지방 총책', note:'관찰사는 지방에서 사실상 왕이나 다름없다. 중앙과 지방의 온도차를 그리기 좋다.'},
+    {n:'정3품 당상', en:'참의 · 승지 · 목사', style:'영감', rule:'왕명 출납, 목(牧) 통치', note:'당상관과 당하관을 가르는 결정적 선. 이 선을 넘느냐가 관리 인생의 분수령이다.'},
+    {n:'정3품 당하', en:'통훈대부 · 부정', style:'나리', rule:'실무 부서의 장', note:'같은 정3품인데 회의석에 앉지 못한다. 신분 서사에 쓸 만한 잔인한 디테일.'},
+    {n:'종3품', en:'집의 · 사간 · 도호부사', style:'나리', rule:'감찰·간쟁, 도호부 통치', note:'왕에게 바른말 하는 자리. 목숨을 걸고 직언하는 인물상.'},
+    {n:'정4품', en:'장령 · 사인 · 군수', style:'나리', rule:'중앙 실무 책임, 군(郡) 수령', note:'“사또”로 불리는 지방관 계층. 민생 사건의 무대.'},
+    {n:'종4품', en:'첨정 · 경력 · 군수', style:'나리', rule:'부서 부책임자', note:''},
+    {n:'정5품', en:'정랑 · 교리 · 현령', style:'나리', rule:'육조의 실무 핵심, 현(縣) 수령', note:'정랑은 인사 실무를 쥐어 품계에 비해 힘이 셌다. “낮은 자리의 큰 권력” 예시.'},
+    {n:'종5품', en:'도사 · 판관 · 현령', style:'나리', rule:'감찰 실무, 재판 보좌', note:''},
+    {n:'정6품', en:'좌랑 · 감찰 · 현감', style:'나리', rule:'문서 실무, 작은 고을 수령', note:'과거 급제자가 처음 받는 자리 근처. 신입 관리 주인공의 출발점.'},
+    {n:'종6품', en:'주부 · 교수 · 찰방', style:'나리', rule:'역참·교육 관리', note:''},
+    {n:'정7품~종9품', en:'참봉 · 봉사 · 훈도 등', style:'나리', rule:'말단 행정·기록·잡무', note:'참하관. 대부분의 관리가 여기서 평생을 마친다.'},
+    {n:'아전 · 서리', en:'향리 · 이방 · 형방', style:'이름 또는 직책', rule:'실제 문서·징세·치안 집행', note:'품계 밖의 실무자. 수령은 몇 년 만에 바뀌지만 아전은 대를 이어 남아 지방을 실제로 움직인다. 부패와 정보의 축.'},
+    {n:'양인 · 상민', en:'農工商', style:'이름으로 부름', rule:'납세·군역 의무', note:'농민·장인·상인. 인구의 대부분.'},
+    {n:'천민', en:'노비 · 백정 · 무당 · 광대', style:'이름으로 부름', rule:'매매·상속 대상, 직역 세습', note:'신분 상승이 사실상 막혀 있어 탈출 서사의 동력이 된다.'},
+  ],
+  tips:[
+    '<b>품계와 관직을 분리</b>해서 설계하면 “품계는 낮은데 자리가 요직”인 인물을 만들 수 있다. 갈등 구조가 훨씬 풍부해진다.',
+    '조선에서 <b>대감(정2품 이상) · 영감(종2품~정3품 당상) · 나리(그 아래)</b>는 호칭이 다르다. 대사에서 호칭 하나로 서열을 드러낼 수 있다.',
+    '지방의 실권은 <b>아전</b>에게 있었다. 부임한 젊은 사또가 아전에게 휘둘리는 구도는 검증된 이야기 틀이다.',
+  ]
+},
+{
+  id:'feudal', name:'중세 신분제', ico:'⚖️', cat:'현실 · 역사', hue:30,
+  desc:'“기도하는 자, 싸우는 자, 일하는 자”라는 삼신분론이 중세 사회를 지탱했다. 작위 서열과 달리 이쪽은 태어나면서 정해지는 삶의 틀이라, 신분 이동 자체가 이야기의 사건이 된다.',
+  tiers:[
+    {n:'왕 · 대영주', en:'Sovereign', style:'폐하 / 전하', rule:'봉토 분배권, 최종 재판권', note:'봉신에게 땅을 주고 충성을 받는 구조의 꼭대기.'},
+    {n:'성직 귀족', en:'Prince-Bishop / Abbot', style:'예하 / 원장님', rule:'교회령 통치, 십일조 징수', note:'칼과 성물을 동시에 쥔 존재. 세속 군주와 대립시키면 좋은 축이 된다.'},
+    {n:'봉신 영주', en:'Vassal Lord', style:'영주님', rule:'하사받은 땅의 통치와 군역 제공', note:'“내 봉신의 봉신은 내 봉신이 아니다”라는 원칙 때문에 왕의 명령이 말단까지 닿지 않는다.'},
+    {n:'기사', en:'Knight', style:'경', rule:'무력 제공, 소규모 봉토', note:'실제로는 폭력적인 무장 지주에 가까웠다. 기사도는 후대의 이상화라는 점을 비틀면 신선하다.'},
+    {n:'하급 성직자', en:'Priest / Monk', style:'신부님 / 수사님', rule:'교구 관리, 성사 집행', note:'마을에서 유일하게 글을 읽는 사람인 경우가 많다. 정보 전달자로 쓰기 좋다.'},
+    {n:'도시민 · 길드원', en:'Burgher / Guildsman', style:'이름으로 부름', rule:'도시 자치권, 상업 독점', note:'“도시의 공기는 자유롭게 한다”. 성벽 안은 영주의 힘이 약해지는 별개의 세계다.'},
+    {n:'자영농', en:'Freeholder', style:'이름으로 부름', rule:'자기 땅 소유, 세금 납부', note:''},
+    {n:'농노', en:'Serf / Villein', style:'이름으로 부름', rule:'부역·현물 납부, 이주 금지', note:'주 3일은 영주 땅에서 일했다. 시간이 자기 것이 아니라는 감각이 핵심.'},
+    {n:'유랑민 · 무법자', en:'Outlaw / Vagrant', style:'—', rule:'법의 보호 밖', note:'법의 보호를 잃은 자는 죽여도 죄가 되지 않았다. 도적단·용병의 공급원.'},
+  ],
+  tips:[
+    '중세의 이동은 극도로 느리다. <b>소식이 도착하는 데 며칠~몇 주</b> 걸린다는 점을 지키면 세계가 갑자기 진짜처럼 느껴진다.',
+    '신분을 넘는 방법은 사실상 <b>전공(戰功) · 성직 · 결혼 · 도시로의 도주</b> 넷뿐이었다. 주인공의 상승 경로를 이 중에서 고르면 설득력이 생긴다.',
+  ]
+},
+{
+  id:'military', name:'군 계급', ico:'🎖', cat:'현실 · 역사', hue:150,
+  desc:'현대 군 계급은 “지휘하는 인원 수”로 층이 나뉜다. 판타지 군대에 그대로 옮겨 써도 독자가 즉시 이해하므로, 규모감을 전달하는 데 효율적이다.',
+  tiers:[
+    {n:'원수', en:'Marshal', style:'원수님', rule:'전군 총사령', note:'전시에만 두는 나라가 많다. 등장 자체가 국가 존망을 뜻하게 만들면 무게가 산다.'},
+    {n:'대장', en:'General', style:'장군님', rule:'군단 이상 · 수만 명', note:''},
+    {n:'중장 · 소장', en:'Lt. General / Major General', style:'장군님', rule:'사단 · 1~2만 명', note:'작전 단위의 실질 지휘부.'},
+    {n:'준장', en:'Brigadier', style:'장군님', rule:'여단 · 3~5천 명', note:'별을 다는 첫 계급. “장교에서 장군으로” 넘어가는 문턱 서사에 쓰인다.'},
+    {n:'대령', en:'Colonel', style:'대령님', rule:'연대 · 1~3천 명', note:'야전에서 가장 오래 굴러본 계층. 노련한 조력자 역할로 좋다.'},
+    {n:'중령 · 소령', en:'Lt. Colonel / Major', style:'—님', rule:'대대 · 300~800명', note:''},
+    {n:'대위', en:'Captain', style:'대위님', rule:'중대 · 100~200명', note:'부하 얼굴을 전부 아는 마지막 계급. 인간적인 지휘관 묘사에 적합.'},
+    {n:'중위 · 소위', en:'Lieutenant / Ensign', style:'—님', rule:'소대 · 30~40명', note:'갓 임관한 신참 장교. 베테랑 부사관에게 배우는 구도가 정석.'},
+    {n:'원사 · 상사', en:'Sergeant Major', style:'—님', rule:'부대 실무 총괄', note:'계급은 낮아도 경험은 최고. 소위를 실질적으로 가르치는 존재.'},
+    {n:'중사 · 하사', en:'Sergeant', style:'—님', rule:'분대 · 8~12명', note:'실제 전투가 벌어지는 최소 단위의 지휘자.'},
+    {n:'병장 · 상등병', en:'Corporal', style:'—', rule:'선임병', note:''},
+    {n:'일병 · 이병', en:'Private', style:'—', rule:'명령 수행', note:'시점 인물로 두면 전쟁의 부조리를 그리기에 가장 좋다.'},
+  ],
+  tips:[
+    '판타지에 쓸 때는 <b>이름만 바꾸고 규모는 유지</b>하는 편이 안전하다. “천인장·백인장·십인장”처럼 숫자를 붙이면 설명 없이도 규모가 전달된다.',
+    '<b>장교와 부사관의 갈등</b>은 계급 사회를 그리는 가장 빠른 방법이다. 권위와 실력이 어긋나는 지점이라서다.',
+  ]
+},
+{
+  id:'clergy', name:'성직 서열', ico:'✝️', cat:'현실 · 역사', hue:200,
+  desc:'가톨릭 교계의 서열. 세속 권력과 별개로 움직이는 두 번째 권력 구조라, 왕국 위에 종교 조직을 얹으면 이야기의 축이 하나 더 생긴다.',
+  tiers:[
+    {n:'교황', en:'Pope / Pontifex', style:'성하', rule:'전 교회의 수장, 파문권', note:'왕을 파문해 신하들의 충성 의무를 해제시킬 수 있다. 칼 없이 왕을 무너뜨리는 무기.'},
+    {n:'추기경', en:'Cardinal', style:'전하 / 예하', rule:'교황 선출권, 교황청 부서 총괄', note:'붉은 옷. 차기 교황을 노리는 정치가들의 무대가 곧 콘클라베다.'},
+    {n:'대주교', en:'Archbishop', style:'예하', rule:'관구 전체의 교회 총괄', note:''},
+    {n:'주교', en:'Bishop', style:'예하', rule:'교구 관리, 서품권', note:'중세엔 영주를 겸하는 경우가 흔했다. 세속 욕망과 신앙 사이의 인물로 쓰기 좋다.'},
+    {n:'대수도원장', en:'Abbot', style:'원장님', rule:'수도원과 그 소유지', note:'수도원은 도서관·양조장·병원을 겸했다. 지식과 재물이 모이는 장소.'},
+    {n:'사제', en:'Priest', style:'신부님', rule:'교구 성사 집행', note:'마을 사람들의 비밀을 고해로 다 알고 있는 존재.'},
+    {n:'부제', en:'Deacon', style:'—', rule:'사제 보좌, 구호 활동', note:''},
+    {n:'수도사 · 수녀', en:'Monk / Nun', style:'수사님 / 수녀님', rule:'기도·필사·노동', note:'글을 다루는 계층. 기록과 번역이 필요한 사건에 투입하기 좋다.'},
+    {n:'평신도', en:'Laity', style:'—', rule:'신앙 생활, 십일조', note:''},
+  ],
+  tips:[
+    '종교 조직은 <b>국경을 넘는 유일한 조직</b>이었다. 적국끼리도 같은 교단이면 정보와 사람이 오간다는 설정이 첩보물에 잘 맞는다.',
+    '판타지로 옮길 땐 <b>“이 신이 실제로 응답하는가”</b>를 먼저 정하라. 기적이 진짜인 세계와 가짜인 세계는 성직자의 성격이 완전히 달라진다.',
+  ]
+},
+
+/* ─────────── 판타지 · 왕국 ─────────── */
+{
+  id:'court', name:'제국 궁정 직위', ico:'🏰', cat:'판타지 · 왕국', hue:280,
+  desc:'작위와 별개로 궁정 안에서 실제 권력을 나누는 자리들. 귀족 서열만으로는 심심할 때 이 층을 얹으면 궁중암투가 굴러가기 시작한다.',
+  tiers:[
+    {n:'재상 · 대신관', en:'Chancellor / Grand Vizier', style:'각하', rule:'국정 총괄, 왕명 기초', note:'왕이 어리거나 무능할수록 실질 통치자가 된다. 흑막 1순위.'},
+    {n:'왕실 근위대장', en:'Lord Commander', style:'경 / 대장님', rule:'왕의 신변과 왕궁 방어', note:'왕과 가장 가까운 칼. 충성과 진실 사이에서 갈등시키기 좋은 자리.'},
+    {n:'대법관', en:'High Justiciar', style:'각하', rule:'최종심 재판, 법 해석', note:'왕조차 형식상 이 사람의 판결을 뒤집기 번거롭게 설정하면 극이 산다.'},
+    {n:'재무관', en:'Lord Treasurer', style:'각하', rule:'국고·조세·화폐 발행', note:'전쟁을 할 수 있는지 없는지를 실제로 결정하는 사람.'},
+    {n:'궁정 마도사', en:'Court Archmage', style:'—공 / 대마법사님', rule:'왕실 자문, 마법 감독', note:'귀족들이 배척하지만 왕은 놓지 못하는 이질적 존재. 외부인 시점으로 쓰기 좋다.'},
+    {n:'첩보 총관', en:'Spymaster', style:'—', rule:'첩보망 운영, 암살 지시', note:'공식 직위가 없는 편이 더 무섭다. “속삭이는 자” 같은 별칭을 붙이면 분위기가 산다.'},
+    {n:'시종장', en:'Lord Chamberlain', style:'—', rule:'왕궁 살림, 알현 일정 통제', note:'왕을 만나려면 반드시 거쳐야 하는 문지기. 사소해 보이지만 실제 권력이 크다.'},
+    {n:'궁정 서기 · 사관', en:'Royal Scribe / Chronicler', style:'—', rule:'기록·문서·역사 편찬', note:'“역사에 어떻게 남길 것인가”로 협박이 가능한 직책.'},
+    {n:'시녀 · 시동', en:'Lady-in-waiting / Page', style:'이름으로 부름', rule:'왕족 수발', note:'모든 대화를 엿듣는 위치. 정보가 새는 통로로 자주 쓰인다.'},
+  ],
+  tips:[
+    '궁정 직위는 <b>작위와 어긋나게</b> 배치할 때 재미있다. 남작이 재상이고 공작이 무직이면, 그 자체로 갈등이 준비된다.',
+    '권력의 크기는 <b>왕과의 물리적 거리</b>로 표현된다. 누가 왕의 침실에 들어갈 수 있는가를 정해두면 서열이 저절로 드러난다.',
+  ]
+},
+{
+  id:'knight', name:'기사단', ico:'🛡', cat:'판타지 · 왕국', hue:210,
+  desc:'왕국·교단·귀족가에 소속된 무장 조직. 서품(敍品)이라는 통과의례가 있어 “들어가는 것 자체가 사건”이 되는 구조라 성장물과 궁합이 좋다.',
+  tiers:[
+    {n:'단장', en:'Grand Master', style:'단장님 / 각하', rule:'기사단 전체, 독자적 재판권', note:'왕에게도 쉽게 굽히지 않는다. 국가 안의 국가로 그리면 긴장이 생긴다.'},
+    {n:'부단장', en:'Marshal / Seneschal', style:'부단장님', rule:'실전 지휘, 단장 대리', note:'단장이 정치를 맡으면 이쪽이 실제 전투를 지휘한다.'},
+    {n:'기사단장급 지휘관', en:'Commander / Preceptor', style:'—경', rule:'지부·중대 단위 지휘', note:'지방 지부장. 본단과 온도차를 두면 조직 내 노선 갈등을 만들 수 있다.'},
+    {n:'정기사', en:'Knight-Brother', style:'경', rule:'독립 임무 수행, 종자 지도', note:'조직의 중추. 이름을 얻은 기사들.'},
+    {n:'준기사 · 수련기사', en:'Knight-Aspirant', style:'—', rule:'서품 전 견습 임무', note:'서품 시험을 클라이맥스로 삼기 좋다.'},
+    {n:'종자', en:'Squire', style:'이름으로 부름', rule:'주군 수행, 무구·군마 관리', note:'주인공의 시작점. 기사의 밑바닥을 보며 환상이 깨지는 서사가 흔하다.'},
+    {n:'시동', en:'Page', style:'이름으로 부름', rule:'심부름, 예법 학습', note:'보통 7~14세. 귀족 자제가 다른 집에 보내져 배우는 관습이 있었다.'},
+    {n:'종군 병사 · 하인', en:'Man-at-arms / Servant', style:'—', rule:'실제 전투 인력, 보급', note:'기사 한 명 뒤에 이런 인원이 여럿 붙는다. 잊고 쓰면 군대 규모가 비현실적이 된다.'},
+  ],
+  tips:[
+    '기사단에 <b>지켜야 할 계율 3~5개</b>를 정해두면 인물이 저절로 움직인다. 그리고 그 계율을 깨야만 하는 상황을 던지면 그게 곧 이야기다.',
+    '<b>서품식·문장(紋章)·맹세문</b> 같은 의례를 하나만 구체적으로 묘사해도 조직 전체가 실재하는 것처럼 느껴진다.',
+  ]
+},
+
+/* ─────────── 판타지 · 마법 / 신앙 ─────────── */
+{
+  id:'mage', name:'마법사 서열 (탑)', ico:'🔮', cat:'판타지 · 마법 · 신앙', hue:265,
+  desc:'마법사 조직은 혈통이 아니라 실력으로 서열이 정해지는 드문 구조다. 그래서 신분제 사회에 얹으면 “평민도 올라갈 수 있는 사다리”가 되어 이야기가 움직인다.',
+  tiers:[
+    {n:'탑주 · 대마법사', en:'Archmage / Tower Master', style:'탑주님 / 대현자', rule:'탑 전체, 금서 접근권', note:'대개 은둔형. 살아 있는지조차 불확실한 존재로 두면 신비감이 유지된다.'},
+    {n:'현자 · 장로', en:'Elder / Sage', style:'현자님', rule:'연구 방향 결정, 후계 심사', note:'수명 연장 마법을 설정하면 “수백 년을 산 노인들의 고인 물” 구도가 만들어진다.'},
+    {n:'수석 마법사', en:'Master Mage', style:'—경 / 스승님', rule:'한 계통(원소·소환·부여 등) 총괄', note:'계통끼리 반목시키면 조직 내부 갈등이 쉽게 생긴다.'},
+    {n:'정마법사', en:'Full Mage', style:'마법사님', rule:'독자 연구·주문 등록 가능', note:'“자기 이름을 붙인 주문을 등록해야 정마법사”라는 규칙은 목표로 삼기 좋은 장치.'},
+    {n:'준마법사', en:'Adept', style:'—', rule:'감독하에 시전, 실전 배치', note:''},
+    {n:'수습생', en:'Apprentice', style:'이름으로 부름', rule:'스승 1인에게 도제식 사사', note:'스승과의 관계가 곧 인생을 좌우한다. 사제 관계를 축으로 삼는 이야기의 출발점.'},
+    {n:'입문자', en:'Novice / Initiate', style:'이름으로 부름', rule:'이론·기초 마력 운용', note:'재능 판별 시험에서 떨어지는 인물을 그리면 냉혹함이 드러난다.'},
+    {n:'무자격 술사', en:'Hedge Wizard', style:'—', rule:'조직 밖, 독학·민간 마술', note:'탑에서 인정하지 않는 야생 마법사. 주인공을 여기에 두면 체제와 충돌시킬 수 있다.'},
+  ],
+  tips:[
+    '<b>승급 조건을 명확한 시험으로</b> 만들어라. “7서클”처럼 숫자만 있으면 밋밋하지만, “봉인된 방에서 사흘을 버틸 것”처럼 사건이 되면 장면이 생긴다.',
+    '마법의 <b>대가(代價)</b>를 정하는 게 서열보다 중요하다. 수명·기억·감정 중 무엇을 지불하는지에 따라 조직의 분위기가 완전히 달라진다.',
+    '실력제 조직에 <b>귀족 자제가 낙하산으로 들어오는</b> 설정을 넣으면, 능력주의의 균열을 통해 사회 비판을 담을 수 있다.',
+  ]
+},
+{
+  id:'temple', name:'신전 · 신관', ico:'🕯', cat:'판타지 · 마법 · 신앙', hue:48,
+  desc:'신이 실제로 힘을 내려주는 세계의 종교 조직. 신탁·치유·파문이 실효를 가지므로 왕권과 대등하거나 그 이상이 될 수 있다.',
+  tiers:[
+    {n:'교주 · 대신관', en:'High Hierophant', style:'성하', rule:'신탁 해석의 최종 권위', note:'“신의 뜻”을 독점 해석한다. 그 해석이 조작일 가능성을 열어두면 반전 소재가 된다.'},
+    {n:'신탁관', en:'Oracle', style:'—', rule:'신의 계시를 직접 받음', note:'대개 어리거나 병약하게 그려진다. 예언의 대가로 몸이 망가진다는 설정이 흔하다.'},
+    {n:'주교 신관', en:'Bishop / Archpriest', style:'예하', rule:'지역 신전 총괄', note:''},
+    {n:'성기사', en:'Paladin', style:'경', rule:'신벌 집행, 이단 토벌', note:'신앙과 무력을 겸한다. 신념이 흔들릴 때 힘도 잃는 설정이면 내면 갈등이 곧 전투력이 된다.'},
+    {n:'신관', en:'Priest / Cleric', style:'신관님', rule:'치유·축복·의식 집행', note:'파티의 치유역. 치유 횟수에 제한을 걸면 긴장감이 생긴다.'},
+    {n:'수도사 · 고행자', en:'Monk / Ascetic', style:'—', rule:'수행·기록·순례', note:'맨몸 무술 계통으로 설정하는 작품도 많다.'},
+    {n:'견습 신관', en:'Acolyte', style:'이름으로 부름', rule:'제단 정리, 기도문 암송', note:''},
+    {n:'신도', en:'Devotee', style:'—', rule:'헌금·봉사', note:'광신도 집단으로 그리면 조직의 그림자를 보여줄 수 있다.'},
+    {n:'이단 · 파문자', en:'Heretic / Excommunicate', style:'—', rule:'신의 가호 상실', note:'치유를 받지 못하고 매장도 거부당한다. 사회적 사망을 뜻하게 만들면 무겁다.'},
+  ],
+  tips:[
+    '<b>신이 여럿</b>이면 신전끼리 경쟁시킬 수 있다. 전쟁신과 풍요신의 신전이 같은 도시에서 예산을 다투는 식의 세속적 묘사가 오히려 실감난다.',
+    '기적에 <b>조건</b>을 걸어라. “신앙심이 아니라 신의 변덕에 달렸다”로 설정하면, 착한 사람이 죽고 악인이 살아나는 비극을 정당하게 쓸 수 있다.',
+  ]
+},
+
+/* ─────────── 판타지 · 조직 ─────────── */
+{
+  id:'guild', name:'모험가 길드 랭크', ico:'⚔️', cat:'판타지 · 조직', hue:130,
+  desc:'의뢰 난이도와 개인 실력을 등급으로 묶은 체계. 독자가 즉시 이해하는 장치라 진입장벽이 낮고, 승급 자체가 목표가 되어 서사를 끌고 간다.',
+  tiers:[
+    {n:'S랭크', en:'S-Rank', style:'—님 (경외)', rule:'국가급 재난 대응, 왕과 독대 가능', note:'대륙에 열 명 남짓으로 두면 희소성이 산다. 이름만 나와도 분위기가 바뀌는 존재.'},
+    {n:'A랭크', en:'A-Rank', style:'—님', rule:'상급 마수 토벌, 소부대 지휘', note:'주인공의 최종 목표로 삼기 적당한 위치.'},
+    {n:'B랭크', en:'B-Rank', style:'—씨', rule:'중급 마수, 호위·탐색 의뢰', note:'실력자로 대접받기 시작하는 선. 여기서 이야기를 시작하면 초반 지루함을 건너뛸 수 있다.'},
+    {n:'C랭크', en:'C-Rank', style:'—씨', rule:'다수 파티 의뢰, 던전 하층', note:'대부분의 모험가가 머무는 구간. “평범한 모험가”의 기준선.'},
+    {n:'D랭크', en:'D-Rank', style:'—', rule:'약한 마물 퇴치, 호위 보조', note:''},
+    {n:'E랭크', en:'E-Rank', style:'—', rule:'채집·배달·잡무', note:'약초 캐기와 시궁쥐 퇴치. 밑바닥의 비참함을 그리기 좋다.'},
+    {n:'F랭크 · 무등록', en:'F-Rank / Unregistered', style:'—', rule:'길드 보증 없음', note:'등록비를 못 내는 사람들. 신분 없는 자의 서사를 여기서 시작할 수 있다.'},
+  ],
+  tips:[
+    '<b>승급 심사를 사람이 한다</b>고 설정하면 정치가 끼어든다. 실력은 되는데 미움을 사서 승급이 막힌 인물은 즉시 매력적이다.',
+    '길드는 <b>세금을 떼고 정보를 판다</b>. 선의의 기관이 아니라 이익집단으로 그리면 훨씬 입체적이다.',
+    '랭크와 실제 강함을 <b>일부러 어긋나게</b> 두는 것도 방법이다. 등급 낮은 노병이 A랭크를 이기는 장면 하나로 세계의 규칙을 뒤흔들 수 있다.',
+  ]
+},
+{
+  id:'demon', name:'마왕군 서열', ico:'😈', cat:'판타지 · 조직', hue:0,
+  desc:'적 진영에도 서열이 있어야 “다음 상대”가 예고된다. 힘의 위계를 명확히 해두면 독자가 강함을 계산하며 읽게 되어 긴장이 유지된다.',
+  tiers:[
+    {n:'마왕', en:'Demon Lord / Overlord', style:'폐하 / 마왕님', rule:'마계 전체, 권능 분배', note:'끝까지 안 나오는 편이 무섭다. 부하들의 증언으로만 존재감을 쌓아가는 방식이 안전하다.'},
+    {n:'마신 · 권속왕', en:'Archdemon', style:'—님', rule:'한 영역(죽음·역병·탐욕 등) 관장', note:'각자 상징 개념을 하나씩 주면 캐릭터가 겹치지 않는다.'},
+    {n:'마왕 직속 간부', en:'Executive / Seven Lords', style:'—경 / 각하', rule:'군단 하나씩 지휘', note:'“사천왕·칠죄종” 구조. 숫자를 정해두면 독자가 진행도를 체감한다.'},
+    {n:'상급 마족', en:'Greater Demon', style:'—', rule:'요새·군단 부지휘', note:'인간형으로 두면 대화가 가능해져 서사가 깊어진다.'},
+    {n:'중급 마족', en:'Lesser Demon', style:'—', rule:'부대 지휘, 단독 침공', note:'중간 보스 담당.'},
+    {n:'마물 · 하급 마족', en:'Fiend / Imp', style:'—', rule:'명령 수행, 소모품', note:''},
+    {n:'사역마 · 마수', en:'Familiar / Beast', style:'—', rule:'지성 없음, 본능적 공격', note:'수를 앞세우는 물량 담당.'},
+    {n:'배교자 · 인간 협력자', en:'Cultist / Traitor', style:'—', rule:'내부 정보 제공, 의식 수행', note:'가장 무서운 적은 안쪽에 있다. 정체를 숨긴 채 아군으로 두면 반전이 된다.'},
+  ],
+  tips:[
+    '마족에게 <b>그들 나름의 논리</b>를 주면 격이 올라간다. 침공의 이유가 “원래 악해서”가 아니라 “마계가 죽어가서”라면 이야기가 달라진다.',
+    '서열이 곧 강함이 아니게 만들 수도 있다. <b>정치로 올라간 간부</b>가 밑의 부하보다 약한 설정은 조직 내분을 만든다.',
+  ]
+},
+{
+  id:'shadow', name:'암살자 · 암흑 조직', ico:'🗡', cat:'판타지 · 조직', hue:300,
+  desc:'이름을 지우고 번호나 별칭으로 부르는 조직. 계급이 곧 “아는 정보의 양”이라 상승할수록 진실에 가까워지는 구조를 만들 수 있다.',
+  tiers:[
+    {n:'수괴 · 그림자', en:'The Head / Shadow', style:'—', rule:'조직 전체, 정체 불명', note:'조직원조차 얼굴을 모른다는 설정이 정석. 사실 이미 죽었거나 여러 명이라는 반전도 흔하다.'},
+    {n:'장로회 · 손가락', en:'Council / The Five Fingers', style:'—', rule:'구역·사업 분할 관리', note:'다섯 명에게 각각 도시 하나씩 맡기면 구조가 한눈에 잡힌다.'},
+    {n:'수석 암살자', en:'Master Assassin', style:'별칭으로 부름', rule:'최고 난도 의뢰 단독 수행', note:'별칭(까마귀·마지막 밤 등)만 알려진 존재. 정체 추적 자체가 플롯이 된다.'},
+    {n:'집행자', en:'Executioner / Blade', style:'번호 또는 별칭', rule:'표적 처리', note:'실무 담당. 감정을 지우도록 훈련받았다는 설정이 흔하다.'},
+    {n:'정보원', en:'Whisperer / Broker', style:'—', rule:'첩보 수집·매매', note:'칼보다 정보가 비싸다는 걸 보여주는 층. 중립적 협력자로 쓰기 좋다.'},
+    {n:'그림자꾼', en:'Shade / Runner', style:'—', rule:'미행·전달·잠입', note:''},
+    {n:'견습', en:'Novice', style:'번호로 부름', rule:'훈련, 시험 임무', note:'첫 살인이 곧 졸업 시험. 이 장면 하나로 조직의 성격이 정해진다.'},
+    {n:'외부 협력자', en:'Contact / Fence', style:'—', rule:'장물·은신처·위조', note:'조직에 속하지 않지만 없으면 안 되는 사람들. 세계를 넓히는 조연 창고.'},
+  ],
+  tips:[
+    '<b>탈퇴 규정</b>을 정하라. 나갈 수 있는가, 나가면 죽는가. 이 한 줄이 인물의 모든 선택을 제약한다.',
+    '계급이 오를수록 <b>조직의 진짜 목적</b>에 가까워지게 설계하면, 승급 자체가 정보 공개 장치가 된다.',
+  ]
+},
+{
+  id:'academy', name:'아카데미 서열', ico:'🎓', cat:'판타지 · 조직', hue:190,
+  desc:'학원물의 뼈대. 학년·성적·가문이라는 세 축이 서로 어긋나면서 갈등을 만든다. 폐쇄된 공간이라 인물 관계가 밀도 있게 쌓인다.',
+  tiers:[
+    {n:'학장', en:'Headmaster', style:'학장님', rule:'학원 전체, 퇴학 결정권', note:'과거에 대단한 인물이었다는 설정이 흔하다. 학원의 비밀을 쥔 사람.'},
+    {n:'교수 · 학과장', en:'Professor', style:'교수님', rule:'학과 운영, 성적 평가', note:'편애하는 교수 한 명만 있어도 학내 정치가 굴러간다.'},
+    {n:'수석 · 학생회장', en:'Head Student', style:'선배님 / 회장', rule:'학생 자치, 징계 발의', note:'실력과 가문을 겸비한 인물로 두면 주인공의 벽이 된다.'},
+    {n:'상급생 (특급반)', en:'Elite Class', style:'선배', rule:'특별 수업·실전 파견', note:'반이 나뉘는 순간 차별이 생긴다. 반 배정 시험을 초반 이벤트로 쓰기 좋다.'},
+    {n:'상급생 (일반)', en:'Upperclassman', style:'선배', rule:'—', note:''},
+    {n:'신입생', en:'Freshman', style:'—', rule:'기초 과정', note:'주인공 시작 위치. 입학식과 첫 실기 시험이 정석 구성.'},
+    {n:'청강생 · 장학생', en:'Scholarship / Auditor', style:'—', rule:'조건부 수학, 성적 미달 시 퇴출', note:'평민 출신 특기생. 신분 갈등을 학원 안으로 끌어오는 장치.'},
+    {n:'사역 학생 · 고용인', en:'Servant Student / Staff', style:'이름으로 부름', rule:'학비 대신 노동', note:'학원의 뒷면을 아는 위치. 시점 인물로 쓰면 신선하다.'},
+  ],
+  tips:[
+    '<b>성적 · 가문 · 실력</b> 세 서열을 일부러 어긋나게 배치하라. 성적 1등이 가문은 몰락 귀족이고 실전은 약하다면, 그 인물 하나로 이야기가 굴러간다.',
+    '학원의 <b>금지 구역과 교칙</b>을 세 개쯤 정해두면 학생들이 알아서 어기러 간다.',
+  ]
+},
+
+/* ─────────── 판타지 · 종족 ─────────── */
+{
+  id:'dragon', name:'용족 위계', ico:'🐉', cat:'판타지 · 종족', hue:15,
+  desc:'수명이 긴 종족은 나이 자체가 계급이 된다. 인간의 왕조 몇 개가 지나가는 동안 한 개체가 계속 살아 있다는 시간 감각이 핵심.',
+  tiers:[
+    {n:'태고룡', en:'Elder Wyrm / Primordial', style:'—', rule:'세계의 법칙에 관여', note:'거의 신격. 잠들어 있고 깨어나면 재앙이라는 설정이 안전하다.'},
+    {n:'고룡', en:'Ancient Dragon', style:'—님 (경외)', rule:'대륙 단위 영역, 브레스', note:'수천 년. 인간을 벌레처럼 여기되 특정 개인에게만 흥미를 갖는 구도가 좋다.'},
+    {n:'성룡', en:'Adult Dragon', style:'—', rule:'광역 영지, 인간형 변신', note:'인간 사회에 섞여 사는 설정으로 쓰기 좋은 단계.'},
+    {n:'준성룡', en:'Young Dragon', style:'—', rule:'둥지와 사냥터 확보', note:'영역을 얻기 위해 다투는 시기. 젊은 용의 야심을 그릴 수 있다.'},
+    {n:'유룡', en:'Wyrmling / Hatchling', style:'—', rule:'부모 보호 아래', note:'인간과 만나 유대를 맺는 전형적 구도.'},
+    {n:'용인 · 반룡', en:'Dragonkin / Half-dragon', style:'—', rule:'용의 피를 이은 아종', note:'순혈에게 멸시받는 설정이면 정체성 서사가 생긴다.'},
+    {n:'비룡 · 아룡', en:'Wyvern / Drake', style:'—', rule:'지성 낮음, 짐승에 가까움', note:'기수(騎手)가 타는 탈것으로 두면 용과 급을 구분할 수 있다.'},
+  ],
+  tips:[
+    '<b>시간 감각</b>이 전부다. 용에게 “10년만 기다려 달라”는 부탁은 인간에게 “10분”과 같다는 식의 대사 하나로 종족 차이가 전달된다.',
+    '<b>보물을 모으는 이유</b>를 새로 정해보라. 탐욕이 아니라 “기억을 물건에 저장한다”면 보물 창고가 곧 그 용의 일생이 된다.',
+  ]
+},
+{
+  id:'elf', name:'엘프 · 숲의 위계', ico:'🏹', cat:'판타지 · 종족', hue:110,
+  desc:'혈통과 세대가 서열을 만드는 폐쇄적 구조. 오래 사는 만큼 변화를 싫어하고, 그 보수성이 인간과의 갈등을 만든다.',
+  tiers:[
+    {n:'대현자 · 초대', en:'Eldest / First-born', style:'—', rule:'숲의 근원과 이어진 존재', note:'세계수와 생명을 공유하는 설정이 흔하다. 나무가 죽으면 함께 죽는다.'},
+    {n:'여왕 · 왕', en:'High Queen / King', style:'폐하', rule:'전 부족 통합 통치', note:''},
+    {n:'장로회', en:'Council of Elders', style:'장로님', rule:'율법 해석, 외부인 출입 결정', note:'수백 년째 같은 사람들이 앉아 있다. 정체된 권력의 상징으로 쓰기 좋다.'},
+    {n:'수호자 · 대궁수', en:'Warden / Master Archer', style:'—', rule:'국경 순찰, 침입자 처리', note:'외부와 접촉하는 유일한 층이라 주인공과 처음 만나는 엘프로 적합.'},
+    {n:'술사 · 정령사', en:'Spiritweaver', style:'—', rule:'정령 교감, 치유', note:''},
+    {n:'장인 · 시인', en:'Artisan / Bard', style:'—', rule:'공예·기록·노래', note:'엘프의 역사가 문자가 아니라 노래로 전해진다면, 노래를 잃는 것이 곧 멸망이다.'},
+    {n:'젊은이', en:'Young One', style:'이름으로 부름', rule:'수련 중 (100세 미만)', note:'“백 살인데 아이 취급” 설정은 종족 차이를 보여주는 손쉬운 장치.'},
+    {n:'추방자 · 혼혈', en:'Exile / Half-elf', style:'—', rule:'숲 출입 금지', note:'양쪽 어디에도 속하지 못하는 위치. 주인공으로 세우기에 가장 좋은 자리.'},
+  ],
+  tips:[
+    '<b>왜 인간을 싫어하는가</b>를 구체적 사건으로 정하라. 막연한 반감보다 “300년 전 숲을 태운 인간 왕국”이 있으면 관계가 살아난다.',
+    '긴 수명의 대가를 하나 붙여보라. <b>아이가 거의 태어나지 않는다</b>면 종족 전체가 조용히 소멸 중이라는 비극이 깔린다.',
+  ]
+},
+{
+  id:'dwarf', name:'드워프 · 씨족', ico:'⛏', cat:'판타지 · 종족', hue:25,
+  desc:'혈통보다 기술과 업적이 서열을 정하는 장인 사회. 가문 대대로 이어지는 명예와 빚이 개인을 규정한다.',
+  tiers:[
+    {n:'산왕', en:'King under the Mountain', style:'폐하', rule:'요새 전체, 광맥 분배권', note:'왕관보다 망치가 권위의 상징이라는 식의 뒤집기가 잘 먹힌다.'},
+    {n:'씨족장', en:'Clan Lord / Thane', style:'족장님', rule:'씨족과 그 공방·갱도', note:'씨족 간 반목은 광맥 소유권에서 시작된다.'},
+    {n:'대장인', en:'Grandmaster Smith', style:'—장인님', rule:'명작(名作) 제작 인가', note:'평생 한 자루만 만드는 장인 설정은 무기의 가치를 단번에 올린다.'},
+    {n:'룬 각인사', en:'Runesmith', style:'—', rule:'룬 마법 부여', note:'드워프식 마법. 주문을 외우는 게 아니라 새겨 넣는다는 차이가 종족색을 만든다.'},
+    {n:'장인', en:'Master Craftsman', style:'—', rule:'공방 운영, 도제 양성', note:''},
+    {n:'전사 · 갱도 수비대', en:'Warrior / Hold Guard', style:'—', rule:'요새 방어, 심층 탐사', note:'깊은 곳에서 무언가를 파냈다는 도입은 언제나 유효하다.'},
+    {n:'직인', en:'Journeyman', style:'이름으로 부름', rule:'수련 후 편력 중', note:'세상을 떠도는 수행 기간. 파티 합류의 자연스러운 명분.'},
+    {n:'도제', en:'Apprentice', style:'이름으로 부름', rule:'공방 잡일과 기초 단련', note:''},
+    {n:'맹세 파기자', en:'Oathbreaker', style:'—', rule:'씨족에서 이름이 지워짐', note:'드워프에게 최악의 처벌. 이름을 되찾는 여정 자체가 하나의 이야기가 된다.'},
+  ],
+  tips:[
+    '<b>“빚과 맹세”</b>를 문화의 중심에 두면 드워프가 살아난다. 은혜도 원한도 대를 이어 기록된다는 설정 하나로 행동 원리가 정해진다.',
+    '기술 서열과 전투력을 분리하라. 최고 대장장이가 전투는 못 하는 편이 오히려 <b>지켜야 할 존재</b>가 되어 이야기가 생긴다.',
+  ]
+},
+];
+
+const CATS = ['현실 · 역사','판타지 · 왕국','판타지 · 마법 · 신앙','판타지 · 조직','판타지 · 종족'];
+const SYS_MAP = new Map(SYSTEMS.map(s => [s.id, s]));
+
+// 계급 색 — 위(밝고 진함)에서 아래(어둡고 옅음)로 자동 생성
+function tierColor(hue, idx, total){
+  const t = total <= 1 ? 0 : idx / (total - 1);
+  const light = 66 - t * 30;
+  const sat = 62 - t * 38;
+  return `hsl(${hue},${sat}%,${light}%)`;
+}
+
+// ═══════════════════════════════════════════════════════
+// 상태
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'rank87_saved';
+let curSys = SYSTEMS[0].id;
+let refQ = '';
+let view = 'ref';
+let bView = 'edit';
+let saved = loadSaved();
+let doc = newDoc();          // 현재 편집 중인 계급표
+
+function newDoc(){ return {id:null, title:'', desc:'', tiers:[]}; }
+function newTier(){ return {id:uid(), n:'', en:'', style:'', rule:'', note:'', c:''}; }
+
+function loadSaved(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    return Array.isArray(raw) ? raw.map(normDoc) : [];
+  }catch{ return []; }
+}
+function normDoc(d){
+  return {
+    id: typeof d.id === 'string' && d.id ? d.id : uid(),
+    title: String(d.title || '이름 없는 계급표').slice(0,60),
+    desc: String(d.desc || '').slice(0,600),
+    tiers: (Array.isArray(d.tiers) ? d.tiers : []).map(t => ({
+      id: uid(),
+      n: String(t.n || '').slice(0,40),
+      en: String(t.en || '').slice(0,60),
+      style: String(t.style || '').slice(0,40),
+      rule: String(t.rule || '').slice(0,200),
+      note: String(t.note || '').slice(0,400),
+      c: typeof t.c === 'string' ? t.c : '',
+    })),
+  };
+}
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(saved)); }
+  catch(e){ toast('저장 공간이 부족합니다'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// 자료실
+// ═══════════════════════════════════════════════════════
+function matchSys(s, q){
+  if(!q) return true;
+  if(s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q)) return true;
+  return s.tiers.some(t =>
+    (t.n||'').toLowerCase().includes(q) ||
+    (t.en||'').toLowerCase().includes(q) ||
+    (t.rule||'').toLowerCase().includes(q));
+}
+
+function renderSysList(){
+  const box = $('sysList');
+  const q = refQ.trim().toLowerCase();
+  const found = SYSTEMS.filter(s => matchSys(s, q));
+  box.innerHTML = '';
+  if(!found.length){
+    box.innerHTML = '<div class="empty-note">찾는 계급이 없습니다.<br>다른 말로 검색해 보세요.</div>';
+    return;
+  }
+  CATS.forEach(cat => {
+    const list = found.filter(s => s.cat === cat);
+    if(!list.length) return;
+    const h = document.createElement('div');
+    h.className = 'cat-head';
+    h.innerHTML = `${esc(cat)}<i></i>`;
+    box.appendChild(h);
+    list.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'sys-btn' + (s.id === curSys ? ' on' : '');
+      b.innerHTML =
+        `<span class="sys-ico">${s.ico}</span>` +
+        `<span class="sys-nm">${esc(s.name)}</span>` +
+        `<span class="sys-ct">${s.tiers.length}단계</span>`;
+      b.onclick = () => {
+        curSys = s.id;
+        renderSysList(); renderDoc();
+        $('refSide').classList.remove('open');
+        $('docBody').scrollTop = 0;
+      };
+      box.appendChild(b);
+    });
+  });
+}
+
+function pyramidHTML(tiers, hue){
+  const n = tiers.length;
+  return `<div class="pyramid">` + tiers.map((t, i) => {
+    const w = 30 + (n <= 1 ? 60 : (i / (n - 1)) * 58);
+    const col = t.c || tierColor(hue, i, n);
+    return `<div class="pyr-row">` +
+      `<span class="pyr-lv">${i + 1}</span>` +
+      `<div class="pyr-bar" style="background:${col};width:${w.toFixed(1)}%" title="${esc(t.rule||'')}">${esc(t.n||'(이름 없음)')}</div>` +
+      `<span class="pyr-en">${esc(t.en||'')}</span>` +
+    `</div>`;
+  }).join('') + `</div>`;
+}
+
+function tableHTML(tiers, hue){
+  return `<div class="tbl-wrap"><div class="scrollX"><table>` +
+    `<thead><tr><th>#</th><th>계급</th><th>호칭</th><th>관할 · 권한</th><th>설정 메모</th></tr></thead><tbody>` +
+    tiers.map((t, i) => {
+      const col = t.c || tierColor(hue, i, tiers.length);
+      return `<tr>` +
+        `<td class="td-lv">${i + 1}</td>` +
+        `<td class="td-nm"><span class="rank-dot" style="background:${col}"></span>${esc(t.n||'(이름 없음)')}` +
+          (t.en ? `<span class="en">${esc(t.en)}</span>` : '') + `</td>` +
+        `<td class="td-style">${esc(t.style||'—')}</td>` +
+        `<td class="td-rule">${esc(t.rule||'—')}</td>` +
+        `<td class="td-note">${esc(t.note||'')}</td>` +
+      `</tr>`;
+    }).join('') + `</tbody></table></div></div>`;
+}
+
+function renderDoc(){
+  const s = SYS_MAP.get(curSys);
+  const box = $('docBody');
+  if(!s){ box.innerHTML = '<div class="empty-note">왼쪽에서 계급 체계를 골라주세요.</div>'; return; }
+  box.innerHTML =
+    `<div class="doc-hd">` +
+      `<div class="doc-ttl">${s.ico} ${esc(s.name)}` +
+        `<span class="badge">${esc(s.cat)}</span>` +
+        `<span class="badge">${s.tiers.length}단계</span></div>` +
+      `<div class="doc-desc">${esc(s.desc)}</div>` +
+    `</div>` +
+    `<div class="sec-ttl">한눈에 보기</div>` +
+    pyramidHTML(s.tiers, s.hue) +
+    `<div class="sec-ttl">계급 상세</div>` +
+    tableHTML(s.tiers, s.hue) +
+    (s.tips && s.tips.length
+      ? `<div class="sec-ttl">쓸 때 참고</div><div class="tips">` +
+        s.tips.map(t => `<div class="tip">${t}</div>`).join('') + `</div>`
+      : '') +
+    `<div style="margin-top:24px;display:flex;gap:7px;flex-wrap:wrap;">` +
+      `<button class="btn pri" id="docToBuilder">🛠 이 체계를 내 계급표로 가져오기</button>` +
+      `<button class="btn" id="docCopyMd">📄 마크다운 복사</button>` +
+    `</div>`;
+
+  $('docToBuilder').onclick = () => {
+    importSystem(s, false);
+    switchView('build');
+    toast(`"${s.name}"을(를) 편집기로 가져왔습니다`);
+  };
+  $('docCopyMd').onclick = () => {
+    copyText(toMarkdown({title:s.name, desc:s.desc, tiers:s.tiers}));
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// 빌더
+// ═══════════════════════════════════════════════════════
+function importSystem(s, append){
+  const tiers = s.tiers.map((t, i) => ({
+    id: uid(), n:t.n||'', en:t.en||'', style:t.style||'', rule:t.rule||'', note:t.note||'',
+    c: tierColor(s.hue, i, s.tiers.length),
+  }));
+  if(append){
+    doc.tiers = doc.tiers.concat(tiers);
+  }else{
+    doc = {id:null, title:s.name, desc:s.desc, tiers};
+    $('bTitle').value = doc.title;
+    $('bDesc').value = doc.desc;
+  }
+  renderBuilder(); renderSaved();
+}
+
+function renderBuilder(){
+  const box = $('bBody');
+  if(bView === 'edit'){
+    box.innerHTML = '';
+    if(!doc.tiers.length){
+      const d = document.createElement('div');
+      d.className = 'b-empty';
+      d.innerHTML = '아직 계급이 없습니다.<br>아래 <b style="color:var(--gold2)">＋ 계급 추가</b>로 직접 쌓거나,<br>왼쪽 <b style="color:var(--gold2)">📚 자료실에서</b>로 기존 체계를 가져와 고쳐 쓰세요.';
+      box.appendChild(d);
+    }
+    doc.tiers.forEach((t, i) => box.appendChild(tierRow(t, i)));
+    const add = document.createElement('button');
+    add.className = 'add-tier';
+    add.textContent = '＋ 계급 추가';
+    add.onclick = () => {
+      doc.tiers.push(newTier());
+      renderBuilder();
+      const rows = box.querySelectorAll('.tier-row input');
+      if(rows.length) rows[rows.length - 6]?.focus();
+    };
+    box.appendChild(add);
+  }else if(bView === 'table'){
+    box.innerHTML = doc.tiers.length
+      ? `<div class="doc-hd"><div class="doc-ttl">${esc(doc.title || '이름 없는 계급표')}</div>` +
+        (doc.desc ? `<div class="doc-desc">${esc(doc.desc)}</div>` : '') + `</div>` +
+        tableHTML(doc.tiers, 45)
+      : '<div class="b-empty">계급을 먼저 추가해 주세요.</div>';
+  }else{
+    box.innerHTML = doc.tiers.length
+      ? `<div class="doc-hd"><div class="doc-ttl">${esc(doc.title || '이름 없는 계급표')}</div></div>` +
+        pyramidHTML(doc.tiers, 45)
+      : '<div class="b-empty">계급을 먼저 추가해 주세요.</div>';
+  }
+}
+
+function tierRow(t, i){
+  const col = t.c || tierColor(45, i, doc.tiers.length);
+  const el = document.createElement('div');
+  el.className = 'tier-row';
+  el.style.borderLeftColor = col;
+  el.innerHTML =
+    `<div class="tier-lv">${i + 1}</div>` +
+    `<div class="tier-fields">` +
+      `<input class="fi" data-f="n" placeholder="계급명 (예: 대공)" maxlength="40" value="${esc(t.n)}">` +
+      `<input class="fi" data-f="en" placeholder="원어·영문 (예: Archduke)" maxlength="60" value="${esc(t.en)}">` +
+      `<input class="fi" data-f="style" placeholder="호칭 (예: 전하)" maxlength="40" value="${esc(t.style)}">` +
+      `<input class="fi" data-f="rule" placeholder="관할·권한" maxlength="200" value="${esc(t.rule)}">` +
+      `<input class="fi wide" data-f="note" placeholder="설정 메모 — 이 계급으로 무슨 이야기를 만들 수 있는지" maxlength="400" value="${esc(t.note)}">` +
+    `</div>` +
+    `<div class="tier-ops">` +
+      `<input type="color" class="color-dot" value="${toHex(col)}" title="색">` +
+      `<button class="iop" data-a="up" title="위로">▲</button>` +
+      `<button class="iop" data-a="dn" title="아래로">▼</button>` +
+      `<button class="iop del" data-a="del" title="삭제">✕</button>` +
+    `</div>`;
+
+  el.querySelectorAll('.fi').forEach(inp => {
+    inp.oninput = e => { t[e.target.dataset.f] = e.target.value; };
+  });
+  el.querySelector('.color-dot').oninput = e => {
+    t.c = e.target.value;
+    el.style.borderLeftColor = t.c;
+  };
+  el.querySelectorAll('.iop').forEach(b => {
+    b.onclick = () => {
+      const a = b.dataset.a;
+      if(a === 'up' && i > 0){ [doc.tiers[i-1], doc.tiers[i]] = [doc.tiers[i], doc.tiers[i-1]]; }
+      else if(a === 'dn' && i < doc.tiers.length - 1){ [doc.tiers[i+1], doc.tiers[i]] = [doc.tiers[i], doc.tiers[i+1]]; }
+      else if(a === 'del'){
+        if(!confirm(`"${t.n || '이름 없는 계급'}"을(를) 지울까요?`)) return;
+        doc.tiers.splice(i, 1);
+      }else return;
+      renderBuilder();
+    };
+  });
+  return el;
+}
+
+// hsl(...) 문자열도 color input에 넣을 수 있게 hex로 바꾼다
+function toHex(col){
+  if(!col) return '#888888';
+  if(col[0] === '#') return col.length === 7 ? col : '#888888';
+  const m = col.match(/hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/);
+  if(!m) return '#888888';
+  const h = parseFloat(m[1]) / 360, s = parseFloat(m[2]) / 100, l = parseFloat(m[3]) / 100;
+  const f = k => {
+    const a = s * Math.min(l, 1 - l);
+    const x = (k + h * 12) % 12;
+    const v = l - a * Math.max(-1, Math.min(x - 3, Math.min(9 - x, 1)));
+    return Math.round(v * 255).toString(16).padStart(2, '0');
+  };
+  return '#' + f(0) + f(8) + f(4);
+}
+
+// ── 저장 목록 ──
+function renderSaved(){
+  const box = $('savedList');
+  $('bCount').textContent = saved.length;
+  box.innerHTML = '';
+  if(!saved.length){
+    box.innerHTML = '<div class="empty-note">저장한 계급표가 없습니다.<br>만든 뒤 💾 저장을 누르세요.</div>';
+    return;
+  }
+  saved.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'saved-item' + (d.id === doc.id ? ' cur' : '');
+    el.innerHTML =
+      `<div class="sv-nm">${esc(d.title)}</div>` +
+      `<span class="sv-meta">${d.tiers.length}단</span>` +
+      `<button class="sv-del" title="삭제">✕</button>`;
+    el.onclick = e => {
+      if(e.target.closest('.sv-del')) return;
+      doc = normDoc(JSON.parse(JSON.stringify(d)));
+      doc.id = d.id;
+      $('bTitle').value = doc.title;
+      $('bDesc').value = doc.desc;
+      renderBuilder(); renderSaved();
+      $('buildSide').classList.remove('open');
+      toast(`"${d.title}" 불러옴`);
+    };
+    el.querySelector('.sv-del').onclick = e => {
+      e.stopPropagation();
+      if(!confirm(`"${d.title}"을(를) 삭제할까요?`)) return;
+      saved = saved.filter(x => x.id !== d.id);
+      if(doc.id === d.id) doc.id = null;
+      persist(); renderSaved();
+      toast('삭제했습니다');
+    };
+    box.appendChild(el);
+  });
+}
+
+function saveDoc(){
+  doc.title = ($('bTitle').value.trim() || '이름 없는 계급표').slice(0,60);
+  doc.desc = $('bDesc').value.trim().slice(0,600);
+  if(!doc.tiers.length){ toast('계급을 하나 이상 추가해 주세요'); return; }
+  const snap = normDoc(JSON.parse(JSON.stringify(doc)));
+  if(doc.id && saved.some(d => d.id === doc.id)){
+    snap.id = doc.id;
+    saved = saved.map(d => d.id === doc.id ? snap : d);
+    toast('덮어썼습니다');
+  }else{
+    snap.id = uid();
+    doc.id = snap.id;
+    saved.push(snap);
+    toast(`"${snap.title}" 저장됨`);
+  }
+  $('bTitle').value = doc.title;
+  persist(); renderSaved();
+}
+
+// ═══════════════════════════════════════════════════════
+// 내보내기
+// ═══════════════════════════════════════════════════════
+function curDocForExport(){
+  return {
+    title: ($('bTitle').value.trim() || doc.title || '이름 없는 계급표'),
+    desc: ($('bDesc').value.trim() || doc.desc || ''),
+    tiers: doc.tiers,
+  };
+}
+const cell = s => String(s || '').replace(/\|/g, '\\|').replace(/\n/g, ' ') || '—';
+
+function toMarkdown(d){
+  let out = `# ${d.title}\n\n`;
+  if(d.desc) out += `> ${d.desc}\n\n`;
+  out += `| # | 계급 | 원어 | 호칭 | 관할·권한 | 설정 메모 |\n`;
+  out += `|---|------|------|------|-----------|-----------|\n`;
+  d.tiers.forEach((t, i) => {
+    out += `| ${i+1} | **${cell(t.n)}** | ${cell(t.en)} | ${cell(t.style)} | ${cell(t.rule)} | ${cell(t.note)} |\n`;
+  });
+  return out;
+}
+function toText(d){
+  let out = `【 ${d.title} 】\n`;
+  if(d.desc) out += `${d.desc}\n`;
+  out += `${'─'.repeat(34)}\n`;
+  d.tiers.forEach((t, i) => {
+    out += `${String(i+1).padStart(2,' ')}. ${t.n || '(이름 없음)'}`;
+    if(t.en) out += `  (${t.en})`;
+    out += '\n';
+    if(t.style) out += `    호칭   ${t.style}\n`;
+    if(t.rule)  out += `    권한   ${t.rule}\n`;
+    if(t.note)  out += `    메모   ${t.note}\n`;
+  });
+  return out;
+}
+
+function openOut(kind){
+  const d = curDocForExport();
+  if(!d.tiers.length){ toast('계급을 먼저 추가해 주세요'); return; }
+  let text, ttl, ico, hint;
+  if(kind === 'md'){
+    text = toMarkdown(d); ttl = '마크다운으로 내보내기'; ico = '📄';
+    hint = '노션·옵시디언·깃허브에 그대로 붙여넣으면 표로 보입니다.';
+  }else if(kind === 'txt'){
+    text = toText(d); ttl = '텍스트로 내보내기'; ico = '📝';
+    hint = '한글·워드 등 아무 곳에나 붙여넣을 수 있는 형태입니다.';
+  }else{
+    text = JSON.stringify({v:1, doc:{title:d.title, desc:d.desc, tiers:d.tiers.map(t =>
+      ({n:t.n, en:t.en, style:t.style, rule:t.rule, note:t.note, c:t.c}))}}, null, 2);
+    ttl = 'JSON으로 내보내기'; ico = '📤';
+    hint = '이 글을 저장해 두면 나중에 📥 JSON으로 그대로 되살릴 수 있습니다.';
+  }
+  $('outTtl').textContent = ttl;
+  $('outIcon').textContent = ico;
+  $('outHint').textContent = hint;
+  $('outArea').value = text;
+  $('outModal').classList.remove('hidden');
+  setTimeout(() => { $('outArea').focus(); $('outArea').select(); }, 60);
+}
+
+function copyText(text){
+  const done = ok => toast(ok ? '복사했습니다' : '복사에 실패했습니다 — 직접 선택해 주세요');
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(() => done(true)).catch(() => fallbackCopy(text, done));
+  }else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){}
+  ta.remove(); done(ok);
+}
+
+function importJSON(file){
+  const r = new FileReader();
+  r.onerror = () => toast('파일을 읽을 수 없습니다');
+  r.onload = e => {
+    let d;
+    try{ d = JSON.parse(e.target.result); }catch{ toast('JSON 형식이 아닙니다'); return; }
+    const raw = d && d.doc ? d.doc : d;
+    if(!raw || !Array.isArray(raw.tiers)){ toast('계급표 형식이 아닙니다'); return; }
+    doc = normDoc(raw);
+    doc.id = null;
+    $('bTitle').value = doc.title;
+    $('bDesc').value = doc.desc;
+    renderBuilder(); renderSaved();
+    toast(`${doc.tiers.length}단계를 불러왔습니다`);
+  };
+  r.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════
+// 프리셋 모달
+// ═══════════════════════════════════════════════════════
+function renderPresetGrid(){
+  const g = $('presetGrid');
+  g.innerHTML = '';
+  SYSTEMS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'preset-card';
+    b.innerHTML =
+      `<div class="pc-nm">${s.ico} ${esc(s.name)}</div>` +
+      `<div class="pc-ct">${esc(s.cat)} · ${s.tiers.length}단계</div>`;
+    b.onclick = () => {
+      const append = $('presetAppend').checked;
+      importSystem(s, append);
+      $('presetModal').classList.add('hidden');
+      toast(append ? `"${s.name}" ${s.tiers.length}단계를 이어붙였습니다` : `"${s.name}"을(를) 가져왔습니다`);
+    };
+    g.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// 작법 팁
+// ═══════════════════════════════════════════════════════
+const GUIDE = [
+  {t:'계급표를 만들기 전에 정할 것 세 가지', items:[
+    '<b>무엇이 서열을 정하는가</b> — 혈통인가, 실력인가, 나이인가, 돈인가. 이 하나만 정해도 조직의 성격이 반쯤 결정된다. 혈통이면 폐쇄적이고 정체되며, 실력이면 경쟁적이고 잔인해진다.',
+    '<b>올라가는 방법과 떨어지는 방법</b> — 승급 조건이 시험인지 공적인지 추천인지, 그리고 강등·추방이 존재하는지. 떨어질 수 있어야 인물이 긴장한다.',
+    '<b>바깥에 있는 사람</b> — 어느 계급에도 속하지 않는 자(추방자·혼혈·무국적자)를 반드시 하나 만들어라. 체계를 바깥에서 볼 수 있는 시점이 생기고, 주인공 자리로도 최적이다.',
+  ]},
+  {t:'단계 수는 몇 개가 좋은가', items:[
+    '독자가 외울 수 있는 건 <b>5~7단계</b>다. 그 이상은 표로만 존재하고 이야기에서는 쓰이지 않는다.',
+    '18단계짜리 조선 품계처럼 촘촘한 체계를 쓸 거라면, 실제 대사에서는 <b>대감·영감·나리</b>처럼 3~4개 묶음으로만 부르게 하라. 정밀함은 설정에 두고, 표면은 단순하게.',
+    '주인공이 오를 계단은 <b>3~4칸</b>이면 충분하다. 밑바닥에서 정상까지 12칸을 다 밟게 하면 중반이 늘어진다.',
+  ]},
+  {t:'서열을 대사와 장면으로 드러내는 법', items:[
+    '<b>호칭</b> — 누가 누구를 뭐라고 부르는지만 정확히 써도 설명 없이 서열이 전달된다. 호칭을 틀리거나 일부러 낮춰 부르는 순간이 곧 사건이다.',
+    '<b>거리와 자리</b> — 누가 왕의 몇 걸음 앞까지 갈 수 있는가, 식탁 어디에 앉는가, 누가 먼저 말을 꺼내는가. 공간이 서열을 말하게 하라.',
+    '<b>기다림</b> — 낮은 사람은 기다리고 높은 사람은 기다리게 한다. 알현을 사흘 기다리는 장면 하나가 설명 열 줄보다 강하다.',
+    '<b>옷과 색</b> — 특정 색·금속·문장을 특정 계급만 쓸 수 있게 정하라. 금지된 색을 입은 인물이 등장하는 것만으로 긴장이 생긴다.',
+  ]},
+  {t:'서열을 일부러 어긋나게 하기', items:[
+    '가장 재미있는 이야기는 <b>공식 서열과 실제 힘이 다를 때</b> 나온다. 품계는 낮은데 왕의 신임을 받는 자, 작위는 높은데 빚더미인 몰락 귀족.',
+    '<b>실무자에게 권력을 주라</b> — 문서를 쥔 서기, 열쇠를 쥔 시종장, 대를 이어 눌러앉은 아전. 계급표 맨 아래 근처에 진짜 실세를 하나 숨겨두면 세계가 입체적이 된다.',
+    '<b>계급이 무의미해지는 순간</b>을 준비하라. 역병·전쟁·재난 앞에서 서열이 무너지는 장면은 그 전까지 쌓아온 계급 묘사를 한 번에 회수한다.',
+  ]},
+  {t:'이름 짓기 요령', items:[
+    '어원을 하나 정해두면 이름이 저절로 나온다. <b>변경백(邊境伯)</b>처럼 “어디를 맡는가”에서 따오거나, <b>탑주·산왕</b>처럼 “어디에 있는가”에서 따오는 방식.',
+    '같은 조직 안에서는 <b>어미를 통일</b>하라. -장 / -관 / -사 / -경 중 하나로 맞추면 조직마다 색이 생긴다.',
+    '판타지 계급에 <b>숫자를 쓰는 방식</b>(1위계, 제7서열, 삼등 신관)은 차갑고 관료적인 인상을 준다. 마법 조직·군대·디스토피아에 잘 맞고, 자연 친화적인 종족에는 어울리지 않는다.',
+  ]},
+  {t:'이 페이지 쓰는 법', items:[
+    '<b>📚 자료실</b>에서 마음에 드는 체계를 고르고 → <b>🛠 이 체계를 내 계급표로 가져오기</b>를 누르면 편집기로 복사된다. 이름과 권한을 내 세계관에 맞게 고쳐 쓰면 된다.',
+    '여러 체계를 <b>이어붙일</b> 수도 있다. 프리셋 창 아래의 “이어붙이기”를 켜고 고르면 지금 목록 밑에 붙는다. 귀족 서열 + 기사단을 합치는 식.',
+    '완성한 표는 <b>마크다운·텍스트·JSON</b>으로 뽑을 수 있다. 마크다운은 노션·옵시디언에, 텍스트는 한글·워드에 붙여넣기 좋다. JSON은 백업용이다.',
+    '저장은 <b>이 브라우저 안</b>에만 남는다. 오래 보관할 원고 설정이라면 JSON으로 뽑아 파일로 따로 보관하는 편이 안전하다.',
+  ]},
+];
+
+function renderGuide(){
+  $('guideBody').innerHTML =
+    `<div class="doc-hd">` +
+      `<div class="doc-ttl">📖 계급 설계 작법 팁</div>` +
+      `<div class="doc-desc">계급표는 설정집을 채우려고 만드는 게 아니라, <b style="color:var(--gold2)">인물이 움직일 이유</b>를 만들려고 만든다. 아래는 표를 이야기로 바꾸는 요령이다.</div>` +
+    `</div>` +
+    GUIDE.map(g =>
+      `<div class="sec-ttl">${esc(g.t)}</div><div class="tips">` +
+      g.items.map(i => `<div class="tip">${i}</div>`).join('') + `</div>`
+    ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 화면 전환 · 레이아웃
+// ═══════════════════════════════════════════════════════
+function switchView(v){
+  view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.view === v));
+  $('v-ref').classList.toggle('on', v === 'ref');
+  $('v-build').classList.toggle('on', v === 'build');
+  $('v-guide').classList.toggle('on', v === 'guide');
+  $('sideTgl').style.visibility = (v === 'guide') ? 'hidden' : '';
+  fitLayout();
+}
+
+// 목록·본문 높이를 화면 기준으로 직접 계산해 못박는다.
+// 부모 레이아웃이 어떻든 안쪽이 화면 안에 갇히므로 항상 스크롤된다.
+function fitLayout(){
+  const vh = window.innerHeight;
+  const set = (el, extra) => {
+    if(!el || !el.offsetParent) return;
+    const top = el.getBoundingClientRect().top;
+    el.style.flex = 'none';
+    el.style.height = Math.max(80, Math.round(vh - top - (extra || 0))) + 'px';
+  };
+  set($('sysList')); set($('docBody')); set($('guideBody'));
+  set($('bBody')); set($('savedList'), 8);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+(function init(){
+  renderSysList(); renderDoc(); renderGuide();
+  renderBuilder(); renderSaved(); renderPresetGrid();
+
+  document.querySelectorAll('.tab').forEach(t => { t.onclick = () => switchView(t.dataset.view); });
+  $('sideTgl').onclick = () => {
+    (view === 'build' ? $('buildSide') : $('refSide')).classList.toggle('open');
+  };
+  $('refSearch').oninput = e => { refQ = e.target.value; renderSysList(); };
+
+  // 빌더 배선
+  $('bTitle').oninput = e => { doc.title = e.target.value; };
+  $('bDesc').oninput = e => { doc.desc = e.target.value; };
+  $('bSave').onclick = saveDoc;
+  $('bNew').onclick = () => {
+    if(doc.tiers.length && !confirm('지금 편집 중인 내용을 비우고 새로 시작할까요?')) return;
+    doc = newDoc();
+    $('bTitle').value = ''; $('bDesc').value = '';
+    renderBuilder(); renderSaved();
+  };
+  $('bClear').onclick = () => {
+    if(!doc.tiers.length) return;
+    if(!confirm('계급 목록을 전부 지울까요? (저장한 표는 그대로 남습니다)')) return;
+    doc.tiers = [];
+    renderBuilder();
+  };
+  $('bPreset').onclick = () => { $('presetModal').classList.remove('hidden'); };
+  $('bImport').onclick = () => $('fileIn').click();
+  $('fileIn').onchange = e => { if(e.target.files[0]) importJSON(e.target.files[0]); e.target.value = ''; };
+  $('bMd').onclick = () => openOut('md');
+  $('bTxt').onclick = () => openOut('txt');
+  $('bJson').onclick = () => openOut('json');
+
+  document.querySelectorAll('[data-bview]').forEach(b => {
+    b.onclick = () => {
+      bView = b.dataset.bview;
+      document.querySelectorAll('[data-bview]').forEach(x => x.classList.toggle('on', x === b));
+      renderBuilder();
+    };
+  });
+
+  // 모달
+  document.querySelectorAll('[data-close]').forEach(b => {
+    b.onclick = () => $(b.dataset.close).classList.add('hidden');
+  });
+  document.querySelectorAll('.modal-bg').forEach(bg => {
+    bg.onmousedown = e => { if(e.target === bg) bg.classList.add('hidden'); };
+  });
+  $('outCopy').onclick = () => copyText($('outArea').value);
+
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.modal-bg:not(.hidden)').forEach(m => m.classList.add('hidden'));
+      document.querySelectorAll('.side.open,.b-side.open').forEach(s => s.classList.remove('open'));
+    }
+  });
+
+  fitLayout();
+  window.addEventListener('resize', fitLayout);
+  window.addEventListener('load', fitLayout);
+  if(window.ResizeObserver) new ResizeObserver(fitLayout).observe(document.documentElement);
+  setTimeout(fitLayout, 80);
+  setTimeout(fitLayout, 400);
+})();
+</script>
+</body>
+</html>

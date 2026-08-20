@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>어느 들판</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:#07090c;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  color:#dfe6f0;font-size:13px;line-height:1.6;touch-action:none;
+  -webkit-tap-highlight-color:transparent;user-select:none;}
+:root{
+  --pane:rgba(12,16,22,.82);--pane2:rgba(20,26,36,.9);
+  --bd:rgba(120,150,190,.16);--bd2:rgba(120,150,190,.3);
+  --t1:#dfe6f0;--t2:#8fa2ba;--t3:#5b6d85;
+  --acc:#6ba7ff;--good:#5fd8a0;--bad:#ff7a72;--warn:#ffc861;
+  --mono:'Consolas','Menlo','Courier New',monospace;
+}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;}
+
+.pane{position:fixed;background:var(--pane);border:1px solid var(--bd);
+  border-radius:11px;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+  box-shadow:0 8px 30px rgba(0,0,0,.45);transition:opacity .3s;}
+body.zen .pane{opacity:0;pointer-events:none;}
+
+/* ── 위쪽 요약 ─────────────────────────────── */
+#top{top:10px;left:10px;padding:8px 13px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:calc(100vw - 20px);}
+#top h1{font-size:14px;font-weight:700;white-space:nowrap;letter-spacing:.3px;}
+#top .st{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:var(--t2);}
+#top .st b{color:var(--t1);font-weight:700;}
+#top .st .w{color:var(--bad);}
+#top .st .p{color:var(--good);}
+
+/* ── 도구 ─────────────────────────────────── */
+#tools{bottom:10px;left:10px;padding:7px;display:flex;gap:5px;flex-wrap:wrap;max-width:min(520px,calc(100vw - 20px));}
+.tool{width:36px;height:36px;border-radius:8px;border:1px solid transparent;
+  background:rgba(255,255,255,.04);color:var(--t2);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:.13s;padding:0;
+  position:relative;}
+.tool:hover{background:rgba(255,255,255,.1);color:var(--t1);}
+.tool.on{background:rgba(107,167,255,.22);border-color:var(--acc);color:#fff;}
+.tool .k{position:absolute;right:2px;bottom:0px;font-size:8px;color:var(--t3);font-family:var(--mono);}
+#terrainRow{display:none;gap:4px;flex-wrap:wrap;width:100%;padding-top:5px;
+  border-top:1px solid var(--bd);margin-top:2px;}
+#terrainRow.on{display:flex;}
+.tbit{padding:4px 9px;border-radius:6px;font-size:11px;cursor:pointer;
+  border:1px solid var(--bd);background:rgba(255,255,255,.03);color:var(--t2);transition:.12s;}
+.tbit:hover{color:var(--t1);}
+.tbit.on{border-color:var(--acc);color:#fff;background:rgba(107,167,255,.2);}
+
+/* ── 오른쪽: 기록 ──────────────────────────── */
+#log{top:10px;right:10px;width:270px;max-height:min(46vh,420px);display:flex;flex-direction:column;}
+#log .hd{padding:7px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;}
+#log .hd b{font-size:11.5px;font-weight:700;color:var(--t2);letter-spacing:.4px;}
+#log .hd .sp{flex:1;}
+#log .body{overflow-y:auto;padding:5px 7px;scrollbar-width:thin;}
+#log .body::-webkit-scrollbar{width:5px;}
+#log .body::-webkit-scrollbar-thumb{background:rgba(120,150,190,.25);border-radius:3px;}
+.ev{font-size:11.5px;line-height:1.5;padding:3px 6px;border-radius:5px;color:var(--t2);
+  cursor:pointer;border-left:2px solid transparent;animation:slip .35s ease;}
+.ev:hover{background:rgba(255,255,255,.05);color:var(--t1);}
+@keyframes slip{from{opacity:0;transform:translateX(9px);}to{opacity:1;transform:none;}}
+.ev .tm{font-family:var(--mono);font-size:9.5px;color:var(--t3);margin-right:5px;}
+.ev.birth{border-left-color:var(--good);}
+.ev.variant{border-left-color:#c88bff;color:#d9b6ff;}
+.ev.death,.ev.trapped{border-left-color:var(--bad);}
+.ev.war{border-left-color:#ff5d52;color:#ffb0aa;}
+.ev.peace{border-left-color:var(--good);color:#a8ecc9;}
+.ev.split{border-left-color:var(--warn);color:#ffdca0;}
+.ev.found{border-left-color:var(--acc);color:#b3d3ff;}
+.ev.outcast{border-left-color:#9b7bd4;color:#cdb6f0;}
+.ev.bond,.ev.play,.ev.teach{border-left-color:#59c3d8;}
+.ev.world,.ev.erase,.ev.arrive{border-left-color:var(--t3);}
+
+/* ── 오른쪽 아래: 손잡이 ───────────────────── */
+#dials{bottom:10px;right:10px;width:238px;padding:9px 11px;}
+#dials .hd{font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.4px;
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;cursor:pointer;}
+#dials .hd .ar{margin-left:auto;color:var(--t3);transition:.2s;}
+#dials.min .body{display:none;}
+#dials.min .hd .ar{transform:rotate(-90deg);}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.row label{font-size:11px;color:var(--t2);width:52px;flex:none;}
+.row input[type=range]{flex:1;height:3px;-webkit-appearance:none;appearance:none;
+  background:rgba(120,150,190,.25);border-radius:2px;outline:none;cursor:pointer;}
+.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;
+  border-radius:50%;background:var(--acc);cursor:pointer;}
+.row input[type=range]::-moz-range-thumb{width:11px;height:11px;border:none;
+  border-radius:50%;background:var(--acc);cursor:pointer;}
+.row .v{font-size:10px;color:var(--t3);font-family:var(--mono);width:26px;text-align:right;flex:none;}
+.seg{display:flex;gap:3px;margin:7px 0 4px;}
+.seg button{flex:1;padding:4px 0;border-radius:5px;border:1px solid var(--bd);
+  background:rgba(255,255,255,.03);color:var(--t2);font-size:10.5px;cursor:pointer;
+  font-family:var(--mono);transition:.12s;}
+.seg button:hover{color:var(--t1);}
+.seg button.on{background:rgba(107,167,255,.22);border-color:var(--acc);color:#fff;}
+.eyes{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd);}
+.eye{padding:3px 8px;border-radius:5px;border:1px solid var(--bd);font-size:10.5px;
+  background:rgba(255,255,255,.03);color:var(--t3);cursor:pointer;transition:.12s;}
+.eye.on{color:#fff;border-color:var(--bd2);background:rgba(255,255,255,.1);}
+
+/* ── 개체 살펴보기 ─────────────────────────── */
+#insp{top:10px;right:290px;width:222px;padding:11px 12px;display:none;}
+#insp.on{display:block;}
+#insp .nm{font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px;}
+#insp .nm .dot{width:10px;height:10px;border-radius:50%;flex:none;}
+#insp .sub{font-size:11px;color:var(--t3);margin-bottom:8px;}
+#insp .tagz{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.tag{font-size:9.5px;padding:1px 7px;border-radius:9px;background:rgba(255,255,255,.07);
+  color:var(--t2);border:1px solid var(--bd);}
+.tag.g{color:var(--good);border-color:rgba(95,216,160,.4);}
+.tag.b{color:var(--bad);border-color:rgba(255,122,114,.4);}
+.tag.p{color:#d9b6ff;border-color:rgba(200,139,255,.4);}
+.tag.y{color:var(--warn);border-color:rgba(255,200,97,.4);}
+.gbar{display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.gbar span{font-size:10px;color:var(--t3);width:40px;flex:none;}
+.gbar .b{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;}
+.gbar .b i{display:block;height:100%;border-radius:2px;}
+#insp .sec{font-size:10px;color:var(--t3);letter-spacing:.4px;margin:8px 0 4px;}
+#insp .rel{font-size:11px;display:flex;justify-content:space-between;gap:6px;padding:1px 0;cursor:pointer;}
+#insp .rel:hover{color:#fff;}
+#insp .btns{display:flex;gap:5px;margin-top:9px;}
+#insp .btns button{flex:1;padding:5px;border-radius:6px;border:1px solid var(--bd);
+  background:rgba(255,255,255,.04);color:var(--t2);font-size:11px;cursor:pointer;font-family:inherit;}
+#insp .btns button:hover{color:#fff;border-color:var(--bd2);}
+
+#hint{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);
+  font-size:11.5px;color:var(--t3);background:rgba(8,11,15,.8);padding:5px 13px;
+  border-radius:14px;pointer-events:none;opacity:0;transition:.3s;white-space:nowrap;}
+#hint.on{opacity:1;}
+
+@media(max-width:760px){
+  #log{width:200px;max-height:34vh;}
+  #insp{right:10px;top:auto;bottom:56px;width:200px;}
+  #dials{display:none;}
+  #top{gap:8px;padding:6px 10px;}
+  #top h1{font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="cv"></canvas>
+
+<!-- 위: 세상 요약 -->
+<div class="pane" id="top">
+  <h1>어느 들판</h1>
+  <div class="st" id="stats"></div>
+</div>
+
+<!-- 아래 왼쪽: 손 -->
+<div class="pane" id="tools">
+  <button class="tool on" data-tool="look"    title="살펴보기 — 눌러서 고르고, 따라가기">👁<span class="k">1</span></button>
+  <button class="tool" data-tool="spawn"      title="개체 놓기">🌱<span class="k">2</span></button>
+  <button class="tool" data-tool="variant"    title="변종 놓기 — 아주 다른 것이 태어난다">🧬<span class="k">3</span></button>
+  <button class="tool" data-tool="erase"      title="지우기">🩹<span class="k">4</span></button>
+  <button class="tool" data-tool="food"       title="먹이 뿌리기">🍃<span class="k">5</span></button>
+  <button class="tool" data-tool="trap"       title="함정 묻기">🕳<span class="k">6</span></button>
+  <button class="tool" data-tool="terrain"    title="땅 바꾸기">⛰<span class="k">7</span></button>
+  <button class="tool" data-tool="disaster"   title="재해 부르기">☄<span class="k">8</span></button>
+  <button class="tool" data-tool="peace"      title="화해시키기">🕊<span class="k">9</span></button>
+  <button class="tool" data-tool="war"        title="싸움 붙이기">⚔<span class="k">0</span></button>
+  <button class="tool" data-tool="mutate"     title="돌연변이 일으키기">✨<span class="k">-</span></button>
+  <div id="terrainRow"></div>
+</div>
+
+<!-- 오른쪽 위: 일어난 일 -->
+<div class="pane" id="log">
+  <div class="hd"><b>일어난 일</b><span class="sp"></span>
+    <button class="eye on" id="autoCam" title="흥미로운 곳으로 시점이 저절로 옮겨 갑니다">시점 자동</button>
+  </div>
+  <div class="body" id="logBody"></div>
+</div>
+
+<!-- 살펴보기 -->
+<div class="pane" id="insp"></div>
+
+<!-- 오른쪽 아래: 손잡이 -->
+<div class="pane" id="dials">
+  <div class="hd" id="dialsHd">세상 손잡이 <span class="ar">▾</span></div>
+  <div class="body">
+    <div class="seg" id="spd">
+      <button data-s="0">⏸</button>
+      <button data-s="1" class="on">1×</button>
+      <button data-s="2">2×</button>
+      <button data-s="4">4×</button>
+      <button data-s="8">8×</button>
+    </div>
+    <div id="dialRows"></div>
+    <div class="eyes" id="eyes">
+      <button class="eye on" data-eye="zone">구역</button>
+      <button class="eye" data-eye="bond">마음</button>
+      <button class="eye on" data-eye="trap">함정</button>
+      <button class="eye" data-eye="dread">두려움</button>
+      <button class="eye" data-eye="name">이름</button>
+      <button class="eye" data-eye="food">먹이</button>
+    </div>
+    <div class="eyes">
+      <button class="eye" id="reseed" style="flex:1">새 세상</button>
+      <button class="eye" id="zen" style="flex:1">가리기 (H)</button>
+    </div>
+  </div>
+</div>
+
+<div id="hint"></div>
+
+<script src="world.js"></script>
+<script src="life.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

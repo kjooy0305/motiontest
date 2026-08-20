@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>놀람 고양이 — 랜덤 트롤 탐험</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0b0a12;--bg2:#131120;--bg3:#1c1930;--bg4:#272242;
+  --border:#2a2545;--border2:#42396b;
+  --txt:#eae6f5;--txt2:#a096c4;--txt3:#5f5686;
+  --acc:#ffb340;--acc2:#ffd280;--acc3:rgba(255,179,64,.15);
+  --pink:#ff6fa5;--pink2:#ffa0c6;
+  --cyan:#56d8e0;--grn:#5fd67f;--red:#ff5f6f;--pur:#a97bff;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.6;user-select:none;touch-action:none;}
+
+#wrap{position:relative;width:100%;height:100%;overflow:hidden;background:#0b0a12;}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;}
+
+/* ── HUD ── */
+#hud{position:absolute;top:0;left:0;right:0;padding:8px 10px;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none;
+  background:linear-gradient(180deg,rgba(11,10,18,.85),transparent);z-index:10;}
+.hbox{background:rgba(19,17,32,.82);border:1px solid var(--border2);border-radius:8px;
+  padding:4px 10px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;
+  backdrop-filter:blur(4px);white-space:nowrap;}
+.hbox small{font-size:10px;color:var(--txt3);font-weight:400;}
+#h-startle{color:var(--pink2);}
+#h-fish{color:var(--acc2);}
+#h-time{color:var(--cyan);}
+#h-seed{color:var(--txt3);font-size:10.5px;font-family:'Consolas',monospace;}
+#bar{position:absolute;left:10px;right:10px;bottom:0;height:3px;background:rgba(255,255,255,.08);border-radius:2px;}
+#bar-in{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--pink));border-radius:2px;transition:.2s;}
+
+/* ── 말풍선/토스트 ── */
+#say{position:absolute;left:50%;top:64px;transform:translateX(-50%) scale(.8);
+  background:rgba(255,255,255,.95);color:#1a1626;padding:8px 18px;border-radius:20px;
+  font-size:15px;font-weight:800;opacity:0;pointer-events:none;z-index:20;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);transition:.18s;white-space:nowrap;max-width:90vw;}
+#say.on{opacity:1;transform:translateX(-50%) scale(1);}
+
+/* ── 오버레이 공통 ── */
+.ov{position:absolute;inset:0;background:rgba(11,10,18,.94);z-index:50;
+  display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;}
+.ov.hide{display:none;}
+.panel{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;
+  padding:20px 22px;max-width:560px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.6);}
+.panel h1{font-size:22px;color:var(--acc2);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.panel h2{font-size:18px;color:var(--acc2);margin-bottom:8px;}
+.panel p{font-size:13px;color:var(--txt2);line-height:1.75;margin-bottom:10px;}
+.panel p b{color:var(--txt);}
+.panel p em{color:var(--acc2);font-style:normal;}
+
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:10px 0 14px;}
+.key{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;color:var(--txt2);}
+.key b{display:block;color:var(--acc2);font-size:13px;font-family:'Consolas',monospace;}
+
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.btn{flex:1;min-width:120px;padding:12px;border-radius:9px;border:1px solid var(--acc);
+  background:var(--acc3);color:var(--acc2);font-size:15px;font-weight:800;
+  cursor:pointer;font-family:inherit;transition:.12s;}
+.btn:hover{background:rgba(255,179,64,.28);}
+.btn:active{transform:translateY(1px);}
+.btn.ghost{border-color:var(--border2);background:var(--bg3);color:var(--txt2);font-size:13px;font-weight:600;padding:9px;}
+.btn.ghost:hover{border-color:var(--acc);color:var(--acc2);}
+.btn.sm{flex:0 0 auto;min-width:0;padding:7px 14px;font-size:12px;}
+
+.opt{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;
+  cursor:pointer;font-size:12.5px;color:var(--txt2);background:var(--bg3);
+  border:1px solid var(--border);margin-bottom:5px;}
+.opt:hover{border-color:var(--border2);}
+.opt input{accent-color:var(--acc);width:15px;height:15px;flex-shrink:0;}
+.opt span b{color:var(--txt);}
+.opt span i{font-style:normal;display:block;font-size:10.5px;color:var(--txt3);}
+
+.seedrow{display:flex;gap:6px;margin-bottom:10px;}
+.seedrow input{flex:1;padding:9px 11px;border-radius:7px;background:var(--bg3);
+  border:1px solid var(--border2);color:var(--txt);font-size:13px;outline:none;
+  font-family:'Consolas',monospace;}
+.seedrow input:focus{border-color:var(--acc);}
+
+.warn{background:rgba(255,95,111,.12);border-left:3px solid var(--red);
+  border-radius:6px;padding:9px 12px;font-size:11.5px;color:var(--txt2);
+  line-height:1.65;margin-bottom:12px;}
+.warn b{color:var(--pink2);}
+
+/* 결과 */
+#res-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:14px;}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center;}
+.stat b{display:block;font-size:22px;color:var(--acc2);line-height:1.2;}
+.stat i{font-style:normal;font-size:10.5px;color:var(--txt3);}
+#res-log{max-height:190px;overflow:auto;background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:9px 11px;margin-bottom:12px;}
+.lg{display:flex;gap:8px;font-size:12px;color:var(--txt2);padding:3px 0;
+  border-bottom:1px solid rgba(42,37,69,.7);align-items:baseline;}
+.lg:last-child{border-bottom:none;}
+.lg .t{font-family:'Consolas',monospace;color:var(--txt3);font-size:10.5px;flex-shrink:0;}
+.lg .n{color:var(--pink2);font-weight:700;}
+.lg .c{color:var(--txt3);margin-left:auto;font-size:10.5px;flex-shrink:0;}
+#rank{text-align:center;font-size:15px;font-weight:800;color:var(--acc2);margin-bottom:12px;}
+#rank small{display:block;font-size:11.5px;color:var(--txt2);font-weight:400;margin-top:2px;}
+
+/* ── 모바일 조작 ── */
+#touch{position:absolute;inset:0;z-index:15;display:none;pointer-events:none;}
+#touch.on{display:block;}
+.tb{position:absolute;bottom:18px;width:64px;height:64px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  color:rgba(255,255,255,.75);pointer-events:auto;}
+.tb:active{background:rgba(255,179,64,.3);}
+#t-left{left:16px;}
+#t-right{left:90px;}
+#t-down{left:164px;}
+#t-jump{right:16px;width:76px;height:76px;bottom:14px;font-size:30px;}
+
+#mute{position:absolute;top:8px;right:10px;z-index:16;width:34px;height:34px;
+  border-radius:8px;background:rgba(19,17,32,.82);border:1px solid var(--border2);
+  color:var(--txt2);font-size:16px;cursor:pointer;pointer-events:auto;}
+#mute:hover{color:var(--acc2);border-color:var(--acc);}
+
+@media(max-width:640px){
+  .panel{padding:16px;}
+  .panel h1{font-size:19px;}
+  #hud{gap:5px;padding:6px 8px;}
+  .hbox{font-size:11.5px;padding:3px 8px;}
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="cv"></canvas>
+
+  <div id="hud">
+    <div class="hbox" id="h-startle">😺 <span id="v-startle">0</span><small>번 놀람</small></div>
+    <div class="hbox" id="h-fish">🐟 <span id="v-fish">0</span><small>/<span id="v-fishmax">8</span></small></div>
+    <div class="hbox" id="h-time">⏱ <span id="v-time">0.0</span><small>초</small></div>
+    <div class="hbox" id="h-seed">SEED <span id="v-seed">—</span></div>
+    <div id="bar"><div id="bar-in"></div></div>
+  </div>
+
+  <button id="mute" title="소리 켜기/끄기">🔊</button>
+
+  <div id="say"></div>
+
+  <div id="touch">
+    <div class="tb" id="t-left">◀</div>
+    <div class="tb" id="t-right">▶</div>
+    <div class="tb" id="t-down">▼</div>
+    <div class="tb" id="t-jump">▲</div>
+  </div>
+
+  <!-- 시작 화면 -->
+  <div class="ov" id="ov-start">
+    <div class="panel">
+      <h1>😼 놀람 고양이</h1>
+      <p><b>죽지 않습니다. 대신 놀랍니다.</b><br>
+        평범해 보이는 것들이 <em>예고 없이</em> 당신을 놀래킵니다.
+        블록이 사라지고, 화면이 뒤집히고, 뭔가가 튀어나옵니다.<br>
+        놀라도 게임은 계속됩니다. <b>🐟 생선을 모아 문을 열고 탈출하세요.</b><br>보라색 <b>발판 위에서 ↓</b>를 누르면 아래로 내려갑니다 — 지하 동굴에 생선이 많습니다.</p>
+
+      <div class="keys">
+        <div class="key"><b>← → / A D</b>이동</div>
+        <div class="key"><b>Space / W / ↑</b>점프</div>
+        <div class="key"><b>↓ / S</b>발판 아래로 (동굴 입구)</div>
+        <div class="key"><b>Shift</b>달리기</div>
+        <div class="key"><b>R</b>새 맵</div>
+      </div>
+
+      <p style="font-size:12px"><b>매번 새로운 조합.</b> 지형·함정 종류·배치가 전부 무작위입니다.
+        같은 모양이라고 같은 함정이 아닙니다 — <em>이번 판에서 안전했던 블록이 다음 판엔 아닐 수 있습니다.</em></p>
+
+      <div class="warn">
+        <b>⚠ 놀람 주의</b> — 갑작스러운 소리·화면 흔들림·번쩍임이 있습니다.
+        불편하면 아래 옵션으로 줄이거나 끌 수 있고, 게임 중에도 오른쪽 위 🔊로 소리를 끌 수 있습니다.
+      </div>
+
+      <label class="opt"><input type="checkbox" id="o-sound" checked><span><b>소리 켜기</b><i>놀람의 절반은 소리입니다</i></span></label>
+      <label class="opt"><input type="checkbox" id="o-shake" checked><span><b>화면 흔들림</b><i>끄면 흔들림 없이 진행됩니다</i></span></label>
+      <label class="opt"><input type="checkbox" id="o-flash"><span><b>번쩍임 줄이기</b><i>빛 번쩍임에 민감하면 켜세요</i></span></label>
+      <label class="opt"><input type="checkbox" id="o-hint"><span><b>순한 맛</b><i>함정 수를 줄이고 화면 조작 계열 함정을 뺍니다</i></span></label>
+
+      <div class="seedrow">
+        <input type="text" id="i-seed" placeholder="시드 (비우면 무작위)" maxlength="12">
+        <button class="btn ghost sm" id="b-rand">🎲</button>
+      </div>
+
+      <div class="row"><button class="btn" id="b-start">시작하기</button></div>
+    </div>
+  </div>
+
+  <!-- 결과 화면 -->
+  <div class="ov hide" id="ov-end">
+    <div class="panel">
+      <h2 id="end-title">🎉 탈출 성공!</h2>
+      <div id="rank"></div>
+      <div id="res-stats"></div>
+      <p style="font-size:12px;margin-bottom:6px"><b>놀람 기록</b></p>
+      <div id="res-log"></div>
+      <div class="row">
+        <button class="btn" id="b-again">새 맵으로 다시</button>
+        <button class="btn ghost" id="b-retry">같은 맵 재도전</button>
+      </div>
+      <div class="row"><button class="btn ghost" id="b-menu">처음으로</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

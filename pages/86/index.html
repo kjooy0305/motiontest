@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영어 문법 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0b07;--bg2:#161208;--bg3:#1e1a0c;--bg4:#272110;
+  --border:#2e2610;--border2:#443a18;
+  --txt:#f0e8d0;--txt2:#a89870;--txt3:#5c5030;
+  --acc:#d97706;--acc2:#fbbf24;--acc3:rgba(217,119,6,.14);--acc4:rgba(217,119,6,.06);
+  --grn:#22c55e;--grn2:#86efac;--grnB:rgba(34,197,94,.12);
+  --blu:#3b82f6;--blu2:#93c5fd;--bluB:rgba(59,130,246,.13);
+  --red:#ef4444;--red2:#fca5a5;--redB:rgba(239,68,68,.12);
+  --pur:#a855f7;--pur2:#d8b4fe;--purB:rgba(168,85,247,.12);
+  --cyn:#06b6d4;--cyn2:#67e8f9;--cynB:rgba(6,182,212,.12);
+  --pnk:#ec4899;--pnk2:#f9a8d4;--pnkB:rgba(236,72,153,.12);
+  --mono:'Consolas','Menlo','Courier New',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;}
+
+/* ── HEADER ── */
+#hdr{background:linear-gradient(135deg,#0a0800,#1a1200,#0a0800);
+  border-bottom:2px solid var(--acc);padding:11px 18px;position:sticky;top:0;z-index:300;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr-icon{font-size:20px;filter:drop-shadow(0 0 10px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);
+  text-shadow:0 0 20px rgba(251,191,36,.35);white-space:nowrap;}
+.badge{font-size:9px;padding:2px 7px;border-radius:3px;background:var(--acc3);
+  border:1px solid rgba(217,119,6,.4);color:var(--acc2);font-weight:700;letter-spacing:.5px;}
+
+/* ── SEARCH ── */
+#srch{flex:1;min-width:130px;max-width:280px;padding:6px 11px;border-radius:5px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt);
+  font-size:12.5px;outline:none;font-family:inherit;}
+#srch:focus{border-color:var(--acc);}
+#srch::placeholder{color:var(--txt3);}
+mark{background:rgba(251,191,36,.35);color:var(--acc2);border-radius:2px;}
+#hit{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+/* ── TABS ── */
+#tabs{display:flex;gap:2px;padding:7px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:48px;z-index:200;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 13px;border-radius:4px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(217,119,6,.4);color:var(--acc2);}
+
+/* ── MAIN ── */
+#main{padding:18px;max-width:1200px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:19px;font-weight:700;color:var(--acc2);margin-bottom:4px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.sec-sub{font-size:12.5px;color:var(--txt2);line-height:1.7;}
+
+/* ── TABLES ── */
+.tw{overflow-x:auto;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);}
+.tw-cap{font-size:11.5px;color:var(--acc2);padding:7px 12px;background:var(--bg3);
+  border-bottom:1px solid var(--border);font-weight:700;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:400px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;
+  padding:7px 11px;border-bottom:1px solid var(--border2);font-size:11.5px;white-space:nowrap;}
+td{padding:6px 11px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.65;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(217,119,6,.05);}
+td strong{color:var(--txt);}
+td em{color:var(--acc2);font-style:normal;}
+td.en{font-style:italic;color:var(--grn2);}
+td.kr{color:var(--txt3);font-size:11.5px;}
+td.form{font-family:var(--mono);font-size:12px;color:var(--blu2);}
+td.ex{color:var(--cyn2);font-size:12px;}
+td.note{color:var(--acc2);font-size:11.5px;}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:12px;}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.card-icon{font-size:16px;}
+.card-title{font-size:13.5px;font-weight:700;}
+.card-body{font-size:13px;color:var(--txt2);line-height:1.75;}
+.card-body strong{color:var(--txt);}
+.card-body em{color:var(--acc2);font-style:italic;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:14px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px;}
+
+/* ── CALLOUTS ── */
+.callout{border-radius:6px;padding:10px 13px;margin-bottom:10px;font-size:12.5px;
+  border-left:3px solid;display:flex;gap:8px;align-items:flex-start;line-height:1.68;}
+.callout .cb{color:var(--txt2);}
+.callout .cb strong{color:var(--txt);}
+.callout .cb em{font-style:italic;color:var(--grn2);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.cyn{background:var(--cynB);border-color:var(--cyn);}
+.callout.pnk{background:var(--pnkB);border-color:var(--pnk);}
+
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 10px;
+  padding-left:10px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+
+/* ── EXAMPLE BOX ── */
+.eg{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
+  padding:9px 13px;margin:6px 0 10px;font-size:13px;line-height:1.8;}
+.eg .e{color:var(--grn2);font-style:italic;}
+.eg .t{color:var(--txt3);font-size:11.5px;margin-left:6px;}
+.eg .w{color:var(--red2);font-style:italic;}
+.eg .w::before{content:'✗ ';color:var(--red);}
+.eg .e::before{content:'✓ ';color:var(--grn);}
+
+/* ── FORMULA ── */
+.formula{font-family:var(--mono);background:var(--bg4);border:1px solid var(--border2);
+  border-radius:5px;padding:8px 13px;margin:8px 0;font-size:13px;color:var(--blu2);
+  line-height:1.75;}
+.formula .v{color:var(--acc2);}
+.formula .o{color:var(--txt3);}
+
+/* ── TAG ── */
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(217,119,6,.4);background:var(--acc3);}
+.tag.g{color:var(--grn2);border-color:rgba(34,197,94,.4);background:var(--grnB);}
+.tag.b{color:var(--blu2);border-color:rgba(59,130,246,.4);background:var(--bluB);}
+.tag.r{color:var(--red2);border-color:rgba(239,68,68,.4);background:var(--redB);}
+.tag.p{color:var(--pur2);border-color:rgba(168,85,247,.4);background:var(--purB);}
+.tag.c{color:var(--cyn2);border-color:rgba(6,182,212,.4);background:var(--cynB);}
+
+/* ── TENSE GRID ── */
+.tense-grid{display:grid;grid-template-columns:140px repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.tg-head{background:var(--bg4);padding:8px 10px;font-size:11.5px;font-weight:700;color:var(--acc2);border-bottom:1px solid var(--border2);}
+.tg-label{background:var(--bg3);padding:7px 10px;font-size:12px;font-weight:700;color:var(--txt);border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
+.tg-cell{background:var(--bg2);padding:7px 10px;font-size:12px;color:var(--txt2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);line-height:1.55;}
+.tg-cell:last-child,.tg-head:last-child{border-right:none;}
+.tg-label:last-child{border-right:none;}
+.tg-row:last-child .tg-label,.tg-row:last-child .tg-cell{border-bottom:none;}
+.tg-cell .fm{font-family:var(--mono);font-size:11px;color:var(--blu2);display:block;}
+.tg-cell .ex{font-size:11px;color:var(--grn2);font-style:italic;display:block;margin-top:2px;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:28px 10px 44px;line-height:1.9;}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .tense-grid{grid-template-columns:110px repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-icon">📘</span>
+  <h1>영어 문법 완전 정리</h1>
+  <span class="badge">English Grammar</span>
+  <input id="srch" type="text" placeholder="문법 검색...">
+  <span id="hit"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="pos">🔤 품사</button>
+  <button class="tab" data-tab="tense">⏰ 시제</button>
+  <button class="tab" data-tab="sent">📐 문장 형식</button>
+  <button class="tab" data-tab="modal">🔧 조동사</button>
+  <button class="tab" data-tab="cond">🌀 가정법</button>
+  <button class="tab" data-tab="adv">📎 심화 문법</button>
+</div>
+
+<div id="main">
+
+<!-- ════════════════ 품사 ════════════════ -->
+<div class="sec on" id="sec-pos">
+  <div class="sec-hd">
+    <div class="sec-title">🔤 품사 <span style="font-size:14px;color:var(--txt3)">Parts of Speech</span></div>
+    <div class="sec-sub">영어의 8가지 품사 — 각 단어가 문장에서 하는 역할을 정의합니다.</div>
+  </div>
+
+  <h3 class="blk">① 명사 Noun</h3>
+  <div class="callout acc"><span>📌</span><div class="cb">사람·사물·장소·개념의 이름. 문장에서 <strong>주어·목적어·보어</strong> 역할을 합니다.</div></div>
+  <div class="tw"><table>
+    <tr><th>종류</th><th>설명</th><th>예</th></tr>
+    <tr><td><strong>가산명사</strong> (Countable)</td><td class="kr">셀 수 있음 · a/an 붙일 수 있음</td><td class="en">a book, two cats, an apple</td></tr>
+    <tr><td><strong>불가산명사</strong> (Uncountable)</td><td class="kr">셀 수 없음 · a/an 불가 · 단수 동사</td><td class="en">water, music, advice, information</td></tr>
+    <tr><td><strong>고유명사</strong> (Proper)</td><td class="kr">특정 대상의 이름 · 항상 대문자</td><td class="en">Korea, London, Monday, Tom</td></tr>
+    <tr><td><strong>집합명사</strong> (Collective)</td><td class="kr">구성원의 집단</td><td class="en">team, family, class, staff</td></tr>
+    <tr><td><strong>추상명사</strong> (Abstract)</td><td class="kr">눈에 보이지 않는 개념</td><td class="en">love, happiness, freedom, hope</td></tr>
+  </table></div>
+  <div class="tw"><div class="tw-cap">복수형 규칙</div><table>
+    <tr><th>규칙</th><th>원형</th><th>복수</th></tr>
+    <tr><td>일반 → +s</td><td class="en">book, cat</td><td class="en">books, cats</td></tr>
+    <tr><td>-s/-sh/-ch/-x/-o → +es</td><td class="en">bus, dish, watch, box</td><td class="en">buses, dishes, watches, boxes</td></tr>
+    <tr><td>자음+y → -y+ies</td><td class="en">city, baby</td><td class="en">cities, babies</td></tr>
+    <tr><td>-f/-fe → -ves</td><td class="en">leaf, wife</td><td class="en">leaves, wives</td></tr>
+    <tr><td>불규칙</td><td class="en">man, child, tooth, mouse, foot, person</td><td class="en">men, children, teeth, mice, feet, people</td></tr>
+    <tr><td>단복수 동형</td><td class="en">sheep, deer, fish, species</td><td class="en">sheep, deer, fish, species</td></tr>
+  </table></div>
+
+  <h3 class="blk">② 대명사 Pronoun</h3>
+  <div class="tw"><table>
+    <tr><th>종류</th><th>주격</th><th>목적격</th><th>소유격</th><th>소유대명사</th><th>재귀대명사</th></tr>
+    <tr><td><strong>1인칭 단수</strong></td><td class="en">I</td><td class="en">me</td><td class="en">my</td><td class="en">mine</td><td class="en">myself</td></tr>
+    <tr><td><strong>2인칭</strong></td><td class="en">you</td><td class="en">you</td><td class="en">your</td><td class="en">yours</td><td class="en">yourself/selves</td></tr>
+    <tr><td><strong>3인칭 남</strong></td><td class="en">he</td><td class="en">him</td><td class="en">his</td><td class="en">his</td><td class="en">himself</td></tr>
+    <tr><td><strong>3인칭 여</strong></td><td class="en">she</td><td class="en">her</td><td class="en">her</td><td class="en">hers</td><td class="en">herself</td></tr>
+    <tr><td><strong>3인칭 중</strong></td><td class="en">it</td><td class="en">it</td><td class="en">its</td><td class="en">—</td><td class="en">itself</td></tr>
+    <tr><td><strong>1인칭 복수</strong></td><td class="en">we</td><td class="en">us</td><td class="en">our</td><td class="en">ours</td><td class="en">ourselves</td></tr>
+    <tr><td><strong>3인칭 복수</strong></td><td class="en">they</td><td class="en">them</td><td class="en">their</td><td class="en">theirs</td><td class="en">themselves</td></tr>
+  </table></div>
+  <div class="tw"><div class="tw-cap">지시·의문·부정대명사</div><table>
+    <tr><th>종류</th><th>예</th><th>용법</th></tr>
+    <tr><td><strong>지시대명사</strong></td><td class="en">this / that / these / those</td><td class="kr">가까운 것 → this/these · 먼 것 → that/those</td></tr>
+    <tr><td><strong>의문대명사</strong></td><td class="en">who / whom / whose / which / what</td><td class="kr">who(주격) · whom(목적격) · whose(소유)</td></tr>
+    <tr><td><strong>부정대명사</strong></td><td class="en">one, some, any, each, both, all, none, either, neither</td><td class="kr">불특정 대상 지칭</td></tr>
+  </table></div>
+
+  <h3 class="blk">③ 동사 Verb</h3>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><span class="card-icon">🏃</span><span class="card-title" style="color:var(--grn2)">동작동사 Action Verb</span></div>
+      <div class="card-body">동작·행위를 나타내는 동사<br><em>run, eat, write, think, speak</em></div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔗</span><span class="card-title" style="color:var(--acc2)">연결동사 Linking Verb</span></div>
+      <div class="card-body">주어와 보어를 연결<br><em>be, seem, look, feel, become, taste, smell, sound, appear</em></div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⚙️</span><span class="card-title" style="color:var(--blu2)">조동사 Auxiliary Verb</span></div>
+      <div class="card-body">본동사를 도와 시제·법·태를 나타냄<br><em>be, have, do, can, will, must, should…</em></div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📏</span><span class="card-title" style="color:var(--pur2)">규칙 vs 불규칙</span></div>
+      <div class="card-body">규칙: <em>walk–walked–walked</em><br>불규칙: <em>go–went–gone · see–saw–seen</em><br><em>buy–bought · sing–sang–sung</em></div></div>
+  </div>
+  <div class="tw"><div class="tw-cap">주요 불규칙 동사 (원형 – 과거 – 과거분사)</div><table>
+    <tr><th>패턴</th><th colspan="3">예시</th></tr>
+    <tr><td><span class="tag g">A–A–A</span> 동형</td><td class="en">cut–cut–cut</td><td class="en">put–put–put</td><td class="en">hit–hit–hit</td></tr>
+    <tr><td><span class="tag a">A–B–A</span> 원형=과거분사</td><td class="en">run–ran–run</td><td class="en">come–came–come</td><td class="en">become–became–become</td></tr>
+    <tr><td><span class="tag b">A–B–B</span> 과거=과거분사</td><td class="en">buy–bought–bought</td><td class="en">teach–taught–taught</td><td class="en">bring–brought–brought</td></tr>
+    <tr><td><span class="tag r">A–B–C</span> 전부 다름</td><td class="en">go–went–gone</td><td class="en">see–saw–seen</td><td class="en">write–wrote–written</td></tr>
+    <tr><td><span class="tag p">A–B–C</span> 전부 다름 ②</td><td class="en">sing–sang–sung</td><td class="en">ring–rang–rung</td><td class="en">swim–swam–swum</td></tr>
+    <tr><td><span class="tag c">A–B–C</span> 전부 다름 ③</td><td class="en">speak–spoke–spoken</td><td class="en">break–broke–broken</td><td class="en">steal–stole–stolen</td></tr>
+  </table></div>
+
+  <h3 class="blk">④ 형용사 Adjective</h3>
+  <div class="callout acc"><span>📌</span><div class="cb">명사를 수식하거나 보어 역할. <strong>명사 앞(한정적)</strong> 또는 <strong>be동사 뒤(서술적)</strong>에 위치.</div></div>
+  <div class="tw"><div class="tw-cap">형용사 어순 (명사 앞에 여러 개 올 때)</div><table>
+    <tr><th>순서</th><th>종류</th><th>예</th></tr>
+    <tr><td>1</td><td>한정사 (Determiner)</td><td class="en">a, the, my, two</td></tr>
+    <tr><td>2</td><td>의견 (Opinion)</td><td class="en">beautiful, ugly, nice</td></tr>
+    <tr><td>3</td><td>크기 (Size)</td><td class="en">big, small, tall, tiny</td></tr>
+    <tr><td>4</td><td>나이 (Age)</td><td class="en">old, young, new, ancient</td></tr>
+    <tr><td>5</td><td>모양 (Shape)</td><td class="en">round, square, oval</td></tr>
+    <tr><td>6</td><td>색상 (Color)</td><td class="en">red, black, golden</td></tr>
+    <tr><td>7</td><td>출처 (Origin)</td><td class="en">Korean, Italian, wooden</td></tr>
+    <tr><td>8</td><td>재료 (Material)</td><td class="en">silk, metal, cotton</td></tr>
+    <tr><td>9</td><td>용도·명사수식 (Purpose)</td><td class="en">sleeping (bag), writing (desk)</td></tr>
+  </table></div>
+  <div class="eg">
+    <span class="e">a beautiful old red Italian sports car</span><span class="t">← 올바른 순서</span><br>
+    <span class="w">a Italian old beautiful red sports car</span><span class="t">← 순서 오류</span>
+  </div>
+
+  <h3 class="blk">⑤ 부사 Adverb</h3>
+  <div class="tw"><table>
+    <tr><th>종류</th><th>뜻</th><th>예</th></tr>
+    <tr><td><strong>방법 (Manner)</strong></td><td class="kr">어떻게</td><td class="en">slowly, carefully, well, fast, hard</td></tr>
+    <tr><td><strong>빈도 (Frequency)</strong></td><td class="kr">얼마나 자주</td><td class="en">always &gt; usually &gt; often &gt; sometimes &gt; rarely &gt; never</td></tr>
+    <tr><td><strong>시간 (Time)</strong></td><td class="kr">언제</td><td class="en">now, soon, already, still, yet, recently, today</td></tr>
+    <tr><td><strong>장소 (Place)</strong></td><td class="kr">어디서</td><td class="en">here, there, everywhere, outside, upstairs</td></tr>
+    <tr><td><strong>정도 (Degree)</strong></td><td class="kr">얼마나</td><td class="en">very, quite, rather, too, enough, almost, nearly</td></tr>
+  </table></div>
+  <div class="callout grn"><span>💡</span><div class="cb">
+    빈도부사 위치: <strong>be동사 뒤</strong> / <strong>일반동사 앞</strong> / <strong>조동사+본동사 사이</strong><br>
+    <em>She is always happy. / He always eats breakfast. / You should always wear a seatbelt.</em>
+  </div></div>
+
+  <h3 class="blk">⑥ 전치사 Preposition</h3>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><span class="card-icon">📅</span><span class="card-title" style="color:var(--acc2)">시간 전치사</span></div>
+      <div class="card-body">
+        <strong>at</strong> — 시각·특정 시점 <em>(at 3 o'clock, at noon, at night)</em><br>
+        <strong>on</strong> — 요일·날짜 <em>(on Monday, on March 3rd)</em><br>
+        <strong>in</strong> — 월·연도·세기·계절 <em>(in May, in 2025, in summer)</em><br>
+        <strong>for</strong> — 기간 <em>(for two hours)</em><br>
+        <strong>since</strong> — 시작 시점 <em>(since 2020)</em><br>
+        <strong>by</strong> — 기한 <em>(by Friday)</em><br>
+        <strong>until/till</strong> — ~까지(계속) <em>(until midnight)</em>
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">📍</span><span class="card-title" style="color:var(--grn2)">장소 전치사</span></div>
+      <div class="card-body">
+        <strong>at</strong> — 지점·건물 <em>(at the door, at school)</em><br>
+        <strong>on</strong> — 표면 <em>(on the table, on the wall)</em><br>
+        <strong>in</strong> — 내부 <em>(in the box, in Seoul)</em><br>
+        <strong>above / below</strong> — 위/아래<br>
+        <strong>between</strong> — 둘 사이 <em>(between A and B)</em><br>
+        <strong>among</strong> — 셋 이상 사이<br>
+        <strong>next to / beside</strong> — 옆에
+      </div></div>
+  </div>
+
+  <h3 class="blk">⑦ 접속사 Conjunction</h3>
+  <div class="tw"><table>
+    <tr><th>종류</th><th>단어</th><th>의미</th></tr>
+    <tr><td rowspan="7"><strong>등위접속사</strong><br><span class="tag">FANBOYS</span></td><td class="en">For</td><td class="kr">왜냐하면 (이유)</td></tr>
+    <tr><td class="en">And</td><td class="kr">그리고 (추가)</td></tr>
+    <tr><td class="en">Nor</td><td class="kr">~도 아니고</td></tr>
+    <tr><td class="en">But</td><td class="kr">그러나 (대조)</td></tr>
+    <tr><td class="en">Or</td><td class="kr">또는 (선택)</td></tr>
+    <tr><td class="en">Yet</td><td class="kr">그런데도 (대조)</td></tr>
+    <tr><td class="en">So</td><td class="kr">그래서 (결과)</td></tr>
+    <tr><td><strong>종속접속사</strong><br><span class="tag b">시간</span></td><td class="en">when, while, as, after, before, until, since, as soon as</td><td class="kr">~할 때, ~하는 동안</td></tr>
+    <tr><td><strong>종속접속사</strong><br><span class="tag g">이유</span></td><td class="en">because, since, as, for</td><td class="kr">~때문에</td></tr>
+    <tr><td><strong>종속접속사</strong><br><span class="tag a">조건</span></td><td class="en">if, unless, as long as, provided that</td><td class="kr">~라면</td></tr>
+    <tr><td><strong>종속접속사</strong><br><span class="tag r">양보</span></td><td class="en">although, though, even though, even if, while</td><td class="kr">비록 ~일지라도</td></tr>
+    <tr><td><strong>상관접속사</strong></td><td class="en">both A and B · either A or B · neither A nor B · not only A but also B · not A but B</td><td class="kr">짝으로 쓰는 접속사</td></tr>
+  </table></div>
+
+  <h3 class="blk">⑧ 관사 Article</h3>
+  <div class="tw"><table>
+    <tr><th>관사</th><th>용법</th><th>예</th></tr>
+    <tr><td><strong>a / an</strong></td><td class="kr">처음 언급, 불특정 단수 가산명사 · 자음소리 앞 a · 모음소리 앞 an</td><td class="en">a cat, an apple, an hour, a university</td></tr>
+    <tr><td><strong>the</strong></td><td class="kr">두 번째 언급, 특정 대상, 유일한 것, 서수·최상급 앞</td><td class="en">the sun, the first, the best, the book I bought</td></tr>
+    <tr><td><strong>무관사 (∅)</strong></td><td class="kr">불가산명사, 복수명사(일반), 고유명사, 언어·과목·스포츠 앞</td><td class="en">water, dogs, Korea, English, soccer</td></tr>
+  </table></div>
+  <div class="callout red"><span>⚠️</span><div class="cb">
+    <strong>an 쓰는 경우:</strong> 철자가 아닌 <strong>소리</strong>가 기준 — <em>an hour</em>(h 묵음), <em>a university</em>(유 소리), <em>an MBA</em>(엠 소리)
+  </div></div>
+</div>
+
+<!-- ════════════════ 시제 ════════════════ -->
+<div class="sec" id="sec-tense">
+  <div class="sec-hd">
+    <div class="sec-title">⏰ 시제 <span style="font-size:14px;color:var(--txt3)">Verb Tenses</span></div>
+    <div class="sec-sub">영어의 12시제 — 현재·과거·미래 × 단순·진행·완료·완료진행</div>
+  </div>
+
+  <h3 class="blk">12시제 한눈에</h3>
+  <div class="tense-grid">
+    <div class="tg-head">시제</div><div class="tg-head">현재 Present</div><div class="tg-head">과거 Past</div><div class="tg-head">미래 Future</div>
+    <div class="tg-label">단순 Simple</div>
+    <div class="tg-cell"><span class="fm">V / V-s</span><span class="ex">She works hard.</span></div>
+    <div class="tg-cell"><span class="fm">V-ed / 불규칙</span><span class="ex">She worked hard.</span></div>
+    <div class="tg-cell"><span class="fm">will V / be going to V</span><span class="ex">She will work hard.</span></div>
+    <div class="tg-label">진행 Continuous</div>
+    <div class="tg-cell"><span class="fm">am/is/are + V-ing</span><span class="ex">She is working now.</span></div>
+    <div class="tg-cell"><span class="fm">was/were + V-ing</span><span class="ex">She was working then.</span></div>
+    <div class="tg-cell"><span class="fm">will be + V-ing</span><span class="ex">She will be working.</span></div>
+    <div class="tg-label">완료 Perfect</div>
+    <div class="tg-cell"><span class="fm">have/has + p.p.</span><span class="ex">She has worked here.</span></div>
+    <div class="tg-cell"><span class="fm">had + p.p.</span><span class="ex">She had worked there.</span></div>
+    <div class="tg-cell"><span class="fm">will have + p.p.</span><span class="ex">She will have worked.</span></div>
+    <div class="tg-label">완료진행 Perf.Cont.</div>
+    <div class="tg-cell"><span class="fm">have/has been + V-ing</span><span class="ex">She has been working.</span></div>
+    <div class="tg-cell"><span class="fm">had been + V-ing</span><span class="ex">She had been working.</span></div>
+    <div class="tg-cell"><span class="fm">will have been + V-ing</span><span class="ex">She will have been working.</span></div>
+  </div>
+
+  <h3 class="blk">현재 시제 Present Tenses</h3>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><span class="card-icon">🔄</span><span class="card-title" style="color:var(--acc2)">현재 단순 Simple Present</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 습관·반복 행동, 불변의 사실·진리, 감정·상태<br>
+        <div class="formula"><span class="v">주어</span> <span class="o">+</span> <span class="v">동사원형</span> (3인칭 단수: <span class="v">+s/es</span>)</div>
+        <em>She drinks coffee every morning.</em> (습관)<br>
+        <em>Water boils at 100°C.</em> (진리)<br>
+        빈도부사와 자주 함께 씀: always, usually, often, sometimes, never
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">▶️</span><span class="card-title" style="color:var(--grn2)">현재 진행 Present Continuous</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 지금 진행 중, 가까운 미래 계획<br>
+        <div class="formula"><span class="v">am/is/are</span> <span class="o">+</span> <span class="v">V-ing</span></div>
+        <em>I am studying right now.</em> (진행)<br>
+        <em>We are meeting tomorrow.</em> (예정된 미래)<br>
+        <span class="tag r">상태동사</span>는 진행형 불가: know, like, believe, want, have(소유), see(이해)
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">✅</span><span class="card-title" style="color:var(--blu2)">현재 완료 Present Perfect</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 경험, 완료, 결과, 계속 (현재와 연결)<br>
+        <div class="formula"><span class="v">have/has</span> <span class="o">+</span> <span class="v">p.p.</span></div>
+        <em>I have visited Paris twice.</em> (경험)<br>
+        <em>She has just finished her work.</em> (완료)<br>
+        함께 쓰이는 부사: ever, never, just, already, yet, recently, for, since
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">⏳</span><span class="card-title" style="color:var(--pur2)">현재 완료진행 Present Perfect Continuous</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 과거부터 지금까지 계속 진행 중인 동작 (기간 강조)<br>
+        <div class="formula"><span class="v">have/has been</span> <span class="o">+</span> <span class="v">V-ing</span></div>
+        <em>I have been studying for 3 hours.</em><br>
+        <em>It has been raining since this morning.</em>
+      </div></div>
+  </div>
+
+  <h3 class="blk">과거 시제 Past Tenses</h3>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><span class="card-icon">⏪</span><span class="card-title" style="color:var(--acc2)">과거 단순 Simple Past</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 과거의 특정 시점에 일어난 일 (현재와 단절)<br>
+        <div class="formula"><span class="v">V-ed</span> / 불규칙</div>
+        <em>I saw the movie last night.</em><br>
+        함께 쓰이는 부사: yesterday, last week, in 2020, ago, then
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🎬</span><span class="card-title" style="color:var(--grn2)">과거 진행 Past Continuous</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 과거 특정 시점에 진행 중, 과거 배경 서술<br>
+        <div class="formula"><span class="v">was/were</span> <span class="o">+</span> <span class="v">V-ing</span></div>
+        <em>I was sleeping when he called.</em><br>
+        <em>While she was cooking, the phone rang.</em>
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔙</span><span class="card-title" style="color:var(--blu2)">과거 완료 Past Perfect</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 과거의 한 시점보다 더 이전에 일어난 일 (대과거)<br>
+        <div class="formula"><span class="v">had</span> <span class="o">+</span> <span class="v">p.p.</span></div>
+        <em>When I arrived, she had already left.</em><br>
+        <em>He had never seen snow before he came to Korea.</em>
+      </div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">♾️</span><span class="card-title" style="color:var(--pur2)">과거 완료진행 Past Perfect Continuous</span></div>
+      <div class="card-body">
+        <strong>용법:</strong> 과거 특정 시점까지 계속 진행된 동작<br>
+        <div class="formula"><span class="v">had been</span> <span class="o">+</span> <span class="v">V-ing</span></div>
+        <em>She had been working for 5 hours when he called.</em>
+      </div></div>
+  </div>
+
+  <h3 class="blk">미래 시제 Future Tenses</h3>
+  <div class="tw"><table>
+    <tr><th>형태</th><th>용법</th><th>예문</th></tr>
+    <tr><td><strong>will + V</strong></td><td class="kr">즉흥적 결정, 예측, 약속</td><td class="en">I'll help you. / It will rain tomorrow.</td></tr>
+    <tr><td><strong>be going to + V</strong></td><td class="kr">계획된 의도, 근거 있는 예측</td><td class="en">I'm going to study abroad. / Look at those clouds — it's going to rain.</td></tr>
+    <tr><td><strong>will be + V-ing</strong></td><td class="kr">미래 특정 시점에 진행 중</td><td class="en">This time tomorrow, I will be flying to London.</td></tr>
+    <tr><td><strong>will have + p.p.</strong></td><td class="kr">미래 특정 시점까지 완료될 일</td><td class="en">By Friday, I will have finished the report.</td></tr>
+    <tr><td><strong>현재 진행형</strong></td><td class="kr">확정된 가까운 미래 계획</td><td class="en">We are meeting at 7 tonight.</td></tr>
+    <tr><td><strong>현재 단순형</strong></td><td class="kr">시간표·일정 (열차·수업 등)</td><td class="en">The train leaves at 9 AM.</td></tr>
+  </table></div>
+
+  <div class="callout red"><span>⚠️</span><div class="cb">
+    <strong>시간·조건 부사절에서는 미래 대신 현재 시제를 씁니다!</strong><br>
+    <em>When he <strong>arrives</strong>, we will start. (×When he will arrive)</em><br>
+    <em>If it <strong>rains</strong> tomorrow, I'll stay home. (×If it will rain)</em>
+  </div></div>
+</div>
+
+<!-- ════════════════ 문장 형식 ════════════════ -->
+<div class="sec" id="sec-sent">
+  <div class="sec-hd">
+    <div class="sec-title">📐 문장 형식 <span style="font-size:14px;color:var(--txt3)">Sentence Patterns</span></div>
+    <div class="sec-sub">영어의 5가지 기본 문형 — 모든 문장은 이 5형식 중 하나입니다.</div>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>형식</th><th>구조</th><th>예문</th><th>주요 동사</th></tr>
+    <tr>
+      <td><span class="tag a">1형식</span></td>
+      <td class="form">S + V</td>
+      <td class="en">Birds fly. / The baby smiled.</td>
+      <td class="kr">자동사: go, come, run, sit, rise, exist</td>
+    </tr>
+    <tr>
+      <td><span class="tag g">2형식</span></td>
+      <td class="form">S + V + C</td>
+      <td class="en">She looks happy. / He became a doctor.</td>
+      <td class="kr">연결동사: be, look, seem, feel, become, get, grow, turn, remain, stay, smell, taste, sound</td>
+    </tr>
+    <tr>
+      <td><span class="tag b">3형식</span></td>
+      <td class="form">S + V + O</td>
+      <td class="en">I love music. / She wrote a letter.</td>
+      <td class="kr">타동사: love, eat, read, buy, make, see, hear</td>
+    </tr>
+    <tr>
+      <td><span class="tag p">4형식</span></td>
+      <td class="form">S + V + IO + DO</td>
+      <td class="en">He gave me a gift. / She told us the truth.</td>
+      <td class="kr">수여동사: give, send, teach, show, tell, buy, make, lend, bring</td>
+    </tr>
+    <tr>
+      <td><span class="tag r">5형식</span></td>
+      <td class="form">S + V + O + OC</td>
+      <td class="en">We call him Tom. / She made me happy.</td>
+      <td class="kr">목적격보어 동사: call, name, make, keep, find, leave, elect, consider, see, hear, have, let</td>
+    </tr>
+  </table></div>
+
+  <h3 class="blk">4형식 → 3형식 전환 (전치사 변환)</h3>
+  <div class="tw"><table>
+    <tr><th>동사</th><th>4형식</th><th>3형식 (전치사)</th></tr>
+    <tr><td class="en"><strong>give, send, teach, show, lend, bring, write, offer</strong></td><td class="en">I gave him a book.</td><td class="en">I gave a book <strong>to</strong> him.</td></tr>
+    <tr><td class="en"><strong>buy, make, cook, get, find</strong></td><td class="en">She made me a cake.</td><td class="en">She made a cake <strong>for</strong> me.</td></tr>
+    <tr><td class="en"><strong>ask</strong></td><td class="en">He asked me a question.</td><td class="en">He asked a question <strong>of</strong> me.</td></tr>
+  </table></div>
+
+  <h3 class="blk">5형식 목적격보어 패턴</h3>
+  <div class="tw"><table>
+    <tr><th>보어 형태</th><th>주요 동사</th><th>예문</th></tr>
+    <tr><td><strong>명사</strong></td><td class="en">call, name, elect, appoint</td><td class="en">We call him Tom.</td></tr>
+    <tr><td><strong>형용사</strong></td><td class="en">make, keep, find, leave, drive</td><td class="en">Music makes me happy.</td></tr>
+    <tr><td><strong>to V (원형부정사)</strong></td><td class="en">want, ask, tell, allow, expect, enable</td><td class="en">I want you to come.</td></tr>
+    <tr><td><strong>V (동사원형)</strong><br><span class="tag r">사역동사</span></td><td class="en">make, have, let</td><td class="en">She made me clean the room.</td></tr>
+    <tr><td><strong>V (동사원형)</strong><br><span class="tag r">지각동사</span></td><td class="en">see, hear, feel, watch, notice</td><td class="en">I saw him run across the street.</td></tr>
+    <tr><td><strong>V-ing</strong><br><span class="tag a">진행 강조</span></td><td class="en">see, hear, watch, feel, find</td><td class="en">I saw him running in the park.</td></tr>
+    <tr><td><strong>p.p.</strong><br><span class="tag b">수동 관계</span></td><td class="en">have, get, make, find, see</td><td class="en">I had my car repaired. / I got my hair cut.</td></tr>
+  </table></div>
+  <div class="callout acc"><span>💡</span><div class="cb">
+    <strong>사역동사 have vs get 차이:</strong><br>
+    <em>I had him fix my car.</em> (목적어가 행위자 → 원형)<br>
+    <em>I got him to fix my car.</em> (get은 to 부정사 사용!)<br>
+    <em>I had/got my car fixed.</em> (목적어가 행위의 대상 → p.p.)
+  </div></div>
+
+  <h3 class="blk">문장 종류</h3>
+  <div class="tw"><table>
+    <tr><th>종류</th><th>설명</th><th>예</th></tr>
+    <tr><td><strong>평서문</strong> Declarative</td><td class="kr">사실이나 의견 진술</td><td class="en">She is a teacher.</td></tr>
+    <tr><td><strong>의문문</strong> Interrogative</td><td class="kr">질문 · 조동사/be 도치 or Wh-</td><td class="en">Is she a teacher? / What does she do?</td></tr>
+    <tr><td><strong>명령문</strong> Imperative</td><td class="kr">주어 생략, 동사원형으로 시작</td><td class="en">Open the door. / Don't run.</td></tr>
+    <tr><td><strong>감탄문</strong> Exclamatory</td><td class="kr">What + (a/an) + 형용사 + 명사! / How + 형용사/부사!</td><td class="en">What a beautiful day! / How fast she runs!</td></tr>
+  </table></div>
+
+  <h3 class="blk">부가의문문 Tag Question</h3>
+  <div class="formula">긍정문 <span class="o">+</span> <span class="v">부정 꼬리?</span> &nbsp;/&nbsp; 부정문 <span class="o">+</span> <span class="v">긍정 꼬리?</span></div>
+  <div class="eg">
+    <span class="e">She is kind, isn't she?</span><br>
+    <span class="e">He doesn't smoke, does he?</span><br>
+    <span class="e">They will come, won't they?</span><br>
+    <span class="e">Let's go, shall we?</span><br>
+    <span class="e">Open the window, will you?</span>
+  </div>
+</div>
+
+<!-- ════════════════ 조동사 ════════════════ -->
+<div class="sec" id="sec-modal">
+  <div class="sec-hd">
+    <div class="sec-title">🔧 조동사 <span style="font-size:14px;color:var(--txt3)">Modal Verbs</span></div>
+    <div class="sec-sub">조동사는 동사 앞에서 능력·허가·의무·추측 등 뜻을 더합니다. <strong>뒤에 항상 동사원형</strong>이 옵니다.</div>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>조동사</th><th>핵심 의미</th><th>예문</th><th>뉘앙스</th></tr>
+    <tr>
+      <td><strong>can</strong></td>
+      <td><span class="tag g">능력</span> <span class="tag b">허가</span> <span class="tag">가능성</span></td>
+      <td class="en">She can speak French. / Can I use your phone?</td>
+      <td class="kr">현재 능력·비공식 허가 요청</td>
+    </tr>
+    <tr>
+      <td><strong>could</strong></td>
+      <td><span class="tag g">과거 능력</span> <span class="tag b">공손한 허가</span> <span class="tag">약한 가능성</span></td>
+      <td class="en">I could swim when I was young. / Could you help me?</td>
+      <td class="kr">can보다 정중, 가정법에서 사용</td>
+    </tr>
+    <tr>
+      <td><strong>may</strong></td>
+      <td><span class="tag b">공식적 허가</span> <span class="tag">약한 추측</span></td>
+      <td class="en">May I come in? / It may rain tonight.</td>
+      <td class="kr">50% 이하 가능성, 공식적 허가 요청</td>
+    </tr>
+    <tr>
+      <td><strong>might</strong></td>
+      <td><span class="tag">아주 약한 추측</span></td>
+      <td class="en">She might be at home. / I might go if I have time.</td>
+      <td class="kr">may보다 더 낮은 가능성 (~30%)</td>
+    </tr>
+    <tr>
+      <td><strong>will</strong></td>
+      <td><span class="tag a">의지·결심</span> <span class="tag g">강한 예측</span></td>
+      <td class="en">I will help you. / It will be fine tomorrow.</td>
+      <td class="kr">화자의 의지·즉흥적 결정</td>
+    </tr>
+    <tr>
+      <td><strong>would</strong></td>
+      <td><span class="tag">과거 습관</span> <span class="tag b">공손한 요청</span> <span class="tag p">가정</span></td>
+      <td class="en">He would often fish here. / Would you like tea? / I would travel if I were rich.</td>
+      <td class="kr">will의 정중형·과거형, 가정법 필수</td>
+    </tr>
+    <tr>
+      <td><strong>shall</strong></td>
+      <td><span class="tag b">제안 (I/We)</span> <span class="tag a">의무·운명</span></td>
+      <td class="en">Shall we dance? / You shall not pass!</td>
+      <td class="kr">주로 Shall I/we로 제안·권유</td>
+    </tr>
+    <tr>
+      <td><strong>should</strong></td>
+      <td><span class="tag r">충고·의무</span> <span class="tag">기대</span></td>
+      <td class="en">You should see a doctor. / He should be home by now.</td>
+      <td class="kr">must보다 부드러운 의무·충고</td>
+    </tr>
+    <tr>
+      <td><strong>must</strong></td>
+      <td><span class="tag r">강한 의무</span> <span class="tag a">강한 추측</span></td>
+      <td class="en">You must wear a seatbelt. / She must be tired.</td>
+      <td class="kr">의무(=have to)·확신에 찬 추측(95%+)</td>
+    </tr>
+    <tr>
+      <td><strong>have to</strong></td>
+      <td><span class="tag r">외부 의무</span></td>
+      <td class="en">I have to submit this by Friday.</td>
+      <td class="kr">규칙·상황에 의한 의무 (must보다 객관적)</td>
+    </tr>
+    <tr>
+      <td><strong>need not</strong></td>
+      <td><span class="tag g">불필요</span></td>
+      <td class="en">You needn't worry. / You don't have to come.</td>
+      <td class="kr">~할 필요 없다 (금지 아님!)</td>
+    </tr>
+    <tr>
+      <td><strong>must not</strong></td>
+      <td><span class="tag r">강한 금지</span></td>
+      <td class="en">You must not smoke here.</td>
+      <td class="kr">절대 하면 안 됨 (≠ don't have to)</td>
+    </tr>
+  </table></div>
+
+  <div class="callout red"><span>⚠️</span><div class="cb">
+    <strong>must not vs don't have to 헷갈리지 않기!</strong><br>
+    <em>You <strong>must not</strong> eat in class.</em> → 먹으면 안 된다 (금지)<br>
+    <em>You <strong>don't have to</strong> eat in class.</em> → 먹어도 되고 안 먹어도 된다 (불필요)
+  </div></div>
+
+  <h3 class="blk">조동사 + have + p.p. (과거에 대한 추측·유감)</h3>
+  <div class="tw"><table>
+    <tr><th>형태</th><th>의미</th><th>예문</th></tr>
+    <tr><td class="en"><strong>must have p.p.</strong></td><td class="kr">~했음에 틀림없다 (강한 확신)</td><td class="en">She must have left already.</td></tr>
+    <tr><td class="en"><strong>can't have p.p.</strong></td><td class="kr">~했을 리 없다 (강한 부정)</td><td class="en">He can't have done that.</td></tr>
+    <tr><td class="en"><strong>may/might have p.p.</strong></td><td class="kr">~했을지도 모른다 (약한 추측)</td><td class="en">She might have missed the bus.</td></tr>
+    <tr><td class="en"><strong>should have p.p.</strong></td><td class="kr">~했어야 했는데 (안 한 것에 후회·비난)</td><td class="en">You should have told me earlier.</td></tr>
+    <tr><td class="en"><strong>could have p.p.</strong></td><td class="kr">~할 수 있었는데 (안 한 것)</td><td class="en">I could have helped you.</td></tr>
+    <tr><td class="en"><strong>would have p.p.</strong></td><td class="kr">~했을 것이다 (가정법 과거완료)</td><td class="en">I would have gone if you had asked.</td></tr>
+    <tr><td class="en"><strong>needn't have p.p.</strong></td><td class="kr">~할 필요 없었는데 (했음)</td><td class="en">You needn't have bought so much food.</td></tr>
+  </table></div>
+</div>
+
+<!-- ════════════════ 가정법 ════════════════ -->
+<div class="sec" id="sec-cond">
+  <div class="sec-hd">
+    <div class="sec-title">🌀 가정법 <span style="font-size:14px;color:var(--txt3)">Conditionals</span></div>
+    <div class="sec-sub">if절로 조건을 제시하고 주절로 결과를 나타냅니다. 현실 여부에 따라 시제가 달라집니다.</div>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>종류</th><th>if절</th><th>주절</th><th>의미</th></tr>
+    <tr>
+      <td><span class="tag g">0형 가정법</span><br><span style="font-size:11px;color:var(--txt3)">Zero Conditional</span></td>
+      <td class="form">If + 현재</td>
+      <td class="form">현재</td>
+      <td class="kr">항상 사실인 진리·습관<br><em>If you heat water to 100°C, it boils.</em></td>
+    </tr>
+    <tr>
+      <td><span class="tag a">1형 가정법</span><br><span style="font-size:11px;color:var(--txt3)">First Conditional</span></td>
+      <td class="form">If + 현재</td>
+      <td class="form">will/can/may + V</td>
+      <td class="kr">현재/미래의 실현 가능한 조건<br><em>If it rains, I will stay home.</em></td>
+    </tr>
+    <tr>
+      <td><span class="tag b">2형 가정법</span><br><span style="font-size:11px;color:var(--txt3)">Second Conditional</span></td>
+      <td class="form">If + 과거</td>
+      <td class="form">would/could/might + V</td>
+      <td class="kr">현재 사실과 반대되는 가정<br><em>If I were rich, I would travel the world.</em></td>
+    </tr>
+    <tr>
+      <td><span class="tag p">3형 가정법</span><br><span style="font-size:11px;color:var(--txt3)">Third Conditional</span></td>
+      <td class="form">If + had p.p.</td>
+      <td class="form">would/could/might + have p.p.</td>
+      <td class="kr">과거 사실과 반대되는 가정 (후회·아쉬움)<br><em>If I had studied harder, I would have passed.</em></td>
+    </tr>
+    <tr>
+      <td><span class="tag r">혼합 가정법</span><br><span style="font-size:11px;color:var(--txt3)">Mixed Conditional</span></td>
+      <td class="form">If + had p.p. (과거)</td>
+      <td class="form">would + V (현재)</td>
+      <td class="kr">과거 조건 + 현재 결과<br><em>If I had studied medicine, I would be a doctor now.</em></td>
+    </tr>
+  </table></div>
+
+  <div class="callout blu"><span>📌</span><div class="cb">
+    <strong>2형 가정법에서 be동사는 인칭에 상관없이 were를 씁니다!</strong><br>
+    <em>If I <strong>were</strong> you, I would apologize. (×If I was you)</em><br>
+    단, 구어체에서 was를 쓰기도 하지만 시험에서는 were가 정답.
+  </div></div>
+
+  <h3 class="blk">I wish / If only / as if (가정법 관용 표현)</h3>
+  <div class="tw"><table>
+    <tr><th>표현</th><th>의미</th><th>예문</th></tr>
+    <tr><td class="en"><strong>I wish + 과거</strong></td><td class="kr">현재 사실과 반대되는 소망</td><td class="en">I wish I had more time. (사실: I don't have much time)</td></tr>
+    <tr><td class="en"><strong>I wish + had p.p.</strong></td><td class="kr">과거에 대한 후회</td><td class="en">I wish I had studied harder. (사실: I didn't study)</td></tr>
+    <tr><td class="en"><strong>I wish + would V</strong></td><td class="kr">상대방의 변화 기원</td><td class="en">I wish you would stop smoking.</td></tr>
+    <tr><td class="en"><strong>If only</strong></td><td class="kr">I wish의 강조형</td><td class="en">If only I were taller!</td></tr>
+    <tr><td class="en"><strong>as if / as though</strong></td><td class="kr">마치 ~인 것처럼</td><td class="en">He acts as if he were the boss. / She talks as if she had seen it.</td></tr>
+    <tr><td class="en"><strong>It's time + 과거</strong></td><td class="kr">지금쯤 ~해야 할 때</td><td class="en">It's time you went to bed.</td></tr>
+    <tr><td class="en"><strong>would rather + 과거</strong></td><td class="kr">차라리 ~했으면 좋겠다</td><td class="en">I would rather you stayed home.</td></tr>
+  </table></div>
+
+  <h3 class="blk">if 없는 가정법 (도치)</h3>
+  <div class="eg">
+    <span class="e">Were I rich, I would buy it.</span><span class="t">= If I were rich</span><br>
+    <span class="e">Had she worked harder, she would have passed.</span><span class="t">= If she had worked harder</span><br>
+    <span class="e">Should you need help, call me.</span><span class="t">= If you should need help (혹시 ~한다면)</span>
+  </div>
+</div>
+
+<!-- ════════════════ 심화 문법 ════════════════ -->
+<div class="sec" id="sec-adv">
+  <div class="sec-hd">
+    <div class="sec-title">📎 심화 문법 <span style="font-size:14px;color:var(--txt3)">Advanced Grammar</span></div>
+    <div class="sec-sub">수동태·관계사·부정사·동명사·분사·비교·관계사 등 핵심 심화 개념</div>
+  </div>
+
+  <h3 class="blk">① 수동태 Passive Voice</h3>
+  <div class="callout acc"><span>📌</span><div class="cb">행위자보다 <strong>행위의 대상</strong>을 강조할 때 사용. <em>by + 행위자</em>는 불필요하면 생략.</div></div>
+  <div class="tw"><div class="tw-cap">시제별 수동태 (be + p.p.)</div><table>
+    <tr><th>시제</th><th>능동태</th><th>수동태</th></tr>
+    <tr><td>현재 단순</td><td class="en">She writes the report.</td><td class="en">The report <strong>is written</strong> (by her).</td></tr>
+    <tr><td>과거 단순</td><td class="en">He broke the window.</td><td class="en">The window <strong>was broken</strong> (by him).</td></tr>
+    <tr><td>미래</td><td class="en">They will finish the work.</td><td class="en">The work <strong>will be finished</strong>.</td></tr>
+    <tr><td>현재 진행</td><td class="en">She is writing the report.</td><td class="en">The report <strong>is being written</strong>.</td></tr>
+    <tr><td>현재 완료</td><td class="en">They have built the bridge.</td><td class="en">The bridge <strong>has been built</strong>.</td></tr>
+    <tr><td>조동사</td><td class="en">You must submit the form.</td><td class="en">The form <strong>must be submitted</strong>.</td></tr>
+  </table></div>
+  <div class="tw"><div class="tw-cap">4형식 수동태 (목적어 2개)</div><table>
+    <tr><th>능동태</th><th>수동태 ①</th><th>수동태 ②</th></tr>
+    <tr><td class="en">They gave him a prize.</td><td class="en"><em>He</em> was given a prize.</td><td class="en">A prize was given to him.</td></tr>
+    <tr><td class="en">She taught us English.</td><td class="en"><em>We</em> were taught English.</td><td class="en">English was taught to us.</td></tr>
+  </table></div>
+
+  <h3 class="blk">② 관계사절 Relative Clauses</h3>
+  <div class="tw"><table>
+    <tr><th>관계사</th><th>선행사</th><th>역할</th><th>예문</th></tr>
+    <tr><td class="en"><strong>who</strong></td><td class="kr">사람</td><td class="kr">주격</td><td class="en">The man <em>who</em> called you is my friend.</td></tr>
+    <tr><td class="en"><strong>whom</strong></td><td class="kr">사람</td><td class="kr">목적격 (격식)</td><td class="en">The woman <em>whom</em> I met was kind.</td></tr>
+    <tr><td class="en"><strong>whose</strong></td><td class="kr">사람·사물</td><td class="kr">소유격</td><td class="en">The girl <em>whose</em> bag was stolen cried.</td></tr>
+    <tr><td class="en"><strong>which</strong></td><td class="kr">사물·동물</td><td class="kr">주격·목적격</td><td class="en">The car <em>which</em> I bought is blue.</td></tr>
+    <tr><td class="en"><strong>that</strong></td><td class="kr">사람·사물</td><td class="kr">주격·목적격 (제한적)</td><td class="en">The book <em>that</em> she likes is mine.</td></tr>
+    <tr><td class="en"><strong>when</strong></td><td class="kr">시간명사</td><td class="kr">관계부사</td><td class="en">I remember the day <em>when</em> we met.</td></tr>
+    <tr><td class="en"><strong>where</strong></td><td class="kr">장소명사</td><td class="kr">관계부사</td><td class="en">This is the city <em>where</em> I was born.</td></tr>
+    <tr><td class="en"><strong>why</strong></td><td class="kr">reason</td><td class="kr">관계부사</td><td class="en">That's the reason <em>why</em> I left.</td></tr>
+    <tr><td class="en"><strong>how</strong></td><td class="kr">선행사 없음</td><td class="kr">관계부사</td><td class="en">This is <em>how</em> it works.</td></tr>
+  </table></div>
+  <div class="callout grn"><span>💡</span><div class="cb">
+    <strong>제한적 vs 계속적 용법:</strong><br>
+    제한적: <em>Students <strong>who study hard</strong> succeed.</em> → 열심히 공부하는 학생들만<br>
+    계속적: <em>My brother, <strong>who lives in Seoul</strong>, called me.</em> → 쉼표, 추가 정보 제공 (that 사용 불가)
+  </div></div>
+
+  <h3 class="blk">③ to부정사 vs 동명사</h3>
+  <div class="tw"><table>
+    <tr><th>패턴</th><th>동사 목록</th><th>예</th></tr>
+    <tr><td><span class="tag a">to V만</span></td><td class="en">want, hope, wish, decide, plan, expect, need, promise, refuse, fail, agree, manage</td><td class="en">She wants to go. / He decided to leave.</td></tr>
+    <tr><td><span class="tag g">V-ing만</span></td><td class="en">enjoy, avoid, finish, stop, mind, keep, suggest, consider, practice, give up, put off, deny, admit</td><td class="en">She enjoys reading. / He stopped smoking.</td></tr>
+    <tr><td><span class="tag b">둘 다 가능 (의미 같음)</span></td><td class="en">like, love, hate, prefer, begin, start, continue, intend</td><td class="en">I like to swim. = I like swimming.</td></tr>
+    <tr><td><span class="tag r">둘 다 가능 (의미 다름)</span></td><td class="en">remember, forget, regret, try, stop</td><td class="en">↓ 아래 참고</td></tr>
+  </table></div>
+  <div class="tw"><div class="tw-cap">의미가 달라지는 동사</div><table>
+    <tr><th>동사</th><th>to V (미래 지향)</th><th>V-ing (과거·사실)</th></tr>
+    <tr><td class="en"><strong>remember</strong></td><td class="en">기억해서 ~하다 (앞으로)</td><td class="en">~한 것을 기억하다 (과거)</td></tr>
+    <tr><td class="en" style="color:var(--txt3)">예</td><td class="en">Remember to lock the door.</td><td class="en">I remember locking the door.</td></tr>
+    <tr><td class="en"><strong>forget</strong></td><td class="en">~할 것을 잊다</td><td class="en">~한 것을 잊다</td></tr>
+    <tr><td class="en" style="color:var(--txt3)">예</td><td class="en">Don't forget to call me.</td><td class="en">I'll never forget meeting you.</td></tr>
+    <tr><td class="en"><strong>try</strong></td><td class="en">~하려고 노력하다</td><td class="en">시험삼아 ~해보다</td></tr>
+    <tr><td class="en" style="color:var(--txt3)">예</td><td class="en">I tried to open the jar.</td><td class="en">Try adding more salt.</td></tr>
+    <tr><td class="en"><strong>stop</strong></td><td class="en">~하기 위해 멈추다</td><td class="en">~하는 것을 그만두다</td></tr>
+    <tr><td class="en" style="color:var(--txt3)">예</td><td class="en">She stopped to buy coffee.</td><td class="en">She stopped buying coffee.</td></tr>
+    <tr><td class="en"><strong>regret</strong></td><td class="en">유감스럽게 ~하다</td><td class="en">~한 것을 후회하다</td></tr>
+    <tr><td class="en" style="color:var(--txt3)">예</td><td class="en">I regret to tell you this.</td><td class="en">I regret saying that.</td></tr>
+  </table></div>
+
+  <h3 class="blk">④ 분사구문 Participial Phrase</h3>
+  <div class="callout acc"><span>📌</span><div class="cb">부사절을 간결하게 줄이는 방법. 주절과 주어가 <strong>같을 때</strong> 접속사+주어 생략, 동사를 <strong>V-ing</strong>로.</div></div>
+  <div class="tw"><table>
+    <tr><th>의미</th><th>부사절</th><th>분사구문</th></tr>
+    <tr><td class="kr">시간</td><td class="en">When I arrived home, I ate dinner.</td><td class="en"><em>Arriving home</em>, I ate dinner.</td></tr>
+    <tr><td class="kr">이유</td><td class="en">Because she was tired, she went to bed.</td><td class="en"><em>Being tired</em>, she went to bed. / <em>Tired</em>, she went to bed.</td></tr>
+    <tr><td class="kr">조건</td><td class="en">If you turn left, you'll find the bank.</td><td class="en"><em>Turning left</em>, you'll find the bank.</td></tr>
+    <tr><td class="kr">동시</td><td class="en">As he sang, he played guitar.</td><td class="en"><em>Singing</em>, he played guitar.</td></tr>
+    <tr><td class="kr">완료</td><td class="en">After she had finished work, she left.</td><td class="en"><em>Having finished work</em>, she left.</td></tr>
+    <tr><td class="kr">수동</td><td class="en">Because it was written in English, I couldn't read it.</td><td class="en"><em>Written in English</em>, I couldn't read it.</td></tr>
+  </table></div>
+
+  <h3 class="blk">⑤ 비교급·최상급</h3>
+  <div class="tw"><table>
+    <tr><th>형태</th><th>원급</th><th>비교급</th><th>최상급</th><th>규칙</th></tr>
+    <tr><td>짧은 형용사</td><td class="en">tall</td><td class="en">taller</td><td class="en">tallest</td><td class="kr">+er / +est</td></tr>
+    <tr><td>-e로 끝</td><td class="en">large</td><td class="en">larger</td><td class="en">largest</td><td class="kr">+r / +st</td></tr>
+    <tr><td>자음+y</td><td class="en">happy</td><td class="en">happier</td><td class="en">happiest</td><td class="kr">y→i+er/est</td></tr>
+    <tr><td>단모음+단자음</td><td class="en">big</td><td class="en">bigger</td><td class="en">biggest</td><td class="kr">자음 겹침</td></tr>
+    <tr><td>긴 형용사</td><td class="en">beautiful</td><td class="en">more beautiful</td><td class="en">most beautiful</td><td class="kr">more/most</td></tr>
+    <tr><td rowspan="3">불규칙</td><td class="en">good/well</td><td class="en">better</td><td class="en">best</td><td></td></tr>
+    <tr><td class="en">bad/ill</td><td class="en">worse</td><td class="en">worst</td><td></td></tr>
+    <tr><td class="en">many/much</td><td class="en">more</td><td class="en">most</td><td></td></tr>
+  </table></div>
+  <div class="tw"><div class="tw-cap">비교 표현 패턴</div><table>
+    <tr><th>패턴</th><th>의미</th><th>예</th></tr>
+    <tr><td class="form">as + 원급 + as</td><td class="kr">~만큼 …한</td><td class="en">She is as tall as her brother.</td></tr>
+    <tr><td class="form">not as/so + 원급 + as</td><td class="kr">~만큼 …하지 않은</td><td class="en">He is not as fast as she is.</td></tr>
+    <tr><td class="form">비교급 + than</td><td class="kr">~보다 더 …한</td><td class="en">She is smarter than him.</td></tr>
+    <tr><td class="form">the + 비교급, the + 비교급</td><td class="kr">~할수록 더 …하다</td><td class="en">The more you practice, the better you get.</td></tr>
+    <tr><td class="form">비교급 + and + 비교급</td><td class="kr">점점 더 …한</td><td class="en">It's getting colder and colder.</td></tr>
+    <tr><td class="form">the + 최상급 + in/of</td><td class="kr">~중에서 가장 …한</td><td class="en">She is the tallest in the class.</td></tr>
+    <tr><td class="form">No (other) + 단수명사 + 비교급 + than</td><td class="kr">원급으로 최상급 표현</td><td class="en">No other student is smarter than Tom.</td></tr>
+  </table></div>
+
+  <h3 class="blk">⑥ 도치 Inversion</h3>
+  <div class="tw"><table>
+    <tr><th>조건</th><th>도치 예문</th><th>일반 어순</th></tr>
+    <tr><td>Negative adv. 문두</td><td class="en">Never have I seen such a thing.</td><td class="en">I have never seen such a thing.</td></tr>
+    <tr><td>Only + 부사구 문두</td><td class="en">Only then did I understand.</td><td class="en">I understood only then.</td></tr>
+    <tr><td>Hardly / Scarcely</td><td class="en">Hardly had she left when it rained.</td><td class="en">She had hardly left when it rained.</td></tr>
+    <tr><td>So + 형용사 문두</td><td class="en">So tired was he that he fell asleep.</td><td class="en">He was so tired that he fell asleep.</td></tr>
+    <tr><td>장소부사 문두 (자동사)</td><td class="en">Here comes the bus.</td><td class="en">The bus comes here.</td></tr>
+  </table></div>
+
+  <h3 class="blk">⑦ 접속부사 vs 종속접속사</h3>
+  <div class="callout red"><span>⚠️</span><div class="cb">
+    <strong>접속부사(however, therefore 등)는 두 문장을 혼자 연결할 수 없습니다!</strong><br>
+    <span class="e">She was tired; <strong>however</strong>, she kept working.</span> ← 세미콜론 필수<br>
+    <span class="w">She was tired, however she kept working.</span> ← 쉼표만으로 불가 (comma splice)
+  </div></div>
+  <div class="tw"><table>
+    <tr><th>의미</th><th>접속부사 (세미콜론/마침표로 연결)</th><th>종속접속사 (쉼표로 연결 가능)</th></tr>
+    <tr><td class="kr">대조</td><td class="en">however, nevertheless, nonetheless, on the other hand</td><td class="en">although, though, even though, while</td></tr>
+    <tr><td class="kr">결과</td><td class="en">therefore, thus, consequently, as a result, hence</td><td class="en">so (등위접속사)</td></tr>
+    <tr><td class="kr">추가</td><td class="en">moreover, furthermore, in addition, besides</td><td class="en">and (등위접속사)</td></tr>
+    <tr><td class="kr">예시</td><td class="en">for example, for instance, that is</td><td class="en">—</td></tr>
+  </table></div>
+</div>
+
+<div class="footnote">
+  영어 문법 완전 정리 · English Grammar Reference<br>
+  수업·시험 대비용 — 품사 · 시제 · 문장 형식 · 조동사 · 가정법 · 심화 문법 포함
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── 탭 전환
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    const key = t.dataset.tab;
+    tabs.forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+    document.getElementById('sec-' + key).classList.add('on');
+    clearSearch();
+  });
+});
+
+// ── 검색
+const srch = document.getElementById('srch');
+const hitEl = document.getElementById('hit');
+let prev = [];
+
+function clearSearch() {
+  prev.forEach(n => { n.innerHTML = n.dataset.orig || n.innerHTML; });
+  prev = [];
+  hitEl.textContent = '';
+}
+
+srch.addEventListener('input', () => {
+  const q = srch.value.trim();
+
+  // 이전 하이라이트 초기화
+  prev.forEach(n => { n.innerHTML = n.dataset.orig; });
+  prev = [];
+  hitEl.textContent = '';
+  if (!q) return;
+
+  // 모든 탭 표시 후 검색
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.getElementById('sec-pos').classList.add('on');
+  tabs.forEach(x => x.classList.remove('on'));
+  tabs[0].classList.add('on');
+
+  // 전체 텍스트 노드 탐색
+  const walker = document.createTreeWalker(document.getElementById('main'), NodeFilter.SHOW_TEXT);
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  let count = 0;
+  let node;
+  while ((node = walker.nextNode())) {
+    if (!node.nodeValue.trim()) continue;
+    const parent = node.parentElement;
+    if (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') continue;
+    if (re.test(node.nodeValue)) {
+      if (!parent.dataset.orig) parent.dataset.orig = parent.innerHTML;
+      parent.innerHTML = parent.dataset.orig.replace(re, '<mark>$1</mark>');
+      prev.push(parent);
+      count += (parent.innerHTML.match(/<mark>/g) || []).length;
+    }
+  }
+  hitEl.textContent = count ? `${count}건` : '없음';
+});
+</script>
+</body>
+</html>

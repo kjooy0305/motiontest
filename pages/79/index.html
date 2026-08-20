@@ -1,0 +1,3590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로블록스 코딩 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080a0e;--bg2:#0f131a;--bg3:#161c25;--bg4:#1f2733;
+  --border:#232c39;--border2:#38455a;
+  --txt:#e3e8ef;--txt2:#96a3b6;--txt3:#5b6779;
+  --acc:#e2453c;--acc2:#ff7f77;--acc3:rgba(226,69,60,.14);--acc4:rgba(226,69,60,.06);
+  --gold:#d4a53a;--gold2:#f5cd6a;--goldB:rgba(212,165,58,.13);
+  --blu:#3d8bfd;--blu2:#7fb4ff;--bluB:rgba(61,139,253,.13);
+  --grn:#3fae6a;--grn2:#68d894;--grnB:rgba(63,174,106,.13);
+  --pur:#9560d4;--pur2:#bb8dff;--purB:rgba(149,96,212,.13);
+  --cyan:#2fa8b8;--cyan2:#5fd2e0;--cyanB:rgba(47,168,184,.13);
+  --org:#e08a3c;--org2:#ffb26b;--orgB:rgba(224,138,60,.13);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;-webkit-text-size-adjust:100%;}
+
+#hdr{background:linear-gradient(135deg,#05070a,#141b26,#05070a);
+  border-bottom:2px solid var(--acc);padding:9px 16px;position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#hdr-logo{font-size:19px;filter:drop-shadow(0 0 9px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);white-space:nowrap;
+  text-shadow:0 0 18px rgba(226,69,60,.45);}
+#hdr .badge{font-size:9px;padding:2px 6px;border-radius:2px;background:var(--acc3);
+  border:1px solid rgba(226,69,60,.35);color:var(--acc);font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+#search{flex:1;min-width:140px;max-width:320px;padding:6px 11px;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--txt);font-size:13px;
+  outline:none;font-family:inherit;}
+#search:focus{border-color:var(--acc);}
+#search::placeholder{color:var(--txt3);}
+#hit-cnt{font-size:11px;color:var(--txt3);white-space:nowrap;}
+
+#tabs{display:flex;gap:2px;padding:6px 12px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:45px;z-index:100;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:5px 12px;border-radius:3px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(226,69,60,.45);color:var(--acc2);}
+.tab.t-b{color:#8fc0ff;}.tab.t-b.on{background:var(--bluB);border-color:rgba(61,139,253,.5);color:var(--blu2);}
+.tab.t-g{color:#7fd8a4;}.tab.t-g.on{background:var(--grnB);border-color:rgba(63,174,106,.5);color:var(--grn2);}
+.tab.t-p{color:#c49bff;}.tab.t-p.on{background:var(--purB);border-color:rgba(149,96,212,.5);color:var(--pur2);}
+.tab.t-o{color:#ffc089;}.tab.t-o.on{background:var(--orgB);border-color:rgba(224,138,60,.5);color:var(--org2);}
+
+#main{padding:16px;max-width:1300px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:17px;font-weight:700;color:var(--acc2);margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec-sub{font-size:12px;color:var(--txt2);line-height:1.7;}
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 9px;
+  padding-left:9px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+h3.blk.b{border-color:var(--blu);}h3.blk.g{border-color:var(--grn);}
+h3.blk.p{border-color:var(--pur);}h3.blk.gold{border-color:var(--gold);}
+h3.blk.o{border-color:var(--org);}h3.blk.c{border-color:var(--cyan);}
+h4.sub{font-size:12.5px;font-weight:700;color:var(--acc);margin:14px 0 7px;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:12px;}
+.grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:12px;}
+.grid-wide{display:grid;grid-template-columns:repeat(auto-fill,minmax(450px,1fr));gap:10px;margin-bottom:12px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;}
+.card.hidden{display:none;}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;}
+.card-icon{font-size:15px;line-height:1;}
+.card-title{font-size:13px;font-weight:700;color:var(--acc);}
+.card.c-b .card-title{color:var(--blu2);}
+.card.c-g .card-title{color:var(--grn2);}
+.card.c-p .card-title{color:var(--pur2);}
+.card.c-o .card-title{color:var(--org2);}
+.card.c-c .card-title{color:var(--cyan2);}
+.card-sub{font-size:9px;color:var(--txt3);margin-left:auto;padding:1px 5px;border-radius:5px;
+  background:var(--bg4);border:1px solid var(--border);white-space:nowrap;}
+.card-desc{font-size:12px;color:var(--txt2);line-height:1.72;}
+.card-desc strong{color:var(--txt);}
+.card-desc em{color:var(--acc2);font-style:normal;}
+ul.tips{list-style:none;}
+ul.tips li{display:flex;gap:7px;padding:4px 0;border-bottom:1px solid rgba(35,44,57,.8);
+  font-size:12px;color:var(--txt2);line-height:1.6;}
+ul.tips li:last-child{border-bottom:none;}
+ul.tips li::before{content:'▸';color:var(--acc);flex-shrink:0;margin-top:1px;}
+ul.tips li strong{color:var(--txt);}
+ul.tips li em{color:var(--acc2);font-style:normal;}
+ol.steps{list-style:none;counter-reset:s;}
+ol.steps li{counter-increment:s;display:flex;gap:9px;padding:5px 0;font-size:12px;
+  color:var(--txt2);line-height:1.65;border-bottom:1px solid rgba(35,44,57,.8);}
+ol.steps li:last-child{border-bottom:none;}
+ol.steps li::before{content:counter(s);flex-shrink:0;width:17px;height:17px;border-radius:50%;
+  background:var(--acc3);border:1px solid rgba(226,69,60,.45);color:var(--acc2);
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+ol.steps li strong{color:var(--txt);}
+ol.steps li em{color:var(--acc2);font-style:normal;}
+
+.tbl-wrap{overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);}
+.tbl-wrap.hidden{display:none;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;padding:7px 10px;
+  border-bottom:1px solid var(--border2);white-space:nowrap;font-size:11.5px;}
+td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(226,69,60,.05);}
+td strong{color:var(--txt);}
+td em{color:var(--acc2);font-style:normal;}
+.tbl-cap{font-size:11px;color:var(--txt3);padding:6px 10px;background:var(--bg3);
+  border-bottom:1px solid var(--border);font-weight:600;}
+.tbl-wrap.b th{color:var(--blu2);}
+.tbl-wrap.g th{color:var(--grn2);}
+.tbl-wrap.gold th{color:var(--gold2);}
+.tbl-wrap.p th{color:var(--pur2);}
+.tbl-wrap.o th{color:var(--org2);}
+
+code{font-family:'Consolas','Courier New',monospace;background:var(--bg4);
+  padding:1px 5px;border-radius:3px;font-size:11.5px;color:var(--gold2);}
+
+/* 코드 블록 */
+.code-box{margin:8px 0 12px;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:#04060a;}
+.code-box.hidden{display:none;}
+.code-hd{font-size:10.5px;padding:5px 11px;background:var(--bg3);border-bottom:1px solid var(--border);
+  color:var(--txt2);font-weight:600;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.code-hd .where{margin-left:auto;font-size:9.5px;color:var(--txt3);padding:1px 6px;border-radius:4px;
+  background:var(--bg4);border:1px solid var(--border);white-space:nowrap;}
+.code-hd .where.srv{color:var(--grn2);border-color:rgba(63,174,106,.4);background:var(--grnB);}
+.code-hd .where.cli{color:var(--blu2);border-color:rgba(61,139,253,.4);background:var(--bluB);}
+.code-hd .where.mod{color:var(--pur2);border-color:rgba(149,96,212,.4);background:var(--purB);}
+pre.code{font-family:'Consolas','Courier New',monospace;font-size:11.5px;line-height:1.62;
+  padding:11px 13px;overflow-x:auto;color:#c9d4e3;white-space:pre;tab-size:2;}
+pre.code .k{color:#ff8b7f;}
+pre.code .s{color:#8fd98f;}
+pre.code .c{color:#5f6d80;font-style:italic;}
+pre.code .g{color:#7fb4ff;}
+pre.code .n{color:#f5cd6a;}
+
+.diag{background:#04060a;border:1px solid var(--border2);border-radius:5px;padding:11px 13px;
+  font-family:'Consolas','Courier New',monospace;font-size:11px;line-height:1.55;
+  color:var(--cyan2);white-space:pre;overflow-x:auto;margin:8px 0 12px;}
+.diag.hidden{display:none;}
+
+.hi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid rgba(226,69,60,.24);border-radius:7px;padding:12px 15px;margin-bottom:12px;}
+.hi-card.hidden{display:none;}
+.hi-title{font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hi-body{font-size:12px;color:var(--txt2);line-height:1.78;}
+.hi-body strong{color:var(--txt);}
+.hi-body em{color:var(--acc2);font-style:normal;}
+.callout{border-radius:5px;padding:9px 12px;margin-bottom:9px;font-size:12px;
+  border-left:3px solid;display:flex;gap:7px;align-items:flex-start;}
+.callout.hidden{display:none;}
+.callout-body{color:var(--txt2);line-height:1.68;}
+.callout-body strong{color:var(--txt);}
+.callout-body em{color:var(--acc2);font-style:normal;}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.gold{background:var(--goldB);border-color:var(--gold);}
+.callout.blu{background:var(--bluB);border-color:var(--blu);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.cyan{background:var(--cyanB);border-color:var(--cyan);}
+.callout.org{background:var(--orgB);border-color:var(--org);}
+
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(226,69,60,.4);background:var(--acc3);}
+.tag.b{color:var(--blu2);border-color:rgba(61,139,253,.4);background:var(--bluB);}
+.tag.g{color:var(--gold2);border-color:rgba(212,165,58,.4);background:var(--goldB);}
+.tag.p{color:var(--pur2);border-color:rgba(149,96,212,.4);background:var(--purB);}
+.tag.n{color:var(--grn2);border-color:rgba(63,174,106,.4);background:var(--grnB);}
+.tag.c{color:var(--cyan2);border-color:rgba(47,168,184,.4);background:var(--cyanB);}
+
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:6px;margin-bottom:12px;}
+.gl-i{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12px;}
+.gl-i.hidden{display:none;}
+.gl-i:hover{border-color:var(--border2);}
+.gl-t{font-weight:700;color:var(--gold2);margin-bottom:1px;}
+.gl-d{color:var(--txt2);font-size:11.5px;line-height:1.55;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:26px 10px 40px;line-height:1.8;}
+.footnote a{color:var(--txt2);}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid,.grid-sm,.grid-wide,.gl{grid-template-columns:1fr;}
+  #hdr h1{font-size:14px;}
+  pre.code{font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-logo">🧱</span>
+  <h1>로블록스 코딩 완전 정리</h1>
+  <span class="badge">STUDIO · LUAU</span>
+  <input id="search" type="text" placeholder="🔍 검색 (예: RemoteEvent, CFrame, 지형, 데이터 저장)">
+  <span id="hit-cnt"></span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="intro">🚀 시작하기</button>
+  <button class="tab t-b" data-tab="build">🧱 맵 만들기</button>
+  <button class="tab t-b" data-tab="tree">🗂 계층 구조</button>
+  <button class="tab t-p" data-tab="script">📜 스크립트 종류</button>
+  <button class="tab t-p" data-tab="luau">🌙 Luau 문법</button>
+  <button class="tab t-g" data-tab="api">🧩 API 기본</button>
+  <button class="tab t-g" data-tab="types">📐 자료형</button>
+  <button class="tab t-o" data-tab="svc">⚙️ 서비스</button>
+  <button class="tab t-o" data-tab="net">🔌 서버·클라이언트</button>
+  <button class="tab" data-tab="char">🏃 캐릭터·도구</button>
+  <button class="tab" data-tab="ui">🖼 UI</button>
+  <button class="tab t-g" data-tab="data">💾 데이터 저장</button>
+  <button class="tab t-b" data-tab="code">🧪 실전 코드</button>
+  <button class="tab t-o" data-tab="debug">🐞 디버깅·최적화</button>
+  <button class="tab t-p" data-tab="pub">🚢 배포·수익화</button>
+  <button class="tab" data-tab="term">📚 용어 사전</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════ 시작하기 ══════════════ -->
+<div class="sec on" id="sec-intro">
+  <div class="sec-hd">
+    <div class="sec-title">🚀 로블록스 개발 시작하기</div>
+    <div class="sec-sub">
+      로블록스에서 게임(공식 명칭은 <strong>익스피리언스 / Experience</strong>)을 만드는 건 전부
+      <strong>Roblox Studio</strong>라는 무료 프로그램 안에서 이뤄집니다.
+      맵을 짓는 것도, 코드를 쓰는 것도, 테스트도, 배포도 전부 여기서 합니다.
+      코드는 <strong>Luau</strong>(루아우)라는 언어를 씁니다 — Lua 5.1을 로블록스가 개조한 것입니다.
+    </div>
+  </div>
+
+  <h3 class="blk">📥 설치와 준비</h3>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">💻</span><span class="card-title">Studio 설치</span></div>
+    <ol class="steps">
+      <li><strong>roblox.com</strong> 에서 계정을 만듭니다 (게임 플레이 계정과 동일합니다).</li>
+      <li><strong>create.roblox.com</strong> 접속 → <em>Start Creating</em> → Studio 설치 파일이 내려받아집니다.</li>
+      <li>설치 후 로그인하면 <strong>새 익스피리언스 만들기</strong> 화면이 뜹니다.</li>
+      <li>템플릿을 고릅니다. 처음이면 <strong>Baseplate</strong>(빈 회색 바닥판)가 가장 깔끔합니다.</li>
+    </ol>
+  </div>
+
+  <div class="callout org"><span>💡</span><div class="callout-body">
+    <strong>기기 요건:</strong> Studio는 <strong>Windows / macOS 전용</strong>입니다.
+    아이패드·안드로이드·크롬북에서는 정식 Studio가 돌아가지 않습니다.
+    로블록스가 브라우저 기반 편집 환경을 계속 확장하고 있으므로, 실제로 쓰기 전에
+    <strong>create.roblox.com</strong> 에서 현재 지원 기기를 확인하세요.
+  </div></div>
+
+  <h3 class="blk">🖥 Studio 화면 구성</h3>
+  <div class="grid">
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">🌲</span><span class="card-title">Explorer (탐색기)</span><span class="card-sub">필수</span></div>
+      <div class="card-desc">
+        게임 안의 <strong>모든 물건이 트리로 보이는 창</strong>입니다. 파트 하나, 스크립트 하나까지 전부 여기 있습니다.
+        <em>View 탭 → Explorer</em> 로 켭니다. <strong>이게 없으면 아무것도 못 합니다.</strong>
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">🔧</span><span class="card-title">Properties (속성)</span><span class="card-sub">필수</span></div>
+      <div class="card-desc">
+        Explorer에서 고른 물건의 <strong>속성값을 보고 고치는 창</strong>입니다.
+        크기·색·위치·고정 여부 전부 여기서 바꿉니다. <em>View 탭 → Properties</em>.
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">📤</span><span class="card-title">Output (출력)</span><span class="card-sub">필수</span></div>
+      <div class="card-desc">
+        <code>print()</code> 결과와 <strong>오류 메시지가 뜨는 창</strong>입니다.
+        빨간 글씨는 오류, 노란 글씨는 경고입니다. <em>View 탭 → Output</em>.
+        코딩할 때 항상 켜두세요.
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">⌨️</span><span class="card-title">Command Bar</span></div>
+      <div class="card-desc">
+        코드 <strong>한 줄을 즉석에서 실행</strong>하는 입력창입니다.
+        파트 100개 한 번에 만들기, 속성 일괄 변경 같은 작업에 아주 유용합니다.
+        <em>View 탭 → Command Bar</em>.
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">🧰</span><span class="card-title">Toolbox</span></div>
+      <div class="card-desc">
+        다른 사람이 올린 모델·이미지·사운드를 가져오는 창입니다.
+        편하지만 <em>악성 스크립트가 숨어 있는 모델</em>이 흔하니, 가져온 모델은
+        반드시 Explorer에서 스크립트가 들어 있는지 확인하세요.
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">📦</span><span class="card-title">Asset Manager</span></div>
+      <div class="card-desc">
+        내가 올린 이미지·사운드·메시·패키지를 관리합니다.
+        <strong>3D 모델(.fbx/.obj) 가져오기</strong>도 여기서 합니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk">📑 상단 리본 탭</h3>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">Studio 상단 메뉴 — 무엇이 어디 있는지</div>
+    <table>
+      <tr><th>탭</th><th>주요 기능</th></tr>
+      <tr><td><strong>Home</strong></td><td>이동/크기/회전 도구, 파트 삽입, 재질·색, 게임 설정, 플레이 테스트</td></tr>
+      <tr><td><strong>Model</strong></td><td>그룹화, 정렬, 앵커, 충돌, 솔리드 모델링(Union/Negate), 제약(Constraint), 지형 편집기</td></tr>
+      <tr><td><strong>Avatar</strong></td><td>리그 빌더, 아바타 임포터, 애니메이션 에디터, 액세서리 도구</td></tr>
+      <tr><td><strong>Test</strong></td><td>Play / Play Here / Run / Stop, <em>여러 클라이언트 동시 테스트</em>, 기기 에뮬레이터</td></tr>
+      <tr><td><strong>View</strong></td><td>각종 창 켜고 끄기(Explorer·Properties·Output·MicroProfiler 등), 화면 표시 옵션</td></tr>
+      <tr><td><strong>Plugins</strong></td><td>설치한 플러그인 실행, 플러그인 관리, 로컬 플러그인 폴더 열기</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">▶️ 테스트 방법 4가지</h3>
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">Test 탭 — 상황에 맞게 골라 쓰세요</div>
+    <table>
+      <tr><th>모드</th><th>단축키</th><th>무엇을 하나</th><th>언제 쓰나</th></tr>
+      <tr><td><strong>Play</strong></td><td>F5</td><td>스폰 지점에서 캐릭터로 시작. 서버+클라이언트가 한 프로세스에서 같이 돎</td><td>일반적인 확인</td></tr>
+      <tr><td><strong>Play Here</strong></td><td>—</td><td>지금 카메라가 보는 위치에서 캐릭터 생성</td><td>먼 곳 테스트</td></tr>
+      <tr><td><strong>Run</strong></td><td>F8</td><td>캐릭터 없이 서버만 실행</td><td>서버 로직만 볼 때</td></tr>
+      <tr><td><strong>Start Server / Clients</strong></td><td>—</td><td>진짜 서버 1개 + 클라이언트 여러 개를 <em>별도 창</em>으로 띄움</td><td><strong>멀티플레이·리모트 검증(필수)</strong></td></tr>
+    </table>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>Play(F5) 하나만 믿으면 안 됩니다.</strong> 이 모드는 서버와 클라이언트가 한 프로세스에 있어서,
+    실제 서버에서는 터지는 코드가 여기선 멀쩡히 돌아가는 경우가 많습니다.
+    특히 <em>리모트 통신·데이터 저장·팀 기능</em>은 반드시 <strong>Start Server + 클라이언트 2개 이상</strong>으로 확인하세요.
+  </div></div>
+
+  <h3 class="blk">👋 첫 스크립트</h3>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">✍️</span><span class="card-title">3분 안에 되는 것</span></div>
+    <ol class="steps">
+      <li>Explorer에서 <strong>ServerScriptService</strong> 위에 마우스를 올리고 <em>➕</em> 클릭</li>
+      <li><strong>Script</strong> 선택 → 코드 편집기가 열립니다</li>
+      <li>아래 코드를 붙여넣고 <strong>F5</strong></li>
+      <li>Output 창에 글자가 찍히면 성공입니다</li>
+    </ol>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🌟 첫 스크립트 — 접속한 사람 환영하기<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Players = game:GetService("Players")
+
+-- 누군가 게임에 들어오면 이 함수가 실행된다
+Players.PlayerAdded:Connect(function(player)
+	print(player.Name .. "님 환영합니다!")
+
+	-- 캐릭터가 생성되면(리스폰 포함) 실행
+	player.CharacterAdded:Connect(function(character)
+		local humanoid = character:WaitForChild("Humanoid")
+		humanoid.WalkSpeed = 32   -- 기본값 16의 두 배로 빠르게
+	end)
+end)</pre>
+  </div>
+
+  <h3 class="blk">🗺 이 문서 읽는 순서</h3>
+  <div class="card">
+    <ul class="tips">
+      <li><strong>완전 초보</strong> — 시작하기 → 맵 만들기 → 계층 구조 → 스크립트 종류 → Luau 문법 순서로 보세요</li>
+      <li><strong>다른 언어를 해본 사람</strong> — Luau 문법을 훑고 바로 API 기본 → 서비스 → 서버·클라이언트로 가세요</li>
+      <li><strong>급한 사람</strong> — <em>실전 코드</em> 탭에 복사해서 바로 쓰는 예제가 모여 있습니다</li>
+      <li><strong>막혔을 때</strong> — 디버깅·최적화 탭의 <em>초보가 가장 많이 겪는 오류</em>를 먼저 확인하세요</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════ 맵 만들기 ══════════════ -->
+<div class="sec" id="sec-build">
+  <div class="sec-hd">
+    <div class="sec-title">🧱 맵 만들기 — 빌딩 전 과정</div>
+    <div class="sec-sub">
+      로블록스 맵은 결국 <strong>파트(Part)</strong>라는 상자를 쌓아 만듭니다.
+      여기에 지형(Terrain), 메시(MeshPart), 조명, 재질을 얹으면 그럴듯한 공간이 됩니다.
+      마우스로 짓는 방법과 <strong>코드로 짓는 방법</strong>을 같이 정리합니다.
+    </div>
+  </div>
+
+  <h3 class="blk b">🟦 파트 — 모든 것의 기본</h3>
+  <div class="card c-b">
+    <div class="card-head"><span class="card-icon">➕</span><span class="card-title">파트 만들기</span></div>
+    <div class="card-desc">
+      <strong>Home 탭 → Part</strong> 버튼을 누르면 카메라 앞에 블록이 하나 생깁니다.
+      드롭다운을 열면 <em>Block · Sphere · Wedge · Cylinder · Corner Wedge</em> 중 고를 수 있습니다.
+      Explorer의 <strong>Workspace</strong> 안에 들어갑니다.
+    </div>
+  </div>
+
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">파트 핵심 속성 — Properties 창에서 바꾸는 것들</div>
+    <table>
+      <tr><th>속성</th><th>뜻</th><th>주의점</th></tr>
+      <tr><td><strong>Size</strong></td><td>크기 (스터드 단위, X·Y·Z)</td><td>1스터드 ≒ 28cm. 캐릭터 키가 약 5스터드</td></tr>
+      <tr><td><strong>Position</strong></td><td>중심점의 월드 좌표</td><td><em>Y가 높이</em>입니다 (다른 엔진과 다를 수 있음)</td></tr>
+      <tr><td><strong>Orientation</strong></td><td>회전 (도 단위)</td><td>내부적으로는 CFrame으로 저장됨</td></tr>
+      <tr><td><strong>Anchored</strong></td><td>고정 여부</td><td><em>체크 안 하면 중력에 떨어집니다.</em> 바닥·벽은 반드시 켜기</td></tr>
+      <tr><td><strong>CanCollide</strong></td><td>충돌 여부</td><td>끄면 통과됩니다. 장식·이펙트에 사용</td></tr>
+      <tr><td><strong>CanTouch</strong></td><td>Touched 이벤트 발생 여부</td><td>끄면 <code>Touched</code>가 안 울립니다 (성능 최적화용)</td></tr>
+      <tr><td><strong>CanQuery</strong></td><td>레이캐스트에 잡히는지</td><td>끄면 광선이 통과합니다</td></tr>
+      <tr><td><strong>Material</strong></td><td>재질 (Plastic, Wood, Neon, Glass…)</td><td><em>Neon은 스스로 빛나 보이지만 실제 광원은 아닙니다</em></td></tr>
+      <tr><td><strong>Color</strong></td><td>색상 (Color3)</td><td>BrickColor는 구형 팔레트 방식</td></tr>
+      <tr><td><strong>Transparency</strong></td><td>투명도 0~1</td><td>1이면 완전 투명 (충돌은 그대로 남음)</td></tr>
+      <tr><td><strong>Reflectance</strong></td><td>반사도 0~1</td><td>하늘을 반사합니다</td></tr>
+      <tr><td><strong>CastShadow</strong></td><td>그림자 생성</td><td>작은 장식은 꺼야 성능이 삽니다</td></tr>
+      <tr><td><strong>Massless</strong></td><td>질량 무시</td><td>용접된 부속품에 사용</td></tr>
+      <tr><td><strong>CollisionGroup</strong></td><td>충돌 그룹 이름</td><td>그룹끼리 충돌 여부를 따로 설정</td></tr>
+    </table>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🧱 코드로 파트 만들기 — 가장 기본<span class="where srv">Script</span></div>
+<pre class="code">local part = Instance.new("Part")
+part.Name = "MyFloor"
+part.Size = Vector3.new(20, 1, 20)          -- 가로20 높이1 세로20
+part.Position = Vector3.new(0, 5, 0)        -- Y가 높이
+part.Anchored = true                        -- 안 하면 떨어진다
+part.Material = Enum.Material.WoodPlanks
+part.Color = Color3.fromRGB(120, 80, 40)
+part.TopSurface = Enum.SurfaceType.Smooth
+
+-- Parent 는 모든 설정을 끝낸 뒤 마지막에 넣는 것이 성능에 좋다
+part.Parent = workspace</pre>
+  </div>
+
+  <div class="callout gold"><span>⚡</span><div class="callout-body">
+    <strong>Parent는 항상 마지막에.</strong> <code>Instance.new("Part", workspace)</code> 처럼
+    두 번째 인자로 부모를 주는 방식은 <em>권장되지 않습니다</em>.
+    부모에 넣는 순간부터 물리·렌더링이 그 파트를 추적하기 시작하므로,
+    속성을 다 정한 뒤 넣어야 불필요한 재계산이 없습니다.
+  </div></div>
+
+  <h3 class="blk b">🛠 편집 도구와 스냅</h3>
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">Home / Model 탭의 변형 도구</div>
+    <table>
+      <tr><th>도구</th><th>단축키</th><th>설명</th></tr>
+      <tr><td><strong>Select</strong></td><td>1</td><td>선택만</td></tr>
+      <tr><td><strong>Move</strong></td><td>2</td><td>화살표를 끌어 이동</td></tr>
+      <tr><td><strong>Scale</strong></td><td>3</td><td>손잡이를 끌어 크기 변경. <em>Shift+드래그로 양쪽 동시</em></td></tr>
+      <tr><td><strong>Rotate</strong></td><td>4</td><td>원형 핸들로 회전</td></tr>
+      <tr><td><strong>Transform</strong></td><td>—</td><td>이동·크기·회전 통합 도구</td></tr>
+    </table>
+  </div>
+  <div class="card c-b">
+    <div class="card-head"><span class="card-icon">📏</span><span class="card-title">그리드 스냅 (Snap to Grid)</span></div>
+    <ul class="tips">
+      <li>Model 탭 우측에 <strong>Rotate</strong>(각도)와 <strong>Move</strong>(스터드) 스냅 값이 있습니다</li>
+      <li>이동 스냅을 <strong>1스터드</strong>로 두면 파트가 딱딱 맞물립니다 — 건물 지을 때 필수</li>
+      <li>정밀 배치가 필요하면 <strong>0.2</strong> 또는 <strong>0.001</strong> 로 낮춥니다</li>
+      <li>회전 스냅은 보통 <strong>15°·45°·90°</strong> 를 씁니다</li>
+      <li>스냅 체크를 <em>완전히 끄면</em> 자유 배치가 되지만 정렬이 흐트러집니다</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">빌딩할 때 실제로 많이 쓰는 단축키</div>
+    <table>
+      <tr><th>키</th><th>동작</th></tr>
+      <tr><td><code>W A S D</code></td><td>카메라 이동 (Q·E 는 아래·위)</td></tr>
+      <tr><td><code>마우스 우클릭 드래그</code></td><td>시점 회전</td></tr>
+      <tr><td><code>마우스 휠</code></td><td>줌</td></tr>
+      <tr><td><code>F</code></td><td>선택한 물건으로 카메라 이동 (Focus)</td></tr>
+      <tr><td><code>Ctrl + D</code></td><td>복제</td></tr>
+      <tr><td><code>Ctrl + G</code></td><td>그룹 → Model 로 묶기</td></tr>
+      <tr><td><code>Ctrl + U</code></td><td>그룹 해제</td></tr>
+      <tr><td><code>Alt + 클릭</code></td><td>모델 안의 개별 파트 선택</td></tr>
+      <tr><td><code>Ctrl + Shift + X</code></td><td>Command Bar 포커스</td></tr>
+      <tr><td><code>F5 / F8 / Shift+F5</code></td><td>Play / Run / Stop</td></tr>
+      <tr><td><code>F9</code></td><td>개발자 콘솔 (테스트 중)</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk b">📦 모델 — 여러 파트 묶기</h3>
+  <div class="card c-b">
+    <div class="card-head"><span class="card-icon">🗃</span><span class="card-title">Model 사용법</span></div>
+    <ul class="tips">
+      <li>파트 여러 개를 고르고 <strong>Ctrl+G</strong> 를 누르면 <code>Model</code> 하나로 묶입니다</li>
+      <li>모델은 통째로 옮기고, 복제하고, 저장할 수 있습니다</li>
+      <li><strong>PrimaryPart</strong> 를 지정하면 그 파트가 모델의 기준점이 됩니다</li>
+      <li>이동은 <code>model:PivotTo(cframe)</code> — <em>구형 <code>SetPrimaryPartCFrame</code> 은 사용 중단됨</em></li>
+      <li>현재 위치는 <code>model:GetPivot()</code> 로 얻습니다</li>
+      <li>크기 범위는 <code>model:GetExtentsSize()</code>, 경계는 <code>model:GetBoundingBox()</code></li>
+    </ul>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">📦 모델 통째로 옮기기 · 복제하기<span class="where srv">Script</span></div>
+<pre class="code">local ServerStorage = game:GetService("ServerStorage")
+local house = ServerStorage:WaitForChild("House")
+
+-- 5칸 간격으로 집 5채 배치
+for i = 1, 5 do
+	local copy = house:Clone()
+	copy:PivotTo(CFrame.new(i * 40, 0, 0))   -- 모델 전체를 이 위치로
+	copy.Parent = workspace
+end
+
+-- 회전까지 같이
+local target = CFrame.new(0, 10, 0) * CFrame.Angles(0, math.rad(90), 0)
+house:Clone():PivotTo(target)</pre>
+  </div>
+
+  <h3 class="blk b">✂️ 솔리드 모델링 (Union · Negate)</h3>
+  <div class="card c-b">
+    <div class="card-head"><span class="card-icon">🔨</span><span class="card-title">모양 깎아내기</span></div>
+    <ul class="tips">
+      <li><strong>Union(합집합)</strong> — 파트 여러 개를 골라 Model 탭 → Union. 하나의 <code>UnionOperation</code> 이 됩니다</li>
+      <li><strong>Negate(빼기)</strong> — 파트를 Negate 한 뒤 다른 파트와 Union 하면 <em>그 모양만큼 구멍이 뚫립니다</em>. 창문·문 만들 때 사용</li>
+      <li><strong>Separate</strong> — 유니온을 다시 분해</li>
+      <li><strong>CollisionFidelity</strong> — 충돌 정밀도. <code>Box</code> → <code>Hull</code> → <code>Default</code> → <code>PreciseConvexDecomposition</code> 순으로 정확하지만 무거워집니다</li>
+      <li><strong>RenderFidelity</strong> — 화면 표시 정밀도. <code>Automatic</code> 이면 멀 때 단순화됩니다</li>
+    </ul>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>유니온을 남발하면 게임이 무거워집니다.</strong> 특히 <em>CollisionFidelity 를 PreciseConvexDecomposition</em> 으로 둔 유니온이 많으면
+    물리 계산이 급격히 늘어납니다. 장식용이라 부딪힐 일이 없으면 <strong>CanCollide 를 끄고 CollisionFidelity 를 Box</strong> 로 두세요.
+  </div></div>
+
+  <h3 class="blk g">🏔 지형 (Terrain)</h3>
+  <div class="card c-g">
+    <div class="card-head"><span class="card-icon">⛰</span><span class="card-title">지형 편집기</span><span class="card-sub">Model 탭</span></div>
+    <div class="card-desc">
+      파트가 아닌 <strong>복셀(voxel) 기반 지형</strong>입니다. 산·강·동굴 같은 자연 지형에 씁니다.
+      <em>Model 탭 → Editor</em> 로 엽니다.
+    </div>
+    <ul class="tips">
+      <li><strong>Generate</strong> — 산·바다·사막을 자동 생성. 시드·크기·바이옴 선택</li>
+      <li><strong>Import</strong> — 하이트맵 이미지로 지형 생성</li>
+      <li><strong>Region</strong> — 영역 선택 후 이동·복사·삭제·채우기</li>
+      <li><strong>Add / Subtract</strong> — 흙을 붙이거나 파냄</li>
+      <li><strong>Grow / Erode</strong> — 기존 표면을 부풀리거나 깎음</li>
+      <li><strong>Smooth</strong> — 울퉁불퉁한 면을 매끄럽게</li>
+      <li><strong>Flatten</strong> — 평평하게 (건물 지을 터 만들기)</li>
+      <li><strong>Paint</strong> — 재질만 바꿈 (잔디 → 모래 등)</li>
+      <li><strong>Sea Level</strong> — 지정 높이까지 물로 채우거나 비움</li>
+    </ul>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🏔 코드로 지형 만들기<span class="where srv">Script</span></div>
+<pre class="code">local Terrain = workspace.Terrain
+
+-- 직육면체 영역을 바위로 채우기
+Terrain:FillBlock(
+	CFrame.new(0, 0, 0),          -- 중심 위치·회전
+	Vector3.new(100, 20, 100),    -- 크기
+	Enum.Material.Rock
+)
+
+-- 구 모양으로 물 채우기 (호수)
+Terrain:FillBall(Vector3.new(0, 10, 0), 25, Enum.Material.Water)
+
+-- 영역 비우기 (동굴 파기)
+Terrain:FillBall(Vector3.new(0, 5, 0), 12, Enum.Material.Air)
+
+-- 재질 색 바꾸기
+Terrain:SetMaterialColor(Enum.Material.Grass, Color3.fromRGB(90, 140, 60))
+
+-- 특정 재질을 다른 재질로 통째 치환
+local region = Region3.new(Vector3.new(-100,-50,-100), Vector3.new(100,50,100))
+Terrain:ReplaceMaterial(region, 4, Enum.Material.Sand, Enum.Material.Snow)
+
+-- 전체 지형 삭제
+-- Terrain:Clear()</pre>
+  </div>
+
+  <h3 class="blk p">🎨 재질과 텍스처</h3>
+  <div class="grid">
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">Material Manager</span></div>
+      <div class="card-desc">
+        기본 재질 목록을 보고, <strong>MaterialVariant</strong> 로 나만의 재질을 만듭니다.
+        같은 <code>Material</code> 값이라도 변형을 지정하면 다른 텍스처가 나옵니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🖼</span><span class="card-title">Texture / Decal</span></div>
+      <div class="card-desc">
+        <strong>Decal</strong> 은 면 하나에 이미지를 붙입니다.
+        <strong>Texture</strong> 는 같은 이미지를 <em>타일처럼 반복</em>합니다 (StudsPerTileU/V 로 크기 조절).
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">✨</span><span class="card-title">SurfaceAppearance</span></div>
+      <div class="card-desc">
+        MeshPart 안에 넣어 <strong>PBR 텍스처</strong>(ColorMap·NormalMap·RoughnessMap·MetalnessMap)를 적용합니다.
+        사실적인 질감을 낼 때 씁니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🧊</span><span class="card-title">MeshPart</span></div>
+      <div class="card-desc">
+        외부 3D 프로그램(Blender 등)에서 만든 모델을 넣는 파트입니다.
+        <strong>Asset Manager → Bulk Import</strong> 또는 <em>3D Importer</em> 로 <code>.fbx</code>/<code>.obj</code> 를 올립니다.
+      </div></div>
+  </div>
+
+  <h3 class="blk gold">💡 조명 (Lighting)</h3>
+  <div class="tbl-wrap gold">
+    <div class="tbl-cap">Lighting 서비스 주요 속성</div>
+    <table>
+      <tr><th>속성</th><th>설명</th></tr>
+      <tr><td><strong>Technology</strong></td><td><code>Voxel</code>(빠름·부정확) / <code>ShadowMap</code>(중간) / <code>Future</code>(가장 예쁨·무거움) / <code>Compatibility</code></td></tr>
+      <tr><td><strong>ClockTime</strong></td><td>0~24 시간. 14 = 낮, 0 = 자정</td></tr>
+      <tr><td><strong>TimeOfDay</strong></td><td>"14:30:00" 형식 문자열</td></tr>
+      <tr><td><strong>GeographicLatitude</strong></td><td>태양 궤도 각도</td></tr>
+      <tr><td><strong>Ambient</strong></td><td>그림자 속 밝기 (실내 어둠 정도)</td></tr>
+      <tr><td><strong>OutdoorAmbient</strong></td><td>야외 그늘 밝기</td></tr>
+      <tr><td><strong>Brightness</strong></td><td>전체 밝기</td></tr>
+      <tr><td><strong>ExposureCompensation</strong></td><td>노출 보정 (밝게/어둡게)</td></tr>
+      <tr><td><strong>GlobalShadows</strong></td><td>그림자 켜기/끄기</td></tr>
+      <tr><td><strong>FogStart / FogEnd / FogColor</strong></td><td>구형 안개 (Atmosphere 쓰면 무시됨)</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">🌫</span><span class="card-title">Lighting 안에 넣는 것들</span></div>
+    <ul class="tips">
+      <li><strong>Atmosphere</strong> — 사실적인 대기·안개. Density·Offset·Haze·Glare 조절</li>
+      <li><strong>Sky</strong> — 스카이박스 6면 이미지 교체, 해·달 이미지, 별 개수</li>
+      <li><strong>Clouds</strong> — <em>Terrain 안에 넣습니다</em> (Lighting 아님). 동적 구름</li>
+      <li><strong>BloomEffect</strong> — 밝은 곳이 번지는 효과</li>
+      <li><strong>BlurEffect</strong> — 화면 전체 흐림</li>
+      <li><strong>ColorCorrectionEffect</strong> — 채도·대비·색조 보정</li>
+      <li><strong>DepthOfFieldEffect</strong> — 피사계 심도 (초점 밖 흐림)</li>
+      <li><strong>SunRaysEffect</strong> — 햇살 퍼짐</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">🔦</span><span class="card-title">개별 광원 — 파트 안에 넣습니다</span></div>
+    <ul class="tips">
+      <li><strong>PointLight</strong> — 전구처럼 사방으로. Range·Brightness·Color·Shadows</li>
+      <li><strong>SpotLight</strong> — 손전등처럼 한 방향 원뿔. Angle·Face</li>
+      <li><strong>SurfaceLight</strong> — 면 전체가 빛남. 간판·천장등에 적합</li>
+      <li><em>광원이 많으면 급격히 무거워집니다.</em> 한 화면에 보이는 광원 수를 관리하세요</li>
+    </ul>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🌇 낮/밤 순환 만들기<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Lighting = game:GetService("Lighting")
+
+local MINUTES_PER_DAY = 4          -- 현실 4분 = 게임 하루
+
+task.spawn(function()
+	while true do
+		local step = 24 / (MINUTES_PER_DAY * 60)   -- 1초당 진행할 시간
+		Lighting.ClockTime = (Lighting.ClockTime + step) % 24
+		task.wait(1)
+	end
+end)</pre>
+  </div>
+
+  <h3 class="blk c">🚩 스폰과 팀</h3>
+  <div class="card c-c">
+    <div class="card-head"><span class="card-icon">🏁</span><span class="card-title">SpawnLocation</span></div>
+    <ul class="tips">
+      <li>Home 탭 → Spawn 으로 삽입. 캐릭터가 여기서 나타납니다</li>
+      <li><strong>Neutral</strong> 이 켜져 있으면 모든 팀이 사용</li>
+      <li><strong>TeamColor</strong> 를 지정하고 Neutral 을 끄면 <em>해당 팀만</em> 그곳에서 스폰</li>
+      <li><strong>AllowTeamChangeOnTouch</strong> — 밟으면 그 팀으로 변경</li>
+      <li><strong>Duration</strong> — 스폰 직후 무적 시간(초). 0이면 무적 없음</li>
+      <li>스폰 지점이 하나도 없으면 캐릭터는 <code>(0, 0, 0)</code> 근처에 떨어집니다</li>
+    </ul>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">👥 팀 만들기<span class="where srv">Script</span></div>
+<pre class="code">local Teams = game:GetService("Teams")
+
+local function makeTeam(name, color)
+	local team = Instance.new("Team")
+	team.Name = name
+	team.TeamColor = BrickColor.new(color)
+	team.AutoAssignable = true     -- 들어온 사람을 자동 배정
+	team.Parent = Teams
+	return team
+end
+
+makeTeam("레드", "Bright red")
+makeTeam("블루", "Bright blue")</pre>
+  </div>
+
+  <h3 class="blk o">🔗 연결과 제약 (Constraints)</h3>
+  <div class="tbl-wrap o">
+    <div class="tbl-cap">파트끼리 붙이거나 움직이게 하는 도구 — Model 탭 → Constraint</div>
+    <table>
+      <tr><th>이름</th><th>역할</th></tr>
+      <tr><td><strong>WeldConstraint</strong></td><td>두 파트를 단단히 붙임. <em>가장 많이 씁니다</em></td></tr>
+      <tr><td><strong>Weld</strong></td><td>구형 용접. C0/C1 오프셋을 직접 지정</td></tr>
+      <tr><td><strong>Motor6D</strong></td><td>애니메이션용 관절. 캐릭터 팔·다리가 이걸로 붙어 있음</td></tr>
+      <tr><td><strong>HingeConstraint</strong></td><td>경첩. 문·바퀴. Servo·Motor 모드 지원</td></tr>
+      <tr><td><strong>PrismaticConstraint</strong></td><td>직선 레일 이동. 엘리베이터·피스톤</td></tr>
+      <tr><td><strong>SpringConstraint</strong></td><td>스프링. 서스펜션</td></tr>
+      <tr><td><strong>RopeConstraint</strong></td><td>밧줄 (최대 길이 제한)</td></tr>
+      <tr><td><strong>RodConstraint</strong></td><td>고정 길이 막대</td></tr>
+      <tr><td><strong>BallSocketConstraint</strong></td><td>볼 조인트 (관절 인형)</td></tr>
+      <tr><td><strong>AlignPosition</strong></td><td>목표 위치로 끌어당김</td></tr>
+      <tr><td><strong>AlignOrientation</strong></td><td>목표 방향으로 회전시킴</td></tr>
+      <tr><td><strong>LinearVelocity</strong></td><td>일정 속도로 밀기 <em>(구형 BodyVelocity 대체)</em></td></tr>
+      <tr><td><strong>AngularVelocity</strong></td><td>일정 각속도로 회전 <em>(구형 BodyAngularVelocity 대체)</em></td></tr>
+      <tr><td><strong>VectorForce</strong></td><td>일정한 힘을 가함 <em>(구형 BodyForce 대체)</em></td></tr>
+    </table>
+  </div>
+  <div class="callout blu"><span>ℹ️</span><div class="callout-body">
+    대부분의 Constraint 는 <strong>Attachment</strong>(부착점) 두 개를 필요로 합니다.
+    파트 안에 Attachment 를 넣고, Constraint 의 <code>Attachment0</code>·<code>Attachment1</code> 에 각각 지정합니다.
+    예외적으로 <strong>WeldConstraint</strong> 는 <code>Part0</code>·<code>Part1</code> 만 넣으면 됩니다.
+  </div></div>
+
+  <div class="code-box">
+    <div class="code-hd">🔩 코드로 용접하기 — 모델 전체를 하나로<span class="where srv">Script</span></div>
+<pre class="code">local model = workspace.MyBuilding
+local primary = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+
+for _, part in model:GetDescendants() do
+	if part:IsA("BasePart") and part ~= primary then
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = primary
+		weld.Part1 = part
+		weld.Parent = primary
+		part.Anchored = false     -- 용접했으니 개별 고정 해제
+	end
+end
+primary.Anchored = true          -- 기준 파트만 고정하면 전체가 고정된다</pre>
+  </div>
+
+  <h3 class="blk">🧩 유용한 빌딩 플러그인</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">Building Tools by F3X</span></div>
+      <div class="card-desc">가장 유명한 무료 빌딩 도구. 정밀 이동·색·재질·복제를 한 창에서 처리</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Archimedes Two</span></div>
+      <div class="card-desc">곡선·아치·원형 배치를 쉽게 만들어 줍니다</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">GapFill / ResizeAlign</span></div>
+      <div class="card-desc">파트 사이 빈 틈을 메우고, 면끼리 정확히 맞춥니다</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Rojo</span></div>
+      <div class="card-desc">외부 코드 편집기(VS Code)와 Studio 를 동기화. 팀 협업·git 관리에 필수</div></div>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    플러그인과 Toolbox 모델은 <strong>스크립트 실행 권한을 요구</strong>할 수 있습니다.
+    출처가 불분명한 것은 설치하지 말고, 설치했다면 <em>Explorer 에서 낯선 Script 가 섞여 들어오지 않았는지</em> 확인하세요.
+    악성 모델이 백도어를 심는 사례가 실제로 많습니다.
+  </div></div>
+</div>
+
+<!-- ══════════════ 계층 구조 ══════════════ -->
+<div class="sec" id="sec-tree">
+  <div class="sec-hd">
+    <div class="sec-title">🗂 계층 구조 — 무엇을 어디에 넣는가</div>
+    <div class="sec-sub">
+      로블록스에서 <strong>"어디에 두느냐"가 곧 "어떻게 동작하느냐"</strong>입니다.
+      같은 스크립트라도 폴더가 다르면 아예 실행이 안 되거나, 해커에게 코드가 통째로 노출됩니다.
+      초보가 가장 많이 실수하는 부분이니 이 표만큼은 외워두세요.
+    </div>
+  </div>
+
+  <h3 class="blk b">🌲 Explorer 최상위 서비스</h3>
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">game 아래의 주요 컨테이너 — 복제(replication) 여부가 핵심</div>
+    <table>
+      <tr><th>이름</th><th>용도</th><th>클라이언트가 볼 수 있나</th></tr>
+      <tr><td><strong>Workspace</strong></td><td>3D 세계. 눈에 보이는 모든 파트·모델·캐릭터</td><td>✅ 전부 보임</td></tr>
+      <tr><td><strong>Players</strong></td><td>접속한 플레이어 목록</td><td>✅ 보임</td></tr>
+      <tr><td><strong>Lighting</strong></td><td>조명·후처리 효과</td><td>✅ 보임</td></tr>
+      <tr><td><strong>ReplicatedStorage</strong></td><td><em>서버·클라이언트가 함께 쓰는 창고</em>. RemoteEvent, 공용 모듈</td><td>✅ 보임</td></tr>
+      <tr><td><strong>ReplicatedFirst</strong></td><td>다른 것보다 <em>먼저</em> 복제됨. 로딩 화면 전용</td><td>✅ 보임</td></tr>
+      <tr><td><strong>ServerScriptService</strong></td><td><em>서버 스크립트를 넣는 곳</em></td><td>❌ <strong>절대 안 보임</strong></td></tr>
+      <tr><td><strong>ServerStorage</strong></td><td>서버 전용 창고. 무기 원본, 맵 조각</td><td>❌ <strong>절대 안 보임</strong></td></tr>
+      <tr><td><strong>StarterGui</strong></td><td>여기 든 UI가 접속 시 플레이어에게 복사됨</td><td>✅ 보임</td></tr>
+      <tr><td><strong>StarterPack</strong></td><td>여기 든 Tool 이 스폰 시 인벤토리에 지급됨</td><td>✅ 보임</td></tr>
+      <tr><td><strong>StarterPlayer</strong></td><td>플레이어 기본 설정 + 스크립트 배포처</td><td>✅ 보임</td></tr>
+      <tr><td><strong>SoundService</strong></td><td>전역 사운드 설정, SoundGroup</td><td>✅ 보임</td></tr>
+      <tr><td><strong>Teams</strong></td><td>팀 목록</td><td>✅ 보임</td></tr>
+      <tr><td><strong>TextChatService</strong></td><td>현재 채팅 시스템. 명령어·채널 커스터마이즈</td><td>✅ 보임</td></tr>
+      <tr><td><strong>Chat</strong></td><td>구형 채팅 시스템 (레거시)</td><td>✅ 보임</td></tr>
+    </table>
+  </div>
+
+  <div class="callout acc"><span>🔐</span><div class="callout-body">
+    <strong>가장 중요한 보안 원칙:</strong> 클라이언트에 복제되는 곳(<em>Workspace · ReplicatedStorage · StarterGui · StarterPlayer</em>)에 둔 것은
+    <strong>플레이어가 전부 열어볼 수 있다</strong>고 가정하세요. 익스플로잇 도구로 스크립트 소스까지 읽힙니다.
+    비밀번호·정답·서버 검증 로직은 반드시 <strong>ServerScriptService / ServerStorage</strong> 안에만 두세요.
+  </div></div>
+
+  <h3 class="blk b">👤 StarterPlayer 내부</h3>
+  <div class="tbl-wrap b">
+    <table>
+      <tr><th>하위 폴더</th><th>무엇이 들어가나</th><th>실행 시점</th></tr>
+      <tr><td><strong>StarterPlayerScripts</strong></td><td>LocalScript. <em>플레이어당 한 번만</em> 실행</td><td>접속 시 1회 (리스폰해도 재실행 안 됨)</td></tr>
+      <tr><td><strong>StarterCharacterScripts</strong></td><td>LocalScript. <em>캐릭터에 복사됨</em></td><td>스폰·리스폰 <strong>할 때마다</strong></td></tr>
+      <tr><td><strong>StarterCharacter</strong></td><td>커스텀 캐릭터 모델 (이름이 정확히 이래야 함)</td><td>스폰 시 이 모델로 대체</td></tr>
+    </table>
+  </div>
+  <div class="card c-b">
+    <div class="card-head"><span class="card-icon">🎛</span><span class="card-title">StarterPlayer 속성으로 조절되는 것</span></div>
+    <ul class="tips">
+      <li><strong>CharacterWalkSpeed</strong> / <strong>CharacterJumpPower</strong> — 기본 이동 속도(16)·점프력(50)</li>
+      <li><strong>CharacterMaxSlopeAngle</strong> — 오를 수 있는 경사 한계</li>
+      <li><strong>EnableMouseLockOption</strong> — Shift 시점 고정 사용 여부</li>
+      <li><strong>CameraMode</strong> — <code>Classic</code> / <code>LockFirstPerson</code>(1인칭 강제)</li>
+      <li><strong>CameraMaxZoomDistance</strong> / <strong>CameraMinZoomDistance</strong> — 줌 제한. 둘을 같은 값으로 두면 줌 고정</li>
+      <li><strong>LoadCharacterAppearance</strong> — 플레이어 아바타 외형을 불러올지</li>
+      <li><strong>RespawnDelay</strong> — 죽고 나서 부활까지 대기 시간</li>
+    </ul>
+  </div>
+
+  <h3 class="blk b">🧍 캐릭터 모델 내부</h3>
+  <div class="diag">Workspace
+ └─ 플레이어이름 (Model)
+     ├─ Humanoid           ← 체력·이동·상태 전부 담당
+     │   └─ Animator       ← 애니메이션 재생기
+     ├─ HumanoidRootPart   ← 보이지 않는 기준 파트 (여기를 옮기면 순간이동)
+     ├─ Head
+     │   ├─ face (Decal)
+     │   └─ Mesh
+     ├─ UpperTorso / LowerTorso        (R15)
+     ├─ LeftUpperArm / LeftLowerArm / LeftHand
+     ├─ RightUpperArm / ...
+     ├─ LeftUpperLeg / ...
+     └─ Shirt / Pants / Accessory ...
+
+※ R6 는 Torso · Left Arm · Right Arm · Left Leg · Right Leg 5개로 단순합니다.</div>
+
+  <h3 class="blk p">📁 정리 습관</h3>
+  <div class="grid">
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🗄</span><span class="card-title">Folder 를 적극 쓰세요</span></div>
+      <div class="card-desc">
+        <code>Instance.new("Folder")</code> 는 아무 기능이 없지만 <strong>정리에 최적</strong>입니다.
+        Workspace 에 <em>Map · NPCs · Props</em> 폴더를 만들어 나누면
+        나중에 <code>workspace.Map:GetChildren()</code> 같은 코드가 훨씬 안전해집니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🏷</span><span class="card-title">CollectionService 태그</span></div>
+      <div class="card-desc">
+        위치와 무관하게 <strong>"이건 킬브릭"</strong> 같은 꼬리표를 붙입니다.
+        Studio 의 <em>Tag Editor</em> 에서 마우스로도 붙일 수 있고,
+        코드로 <code>CollectionService:GetTagged("Killbrick")</code> 하면 전부 모입니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">📌</span><span class="card-title">Attribute</span></div>
+      <div class="card-desc">
+        인스턴스에 <strong>내가 만든 속성</strong>을 붙입니다.
+        <code>part:SetAttribute("Damage", 25)</code> · <code>part:GetAttribute("Damage")</code>.
+        Properties 창 맨 아래에서 마우스로도 추가할 수 있어 <em>구형 IntValue/StringValue 보다 편합니다</em>.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">💠</span><span class="card-title">Value 객체 (레거시)</span></div>
+      <div class="card-desc">
+        <code>IntValue · StringValue · BoolValue · NumberValue · ObjectValue · CFrameValue</code> 등.
+        <strong>leaderstats 는 아직 이 방식이 필요합니다</strong> (순위표가 Value 객체를 읽음).
+      </div></div>
+  </div>
+</div>
+
+<!-- ══════════════ 스크립트 종류 ══════════════ -->
+<div class="sec" id="sec-script">
+  <div class="sec-hd">
+    <div class="sec-title">📜 스크립트 3종 — 언제 무엇을 쓰나</div>
+    <div class="sec-sub">
+      로블록스에는 스크립트가 세 가지 있습니다. 겉보기엔 다 똑같은 코드 파일이지만
+      <strong>실행되는 컴퓨터가 다릅니다.</strong> 이걸 헷갈리면 "코드가 안 돌아요"의 90%가 생깁니다.
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">🖥</span><span class="card-title">Script (서버)</span><span class="card-sub">초록 아이콘</span></div>
+      <div class="card-desc">
+        <strong>서버 컴퓨터에서 실행</strong>됩니다. 모든 플레이어에게 공통으로 적용되는 것,
+        신뢰가 필요한 것(체력·돈·아이템 지급)은 전부 여기서 처리합니다.<br>
+        <em>넣는 곳:</em> ServerScriptService (권장), Workspace, ServerStorage
+      </div></div>
+    <div class="card c-b">
+      <div class="card-head"><span class="card-icon">📱</span><span class="card-title">LocalScript (클라이언트)</span><span class="card-sub">파란 아이콘</span></div>
+      <div class="card-desc">
+        <strong>플레이어 각자의 기기에서 실행</strong>됩니다. UI, 카메라, 키 입력, 개인 이펙트용.<br>
+        <em>넣는 곳:</em> StarterPlayerScripts, StarterCharacterScripts, StarterGui, StarterPack, 플레이어 캐릭터 안<br>
+        <em>❌ Workspace·ServerScriptService 에 넣으면 아예 실행되지 않습니다</em>
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">📦</span><span class="card-title">ModuleScript</span><span class="card-sub">보라 아이콘</span></div>
+      <div class="card-desc">
+        <strong>스스로는 실행되지 않습니다.</strong> 다른 스크립트가 <code>require()</code> 로 불러 씁니다.
+        함수·설정값을 한 곳에 모아 재사용할 때 씁니다.<br>
+        <em>넣는 곳:</em> ReplicatedStorage(공용) / ServerStorage·ServerScriptService(서버 전용)
+      </div></div>
+  </div>
+
+  <h3 class="blk">🎯 RunContext — 위치 제약 없이 실행하기</h3>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">Script.RunContext 속성</span></div>
+    <div class="card-desc">
+      최근의 <code>Script</code> 에는 <strong>RunContext</strong> 속성이 있습니다.
+      이걸 쓰면 위치와 무관하게 실행 주체를 지정할 수 있습니다.
+    </div>
+    <ul class="tips">
+      <li><strong>Legacy</strong> — 기존 방식. 놓인 위치에 따라 실행 여부가 결정됨</li>
+      <li><strong>Server</strong> — <em>어디에 있든</em> 서버에서 실행</li>
+      <li><strong>Client</strong> — <em>어디에 있든</em> 클라이언트에서 실행 (ReplicatedStorage 에 둬도 동작)</li>
+    </ul>
+    <div class="card-desc" style="margin-top:6px">
+      다만 기존 자료·튜토리얼은 대부분 <em>Script = 서버, LocalScript = 클라이언트</em> 라는 전통 방식을 전제합니다.
+      혼자 만들 때는 헷갈리지 않게 <strong>전통 방식으로 통일</strong>하는 편이 안전합니다.
+    </div>
+  </div>
+
+  <h3 class="blk p">📦 ModuleScript 쓰는 법</h3>
+  <div class="code-box">
+    <div class="code-hd">📦 모듈 정의 — 반드시 테이블(또는 값) 하나를 return<span class="where mod">ModuleScript · ReplicatedStorage/Utils</span></div>
+<pre class="code">local Utils = {}
+
+-- 두 위치 사이 거리
+function Utils.distance(a: Vector3, b: Vector3): number
+	return (a - b).Magnitude
+end
+
+-- 숫자에 천 단위 콤마 (1234567 -> "1,234,567")
+function Utils.comma(n: number): string
+	local s = tostring(math.floor(n))
+	local out = s:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+	return (out:gsub("^,", ""))
+end
+
+-- 테이블에서 무작위 하나 뽑기
+function Utils.pick(list)
+	return list[math.random(1, #list)]
+end
+
+return Utils   -- 이 줄이 없으면 오류가 납니다</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">📦 모듈 사용<span class="where srv">Script 또는 LocalScript</span></div>
+<pre class="code">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Utils = require(ReplicatedStorage:WaitForChild("Utils"))
+
+print(Utils.comma(1234567))               -- 1,234,567
+print(Utils.pick({"검", "활", "지팡이"}))</pre>
+  </div>
+  <div class="callout gold"><span>⚡</span><div class="callout-body">
+    <strong>모듈은 한 번만 실행됩니다.</strong> 같은 모듈을 여러 스크립트가 <code>require</code> 해도
+    코드는 최초 1회만 돌고, 이후에는 <em>같은 테이블을 공유</em>합니다.
+    그래서 모듈에 값을 저장해두면 <strong>여러 스크립트가 공유하는 저장소</strong>처럼 쓸 수 있습니다.
+    단, 서버와 클라이언트는 서로 다른 사본을 가지므로 값이 공유되지 <em>않습니다</em>.
+  </div></div>
+
+  <h3 class="blk">🚫 초보가 가장 많이 하는 실수</h3>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">❌</span><span class="card-title">LocalScript 를 Workspace 에</span></div>
+      <div class="card-desc">
+        Workspace 안의 LocalScript 는 <strong>실행되지 않습니다</strong>(캐릭터 모델 안은 예외).
+        UI 코드는 StarterGui, 조작 코드는 StarterPlayerScripts 로 옮기세요.
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">❌</span><span class="card-title">서버에서 LocalPlayer 접근</span></div>
+      <div class="card-desc">
+        <code>Players.LocalPlayer</code> 는 <strong>클라이언트에만 존재</strong>합니다.
+        서버에서 쓰면 <code>nil</code> 이라 오류가 납니다. 서버에서는 이벤트 인자로 받은 <em>player</em> 를 쓰세요.
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">❌</span><span class="card-title">클라이언트에서 고친 게 안 보임</span></div>
+      <div class="card-desc">
+        LocalScript 로 파트 색을 바꾸면 <strong>그 사람 화면에서만</strong> 바뀝니다.
+        모두에게 보이게 하려면 서버(Script)가 바꿔야 합니다.
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">❌</span><span class="card-title">Disabled 체크된 스크립트</span></div>
+      <div class="card-desc">
+        Properties 의 <code>Disabled</code> 가 체크돼 있으면 실행되지 않습니다.
+        "코드가 아무 반응이 없다" 싶으면 여기부터 보세요.
+      </div></div>
+  </div>
+</div>
+
+<!-- ══════════════ Luau 문법 ══════════════ -->
+<div class="sec" id="sec-luau">
+  <div class="sec-hd">
+    <div class="sec-title">🌙 Luau 문법 총정리</div>
+    <div class="sec-sub">
+      Luau 는 <strong>Lua 5.1 기반</strong>에 타입 검사·성능 개선·문법 확장을 더한 로블록스 전용 언어입니다.
+      다른 언어와 크게 다른 점: <em>인덱스가 1부터 시작</em>, <em>세미콜론 불필요</em>, <em>중괄호 대신 <code>end</code></em>,
+      <em><code>!=</code> 가 아니라 <code>~=</code></em> 입니다.
+    </div>
+  </div>
+
+  <h3 class="blk p">📌 변수와 자료형</h3>
+  <div class="code-box">
+    <div class="code-hd">📌 변수 선언</div>
+<pre class="code">local x = 10              -- 지역 변수 (거의 항상 이것을 쓴다)
+globalVar = 20            -- 전역 변수 (권장하지 않음 · 느리고 충돌 위험)
+
+local a, b, c = 1, 2, 3   -- 여러 개 한 번에
+a, b = b, a               -- 값 교환
+
+local count = 0
+count += 1                -- Luau 확장: count = count + 1
+count -= 2                -- -=  *=  /=  //=  %=  ^=  ..= 전부 사용 가능
+
+-- 상수처럼 쓰는 관례: 대문자 (언어가 강제하지는 않음)
+local MAX_HEALTH = 100</pre>
+  </div>
+
+  <div class="tbl-wrap p">
+    <div class="tbl-cap">기본 자료형 8가지</div>
+    <table>
+      <tr><th>타입</th><th>예시</th><th>설명</th></tr>
+      <tr><td><strong>nil</strong></td><td><code>nil</code></td><td>값이 없음. <em>조건문에서 false 취급</em></td></tr>
+      <tr><td><strong>boolean</strong></td><td><code>true</code> / <code>false</code></td><td>참·거짓. <em>0과 빈 문자열은 true 입니다</em></td></tr>
+      <tr><td><strong>number</strong></td><td><code>42</code>, <code>3.14</code>, <code>-7</code></td><td>정수·실수 구분 없음 (모두 double)</td></tr>
+      <tr><td><strong>string</strong></td><td><code>"안녕"</code>, <code>'hi'</code></td><td>따옴표 어느 쪽이든 가능</td></tr>
+      <tr><td><strong>table</strong></td><td><code>{1,2,3}</code>, <code>{a=1}</code></td><td>배열과 딕셔너리를 겸함. <em>Lua 의 유일한 자료구조</em></td></tr>
+      <tr><td><strong>function</strong></td><td><code>function() end</code></td><td>함수도 값이라 변수에 담을 수 있음</td></tr>
+      <tr><td><strong>userdata</strong></td><td><code>Vector3.new(1,2,3)</code></td><td>엔진이 제공하는 타입 (Instance, CFrame 등)</td></tr>
+      <tr><td><strong>thread</strong></td><td><code>coroutine.create(f)</code></td><td>코루틴</td></tr>
+    </table>
+  </div>
+  <div class="callout org"><span>⚠️</span><div class="callout-body">
+    <strong>거짓인 값은 <code>false</code> 와 <code>nil</code> 딱 둘뿐입니다.</strong>
+    다른 언어와 달리 <code>0</code>, <code>""</code>(빈 문자열), <code>{}</code>(빈 테이블)은 전부 <em>참</em>입니다.
+    <code>if hp then</code> 은 hp가 0이어도 통과하므로, 반드시 <code>if hp &gt; 0 then</code> 처럼 명시적으로 비교하세요.
+  </div></div>
+
+  <h3 class="blk p">➗ 연산자</h3>
+  <div class="tbl-wrap p">
+    <table>
+      <tr><th>분류</th><th>연산자</th><th>비고</th></tr>
+      <tr><td>산술</td><td><code>+ - * / // % ^</code></td><td><code>//</code> 는 내림 나눗셈, <code>^</code> 는 거듭제곱</td></tr>
+      <tr><td>비교</td><td><code>== ~= &lt; &gt; &lt;= &gt;=</code></td><td><em><code>!=</code> 아님 → <code>~=</code></em></td></tr>
+      <tr><td>논리</td><td><code>and or not</code></td><td><code>&amp;&amp; || !</code> 아님</td></tr>
+      <tr><td>연결</td><td><code>..</code></td><td>문자열 이어붙이기. <code>"a".."b"</code> → "ab"</td></tr>
+      <tr><td>길이</td><td><code>#</code></td><td><code>#tbl</code> 배열 길이, <code>#str</code> 문자열 바이트 수</td></tr>
+      <tr><td>복합대입</td><td><code>+= -= *= /= //= %= ^= ..=</code></td><td>Luau 확장 (표준 Lua 에는 없음)</td></tr>
+    </table>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">💡 and / or 를 값 선택에 쓰는 관용구</div>
+<pre class="code">-- 삼항 연산자가 없어서 이렇게 씁니다
+local speed = isRunning and 32 or 16      -- isRunning 이면 32, 아니면 16
+
+-- 기본값 지정
+local name = playerName or "이름없음"     -- playerName 이 nil 이면 "이름없음"
+
+-- ⚠️ 함정: 중간 값이 false/nil 이면 의도와 다르게 동작합니다
+local v = cond and false or "기본"        -- cond 가 true 여도 "기본" 이 나옴!
+
+-- Luau 는 if 표현식도 지원합니다 (이쪽이 안전)
+local speed2 = if isRunning then 32 else 16</pre>
+  </div>
+
+  <h3 class="blk p">🔀 조건문과 반복문</h3>
+  <div class="code-box">
+    <div class="code-hd">🔀 if / elseif / else</div>
+<pre class="code">local hp = 45
+
+if hp &lt;= 0 then
+	print("사망")
+elseif hp &lt; 30 then
+	print("위험")
+elseif hp &lt; 70 then
+	print("보통")
+else
+	print("건강")
+end</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🔁 반복문 4종</div>
+<pre class="code">-- 1) 숫자 for : 시작, 끝, 증가폭(생략 시 1)
+for i = 1, 10 do print(i) end
+for i = 10, 1, -1 do print(i) end        -- 거꾸로
+for i = 0, 1, 0.1 do print(i) end        -- 소수도 가능
+
+-- 2) 배열 순회
+local fruits = {"사과", "바나나", "포도"}
+for i, v in ipairs(fruits) do
+	print(i, v)                          -- 1 사과 / 2 바나나 / 3 포도
+end
+
+-- 3) 딕셔너리 순회 (순서 보장 안 됨)
+local stats = {hp = 100, mp = 50}
+for key, value in pairs(stats) do
+	print(key, value)
+end
+
+-- 4) Luau 일반화 순회 : ipairs/pairs 없이 그냥 씁니다 (권장)
+for i, v in fruits do print(i, v) end
+for _, child in workspace:GetChildren() do print(child.Name) end
+
+-- while : 조건이 참인 동안
+local n = 0
+while n &lt; 5 do
+	n += 1
+end
+
+-- repeat : 최소 한 번은 실행
+repeat
+	n -= 1
+until n &lt;= 0
+
+-- break 로 탈출, continue 로 다음 반복
+for i = 1, 10 do
+	if i == 3 then continue end   -- 3만 건너뜀
+	if i == 8 then break end      -- 8에서 멈춤
+	print(i)
+end</pre>
+  </div>
+
+  <h3 class="blk p">🔧 함수</h3>
+  <div class="code-box">
+    <div class="code-hd">🔧 함수 정의와 호출</div>
+<pre class="code">-- 기본
+local function add(a, b)
+	return a + b
+end
+
+-- 익명 함수를 변수에 담기 (위와 거의 동일)
+local mul = function(a, b) return a * b end
+
+-- 여러 값 반환
+local function minMax(t)
+	local lo, hi = t[1], t[1]
+	for _, v in t do
+		if v &lt; lo then lo = v end
+		if v &gt; hi then hi = v end
+	end
+	return lo, hi
+end
+local low, high = minMax({5, 2, 9, 1})
+
+-- 가변 인자
+local function sum(...)
+	local total = 0
+	for _, v in {...} do total += v end
+	return total
+end
+print(sum(1, 2, 3, 4))       -- 10
+
+-- 인자 개수가 모자라면 nil 이 들어옵니다 (오류 아님)
+local function greet(name)
+	name = name or "손님"     -- 기본값 처리 관용구
+	print("안녕 " .. name)
+end
+greet()                       -- 안녕 손님
+
+-- 테이블 안의 함수 : 콜론(:) 은 self 를 자동으로 넘깁니다
+local dog = {name = "바둑이"}
+function dog:bark()
+	print(self.name .. " 멍멍")
+end
+dog:bark()</pre>
+  </div>
+  <div class="callout blu"><span>ℹ️</span><div class="callout-body">
+    <strong>점(.)과 콜론(:)의 차이</strong> — <code>obj.method()</code> 는 그냥 호출,
+    <code>obj:method()</code> 는 <em>obj 를 첫 인자(self)로 자동 전달</em>합니다.
+    로블록스 API 는 대부분 콜론입니다: <code>part:Destroy()</code>, <code>humanoid:MoveTo()</code>.
+    반대로 <em>생성자</em>는 점입니다: <code>Vector3.new()</code>, <code>Instance.new()</code>.
+  </div></div>
+
+  <h3 class="blk p">📊 테이블</h3>
+  <div class="code-box">
+    <div class="code-hd">📊 배열처럼 · 딕셔너리처럼</div>
+<pre class="code">-- 배열 (인덱스는 1부터!)
+local list = {"a", "b", "c"}
+print(list[1])          -- a   (0이 아니라 1)
+print(#list)            -- 3
+
+-- 딕셔너리
+local player = {
+	name = "철수",
+	level = 5,
+	["복잡한 키"] = true,   -- 공백·한글 키는 대괄호 표기
+}
+print(player.name)
+print(player["level"])
+
+-- 중첩
+local data = {
+	inventory = {"검", "포션"},
+	stats = {hp = 100, mp = 30},
+}
+print(data.stats.hp)
+print(data.inventory[2])</pre>
+  </div>
+  <div class="tbl-wrap p">
+    <div class="tbl-cap">table 라이브러리 — 자주 쓰는 것</div>
+    <table>
+      <tr><th>함수</th><th>설명</th></tr>
+      <tr><td><code>table.insert(t, v)</code></td><td>맨 뒤에 추가</td></tr>
+      <tr><td><code>table.insert(t, i, v)</code></td><td>i번째에 끼워넣기</td></tr>
+      <tr><td><code>table.remove(t, i)</code></td><td>i번째 제거 후 반환 (i 생략 시 마지막)</td></tr>
+      <tr><td><code>table.find(t, v)</code></td><td>값의 인덱스 반환, 없으면 nil</td></tr>
+      <tr><td><code>table.concat(t, sep)</code></td><td>배열을 문자열로 합침</td></tr>
+      <tr><td><code>table.sort(t, fn)</code></td><td>정렬. fn 은 <code>function(a,b) return a&lt;b end</code></td></tr>
+      <tr><td><code>table.clear(t)</code></td><td>내용만 비움 (테이블 재사용)</td></tr>
+      <tr><td><code>table.create(n, v)</code></td><td>크기 n 을 미리 확보 <em>(Luau 확장 · 성능)</em></td></tr>
+      <tr><td><code>table.clone(t)</code></td><td>얕은 복사 <em>(Luau 확장)</em></td></tr>
+      <tr><td><code>table.freeze(t)</code></td><td>읽기 전용으로 잠금 <em>(Luau 확장)</em></td></tr>
+      <tr><td><code>table.unpack(t)</code></td><td>배열을 개별 인자로 펼침</td></tr>
+    </table>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>테이블은 참조로 전달됩니다.</strong> <code>local b = a</code> 로 복사한 뒤 <code>b</code> 를 고치면 <code>a</code> 도 바뀝니다.
+    진짜 복사가 필요하면 <code>table.clone(a)</code>(얕은 복사)를 쓰고,
+    중첩 테이블까지 복사하려면 <em>재귀 깊은 복사 함수</em>를 직접 만들어야 합니다.
+  </div></div>
+
+  <h3 class="blk p">🔤 문자열</h3>
+  <div class="code-box">
+    <div class="code-hd">🔤 문자열 다루기</div>
+<pre class="code">local s = "Hello Roblox"
+
+print(#s)                        -- 12  (길이)
+print(s:upper())                 -- HELLO ROBLOX
+print(s:lower())
+print(s:sub(1, 5))               -- Hello  (1부터 5까지)
+print(s:sub(-6))                 -- Roblox (뒤에서 6글자)
+print(s:find("Rob"))             -- 7  9   (시작·끝 위치)
+print(s:gsub("Roblox", "World")) -- Hello World  1  (바뀐 횟수도 반환)
+print(s:rep(2))                  -- 두 번 반복
+print(("  여백  "):gsub("^%s+", ""))  -- 앞 공백 제거
+
+-- 서식
+print(string.format("%s님의 점수는 %d점 (%.1f%%)", "철수", 95, 87.5))
+
+-- 분리
+for word in ("a,b,c"):gmatch("[^,]+") do print(word) end
+local parts = string.split("a,b,c", ",")    -- {"a","b","c"}
+
+-- 여러 줄 문자열
+local long = [[
+첫 줄
+둘째 줄
+]]
+
+-- 문자열 보간 (Luau 확장) — 역따옴표 사용
+local name = "철수"
+print(`안녕 {name}, 레벨은 {1 + 4} 입니다`)</pre>
+  </div>
+  <div class="callout gold"><span>⚡</span><div class="callout-body">
+    <strong>반복문 안에서 <code>..</code> 로 문자열을 계속 이어붙이면 아주 느립니다.</strong>
+    문자열은 불변이라 매번 새로 만들기 때문입니다.
+    조각을 테이블에 <code>table.insert</code> 로 모은 뒤 마지막에 <code>table.concat</code> 하세요.
+  </div></div>
+
+  <h3 class="blk p">🔢 math · 난수</h3>
+  <div class="code-box">
+    <div class="code-hd">🔢 자주 쓰는 수학 함수</div>
+<pre class="code">math.floor(3.7)      -- 3    내림
+math.ceil(3.2)       -- 4    올림
+math.round(3.5)      -- 4    반올림
+math.abs(-5)         -- 5    절댓값
+math.max(1, 9, 4)    -- 9
+math.min(1, 9, 4)    -- 1
+math.clamp(15, 0, 10)-- 10   범위 안으로 가두기 (아주 유용)
+math.sqrt(16)        -- 4
+math.rad(180)        -- 3.14…  도 → 라디안 (회전에 필수)
+math.deg(math.pi)    -- 180
+math.huge            -- 무한대
+
+-- 난수
+math.random(1, 6)              -- 1~6 정수 (주사위)
+math.random()                  -- 0~1 실수
+
+-- 독립적인 난수 생성기 (권장 · 서로 간섭하지 않음)
+local rng = Random.new()
+print(rng:NextInteger(1, 100))
+print(rng:NextNumber(0, 1))</pre>
+  </div>
+
+  <h3 class="blk p">🏷 타입 주석 (Luau 타입 시스템)</h3>
+  <div class="code-box">
+    <div class="code-hd">🏷 타입을 적으면 오타를 미리 잡아줍니다</div>
+<pre class="code">--!strict
+-- 파일 첫 줄에 이걸 넣으면 엄격 타입 검사가 켜집니다
+-- (--!nonstrict 기본, --!nocheck 검사 끔)
+
+local hp: number = 100
+local playerName: string = "철수"
+local isAlive: boolean = true
+local target: BasePart? = nil       -- ? 는 nil 이 될 수 있다는 뜻
+
+-- 함수 인자·반환 타입
+local function heal(amount: number): number
+	hp += amount
+	return hp
+end
+
+-- 사용자 정의 타입
+type Weapon = {
+	name: string,
+	damage: number,
+	twoHanded: boolean?,          -- 선택 항목
+}
+
+local sword: Weapon = {
+	name = "롱소드",
+	damage = 25,
+}
+
+-- 여러 타입 중 하나 (유니온)
+type Result = "success" | "fail" | "timeout"
+
+-- 다른 모듈에 타입 내보내기
+export type Weapon = Weapon</pre>
+  </div>
+  <div class="callout blu"><span>ℹ️</span><div class="callout-body">
+    타입은 <strong>실행에 영향을 주지 않습니다.</strong> Studio 편집기가 밑줄로 경고해 줄 뿐,
+    게임이 돌아갈 때 검사하지는 않습니다. 그래도 <em>오타·nil 실수</em>를 대부분 미리 잡아주므로
+    프로젝트가 커질수록 가치가 큽니다.
+  </div></div>
+
+  <h3 class="blk p">⏱ 시간과 비동기</h3>
+  <div class="tbl-wrap p">
+    <div class="tbl-cap">task 라이브러리 — 구형 함수를 대체합니다</div>
+    <table>
+      <tr><th>현재 권장</th><th>구형 (비권장)</th><th>설명</th></tr>
+      <tr><td><code>task.wait(n)</code></td><td><code>wait(n)</code></td><td>n초 대기. <em>더 정확하고 빠름</em></td></tr>
+      <tr><td><code>task.spawn(fn)</code></td><td><code>spawn(fn)</code></td><td>새 스레드에서 <em>즉시</em> 실행</td></tr>
+      <tr><td><code>task.delay(n, fn)</code></td><td><code>delay(n, fn)</code></td><td>n초 뒤 실행</td></tr>
+      <tr><td><code>task.defer(fn)</code></td><td>—</td><td>이번 프레임이 끝난 뒤 실행</td></tr>
+      <tr><td><code>task.cancel(thread)</code></td><td>—</td><td>예약된 스레드 취소</td></tr>
+      <tr><td><code>os.clock()</code></td><td><code>tick()</code></td><td>고정밀 경과 시간 (성능 측정용)</td></tr>
+      <tr><td><code>os.time()</code></td><td>—</td><td>유닉스 타임스탬프 (초)</td></tr>
+      <tr><td><code>DateTime.now()</code></td><td>—</td><td>날짜·시간 객체. 서식 출력에 편리</td></tr>
+    </table>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">⏱ 대기와 스레드</div>
+<pre class="code">task.wait(2)                       -- 2초 대기
+task.wait()                        -- 다음 프레임까지 (약 1/60초)
+
+-- 메인 흐름을 막지 않고 따로 돌리기
+task.spawn(function()
+	while true do
+		print("1초마다")
+		task.wait(1)
+	end
+end)
+
+-- 3초 뒤 한 번
+task.delay(3, function()
+	print("3초 지남")
+end)
+
+-- 취소 가능한 예약
+local t = task.delay(10, function() print("안 나옴") end)
+task.cancel(t)</pre>
+  </div>
+
+  <h3 class="blk p">🛡 오류 처리 (pcall)</h3>
+  <div class="code-box">
+    <div class="code-hd">🛡 실패할 수 있는 코드는 pcall 로 감쌉니다</div>
+<pre class="code">-- pcall = protected call. 오류가 나도 게임이 멈추지 않습니다
+local success, result = pcall(function()
+	return someRiskyFunction()
+end)
+
+if success then
+	print("성공:", result)
+else
+	warn("실패:", result)      -- result 에 오류 메시지가 들어옵니다
+end
+
+-- 인자를 함께 넘기는 형태
+local ok, err = pcall(myFunction, arg1, arg2)
+
+-- 오류 메시지를 가공하려면 xpcall
+local ok2 = xpcall(function()
+	error("문제 발생")
+end, function(msg)
+	warn("잡힘: " .. msg .. "\n" .. debug.traceback())
+end)
+
+-- 직접 오류 발생시키기
+if hp &lt; 0 then
+	error("체력이 음수일 수 없습니다")
+end
+
+assert(type(name) == "string", "name 은 문자열이어야 합니다")</pre>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>DataStore·HttpService 호출은 반드시 pcall 로 감싸세요.</strong>
+    네트워크 문제로 언제든 실패할 수 있고, 감싸지 않으면 그 스크립트 전체가 그 자리에서 멈춥니다.
+    <em>플레이어 데이터가 날아가는 사고의 가장 흔한 원인입니다.</em>
+  </div></div>
+
+  <h3 class="blk p">🧬 메타테이블과 OOP</h3>
+  <div class="code-box">
+    <div class="code-hd">🧬 클래스 흉내내기 — 로블록스에서 가장 흔한 패턴<span class="where mod">ModuleScript</span></div>
+<pre class="code">local Enemy = {}
+Enemy.__index = Enemy          -- 자기 자신을 조회 대상으로 지정
+
+function Enemy.new(name: string, hp: number)
+	local self = setmetatable({}, Enemy)
+	self.name = name
+	self.hp = hp
+	self.alive = true
+	return self
+end
+
+function Enemy:takeDamage(amount: number)
+	self.hp -= amount
+	if self.hp &lt;= 0 then
+		self.hp = 0
+		self.alive = false
+		self:onDeath()
+	end
+end
+
+function Enemy:onDeath()
+	print(self.name .. " 처치")
+end
+
+return Enemy
+
+--[[ 사용하는 쪽
+local Enemy = require(script.Parent.Enemy)
+local slime = Enemy.new("슬라임", 30)
+slime:takeDamage(50)      --> 슬라임 처치
+]]</pre>
+  </div>
+  <div class="tbl-wrap p">
+    <div class="tbl-cap">자주 쓰는 메타메서드</div>
+    <table>
+      <tr><th>메타메서드</th><th>언제 불리나</th></tr>
+      <tr><td><code>__index</code></td><td>없는 키를 읽을 때 → 상속 구현의 핵심</td></tr>
+      <tr><td><code>__newindex</code></td><td>없는 키에 값을 넣을 때 → 읽기 전용 구현</td></tr>
+      <tr><td><code>__add __sub __mul __div</code></td><td>사칙연산 오버로딩</td></tr>
+      <tr><td><code>__eq __lt __le</code></td><td>비교 연산</td></tr>
+      <tr><td><code>__tostring</code></td><td><code>tostring()</code>·<code>print()</code> 할 때</td></tr>
+      <tr><td><code>__len</code></td><td><code>#</code> 연산자</td></tr>
+      <tr><td><code>__call</code></td><td>테이블을 함수처럼 호출할 때</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════ API 기본 ══════════════ -->
+<div class="sec" id="sec-api">
+  <div class="sec-hd">
+    <div class="sec-title">🧩 로블록스 API 기본 — Instance 다루기</div>
+    <div class="sec-sub">
+      게임 안의 모든 것(파트·스크립트·UI·소리)은 <strong>Instance</strong> 라는 공통 조상을 가집니다.
+      찾고, 만들고, 지우고, 이벤트를 듣는 방법은 전부 동일합니다.
+    </div>
+  </div>
+
+  <h3 class="blk g">🔍 찾기</h3>
+  <div class="tbl-wrap g">
+    <table>
+      <tr><th>메서드</th><th>동작</th><th>못 찾으면</th></tr>
+      <tr><td><code>parent.이름</code></td><td>직접 접근 (점 표기)</td><td><em>오류 발생</em></td></tr>
+      <tr><td><code>:FindFirstChild("이름")</code></td><td>자식 중에서 찾기</td><td><code>nil</code> 반환</td></tr>
+      <tr><td><code>:FindFirstChild("이름", true)</code></td><td>손자까지 재귀 탐색</td><td><code>nil</code></td></tr>
+      <tr><td><code>:WaitForChild("이름")</code></td><td>생길 때까지 <em>기다림</em></td><td>무한 대기 (5초 후 경고)</td></tr>
+      <tr><td><code>:WaitForChild("이름", 10)</code></td><td>최대 10초만 기다림</td><td><code>nil</code></td></tr>
+      <tr><td><code>:FindFirstChildOfClass("Humanoid")</code></td><td>클래스로 찾기</td><td><code>nil</code></td></tr>
+      <tr><td><code>:FindFirstChildWhichIsA("BasePart")</code></td><td>상위 클래스 포함해 찾기</td><td><code>nil</code></td></tr>
+      <tr><td><code>:FindFirstAncestor("이름")</code></td><td>조상 방향으로 찾기</td><td><code>nil</code></td></tr>
+      <tr><td><code>:GetChildren()</code></td><td>직계 자식 배열</td><td>빈 배열</td></tr>
+      <tr><td><code>:GetDescendants()</code></td><td>모든 후손 배열</td><td>빈 배열</td></tr>
+      <tr><td><code>:IsA("BasePart")</code></td><td>타입 확인</td><td><code>false</code></td></tr>
+      <tr><td><code>:IsDescendantOf(obj)</code></td><td>포함 관계 확인</td><td><code>false</code></td></tr>
+    </table>
+  </div>
+  <div class="callout gold"><span>⚡</span><div class="callout-body">
+    <strong>클라이언트에서는 <code>WaitForChild</code>, 서버에서는 점 표기</strong>가 기본 원칙입니다.
+    클라이언트는 맵이 아직 다 복제되지 않은 상태에서 스크립트가 먼저 돌 수 있어서,
+    <code>workspace.Map.Door</code> 라고 쓰면 "Door is not a valid member of..." 오류가 납니다.
+  </div></div>
+
+  <div class="code-box">
+    <div class="code-hd">🔍 안전하게 찾기</div>
+<pre class="code">-- 있을 수도 없을 수도 있는 것
+local sword = player.Backpack:FindFirstChild("Sword")
+if sword then
+	sword:Destroy()
+end
+
+-- 반드시 있어야 하고, 조금 기다려도 되는 것 (클라이언트)
+local remote = game:GetService("ReplicatedStorage"):WaitForChild("Hit")
+
+-- 특정 타입만 골라내기
+for _, obj in workspace:GetDescendants() do
+	if obj:IsA("BasePart") then
+		obj.Anchored = true
+	elseif obj:IsA("Script") or obj:IsA("LocalScript") then
+		warn("스크립트 발견:", obj:GetFullName())
+	end
+end</pre>
+  </div>
+
+  <h3 class="blk g">✨ 만들고 지우기</h3>
+  <div class="code-box">
+    <div class="code-hd">✨ 생성 · 복제 · 삭제</div>
+<pre class="code">-- 생성
+local p = Instance.new("Part")
+p.Size = Vector3.new(4, 1, 4)
+p.Parent = workspace              -- 항상 마지막
+
+-- 복제
+local copy = p:Clone()
+copy.Position = p.Position + Vector3.new(0, 5, 0)
+copy.Parent = workspace
+
+-- 삭제 (되돌릴 수 없음)
+p:Destroy()
+
+-- 화면에서만 치우기 (나중에 되살릴 수 있음)
+p.Parent = nil
+
+-- 일정 시간 뒤 자동 삭제
+game:GetService("Debris"):AddItem(copy, 5)
+
+-- 삭제됐는지 확인
+print(p.Parent == nil)</pre>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong><code>:Destroy()</code> 와 <code>Parent = nil</code> 은 다릅니다.</strong>
+    Destroy 는 이벤트 연결까지 끊고 <em>영구히 잠급니다</em>(속성 변경 불가).
+    Parent 만 nil 로 두면 객체는 살아 있어 <strong>메모리에 계속 남습니다</strong> —
+    이게 쌓이면 메모리 누수가 됩니다. 다시 안 쓸 거면 Destroy 를 쓰세요.
+  </div></div>
+
+  <h3 class="blk g">📡 이벤트</h3>
+  <div class="code-box">
+    <div class="code-hd">📡 연결 · 해제 · 한 번만</div>
+<pre class="code">local part = workspace.Trap
+
+-- 연결
+local conn = part.Touched:Connect(function(hit)
+	print(hit.Name .. " 가 닿음")
+end)
+
+-- 해제 (아주 중요 · 안 하면 메모리 누수)
+conn:Disconnect()
+
+-- 딱 한 번만 실행되고 자동 해제
+part.Touched:Once(function(hit)
+	print("최초 접촉")
+end)
+
+-- 이벤트가 올 때까지 코드 멈추고 기다리기
+local hit = part.Touched:Wait()
+print("드디어 닿음:", hit.Name)
+
+-- 속성 변경 감지
+humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+	print("체력:", humanoid.Health)
+end)
+
+-- 어떤 속성이든 바뀌면 (일부 객체만 지원)
+part.Changed:Connect(function(propertyName)
+	print(propertyName .. " 변경됨")
+end)
+
+-- 속성(Attribute) 변경 감지
+part:GetAttributeChangedSignal("Damage"):Connect(function()
+	print("데미지 변경:", part:GetAttribute("Damage"))
+end)</pre>
+  </div>
+  <div class="tbl-wrap g">
+    <div class="tbl-cap">자주 쓰는 이벤트</div>
+    <table>
+      <tr><th>이벤트</th><th>대상</th><th>인자</th></tr>
+      <tr><td><code>.Touched</code></td><td>BasePart</td><td>닿은 파트</td></tr>
+      <tr><td><code>.TouchEnded</code></td><td>BasePart</td><td>떨어진 파트</td></tr>
+      <tr><td><code>.ChildAdded</code> / <code>.ChildRemoved</code></td><td>Instance</td><td>추가·제거된 자식</td></tr>
+      <tr><td><code>.DescendantAdded</code></td><td>Instance</td><td>추가된 후손</td></tr>
+      <tr><td><code>.AncestryChanged</code></td><td>Instance</td><td>자식, 새 부모</td></tr>
+      <tr><td><code>.Destroying</code></td><td>Instance</td><td>—</td></tr>
+      <tr><td><code>.PlayerAdded</code> / <code>.PlayerRemoving</code></td><td>Players</td><td>플레이어</td></tr>
+      <tr><td><code>.CharacterAdded</code></td><td>Player</td><td>캐릭터 모델</td></tr>
+      <tr><td><code>.Died</code></td><td>Humanoid</td><td>—</td></tr>
+      <tr><td><code>.Activated</code></td><td>Tool</td><td>—</td></tr>
+      <tr><td><code>.Triggered</code></td><td>ProximityPrompt</td><td>플레이어</td></tr>
+      <tr><td><code>.MouseButton1Click</code></td><td>GuiButton</td><td>—</td></tr>
+    </table>
+  </div>
+  <div class="callout org"><span>⚠️</span><div class="callout-body">
+    <strong>Touched 는 생각보다 자주 울립니다.</strong> 캐릭터가 파트 위를 걷기만 해도
+    팔·다리·몸통이 각각 초당 수십 번 이벤트를 발생시킵니다.
+    <em>디바운스(중복 방지)</em> 없이 데미지 코드를 넣으면 즉사합니다. 실전 코드 탭의 킬브릭 예제를 참고하세요.
+  </div></div>
+</div>
+
+<!-- ══════════════ 자료형 ══════════════ -->
+<div class="sec" id="sec-types">
+  <div class="sec-hd">
+    <div class="sec-title">📐 로블록스 전용 자료형</div>
+    <div class="sec-sub">
+      위치·회전·색·화면 좌표를 표현하는 특수 타입들입니다.
+      특히 <strong>CFrame</strong> 은 로블록스 코딩에서 가장 자주 막히는 개념이므로 예제를 많이 넣었습니다.
+    </div>
+  </div>
+
+  <h3 class="blk g">➡️ Vector3 — 위치와 방향</h3>
+  <div class="code-box">
+    <div class="code-hd">➡️ Vector3</div>
+<pre class="code">local v = Vector3.new(10, 5, -3)      -- X(좌우) Y(높이) Z(앞뒤)
+print(v.X, v.Y, v.Z)
+
+-- 상수
+Vector3.zero      -- (0,0,0)
+Vector3.one       -- (1,1,1)
+Vector3.xAxis     -- (1,0,0)
+Vector3.yAxis     -- (0,1,0)
+
+-- 연산
+local a = Vector3.new(1, 0, 0)
+local b = Vector3.new(0, 0, 1)
+print(a + b)              -- (1,0,1)
+print(a * 3)              -- (3,0,0)
+
+-- 길이와 단위 벡터
+local dir = target.Position - start.Position
+print(dir.Magnitude)      -- 두 점 사이 거리
+print(dir.Unit)           -- 길이 1짜리 방향만
+
+-- 두 점 사이 보간 (0=시작, 1=끝)
+print(a:Lerp(b, 0.5))
+
+-- 내적·외적
+print(a:Dot(b))           -- 0 이면 수직
+print(a:Cross(b))         -- 두 벡터에 수직인 벡터
+
+-- 거리 재기 관용구
+local dist = (partA.Position - partB.Position).Magnitude
+if dist &lt; 20 then print("가깝다") end</pre>
+  </div>
+
+  <h3 class="blk g">🧭 CFrame — 위치 + 회전</h3>
+  <div class="card c-g">
+    <div class="card-head"><span class="card-icon">🧭</span><span class="card-title">CFrame 이 뭔가</span></div>
+    <div class="card-desc">
+      <strong>Coordinate Frame</strong> 의 줄임말로, <em>위치와 회전을 한 덩어리로</em> 담은 값입니다.
+      <code>part.Position</code> 은 위치만이지만 <code>part.CFrame</code> 은 "어디에, 어느 쪽을 보고 있는지"까지 담습니다.
+      파트를 정확히 배치하거나 회전시키려면 CFrame 을 써야 합니다.
+    </div>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🧭 CFrame 만들기</div>
+<pre class="code">-- 위치만 (회전 없음)
+local c1 = CFrame.new(0, 10, 0)
+
+-- 위치 + 회전 (라디안!  도 단위면 math.rad 로 변환)
+local c2 = CFrame.new(0, 10, 0) * CFrame.Angles(0, math.rad(90), 0)
+
+-- A 지점에서 B 지점을 바라보게
+local c3 = CFrame.lookAt(Vector3.new(0,5,0), Vector3.new(20,5,0))
+
+-- 기존 파트 기준
+local c4 = part.CFrame
+
+-- 분해
+print(c2.Position)          -- 위치만 뽑기
+print(c2.LookVector)        -- 앞 방향
+print(c2.RightVector)       -- 오른쪽 방향
+print(c2.UpVector)          -- 위쪽 방향
+local x, y, z = c2:ToEulerAnglesXYZ()   -- 회전 각도(라디안)</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🧭 CFrame 곱셈 — 이게 핵심입니다</div>
+<pre class="code">-- ⭐ 곱하기는 "그 물체 기준으로 이동/회전" 을 뜻합니다
+
+-- 파트가 바라보는 방향으로 5칸 앞
+part.CFrame = part.CFrame * CFrame.new(0, 0, -5)
+-- (로블록스에서 -Z 가 앞쪽입니다)
+
+-- 제자리에서 45도 회전
+part.CFrame = part.CFrame * CFrame.Angles(0, math.rad(45), 0)
+
+-- 월드 기준으로 위로 5칸 (곱셈이 아니라 덧셈)
+part.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+
+-- ⚠️ 순서가 중요합니다 (교환법칙이 성립하지 않음)
+local A = CFrame.new(10,0,0) * CFrame.Angles(0, math.rad(90), 0)
+local B = CFrame.Angles(0, math.rad(90), 0) * CFrame.new(10,0,0)
+-- A 와 B 는 서로 다른 결과입니다
+
+-- 부드러운 이동 (보간)
+local start = part.CFrame
+local finish = CFrame.new(50, 10, 0)
+for i = 0, 1, 0.02 do
+	part.CFrame = start:Lerp(finish, i)
+	task.wait()
+end</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🧭 실전 — 캐릭터 순간이동 · 문 회전</div>
+<pre class="code">-- 캐릭터 순간이동 (HumanoidRootPart 를 옮깁니다)
+local char = player.Character
+char:PivotTo(CFrame.new(100, 20, 50))
+-- 또는
+char.HumanoidRootPart.CFrame = CFrame.new(100, 20, 50)
+
+-- 플레이어를 특정 지점 앞으로, 그 지점을 바라보게
+local spot = workspace.Portal
+char:PivotTo(spot.CFrame * CFrame.new(0, 3, -5))
+
+-- 문을 경첩 기준으로 90도 열기
+local door = workspace.Door
+local hinge = workspace.Hinge          -- 회전축이 될 빈 파트
+local closed = door.CFrame
+local offset = hinge.CFrame:ToObjectSpace(closed)
+
+for angle = 0, 90, 3 do
+	local rot = hinge.CFrame * CFrame.Angles(0, math.rad(angle), 0)
+	door.CFrame = rot * offset
+	task.wait(0.01)
+end</pre>
+  </div>
+
+  <h3 class="blk g">🎨 Color3 · BrickColor</h3>
+  <div class="code-box">
+    <div class="code-hd">🎨 색</div>
+<pre class="code">-- 0~1 범위 (헷갈리기 쉬움)
+local c1 = Color3.new(1, 0, 0)              -- 빨강
+
+-- 0~255 범위 (이쪽이 직관적 · 권장)
+local c2 = Color3.fromRGB(226, 69, 60)
+
+-- 색상·채도·명도
+local c3 = Color3.fromHSV(0.33, 1, 1)       -- 초록
+
+-- 16진수
+local c4 = Color3.fromHex("#E2453C")
+
+-- 두 색 섞기
+local mixed = c1:Lerp(c2, 0.5)
+
+-- 구형 팔레트 방식 (팀 색에는 아직 필요)
+local bc = BrickColor.new("Bright red")
+local bc2 = BrickColor.Random()
+print(bc.Color)                              -- Color3 로 변환
+
+part.Color = c2
+part.BrickColor = bc</pre>
+  </div>
+
+  <h3 class="blk g">📱 UDim2 — 화면 좌표</h3>
+  <div class="code-box">
+    <div class="code-hd">📱 UDim2 (UI 전용)</div>
+<pre class="code">-- UDim2.new(가로비율, 가로픽셀, 세로비율, 세로픽셀)
+-- 비율(Scale) = 부모 크기의 몇 %  ·  픽셀(Offset) = 절대 픽셀
+
+frame.Size = UDim2.new(0.5, 0, 0.3, 0)      -- 부모의 가로50% 세로30%
+frame.Size = UDim2.new(0, 200, 0, 100)      -- 정확히 200x100 픽셀
+frame.Size = UDim2.new(0.5, -20, 0, 50)     -- 절반에서 20픽셀 뺀 크기
+
+-- 짧은 표기
+frame.Position = UDim2.fromScale(0.5, 0.5)  -- 비율만
+frame.Size = UDim2.fromOffset(300, 150)     -- 픽셀만
+
+-- 가운데 정렬 관용구
+frame.AnchorPoint = Vector2.new(0.5, 0.5)   -- 기준점을 자기 중앙으로
+frame.Position = UDim2.fromScale(0.5, 0.5)  -- 부모 정중앙에 배치</pre>
+  </div>
+  <div class="callout blu"><span>ℹ️</span><div class="callout-body">
+    <strong>비율(Scale)을 쓰면 기기 크기가 달라도 레이아웃이 유지됩니다.</strong>
+    픽셀(Offset)만 쓰면 폰에서 UI가 화면 밖으로 나가거나 너무 작아집니다.
+    <em>크기는 Scale 위주 + 최소/최대 보정</em>이 안전한 조합입니다.
+  </div></div>
+
+  <h3 class="blk g">🔠 Enum — 정해진 선택지</h3>
+  <div class="code-box">
+    <div class="code-hd">🔠 Enum</div>
+<pre class="code">part.Material = Enum.Material.Neon
+part.Shape = Enum.PartType.Ball
+humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+
+-- 값 확인
+print(Enum.Material.Neon.Name)     -- "Neon"
+print(Enum.Material.Neon.Value)    -- 숫자 ID
+
+-- 전체 목록 훑기
+for _, m in Enum.Material:GetEnumItems() do
+	print(m.Name)
+end
+
+-- 자주 쓰는 Enum 계열
+-- Enum.Material / PartType / SurfaceType / KeyCode / UserInputType
+-- Enum.EasingStyle / EasingDirection / HumanoidStateType
+-- Enum.RaycastFilterType / CollisionFidelity / Font</pre>
+  </div>
+
+  <h3 class="blk g">🔭 레이캐스트 — 광선 쏘기</h3>
+  <div class="code-box">
+    <div class="code-hd">🔭 Raycast (총·시야 판정에 필수)</div>
+<pre class="code">local params = RaycastParams.new()
+params.FilterDescendantsInstances = {player.Character}   -- 제외할 대상
+params.FilterType = Enum.RaycastFilterType.Exclude       -- 이것들은 무시
+params.IgnoreWater = true
+
+local origin = camera.CFrame.Position
+local direction = camera.CFrame.LookVector * 500         -- 500칸 앞까지
+
+local result = workspace:Raycast(origin, direction, params)
+
+if result then
+	print("맞음:", result.Instance.Name)
+	print("위치:", result.Position)
+	print("표면 법선:", result.Normal)
+	print("거리:", result.Distance)
+	print("재질:", result.Material)
+else
+	print("아무것도 없음")
+end
+
+-- 반대로 "이것들만" 검사하려면
+params.FilterType = Enum.RaycastFilterType.Include
+params.FilterDescendantsInstances = {workspace.Targets}</pre>
+  </div>
+  <div class="callout org"><span>📌</span><div class="callout-body">
+    <strong>direction 은 방향이 아니라 "방향 × 거리"</strong> 입니다.
+    <code>LookVector</code> 만 넣으면 딱 1칸만 검사합니다. 반드시 원하는 사거리를 곱하세요.
+  </div></div>
+</div>
+
+<!-- ══════════════ 서비스 ══════════════ -->
+<div class="sec" id="sec-svc">
+  <div class="sec-hd">
+    <div class="sec-title">⚙️ 서비스 — 엔진 기능 불러오기</div>
+    <div class="sec-sub">
+      로블록스의 기능은 <strong>서비스(Service)</strong> 단위로 나뉘어 있습니다.
+      항상 <code>game:GetService("이름")</code> 으로 가져오세요 —
+      <code>game.Players</code> 처럼 점으로 접근하면 이름이 바뀌었을 때 깨집니다.
+    </div>
+  </div>
+
+  <div class="tbl-wrap o">
+    <div class="tbl-cap">주요 서비스 한눈에</div>
+    <table>
+      <tr><th>서비스</th><th>용도</th><th>서버/클라</th></tr>
+      <tr><td><strong>Players</strong></td><td>플레이어 목록·접속 이벤트</td><td>양쪽</td></tr>
+      <tr><td><strong>RunService</strong></td><td>매 프레임 실행, 실행 환경 판별</td><td>양쪽</td></tr>
+      <tr><td><strong>TweenService</strong></td><td>부드러운 값 변화 애니메이션</td><td>양쪽</td></tr>
+      <tr><td><strong>UserInputService</strong></td><td>키보드·마우스·터치 입력</td><td><em>클라이언트만</em></td></tr>
+      <tr><td><strong>ContextActionService</strong></td><td>입력을 액션 이름으로 묶어 관리 (모바일 버튼 자동 생성)</td><td><em>클라이언트만</em></td></tr>
+      <tr><td><strong>ReplicatedStorage</strong></td><td>공용 저장소</td><td>양쪽</td></tr>
+      <tr><td><strong>ServerStorage</strong></td><td>서버 전용 저장소</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>Debris</strong></td><td>일정 시간 후 자동 삭제</td><td>양쪽</td></tr>
+      <tr><td><strong>DataStoreService</strong></td><td>영구 데이터 저장</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>MemoryStoreService</strong></td><td>서버 간 공유하는 임시 저장 (대기열·매칭)</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>HttpService</strong></td><td>외부 요청, JSON 변환, GUID 생성</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>MarketplaceService</strong></td><td>게임패스·개발자 상품 판매</td><td>양쪽</td></tr>
+      <tr><td><strong>TeleportService</strong></td><td>다른 플레이스로 이동</td><td>양쪽</td></tr>
+      <tr><td><strong>PathfindingService</strong></td><td>NPC 길찾기</td><td>주로 서버</td></tr>
+      <tr><td><strong>CollectionService</strong></td><td>태그로 객체 묶어 관리</td><td>양쪽</td></tr>
+      <tr><td><strong>PhysicsService</strong></td><td>충돌 그룹 설정</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>SoundService</strong></td><td>사운드 그룹·전역 설정</td><td>양쪽</td></tr>
+      <tr><td><strong>TextService</strong></td><td>텍스트 필터링 (욕설·개인정보)</td><td><em>서버만</em></td></tr>
+      <tr><td><strong>TextChatService</strong></td><td>채팅 시스템·명령어</td><td>양쪽</td></tr>
+      <tr><td><strong>Lighting</strong></td><td>조명·후처리</td><td>양쪽</td></tr>
+      <tr><td><strong>StarterGui</strong></td><td>기본 UI 요소 켜고 끄기, 알림 띄우기</td><td>클라이언트</td></tr>
+      <tr><td><strong>TweenService</strong></td><td>속성 애니메이션</td><td>양쪽</td></tr>
+      <tr><td><strong>Workspace</strong></td><td>3D 세계. <code>workspace</code> 로 바로 접근 가능</td><td>양쪽</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk o">🔁 RunService — 매 프레임</h3>
+  <div class="code-box">
+    <div class="code-hd">🔁 프레임 루프와 환경 판별</div>
+<pre class="code">local RunService = game:GetService("RunService")
+
+-- 실행 환경 확인
+if RunService:IsServer() then print("서버") end
+if RunService:IsClient() then print("클라이언트") end
+if RunService:IsStudio() then print("스튜디오 테스트 중") end
+
+-- 매 프레임 (클라이언트 전용 · 카메라·UI에 사용)
+RunService.RenderStepped:Connect(function(deltaTime)
+	-- deltaTime = 지난 프레임에서 흐른 시간(초)
+end)
+
+-- 물리 계산 후 매 프레임 (서버·클라 양쪽)
+RunService.Heartbeat:Connect(function(dt)
+	-- 일반적인 게임 루프에 가장 무난합니다
+end)
+
+-- 물리 계산 전
+RunService.Stepped:Connect(function(time, dt)
+end)
+
+-- 프레임률과 무관하게 일정한 속도로 움직이려면 dt 를 곱합니다
+local SPEED = 10
+RunService.Heartbeat:Connect(function(dt)
+	part.Position += Vector3.new(SPEED * dt, 0, 0)
+end)</pre>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>RenderStepped 는 클라이언트에서만 동작</strong>하며, 여기 무거운 코드를 넣으면
+    <em>프레임이 그대로 떨어집니다</em>. 화면 렌더링 직전에 반드시 끝나야 하는 작업(카메라 조작)만 넣고,
+    나머지는 <code>Heartbeat</code> 를 쓰세요.
+  </div></div>
+
+  <h3 class="blk o">🎬 TweenService — 부드러운 애니메이션</h3>
+  <div class="code-box">
+    <div class="code-hd">🎬 Tween 기본</div>
+<pre class="code">local TweenService = game:GetService("TweenService")
+
+local info = TweenInfo.new(
+	2,                                  -- 지속 시간(초)
+	Enum.EasingStyle.Quad,              -- 가속 곡선
+	Enum.EasingDirection.Out,           -- 방향 (In / Out / InOut)
+	0,                                  -- 반복 횟수 (-1 = 무한)
+	false,                              -- 되돌아오기(reverse)
+	0                                   -- 시작 전 지연(초)
+)
+
+local goal = {
+	Position = Vector3.new(0, 30, 0),
+	Transparency = 0.5,
+	Color = Color3.fromRGB(255, 0, 0),
+}
+
+local tween = TweenService:Create(part, info, goal)
+tween:Play()
+
+-- 제어
+-- tween:Pause()
+-- tween:Cancel()
+tween.Completed:Connect(function(state)
+	print("완료", state)     -- Enum.PlaybackState.Completed
+end)
+
+-- UI 에도 똑같이 씁니다
+TweenService:Create(frame, TweenInfo.new(0.3), {
+	Position = UDim2.fromScale(0.5, 0.5),
+	BackgroundTransparency = 0,
+}):Play()</pre>
+  </div>
+  <div class="tbl-wrap o">
+    <div class="tbl-cap">EasingStyle — 움직임의 느낌</div>
+    <table>
+      <tr><th>스타일</th><th>느낌</th></tr>
+      <tr><td><code>Linear</code></td><td>일정한 속도 (기계적)</td></tr>
+      <tr><td><code>Quad</code> / <code>Cubic</code> / <code>Quart</code> / <code>Quint</code></td><td>점점 가속·감속. 숫자가 클수록 강함</td></tr>
+      <tr><td><code>Sine</code></td><td>부드럽고 자연스러움 <em>(UI 에 무난)</em></td></tr>
+      <tr><td><code>Back</code></td><td>살짝 뒤로 갔다 튀어나옴</td></tr>
+      <tr><td><code>Bounce</code></td><td>바닥에 튕김</td></tr>
+      <tr><td><code>Elastic</code></td><td>고무줄처럼 흔들림</td></tr>
+      <tr><td><code>Exponential</code></td><td>매우 급격한 가감속</td></tr>
+    </table>
+  </div>
+  <div class="callout org"><span>📌</span><div class="callout-body">
+    <strong>Tween 은 Anchored 파트에만 안정적으로 동작합니다.</strong>
+    고정되지 않은 파트는 물리 엔진이 동시에 위치를 계산해서 서로 싸웁니다.
+    움직이는 발판은 <code>Anchored = true</code> 로 두고 Tween 하세요.
+  </div></div>
+
+  <h3 class="blk o">⌨️ 입력 처리</h3>
+  <div class="code-box">
+    <div class="code-hd">⌨️ UserInputService<span class="where cli">LocalScript</span></div>
+<pre class="code">local UIS = game:GetService("UserInputService")
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end     -- 채팅창 타이핑 중이면 무시
+
+	if input.KeyCode == Enum.KeyCode.E then
+		print("E 눌림")
+	elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
+		print("좌클릭")
+	end
+end)
+
+UIS.InputEnded:Connect(function(input) end)
+
+-- 현재 눌려 있는지 즉시 확인
+if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
+	print("달리는 중")
+end
+
+-- 기기 판별 (모바일 대응)
+print(UIS.TouchEnabled)          -- 터치 지원
+print(UIS.KeyboardEnabled)
+print(UIS.GamepadEnabled)
+
+-- 마우스 위치
+local pos = UIS:GetMouseLocation()</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">🎮 ContextActionService — 모바일 버튼까지 자동<span class="where cli">LocalScript</span></div>
+<pre class="code">local CAS = game:GetService("ContextActionService")
+
+local function onSprint(actionName, inputState, inputObject)
+	local char = game.Players.LocalPlayer.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not hum then return end
+
+	if inputState == Enum.UserInputState.Begin then
+		hum.WalkSpeed = 32
+	elseif inputState == Enum.UserInputState.End then
+		hum.WalkSpeed = 16
+	end
+end
+
+CAS:BindAction(
+	"Sprint",                      -- 액션 이름
+	onSprint,
+	true,                          -- 모바일에 화면 버튼 자동 생성
+	Enum.KeyCode.LeftShift,        -- PC 키
+	Enum.KeyCode.ButtonL3          -- 게임패드 키
+)
+CAS:SetTitle("Sprint", "달리기")
+
+-- 해제
+-- CAS:UnbindAction("Sprint")</pre>
+  </div>
+
+  <h3 class="blk o">🔊 사운드</h3>
+  <div class="code-box">
+    <div class="code-hd">🔊 Sound</div>
+<pre class="code">-- 위치가 있는 소리 : 파트 안에 넣으면 거리에 따라 크기가 변합니다
+local s = Instance.new("Sound")
+s.SoundId = "rbxassetid://1234567890"
+s.Volume = 0.5
+s.Looped = false
+s.RollOffMaxDistance = 100
+s.Parent = workspace.Radio        -- 파트 안 = 3D 사운드
+s:Play()
+
+-- 전역 소리(BGM) : SoundService 나 클라이언트 스크립트 안에
+local bgm = Instance.new("Sound")
+bgm.SoundId = "rbxassetid://9876543210"
+bgm.Looped = true
+bgm.Parent = game:GetService("SoundService")
+bgm:Play()
+
+-- 이벤트
+s.Ended:Connect(function() print("끝") end)
+
+-- 볼륨 그룹으로 묶어 한 번에 조절
+local group = Instance.new("SoundGroup")
+group.Name = "SFX"
+group.Volume = 0.7
+group.Parent = game:GetService("SoundService")
+s.SoundGroup = group</pre>
+  </div>
+
+  <h3 class="blk o">🏷 CollectionService — 태그로 관리</h3>
+  <div class="code-box">
+    <div class="code-hd">🏷 같은 종류를 한 번에 다루기<span class="where srv">Script</span></div>
+<pre class="code">local CollectionService = game:GetService("CollectionService")
+
+local function setupKillbrick(part)
+	part.Touched:Connect(function(hit)
+		local hum = hit.Parent:FindFirstChildOfClass("Humanoid")
+		if hum then hum.Health = 0 end
+	end)
+end
+
+-- 이미 태그된 것들 처리
+for _, part in CollectionService:GetTagged("Killbrick") do
+	setupKillbrick(part)
+end
+
+-- 나중에 태그가 붙는 것도 자동 처리
+CollectionService:GetInstanceAddedSignal("Killbrick"):Connect(setupKillbrick)
+
+-- 태그 붙이기·떼기·확인
+CollectionService:AddTag(part, "Killbrick")
+CollectionService:RemoveTag(part, "Killbrick")
+print(CollectionService:HasTag(part, "Killbrick"))</pre>
+  </div>
+  <div class="callout blu"><span>💡</span><div class="callout-body">
+    태그 방식의 장점은 <strong>맵을 아무리 바꿔도 코드를 안 고쳐도 된다</strong>는 점입니다.
+    파트마다 스크립트를 복사해 넣는 대신, Studio 의 <em>Tag Editor</em> 에서 태그만 붙이면
+    스크립트 하나가 전부 처리합니다. 파트 수백 개짜리 맵에서 성능 차이도 큽니다.
+  </div></div>
+
+  <h3 class="blk o">🧭 PathfindingService — NPC 길찾기</h3>
+  <div class="code-box">
+    <div class="code-hd">🧭 장애물을 피해 이동<span class="where srv">Script</span></div>
+<pre class="code">local PathfindingService = game:GetService("PathfindingService")
+
+local npc = workspace.NPC
+local humanoid = npc:WaitForChild("Humanoid")
+
+local path = PathfindingService:CreatePath({
+	AgentRadius = 2,
+	AgentHeight = 5,
+	AgentCanJump = true,
+	AgentMaxSlope = 45,
+})
+
+local function walkTo(destination: Vector3)
+	local ok = pcall(function()
+		path:ComputeAsync(npc.PrimaryPart.Position, destination)
+	end)
+
+	if not ok or path.Status ~= Enum.PathStatus.Success then
+		warn("경로를 찾지 못했습니다")
+		return
+	end
+
+	for _, waypoint in path:GetWaypoints() do
+		if waypoint.Action == Enum.PathWaypointAction.Jump then
+			humanoid.Jump = true
+		end
+		humanoid:MoveTo(waypoint.Position)
+		local reached = humanoid.MoveToFinished:Wait()
+		if not reached then break end     -- 막히면 중단
+	end
+end
+
+walkTo(workspace.Goal.Position)</pre>
+  </div>
+
+  <h3 class="blk o">💥 PhysicsService — 충돌 그룹</h3>
+  <div class="code-box">
+    <div class="code-hd">💥 특정 대상끼리만 충돌시키기<span class="where srv">Script</span></div>
+<pre class="code">local PhysicsService = game:GetService("PhysicsService")
+
+PhysicsService:RegisterCollisionGroup("Players")
+PhysicsService:RegisterCollisionGroup("Ghosts")
+
+-- 유령끼리, 그리고 유령과 플레이어는 서로 통과
+PhysicsService:CollisionGroupSetCollidable("Ghosts", "Ghosts", false)
+PhysicsService:CollisionGroupSetCollidable("Ghosts", "Players", false)
+
+-- 파트에 그룹 지정
+for _, p in npc:GetDescendants() do
+	if p:IsA("BasePart") then
+		p.CollisionGroup = "Ghosts"
+	end
+end</pre>
+  </div>
+</div>
+
+<!-- ══════════════ 서버·클라이언트 ══════════════ -->
+<div class="sec" id="sec-net">
+  <div class="sec-hd">
+    <div class="sec-title">🔌 서버 · 클라이언트 통신</div>
+    <div class="sec-sub">
+      로블록스는 <strong>서버 하나 + 클라이언트 여러 개</strong> 구조입니다.
+      둘은 메모리를 공유하지 않으므로 <em>대화를 하려면 리모트가 필요</em>합니다.
+      여기를 대충 만들면 곧바로 핵·치트에 뚫립니다.
+    </div>
+  </div>
+
+  <div class="diag">   [클라이언트 A]          [클라이언트 B]
+        │                      │
+        │  FireServer()        │
+        ▼                      ▼
+   ┌─────────────────────────────────┐
+   │            서 버                 │  ← 여기만 신뢰할 수 있음
+   │  · 검증  · 데이터  · 보상 지급     │
+   └─────────────────────────────────┘
+        │  FireClient() / FireAllClients()
+        ▼
+   [모든 클라이언트에 반영]</div>
+
+  <h3 class="blk">📨 RemoteEvent — 단방향 (응답 없음)</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>방향</th><th>보내는 쪽</th><th>받는 쪽</th></tr>
+      <tr><td>클라 → 서버</td><td><code>remote:FireServer(...)</code></td><td><code>remote.OnServerEvent:Connect(function(player, ...))</code></td></tr>
+      <tr><td>서버 → 클라 1명</td><td><code>remote:FireClient(player, ...)</code></td><td><code>remote.OnClientEvent:Connect(function(...))</code></td></tr>
+      <tr><td>서버 → 전원</td><td><code>remote:FireAllClients(...)</code></td><td><code>remote.OnClientEvent:Connect(...)</code></td></tr>
+    </table>
+  </div>
+  <div class="callout gold"><span>⚡</span><div class="callout-body">
+    <strong><code>OnServerEvent</code> 의 첫 번째 인자는 항상 <code>player</code> 입니다.</strong>
+    클라이언트가 보내지 않아도 엔진이 자동으로 끼워 넣습니다.
+    그래서 <em>"누가 보냈는지"는 위조할 수 없습니다</em> — 이게 서버 검증의 출발점입니다.
+  </div></div>
+
+  <div class="code-box">
+    <div class="code-hd">📨 클라이언트 → 서버<span class="where cli">LocalScript</span></div>
+<pre class="code">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local buyItem = ReplicatedStorage:WaitForChild("BuyItem")
+
+-- "검을 사겠다" 는 요청만 보냅니다. 가격 계산은 서버가 합니다
+buyItem:FireServer("Sword")</pre>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">📨 서버에서 받기 + 검증<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local buyItem = ReplicatedStorage:WaitForChild("BuyItem")
+
+local PRICES = { Sword = 100, Bow = 150, Staff = 200 }
+
+buyItem.OnServerEvent:Connect(function(player, itemName)
+	-- 1) 타입 검사 — 클라이언트는 아무 값이나 보낼 수 있습니다
+	if type(itemName) ~= "string" then return end
+
+	-- 2) 존재 검사
+	local price = PRICES[itemName]
+	if not price then return end
+
+	-- 3) 소지금 검사 (서버가 가진 값으로만)
+	local coins = player.leaderstats.Coins
+	if coins.Value &lt; price then
+		return
+	end
+
+	-- 4) 실제 처리
+	coins.Value -= price
+	local tool = ReplicatedStorage.Weapons[itemName]:Clone()
+	tool.Parent = player.Backpack
+end)</pre>
+  </div>
+
+  <h3 class="blk">↔️ RemoteFunction — 양방향 (응답 받음)</h3>
+  <div class="code-box">
+    <div class="code-hd">↔️ 값을 돌려받아야 할 때</div>
+<pre class="code">-- 서버 쪽 (Script)
+local getShopData = ReplicatedStorage:WaitForChild("GetShopData")
+
+getShopData.OnServerInvoke = function(player)
+	return {
+		coins = player.leaderstats.Coins.Value,
+		items = {"Sword", "Bow"},
+	}
+end
+
+-- 클라이언트 쪽 (LocalScript)
+local data = getShopData:InvokeServer()     -- 응답이 올 때까지 멈춤
+print(data.coins)</pre>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>서버가 클라이언트를 Invoke 하지 마세요.</strong>
+    <code>remoteFunction:InvokeClient(player)</code> 는 그 클라이언트가 응답을 안 주거나
+    중간에 나가버리면 <em>서버 스레드가 영원히 멈춥니다</em>.
+    서버→클라 요청이 필요하면 RemoteEvent 두 개(요청·응답)로 나누세요.
+  </div></div>
+
+  <h3 class="blk">🔗 Bindable — 같은 쪽 안에서만</h3>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">🔗</span><span class="card-title">BindableEvent / BindableFunction</span></div>
+    <div class="card-desc">
+      <strong>서버끼리, 또는 클라이언트끼리</strong> 스크립트 간 통신에 씁니다.
+      네트워크를 타지 않으므로 서버↔클라 통신에는 <em>쓸 수 없습니다</em>.
+      요즘은 그냥 ModuleScript 로 함수를 공유하는 편이 더 깔끔한 경우가 많습니다.
+    </div>
+  </div>
+
+  <h3 class="blk">🛡 보안 — 반드시 지킬 것</h3>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🚫</span><span class="card-title">클라이언트를 절대 믿지 마세요</span></div>
+      <div class="card-desc">
+        익스플로잇 도구를 쓰면 <strong>LocalScript 는 원하는 대로 조작</strong>됩니다.
+        "클라이언트가 보낸 데미지 값"이나 "클라이언트가 보낸 좌표"를 그대로 쓰면 즉시 뚫립니다.
+        <em>서버가 직접 계산한 값만 신뢰하세요.</em>
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔍</span><span class="card-title">모든 인자를 검사</span></div>
+      <div class="card-desc">
+        <code>OnServerEvent</code> 로 들어오는 값은 <strong>타입·범위·존재 여부</strong>를 전부 확인해야 합니다.
+        숫자를 기대했는데 테이블이 오면 스크립트가 터집니다.
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">⏱</span><span class="card-title">호출 빈도 제한 (쿨다운)</span></div>
+      <div class="card-desc">
+        리모트를 <em>초당 수천 번</em> 호출해 서버를 마비시키는 공격이 흔합니다.
+        플레이어별 마지막 호출 시각을 저장해 최소 간격을 강제하세요.
+      </div></div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📏</span><span class="card-title">거리·조건 재확인</span></div>
+      <div class="card-desc">
+        "상자를 열었다"는 요청이 오면 서버가 <strong>정말 그 상자 근처에 있는지</strong> 다시 재세요.
+        맵 반대편에서 보낸 요청을 걸러낼 수 있습니다.
+      </div></div>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🛡 쿨다운 + 거리 검증을 갖춘 안전한 리모트<span class="where srv">Script</span></div>
+<pre class="code">local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local openChest = ReplicatedStorage:WaitForChild("OpenChest")
+
+local COOLDOWN = 1        -- 초
+local MAX_DISTANCE = 15   -- 스터드
+local lastUse = {}
+
+Players.PlayerRemoving:Connect(function(p)
+	lastUse[p] = nil       -- 나간 사람 기록 정리 (메모리 누수 방지)
+end)
+
+openChest.OnServerEvent:Connect(function(player, chest)
+	-- 쿨다운
+	local now = os.clock()
+	if lastUse[player] and now - lastUse[player] &lt; COOLDOWN then return end
+	lastUse[player] = now
+
+	-- 타입·소속 검사
+	if typeof(chest) ~= "Instance" or not chest:IsA("BasePart") then return end
+	if not chest:IsDescendantOf(workspace.Chests) then return end
+
+	-- 거리 검사
+	local char = player.Character
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+	if (root.Position - chest.Position).Magnitude &gt; MAX_DISTANCE then return end
+
+	-- 이미 열린 상자인지
+	if chest:GetAttribute("Opened") then return end
+	chest:SetAttribute("Opened", true)
+
+	-- 보상 지급
+	player.leaderstats.Coins.Value += 50
+end)</pre>
+  </div>
+</div>
+
+<!-- ══════════════ 캐릭터 ══════════════ -->
+<div class="sec" id="sec-char">
+  <div class="sec-hd">
+    <div class="sec-title">🏃 캐릭터 · 휴머노이드 · 도구</div>
+    <div class="sec-sub">
+      플레이어 캐릭터는 <strong>Humanoid</strong> 가 들어 있는 Model 입니다.
+      체력·이동·애니메이션이 전부 여기에 달려 있습니다. NPC 도 구조가 완전히 같습니다.
+    </div>
+  </div>
+
+  <h3 class="blk">❤️ Humanoid 주요 속성</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>속성</th><th>기본값</th><th>설명</th></tr>
+      <tr><td><code>Health</code></td><td>100</td><td>현재 체력. 0이 되면 사망</td></tr>
+      <tr><td><code>MaxHealth</code></td><td>100</td><td>최대 체력</td></tr>
+      <tr><td><code>WalkSpeed</code></td><td>16</td><td>이동 속도</td></tr>
+      <tr><td><code>JumpPower</code></td><td>50</td><td><code>UseJumpPower=true</code> 일 때 점프력</td></tr>
+      <tr><td><code>JumpHeight</code></td><td>7.2</td><td><code>UseJumpPower=false</code> 일 때 점프 높이</td></tr>
+      <tr><td><code>UseJumpPower</code></td><td>—</td><td>둘 중 어느 방식을 쓸지</td></tr>
+      <tr><td><code>WalkSpeed = 0</code></td><td>—</td><td>움직임 봉쇄 (컷신·기절)</td></tr>
+      <tr><td><code>PlatformStand</code></td><td>false</td><td>true 면 넘어져 조작 불가</td></tr>
+      <tr><td><code>Sit</code></td><td>false</td><td>앉기</td></tr>
+      <tr><td><code>DisplayName</code></td><td>—</td><td>머리 위 표시 이름</td></tr>
+      <tr><td><code>HealthDisplayType</code></td><td>—</td><td>체력바 표시 방식</td></tr>
+      <tr><td><code>RigType</code></td><td>R15</td><td>R6 / R15</td></tr>
+      <tr><td><code>AutoRotate</code></td><td>true</td><td>이동 방향으로 자동 회전</td></tr>
+    </table>
+  </div>
+  <div class="code-box">
+    <div class="code-hd">❤️ 캐릭터 다루기 정석<span class="where srv">Script</span></div>
+<pre class="code">local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+		local humanoid = character:WaitForChild("Humanoid")
+		local root = character:WaitForChild("HumanoidRootPart")
+
+		humanoid.MaxHealth = 150
+		humanoid.Health = 150
+		humanoid.WalkSpeed = 20
+
+		humanoid.Died:Connect(function()
+			print(player.Name .. " 사망")
+		end)
+
+		humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+			if humanoid.Health &lt; 30 then
+				print("체력 위험")
+			end
+		end)
+	end)
+end)</pre>
+  </div>
+  <div class="callout org"><span>📌</span><div class="callout-body">
+    <strong><code>player.Character</code> 는 <code>nil</code> 일 수 있습니다.</strong>
+    접속 직후·사망 직후에는 캐릭터가 없습니다. 항상 <code>CharacterAdded</code> 로 받거나,
+    <code>local char = player.Character or player.CharacterAdded:Wait()</code> 관용구를 쓰세요.
+  </div></div>
+
+  <h3 class="blk">🎭 애니메이션</h3>
+  <div class="code-box">
+    <div class="code-hd">🎭 애니메이션 재생</div>
+<pre class="code">local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://1234567890"
+
+local humanoid = character:WaitForChild("Humanoid")
+local animator = humanoid:WaitForChild("Animator")
+
+local track = animator:LoadAnimation(anim)
+track.Priority = Enum.AnimationPriority.Action
+track.Looped = false
+track:Play()
+
+track:AdjustSpeed(1.5)
+track.Stopped:Wait()
+track:Stop(0.2)          -- 0.2초에 걸쳐 서서히 멈춤
+
+-- 마커 (애니메이션 에디터에서 특정 프레임에 표시해 둔 지점)
+track:GetMarkerReachedSignal("HitFrame"):Connect(function()
+	print("타격 순간")
+end)</pre>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-cap">AnimationPriority — 겹칠 때 우선순위</div>
+    <table>
+      <tr><th>우선순위</th><th>용도</th></tr>
+      <tr><td><code>Core</code></td><td>가장 낮음. 기본 idle</td></tr>
+      <tr><td><code>Idle</code></td><td>대기 동작</td></tr>
+      <tr><td><code>Movement</code></td><td>걷기·달리기</td></tr>
+      <tr><td><code>Action</code></td><td>공격·상호작용 <em>(대부분 여기)</em></td></tr>
+      <tr><td><code>Action2~4</code></td><td>더 높은 우선순위</td></tr>
+    </table>
+  </div>
+  <div class="callout acc"><span>⚠️</span><div class="callout-body">
+    <strong>애니메이션은 소유권 문제가 있습니다.</strong> 내가 업로드한 애니메이션은
+    <em>내 게임(또는 내가 속한 그룹의 게임)</em>에서만 재생됩니다.
+    남의 애니메이션 ID 를 그대로 쓰면 스튜디오에서는 되는데 게임에서는 안 되는 일이 생깁니다.
+  </div></div>
+
+  <h3 class="blk">🗡 Tool — 손에 드는 도구</h3>
+  <div class="code-box">
+    <div class="code-hd">🗡 Tool 스크립트<span class="where srv">Script · Tool 안에</span></div>
+<pre class="code">local tool = script.Parent
+local DAMAGE = 25
+local COOLDOWN = 0.6
+local canHit = true
+
+tool.Activated:Connect(function()          -- 클릭했을 때
+	if not canHit then return end
+	canHit = false
+
+	local char = tool.Parent
+	local hum = char:FindFirstChildOfClass("Humanoid")
+
+	-- 앞쪽 짧은 거리에 있는 대상 탐색
+	local root = char:FindFirstChild("HumanoidRootPart")
+	for _, other in workspace:GetChildren() do
+		local targetHum = other:FindFirstChildOfClass("Humanoid")
+		local targetRoot = other:FindFirstChild("HumanoidRootPart")
+		if targetHum and targetRoot and other ~= char then
+			if (targetRoot.Position - root.Position).Magnitude &lt; 8 then
+				targetHum:TakeDamage(DAMAGE)
+			end
+		end
+	end
+
+	task.wait(COOLDOWN)
+	canHit = true
+end)
+
+tool.Equipped:Connect(function() print("장착") end)
+tool.Unequipped:Connect(function() print("해제") end)</pre>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-icon">📎</span><span class="card-title">Tool 속성</span></div>
+    <ul class="tips">
+      <li><strong>RequiresHandle</strong> — <code>Handle</code> 이라는 이름의 파트가 필요한지. 없으면 false 로</li>
+      <li><strong>CanBeDropped</strong> — Backspace 로 버릴 수 있는지</li>
+      <li><strong>ToolTip</strong> — 마우스를 올렸을 때 뜨는 설명</li>
+      <li><strong>TextureId</strong> — 인벤토리 아이콘 이미지</li>
+      <li><strong>GripPos / GripForward / GripUp</strong> — 손에 쥐는 위치·각도 조정</li>
+      <li>StarterPack 에 넣으면 <em>스폰할 때마다 자동 지급</em>됩니다</li>
+    </ul>
+  </div>
+
+  <h3 class="blk">🖐 ProximityPrompt — 다가가서 E</h3>
+  <div class="code-box">
+    <div class="code-hd">🖐 상호작용 프롬프트<span class="where srv">Script</span></div>
+<pre class="code">local prompt = Instance.new("ProximityPrompt")
+prompt.ActionText = "열기"
+prompt.ObjectText = "보물 상자"
+prompt.KeyboardKeyCode = Enum.KeyCode.E
+prompt.HoldDuration = 1              -- 1초 꾹 눌러야 발동
+prompt.MaxActivationDistance = 10
+prompt.RequiresLineOfSight = false   -- 벽 너머에서도 보일지
+prompt.Parent = workspace.Chest
+
+prompt.Triggered:Connect(function(player)
+	print(player.Name .. " 가 상자를 열었다")
+	prompt.Enabled = false
+end)</pre>
+  </div>
+  <div class="callout blu"><span>💡</span><div class="callout-body">
+    ProximityPrompt 는 <strong>모바일·콘솔 대응이 자동</strong>입니다.
+    직접 UI 를 만들고 거리 계산을 돌리는 것보다 훨씬 간단하고 성능도 좋으니,
+    "가까이 가서 상호작용" 은 이걸 먼저 고려하세요.
+  </div></div>
+</div>
+
+<!-- ══════════════ UI ══════════════ -->
+<div class="sec" id="sec-ui">
+  <div class="sec-hd">
+    <div class="sec-title">🖼 UI 만들기</div>
+    <div class="sec-sub">
+      화면에 붙는 UI 는 <strong>ScreenGui</strong> 안에 넣고 <em>StarterGui</em> 에 둡니다.
+      3D 공간에 떠 있는 UI 는 <strong>BillboardGui</strong>(항상 정면) 또는 <strong>SurfaceGui</strong>(파트 표면)를 씁니다.
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">UI 요소 종류</div>
+    <table>
+      <tr><th>클래스</th><th>설명</th></tr>
+      <tr><td><strong>ScreenGui</strong></td><td>화면 UI 의 최상위 컨테이너. StarterGui 에 넣음</td></tr>
+      <tr><td><strong>Frame</strong></td><td>사각형 상자. 배경·그룹 용도</td></tr>
+      <tr><td><strong>ScrollingFrame</strong></td><td>스크롤되는 프레임. <code>CanvasSize</code> 지정 필요</td></tr>
+      <tr><td><strong>TextLabel</strong></td><td>글자 표시 (클릭 불가)</td></tr>
+      <tr><td><strong>TextButton</strong></td><td>글자 버튼</td></tr>
+      <tr><td><strong>TextBox</strong></td><td>입력창</td></tr>
+      <tr><td><strong>ImageLabel</strong> / <strong>ImageButton</strong></td><td>이미지 표시·버튼</td></tr>
+      <tr><td><strong>ViewportFrame</strong></td><td>UI 안에 3D 모델 렌더링 (아이템 미리보기)</td></tr>
+      <tr><td><strong>BillboardGui</strong></td><td>3D 위치에 붙어 항상 카메라를 향함 (머리 위 이름표)</td></tr>
+      <tr><td><strong>SurfaceGui</strong></td><td>파트 표면에 붙는 UI (간판·모니터)</td></tr>
+      <tr><td><strong>CanvasGroup</strong></td><td>자식 전체의 투명도를 한 번에 조절</td></tr>
+    </table>
+  </div>
+
+  <div class="tbl-wrap b">
+    <div class="tbl-cap">배치 보조 (UI◯◯ 계열 — 부모 안에 넣기만 하면 됩니다)</div>
+    <table>
+      <tr><th>클래스</th><th>역할</th></tr>
+      <tr><td><strong>UIListLayout</strong></td><td>자식을 세로·가로로 자동 나열. <code>Padding</code>·<code>SortOrder</code></td></tr>
+      <tr><td><strong>UIGridLayout</strong></td><td>격자 배치 (인벤토리 칸)</td></tr>
+      <tr><td><strong>UIPageLayout</strong></td><td>페이지 넘기기</td></tr>
+      <tr><td><strong>UICorner</strong></td><td>모서리 둥글게</td></tr>
+      <tr><td><strong>UIStroke</strong></td><td>테두리선 (글자 외곽선도 가능)</td></tr>
+      <tr><td><strong>UIGradient</strong></td><td>그라데이션</td></tr>
+      <tr><td><strong>UIPadding</strong></td><td>안쪽 여백</td></tr>
+      <tr><td><strong>UIAspectRatioConstraint</strong></td><td>가로세로 비율 고정 <em>(기기 대응에 유용)</em></td></tr>
+      <tr><td><strong>UISizeConstraint</strong></td><td>최소·최대 크기 제한</td></tr>
+      <tr><td><strong>UITextSizeConstraint</strong></td><td>글자 크기 제한</td></tr>
+    </table>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🖼 코드로 UI 만들기<span class="where cli">LocalScript · StarterPlayerScripts</span></div>
+<pre class="code">local player = game:GetService("Players").LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "MyGui"
+gui.ResetOnSpawn = false           -- 죽어도 UI 유지
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromScale(0.3, 0.15)
+frame.Position = UDim2.fromScale(0.5, 0.5)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)     -- 정중앙 정렬
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+frame.BackgroundTransparency = 0.1
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.fromScale(1, 1)
+label.BackgroundTransparency = 1
+label.Text = "안녕하세요!"
+label.TextColor3 = Color3.new(1, 1, 1)
+label.TextScaled = true            -- 상자 크기에 맞춰 글자 크기 자동
+label.FontFace = Font.fromEnum(Enum.Font.GothamBold)
+label.Parent = frame
+
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(1, 0, 0, 40)
+btn.Position = UDim2.new(0, 0, 1, 8)
+btn.Text = "닫기"
+btn.Parent = frame
+
+btn.MouseButton1Click:Connect(function()
+	gui.Enabled = false
+end)</pre>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">✨ UI 애니메이션 — 부드럽게 등장<span class="where cli">LocalScript</span></div>
+<pre class="code">local TweenService = game:GetService("TweenService")
+
+local function popIn(frame)
+	frame.Size = UDim2.fromScale(0, 0)
+	frame.Visible = true
+
+	TweenService:Create(
+		frame,
+		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{Size = UDim2.fromScale(0.3, 0.15)}
+	):Play()
+end
+
+local function fadeOut(frame)
+	local t = TweenService:Create(
+		frame,
+		TweenInfo.new(0.25),
+		{BackgroundTransparency = 1}
+	)
+	t:Play()
+	t.Completed:Wait()
+	frame.Visible = false
+end</pre>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🏷 머리 위 이름표 (BillboardGui)<span class="where srv">Script</span></div>
+<pre class="code">local function addNametag(character, text)
+	local head = character:WaitForChild("Head")
+
+	local bb = Instance.new("BillboardGui")
+	bb.Name = "Nametag"
+	bb.Size = UDim2.new(0, 200, 0, 50)
+	bb.StudsOffset = Vector3.new(0, 2.5, 0)   -- 머리 위로 띄우기
+	bb.AlwaysOnTop = true
+	bb.MaxDistance = 60                        -- 이 거리 밖에서는 안 보임
+	bb.Parent = head
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextStrokeTransparency = 0.4
+	label.TextScaled = true
+	label.Parent = bb
+end</pre>
+  </div>
+
+  <div class="callout org"><span>📱</span><div class="callout-body">
+    <strong>모바일 대응 체크리스트</strong> — 로블록스 이용자의 상당수가 휴대폰입니다.
+    ① 크기·위치는 <em>Scale 중심</em>으로 ② 버튼은 손가락에 맞게 충분히 크게
+    ③ <code>UIAspectRatioConstraint</code> 로 비율 고정 ④ Studio <em>Test 탭 → Device</em> 에뮬레이터로 확인
+    ⑤ 화면 위쪽 모서리는 로블록스 기본 버튼과 겹치니 피하세요.
+  </div></div>
+
+  <div class="code-box">
+    <div class="code-hd">🔇 기본 UI 끄기 / 알림 띄우기<span class="where cli">LocalScript</span></div>
+<pre class="code">local StarterGui = game:GetService("StarterGui")
+
+-- 기본 요소 끄기
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+
+-- 시스템 알림
+StarterGui:SetCore("SendNotification", {
+	Title = "알림",
+	Text = "퀘스트를 완료했습니다!",
+	Duration = 5,
+})</pre>
+  </div>
+</div>
+
+<!-- ══════════════ 데이터 저장 ══════════════ -->
+<div class="sec" id="sec-data">
+  <div class="sec-hd">
+    <div class="sec-title">💾 데이터 저장 (DataStore)</div>
+    <div class="sec-sub">
+      플레이어가 나갔다 들어와도 레벨·코인이 유지되게 하는 기능입니다.
+      <strong>서버에서만</strong> 동작하며, <em>실패할 수 있는 네트워크 작업</em>이므로 반드시 pcall 로 감싸야 합니다.
+    </div>
+  </div>
+
+  <div class="callout acc"><span>⚙️</span><div class="callout-body">
+    <strong>먼저 설정을 켜야 합니다.</strong> Studio → <em>File → Game Settings → Security →
+    "Enable Studio Access to API Services"</em> 를 켜야 스튜디오 테스트에서 DataStore 가 동작합니다.
+    또한 <strong>게임이 한 번이라도 로블록스에 게시(Publish)</strong> 되어 있어야 합니다.
+  </div></div>
+
+  <div class="code-box">
+    <div class="code-hd">💾 기본 API</div>
+<pre class="code">local DataStoreService = game:GetService("DataStoreService")
+local store = DataStoreService:GetDataStore("PlayerData_v1")
+
+-- 읽기
+local ok, data = pcall(function()
+	return store:GetAsync("player_" .. userId)
+end)
+
+-- 쓰기 (덮어쓰기)
+local ok2 = pcall(function()
+	store:SetAsync("player_" .. userId, {coins = 100, level = 3})
+end)
+
+-- 안전한 갱신 (동시 접근에 강함 · 권장)
+local ok3 = pcall(function()
+	store:UpdateAsync("player_" .. userId, function(old)
+		old = old or {coins = 0}
+		old.coins += 50
+		return old
+	end)
+end)
+
+-- 삭제
+pcall(function() store:RemoveAsync("player_" .. userId) end)
+
+-- 순위표용 정렬 저장소
+local ordered = DataStoreService:GetOrderedDataStore("TopCoins")
+pcall(function() ordered:SetAsync(tostring(userId), 1500) end)
+
+local page = ordered:GetSortedAsync(false, 10)   -- 내림차순 상위 10명
+for rank, entry in page:GetCurrentPage() do
+	print(rank, entry.key, entry.value)
+end</pre>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">💾 실전 — 저장 시스템 한 벌<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local store = DataStoreService:GetDataStore("PlayerData_v1")
+
+local DEFAULT = { coins = 0, level = 1 }
+local cache = {}                    -- 접속 중 데이터를 메모리에 들고 있음
+
+local function key(player)
+	return "p_" .. player.UserId
+end
+
+-- 재시도까지 하는 안전한 불러오기
+local function load(player)
+	for attempt = 1, 3 do
+		local ok, result = pcall(function()
+			return store:GetAsync(key(player))
+		end)
+		if ok then
+			return result or table.clone(DEFAULT)
+		end
+		warn("불러오기 실패", attempt, result)
+		task.wait(2 ^ attempt)      -- 2초, 4초, 8초 (지수 백오프)
+	end
+	return nil                      -- 끝내 실패
+end
+
+local function save(player)
+	local data = cache[player]
+	if not data then return end
+
+	local ok, err = pcall(function()
+		store:SetAsync(key(player), data)
+	end)
+	if not ok then warn("저장 실패:", err) end
+end
+
+Players.PlayerAdded:Connect(function(player)
+	local data = load(player)
+
+	if not data then
+		-- ⚠️ 불러오기 실패 시 기본값을 주면 기존 데이터가 날아갑니다
+		player:Kick("데이터를 불러오지 못했습니다. 다시 접속해 주세요.")
+		return
+	end
+
+	cache[player] = data
+
+	-- leaderstats (순위표에 표시)
+	local stats = Instance.new("Folder")
+	stats.Name = "leaderstats"
+	stats.Parent = player
+
+	local coins = Instance.new("IntValue")
+	coins.Name = "Coins"
+	coins.Value = data.coins
+	coins.Parent = stats
+
+	coins.Changed:Connect(function(v)
+		data.coins = v              -- 값이 바뀌면 캐시에 반영
+	end)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	save(player)
+	cache[player] = nil
+end)
+
+-- 서버가 닫힐 때 남은 사람 전부 저장 (아주 중요)
+game:BindToClose(function()
+	for _, player in Players:GetPlayers() do
+		task.spawn(save, player)
+	end
+	task.wait(3)                    -- 저장이 끝날 시간을 벌어줌
+end)
+
+-- 주기적 자동 저장
+task.spawn(function()
+	while true do
+		task.wait(120)
+		for _, player in Players:GetPlayers() do
+			task.spawn(save, player)
+		end
+	end
+end)</pre>
+  </div>
+
+  <h3 class="blk g">⚠️ 반드시 알아야 할 제약</h3>
+  <div class="grid">
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">📉</span><span class="card-title">호출 한도</span></div>
+      <div class="card-desc">
+        요청 수에 제한이 있습니다. 매 프레임 저장하면 <strong>큐가 밀려 실패</strong>합니다.
+        <code>DataStoreService:GetRequestBudgetForRequestType()</code> 로 남은 예산을 확인할 수 있습니다.
+        <em>플레이어당 1~2분에 한 번 이상 저장하지 마세요.</em>
+      </div></div>
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">🚪</span><span class="card-title">서버 종료 시 유실</span></div>
+      <div class="card-desc">
+        서버가 갑자기 닫히면 저장이 끊깁니다. <strong><code>game:BindToClose</code></strong> 를 반드시 넣으세요.
+        여기서 <code>task.wait</code> 로 약간의 시간을 벌어주는 것도 중요합니다.
+      </div></div>
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">👥</span><span class="card-title">중복 접속 (세션 잠금)</span></div>
+      <div class="card-desc">
+        같은 사람이 두 서버에 동시에 들어가면 데이터가 <strong>서로 덮어씁니다</strong>.
+        실서비스급이라면 <em>ProfileService</em>·<em>ProfileStore</em> 같은 검증된 오픈소스 모듈을 쓰는 것이 안전합니다.
+      </div></div>
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">📦</span><span class="card-title">저장 가능한 타입</span></div>
+      <div class="card-desc">
+        숫자·문자열·불리언·<strong>이들로만 이루어진 테이블</strong>만 됩니다.
+        <em>Instance·Vector3·CFrame·Color3 는 그대로 저장할 수 없습니다.</em>
+        <code>{x=1,y=2,z=3}</code> 처럼 풀어서 저장하고 불러올 때 복원하세요.
+      </div></div>
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">🕳</span><span class="card-title">배열 구멍 주의</span></div>
+      <div class="card-desc">
+        중간이 <code>nil</code> 인 배열은 저장·복원 과정에서 <strong>뒷부분이 잘릴 수 있습니다</strong>.
+        인벤토리는 인덱스 배열보다 <em>키-값 딕셔너리</em>가 안전합니다.
+      </div></div>
+    <div class="card c-g">
+      <div class="card-head"><span class="card-icon">🔢</span><span class="card-title">버전 관리</span></div>
+      <div class="card-desc">
+        저장 구조를 바꿀 때는 <code>"PlayerData_v2"</code> 처럼 <strong>이름에 버전</strong>을 넣거나,
+        데이터 안에 <code>version</code> 필드를 두고 마이그레이션 코드를 작성하세요.
+      </div></div>
+  </div>
+</div>
+
+<!-- ══════════════ 실전 코드 ══════════════ -->
+<div class="sec" id="sec-code">
+  <div class="sec-hd">
+    <div class="sec-title">🧪 실전 코드 모음</div>
+    <div class="sec-sub">
+      복사해서 바로 쓸 수 있는 예제입니다. 각 블록 오른쪽에 <em>어떤 스크립트로, 어디에 넣는지</em> 적어뒀습니다.
+      경로가 다르면 대부분 동작하지 않으니 꼭 확인하세요.
+    </div>
+  </div>
+
+  <h3 class="blk b">🏆 순위표 (leaderstats)</h3>
+  <div class="code-box">
+    <div class="code-hd">🏆 오른쪽 위 순위표에 코인·레벨 표시<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+	-- 폴더 이름이 정확히 "leaderstats" 여야 순위표에 뜹니다
+	local stats = Instance.new("Folder")
+	stats.Name = "leaderstats"
+	stats.Parent = player
+
+	local coins = Instance.new("IntValue")
+	coins.Name = "코인"
+	coins.Value = 0
+	coins.Parent = stats
+
+	local level = Instance.new("IntValue")
+	level.Name = "레벨"
+	level.Value = 1
+	level.Parent = stats
+end)</pre>
+  </div>
+
+  <h3 class="blk b">☠️ 데미지 발판 (킬브릭)</h3>
+  <div class="code-box">
+    <div class="code-hd">☠️ 디바운스로 중복 처리 방지<span class="where srv">Script · 파트 안</span></div>
+<pre class="code">local part = script.Parent
+local cooldown = {}          -- 사람별 재처리 방지
+
+part.Touched:Connect(function(hit)
+	local character = hit.Parent
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health &lt;= 0 then return end
+
+	-- Touched 는 팔·다리마다 울리므로 반드시 막아야 합니다
+	if cooldown[character] then return end
+	cooldown[character] = true
+
+	humanoid:TakeDamage(25)
+
+	task.delay(1, function()
+		cooldown[character] = nil
+	end)
+end)</pre>
+  </div>
+
+  <h3 class="blk b">🦘 점프 패드</h3>
+  <div class="code-box">
+    <div class="code-hd">🦘 밟으면 위로 튀어오름<span class="where srv">Script · 파트 안</span></div>
+<pre class="code">local pad = script.Parent
+local POWER = 120
+
+pad.Touched:Connect(function(hit)
+	local char = hit.Parent
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	if root:GetAttribute("Boosting") then return end
+	root:SetAttribute("Boosting", true)
+
+	root.AssemblyLinearVelocity = Vector3.new(
+		root.AssemblyLinearVelocity.X,
+		POWER,
+		root.AssemblyLinearVelocity.Z
+	)
+
+	task.delay(0.5, function()
+		if root.Parent then root:SetAttribute("Boosting", nil) end
+	end)
+end)</pre>
+  </div>
+
+  <h3 class="blk b">🚪 자동문</h3>
+  <div class="code-box">
+    <div class="code-hd">🚪 다가가면 열리고 멀어지면 닫힘<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local door = workspace.Door
+local closedCF = door.CFrame
+local openCF = closedCF * CFrame.new(0, 0, -8)   -- 옆으로 밀리는 문
+local isOpen = false
+local RANGE = 12
+
+local info = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function setDoor(open)
+	if isOpen == open then return end
+	isOpen = open
+	TweenService:Create(door, info, {CFrame = open and openCF or closedCF}):Play()
+end
+
+-- 0.2초마다 검사 (매 프레임 돌릴 필요가 없습니다)
+task.spawn(function()
+	while true do
+		local anyoneNear = false
+		for _, player in Players:GetPlayers() do
+			local char = player.Character
+			local root = char and char:FindFirstChild("HumanoidRootPart")
+			if root and (root.Position - door.Position).Magnitude &lt; RANGE then
+				anyoneNear = true
+				break
+			end
+		end
+		setDoor(anyoneNear)
+		task.wait(0.2)
+	end
+end)</pre>
+  </div>
+
+  <h3 class="blk b">🚩 체크포인트 시스템</h3>
+  <div class="code-box">
+    <div class="code-hd">🚩 오비(장애물 코스)용 단계 저장<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Players = game:GetService("Players")
+local checkpoints = workspace:WaitForChild("Checkpoints")
+
+Players.PlayerAdded:Connect(function(player)
+	local stats = Instance.new("Folder")
+	stats.Name = "leaderstats"
+	stats.Parent = player
+
+	local stage = Instance.new("IntValue")
+	stage.Name = "단계"
+	stage.Value = 1
+	stage.Parent = stats
+
+	player.CharacterAdded:Connect(function(char)
+		local target = checkpoints:FindFirstChild(tostring(stage.Value))
+		if target then
+			task.wait()      -- 캐릭터가 완전히 로드될 때까지 한 프레임
+			char:PivotTo(target.CFrame + Vector3.new(0, 4, 0))
+		end
+	end)
+end)
+
+for _, cp in checkpoints:GetChildren() do
+	cp.Touched:Connect(function(hit)
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		if not player then return end
+
+		local stage = player.leaderstats["단계"]
+		local num = tonumber(cp.Name)
+
+		-- 앞 단계로만 갱신 (뒤로 돌아가도 단계가 내려가지 않음)
+		if num and num &gt; stage.Value then
+			stage.Value = num
+		end
+	end)
+end</pre>
+  </div>
+
+  <h3 class="blk b">⏱ 라운드 시스템</h3>
+  <div class="code-box">
+    <div class="code-hd">⏱ 대기 → 진행 → 종료 반복<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local statusValue = Instance.new("StringValue")
+statusValue.Name = "Status"
+statusValue.Parent = ReplicatedStorage      -- 클라이언트가 UI로 표시
+
+local INTERMISSION = 15
+local ROUND_TIME = 90
+local MIN_PLAYERS = 2
+
+local function countdown(seconds, label)
+	for i = seconds, 1, -1 do
+		statusValue.Value = label .. " " .. i .. "초"
+		task.wait(1)
+	end
+end
+
+while true do
+	-- 인원이 찰 때까지 대기
+	while #Players:GetPlayers() &lt; MIN_PLAYERS do
+		statusValue.Value = "플레이어를 기다리는 중..."
+		task.wait(2)
+	end
+
+	countdown(INTERMISSION, "곧 시작합니다")
+
+	-- 라운드 시작 : 참가자를 맵으로
+	statusValue.Value = "라운드 진행 중"
+	local alive = {}
+	for _, player in Players:GetPlayers() do
+		local char = player.Character
+		if char then
+			char:PivotTo(workspace.Arena.Spawn.CFrame + Vector3.new(0, 5, 0))
+			alive[player] = true
+		end
+	end
+
+	-- 시간이 다 되거나 한 명만 남을 때까지
+	local elapsed = 0
+	while elapsed &lt; ROUND_TIME do
+		task.wait(1)
+		elapsed += 1
+
+		for player in alive do
+			local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+			if not hum or hum.Health &lt;= 0 then
+				alive[player] = nil
+			end
+		end
+
+		local count = 0
+		for _ in alive do count += 1 end
+		if count &lt;= 1 then break end
+	end
+
+	statusValue.Value = "라운드 종료"
+	task.wait(3)
+end</pre>
+  </div>
+
+  <h3 class="blk b">🤖 플레이어를 쫓는 NPC</h3>
+  <div class="code-box">
+    <div class="code-hd">🤖 가장 가까운 사람 추적<span class="where srv">Script · NPC 모델 안</span></div>
+<pre class="code">local Players = game:GetService("Players")
+
+local npc = script.Parent
+local humanoid = npc:WaitForChild("Humanoid")
+local root = npc:WaitForChild("HumanoidRootPart")
+
+local DETECT_RANGE = 60
+local ATTACK_RANGE = 6
+local DAMAGE = 10
+local lastAttack = 0
+
+local function findTarget()
+	local closest, closestDist = nil, DETECT_RANGE
+
+	for _, player in Players:GetPlayers() do
+		local char = player.Character
+		local targetRoot = char and char:FindFirstChild("HumanoidRootPart")
+		local targetHum = char and char:FindFirstChildOfClass("Humanoid")
+
+		if targetRoot and targetHum and targetHum.Health &gt; 0 then
+			local dist = (targetRoot.Position - root.Position).Magnitude
+			if dist &lt; closestDist then
+				closest, closestDist = char, dist
+			end
+		end
+	end
+	return closest, closestDist
+end
+
+while humanoid.Health &gt; 0 do
+	local target, dist = findTarget()
+
+	if target then
+		humanoid:MoveTo(target.HumanoidRootPart.Position)
+
+		if dist &lt;= ATTACK_RANGE and os.clock() - lastAttack &gt; 1.5 then
+			lastAttack = os.clock()
+			target:FindFirstChildOfClass("Humanoid"):TakeDamage(DAMAGE)
+		end
+	end
+
+	task.wait(0.3)
+end</pre>
+  </div>
+
+  <h3 class="blk b">🛒 게임패스 판매</h3>
+  <div class="code-box">
+    <div class="code-hd">🛒 게임패스 구매 유도 + 소유 확인<span class="where srv">Script</span></div>
+<pre class="code">local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+local GAMEPASS_ID = 123456789
+
+local function hasPass(player)
+	local ok, owns = pcall(function()
+		return MarketplaceService:UserOwnsGamePassAsync(player.UserId, GAMEPASS_ID)
+	end)
+	return ok and owns
+end
+
+Players.PlayerAdded:Connect(function(player)
+	if hasPass(player) then
+		print(player.Name .. " 는 VIP")
+	end
+end)
+
+-- 구매 창 띄우기 (클라이언트에서 호출해도 됩니다)
+-- MarketplaceService:PromptGamePassPurchase(player, GAMEPASS_ID)
+
+-- 구매 완료 감지
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, id, purchased)
+	if purchased and id == GAMEPASS_ID then
+		print(player.Name .. " 구매 완료")
+	end
+end)</pre>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">💰 개발자 상품 (반복 구매 가능)<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+local PRODUCTS = {
+	[111111] = function(player)
+		player.leaderstats.Coins.Value += 100
+	end,
+	[222222] = function(player)
+		local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if hum then hum.Health = hum.MaxHealth end
+	end,
+}
+
+-- ⚠️ ProcessReceipt 는 게임 전체에서 딱 하나만 있어야 합니다
+MarketplaceService.ProcessReceipt = function(receiptInfo)
+	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
+	if not player then
+		-- 아직 서버에 없으면 나중에 다시 시도하게 둡니다
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	local handler = PRODUCTS[receiptInfo.ProductId]
+	if not handler then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	local ok = pcall(handler, player)
+	if not ok then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	-- 성공했을 때만 이걸 반환해야 로벅스가 지급됩니다
+	return Enum.ProductPurchaseDecision.PurchaseGranted
+end</pre>
+  </div>
+
+  <h3 class="blk b">📷 카메라 조작</h3>
+  <div class="code-box">
+    <div class="code-hd">📷 시점 고정 · 컷신<span class="where cli">LocalScript</span></div>
+<pre class="code">local camera = workspace.CurrentCamera
+local TweenService = game:GetService("TweenService")
+
+-- 카메라를 스크립트가 직접 제어
+camera.CameraType = Enum.CameraType.Scriptable
+camera.CFrame = CFrame.new(Vector3.new(0, 50, 0), Vector3.new(0, 0, 0))
+
+-- 부드럽게 이동
+TweenService:Create(camera, TweenInfo.new(3, Enum.EasingStyle.Sine), {
+	CFrame = workspace.CamTarget.CFrame
+}):Play()
+
+task.wait(3)
+
+-- 원래대로 (플레이어 조작 복귀)
+camera.CameraType = Enum.CameraType.Custom
+camera.CameraSubject = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+-- 1인칭 강제 / 줌 고정은 StarterPlayer 속성으로도 가능합니다
+camera.FieldOfView = 70</pre>
+  </div>
+
+  <h3 class="blk b">💬 채팅 명령어</h3>
+  <div class="code-box">
+    <div class="code-hd">💬 관리자 명령어 (TextChatService)<span class="where srv">Script · ServerScriptService</span></div>
+<pre class="code">local TextChatService = game:GetService("TextChatService")
+local Players = game:GetService("Players")
+
+local ADMINS = { [12345678] = true }        -- UserId 로 관리자 지정
+
+local cmd = Instance.new("TextChatCommand")
+cmd.Name = "SpeedCommand"
+cmd.PrimaryAlias = "/speed"
+cmd.SecondaryAlias = "/ws"
+cmd.Parent = TextChatService
+
+cmd.Triggered:Connect(function(source, message)
+	local player = Players:GetPlayerByUserId(source.UserId)
+	if not player or not ADMINS[player.UserId] then return end
+
+	local value = tonumber(message:match("%d+"))
+	if not value then return end
+
+	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.WalkSpeed = math.clamp(value, 0, 200)
+	end
+end)</pre>
+  </div>
+  <div class="callout org"><span>📌</span><div class="callout-body">
+    관리자 판별은 <strong>반드시 UserId 로</strong> 하세요. 이름은 바뀔 수 있습니다.
+    그리고 이 로직은 <em>서버 스크립트</em>에 있어야 합니다 — 클라이언트에 두면 아무나 관리자가 됩니다.
+  </div></div>
+
+  <h3 class="blk b">💥 파티클과 이펙트</h3>
+  <div class="code-box">
+    <div class="code-hd">💥 폭발 이펙트 만들고 자동 정리<span class="where srv">Script</span></div>
+<pre class="code">local Debris = game:GetService("Debris")
+
+local function boom(position: Vector3)
+	local attach = Instance.new("Part")
+	attach.Anchored = true
+	attach.CanCollide = false
+	attach.Transparency = 1
+	attach.Position = position
+	attach.Parent = workspace
+
+	local p = Instance.new("ParticleEmitter")
+	p.Texture = "rbxassetid://241650934"
+	p.Rate = 0                       -- 지속 발생 없음
+	p.Lifetime = NumberRange.new(0.4, 0.8)
+	p.Speed = NumberRange.new(20, 35)
+	p.SpreadAngle = Vector2.new(180, 180)
+	p.Parent = attach
+	p:Emit(60)                       -- 한 번에 60개 뿜기
+
+	local light = Instance.new("PointLight")
+	light.Brightness = 8
+	light.Range = 25
+	light.Parent = attach
+
+	Debris:AddItem(attach, 2)        -- 2초 뒤 자동 삭제
+end</pre>
+  </div>
+</div>
+
+<!-- ══════════════ 디버깅·최적화 ══════════════ -->
+<div class="sec" id="sec-debug">
+  <div class="sec-hd">
+    <div class="sec-title">🐞 디버깅 · 성능 최적화</div>
+    <div class="sec-sub">
+      "왜 안 되지?" 를 빨리 푸는 방법과, 게임이 느려지지 않게 만드는 방법입니다.
+    </div>
+  </div>
+
+  <h3 class="blk o">🔎 오류 읽는 법</h3>
+  <div class="tbl-wrap o">
+    <div class="tbl-cap">초보가 가장 자주 만나는 오류 메시지</div>
+    <table>
+      <tr><th>메시지</th><th>뜻</th><th>해결</th></tr>
+      <tr><td><code>attempt to index nil with 'X'</code></td><td>없는 것의 속성을 읽으려 함</td><td>그 앞 단계가 nil 인지 확인. <code>WaitForChild</code>·<code>FindFirstChild</code> 사용</td></tr>
+      <tr><td><code>X is not a valid member of Y</code></td><td>Y 안에 X 가 없음</td><td>이름 오타 확인, 클라이언트면 아직 복제 전일 수 있음</td></tr>
+      <tr><td><code>attempt to call a nil value</code></td><td>없는 함수를 호출</td><td>함수 이름 오타, 모듈에서 <code>return</code> 누락</td></tr>
+      <tr><td><code>attempt to perform arithmetic on a string</code></td><td>문자열로 계산 시도</td><td><code>tonumber()</code> 로 변환</td></tr>
+      <tr><td><code>Infinite yield possible on 'WaitForChild("X")'</code></td><td>5초 넘게 기다리는 중</td><td>이름이 맞는지, 그 객체가 그 위치에 정말 생기는지 확인</td></tr>
+      <tr><td><code>Unable to cast value to Object</code></td><td>타입이 안 맞음</td><td>Vector3 자리에 숫자를 넣지 않았는지 확인</td></tr>
+      <tr><td><code>Script timeout / exhausted allowed execution time</code></td><td>양보 없는 무한 루프</td><td>루프 안에 <code>task.wait()</code> 추가</td></tr>
+      <tr><td><code>Maximum event re-entrancy depth exceeded</code></td><td>이벤트가 자기 자신을 계속 호출</td><td>값 변경 이벤트 안에서 같은 값을 또 바꾸고 있지 않은지 확인</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk o">🧰 디버깅 도구</h3>
+  <div class="grid">
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">🖨</span><span class="card-title">print · warn</span></div>
+      <div class="card-desc">
+        가장 확실한 방법입니다. <code>print("여기까지 옴", 변수)</code> 를 곳곳에 넣어
+        <strong>어디까지 실행됐는지</strong> 좁혀 들어가세요. <code>warn</code> 은 노란색으로 눈에 띕니다.
+      </div></div>
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">🔴</span><span class="card-title">중단점 (Breakpoint)</span></div>
+      <div class="card-desc">
+        코드 편집기 줄 번호 왼쪽을 클릭하면 빨간 점이 찍힙니다.
+        실행이 그 줄에서 멈추고 <em>모든 변수 값</em>을 들여다볼 수 있습니다.
+        조건부 중단점도 지정할 수 있습니다.
+      </div></div>
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">🖥</span><span class="card-title">개발자 콘솔 (F9)</span></div>
+      <div class="card-desc">
+        <strong>실제 게임에서</strong> 로그와 오류를 보는 창입니다.
+        서버 로그·클라이언트 로그·메모리·네트워크를 탭으로 나눠 봅니다.
+        배포 후 버그 잡을 때 필수입니다.
+      </div></div>
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">📊</span><span class="card-title">MicroProfiler (Ctrl+F6)</span></div>
+      <div class="card-desc">
+        프레임마다 <strong>무엇이 시간을 잡아먹는지</strong> 막대로 보여줍니다.
+        렉의 원인을 찾을 때 씁니다.
+      </div></div>
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">🧵</span><span class="card-title">Script Analysis</span></div>
+      <div class="card-desc">
+        View 탭 → Script Analysis. 실행 전에 <em>문법 오류·타입 경고</em>를 모아 보여줍니다.
+      </div></div>
+    <div class="card c-o">
+      <div class="card-head"><span class="card-icon">🗺</span><span class="card-title">GetFullName · traceback</span></div>
+      <div class="card-desc">
+        <code>obj:GetFullName()</code> 은 전체 경로를 문자열로 줍니다.
+        <code>debug.traceback()</code> 은 <em>어떤 경로로 이 함수가 불렸는지</em> 보여줍니다.
+      </div></div>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">🔎 디버깅에 쓰는 관용구</div>
+<pre class="code">-- 값과 타입을 함께 찍기
+print(typeof(value), value)
+
+-- 테이블 내용 보기 (print 로는 주소만 나옵니다)
+local HttpService = game:GetService("HttpService")
+print(HttpService:JSONEncode(myTable))
+
+-- 여기까지 왔는지 확인
+print("[디버그] 1단계 통과")
+
+-- 전체 경로 확인
+print(part:GetFullName())     -- Workspace.Map.Doors.Door1
+
+-- 호출 경로 추적
+print(debug.traceback())
+
+-- 조건이 깨지면 즉시 알림
+assert(humanoid, "Humanoid 가 없습니다: " .. character:GetFullName())</pre>
+  </div>
+
+  <h3 class="blk o">⚡ 성능 최적화</h3>
+  <div class="tbl-wrap o">
+    <div class="tbl-cap">효과가 큰 것부터</div>
+    <table>
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td><strong>StreamingEnabled</strong></td><td>Workspace 속성. 넓은 맵에서 <em>가까운 부분만 로드</em>합니다. 대형 맵이면 거의 필수</td></tr>
+      <tr><td><strong>파트 수 줄이기</strong></td><td>안 보이는 뒷면·바닥 밑 파트를 지우세요. 유니온·메시로 합치는 것도 방법</td></tr>
+      <tr><td><strong>CastShadow 끄기</strong></td><td>작은 장식은 그림자를 끄면 체감이 큽니다</td></tr>
+      <tr><td><strong>광원 수 제한</strong></td><td>PointLight·SpotLight 는 비쌉니다. Neon 재질로 대체 가능하면 그쪽이 쌉니다</td></tr>
+      <tr><td><strong>Anchored 켜기</strong></td><td>움직이지 않는 파트는 전부 고정. 물리 계산에서 빠집니다</td></tr>
+      <tr><td><strong>CanCollide·CanTouch·CanQuery 끄기</strong></td><td>장식용 파트는 셋 다 끄면 충돌·판정 비용이 사라집니다</td></tr>
+      <tr><td><strong>while 루프에 wait</strong></td><td>양보 없는 루프는 서버를 통째로 멈춥니다</td></tr>
+      <tr><td><strong>이벤트 Disconnect</strong></td><td>안 쓰는 연결은 반드시 끊으세요. 메모리 누수의 1순위</td></tr>
+      <tr><td><strong>클라이언트로 넘기기</strong></td><td>이펙트·UI·소리는 각자 기기에서 처리하면 서버가 가벼워집니다</td></tr>
+      <tr><td><strong>루프 밖으로 빼기</strong></td><td><code>GetService</code>·<code>GetChildren</code> 같은 걸 매 프레임 호출하지 마세요</td></tr>
+    </table>
+  </div>
+
+  <div class="code-box">
+    <div class="code-hd">⚡ 나쁜 예 vs 좋은 예</div>
+<pre class="code">-- ❌ 나쁨 : 매 프레임 전체 순회 + 서비스 재조회
+game:GetService("RunService").Heartbeat:Connect(function()
+	for _, player in game:GetService("Players"):GetPlayers() do
+		for _, part in workspace:GetDescendants() do
+			-- 수천 번 반복 → 프레임 급락
+		end
+	end
+end)
+
+-- ✅ 좋음 : 서비스는 위에서 한 번, 검사 주기는 필요한 만큼만
+local Players = game:GetService("Players")
+local targets = workspace.Targets:GetChildren()   -- 미리 캐시
+
+task.spawn(function()
+	while true do
+		for _, player in Players:GetPlayers() do
+			-- 필요한 것만
+		end
+		task.wait(0.2)          -- 초당 5번이면 충분한 일이 많습니다
+	end
+end)
+
+-- ❌ 나쁨 : 연결을 쌓기만 함
+part.Touched:Connect(function() end)   -- 계속 새로 만들면 누적됨
+
+-- ✅ 좋음 : 필요 없어지면 끊기
+local conn
+conn = part.Touched:Connect(function()
+	conn:Disconnect()
+end)</pre>
+  </div>
+
+  <div class="callout acc"><span>🧹</span><div class="callout-body">
+    <strong>메모리 누수 3대 원인</strong> — ① 끊지 않은 이벤트 연결
+    ② 나간 플레이어를 키로 계속 들고 있는 테이블 (<code>PlayerRemoving</code> 에서 <code>nil</code> 로 비우세요)
+    ③ <code>Parent = nil</code> 로만 치워둔 인스턴스. 개발자 콘솔의 <em>Memory</em> 탭에서 사용량이 계속 오르면 이 셋부터 의심하세요.
+  </div></div>
+</div>
+
+<!-- ══════════════ 배포·수익화 ══════════════ -->
+<div class="sec" id="sec-pub">
+  <div class="sec-hd">
+    <div class="sec-title">🚢 게시 · 설정 · 수익화</div>
+    <div class="sec-sub">
+      만든 게임을 실제로 사람들이 들어올 수 있게 올리고, 설정을 잡고, 수익을 내는 과정입니다.
+    </div>
+  </div>
+
+  <h3 class="blk p">📤 게시하기</h3>
+  <div class="card c-p">
+    <ol class="steps">
+      <li><strong>File → Publish to Roblox</strong> (첫 게시는 <em>Ctrl+Alt+P</em>)</li>
+      <li>이름·설명을 적고 <strong>Create</strong></li>
+      <li>게시 후 <strong>Home 탭 → Game Settings</strong> 에서 세부 설정</li>
+      <li><strong>Permissions</strong> 탭에서 공개 범위를 <em>Public</em> 으로 바꿔야 남들이 들어올 수 있습니다</li>
+      <li>이후에는 <code>Ctrl+P</code> 로 덮어쓰기 게시. <em>게시하는 순간 실서버에 반영</em>됩니다</li>
+    </ol>
+  </div>
+  <div class="callout org"><span>📌</span><div class="callout-body">
+    <strong>용어 정리</strong> — <em>Experience(익스피리언스)</em> 는 게임 전체,
+    <em>Place(플레이스)</em> 는 그 안의 개별 맵입니다. 하나의 익스피리언스에 여러 플레이스를 두고
+    <code>TeleportService</code> 로 오갈 수 있습니다. 처음 만든 플레이스가 <strong>시작 플레이스</strong>가 됩니다.
+  </div></div>
+
+  <h3 class="blk p">⚙️ Game Settings 주요 항목</h3>
+  <div class="tbl-wrap p">
+    <table>
+      <tr><th>탭</th><th>설정</th></tr>
+      <tr><td><strong>Basic Info</strong></td><td>이름·설명·장르·썸네일·아이콘</td></tr>
+      <tr><td><strong>Permissions</strong></td><td>공개/비공개, 특정 사용자·그룹 허용</td></tr>
+      <tr><td><strong>Monetization</strong></td><td>유료 입장(Paid Access), 프라이빗 서버 판매</td></tr>
+      <tr><td><strong>Security</strong></td><td><em>Studio 의 API 서비스 접근</em>(DataStore 테스트에 필요), <em>HTTP 요청 허용</em>, 서드파티 판매·텔레포트 허용</td></tr>
+      <tr><td><strong>Avatar</strong></td><td>R6/R15 허용, 기본 이동 속도·점프·체력 등</td></tr>
+      <tr><td><strong>World</strong></td><td>중력, 걷기 속도, 점프 등 물리 기본값</td></tr>
+      <tr><td><strong>Options</strong></td><td>지원 기기(PC·모바일·콘솔·VR)</td></tr>
+      <tr><td><strong>Localization</strong></td><td>번역 자동화 설정</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk p">💰 수익화 수단</h3>
+  <div class="grid">
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🎟</span><span class="card-title">게임패스 (Game Pass)</span></div>
+      <div class="card-desc">
+        <strong>한 번 사면 영구</strong>. VIP, 특수 무기, 배속 같은 데 씁니다.
+        <code>UserOwnsGamePassAsync</code> 로 소유 여부를 확인합니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🧪</span><span class="card-title">개발자 상품 (Developer Product)</span></div>
+      <div class="card-desc">
+        <strong>여러 번 살 수 있음</strong>. 코인 충전, 부활권 등.
+        <code>ProcessReceipt</code> 로 처리하며 <em>게임 전체에 하나만</em> 정의해야 합니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">🚪</span><span class="card-title">유료 입장 · 프라이빗 서버</span></div>
+      <div class="card-desc">
+        입장 자체를 유료로 하거나, 개인 서버를 월정액으로 팝니다.
+        Game Settings → Monetization 에서 켭니다.
+      </div></div>
+    <div class="card c-p">
+      <div class="card-head"><span class="card-icon">📈</span><span class="card-title">참여 기반 지급</span></div>
+      <div class="card-desc">
+        프리미엄 가입자가 게임에서 보낸 시간에 비례해 지급되는 수익입니다.
+        따로 코딩할 것은 없고, 체류 시간이 길수록 유리합니다.
+      </div></div>
+  </div>
+  <div class="callout acc"><span>💵</span><div class="callout-body">
+    <strong>로벅스를 현금으로 바꾸려면(DevEx)</strong> 최소 보유량·연령·계정 상태 등 <em>자격 요건</em>을 충족해야 하고,
+    환전 비율과 조건은 로블록스가 수시로 조정합니다.
+    수익 계획을 세우기 전에 <strong>create.roblox.com 의 현재 DevEx 안내</strong>를 직접 확인하세요.
+  </div></div>
+
+  <h3 class="blk p">📜 지켜야 할 규정</h3>
+  <div class="card">
+    <ul class="tips">
+      <li><strong>커뮤니티 규정</strong> — 폭력·선정성·도박 요소·현실 상품 거래는 게임 삭제 사유입니다</li>
+      <li><strong>연령 등급</strong> — 콘텐츠 설문(Experience Guidelines)을 작성해야 공개할 수 있습니다</li>
+      <li><strong>저작권</strong> — 남의 이미지·음악·모델을 무단으로 올리면 <em>계정 제재</em>를 받습니다</li>
+      <li><strong>채팅 필터</strong> — 사용자가 입력한 문자열을 화면에 표시할 땐 <code>TextService:FilterStringAsync</code> 로 걸러야 합니다</li>
+      <li><strong>백도어 주의</strong> — Toolbox 모델에 숨은 스크립트가 게임을 탈취하는 사례가 많습니다</li>
+      <li>규정은 자주 바뀌므로 <em>공식 문서를 최종 기준</em>으로 삼으세요</li>
+    </ul>
+  </div>
+
+  <h3 class="blk p">🌐 좋은 참고처</h3>
+  <div class="grid-sm">
+    <div class="card"><div class="card-head"><span class="card-title">create.roblox.com/docs</span></div>
+      <div class="card-desc">공식 문서. <strong>API 레퍼런스가 항상 최신</strong>입니다. 한국어 번역도 제공</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">devforum.roblox.com</span></div>
+      <div class="card-desc">공식 포럼. 실전 문제 해결·오픈소스 모듈이 모여 있음</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">luau.org</span></div>
+      <div class="card-desc">Luau 언어 자체의 공식 문서 (타입 시스템 상세)</div></div>
+    <div class="card"><div class="card-head"><span class="card-title">Studio 안 도움말</span></div>
+      <div class="card-desc">코드에서 API 이름에 커서를 두고 <strong>F1</strong> 을 누르면 해당 문서로 이동</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ 용어 사전 ══════════════ -->
+<div class="sec" id="sec-term">
+  <div class="sec-hd">
+    <div class="sec-title">📚 용어 사전</div>
+    <div class="sec-sub">검색창에 단어를 넣으면 이 목록에서도 바로 찾을 수 있습니다.</div>
+  </div>
+
+  <h3 class="blk gold">기본 개념</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">Luau (루아우)</div><div class="gl-d">로블록스 전용 언어. Lua 5.1 기반에 타입·성능 개선을 더함</div></div>
+    <div class="gl-i"><div class="gl-t">Experience</div><div class="gl-d">게임 전체를 가리키는 공식 용어</div></div>
+    <div class="gl-i"><div class="gl-t">Place</div><div class="gl-d">익스피리언스 안의 개별 맵. 여러 개를 둘 수 있음</div></div>
+    <div class="gl-i"><div class="gl-t">Instance</div><div class="gl-d">게임 안 모든 객체의 조상 클래스</div></div>
+    <div class="gl-i"><div class="gl-t">Part</div><div class="gl-d">맵을 이루는 기본 블록</div></div>
+    <div class="gl-i"><div class="gl-t">Stud (스터드)</div><div class="gl-d">로블록스의 길이 단위. 캐릭터 키가 약 5스터드</div></div>
+    <div class="gl-i"><div class="gl-t">Anchored</div><div class="gl-d">고정 여부. 끄면 중력에 떨어짐</div></div>
+    <div class="gl-i"><div class="gl-t">Humanoid</div><div class="gl-d">캐릭터의 체력·이동·상태를 담당하는 객체</div></div>
+    <div class="gl-i"><div class="gl-t">HumanoidRootPart</div><div class="gl-d">캐릭터의 보이지 않는 기준 파트. 순간이동에 사용</div></div>
+    <div class="gl-i"><div class="gl-t">Rig (리그)</div><div class="gl-d">캐릭터 뼈대. R6(6부위)와 R15(15부위)</div></div>
+  </div>
+
+  <h3 class="blk gold">코딩</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">Script</div><div class="gl-d">서버에서 실행되는 스크립트</div></div>
+    <div class="gl-i"><div class="gl-t">LocalScript</div><div class="gl-d">플레이어 기기에서 실행되는 스크립트</div></div>
+    <div class="gl-i"><div class="gl-t">ModuleScript</div><div class="gl-d">require 로 불러 쓰는 재사용 코드 묶음</div></div>
+    <div class="gl-i"><div class="gl-t">RemoteEvent</div><div class="gl-d">서버↔클라 단방향 통신 (응답 없음)</div></div>
+    <div class="gl-i"><div class="gl-t">RemoteFunction</div><div class="gl-d">서버↔클라 양방향 통신 (응답 받음)</div></div>
+    <div class="gl-i"><div class="gl-t">Replication (복제)</div><div class="gl-d">서버의 변경 사항이 클라이언트에 자동 전파되는 것</div></div>
+    <div class="gl-i"><div class="gl-t">FilteringEnabled</div><div class="gl-d">클라이언트 변경이 서버에 반영되지 않는 보안 구조. 현재는 항상 켜짐</div></div>
+    <div class="gl-i"><div class="gl-t">Yield (양보)</div><div class="gl-d">task.wait 등으로 잠시 멈춰 다른 코드에 순서를 넘기는 것</div></div>
+    <div class="gl-i"><div class="gl-t">Debounce</div><div class="gl-d">중복 실행 방지 장치. Touched 처리에 필수</div></div>
+    <div class="gl-i"><div class="gl-t">pcall</div><div class="gl-d">오류가 나도 멈추지 않게 감싸는 보호 호출</div></div>
+    <div class="gl-i"><div class="gl-t">CFrame</div><div class="gl-d">위치+회전을 함께 담는 값</div></div>
+    <div class="gl-i"><div class="gl-t">Vector3</div><div class="gl-d">3차원 위치·방향 값</div></div>
+    <div class="gl-i"><div class="gl-t">UDim2</div><div class="gl-d">UI 좌표. 비율(Scale)과 픽셀(Offset)을 함께 지정</div></div>
+    <div class="gl-i"><div class="gl-t">Raycast</div><div class="gl-d">광선을 쏘아 무엇에 맞는지 알아내는 판정</div></div>
+    <div class="gl-i"><div class="gl-t">Tween</div><div class="gl-d">값을 부드럽게 변화시키는 애니메이션</div></div>
+    <div class="gl-i"><div class="gl-t">Attribute</div><div class="gl-d">인스턴스에 붙이는 사용자 정의 속성</div></div>
+    <div class="gl-i"><div class="gl-t">Tag</div><div class="gl-d">CollectionService 로 붙이는 꼬리표. 같은 종류를 한 번에 처리</div></div>
+    <div class="gl-i"><div class="gl-t">DataStore</div><div class="gl-d">플레이어 데이터를 영구 저장하는 서비스</div></div>
+    <div class="gl-i"><div class="gl-t">leaderstats</div><div class="gl-d">이 이름의 폴더를 만들면 순위표에 자동 표시됨</div></div>
+  </div>
+
+  <h3 class="blk gold">빌딩</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">Terrain</div><div class="gl-d">복셀 기반 자연 지형</div></div>
+    <div class="gl-i"><div class="gl-t">Union / Negate</div><div class="gl-d">파트를 합치거나 구멍을 뚫는 솔리드 모델링</div></div>
+    <div class="gl-i"><div class="gl-t">MeshPart</div><div class="gl-d">외부에서 만든 3D 모델을 넣는 파트</div></div>
+    <div class="gl-i"><div class="gl-t">Constraint</div><div class="gl-d">파트를 붙이거나 움직이게 하는 물리 연결</div></div>
+    <div class="gl-i"><div class="gl-t">Attachment</div><div class="gl-d">Constraint·파티클을 붙이는 부착점</div></div>
+    <div class="gl-i"><div class="gl-t">SpawnLocation</div><div class="gl-d">캐릭터가 나타나는 지점</div></div>
+    <div class="gl-i"><div class="gl-t">StreamingEnabled</div><div class="gl-d">가까운 지역만 불러오는 대형 맵 최적화 기능</div></div>
+    <div class="gl-i"><div class="gl-t">CollisionFidelity</div><div class="gl-d">유니온·메시의 충돌 판정 정밀도</div></div>
+    <div class="gl-i"><div class="gl-t">SurfaceAppearance</div><div class="gl-d">PBR 텍스처로 사실적 질감을 내는 객체</div></div>
+    <div class="gl-i"><div class="gl-t">BillboardGui</div><div class="gl-d">3D 공간에서 항상 카메라를 향하는 UI</div></div>
+  </div>
+
+  <h3 class="blk gold">운영·수익</h3>
+  <div class="gl">
+    <div class="gl-i"><div class="gl-t">Robux (로벅스)</div><div class="gl-d">로블록스 내 화폐</div></div>
+    <div class="gl-i"><div class="gl-t">Game Pass</div><div class="gl-d">한 번 사면 영구히 유지되는 상품</div></div>
+    <div class="gl-i"><div class="gl-t">Developer Product</div><div class="gl-d">여러 번 구매 가능한 소모성 상품</div></div>
+    <div class="gl-i"><div class="gl-t">DevEx</div><div class="gl-d">로벅스를 현금으로 환전하는 프로그램</div></div>
+    <div class="gl-i"><div class="gl-t">Exploit (익스플로잇)</div><div class="gl-d">클라이언트를 조작하는 치트. 서버 검증으로 막아야 함</div></div>
+    <div class="gl-i"><div class="gl-t">Backdoor (백도어)</div><div class="gl-d">모델에 숨겨진 악성 스크립트. 게임 탈취에 사용됨</div></div>
+    <div class="gl-i"><div class="gl-t">Obby</div><div class="gl-d">장애물 코스 장르. 체크포인트 방식이 기본</div></div>
+    <div class="gl-i"><div class="gl-t">Rojo</div><div class="gl-d">외부 편집기·git 과 Studio 를 연결하는 도구</div></div>
+  </div>
+
+  <div class="callout cyan"><span>📌</span><div class="callout-body">
+    <strong>이 문서 기준일:</strong> 2026년 8월. 로블록스는 API·정책이 자주 바뀝니다.
+    특히 <em>채팅 시스템·수익화 조건·DevEx 비율·지원 기기</em>는 변경이 잦으니,
+    실제로 적용하기 전에 <strong>create.roblox.com/docs</strong> 에서 현재 문서를 한 번 더 확인하세요.
+    공식 문서가 항상 최종 기준입니다.
+  </div></div>
+</div>
+
+<div class="footnote">
+  로블록스 코딩 완전 정리 — Studio 사용법 · 맵 빌딩 · 계층 구조 · 스크립트 3종 · Luau 문법 ·
+  API/자료형 · 서비스 · 서버·클라이언트 통신 · 캐릭터 · UI · 데이터 저장 · 실전 코드 · 디버깅·최적화 · 배포·수익화 · 용어 사전<br>
+  ※ 코드는 전부 예제이며, 실제 프로젝트에 넣을 때는 경로와 이름을 환경에 맞게 바꾸세요.<br>
+  ※ API 세부 사항은 공식 문서(create.roblox.com/docs)를 우선합니다.
+</div>
+
+</div><!-- /main -->
+
+<script src="app.js"></script>
+</body>
+</html>

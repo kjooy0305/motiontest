@@ -108,72 +108,161 @@ function copyText(text) {
 }
 
 /* ═══════════ 만들기 화면 ═══════════ */
+const ML_BASE = 'https://cdn.jsdelivr.net/npm/mathlive@0.110.0';
 const inputEl = $('input');
 const outEl = $('output');
 const prevEl = $('preview');
 
-let easyMode = true;
+let mode = 'draw';        // 'draw'(수식 편집기) | 'easy'(빠른 입력) | 'tex'(코드)
+let mf = null;            // MathLive 편집기
+let mlReady = false;
 let displayMode = true;
+let showCode = false;     // 평소엔 코드를 감춰둔다
 let currentTex = '';
 
-const SAMPLES_EASY = [
-  '(-b +- sqrt(b^2 - 4ac))/(2a)',
-  'sum_(k=1)^n k^2 = (n(n+1)(2n+1))/6',
-  'int_0^1 x^2 dx = 1/3',
-  'lim(x->0) sin(x)/x = 1',
-  'bar(x) = (1/n) sum_(i=1)^n x_i',
-  'mat(1,2;3,4)',
-];
-const SAMPLES_TEX = [
-  'x = \\frac{-b \\pm \\sqrt{b^{2}-4ac}}{2a}',
-  '\\sum_{k=1}^{n} k^{2} = \\frac{n(n+1)(2n+1)}{6}',
-  '\\int_{0}^{1} x^{2}\\,dx = \\frac{1}{3}',
-  '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1',
-  '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}',
-];
-let sampleIdx = 0;
+/* ── MathLive 초기화 ────────────────────── */
+function initMathfield() {
+  if (typeof MathfieldElement === 'undefined') return false;
+  try {
+    MathfieldElement.fontsDirectory = ML_BASE + '/fonts';
+    MathfieldElement.soundsDirectory = null;      // 효과음은 받지 않는다
 
-function setMode(easy) {
-  easyMode = easy;
-  $('mEasy').classList.toggle('on', easy);
-  $('mTex').classList.toggle('on', !easy);
-  $('inLabel').textContent = easy ? '📝 수식을 적어보세요' : '📝 KaTeX 코드를 직접 쓰세요';
-  $('easyHint').style.display = easy ? '' : 'none';
-  inputEl.placeholder = easy
-    ? '예)  (x^2 + 1)/(x - 1) = sqrt(2)/2'
-    : '예)  \\frac{x^{2}+1}{x-1} = \\frac{\\sqrt{2}}{2}';
+    const el = new MathfieldElement();
+    el.smartMode = true;      // 글자를 이어 치면 알아서 텍스트로 전환 (한글·영어)
+    el.smartFence = true;     // 괄호 자동 짝맞춤
+    el.mathVirtualKeyboardPolicy = 'manual';
+    el.setAttribute('aria-label', '수식 입력란');
+    el.addEventListener('input', update);
+
+    const host = $('mfHost');
+    host.innerHTML = '';
+    host.appendChild(el);
+    mf = el;
+    mlReady = true;
+    return true;
+  } catch (e) {
+    console.warn('수식 편집기를 시작하지 못했습니다:', e);
+    return false;
+  }
+}
+
+/* MathLive 가 내놓는 표기 중 KaTeX 가 모르는 것을 바꿔준다 */
+function toKatex(latex) {
+  if (!latex) return '';
+  return latex
+    .replace(/\\placeholder\{([^{}]*)\}/g, '$1')   // 빈 칸은 지운다
+    .replace(/\\placeholder(?![a-zA-Z])/g, '')
+    .replace(/\\mleft(?![a-zA-Z])/g, '\\left')
+    .replace(/\\mright(?![a-zA-Z])/g, '\\right')
+    .replace(/\\differentialD(?![a-zA-Z])/g, 'd')
+    .replace(/\\exponentialE(?![a-zA-Z])/g, 'e')
+    .replace(/\\imaginaryI(?![a-zA-Z])/g, 'i')
+    .replace(/\\left\.\s*\\right\./g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/* ── 현재 수식 가져오기 / 넣기 ──────────── */
+function getLatex() {
+  if (mode === 'draw') return mlReady ? toKatex(mf.value) : '';
+  if (mode === 'easy') {
+    try { return Convert.easyToTex(inputEl.value); } catch (e) { return ''; }
+  }
+  return inputEl.value;
+}
+function setLatex(tex) {
+  if (mode === 'draw' && mlReady) { mf.value = tex; }
+  else if (mode === 'tex') { inputEl.value = tex; }
+  else { inputEl.value = tex; }   // 빠른 입력 모드에도 코드를 그대로 넣으면 통과된다
   update();
 }
 
-function update() {
-  const src = inputEl.value;
-  let tex;
-  if (easyMode) {
-    try { tex = Convert.easyToTex(src); }
-    catch (e) { tex = ''; }
-  } else {
-    tex = src;
+/* ── 모드 전환 ─────────────────────────── */
+const MODE_BTN = {draw: 'mDraw', easy: 'mEasy', tex: 'mTex'};
+
+function setMode(m, keep) {
+  const carried = keep === false ? '' : getLatex();
+  mode = m;
+
+  Object.entries(MODE_BTN).forEach(([k, id]) => {
+    const b = $(id);
+    if (b) b.classList.toggle('on', k === m);
+  });
+
+  const drawing = (m === 'draw');
+  $('mfHost').style.display = drawing ? 'flex' : 'none';
+  inputEl.style.display = drawing ? 'none' : 'block';
+  $('drawHint').style.display = drawing ? 'block' : 'none';
+  $('easyHint').style.display = (m === 'easy') ? 'block' : 'none';
+  $('btnKbd').style.display = drawing ? '' : 'none';
+
+  $('inLabel').textContent =
+    drawing ? '✍️ 여기에 수식을 쓰세요' :
+    m === 'easy' ? '⌨️ 키보드로 빠르게 (a+b)/2' : '</> KaTeX 코드를 직접';
+
+  inputEl.placeholder = m === 'easy'
+    ? '예)  (x^2 + 1)/(x - 1) = sqrt(2)/2'
+    : '예)  \\frac{x^{2}+1}{x-1}';
+
+  if (carried) {
+    if (drawing && mlReady) mf.value = carried;
+    else inputEl.value = carried;
   }
-  currentTex = tex;
+  update();
+}
 
-  outEl.textContent = tex || '';
-  if (!tex.trim()) outEl.innerHTML = '<span style="color:#5c6678">여기에 KaTeX 코드가 나옵니다</span>';
+/* ── 갱신 ──────────────────────────────── */
+function update() {
+  currentTex = getLatex();
 
-  const ok = renderTo(prevEl, tex, displayMode);
+  const ok = renderTo(prevEl, currentTex, displayMode);
+
+  outEl.textContent = currentTex || '(비어 있음)';
   outEl.classList.toggle('err', !ok);
-  buildExplain(tex);
+  outEl.style.display = showCode ? 'block' : 'none';
+
+  buildExplain(currentTex);
 }
 
 inputEl.addEventListener('input', update);
 
-$('mEasy').addEventListener('click', () => setMode(true));
-$('mTex').addEventListener('click', () => setMode(false));
+$('mDraw').addEventListener('click', () => {
+  if (!mlReady) { toast('수식 편집기를 불러오지 못했습니다'); return; }
+  setMode('draw');
+});
+$('mEasy').addEventListener('click', () => setMode('easy'));
+$('mTex').addEventListener('click', () => setMode('tex'));
 
-$('btnClear').addEventListener('click', () => { inputEl.value = ''; inputEl.focus(); update(); });
+/* ── 버튼들 ────────────────────────────── */
+const SAMPLES = {
+  draw: [
+    'x = \\frac{-b \\pm \\sqrt{b^{2}-4ac}}{2a}',
+    '\\sum_{k=1}^{n} k^{2} = \\frac{n(n+1)(2n+1)}{6}',
+    '\\int_{0}^{1} x^{2}\\,dx = \\frac{1}{3}',
+    '\\text{넓이} = \\pi r^{2}',
+    '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}',
+  ],
+  easy: [
+    '(-b +- sqrt(b^2 - 4ac))/(2a)',
+    'sum_(k=1)^n k^2 = (n(n+1)(2n+1))/6',
+    'int_0^1 x^2 dx = 1/3',
+    'lim(x->0) sin(x)/x = 1',
+    '"넓이" = pi r^2',
+  ],
+};
+let sampleIdx = 0;
+
+$('btnClear').addEventListener('click', () => {
+  if (mode === 'draw' && mlReady) { mf.value = ''; mf.focus(); }
+  else { inputEl.value = ''; inputEl.focus(); }
+  update();
+});
 $('btnSample').addEventListener('click', () => {
-  const list = easyMode ? SAMPLES_EASY : SAMPLES_TEX;
-  inputEl.value = list[sampleIdx % list.length];
+  const list = mode === 'easy' ? SAMPLES.easy : SAMPLES.draw;
+  const v = list[sampleIdx % list.length];
   sampleIdx++;
+  if (mode === 'draw' && mlReady) mf.value = v;
+  else inputEl.value = v;
   update();
 });
 $('btnDisp').addEventListener('click', () => {
@@ -181,44 +270,103 @@ $('btnDisp').addEventListener('click', () => {
   $('btnDisp').textContent = '디스플레이 모드: ' + (displayMode ? '켬' : '끔');
   update();
 });
+$('btnKbd').addEventListener('click', () => {
+  const vk = window.mathVirtualKeyboard;
+  if (!vk) { toast('화면 키보드를 쓸 수 없습니다'); return; }
+  if (mf) mf.focus();
+  if (vk.visible) vk.hide(); else vk.show();
+});
 $('goGuide').addEventListener('click', () => goTab('guide'));
 
-$('btnCopy').addEventListener('click', () => copyText(currentTex));
-$('btnCopyInline').addEventListener('click', () => copyText('$' + currentTex + '$'));
-$('btnCopyBlock').addEventListener('click', () => copyText('$$\n' + currentTex + '\n$$'));
-$('btnToTex').addEventListener('click', () => {
-  if (!currentTex) { toast('먼저 수식을 입력하세요'); return; }
-  inputEl.value = currentTex;
-  setMode(false);
-  toast('이제 KaTeX 코드를 직접 고칠 수 있습니다');
-  inputEl.focus();
+$('btnShowCode').addEventListener('click', () => {
+  showCode = !showCode;
+  $('btnShowCode').textContent = showCode ? '코드 숨기기' : '코드 보기';
+  update();
 });
 
-/* ── 커서 위치에 삽입 + ▢ 자리 이동 ── */
-function insertAtCursor(text) {
+function copyAndReveal(text, label) {
+  if (!currentTex) { toast('먼저 수식을 입력하세요'); return; }
+  copyText(text);
+  outEl.textContent = text;
+  outEl.style.display = 'block';
+  outEl.classList.remove('err');
+  $('btnShowCode').textContent = '코드 숨기기';
+  showCode = true;
+  if (label) toast(label + ' 복사했습니다');
+}
+$('btnCopy').addEventListener('click', () => copyAndReveal(currentTex, 'KaTeX 코드를'));
+$('btnCopyInline').addEventListener('click', () => copyAndReveal('$' + currentTex + '$', '$…$ 형태로'));
+$('btnCopyBlock').addEventListener('click', () => copyAndReveal('$$\n' + currentTex + '\n$$', '$$…$$ 형태로'));
+$('btnToTex').addEventListener('click', () => {
+  if (!currentTex) { toast('먼저 수식을 입력하세요'); return; }
+  const t = currentTex;
+  setMode('tex', false);
+  inputEl.value = t;
+  update();
+  inputEl.focus();
+  toast('이제 코드를 직접 고칠 수 있습니다');
+});
+
+/* ── 한글·영어 넣기 ────────────────────── */
+const textBox = $('textBox');
+const textInput = $('textInput');
+
+$('btnText').addEventListener('click', () => {
+  const open = textBox.style.display !== 'none';
+  textBox.style.display = open ? 'none' : 'block';
+  if (!open) { textInput.value = ''; textInput.focus(); }
+});
+$('textCancel').addEventListener('click', () => { textBox.style.display = 'none'; });
+$('textOk').addEventListener('click', insertText);
+textInput.addEventListener('keydown', ev => {
+  if (ev.key === 'Enter') { ev.preventDefault(); insertText(); }
+  if (ev.key === 'Escape') { textBox.style.display = 'none'; }
+});
+
+function insertText() {
+  const raw = textInput.value.trim();
+  if (!raw) { toast('넣을 글자를 적어주세요'); return; }
+  // \text{} 안에서 문제가 되는 글자를 정리
+  const safe = raw.replace(/[\\{}$&#^_~%]/g, m => ({'\\': '', '{': '(', '}': ')'}[m] || ''));
+  insertSymbol('\\text{' + safe + '}');
+  textInput.value = '';
+  textInput.focus();
+}
+
+/* ── 팔레트·사전에서 넣기 ──────────────── */
+function insertSymbol(code, easyForm) {
+  if (mode === 'draw' && mlReady) {
+    const tex = code.replace(/▢/g, '#?');
+    try {
+      if (typeof mf.insert === 'function') mf.insert(tex, {focus: true});
+      else mf.executeCommand(['insert', tex]);
+    } catch (e) {
+      mf.value = mf.value + tex.replace(/#\?/g, '');
+    }
+    mf.focus();
+    update();
+    return;
+  }
+
+  const text = (mode === 'easy' && easyForm) ? easyForm : code;
   const el = inputEl;
   const s = el.selectionStart, e = el.selectionEnd;
   el.value = el.value.slice(0, s) + text + el.value.slice(e);
 
   const holder = el.value.indexOf('▢', s);
-  if (holder !== -1 && holder < s + text.length) {
-    el.setSelectionRange(holder, holder + 1);
-  } else {
-    const pos = s + text.length;
-    el.setSelectionRange(pos, pos);
-  }
+  if (holder !== -1 && holder < s + text.length) el.setSelectionRange(holder, holder + 1);
+  else { const pos = s + text.length; el.setSelectionRange(pos, pos); }
   el.focus();
   update();
 }
 
-// Tab 으로 다음 ▢ 로 이동
+// 코드 모드에서 Tab 으로 다음 ▢ 자리로 이동
 inputEl.addEventListener('keydown', ev => {
   if (ev.key !== 'Tab') return;
   const el = inputEl;
-  const from = el.selectionEnd;
-  let idx = el.value.indexOf('▢', from);
+  let idx = el.value.indexOf('▢', el.selectionEnd);
   if (idx === -1) idx = el.value.indexOf('▢');
-  if (idx === -1) return;          // 자리표시가 없으면 기본 동작
+  if (idx === -1) return;
   ev.preventDefault();
   el.setSelectionRange(idx, idx + 1);
 });
@@ -244,7 +392,7 @@ function buildPalette() {
   REF.filter(r => r.cat === curCat).forEach(r => {
     const b = document.createElement('button');
     b.className = 'pal-btn';
-    b.title = r.desc + '\n' + r.code + (r.easy ? '\n쉬운 입력: ' + r.easy : '');
+    b.title = r.desc + '\n' + r.code + (r.easy ? '\n빠른 입력: ' + r.easy : '');
 
     const sym = document.createElement('span');
     sym.className = 'sym';
@@ -256,10 +404,7 @@ function buildPalette() {
     nm.textContent = r.desc.replace(/\s*\(.*\)$/, '');
     b.appendChild(nm);
 
-    b.onclick = () => {
-      // 쉬운 입력 모드에서는 짧은 표기를 넣어준다
-      insertAtCursor(easyMode && r.easy ? r.easy : r.code);
-    };
+    b.onclick = () => insertSymbol(r.code, r.easy);
     grid.appendChild(b);
   });
 }
@@ -372,7 +517,7 @@ function buildDict() {
       if (r.easy) {
         const e = document.createElement('div');
         e.className = 'dict-easy';
-        e.textContent = '쉬운 입력: ' + r.easy;
+        e.textContent = '빠른 입력: ' + r.easy;
         info.appendChild(e);
       }
 
@@ -434,8 +579,8 @@ function buildExamples() {
       useBtn.className = 'btn sm pri';
       useBtn.textContent = '가져오기';
       useBtn.onclick = () => {
-        inputEl.value = e.tex;
-        setMode(false);
+        setMode(mlReady ? 'draw' : 'tex', false);
+        setLatex(e.tex);
         goTab('make');
         toast('편집기로 가져왔습니다');
       };
@@ -574,7 +719,7 @@ function buildGuide() {
   const rows = REF.filter(r => r.easy);
   const wrap = document.createElement('div');
   wrap.className = 'tbl-wrap';
-  let html = '<div class="tbl-cap">쉬운 입력 → KaTeX 대응표 (' + rows.length + '개)</div>' +
+  let html = '<div class="tbl-cap">빠른 입력 → KaTeX 대응표 (' + rows.length + '개)</div>' +
     '<table><tr><th>이렇게 적으면</th><th>이 코드가 됩니다</th><th>결과</th><th>뜻</th></tr>';
   rows.forEach(r => {
     html += '<tr><td><code>' + escapeHtml(r.easy) + '</code></td>' +
@@ -600,6 +745,20 @@ buildGuide();
 qOrder = QUIZ.map((_, i) => i);
 loadQuestion();
 
-inputEl.value = SAMPLES_EASY[0];
-sampleIdx = 1;
-setMode(true);
+// 수식 편집기를 먼저 띄우고, 못 쓰면 코드 모드로 물러난다
+if (initMathfield()) {
+  setMode('draw', false);
+  mf.value = SAMPLES.draw[0];
+  sampleIdx = 1;
+  update();
+} else {
+  $('mDraw').style.opacity = '.45';
+  $('mDraw').title = '수식 편집기를 불러오지 못했습니다 (인터넷 연결 확인)';
+  $('mfHost').innerHTML =
+    '<div id="mfLoading">수식 편집기를 불러오지 못했습니다. ' +
+    '아래 <b>빠른 입력</b>이나 <b>코드</b> 모드를 쓰세요.</div>';
+  setMode('easy', false);
+  inputEl.value = SAMPLES.easy[0];
+  sampleIdx = 1;
+  update();
+}

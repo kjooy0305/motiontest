@@ -100,6 +100,16 @@ textarea.ed::placeholder{color:var(--txt3);}
 .btn.ok{background:var(--grnB);border-color:rgba(63,178,122,.5);color:var(--grn2);}
 .btn.sm{padding:3px 8px;font-size:10.5px;}
 
+/* ── 수식 편집기 (MathLive) ── */
+#mfHost{min-height:76px;display:flex;align-items:center;}
+#mfLoading{color:var(--txt3);font-size:12px;padding:26px 4px;}
+math-field{width:100%;background:#fdfdfb;color:#111;border:1px solid #d8d8d0;border-radius:6px;
+  padding:14px 12px;font-size:22px;min-height:76px;--caret-color:#0b5;--selection-background-color:#cfe3ff;
+  --placeholder-color:#b0b0a8;--smart-fence-color:#888;}
+math-field:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(91,141,239,.25);}
+math-field::part(virtual-keyboard-toggle){display:none;}
+math-field::part(menu-toggle){display:none;}
+
 /* ── 팔레트 ── */
 .pal-cats{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;}
 .pal-cat{padding:4px 9px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);
@@ -220,9 +230,9 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
 <div id="hdr">
   <span id="hdr-logo">∑</span>
   <h1>KaTeX 수식 변환기</h1>
-  <span class="badge">MATH → LaTeX</span>
+  <span class="badge">보이는 대로 쓰기</span>
   <span class="spacer"></span>
-  <span id="katexWarn">⚠ KaTeX 로드 실패 — 인터넷 연결을 확인하세요 (코드 변환은 계속 됩니다)</span>
+  <span id="katexWarn">⚠ 수식 라이브러리를 불러오지 못했습니다 — 인터넷 연결을 확인하세요</span>
 </div>
 
 <div id="tabs">
@@ -240,8 +250,9 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
   <div class="sec-hd">
     <div class="sec-title">✏️ 수식 만들기</div>
     <div class="sec-sub">
-      왼쪽에 수식을 적으면 오른쪽에 <strong>KaTeX 코드</strong>와 <strong>실제 모양</strong>이 바로 나옵니다.
-      KaTeX를 몰라도 <em>쉬운 입력</em> 모드로 쓸 수 있고, 익숙해지면 <em>직접 입력</em> 모드로 넘어가세요.
+      <strong>지오지브라처럼 보이는 대로 씁니다.</strong> <code>/</code> 를 누르면 분수 칸이 생기고,
+      <code>sqrt</code> 를 치면 루트가 그려집니다. 코드는 평소엔 감춰두었다가
+      <strong>복사할 때만</strong> 보여드립니다. 한글·영어는 <em>[가 한글·영어]</em> 버튼으로 넣으세요.
     </div>
   </div>
 
@@ -249,25 +260,52 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
     <!-- 왼쪽: 입력 -->
     <div>
       <div class="modeSw">
-        <button id="mEasy" class="on">쉬운 입력<span class="sub">평소 쓰던 대로 (a+b)/2</span></button>
-        <button id="mTex">KaTeX 직접 입력<span class="sub">\frac{a+b}{2}</span></button>
+        <button id="mDraw" class="on">✍️ 수식 쓰기<span class="sub">보이는 대로 편집</span></button>
+        <button id="mEasy">⌨️ 빠른 입력<span class="sub">(a+b)/2 처럼</span></button>
+        <button id="mTex">&lt;/&gt; 코드<span class="sub">\frac{a+b}{2}</span></button>
       </div>
 
       <div class="panel">
         <div class="panel-hd">
-          <span id="inLabel">📝 수식을 적어보세요</span>
+          <span id="inLabel">✍️ 여기에 수식을 쓰세요</span>
           <span class="right">
+            <button class="btn sm ok" id="btnText">가 한글·영어</button>
+            <button class="btn sm" id="btnKbd">⌨ 화면 키보드</button>
             <button class="btn sm" id="btnClear">지우기</button>
-            <button class="btn sm" id="btnSample">예시 넣기</button>
+            <button class="btn sm" id="btnSample">예시</button>
           </span>
         </div>
         <div class="panel-bd">
-          <textarea class="ed" id="input" spellcheck="false" placeholder="예)  (x^2 + 1)/(x - 1) = sqrt(2)/2"></textarea>
-          <div id="easyHint" style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.6;">
+          <div id="mfHost"><div id="mfLoading">수식 편집기를 불러오는 중…</div></div>
+          <textarea class="ed" id="input" spellcheck="false" style="display:none"></textarea>
+
+          <div id="drawHint" style="font-size:11px;color:var(--txt3);margin-top:8px;line-height:1.7;">
+            <b style="color:var(--txt2)">GeoGebra처럼 쓰면 됩니다.</b>
+            <code>/</code> 누르면 분수 · <code>^</code> 위첨자 · <code>_</code> 아래첨자 ·
+            <code>sqrt</code> 루트 · <code>sum</code> 시그마 · <code>int</code> 적분 ·
+            <code>alpha</code> α · <code>&lt;=</code> ≤ · <code>oo</code> ∞<br>
+            칸을 빠져나올 땐 <b>→</b> 또는 <b>Tab</b>, 되돌리려면 <b>Ctrl+Z</b> 입니다.
+            아래 팔레트를 눌러 넣어도 됩니다.
+          </div>
+
+          <div id="easyHint" style="display:none;font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.6;">
             <code>/</code> 분수 · <code>^</code> 위첨자 · <code>_</code> 아래첨자 · <code>sqrt(x)</code> 루트 ·
             <code>sum_(k=1)^n</code> 시그마 · <code>int_0^1</code> 적분 · <code>alpha</code> α ·
             <code>&lt;=</code> ≤ · <code>-&gt;</code> → · <code>oo</code> ∞
             <span style="color:var(--acc2);cursor:pointer;text-decoration:underline;" id="goGuide">전체 문법 보기</span>
+          </div>
+
+          <!-- 한글·영어 넣기 -->
+          <div id="textBox" style="display:none;margin-top:9px;padding:9px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;">
+            <div style="font-size:11px;color:var(--txt2);margin-bottom:5px;">
+              넣을 글자를 적고 <b>Enter</b> — 수식 안에 <code>\text{…}</code> 로 들어갑니다
+            </div>
+            <div style="display:flex;gap:6px;">
+              <input id="textInput" type="text" placeholder="예) 넓이,  when,  단위: m/s"
+                style="flex:1;min-width:0;padding:6px 9px;border-radius:5px;background:#05070c;border:1px solid var(--border2);color:var(--txt);font-size:13px;outline:none;font-family:inherit;">
+              <button class="btn pri" id="textOk">넣기</button>
+              <button class="btn" id="textCancel">닫기</button>
+            </div>
           </div>
         </div>
       </div>
@@ -276,7 +314,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
         <div class="panel-hd">
           <span>🎛 기호 팔레트</span>
           <span class="right" style="font-size:10px;color:var(--txt3);font-weight:400;">
-            누르면 커서 위치에 삽입됩니다
+            누르면 커서 위치에 들어갑니다
           </span>
         </div>
         <div class="panel-bd">
@@ -290,7 +328,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
     <div>
       <div class="panel">
         <div class="panel-hd">
-          <span>👁 미리보기</span>
+          <span>👁 완성된 모양</span>
           <span class="right">
             <button class="btn sm" id="btnDisp">디스플레이 모드: 켬</button>
           </span>
@@ -302,16 +340,22 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
 
       <div class="panel" style="margin-top:10px;">
         <div class="panel-hd">
-          <span>📋 KaTeX 코드</span>
+          <span>📋 복사하기</span>
           <span class="right">
-            <button class="btn sm pri" id="btnCopy">복사</button>
-            <button class="btn sm" id="btnCopyInline">$…$ 복사</button>
-            <button class="btn sm" id="btnCopyBlock">$$…$$ 복사</button>
-            <button class="btn sm ok" id="btnToTex">이 코드 직접 편집</button>
+            <button class="btn sm" id="btnShowCode">코드 보기</button>
           </span>
         </div>
         <div class="panel-bd">
-          <div class="out-code" id="output"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn pri" id="btnCopy">KaTeX 코드 복사</button>
+            <button class="btn" id="btnCopyInline">$…$ 복사</button>
+            <button class="btn" id="btnCopyBlock">$$…$$ 복사</button>
+            <button class="btn ok" id="btnToTex">코드 직접 고치기</button>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt3);margin-top:7px;line-height:1.6;">
+            평소엔 코드를 감춰둡니다. <b>복사를 누르면 무엇이 복사됐는지</b> 아래에 보여드립니다.
+          </div>
+          <div class="out-code" id="output" style="display:none;margin-top:9px;"></div>
         </div>
       </div>
 
@@ -331,7 +375,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
     <div class="sec-title">📖 기호 사전</div>
     <div class="sec-sub">
       찾는 기호를 검색하세요. <strong>항목을 클릭하면 코드가 복사</strong>됩니다.
-      초록색은 <em>쉬운 입력</em> 모드에서 쓸 수 있는 짧은 표기입니다.
+      초록색은 <em>빠른 입력</em> 모드에서 쓸 수 있는 짧은 표기입니다.
     </div>
   </div>
   <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -473,7 +517,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
     </ul>
   </div>
 
-  <h3 class="blk g">7. 이 페이지의 "쉬운 입력" 문법</h3>
+  <h3 class="blk g">7. 이 페이지의 "빠른 입력" 문법</h3>
   <div class="sec-sub" style="margin-bottom:9px;">
     KaTeX를 모를 때 쓰는 임시 표기법입니다. 왼쪽처럼 적으면 오른쪽 KaTeX 코드로 바꿔줍니다.
   </div>
@@ -490,7 +534,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
   </div></div>
 
   <div class="callout grn"><span>✅</span><div class="callout-body">
-    <strong>섞어 써도 됩니다.</strong> 쉬운 입력 모드에서 <code>\frac{a}{b}</code> 같은 진짜 KaTeX 코드를 그대로 적어도
+    <strong>섞어 써도 됩니다.</strong> 빠른 입력 모드에서 <code>\frac{a}{b}</code> 같은 진짜 KaTeX 코드를 그대로 적어도
     그대로 통과시킵니다. 아는 것부터 조금씩 KaTeX로 바꿔 쓰다 보면 어느새 다 쓰게 됩니다.
   </div></div>
 
@@ -517,7 +561,7 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
 </div>
 
 <div class="footnote">
-  KaTeX 수식 변환기 — 쉬운 입력 → KaTeX 자동 변환 · 기호 팔레트 · 기호 사전 · 예제 · 연습 문제 · 문법 가이드<br>
+  KaTeX 수식 변환기 — 빠른 입력 → KaTeX 자동 변환 · 기호 팔레트 · 기호 사전 · 예제 · 연습 문제 · 문법 가이드<br>
   수식 렌더링: KaTeX (CDN) · 참고한 도구: CodeCogs Equation Editor
 </div>
 
@@ -525,9 +569,11 @@ td code,code{font-family:'Consolas','Courier New',monospace;background:var(--bg4
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-<script src="data.js"></script>
-<script src="convert.js"></script>
-<script src="app.js"></script>
+<!-- defer 는 문서 순서대로 실행되므로 katex → mathlive → app 순서가 보장된다 -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathlive@0.110.0/mathlive.min.js"></script>
+<script defer src="data.js"></script>
+<script defer src="convert.js"></script>
+<script defer src="app.js"></script>
 </body>
 </html>

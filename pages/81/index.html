@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수원대 AI 데이터과학부 완전 정리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090b14;--bg2:#0f1220;--bg3:#14192c;--bg4:#1b2238;
+  --border:#1f2a45;--border2:#2c3d62;
+  --txt:#dde5f5;--txt2:#8b9ec4;--txt3:#4d6090;
+  --acc:#5b8dee;--acc2:#88aaff;--acc3:rgba(91,141,238,.13);--acc4:rgba(91,141,238,.06);
+  --grn:#4ade80;--grn2:#7ef5a6;--grnB:rgba(74,222,128,.12);
+  --yel:#fbbf24;--yel2:#fde68a;--yelB:rgba(251,191,36,.12);
+  --red:#f87171;--red2:#fca5a5;--redB:rgba(248,113,113,.12);
+  --pur:#c084fc;--pur2:#d8b4fe;--purB:rgba(192,132,252,.12);
+  --cyn:#22d3ee;--cyn2:#67e8f9;--cynB:rgba(34,211,238,.12);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;
+  font-size:14px;line-height:1.7;min-height:100vh;}
+
+/* ── HEADER ── */
+#hdr{background:linear-gradient(135deg,#060810,#0e1628,#060810);
+  border-bottom:2px solid var(--acc);padding:11px 18px;position:sticky;top:0;z-index:300;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#hdr-icon{font-size:20px;filter:drop-shadow(0 0 10px var(--acc));}
+#hdr h1{font-size:16px;font-weight:700;color:var(--acc2);
+  text-shadow:0 0 20px rgba(91,141,238,.4);white-space:nowrap;}
+.badge{font-size:9px;padding:2px 7px;border-radius:3px;background:var(--acc3);
+  border:1px solid rgba(91,141,238,.35);color:var(--acc);font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+
+/* ── TABS ── */
+#tabs{display:flex;gap:2px;padding:7px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:48px;z-index:200;}
+#tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 13px;border-radius:4px;border:1px solid transparent;font-size:12px;
+  font-weight:600;cursor:pointer;color:var(--txt2);white-space:nowrap;background:none;
+  transition:.12s;font-family:inherit;}
+.tab:hover{color:var(--txt);background:var(--bg3);}
+.tab.on{background:var(--acc3);border-color:rgba(91,141,238,.4);color:var(--acc2);}
+
+/* ── LAYOUT ── */
+#main{padding:18px;max-width:1200px;margin:0 auto;}
+.sec{display:none;}.sec.on{display:block;}
+.sec-hd{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.sec-title{font-size:19px;font-weight:700;color:var(--acc2);margin-bottom:4px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.sec-sub{font-size:12.5px;color:var(--txt2);line-height:1.7;}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin-bottom:12px;}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.card-icon{font-size:16px;}
+.card-title{font-size:13.5px;font-weight:700;}
+.card-body{font-size:13px;color:var(--txt2);line-height:1.72;}
+.card-body strong{color:var(--txt);}
+.card-body em{color:var(--acc2);font-style:normal;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:14px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px;}
+
+/* ── TABLES ── */
+.tw{overflow-x:auto;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);}
+.tw-cap{font-size:11.5px;color:var(--acc2);padding:7px 12px;background:var(--bg3);
+  border-bottom:1px solid var(--border);font-weight:700;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:360px;}
+th{background:var(--bg4);color:var(--acc2);font-weight:700;text-align:left;
+  padding:7px 11px;border-bottom:1px solid var(--border2);font-size:11.5px;white-space:nowrap;}
+td{padding:6px 11px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.6;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(91,141,238,.05);}
+td strong{color:var(--txt);}
+td.cr{text-align:center;font-weight:600;color:var(--acc2);}
+td.cat{color:var(--yel2);font-weight:600;font-size:11px;}
+td.must{color:var(--red2);font-weight:700;}
+td.core{color:var(--grn2);font-weight:600;}
+td.elec{color:var(--txt2);}
+td.jump{color:var(--pur2);font-weight:600;}
+
+/* ── CALLOUTS ── */
+.callout{border-radius:6px;padding:10px 13px;margin-bottom:10px;font-size:12.5px;
+  border-left:3px solid;display:flex;gap:8px;align-items:flex-start;line-height:1.68;}
+.callout-body{color:var(--txt2);}
+.callout-body strong{color:var(--txt);}
+.callout.acc{background:var(--acc4);border-color:var(--acc);}
+.callout.grn{background:var(--grnB);border-color:var(--grn);}
+.callout.yel{background:var(--yelB);border-color:var(--yel);}
+.callout.red{background:var(--redB);border-color:var(--red);}
+.callout.pur{background:var(--purB);border-color:var(--pur);}
+.callout.cyn{background:var(--cynB);border-color:var(--cyn);}
+
+/* ── SECTION HEADING ── */
+h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:22px 0 10px;
+  padding-left:10px;border-left:3px solid var(--acc);display:flex;align-items:center;gap:7px;}
+
+/* ── INFO ROWS ── */
+.info-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.info-chip{display:flex;gap:4px;align-items:center;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:6px;padding:7px 12px;flex:1;min-width:200px;}
+.info-chip .lbl{font-size:11px;color:var(--txt3);font-weight:700;min-width:68px;flex-shrink:0;}
+.info-chip .val{font-size:12.5px;color:var(--txt);font-weight:600;}
+
+/* ── GPA CALC ── */
+.gpa-box{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:12px;}
+.gpa-box h4{font-size:12.5px;font-weight:700;color:var(--acc2);margin-bottom:9px;}
+.gpa-formula{font-size:13px;color:var(--txt);text-align:center;padding:9px;background:var(--bg4);border-radius:6px;margin-bottom:10px;line-height:1.8;}
+
+/* ── TAG ── */
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--txt2);white-space:nowrap;}
+.tag.a{color:var(--acc2);border-color:rgba(91,141,238,.4);background:var(--acc3);}
+.tag.g{color:var(--grn2);border-color:rgba(74,222,128,.4);background:var(--grnB);}
+.tag.y{color:var(--yel2);border-color:rgba(251,191,36,.4);background:var(--yelB);}
+.tag.r{color:var(--red2);border-color:rgba(248,113,113,.4);background:var(--redB);}
+.tag.p{color:var(--pur2);border-color:rgba(192,132,252,.4);background:var(--purB);}
+
+/* ── CERT GRID ── */
+.cert-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.cert-item .c-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.cert-item .c-abbr{font-size:11px;font-weight:700;color:var(--acc2);margin-bottom:4px;}
+.cert-item .c-body{font-size:11.5px;color:var(--txt2);line-height:1.6;}
+
+/* ── SEMESTER SEMESTER NAV ── */
+.sem-nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.sem-btn{padding:5px 11px;border-radius:5px;border:1px solid var(--border2);font-size:11.5px;
+  font-weight:600;cursor:pointer;color:var(--txt2);background:var(--bg3);font-family:inherit;transition:.12s;}
+.sem-btn:hover{border-color:var(--acc);color:var(--acc2);}
+.sem-btn.on{background:var(--acc3);border-color:var(--acc);color:var(--acc2);}
+
+.sem-sec{display:none;}.sem-sec.on{display:block;}
+.sem-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.sem-title{font-size:15px;font-weight:700;color:var(--acc2);}
+.sem-credits{font-size:12px;color:var(--txt2);background:var(--bg3);border:1px solid var(--border2);
+  border-radius:5px;padding:3px 10px;}
+
+.footnote{font-size:11px;color:var(--txt3);text-align:center;padding:28px 10px 44px;line-height:1.9;}
+
+@media(max-width:640px){
+  #main{padding:12px 10px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  #hdr h1{font-size:14px;}
+  .info-chip{min-width:160px;}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <span id="hdr-icon">🎓</span>
+  <h1>수원대 AI 데이터과학부 완전 정리</h1>
+  <span class="badge">26학번 기준</span>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="intro">🏫 학과 소개</button>
+  <button class="tab" data-tab="curriculum">📚 학기별 커리큘럼</button>
+  <button class="tab" data-tab="grad">🎯 졸업 요건</button>
+  <button class="tab" data-tab="gpa">📊 학점 제도</button>
+  <button class="tab" data-tab="skills">🏆 취득 역량</button>
+</div>
+
+<div id="main">
+
+<!-- ══════════════════ 학과 소개 ══════════════════ -->
+<div class="sec on" id="sec-intro">
+  <div class="sec-hd">
+    <div class="sec-title">🏫 학과 소개</div>
+    <div class="sec-sub">수원대학교 지능형SW융합대학 · 데이터과학부 기본 정보입니다.</div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-chip"><span class="lbl">정식 명칭</span><span class="val">데이터과학부 (데이터과학 전공)</span></div>
+    <div class="info-chip"><span class="lbl">소속 대학</span><span class="val">지능형SW융합대학</span></div>
+    <div class="info-chip"><span class="lbl">행정실</span><span class="val">경상대학 306호 · 031-220-2515/2521</span></div>
+    <div class="info-chip"><span class="lbl">교수진</span><span class="val">16명 (수학·통계·생물정보·의료AI·클라우드 등)</span></div>
+    <div class="info-chip"><span class="lbl">대학원</span><span class="val">일반대학원 데이터과학과 (석·박사)</span></div>
+    <div class="info-chip"><span class="lbl">부설 기관</span><span class="val">통계조사연구소 · DS&amp;ML 센터</span></div>
+  </div>
+
+  <h3 class="blk">💡 학부의 강점</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🤖</span><span class="card-title" style="color:var(--acc2)">AI · 머신러닝 중심</span></div>
+      <div class="card-body">딥러닝1·2, 머신러닝1·2, 딥러닝응용1·2까지 <strong>6개 AI 전공과목</strong>을 2~3학년에 집중 편성. 이론과 실습을 동시에 익힙니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📊</span><span class="card-title" style="color:var(--grn2)">통계 기반 데이터 분석</span></div>
+      <div class="card-body">통계학1·2, 확률론, 회귀분석, 베이지안분석, 시계열분석까지 <strong>탄탄한 수리통계 커리큘럼</strong>. 현업 데이터 분석에 바로 적용 가능.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🛠️</span><span class="card-title" style="color:var(--yel2)">다양한 실무 도구</span></div>
+      <div class="card-body">Python, R, SQL, 웹 크롤링까지 <strong>현업에서 쓰는 스택</strong>을 1·2학년부터 체계적으로. SAS·MS Azure 공인자격증 연계 프로그램도 운영.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏭</span><span class="card-title" style="color:var(--pur2)">산학 연계 졸업 프로젝트</span></div>
+      <div class="card-body">4학년 캡스톤디자인1·2(각 3학점)로 실제 기업 문제를 해결. <strong>기업 연계 과제</strong>를 통해 포트폴리오와 취업 연계까지.</div>
+    </div>
+  </div>
+
+  <h3 class="blk">🗺️ 4년 흐름 한눈에</h3>
+  <div class="tw">
+    <table>
+      <tr><th>학년</th><th>핵심 키워드</th><th>주요 과목</th></tr>
+      <tr><td><strong>1학년</strong></td><td><span class="tag a">기초 수립</span></td><td style="color:var(--txt2)">데이터사이언스입문, 수학1·2, 통계학1·2, 소프트웨어적사고</td></tr>
+      <tr><td><strong>2학년</strong></td><td><span class="tag g">도구·모델 입문</span></td><td style="color:var(--txt2)">R언어, 파이썬데이터분석, 선형대수학, 딥러닝1·2, 데이터구조, 데이터시각화</td></tr>
+      <tr><td><strong>3학년</strong></td><td><span class="tag y">심화 분석</span></td><td style="color:var(--txt2)">머신러닝1·2, 딥러닝응용1·2, 회귀분석, 빅데이터분석, 빅데이터플랫폼, DB</td></tr>
+      <tr><td><strong>4학년</strong></td><td><span class="tag p">실전·졸업</span></td><td style="color:var(--txt2)">데이터마이닝, 알고리즘, 캡스톤디자인1·2, 시계열분석, 금융데이터분석</td></tr>
+    </table>
+  </div>
+
+  <h3 class="blk">🏢 취업 분야</h3>
+  <div class="grid3">
+    <div class="card"><div class="card-head"><span class="card-icon">🏦</span><span class="card-title" style="color:var(--acc2)">금융 · 핀테크</span></div>
+      <div class="card-body">신용 평가, 이상 거래 탐지, 자산 운용 AI, 리스크 분석</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🏥</span><span class="card-title" style="color:var(--grn2)">의료 · 바이오</span></div>
+      <div class="card-body">의료 영상 분석, 신약 개발 데이터, 임상 통계, 의료AI</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🏭</span><span class="card-title" style="color:var(--yel2)">제조 · 공공</span></div>
+      <div class="card-body">예측 정비, 공정 최적화, 공공데이터 분석, 정책 수립</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🛒</span><span class="card-title" style="color:var(--pur2)">커머스 · 마케팅</span></div>
+      <div class="card-body">추천 시스템, 고객 분석, A/B 테스트, 마케팅 데이터</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">🔬</span><span class="card-title" style="color:var(--cyn2)">연구 · 대학원</span></div>
+      <div class="card-body">석·박사 진학, 국책 연구소, AI 스타트업 연구직</div></div>
+    <div class="card"><div class="card-head"><span class="card-icon">☁️</span><span class="card-title" style="color:var(--red2)">클라우드 · IT</span></div>
+      <div class="card-body">빅데이터 엔지니어, MLOps, 클라우드 데이터 플랫폼</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 학기별 커리큘럼 ══════════════════ -->
+<div class="sec" id="sec-curriculum">
+  <div class="sec-hd">
+    <div class="sec-title">📚 학기별 커리큘럼</div>
+    <div class="sec-sub">26학번 기준 1학년 1학기 ~ 4학년 2학기 전공 교과과정입니다. <span class="tag r">전공필수</span> <span class="tag g">전공핵심</span> <span class="tag">전공선택</span> <span class="tag p">진로취업</span></div>
+  </div>
+
+  <div class="sem-nav" id="sem-nav"></div>
+
+  <!-- 1-1 -->
+  <div class="sem-sec on" id="sem-1-1">
+    <div class="sem-header">
+      <span class="sem-title">1학년 1학기</span>
+      <span class="sem-credits">전공 9학점</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>데이터사이언스입문</strong></td><td class="cr">3</td><td class="cat">전공기초교양</td><td style="color:var(--txt2)">데이터 분석 흐름·도구 전반 오리엔테이션</td></tr>
+      <tr><td><strong>수학 1</strong></td><td class="cr">3</td><td class="cat">전공기초교양</td><td style="color:var(--txt2)">미적분·극한·함수 — 통계·머신러닝 기반</td></tr>
+      <tr><td><strong>통계학 1</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">기술통계, 확률 기초, 분포 — 이후 모든 분석의 뿌리</td></tr>
+    </table></div>
+    <div class="callout acc"><span>💡</span><div class="callout-body"><strong>1학기 포인트:</strong> 수학·통계 기초를 놓치면 2학년 이후 흔들립니다. 통계학1 특히 집중하세요. 데이터사이언스입문은 전체 로드맵을 보여주는 나침반 역할.</div></div>
+  </div>
+
+  <!-- 1-2 -->
+  <div class="sem-sec" id="sem-1-2">
+    <div class="sem-header">
+      <span class="sem-title">1학년 2학기</span>
+      <span class="sem-credits">전공 10학점</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>수학 2</strong></td><td class="cr">3</td><td class="cat">전공기초교양</td><td style="color:var(--txt2)">선형대수·벡터·행렬 기초 (2학년 선형대수학 선행)</td></tr>
+      <tr><td><strong>통계학 2</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">추론통계, 가설검정, 신뢰구간, 회귀 기초</td></tr>
+      <tr><td><strong>소프트웨어적사고</strong></td><td class="cr">3</td><td class="cat">전공기초교양</td><td style="color:var(--txt2)">알고리즘적 사고, 기초 코딩 마인드셋</td></tr>
+      <tr><td><strong>전공진로세미나 1 (JUMP UP 1)</strong></td><td class="cr">1</td><td class="jump">전공진로취업</td><td style="color:var(--txt2)">진로 탐색, 선배 멘토링, 직무 소개</td></tr>
+    </table></div>
+    <div class="callout grn"><span>✅</span><div class="callout-body"><strong>JUMP UP 1:</strong> 1학점짜리지만 학과의 진로·취업 프로그램 첫 단계입니다. 출석·과제 성실히 하면 이후 JUMP UP 2·3에서도 이점이 생깁니다.</div></div>
+  </div>
+
+  <!-- 2-1 -->
+  <div class="sem-sec" id="sem-2-1">
+    <div class="sem-header">
+      <span class="sem-title">2학년 1학기</span>
+      <span class="sem-credits">전공 18학점 (최대)</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>선형대수학</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">벡터·행렬·고유값 — 머신러닝·딥러닝의 수학 엔진</td></tr>
+      <tr><td><strong>딥러닝 1</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">신경망 구조, 역전파, 활성화 함수, CNN 입문</td></tr>
+      <tr><td><strong>R 언어</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">R 기초 문법, 데이터 조작(dplyr), 시각화(ggplot2)</td></tr>
+      <tr><td><strong>이산구조론</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">그래프·집합·논리 — 알고리즘·데이터베이스 기반</td></tr>
+      <tr><td><strong>조사방법론</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">설문설계, 표본 추출, 실증 연구 방법</td></tr>
+      <tr><td><strong>웹크롤 자료분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">BeautifulSoup·Selenium으로 실제 데이터 수집·분석</td></tr>
+    </table></div>
+    <div class="callout yel"><span>⚡</span><div class="callout-body"><strong>2-1 난이도 주의:</strong> 선형대수학 + 딥러닝1이 동시에 오는 학기입니다. 선형대수를 이해해야 딥러닝의 역전파를 이해할 수 있습니다. 우선순위 1순위로 관리하세요.</div></div>
+  </div>
+
+  <!-- 2-2 -->
+  <div class="sem-sec" id="sem-2-2">
+    <div class="sem-header">
+      <span class="sem-title">2학년 2학기</span>
+      <span class="sem-credits">전공 22학점 (최대)</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>선형대수학과응용</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">PCA·SVD·선형회귀 등 머신러닝 직접 응용</td></tr>
+      <tr><td><strong>파이썬 데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">Pandas·NumPy·Matplotlib — 데이터 분석 핵심 스택</td></tr>
+      <tr><td><strong>데이터구조</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">리스트·트리·그래프·해시 — 알고리즘 기반</td></tr>
+      <tr><td><strong>확률론</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">조건부 확률, 베이즈 정리, 랜덤변수, 분포</td></tr>
+      <tr><td><strong>딥러닝 2</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">RNN·LSTM·Transformer 입문, 시계열·NLP 기초</td></tr>
+      <tr><td><strong>R 데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">R로 실제 데이터 분석 프로젝트 수행</td></tr>
+      <tr><td><strong>데이터 시각화</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">Tableau·ggplot2·Plotly로 데이터 스토리텔링</td></tr>
+      <tr><td><strong>전공진로세미나 2 (JUMP UP 2)</strong></td><td class="cr">1</td><td class="jump">전공진로취업</td><td style="color:var(--txt2)">직무·산업 탐색, 자격증·인턴십 계획 수립</td></tr>
+    </table></div>
+    <div class="callout acc"><span>📌</span><div class="callout-body"><strong>파이썬 데이터분석</strong>은 이 학기 가장 실용적인 과목입니다. Pandas를 완전히 익혀두면 3학년 모든 과목에서 속도가 붙습니다. 확률론도 베이지안분석(3-2) 선행 개념이라 중요합니다.</div></div>
+  </div>
+
+  <!-- 3-1 -->
+  <div class="sem-sec" id="sem-3-1">
+    <div class="sem-header">
+      <span class="sem-title">3학년 1학기</span>
+      <span class="sem-credits">전공 15학점</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>머신러닝 1</strong></td><td class="cr">3</td><td class="core">전공핵심</td><td style="color:var(--txt2)">지도학습 전반 (선형·로지스틱·SVM·트리·앙상블)</td></tr>
+      <tr><td><strong>데이터베이스</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">SQL, ERD, 정규화, 트랜잭션 — 실무 필수</td></tr>
+      <tr><td><strong>공공데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">공공API·행정 데이터 수집·분석 실습</td></tr>
+      <tr><td><strong>회귀분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">단순·다중·다항·로지스틱 회귀 심화</td></tr>
+      <tr><td><strong>딥러닝응용 1</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">CV(이미지 분류·객체탐지), Transfer Learning</td></tr>
+    </table></div>
+    <div class="callout grn"><span>🎯</span><div class="callout-body"><strong>머신러닝1</strong>은 학부 커리큘럼의 정점 중 하나입니다. 알고리즘 원리를 코드로 직접 구현하면서 익혀야 진짜 실력이 됩니다. SQLD 자격증은 데이터베이스 수강과 동시에 준비하기 딱 좋은 타이밍입니다.</div></div>
+  </div>
+
+  <!-- 3-2 -->
+  <div class="sem-sec" id="sem-3-2">
+    <div class="sem-header">
+      <span class="sem-title">3학년 2학기</span>
+      <span class="sem-credits">전공 22학점 (최대)</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>머신러닝 2</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">비지도학습(클러스터링·차원축소), 강화학습 기초</td></tr>
+      <tr><td><strong>딥러닝응용 2</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">NLP(BERT·GPT), 생성 모델(GAN·Diffusion)</td></tr>
+      <tr><td><strong>빅데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">Hadoop·Spark로 대용량 데이터 처리·분석</td></tr>
+      <tr><td><strong>빅데이터플랫폼</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">Kafka·Flink 스트리밍, 클라우드 데이터 파이프라인</td></tr>
+      <tr><td><strong>베이지안분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">사전분포·사후분포·MCMC — 확률론 심화</td></tr>
+      <tr><td><strong>응용통계</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">분산분석·비모수검정·실험계획법</td></tr>
+      <tr><td><strong>라이프케어 빅데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">헬스케어 데이터 특화 분석 (의료·바이오 진로 시)</td></tr>
+      <tr><td><strong>전공진로세미나 3 (JUMP UP 3)</strong></td><td class="cr">1</td><td class="jump">전공진로취업</td><td style="color:var(--txt2)">최종 진로 결정, 취업·대학원 준비 로드맵</td></tr>
+    </table></div>
+    <div class="callout pur"><span>🚀</span><div class="callout-body"><strong>빅데이터분석 + 빅데이터플랫폼</strong> 조합으로 데이터 엔지니어링까지 커버됩니다. ADsP 자격증은 이 학기 전후로 준비하면 커리큘럼과 시너지가 최고입니다.</div></div>
+  </div>
+
+  <!-- 4-1 -->
+  <div class="sem-sec" id="sem-4-1">
+    <div class="sem-header">
+      <span class="sem-title">4학년 1학기</span>
+      <span class="sem-credits">전공 15학점</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>캡스톤디자인 1</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">팀 프로젝트 — 문제 정의·데이터 수집·모델 설계</td></tr>
+      <tr><td><strong>데이터마이닝</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">연관규칙·패턴 탐색·텍스트마이닝 심화</td></tr>
+      <tr><td><strong>알고리즘</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">정렬·탐색·동적프로그래밍·그래프 알고리즘</td></tr>
+      <tr><td><strong>통계적추론</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">최우추정·베이즈추정·검정이론 심화</td></tr>
+      <tr><td><strong>금융데이터분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">주가·채권·파생 데이터 분석, 퀀트 기초</td></tr>
+    </table></div>
+    <div class="callout yel"><span>⚠️</span><div class="callout-body"><strong>캡스톤디자인1 주의:</strong> 4학년 1학기 종강 전까지 <strong>외국어 인증(토익 등) 점수를 제출</strong>해야 합니다. 늦어도 3학년 여름방학에 응시해 두세요.</div></div>
+  </div>
+
+  <!-- 4-2 -->
+  <div class="sem-sec" id="sem-4-2">
+    <div class="sem-header">
+      <span class="sem-title">4학년 2학기</span>
+      <span class="sem-credits">전공 6학점 + 졸업 준비</span>
+    </div>
+    <div class="tw"><table>
+      <tr><th>과목명</th><th>학점</th><th>이수구분</th><th>내용</th></tr>
+      <tr><td><strong>캡스톤디자인 2</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">팀 프로젝트 완성 · 발표 · 포트폴리오 정리</td></tr>
+      <tr><td><strong>시계열분석</strong></td><td class="cr">3</td><td class="elec">전공선택</td><td style="color:var(--txt2)">ARIMA·SARIMA·Prophet — 예측 모델링</td></tr>
+    </table></div>
+    <div class="callout grn"><span>🎓</span><div class="callout-body"><strong>4-2는 수강 학점 자체는 적지만</strong> 캡스톤 발표·졸업 준비·취업 활동이 겹치는 가장 바쁜 학기입니다. 캡스톤 결과물을 GitHub 포트폴리오에 정리해 두세요.</div></div>
+
+    <h3 class="blk">📈 전체 전공 학점 요약</h3>
+    <div class="tw"><table>
+      <tr><th>학년</th><th>1학기</th><th>2학기</th><th>소계</th></tr>
+      <tr><td><strong>1학년</strong></td><td class="cr">9</td><td class="cr">10</td><td class="cr">19</td></tr>
+      <tr><td><strong>2학년</strong></td><td class="cr">18</td><td class="cr">22</td><td class="cr">40</td></tr>
+      <tr><td><strong>3학년</strong></td><td class="cr">15</td><td class="cr">22</td><td class="cr">37</td></tr>
+      <tr><td><strong>4학년</strong></td><td class="cr">15</td><td class="cr">6</td><td class="cr">21</td></tr>
+      <tr><td><strong>합계</strong></td><td></td><td></td><td class="cr" style="color:var(--grn2);font-size:14px">117 학점</td></tr>
+    </table></div>
+    <div class="callout acc"><span>💡</span><div class="callout-body">위 합계는 개설 전공과목 전체 이수 시 최대치입니다. 졸업에는 총 130학점(전공+교양+일반선택) 이상이 필요하며, 전공 이외 교양 및 일반선택으로 나머지를 채웁니다.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ 졸업 요건 ══════════════════ -->
+<div class="sec" id="sec-grad">
+  <div class="sec-hd">
+    <div class="sec-title">🎯 졸업 요건</div>
+    <div class="sec-sub">이 조건을 모두 충족해야 이학사/공학사 학위를 받을 수 있습니다.</div>
+  </div>
+
+  <h3 class="blk">✅ 기본 졸업 조건</h3>
+  <div class="tw"><table>
+    <tr><th>항목</th><th>기준</th><th>비고</th></tr>
+    <tr><td><strong>총 이수학점</strong></td><td class="cr" style="color:var(--grn2);font-size:14px">130학점 이상</td><td style="color:var(--txt2)">전공+교양+일반선택 합산</td></tr>
+    <tr><td><strong>등록 학기</strong></td><td class="cr">8학기 이상</td><td style="color:var(--txt2)">휴학 기간 제외</td></tr>
+    <tr><td><strong>전체 평점평균</strong></td><td class="cr">2.0 이상</td><td style="color:var(--txt2)">단수전공 기준 (4.5 만점)</td></tr>
+    <tr><td><strong>복수전공자 평균</strong></td><td class="cr">2.5 이상</td><td style="color:var(--txt2)">제1전공 + 복수전공 각각</td></tr>
+    <tr><td><strong>외국어 인증</strong></td><td class="cr">토익 등 기준 점수</td><td style="color:var(--txt2)">4학년 1학기 종강 전 제출 필수</td></tr>
+    <tr><td><strong>JUMP UP 이수</strong></td><td class="cr">JUMP UP 1~3</td><td style="color:var(--txt2)">진로취업 세미나 3과목 필수</td></tr>
+  </table></div>
+
+  <div class="callout red"><span>🚨</span><div class="callout-body"><strong>외국어 인증 놓치면 졸업 불가!</strong> 토익(TOEIC)이 가장 일반적이며, 지능형SW융합대학 기준 점수는 학과 사무실(031-220-2521)에서 확인하세요. 늦어도 <strong>3학년 여름방학(2028년 8월)</strong>에 응시해 두는 게 안전합니다.</div></div>
+
+  <h3 class="blk">🎓 취득 학위</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📜</span><span class="card-title" style="color:var(--acc2)">이학사 / 공학사</span></div>
+      <div class="card-body">졸업 시 자동 수여. <strong>데이터과학 전공</strong> 학사학위증이 발급됩니다.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔬</span><span class="card-title" style="color:var(--grn2)">석사 → 박사 (선택)</span></div>
+      <div class="card-body">일반대학원 데이터과학과 진학 시. 필수과목 + 논문 6학점 포함.</div>
+    </div>
+  </div>
+
+  <h3 class="blk">📋 부전공 · 복수전공</h3>
+  <div class="tw"><table>
+    <tr><th>구분</th><th>이수 조건</th></tr>
+    <tr><td><strong>부전공</strong></td><td style="color:var(--txt2)">해당 학과 지정 과목 <strong>21학점 이상</strong> 이수</td></tr>
+    <tr><td><strong>복수전공</strong></td><td style="color:var(--txt2)">제1전공 + 복수전공 학과 졸업기준학점 <strong>각각 모두</strong> 이수 / 평점 2.5 이상 유지</td></tr>
+    <tr><td><strong>초과학점</strong></td><td style="color:var(--txt2)">졸업기준 초과 이수분은 <strong>일반선택</strong>으로 자동 전환</td></tr>
+    <tr><td><strong>타 대학 학점</strong></td><td style="color:var(--txt2)">총 취득학점에는 포함되나 <strong>GPA 계산 제외</strong></td></tr>
+  </table></div>
+
+  <h3 class="blk">⚡ 조기졸업 요건 (6학기 = 3년 졸업)</h3>
+  <div class="callout cyn"><span>📌</span><div class="callout-body">
+    아래 <strong>5가지 조건 전부</strong> 충족해야 신청 가능합니다:<br>
+    ① 매 학기 <strong>15학점 이상</strong> 수강<br>
+    ② 매 학기 <strong>평점 4.0 이상</strong> 유지<br>
+    ③ F학점 없음 + 계절학기 학점 없음<br>
+    ④ 재이수 이력 없음<br>
+    ⑤ 징계처분 없음<br>
+    신청: 최종학기 개시 후 <strong>30일 이내</strong>.
+  </div></div>
+</div>
+
+<!-- ══════════════════ 학점 제도 ══════════════════ -->
+<div class="sec" id="sec-gpa">
+  <div class="sec-hd">
+    <div class="sec-title">📊 학점 제도 (GPA)</div>
+    <div class="sec-sub">수원대학교 4.5 만점 기준 성적 등급·계산 방법·경고 기준입니다.</div>
+  </div>
+
+  <h3 class="blk">📈 성적 등급표 (4.5 만점)</h3>
+  <div class="tw"><table>
+    <tr><th>등급</th><th>실점 범위</th><th>평점</th><th>의미</th></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--grn2)">A+</td><td>95 ~ 100점</td><td class="cr" style="color:var(--grn2);font-size:15px">4.5</td><td style="color:var(--txt2)">최우수 — 상위 10% 이내</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--grn)">A0</td><td>90 ~ 94점</td><td class="cr" style="color:var(--grn)">4.0</td><td style="color:var(--txt2)">우수</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--acc2)">B+</td><td>85 ~ 89점</td><td class="cr" style="color:var(--acc2)">3.5</td><td style="color:var(--txt2)">양호 이상</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--acc)">B0</td><td>80 ~ 84점</td><td class="cr" style="color:var(--acc)">3.0</td><td style="color:var(--txt2)">양호</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--yel2)">C+</td><td>75 ~ 79점</td><td class="cr" style="color:var(--yel2)">2.5</td><td style="color:var(--txt2)">보통 이상</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--yel)">C0</td><td>70 ~ 74점</td><td class="cr" style="color:var(--yel)">2.0</td><td style="color:var(--txt2)">보통 — 졸업 평균선</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--pur2)">D+</td><td>65 ~ 69점</td><td class="cr" style="color:var(--pur2)">1.5</td><td style="color:var(--txt2)">미흡</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--pur)">D0</td><td>60 ~ 64점</td><td class="cr" style="color:var(--pur)">1.0</td><td style="color:var(--txt2)">최저 이수</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--red2)">F</td><td>59점 이하</td><td class="cr" style="color:var(--red2)">0.0</td><td style="color:var(--txt2)">낙제 — 재이수 필요</td></tr>
+    <tr><td style="font-size:15px;font-weight:700;color:var(--txt3)">P</td><td>Pass/Fail</td><td class="cr" style="color:var(--txt3)">산정 제외</td><td style="color:var(--txt2)">합/불 과목 (GPA 계산 제외)</td></tr>
+  </table></div>
+
+  <h3 class="blk">🧮 GPA 계산 방법</h3>
+  <div class="gpa-box">
+    <h4>계산 공식</h4>
+    <div class="gpa-formula">
+      평점평균 = <strong>(각 과목 학점 × 취득평점)의 합</strong> ÷ <strong>수강신청 총 학점 수</strong><br>
+      <span style="font-size:11px;color:var(--txt3)">소수점 셋째 자리에서 반올림 → 둘째 자리까지 표기 · F는 0점으로 반영 · P/R 과목 제외</span>
+    </div>
+
+    <div class="tw" style="margin:0">
+    <div class="tw-cap">예시 계산 (12학점 수강)</div>
+    <table>
+      <tr><th>과목</th><th>학점</th><th>등급</th><th>평점</th><th>학점×평점</th></tr>
+      <tr><td>머신러닝 1</td><td class="cr">3</td><td style="color:var(--grn2)">A+</td><td class="cr">4.5</td><td class="cr">13.5</td></tr>
+      <tr><td>딥러닝 1</td><td class="cr">3</td><td style="color:var(--acc2)">B+</td><td class="cr">3.5</td><td class="cr">10.5</td></tr>
+      <tr><td>선형대수학</td><td class="cr">3</td><td style="color:var(--grn)">A0</td><td class="cr">4.0</td><td class="cr">12.0</td></tr>
+      <tr><td>데이터시각화</td><td class="cr">3</td><td style="color:var(--yel2)">C+</td><td class="cr">2.5</td><td class="cr">7.5</td></tr>
+      <tr><td colspan="3" style="text-align:right;font-weight:700;color:var(--txt)">합계</td><td class="cr">12</td><td class="cr">43.5</td></tr>
+    </table></div>
+    <div style="text-align:center;padding:10px;font-size:14px;color:var(--grn2);font-weight:700;margin-top:8px">
+      평점평균 = 43.5 ÷ 12 = <span style="font-size:18px">3.63</span>
+    </div>
+  </div>
+
+  <h3 class="blk">🚨 학사경고 기준</h3>
+  <div class="callout red"><span>⚠️</span><div class="callout-body">
+    다음 중 <strong>하나라도 해당</strong>하면 학사경고가 부여됩니다:<br>
+    • 수강신청 미수강<br>
+    • <strong>평점평균 1.5 미만</strong> (매 학기)<br>
+    • <strong>F학점 6학점 이상</strong> 취득<br>
+    학사경고가 누적되면 제적 위험이 있습니다. 경고를 받으면 즉시 교수 상담을 받으세요.
+  </div></div>
+
+  <h3 class="blk">🔄 재이수 & 성적 이의신청</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔄</span><span class="card-title" style="color:var(--yel2)">재이수</span></div>
+      <div class="card-body">F 또는 낮은 성적 과목을 재수강할 수 있습니다. 재이수 시 <strong>새로운 성적으로 GPA 계산</strong>(구 성적 대체). 단, 조기졸업 신청 시 재이수 이력이 있으면 불가.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📝</span><span class="card-title" style="color:var(--acc2)">성적 이의신청</span></div>
+      <div class="card-body">성적 공개 기간 중 누락·착오 발견 시 <strong>해당 과목 담당 교수에게 즉시</strong> 이의 신청. 포털(u-saint)에서 열람 후 교수 이메일 또는 면담으로 진행.</div>
+    </div>
+  </div>
+
+  <h3 class="blk">📅 학사 일정 주요 포인트</h3>
+  <div class="tw"><table>
+    <tr><th>시점</th><th>해야 할 것</th></tr>
+    <tr><td><strong>매 학기 초</strong></td><td style="color:var(--txt2)">수강신청 마감 전 이수구분·선수과목 확인 / 포털(u-saint) 이수체계 점검</td></tr>
+    <tr><td><strong>매 학기 말</strong></td><td style="color:var(--txt2)">성적 공개 기간에 성적 열람 → 이의 있으면 즉시 교수 연락</td></tr>
+    <tr><td><strong>3학년 여름방학</strong></td><td style="color:var(--txt2)">외국어 인증(토익 등) 응시 권장 — 4학년 1학기 종강 전 제출 데드라인</td></tr>
+    <tr><td><strong>4학년 1학기</strong></td><td style="color:var(--txt2)">외국어 인증 점수 제출 / 졸업 신청 확인 / 취업·대학원 지원 본격화</td></tr>
+  </table></div>
+</div>
+
+<!-- ══════════════════ 취득 역량 ══════════════════ -->
+<div class="sec" id="sec-skills">
+  <div class="sec-hd">
+    <div class="sec-title">🏆 취득 역량 · 자격증 · 기회</div>
+    <div class="sec-sub">4년 과정을 마치면 갖추게 되는 실력과 도전할 수 있는 자격증·경험입니다.</div>
+  </div>
+
+  <h3 class="blk">💻 기술 역량</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🐍</span><span class="card-title" style="color:var(--acc2)">프로그래밍 & 분석 도구</span></div>
+      <div class="card-body">
+        <span class="tag a">Python</span><span class="tag a">R</span><span class="tag a">SQL</span><span class="tag a">SAS</span><span class="tag">SPSS</span><span class="tag">MATLAB</span><br><br>
+        Pandas·NumPy·Scikit-learn·TensorFlow/PyTorch·ggplot2·Tableau·Spark
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🤖</span><span class="card-title" style="color:var(--grn2)">AI · 머신러닝</span></div>
+      <div class="card-body">
+        <span class="tag g">지도학습</span><span class="tag g">비지도학습</span><span class="tag g">딥러닝</span><span class="tag g">NLP</span><span class="tag g">CV</span><br><br>
+        SVM·앙상블·CNN·RNN·Transformer·GAN·베이지안 모델 설계 및 구현
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📊</span><span class="card-title" style="color:var(--yel2)">통계 · 분석 능력</span></div>
+      <div class="card-body">
+        <span class="tag y">통계적추론</span><span class="tag y">회귀분석</span><span class="tag y">시계열</span><span class="tag y">베이지안</span><br><br>
+        가설검정·분산분석·실험계획·비모수통계·데이터 기반 의사결정
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">☁️</span><span class="card-title" style="color:var(--pur2)">빅데이터 · 클라우드</span></div>
+      <div class="card-body">
+        <span class="tag p">Hadoop</span><span class="tag p">Spark</span><span class="tag p">Kafka</span><span class="tag p">MS Azure</span><br><br>
+        대용량 데이터 파이프라인 설계, 스트리밍 처리, 클라우드 플랫폼
+      </div>
+    </div>
+  </div>
+
+  <h3 class="blk">🏅 권장 자격증</h3>
+  <div class="grid3">
+    <div class="cert-item">
+      <div class="c-abbr">ADsP</div>
+      <div class="c-name">데이터분석 준전문가</div>
+      <div class="c-body">한국데이터산업진흥원 발급. 데이터 분석 직군 필수 자격증. <span class="tag g">3학년 권장</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">SQLD</div>
+      <div class="c-name">SQL Developer</div>
+      <div class="c-body">한국데이터산업진흥원 발급. DB 설계·쿼리 능력 인증. <span class="tag g">3학년 1학기</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">ADP</div>
+      <div class="c-name">데이터분석 전문가</div>
+      <div class="c-body">ADsP 취득 후 도전. 데이터 분석 전문가 국가 자격. <span class="tag a">4학년 권장</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">정보처리기사</div>
+      <div class="c-name">정보처리기사</div>
+      <div class="c-body">한국산업인력공단. SW 전반 능력 인증. 취업 공고 기재 빈도 높음. <span class="tag">3~4학년</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">사회조사분석사 2급</div>
+      <div class="c-name">사회조사분석사</div>
+      <div class="c-body">설문 설계·통계 분석 능력. 조사방법론 과목 연계. <span class="tag y">2~3학년</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">SAS Certified</div>
+      <div class="c-name">SAS 국제자격증</div>
+      <div class="c-body">SAS Institute 발급. 제약·금융·공공기관 선호. <span class="tag">3~4학년</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">MS Azure DP-900</div>
+      <div class="c-name">Azure Data Fundamentals</div>
+      <div class="c-body">Microsoft Academic Program 연계 지원. 클라우드 데이터 기초. <span class="tag p">2학년~</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">SQLD → SQLP</div>
+      <div class="c-name">SQL Professional</div>
+      <div class="c-body">DB 설계 전문가 수준. 데이터 엔지니어링 직군 필수. <span class="tag a">4학년</span></div>
+    </div>
+    <div class="cert-item">
+      <div class="c-abbr">품질경영기사</div>
+      <div class="c-name">품질경영기사</div>
+      <div class="c-body">한국산업인력공단. 통계적 공정관리·품질 분석 연계. <span class="tag">3~4학년</span></div>
+    </div>
+  </div>
+
+  <h3 class="blk">🔗 학교 지원 프로그램</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏢</span><span class="card-title" style="color:var(--acc2)">현장실습 (인턴십)</span></div>
+      <div class="card-body">3·4학년 대상 하계·동계 방학 인턴십. <strong>빅데이터·AI 관련 기업</strong> 연계. 교과목 학점 인정 또는 비교과 프로그램으로 운영.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🔬</span><span class="card-title" style="color:var(--grn2)">학부연구생</span></div>
+      <div class="card-body">교수 연구실에 학부생으로 참여. 논문 연계·대학원 진학 희망자에게 추천. 통계조사연구소·DS&amp;ML 센터 소속.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎯</span><span class="card-title" style="color:var(--yel2)">JUMP UP 진로 프로그램</span></div>
+      <div class="card-body">1~3학년에 걸쳐 단계별 진로 탐색. 직무 특강, 기업 탐방, 1:1 교수 상담. 취업동아리 지원금·특강 연계.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">📦</span><span class="card-title" style="color:var(--pur2)">캡스톤디자인 (4학년)</span></div>
+      <div class="card-body">1·2학기 산학 프로젝트. 기업 연계 과제 수행 시 <strong>실제 현업 문제 해결</strong> 경험. 졸업 포트폴리오 핵심.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🏆</span><span class="card-title" style="color:var(--cyn2)">데이터 경진대회</span></div>
+      <div class="card-body">Kaggle, 공공데이터 활용 경진대회, 통계청 분석 공모전 등 교수 추천·학과 지원. 수상 이력은 취업·대학원 가산점.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon">🎓</span><span class="card-title" style="color:var(--red2)">대학원 직진학</span></div>
+      <div class="card-body">일반대학원 데이터과학과 석사 → 박사. 필수: DS개론·수학·프로그래밍언어·데이터마이닝·세미나 + 논문 6학점.</div>
+    </div>
+  </div>
+
+  <div class="callout acc"><span>🗺️</span><div class="callout-body">
+    <strong>추천 자격증 타임라인:</strong><br>
+    <strong>1학년:</strong> 외국어(토익) 기초 점수 확보<br>
+    <strong>2학년:</strong> MS Azure DP-900, 사회조사분석사 2급<br>
+    <strong>3학년 1학기:</strong> SQLD (데이터베이스 과목 연계)<br>
+    <strong>3학년 2학기:</strong> ADsP (빅데이터분석 연계)<br>
+    <strong>4학년 1학기:</strong> 정보처리기사, 외국어 인증 최종 제출<br>
+    <strong>4학년 2학기:</strong> ADP 또는 전문 분야 자격증
+  </div></div>
+</div>
+
+<div class="footnote">
+  수원대학교 데이터과학부 (지능형SW융합대학) · 26학번 기준<br>
+  커리큘럼·졸업 요건은 학년도별 변경 가능 — 최신 정보는 포털(u-saint) 또는 학과 사무실(031-220-2521) 확인
+</div>
+
+</div><!-- /main -->
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    const key = t.dataset.tab;
+    tabs.forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+    document.getElementById('sec-' + key).classList.add('on');
+  });
+});
+
+// 학기 네비게이션
+const semDefs = [
+  {id:'1-1', label:'1학년 1학기'},
+  {id:'1-2', label:'1학년 2학기'},
+  {id:'2-1', label:'2학년 1학기'},
+  {id:'2-2', label:'2학년 2학기'},
+  {id:'3-1', label:'3학년 1학기'},
+  {id:'3-2', label:'3학년 2학기'},
+  {id:'4-1', label:'4학년 1학기'},
+  {id:'4-2', label:'4학년 2학기'},
+];
+const nav = document.getElementById('sem-nav');
+semDefs.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'sem-btn' + (i === 0 ? ' on' : '');
+  btn.textContent = s.label;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    document.querySelectorAll('.sem-sec').forEach(x => x.classList.remove('on'));
+    document.getElementById('sem-' + s.id).classList.add('on');
+  });
+  nav.appendChild(btn);
+});
+</script>
+</body>
+</html>

@@ -392,7 +392,8 @@ function buildPalette() {
   REF.filter(r => r.cat === curCat).forEach(r => {
     const b = document.createElement('button');
     b.className = 'pal-btn';
-    b.title = r.desc + '\n' + r.code + (r.easy ? '\n빠른 입력: ' + r.easy : '');
+    b.title = r.desc + (r.read ? '\n읽는 법: ' + r.read : '') +
+             '\n' + r.code + (r.easy ? '\n빠른 입력: ' + r.easy : '');
 
     const sym = document.createElement('span');
     sym.className = 'sym';
@@ -514,6 +515,12 @@ function buildDict() {
       desc.className = 'dict-desc';
       desc.textContent = r.desc;
       info.appendChild(code); info.appendChild(desc);
+      if (r.read) {
+        const rd = document.createElement('div');
+        rd.className = 'dict-read';
+        rd.textContent = r.read;
+        info.appendChild(rd);
+      }
       if (r.easy) {
         const e = document.createElement('div');
         e.className = 'dict-easy';

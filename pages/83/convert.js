@@ -12,7 +12,7 @@
      abs(x)         \left| x \right|
      mat(1,2;3,4)   \begin{pmatrix}...\end{pmatrix}
      "글자"          \text{글자}
-     alpha  <=  ->  oo  RR  ...
+     alpha  <=  ->  oo  RR  sup  inf  ...
    ═══════════════════════════════════════════════════════════ */
 (function (root) {
   'use strict';
@@ -93,8 +93,11 @@
     ['notin', 'const', '\\notin'],
     ['sube', 'const', '\\subseteq'],
     ['supe', 'const', '\\supseteq'],
+    ['subset', 'const', '\\subset'],
+    ['supset', 'const', '\\supset'],
     ['sub', 'const', '\\subset'],
-    ['sup', 'const', '\\supset'],
+    ['sup', 'bigop', '\\sup'],
+    ['inf', 'bigop', '\\inf'],
     ['in', 'const', '\\in'],
     ['uu', 'const', '\\cup'],
     ['nn', 'const', '\\cap'],
@@ -127,7 +130,6 @@
 
     // ── 기타 기호 ──
     ['infty', 'const', '\\infty'],
-    ['inf', 'const', '\\infty'],
     ['oo', 'const', '\\infty'],
     ['partial', 'const', '\\partial'],
     ['del', 'const', '\\partial'],

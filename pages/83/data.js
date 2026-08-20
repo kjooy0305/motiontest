@@ -88,19 +88,16 @@ const REF = [
   {cat:'그리스', code:'\\Psi', desc:'대문자 프시', tex:'\\Psi'},
   {cat:'그리스', code:'\\Omega', desc:'대문자 오메가 (옴)', easy:'Omega', tex:'\\Omega'},
 
-  /* ── 큰 연산자 ── */
-  {cat:'큰기호', code:'\\sum_{▢}^{▢}', desc:'시그마 (합)', easy:'sum_(k=1)^n', tex:'\\sum_{k=1}^{n}'},
-  {cat:'큰기호', code:'\\prod_{▢}^{▢}', desc:'파이 (곱)', easy:'prod_(i=1)^n', tex:'\\prod_{i=1}^{n}'},
-  {cat:'큰기호', code:'\\int_{▢}^{▢}', desc:'정적분', easy:'int_0^1', tex:'\\int_{0}^{1}'},
-  {cat:'큰기호', code:'\\int', desc:'부정적분', easy:'int', tex:'\\int'},
-  {cat:'큰기호', code:'\\iint', desc:'이중적분', tex:'\\iint'},
-  {cat:'큰기호', code:'\\iiint', desc:'삼중적분', tex:'\\iiint'},
-  {cat:'큰기호', code:'\\oint', desc:'선적분 (닫힌 경로)', easy:'oint', tex:'\\oint'},
-  {cat:'큰기호', code:'\\lim_{▢}', desc:'극한', easy:'lim_(x->0)', tex:'\\lim_{x \\to 0}'},
-  {cat:'큰기호', code:'\\bigcup_{▢}^{▢}', desc:'합집합 (큰)', tex:'\\bigcup_{i=1}^{n}'},
-  {cat:'큰기호', code:'\\bigcap_{▢}^{▢}', desc:'교집합 (큰)', tex:'\\bigcap_{i=1}^{n}'},
-  {cat:'큰기호', code:'\\max_{▢}', desc:'최댓값', easy:'max', tex:'\\max'},
-  {cat:'큰기호', code:'\\min_{▢}', desc:'최솟값', easy:'min', tex:'\\min'},
+  /* ── 합·극한 ── */
+  {cat:'합·극한', code:'\\sum_{▢}^{▢}', desc:'시그마 (총합)', easy:'sum_(k=1)^n', tex:'\\sum_{k=1}^{n}'},
+  {cat:'합·극한', code:'\\prod_{▢}^{▢}', desc:'대문자 파이 (총곱)', easy:'prod_(i=1)^n', tex:'\\prod_{i=1}^{n}'},
+  {cat:'합·극한', code:'\\lim_{▢}', desc:'극한', easy:'lim_(x->0)', tex:'\\lim_{x \\to 0}'},
+  {cat:'합·극한', code:'\\bigcup_{▢}^{▢}', desc:'합집합 (큰)', tex:'\\bigcup_{i=1}^{n}'},
+  {cat:'합·극한', code:'\\bigcap_{▢}^{▢}', desc:'교집합 (큰)', tex:'\\bigcap_{i=1}^{n}'},
+  {cat:'합·극한', code:'\\max_{▢}', desc:'최댓값', easy:'max', tex:'\\max'},
+  {cat:'합·극한', code:'\\sup_{▢}', desc:'상한 (수프리멈)', easy:'sup', tex:'\\sup'},
+  {cat:'합·극한', code:'\\inf_{▢}', desc:'하한 (인피멈)', easy:'inf', tex:'\\inf'},
+  {cat:'합·극한', code:'\\min_{▢}', desc:'최솟값', easy:'min', tex:'\\min'},
 
   /* ── 화살표 ── */
   {cat:'화살표', code:'\\to', desc:'→ (수렴·사상)', easy:'->', tex:'\\to'},
@@ -169,14 +166,19 @@ const REF = [
   {cat:'함수', code:'\\ker', desc:'핵 (kernel)', tex:'\\ker'},
 
   /* ── 미적분·물리 ── */
+  {cat:'미적분', code:'\\int_{▢}^{▢}', desc:'정적분 (인티그럴)', easy:'int_0^1', tex:'\\int_{0}^{1}'},
+  {cat:'미적분', code:'\\int', desc:'부정적분 · 적분 기호', easy:'int', tex:'\\int'},
+  {cat:'미적분', code:'\\iint', desc:'이중적분', tex:'\\iint'},
+  {cat:'미적분', code:'\\iiint', desc:'삼중적분', tex:'\\iiint'},
+  {cat:'미적분', code:'\\oint', desc:'선적분 (닫힌 경로)', easy:'oint', tex:'\\oint'},
   {cat:'미적분', code:'\\frac{d▢}{d▢}', desc:'도함수', easy:'d/dx', tex:'\\frac{dy}{dx}'},
   {cat:'미적분', code:'\\frac{\\partial ▢}{\\partial ▢}', desc:'편도함수', easy:'del/delx', tex:'\\frac{\\partial f}{\\partial x}'},
   {cat:'미적분', code:'\\frac{d^{2}▢}{d▢^{2}}', desc:'이계도함수', tex:'\\frac{d^{2}y}{dx^{2}}'},
-  {cat:'미적분', code:'\\partial', desc:'∂ 편미분 기호', easy:'del', tex:'\\partial'},
-  {cat:'미적분', code:'\\nabla', desc:'∇ 나블라 (기울기)', easy:'grad', tex:'\\nabla'},
+  {cat:'미적분', code:'\\partial', desc:'∂ 편미분 (라운드 디 · 파셜)', easy:'del', tex:'\\partial'},
+  {cat:'미적분', code:'\\nabla', desc:'∇ 나블라 · 델 (기울기)', easy:'grad', tex:'\\nabla'},
   {cat:'미적분', code:'\\infty', desc:'∞ 무한대', easy:'oo', tex:'\\infty'},
-  {cat:'미적분', code:'\\,d▢', desc:'적분 변수 (앞에 얇은 공백)', easy:'dx', tex:'\\,dx'},
-  {cat:'미적분', code:"▢'", desc:'프라임 (미분)', tex:"f'(x)"},
+  {cat:'미적분', code:'\\,d▢', desc:'적분 변수 dx (앞에 얇은 공백이 붙음)', easy:'dx', tex:'\\,dx'},
+  {cat:'미적분', code:"▢'", desc:"프라임 f' (미분) — 변수 뒤에 붙입니다", tex:"f'(x)"},
   {cat:'미적분', code:'\\dot{▢}', desc:'시간 미분 (점 하나)', easy:'dot(x)', tex:'\\dot{x}'},
   {cat:'미적분', code:'\\ddot{▢}', desc:'2계 시간 미분', tex:'\\ddot{x}'},
 
@@ -307,3 +309,127 @@ const QUIZ = [
   {tex:'\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', hint:'칸은 & 로, 줄은 \\\\ 로 나눕니다.'},
   {tex:'\\frac{-b \\pm \\sqrt{b^{2}-4ac}}{2a}', hint:'근의 공식입니다. ± 는 \\pm 이고, 루트 안이 분자 일부입니다.'},
 ];
+
+/* ═══════════════════════════════════════════
+   기호 읽는 법 · 검색어
+   code → "한국어 읽기 · 영어 이름"
+   사전 카드에 함께 보여주고, 검색어로도 걸린다.
+   ═══════════════════════════════════════════ */
+const READING = {
+  '\\int_{▢}^{▢}': '인티그럴 · 인테그랄 · integral · 적분',
+  '\\int': '인티그럴 · 인테그랄 · integral',
+  '\\iint': '더블 인티그럴 · double integral',
+  '\\iiint': '트리플 인티그럴 · triple integral',
+  '\\oint': '컨투어 인티그럴 · contour integral',
+  '\\partial': '파셜 · 라운드 디 · 델 · partial',
+  '\\nabla': '나블라 · 델 · nabla · del · gradient',
+  '\\infty': '인피니티 · infinity · 무한대',
+  '\\,d▢': '디엑스 · dx · 적분 변수',
+  '\\frac{d▢}{d▢}': '디와이 디엑스 · derivative · 도함수',
+  '\\frac{\\partial ▢}{\\partial ▢}': '파셜 · partial derivative · 편미분',
+  '\\dot{▢}': '닷 · dot · 시간 미분',
+  '\\ddot{▢}': '더블 닷 · double dot',
+  "▢'": '프라임 · prime',
+
+  '\\sum_{▢}^{▢}': '시그마 · sigma · summation · 합',
+  '\\prod_{▢}^{▢}': '파이 · pi · product · 곱',
+  '\\lim_{▢}': '리미트 · limit · 극한',
+  '\\bigcup_{▢}^{▢}': '유니온 · union · 합집합',
+  '\\bigcap_{▢}^{▢}': '인터섹션 · intersection · 교집합',
+  '\\max_{▢}': '맥스 · max · maximum',
+  '\\sup_{▢}': '수프리멈 · supremum · 상한',
+  '\\inf_{▢}': '인피멈 · infimum · 하한',
+  '\\min_{▢}': '민 · min · minimum',
+
+  '\\frac{▢}{▢}': '프랙 · fraction · 분수',
+  '\\dfrac{▢}{▢}': '디스플레이 프랙 · display fraction',
+  '\\sqrt{▢}': '스퀘어 루트 · 루트 · square root · radical',
+  '\\sqrt[▢]{▢}': '엔제곱근 · nth root · 루트',
+  '\\binom{▢}{▢}': '바이노미얼 · binomial · 조합 · nCr · 콤비네이션',
+  '^{▢}': '지수 · 위첨자 · superscript · power',
+  '_{▢}': '아래첨자 · subscript · index',
+  '\\overline{▢}': '오버라인 · overline · 바 · 평균',
+  '\\text{▢}': '텍스트 · text · 한글 · 영어 · 글자',
+
+  '\\times': '타임스 · times · 곱하기',
+  '\\div': '디바이드 · divide · 나누기',
+  '\\cdot': '닷 · cdot · 곱',
+  '\\pm': '플러스마이너스 · plus minus',
+  '\\ne': '낫이퀄 · not equal',
+  '\\le': '작거나 같다 · less than or equal',
+  '\\ge': '크거나 같다 · greater than or equal',
+  '\\approx': '어프록스 · approximately · 근사',
+  '\\equiv': '이퀴브 · equivalent · 합동',
+  '\\propto': '프로포셔널 · proportional · 비례',
+
+  '\\to': '애로우 · arrow · 화살표 · 수렴',
+  '\\Rightarrow': '더블 애로우 · implies · 따라서',
+  '\\Leftrightarrow': '이프앤온리이프 · iff · 필요충분',
+  '\\mapsto': '맵스투 · maps to · 대응',
+
+  '\\in': '엘리먼트 오브 · element of · 원소',
+  '\\subset': '서브셋 · subset · 부분집합',
+  '\\cup': '유니온 · union · 합집합',
+  '\\cap': '인터섹션 · intersection · 교집합',
+  '\\emptyset': '엠티셋 · empty set · 공집합',
+  '\\forall': '포올 · for all · 임의의',
+  '\\exists': '데어이그지스트 · there exists · 존재',
+  '\\mathbb{R}': '리얼 · real numbers · 실수',
+  '\\mathbb{N}': '내추럴 · natural numbers · 자연수',
+  '\\mathbb{Z}': '인티저 · integers · 정수',
+  '\\mathbb{Q}': '래셔널 · rational numbers · 유리수',
+  '\\mathbb{C}': '컴플렉스 · complex numbers · 복소수',
+
+  '\\left| ▢ \\right|': '앱설루트 · absolute value · 절댓값',
+  '\\left\\| ▢ \\right\\|': '노름 · norm · 크기',
+  '\\lfloor ▢ \\rfloor': '플로어 · floor · 버림 · 가우스',
+  '\\lceil ▢ \\rceil': '실링 · ceiling · 올림',
+  '\\langle ▢ \\rangle': '앵글 브래킷 · inner product · 내적',
+
+  '\\vec{▢}': '벡터 · vector · 화살표',
+  '\\hat{▢}': '햇 · hat · 추정량 · 단위벡터',
+  '\\bar{▢}': '바 · bar · 평균',
+  '\\tilde{▢}': '틸데 · tilde · 물결',
+  '\\overbrace{▢}^{▢}': '오버브레이스 · overbrace',
+  '\\underbrace{▢}_{▢}': '언더브레이스 · underbrace',
+
+  '\\begin{pmatrix} ▢ & ▢ \\\\ ▢ & ▢ \\end{pmatrix}': '매트릭스 · matrix · 행렬',
+  '\\begin{bmatrix} ▢ & ▢ \\\\ ▢ & ▢ \\end{bmatrix}': '매트릭스 · matrix · 행렬',
+  '\\begin{vmatrix} ▢ & ▢ \\\\ ▢ & ▢ \\end{vmatrix}': '디터미넌트 · determinant · 행렬식',
+  '\\begin{cases} ▢ & ▢ \\\\ ▢ & ▢ \\end{cases}': '케이스 · cases · 경우 나누기 · 연립',
+
+  '\\sin': '사인 · sine', '\\cos': '코사인 · cosine', '\\tan': '탄젠트 · tangent',
+  '\\log': '로그 · logarithm', '\\ln': '엘엔 · 자연로그 · natural log',
+  '\\exp': '엑스포넨셜 · exponential', '\\det': '디터미넌트 · determinant · 행렬식',
+  '\\gcd': '최대공약수 · greatest common divisor',
+
+  '\\bar{x}': '엑스바 · x bar · 표본평균',
+  '\\hat{p}': '피햇 · p hat · 표본비율',
+  'P(▢ \\mid ▢)': '조건부확률 · conditional probability',
+  'E[▢]': '기댓값 · expected value · 익스펙테이션',
+  '\\operatorname{Var}(▢)': '분산 · variance',
+  '{}_{n}P_{r}': '순열 · permutation · 퍼뮤테이션',
+  '{}_{n}C_{r}': '조합 · combination · 콤비네이션',
+  '▢!': '팩토리얼 · factorial',
+
+  '\\mathbf{▢}': '볼드 · bold · 굵게',
+  '\\mathrm{▢}': '로만 · roman · 정체',
+  '\\mathcal{▢}': '캘리그래픽 · calligraphic · 필기체',
+  '\\displaystyle': '디스플레이스타일 · displaystyle',
+};
+
+/* 그리스 문자는 이름 자체가 읽는 법이라 영어만 붙여준다 */
+const GREEK_EN = {
+  '\\alpha':'alpha','\\beta':'beta','\\gamma':'gamma','\\delta':'delta',
+  '\\epsilon':'epsilon','\\varepsilon':'epsilon','\\zeta':'zeta','\\eta':'eta',
+  '\\theta':'theta','\\vartheta':'theta','\\iota':'iota','\\kappa':'kappa',
+  '\\lambda':'lambda','\\mu':'mu','\\nu':'nu','\\xi':'xi','\\pi':'pi','\\rho':'rho',
+  '\\sigma':'sigma','\\tau':'tau','\\upsilon':'upsilon','\\phi':'phi','\\varphi':'phi',
+  '\\chi':'chi','\\psi':'psi','\\omega':'omega',
+  '\\Gamma':'Gamma','\\Delta':'Delta','\\Theta':'Theta','\\Lambda':'Lambda',
+  '\\Xi':'Xi','\\Pi':'Pi','\\Sigma':'Sigma','\\Phi':'Phi','\\Psi':'Psi','\\Omega':'Omega',
+};
+
+REF.forEach(r => {
+  r.read = READING[r.code] || GREEK_EN[r.code] || '';
+});

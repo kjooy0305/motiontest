@@ -97,6 +97,18 @@ h3.blk{font-size:14px;font-weight:700;color:var(--txt);margin:20px 0 9px;
 .btn.ghost:hover{border-color:var(--acc);color:var(--acc2);background:var(--bg4);}
 .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
 
+/* 키트 버튼 */
+#kits{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+@media(max-width:420px){#kits{grid-template-columns:1fr;}}
+.kit{text-align:left;padding:8px 10px;border-radius:6px;cursor:pointer;
+  background:var(--bg3);border:1px solid var(--border2);font-family:inherit;transition:.12s;}
+.kit b{display:block;font-size:12px;color:var(--txt);font-weight:700;line-height:1.4;}
+.kit i{display:block;font-style:normal;font-size:10px;color:var(--txt3);line-height:1.45;margin-top:1px;}
+.kit:hover{border-color:var(--acc);}
+.kit.on{background:var(--acc3);border-color:var(--acc);}
+.kit.on b{color:var(--acc2);}
+.kit.on i{color:var(--txt2);}
+
 /* ── 파일 트리 ── */
 #tree{background:#050807;border:1px solid var(--border2);border-radius:6px;
   padding:10px 12px;font-family:'Consolas','Courier New',monospace;font-size:11.5px;
@@ -209,6 +221,13 @@ pre.code{background:#050807;border:1px solid var(--border2);border-radius:5px;pa
     <div class="sec-sub">이름과 형태만 정하면 <strong>바로 작동하는 zip</strong>이 만들어집니다. 압축을 풀 필요 없이 폴더에 넣고 <code>/reload</code>만 하면 끝입니다.</div>
   </div>
 
+  <div class="callout gold" style="margin-bottom:14px"><span>📁</span><div class="callout-body">
+    <strong>폴더 구조가 막막하다면</strong> — 아래 키트에서 <b>「📁 폴더 뼈대만」</b>을 고르세요.
+    데이터팩·리소스팩이 가질 수 있는 <strong>모든 표준 폴더가 만들어지고</strong>,
+    각 폴더 안에 <em>「여기엔 뭘 넣는지」 설명서</em>가 들어갑니다.
+    경로를 외울 필요 없이 폴더를 열어 보면 됩니다.
+  </div></div>
+
   <div id="gen">
     <!-- ── 왼쪽: 설정 ── -->
     <div>
@@ -263,13 +282,17 @@ pre.code{background:#050807;border:1px solid var(--border2);border-radius:5px;pa
       </div>
 
       <div class="panel" style="margin-top:12px">
-        <div class="panel-t">🧩 넣을 내용</div>
-        <div id="opts"></div>
-        <div class="btn-row">
-          <button class="btn ghost sm" id="b-all">전부 선택</button>
-          <button class="btn ghost sm" id="b-min">최소 구성</button>
-          <button class="btn ghost sm" id="b-rec">추천 구성</button>
+        <div class="panel-t">🎒 키트 — 목적을 고르면 한 번에 구성</div>
+        <div id="kits"></div>
+        <div class="hint" style="font-size:10.5px;color:var(--txt3);margin-top:7px">
+          폴더가 어디에 뭐가 들어가는지 모르겠다면 <b style="color:var(--gold2)">📁 폴더 뼈대만</b>을 고르세요.
+          모든 표준 폴더가 만들어지고 각 폴더마다 설명서가 들어갑니다.
         </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-t">🧩 세부 항목</div>
+        <div id="opts"></div>
       </div>
 
       <div class="panel" style="margin-top:12px">
@@ -372,6 +395,23 @@ pre.code{background:#050807;border:1px solid var(--border2);border-radius:5px;pa
     <strong>1.21.3 이하</strong> — 바닐라 모델을 덮어쓰고 <code>custom_model_data</code> 숫자로 분기.<br>
     <strong>생성기가 선택한 버전에 맞춰 알아서 만들어 줍니다.</strong>
   </div></div>
+
+  <h3 class="blk">📚 전체 폴더 레퍼런스 — 어디에 뭘 넣나</h3>
+  <div class="callout acc"><span>💡</span><div class="callout-body">
+    이 표를 외울 필요 없습니다. 생성기에서 <strong>📁 폴더 뼈대만</strong> 키트를 고르면
+    <em>모든 폴더가 만들어지고 각 폴더 안에 이 설명이 들어갑니다.</em>
+    폴더를 열면 뭘 넣는 곳인지 바로 보입니다.
+  </div></div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">데이터팩 — <code>data/&lt;네임스페이스&gt;/</code> 아래 (1.21+ 단수형 기준)</div>
+    <table id="dp-folders"><tr><th>폴더</th><th>넣는 것</th></tr></table>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-cap">리소스팩 — <code>assets/&lt;네임스페이스&gt;/</code> 아래</div>
+    <table id="rp-folders"><tr><th>폴더</th><th>넣는 것</th></tr></table>
+  </div>
 
   <h3 class="blk">📛 이름 규칙 — 어기면 조용히 작동하지 않습니다</h3>
   <div class="tbl-wrap">

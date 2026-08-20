@@ -720,9 +720,13 @@ ${'='.repeat(50)}
 ■ 설치
   1) 이 zip 을 압축 풀지 말고 그대로
      <월드 폴더>/datapacks/  에 넣으세요.
-${K === 'both' ? `     ※ 둘 다 받으셨다면 zip 안의 datapack 폴더 내용만
-        따로 zip 으로 묶거나, 폴더째 datapacks/ 에 넣으면 됩니다.\n` : ''}  2) 게임에서  /reload
+${K === 'both' ? `     ※ 리소스팩은 별도의 zip 으로 따로 받아집니다.
+        그쪽은 resourcepacks/ 폴더에 넣으면 됩니다.\n` : ''}  2) 게임에서  /reload
   3) 확인:  /datapack list   ← 목록에 있으면 성공
+
+  ★ 압축을 풀 필요가 없습니다. 마인크래프트가 zip 안을 직접 읽습니다.
+    풀어서 폴더째 넣어도 되지만, 압축 프로그램이 폴더를 한 겹 더
+    만드는 경우가 많아 그대로 두는 쪽이 안전합니다.
 
   월드 폴더 찾기: 게임 월드 목록 → 월드 선택 → [편집] → [월드 폴더 열기]
 
@@ -879,11 +883,18 @@ function buildTree(files) {
       else cur = (cur[p] = cur[p] || {});
     });
   });
+  const c0 = cfg();
+  // "둘 다"일 때 최상위 두 폴더는 실제로는 별도의 zip 파일이 된다
+  const zipLabel = {
+    datapack: `📦 ${c0.ns}_datapack.zip`,
+    resourcepack: `📦 ${c0.ns}_resourcepack.zip`
+  };
   const lines = [];
   const walk = (node, depth) => {
     const dirs = Object.keys(node).filter(k => k !== '__f').sort();
     dirs.forEach(d => {
-      lines.push(`<span class="tn d">${'  '.repeat(depth)}📁 ${esc(d)}/</span>`);
+      const isZip = depth === 0 && kind() === 'both' && zipLabel[d];
+      lines.push(`<span class="tn d">${'  '.repeat(depth)}${isZip ? esc(zipLabel[d]) : '📁 ' + esc(d) + '/'}</span>`);
       walk(node[d], depth + 1);
     });
     (node.__f || []).sort((a, b) => a.n.localeCompare(b.n)).forEach(x => {
@@ -926,12 +937,11 @@ function refresh() {
   showFile(keep ? S.sel : (files.find(f => !f.bin) || files[0] || {}).name);
 
   const K = kind();
-  el.guide.innerHTML = `<strong>설치:</strong> `
-    + (K !== 'res' ? `데이터팩 zip → <code>&lt;월드 폴더&gt;/datapacks/</code> → <code>/reload</code>` : '')
+  el.guide.innerHTML = `<strong>설치 — 압축을 풀지 않습니다.</strong> zip 파일 그대로 넣으면 됩니다.<br>`
+    + (K === 'both' ? `<span style="color:var(--txt3)">둘 다 선택하면 <b>zip 2개</b>가 따로 내려받아집니다. 각각 pack.mcmeta가 최상단이라 바로 쓸 수 있습니다.</span><br>` : '')
+    + (K !== 'res' ? `<code>${esc(c.ns)}_datapack.zip</code> → <code>&lt;월드 폴더&gt;/datapacks/</code> → <code>/reload</code>` : '')
     + (K === 'both' ? '<br>' : '')
-    + (K !== 'data' ? `리소스팩 zip → <code>&lt;.minecraft&gt;/resourcepacks/</code> → 설정에서 활성화 (<code>F3+T</code>로 새로고침)` : '')
-    + (K === 'both' ? `<br><span style="color:var(--txt3)">둘 다 선택하면 zip 안에 <code>datapack/</code> · <code>resourcepack/</code> 폴더로 나뉘어 담깁니다. 각 폴더 <em>안의 내용</em>을 해당 위치에 넣으세요.</span>` : '')
-    + `<br><strong>압축을 풀지 마세요.</strong> zip 그대로 넣으면 됩니다.`;
+    + (K !== 'data' ? `<code>${esc(c.ns)}_resourcepack.zip</code> → <code>&lt;.minecraft&gt;/resourcepacks/</code> → 설정에서 활성화 (<code>F3+T</code> 새로고침)` : '');
 }
 
 function showFile(path) {
@@ -954,20 +964,48 @@ function toast(msg) {
   t._t = setTimeout(() => t.classList.remove('on'), 2200);
 }
 
-function download() {
-  const c = cfg();
-  const files = S.files;
-  if (!files.length) { toast('만들 파일이 없습니다'); return; }
-  const blob = buildZip(files);
+/* 미리보기용 경로(datapack/ · resourcepack/ 접두사)를 떼어내고
+   팩별로 나눈다. ★ 각 zip 은 pack.mcmeta 가 최상단에 오도록 만들어야
+   압축을 풀지 않고 그대로 넣을 수 있다. */
+function splitPacks(files) {
   const K = kind();
-  const suffix = K === 'data' ? '_datapack' : K === 'res' ? '_resourcepack' : '_pack';
+  const d = [], r = [];
+  for (const f of files) {
+    if (f.name.startsWith('datapack/')) d.push(Object.assign({}, f, { name: f.name.slice(9) }));
+    else if (f.name.startsWith('resourcepack/')) r.push(Object.assign({}, f, { name: f.name.slice(13) }));
+    else (K === 'res' ? r : d).push(f);
+  }
+  return { d, r };
+}
+
+function saveZip(files, filename) {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `${c.ns}${suffix}.zip`;
+  a.href = URL.createObjectURL(buildZip(files));
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
-  toast(`${a.download} 다운로드 (${files.length}개 파일)`);
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+
+function download() {
+  const c = cfg();
+  if (!S.files.length) { toast('만들 파일이 없습니다'); return; }
+  const { d, r } = splitPacks(S.files);
+
+  // 데이터팩과 리소스팩은 각각 별도 zip 으로 내려받는다.
+  // 하나로 합치면 pack.mcmeta 가 최상단에 오지 않아 압축을 풀어야만 쓸 수 있다.
+  if (d.length && r.length) {
+    saveZip(d, `${c.ns}_datapack.zip`);
+    // 브라우저가 연속 다운로드를 막는 경우가 있어 간격을 둔다
+    setTimeout(() => saveZip(r, `${c.ns}_resourcepack.zip`), 600);
+    toast(`zip 2개 다운로드 — 데이터팩 ${d.length}개 · 리소스팩 ${r.length}개 파일`);
+  } else if (d.length) {
+    saveZip(d, `${c.ns}_datapack.zip`);
+    toast(`${c.ns}_datapack.zip 다운로드 (${d.length}개 파일)`);
+  } else {
+    saveZip(r, `${c.ns}_resourcepack.zip`);
+    toast(`${c.ns}_resourcepack.zip 다운로드 (${r.length}개 파일)`);
+  }
 }
 
 /* ─────────── 10. 이벤트 연결 ─────────── */

@@ -5,6 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Motion Test</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ── 카테고리 3줄 ── */
+    .cat-list { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+    .cat-item {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; padding: 14px 16px;
+      background: #fff; border: 2px solid #e4e6ea; border-radius: 16px;
+      cursor: pointer; text-align: left; transition: border-color .12s, background .12s, transform .1s;
+    }
+    .cat-item:hover { background: #f8f9ff; }
+    .cat-item:active { transform: scale(.985); }
+    .cat-item.active-docs { border-color: #3b5bdb; background: #f0f3ff; }
+    .cat-item.active-game { border-color: #e8590c; background: #fff5eb; }
+    .cat-item.active-exp { border-color: #0ca678; background: #ebfbee; }
+    .cat-icon {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .cat-docs .cat-icon { background: #dbe4ff; }
+    .cat-game .cat-icon { background: #ffe8cc; }
+    .cat-exp .cat-icon { background: #c3fae8; }
+    .cat-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .cat-label { font-size: 16px; font-weight: 800; color: #111; }
+    .cat-desc { font-size: 12px; color: #999; }
+    .cat-count { font-size: 13px; font-weight: 800; color: #fff; background: #adb5bd; border-radius: 20px; padding: 2px 10px; flex-shrink: 0; }
+    .cat-docs .cat-count { background: #3b5bdb; }
+    .cat-game .cat-count { background: #e8590c; }
+    .cat-exp .cat-count { background: #0ca678; }
+    .cat-chevron { font-size: 20px; color: #ccc; flex-shrink: 0; }
+
+    /* ── 검색 ── */
+    .search-wrap { padding: 12px 16px 0; position: sticky; top: 0; z-index: 5; }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border: 1px solid #e4e6ea; border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .search-box .s-icon { font-size: 16px; color: #999; }
+    #search-input {
+      flex: 1; border: none; outline: none; font-size: 15px; background: transparent; color: #111;
+    }
+    #search-clear {
+      border: none; background: #f1f3f5; width: 22px; height: 22px; border-radius: 50%;
+      cursor: pointer; font-size: 13px; color: #666; display: none; line-height: 1;
+    }
+
+    /* ── 현재 필터 바 ── */
+    .filter-bar { padding: 10px 16px 0; display: none; align-items: center; gap: 8px; }
+    .filter-bar.show { display: flex; }
+    .filter-tag {
+      font-size: 13px; font-weight: 700; background: #111; color: #fff;
+      border-radius: 20px; padding: 5px 12px;
+    }
+    .filter-reset {
+      font-size: 13px; font-weight: 600; background: #fff; border: 1px solid #e4e6ea;
+      border-radius: 20px; padding: 5px 12px; cursor: pointer; color: #555;
+    }
+    .filter-reset:hover { background: #f1f3f5; }
+    .list-meta { padding: 10px 20px 0; font-size: 12px; color: #999; }
+  </style>
 </head>
 <body>
 
@@ -14,6 +74,54 @@
     <h1>Motion Test</h1>
     <p>테스트 항목을 선택하세요</p>
   </div>
+
+  <!-- 카테고리 3줄 바로가기 -->
+  <div class="cat-list" id="cat-list">
+    <button class="cat-item cat-docs" data-cat="docs">
+      <div class="cat-icon">📚</div>
+      <div class="cat-info">
+        <span class="cat-label">자료 정리 모음</span>
+        <span class="cat-desc">가이드 · 레퍼런스 · 백과사전</span>
+      </div>
+      <span class="cat-count" id="count-docs">0</span>
+      <span class="cat-chevron">›</span>
+    </button>
+    <button class="cat-item cat-game" data-cat="game">
+      <div class="cat-icon">🎮</div>
+      <div class="cat-info">
+        <span class="cat-label">게임 모음</span>
+        <span class="cat-desc">플레이 가능한 게임들</span>
+      </div>
+      <span class="cat-count" id="count-game">0</span>
+      <span class="cat-chevron">›</span>
+    </button>
+    <button class="cat-item cat-exp" data-cat="exp">
+      <div class="cat-icon">✨</div>
+      <div class="cat-info">
+        <span class="cat-label">체험 요소 모음</span>
+        <span class="cat-desc">시뮬레이션 · 도구 · 인터랙션</span>
+      </div>
+      <span class="cat-count" id="count-exp">0</span>
+      <span class="cat-chevron">›</span>
+    </button>
+  </div>
+
+  <!-- 검색 -->
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="s-icon">🔍</span>
+      <input id="search-input" type="text" placeholder="이름 또는 번호로 검색 (예: 미로, 42, KaTeX)" autocomplete="off">
+      <button id="search-clear" title="지우기">✕</button>
+    </div>
+  </div>
+
+  <!-- 현재 필터 표시 -->
+  <div class="filter-bar" id="filter-bar">
+    <span class="filter-tag" id="filter-tag"></span>
+    <button class="filter-reset" id="filter-reset">✕ 전체 보기</button>
+  </div>
+
+  <div class="list-meta" id="list-meta"></div>
   <div class="btn-list" id="btn-list"></div>
 </div>
 
@@ -30,36 +138,183 @@
 <script src="data/pages.js"></script>
 
 <script>
-  // ── 버튼 목록 생성 ────────────────────────
-  const list = document.getElementById('btn-list');
+  const MAX_N = 500;
 
-  for (let i = 1; i <= 100; i++) {
-    const page  = PAGES[i] || {};
-    const label = page.label || `테스트 ${i}`;
-    const desc  = page.desc  || null;
-    const thumb = page.thumb || null;
+  // ── 카테고리 분류 ─────────────────────
+  // page.cat 이 있으면 우선 사용, 없으면 아래 목록 기준
+  const CAT_GAME = new Set([2,3,6,7,8,9,10,16,17,25,43,59,60,69,76,77,84]);
+  const CAT_EXP  = new Set([1,4,11,13,14,15,24,30,31,37,39,40,44,48,55,57,58,61,78,80,82,83,85]);
+  // 나머지는 전부 docs
+  const CAT_LABEL = { docs: '자료 정리 모음', game: '게임 모음', exp: '체험 요소 모음' };
 
-    const thumbHtml = thumb
-      ? `<div class="btn-thumb"><img src="${thumb}" alt="${label}"></div>`
-      : `<div class="btn-thumb"><span class="btn-num">${i}</span></div>`;
-
-    const descHtml = desc
-      ? `<span class="btn-desc">${desc}</span>`
-      : '';
-
-    const btn = document.createElement('button');
-    btn.className = 'btn-item';
-    btn.innerHTML =
-      thumbHtml +
-      `<div class="btn-info">
-         <span class="btn-label">${label}</span>
-         ${descHtml}
-       </div>` +
-      `<span class="btn-chevron">›</span>`;
-
-    btn.addEventListener('click', () => { location.hash = i; });
-    list.appendChild(btn);
+  function getCat(n) {
+    const p = (typeof PAGES !== 'undefined' && PAGES[n]) || {};
+    if (p.cat === 'docs' || p.cat === 'game' || p.cat === 'exp') return p.cat;
+    if (CAT_GAME.has(n)) return 'game';
+    if (CAT_EXP.has(n)) return 'exp';
+    return 'docs';
   }
+
+  function getItem(n) {
+    const page  = (typeof PAGES !== 'undefined' && PAGES[n]) || {};
+    return {
+      n,
+      label: page.label || `테스트 ${n}`,
+      desc: page.desc || '',
+      thumb: page.thumb || null,
+      url: page.url || null,
+      cat: getCat(n),
+      hasContent: !!page.url,
+    };
+  }
+
+  // 전체 1~500 아이템 미리 생성
+  const ALL = [];
+  for (let i = 1; i <= MAX_N; i++) ALL.push(getItem(i));
+
+  // 카테고리 개수 표시 (내용 있는 것만 집계)
+  function updateCounts() {
+    const c = { docs: 0, game: 0, exp: 0 };
+    ALL.forEach(it => { if (it.hasContent) c[it.cat]++; });
+    document.getElementById('count-docs').textContent = c.docs;
+    document.getElementById('count-game').textContent = c.game;
+    document.getElementById('count-exp').textContent = c.exp;
+  }
+
+  // ── 상태 & 렌더 ───────────────────────
+  let activeCat = null; // null | 'docs' | 'game' | 'exp'
+  let query = '';
+
+  const listEl = document.getElementById('btn-list');
+  const metaEl = document.getElementById('list-meta');
+  const filterBar = document.getElementById('filter-bar');
+  const filterTag = document.getElementById('filter-tag');
+  const searchInput = document.getElementById('search-input');
+  const searchClear = document.getElementById('search-clear');
+
+  function matchesQuery(it, q) {
+    if (!q) return true;
+    q = q.trim().toLowerCase();
+    if (!q) return true;
+    // 번호 검색: "42" / "#42" / "테스트 42"
+    const qNum = q.replace(/^(테스트|test|#)\s*/i, '');
+    if (String(it.n) === qNum) return true;
+    if (String(it.n).includes(qNum) && /^\d+$/.test(qNum)) return true;
+    // 이름 + 설명 검색
+    return it.label.toLowerCase().includes(q) || (it.desc || '').toLowerCase().includes(q);
+  }
+
+  function renderList() {
+    listEl.innerHTML = '';
+    const q = query.trim();
+    let items = ALL.filter(it => (!activeCat || it.cat === activeCat) && matchesQuery(it, q));
+
+    // 내용 있는 항목 우선, 그 다음 번호순
+    items.sort((a, b) => {
+      if (!!a.hasContent !== !!b.hasContent) return a.hasContent ? -1 : 1;
+      return a.n - b.n;
+    });
+
+    // 필터 바
+    if (activeCat) {
+      filterBar.classList.add('show');
+      filterTag.textContent = CAT_LABEL[activeCat];
+    } else {
+      filterBar.classList.remove('show');
+    }
+
+    // 카테고리 버튼 활성 표시
+    document.querySelectorAll('.cat-item').forEach(btn => {
+      btn.classList.remove('active-docs', 'active-game', 'active-exp');
+      if (btn.dataset.cat === activeCat) btn.classList.add('active-' + activeCat);
+    });
+
+    // 메타 텍스트
+    const total = ALL.filter(it => !activeCat || it.cat === activeCat).length;
+    const withContent = items.length;
+    if (q) {
+      metaEl.textContent = `"${query.trim()}" 검색 결과 ${withContent}개` + (activeCat ? ` (${CAT_LABEL[activeCat]} 내)` : ' (전체 500개 중)');
+    } else if (activeCat) {
+      metaEl.textContent = `${CAT_LABEL[activeCat]} — ${items.filter(i=>i.hasContent).length}개 (전체 ${total}칸 중)`;
+    } else {
+      const filled = ALL.filter(i=>i.hasContent).length;
+      metaEl.textContent = `전체 ${filled}개 등록됨 (500칸 중) — 위 3줄에서 주제별로 모아보기`;
+    }
+
+    if (items.length === 0) {
+      listEl.innerHTML = `<div class="empty-msg" style="padding:40px 0;"><span class="icon">🔍</span><p>검색 결과가 없습니다</p></div>`;
+      return;
+    }
+
+    // 검색 중이 아닐 때는 내용 있는 것만 보여주고, 검색 중에는 빈 칸도 번호 매칭되면 보여줌
+    const showEmpty = !!q;
+    items.forEach(it => {
+      if (!it.hasContent && !showEmpty && !q) {
+        // 전체 보기에서는 빈 칸 숨김 (500칸이 너무 길어지므로)
+        // 단, 카테고리 모음 안에서도 빈 칸은 숨김
+        return;
+      }
+      if (!it.hasContent && !showEmpty) return;
+
+      const thumbHtml = it.thumb
+        ? `<div class="btn-thumb"><img src="${it.thumb}" alt="${it.label}"></div>`
+        : `<div class="btn-thumb"><span class="btn-num">${it.n}</span></div>`;
+
+      // 카테고리 뱃지 (전체 보기에서만)
+      const badge = !activeCat
+        ? `<span class="btn-desc">[${CAT_LABEL[it.cat].replace(' 모음','')}] ${it.desc || ''}</span>`
+        : (it.desc ? `<span class="btn-desc">${it.desc}</span>` : '');
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-item';
+      if (!it.hasContent) btn.style.opacity = '0.55';
+      btn.innerHTML =
+        thumbHtml +
+        `<div class="btn-info">
+           <span class="btn-label">${it.n}. ${it.label}</span>
+           ${badge}
+         </div>` +
+        `<span class="btn-chevron">›</span>`;
+
+      if (it.hasContent) {
+        btn.addEventListener('click', () => { location.hash = it.n; });
+      } else {
+        btn.disabled = true;
+        btn.style.cursor = 'default';
+      }
+      listEl.appendChild(btn);
+    });
+  }
+
+  // ── 카테고리 클릭 → 해당 주제 바로가기만 모아서 보여주기 ──
+  document.querySelectorAll('.cat-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = btn.dataset.cat;
+      activeCat = (activeCat === c) ? null : c; // 다시 누르면 전체로
+      renderList();
+      document.getElementById('view-home').scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  document.getElementById('filter-reset').addEventListener('click', () => {
+    activeCat = null;
+    renderList();
+  });
+
+  // ── 검색 ──
+  let searchTimer = null;
+  searchInput.addEventListener('input', () => {
+    searchClear.style.display = searchInput.value ? 'block' : 'none';
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { query = searchInput.value; renderList(); }, 120);
+  });
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    query = '';
+    searchClear.style.display = 'none';
+    renderList();
+    searchInput.focus();
+  });
 
   // ── 뒤로가기 ──────────────────────────────
   document.getElementById('back-btn').addEventListener('click', () => {
@@ -69,12 +324,17 @@
   // ── 라우터 ────────────────────────────────
   function render() {
     const n = parseInt(location.hash.replace('#', ''));
-    const isDetail = n >= 1 && n <= 100;
+    const isDetail = n >= 1 && n <= MAX_N && ((typeof PAGES !== 'undefined' && PAGES[n] && PAGES[n].url));
 
     document.getElementById('view-home').classList.toggle('active', !isDetail);
     document.getElementById('view-detail').classList.toggle('active', isDetail);
 
     if (!isDetail) {
+      // 빈 칸 해시(#88 등)면 홈으로 복귀
+      if (location.hash && location.hash !== '') {
+        const nn = parseInt(location.hash.replace('#', ''));
+        if (nn >= 1 && nn <= MAX_N) history.replaceState(null, '', location.pathname);
+      }
       document.title = 'Motion Test';
       return;
     }
@@ -82,24 +342,18 @@
     const page  = PAGES[n] || {};
     const label = page.label || `테스트 ${n}`;
 
-    document.getElementById('detail-title').textContent = label;
+    document.getElementById('detail-title').textContent = `${n}. ${label}`;
     document.title = `${label} — Motion Test`;
 
     const content = document.getElementById('detail-content');
-    if (page.url) {
-      content.innerHTML =
-        `<iframe class="detail-iframe" src="${page.url}" allowfullscreen
-                 allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
-    } else {
-      content.innerHTML =
-        `<div class="empty-msg">
-           <span class="icon">🧪</span>
-           <p>아직 내용이 없습니다</p>
-         </div>`;
-    }
+    content.innerHTML =
+      `<iframe class="detail-iframe" src="${page.url}" allowfullscreen
+               allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
   }
 
   window.addEventListener('hashchange', render);
+  updateCounts();
+  renderList();
   render();
 </script>
 </body>

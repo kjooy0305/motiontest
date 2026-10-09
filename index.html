@@ -64,6 +64,60 @@
     }
     .filter-reset:hover { background: #f1f3f5; }
     .list-meta { padding: 10px 20px 0; font-size: 12px; color: #999; }
+
+    /* ── 설정 토글 ── */
+    .settings-btn {
+      position: fixed; top: 14px; right: 16px; z-index: 20;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #fff; border: 1px solid #e4e6ea;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      transition: background .12s;
+    }
+    .settings-btn:hover { background: #f1f3f5; }
+
+    /* ── 설정 패널 ── */
+    .settings-panel {
+      position: fixed; top: 60px; right: 16px; z-index: 20;
+      background: #fff; border-radius: 14px; border: 1px solid #e4e6ea;
+      box-shadow: 0 8px 30px rgba(0,0,0,.12);
+      padding: 16px; width: 240px;
+      display: none;
+    }
+    .settings-panel.open { display: block; }
+    .settings-panel h3 { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 12px; }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; font-size: 13px; color: #333;
+    }
+    .setting-row + .setting-row { border-top: 1px solid #f1f3f5; }
+    .toggle-switch {
+      position: relative; width: 40px; height: 22px;
+      background: #dee2e6; border-radius: 20px; cursor: pointer;
+      transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-switch.on { background: #3b5bdb; }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle-switch.on::after { transform: translateX(18px); }
+
+    /* ── 카테고리 뷰 ── */
+    .cat-view-header {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff; border-bottom: 1px solid #e4e6ea;
+      padding: 0 16px; height: 56px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .cat-view-title { font-size: 17px; font-weight: 700; color: #111; flex: 1; }
+    .cat-view-search {
+      padding: 10px 16px 0; position: sticky; top: 56px; z-index: 5;
+      background: #fff;
+    }
   </style>
 </head>
 <body>
@@ -125,6 +179,23 @@
   <div class="btn-list" id="btn-list"></div>
 </div>
 
+<!-- ── 카테고리 뷰 ──────────────────────────── -->
+<div class="view" id="view-category">
+  <div class="cat-view-header">
+    <button class="back-btn" id="cat-back-btn">‹</button>
+    <span class="cat-view-title" id="cat-view-title"></span>
+  </div>
+  <div class="cat-view-search">
+    <div class="search-box">
+      <span class="s-icon">🔍</span>
+      <input id="cat-search-input" type="text" placeholder="이 카테고리 내 검색..." autocomplete="off">
+      <button id="cat-search-clear" title="지우기">✕</button>
+    </div>
+  </div>
+  <div class="list-meta" id="cat-list-meta"></div>
+  <div class="btn-list" id="cat-btn-list"></div>
+</div>
+
 <!-- ── 상세 뷰 ─────────────────────────────── -->
 <div class="view" id="view-detail">
   <div class="detail-header">
@@ -132,6 +203,16 @@
     <span class="detail-title" id="detail-title"></span>
   </div>
   <div class="detail-content" id="detail-content"></div>
+</div>
+
+<!-- ── 설정 버튼 & 패널 ──────────────────── -->
+<button class="settings-btn" id="settings-btn">⚙️</button>
+<div class="settings-panel" id="settings-panel">
+  <h3>설정</h3>
+  <div class="setting-row">
+    <span>전체 500칸 표시</span>
+    <div class="toggle-switch" id="toggle-all"></div>
+  </div>
 </div>
 
 <!-- 페이지 설정 로드 -->
@@ -184,6 +265,8 @@
   // ── 상태 & 렌더 ───────────────────────
   let activeCat = null; // null | 'docs' | 'game' | 'exp'
   let query = '';
+  let catQuery = '';
+  let showAllSlots = localStorage.getItem('motiontest-showall') === 'true';
 
   const listEl = document.getElementById('btn-list');
   const metaEl = document.getElementById('list-meta');
@@ -192,30 +275,56 @@
   const searchInput = document.getElementById('search-input');
   const searchClear = document.getElementById('search-clear');
 
+  const catListEl = document.getElementById('cat-btn-list');
+  const catMetaEl = document.getElementById('cat-list-meta');
+  const catSearchInput = document.getElementById('cat-search-input');
+  const catSearchClear = document.getElementById('cat-search-clear');
+
   function matchesQuery(it, q) {
     if (!q) return true;
     q = q.trim().toLowerCase();
     if (!q) return true;
-    // 번호 검색: "42" / "#42" / "테스트 42"
     const qNum = q.replace(/^(테스트|test|#)\s*/i, '');
     if (String(it.n) === qNum) return true;
     if (String(it.n).includes(qNum) && /^\d+$/.test(qNum)) return true;
-    // 이름 + 설명 검색
     return it.label.toLowerCase().includes(q) || (it.desc || '').toLowerCase().includes(q);
+  }
+
+  function createItemBtn(it, showBadge) {
+    const thumbHtml = it.thumb
+      ? `<div class="btn-thumb"><img src="${it.thumb}" alt="${it.label}"></div>`
+      : `<div class="btn-thumb"><span class="btn-num">${it.n}</span></div>`;
+    const badge = showBadge
+      ? `<span class="btn-desc">[${CAT_LABEL[it.cat].replace(' 모음','')}] ${it.desc || ''}</span>`
+      : (it.desc ? `<span class="btn-desc">${it.desc}</span>` : '');
+    const btn = document.createElement('button');
+    btn.className = 'btn-item';
+    if (!it.hasContent) btn.style.opacity = '0.55';
+    btn.innerHTML =
+      thumbHtml +
+      `<div class="btn-info">
+          <span class="btn-label">${it.n}. ${it.label}</span>
+          ${badge}
+        </div>` +
+      `<span class="btn-chevron">›</span>`;
+    if (it.hasContent) {
+      btn.addEventListener('click', () => { location.hash = it.n; });
+    } else {
+      btn.disabled = true;
+      btn.style.cursor = 'default';
+    }
+    return btn;
   }
 
   function renderList() {
     listEl.innerHTML = '';
     const q = query.trim();
     let items = ALL.filter(it => (!activeCat || it.cat === activeCat) && matchesQuery(it, q));
-
-    // 내용 있는 항목 우선, 그 다음 번호순
     items.sort((a, b) => {
       if (!!a.hasContent !== !!b.hasContent) return a.hasContent ? -1 : 1;
       return a.n - b.n;
     });
 
-    // 필터 바
     if (activeCat) {
       filterBar.classList.add('show');
       filterTag.textContent = CAT_LABEL[activeCat];
@@ -223,13 +332,11 @@
       filterBar.classList.remove('show');
     }
 
-    // 카테고리 버튼 활성 표시
     document.querySelectorAll('.cat-item').forEach(btn => {
       btn.classList.remove('active-docs', 'active-game', 'active-exp');
       if (btn.dataset.cat === activeCat) btn.classList.add('active-' + activeCat);
     });
 
-    // 메타 텍스트
     const total = ALL.filter(it => !activeCat || it.cat === activeCat).length;
     const withContent = items.length;
     if (q) {
@@ -246,62 +353,72 @@
       return;
     }
 
-    // 검색 중이 아닐 때는 내용 있는 것만 보여주고, 검색 중에는 빈 칸도 번호 매칭되면 보여줌
-    const showEmpty = !!q;
+    const showEmpty = !!q || showAllSlots;
     items.forEach(it => {
-      if (!it.hasContent && !showEmpty && !q) {
-        // 전체 보기에서는 빈 칸 숨김 (500칸이 너무 길어지므로)
-        // 단, 카테고리 모음 안에서도 빈 칸은 숨김
-        return;
-      }
       if (!it.hasContent && !showEmpty) return;
-
-      const thumbHtml = it.thumb
-        ? `<div class="btn-thumb"><img src="${it.thumb}" alt="${it.label}"></div>`
-        : `<div class="btn-thumb"><span class="btn-num">${it.n}</span></div>`;
-
-      // 카테고리 뱃지 (전체 보기에서만)
-      const badge = !activeCat
-        ? `<span class="btn-desc">[${CAT_LABEL[it.cat].replace(' 모음','')}] ${it.desc || ''}</span>`
-        : (it.desc ? `<span class="btn-desc">${it.desc}</span>` : '');
-
-      const btn = document.createElement('button');
-      btn.className = 'btn-item';
-      if (!it.hasContent) btn.style.opacity = '0.55';
-      btn.innerHTML =
-        thumbHtml +
-        `<div class="btn-info">
-           <span class="btn-label">${it.n}. ${it.label}</span>
-           ${badge}
-         </div>` +
-        `<span class="btn-chevron">›</span>`;
-
-      if (it.hasContent) {
-        btn.addEventListener('click', () => { location.hash = it.n; });
-      } else {
-        btn.disabled = true;
-        btn.style.cursor = 'default';
-      }
-      listEl.appendChild(btn);
+      listEl.appendChild(createItemBtn(it, !activeCat));
     });
   }
 
-  // ── 카테고리 클릭 → 해당 주제 바로가기만 모아서 보여주기 ──
+  function renderCatList() {
+    if (!activeCat) return;
+    catListEl.innerHTML = '';
+    const q = catQuery.trim();
+    let items = ALL.filter(it => it.cat === activeCat && matchesQuery(it, q));
+    items.sort((a, b) => a.n - b.n);
+
+    const totalInCat = ALL.filter(it => it.cat === activeCat).length;
+    const filledInCat = items.filter(i => i.hasContent).length;
+    if (q) {
+      catMetaEl.textContent = `"${catQuery.trim()}" 검색 결과 ${items.length}개 (전체 ${totalInCat}칸 중)`;
+    } else {
+      catMetaEl.textContent = `${CAT_LABEL[activeCat]} — ${filledInCat}개 등록됨 (전체 ${totalInCat}칸 중)`;
+    }
+
+    if (items.length === 0) {
+      catListEl.innerHTML = `<div class="empty-msg" style="padding:40px 0;"><span class="icon">🔍</span><p>검색 결과가 없습니다</p></div>`;
+      return;
+    }
+
+    const showEmpty = !!q || showAllSlots;
+    items.forEach(it => {
+      if (!it.hasContent && !showEmpty) return;
+      catListEl.appendChild(createItemBtn(it, false));
+    });
+  }
+
+  function switchToCatView(cat) {
+    activeCat = cat;
+    catQuery = '';
+    catSearchInput.value = '';
+    catSearchClear.style.display = 'none';
+    document.getElementById('cat-view-title').textContent = CAT_LABEL[cat];
+    document.getElementById('view-category').classList.add('active');
+    document.getElementById('view-home').classList.remove('active');
+    renderCatList();
+  }
+
+  function switchToHome() {
+    activeCat = null;
+    document.getElementById('view-home').classList.add('active');
+    document.getElementById('view-category').classList.remove('active');
+    renderList();
+  }
+
   document.querySelectorAll('.cat-item').forEach(btn => {
     btn.addEventListener('click', () => {
-      const c = btn.dataset.cat;
-      activeCat = (activeCat === c) ? null : c; // 다시 누르면 전체로
-      renderList();
-      document.getElementById('view-home').scrollTo({ top: 0, behavior: 'smooth' });
+      switchToCatView(btn.dataset.cat);
     });
   });
+
+  document.getElementById('cat-back-btn').addEventListener('click', switchToHome);
 
   document.getElementById('filter-reset').addEventListener('click', () => {
     activeCat = null;
     renderList();
   });
 
-  // ── 검색 ──
+  // ── 홈 검색 ──
   let searchTimer = null;
   searchInput.addEventListener('input', () => {
     searchClear.style.display = searchInput.value ? 'block' : 'none';
@@ -316,6 +433,48 @@
     searchInput.focus();
   });
 
+  // ── 카테고리 검색 ──
+  let catSearchTimer = null;
+  catSearchInput.addEventListener('input', () => {
+    catSearchClear.style.display = catSearchInput.value ? 'block' : 'none';
+    clearTimeout(catSearchTimer);
+    catSearchTimer = setTimeout(() => { catQuery = catSearchInput.value; renderCatList(); }, 120);
+  });
+  catSearchClear.addEventListener('click', () => {
+    catSearchInput.value = '';
+    catQuery = '';
+    catSearchClear.style.display = 'none';
+    renderCatList();
+    catSearchInput.focus();
+  });
+
+  // ── 설정 ──
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsPanel = document.getElementById('settings-panel');
+  const toggleAll = document.getElementById('toggle-all');
+
+  function updateToggleUI() {
+    toggleAll.classList.toggle('on', showAllSlots);
+  }
+  updateToggleUI();
+
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    settingsPanel.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+      settingsPanel.classList.remove('open');
+    }
+  });
+  toggleAll.addEventListener('click', () => {
+    showAllSlots = !showAllSlots;
+    localStorage.setItem('motiontest-showall', showAllSlots);
+    updateToggleUI();
+    if (activeCat) renderCatList();
+    else renderList();
+  });
+
   // ── 뒤로가기 ──────────────────────────────
   document.getElementById('back-btn').addEventListener('click', () => {
     location.hash = '';
@@ -326,18 +485,26 @@
     const n = parseInt(location.hash.replace('#', ''));
     const isDetail = n >= 1 && n <= MAX_N && ((typeof PAGES !== 'undefined' && PAGES[n] && PAGES[n].url));
 
-    document.getElementById('view-home').classList.toggle('active', !isDetail);
     document.getElementById('view-detail').classList.toggle('active', isDetail);
 
     if (!isDetail) {
-      // 빈 칸 해시(#88 등)면 홈으로 복귀
       if (location.hash && location.hash !== '') {
         const nn = parseInt(location.hash.replace('#', ''));
         if (nn >= 1 && nn <= MAX_N) history.replaceState(null, '', location.pathname);
       }
       document.title = 'Motion Test';
+      if (activeCat) {
+        document.getElementById('view-category').classList.add('active');
+        document.getElementById('view-home').classList.remove('active');
+      } else {
+        document.getElementById('view-home').classList.add('active');
+        document.getElementById('view-category').classList.remove('active');
+      }
       return;
     }
+
+    document.getElementById('view-home').classList.remove('active');
+    document.getElementById('view-category').classList.remove('active');
 
     const page  = PAGES[n] || {};
     const label = page.label || `테스트 ${n}`;
@@ -348,7 +515,7 @@
     const content = document.getElementById('detail-content');
     content.innerHTML =
       `<iframe class="detail-iframe" src="${page.url}" allowfullscreen
-               allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
+       allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
   }
 
   window.addEventListener('hashchange', render);

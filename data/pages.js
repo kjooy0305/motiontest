@@ -628,4 +628,11 @@ const PAGES = {
     desc  : '인간 혐오 시뮬레이터 · 남의 불행을 팔아먹는 10일간의 실험',
     cat   : 'game',
   },
+  89: {
+    label : '시련의 탑',
+    url   : 'pages/89/',
+    thumb : null,
+    desc  : '로그라이크 덱빌딩 카드게임 · 12층 보스 정복',
+    cat   : 'game',
+  },
 };

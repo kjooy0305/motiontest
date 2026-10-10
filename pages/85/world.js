@@ -76,6 +76,15 @@ const World = {
     this.rand = rng(this.seed);
     this.gw = Math.ceil(this.WW / this.CS);
     this.gh = Math.ceil(this.WH / this.CS);
+    /* 노이즈 주파수를 절대 칸 좌표 기준으로 고정 — 나중에 들판을
+       넓혀도 이미 있던 땅의 모양이 바뀌지 않는다 */
+    this.ku1 = 5.5 / this.gw; this.kv1 = 3.6 / this.gh;
+    this.ku2 = 4.2 / this.gw; this.kv2 = 2.8 / this.gh;
+    this.ku3 = 3.1 / this.gw; this.kv3 = 2.2 / this.gh;
+    this.nz1 = makeNoise(this.seed);
+    this.nz2 = makeNoise(this.seed ^ 0x9e37);
+    this.nz3 = makeNoise(this.seed ^ 0x51ed);
+    this.expansions = 0;
     const n = this.gw * this.gh;
     this.ter = new Uint8Array(n);
     this.food = new Float32Array(n);
@@ -99,39 +108,89 @@ const World = {
     return TERINFO[this.terAt(x, y)].pass === 1;
   },
 
-  generate() {
-    const nz1 = makeNoise(this.seed);
-    const nz2 = makeNoise(this.seed ^ 0x9e37);
-    const nz3 = makeNoise(this.seed ^ 0x51ed);
-    const { gw, gh, ter, food } = this;
+  /* 한 칸의 지형을 정한다. x·y는 절대 칸 좌표라서
+     들판을 넓혀도 기존 칸을 다시 계산하면 같은 값이 나온다 */
+  genCell(x, y, gw, gh) {
+    const h = fbm(this.nz1, x * this.ku1, y * this.kv1, 5);          // 높낮이
+    const w = fbm(this.nz2, x * this.ku2 + 11, y * this.kv2 + 7, 4); // 물기
+    const t = fbm(this.nz3, x * this.ku3 + 31, y * this.kv3 + 3, 3); // 더위
 
+    /* 가장자리는 조금 낮춰 세계가 섬처럼 닫히게 */
+    const u = x / gw, v = y / gh;
+    const edge = Math.min(u, v, 1 - u, 1 - v);
+    const hh = h - Math.max(0, .16 - edge) * 1.4;
+
+    let k;
+    if (hh < .30) k = TER.WATER;
+    else if (hh > .745) k = TER.ROCK;
+    else if (w > .66 && hh < .40) k = TER.MARSH;
+    else if (t > .70 && w < .40) k = TER.SCALD;
+    else if (t < .285 && hh > .52) k = TER.COLD;
+    else if (w > .60) k = TER.FOREST;
+    else if (w > .50 && h > .45) k = TER.BLOOM;
+    else k = TER.PLAIN;
+    return k;
+  },
+
+  generate() {
+    const { gw, gh, ter, food } = this;
     for (let y = 0; y < gh; y++) {
       for (let x = 0; x < gw; x++) {
-        const u = x / gw, v = y / gh;
-        const h = fbm(nz1, u * 5.5, v * 3.6, 5);          // 높낮이
-        const w = fbm(nz2, u * 4.2 + 11, v * 2.8 + 7, 4); // 물기
-        const t = fbm(nz3, u * 3.1 + 31, v * 2.2 + 3, 3); // 더위
-
-        /* 가장자리는 조금 낮춰 세계가 섬처럼 닫히게 */
-        const edge = Math.min(u, v, 1 - u, 1 - v);
-        const hh = h - Math.max(0, .16 - edge) * 1.4;
-
-        let k;
-        if (hh < .30) k = TER.WATER;
-        else if (hh > .745) k = TER.ROCK;
-        else if (w > .66 && hh < .40) k = TER.MARSH;
-        else if (t > .70 && w < .40) k = TER.SCALD;
-        else if (t < .285 && hh > .52) k = TER.COLD;
-        else if (w > .60) k = TER.FOREST;
-        else if (w > .50 && h > .45) k = TER.BLOOM;
-        else k = TER.PLAIN;
-
+        const k = this.genCell(x, y, gw, gh);
         const i = y * gw + x;
         ter[i] = k;
         food[i] = TERINFO[k].cap * (.35 + this.rand() * .5);
       }
     }
     this.smooth();
+  },
+
+  /* ── 들판 넓히기 ────────────────────────────────────────
+     처음 정한 필드를 확정하고, 바깥에 새 땅을 덧붙인다.
+     안에 있던 땅·먹이·무서움은 그대로 복사되므로
+     살던 것들은 아무 일도 없었던 것처럼 계속 산다.
+     주위는 그냥 빈 여백으로 남는다.                          */
+  MAX_WW: 4000, MAX_WH: 3000, MAX_EXPAND: 6,
+  expand(marginCells = 25) {
+    const m = Math.max(8, Math.round(marginCells));
+    const ngw = this.gw + m * 2, ngh = this.gh + m * 2;
+    if (this.expansions >= this.MAX_EXPAND) return false;
+    if (ngw * this.CS > this.MAX_WW || ngh * this.CS > this.MAX_WH) return false;
+
+    const { gw, gh, ter, food, dread } = this;
+    const nter = new Uint8Array(ngw * ngh);
+    const nfood = new Float32Array(ngw * ngh);
+    const ndr = new Float32Array(ngw * ngh);
+
+    /* 있던 땅을 가운데에 그대로 옮긴다 */
+    for (let y = 0; y < gh; y++) {
+      for (let x = 0; x < gw; x++) {
+        const ni = (y + m) * ngw + (x + m);
+        const oi = y * gw + x;
+        nter[ni] = ter[oi];
+        nfood[ni] = food[oi];
+        ndr[ni] = dread[oi];
+      }
+    }
+    this.gw = ngw; this.gh = ngh;
+    this.WW = ngw * this.CS; this.WH = ngh * this.CS;
+    this.ter = nter; this.food = nfood; this.dread = ndr;
+
+    /* 새로 생긴 가장자리만 지형 생성 — 절대 좌표 노이즈라 이어진다 */
+    for (let y = 0; y < ngh; y++) {
+      for (let x = 0; x < ngw; x++) {
+        const inOld = x >= m && y >= m && x < m + gw && y < m + gh;
+        if (inOld) continue;
+        const k = this.genCell(x, y, ngw, ngh);
+        const i = y * ngw + x;
+        nter[i] = k;
+        nfood[i] = TERINFO[k].cap * (.35 + this.rand() * .5);
+      }
+    }
+    this.expansions++;
+    this.smooth();
+    this.dirty = true;
+    return true;
   },
 
   /* 홀로 떨어진 칸을 주변에 맞춰 다듬는다 — 지형이 얼룩덜룩하지 않게 */

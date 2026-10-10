@@ -228,9 +228,17 @@ function render() {
   if (eyes.bond) drawBonds();
   drawAgents(s);
   if (selected && selected.alive) drawSelection(s);
+  drawFieldEdge();
 
   ctx.restore();
   drawEdgeVignette();
+}
+
+/* 확정된 들판의 경계 — 바깥은 그냥 빈 여백이다 */
+function drawFieldEdge() {
+  ctx.strokeStyle = 'rgba(120,150,190,.4)';
+  ctx.lineWidth = 2 / scale();
+  ctx.strokeRect(0, 0, World.WW, World.WH);
 }
 
 function drawDread() {
@@ -450,15 +458,26 @@ function stepCamera(dt) {
   cam.x = lerp(cam.x, cam.tx, k);
   cam.y = lerp(cam.y, cam.ty, k);
   cam.zoom = lerp(cam.zoom, cam.tzoom, Math.min(1, dt * 1.8));
-  /* 화면 밖으로 너무 나가지 않게 */
-  const s = scale();
-  const halfW = VW / 2 / s, halfH = VH / 2 / s;
-  cam.x = clamp(cam.x, halfW, World.WW - halfW);
-  cam.y = clamp(cam.y, halfH, World.WH - halfH);
-  cam.tx = clamp(cam.tx, halfW, World.WW - halfW);
-  cam.ty = clamp(cam.ty, halfH, World.WH - halfH);
+  clampCam();
 
   if (cam.idleFor > 0) { cam.idleFor -= dt; if (cam.idleFor <= 0 && $('autoCam').dataset.want !== '0') cam.auto = true; }
+}
+/* 축소해서 화면이 들판보다 커지면 가운데에 고정한다.
+   예전에는 clamp 최소·최대가 뒤집히면서 카메라가
+   양쪽 끝으로 튀는 바람에 화면이 크게 흔들렸다. */
+function clampCam() {
+  const s = scale();
+  const halfW = VW / 2 / s, halfH = VH / 2 / s;
+  if (halfW * 2 >= World.WW) cam.x = cam.tx = World.WW / 2;
+  else {
+    cam.x = clamp(cam.x, halfW, World.WW - halfW);
+    cam.tx = clamp(cam.tx, halfW, World.WW - halfW);
+  }
+  if (halfH * 2 >= World.WH) cam.y = cam.ty = World.WH / 2;
+  else {
+    cam.y = clamp(cam.y, halfH, World.WH - halfH);
+    cam.ty = clamp(cam.ty, halfH, World.WH - halfH);
+  }
 }
 function toWorld(px, py) {
   const s = scale();
@@ -606,11 +625,12 @@ cv.addEventListener('wheel', e => {
   e.preventDefault();
   touched();
   const before = toWorld(e.clientX, e.clientY);
-  cam.tzoom = clamp(cam.tzoom * (e.deltaY < 0 ? 1.18 : 1 / 1.18), .6, 6);
+  cam.tzoom = clamp(cam.tzoom * (e.deltaY < 0 ? 1.18 : 1 / 1.18), .35, 6);
   cam.zoom = cam.tzoom;
   const after = toWorld(e.clientX, e.clientY);
   cam.tx += before.x - after.x; cam.ty += before.y - after.y;
   cam.x = cam.tx; cam.y = cam.ty;
+  clampCam();
 }, { passive: false });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -681,6 +701,7 @@ function buildUI() {
 
   $('dialsHd').addEventListener('click', () => $('dials').classList.toggle('min'));
   $('reseed').addEventListener('click', () => newWorld());
+  $('expandBtn').addEventListener('click', () => { touched(); expandField(); });
   $('zen').addEventListener('click', () => document.body.classList.toggle('zen'));
   $('autoCam').addEventListener('click', () => {
     const want = $('autoCam').classList.toggle('on');
@@ -836,10 +857,37 @@ function newWorld() {
   updateInspector();
   cam.tx = cam.x = World.WW / 2; cam.ty = cam.y = World.WH / 2;
   cam.tzoom = cam.zoom = 1;
+  expandCount = 0;
+  updateExpandBtn();
   poi = [];
   drawTerrain();
   drawFood();
   calcTerritory();
+}
+
+/* ── 들판 넓히기 ────────────────────────────────────────── */
+let expandCount = 0;
+function updateExpandBtn() {
+  const b = $('expandBtn');
+  if (!b) return;
+  const left = World.MAX_EXPAND - (World.expansions || 0);
+  b.textContent = left > 0 ? `🌍 넓히기(${left})` : '🌍 끝까지 넓힘';
+  b.classList.toggle('on', left <= 0);
+}
+function expandField() {
+  if (!World.expand(25)) {
+    hint('들판이 더 넓어질 수 없다 — 여기가 끝이다');
+    return;
+  }
+  expandCount++;
+  resize();       // 들판 크기에 맞춰 맞춤 배율 다시 계산
+  initTG();       // 구역 격자 다시 깔기
+  calcTerritory();
+  drawFood();
+  clampCam();
+  updateExpandBtn();
+  Life.log('world', `들판이 넓어졌다 (${World.WW}×${World.WH})`, { x: World.WW / 2, y: World.WH / 2 });
+  hint(`들판 확장 (${expandCount}회) — 바깥 여백에서 새 땅이 이어진다`);
 }
 
 let last = 0;

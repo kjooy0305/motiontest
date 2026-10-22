@@ -210,7 +210,7 @@
 <div class="settings-panel" id="settings-panel">
   <h3>설정</h3>
   <div class="setting-row">
-    <span>전체 500칸 표시</span>
+    <span>전체 100칸 표시</span>
     <div class="toggle-switch" id="toggle-all"></div>
   </div>
 </div>
@@ -219,7 +219,7 @@
 <script src="data/pages.js"></script>
 
 <script>
-  const MAX_N = 500;
+  const MAX_N = 100;
 
   // ── 카테고리 분류 ─────────────────────
   // page.cat 이 있으면 우선 사용, 없으면 아래 목록 기준
@@ -249,7 +249,7 @@
     };
   }
 
-  // 전체 1~500 아이템 미리 생성
+  // 전체 1~MAX_N 아이템 미리 생성
   const ALL = [];
   for (let i = 1; i <= MAX_N; i++) ALL.push(getItem(i));
 
@@ -266,7 +266,7 @@
   let activeCat = null; // null | 'docs' | 'game' | 'exp'
   let query = '';
   let catQuery = '';
-  let showAllSlots = localStorage.getItem('motiontest-showall') === 'true';
+  let showAllSlots = localStorage.getItem('motiontest-showall') !== 'false';
 
   const listEl = document.getElementById('btn-list');
   const metaEl = document.getElementById('list-meta');
@@ -299,7 +299,6 @@
       : (it.desc ? `<span class="btn-desc">${it.desc}</span>` : '');
     const btn = document.createElement('button');
     btn.className = 'btn-item';
-    if (!it.hasContent) btn.style.opacity = '0.55';
     btn.innerHTML =
       thumbHtml +
       `<div class="btn-info">
@@ -307,12 +306,7 @@
           ${badge}
         </div>` +
       `<span class="btn-chevron">›</span>`;
-    if (it.hasContent) {
-      btn.addEventListener('click', () => { location.hash = it.n; });
-    } else {
-      btn.disabled = true;
-      btn.style.cursor = 'default';
-    }
+    btn.addEventListener('click', () => { location.hash = it.n; });
     return btn;
   }
 
@@ -320,10 +314,8 @@
     listEl.innerHTML = '';
     const q = query.trim();
     let items = ALL.filter(it => (!activeCat || it.cat === activeCat) && matchesQuery(it, q));
-    items.sort((a, b) => {
-      if (!!a.hasContent !== !!b.hasContent) return a.hasContent ? -1 : 1;
-      return a.n - b.n;
-    });
+    items.sort((a, b) => a.n - b.n);
+    if (!showAllSlots) items = items.filter(it => it.hasContent);
 
     if (activeCat) {
       filterBar.classList.add('show');
@@ -340,12 +332,12 @@
     const total = ALL.filter(it => !activeCat || it.cat === activeCat).length;
     const withContent = items.length;
     if (q) {
-      metaEl.textContent = `"${query.trim()}" 검색 결과 ${withContent}개` + (activeCat ? ` (${CAT_LABEL[activeCat]} 내)` : ' (전체 500개 중)');
+      metaEl.textContent = `"${query.trim()}" 검색 결과 ${withContent}개` + (activeCat ? ` (${CAT_LABEL[activeCat]} 내)` : ' (전체 100개 중)');
     } else if (activeCat) {
       metaEl.textContent = `${CAT_LABEL[activeCat]} — ${items.filter(i=>i.hasContent).length}개 (전체 ${total}칸 중)`;
     } else {
       const filled = ALL.filter(i=>i.hasContent).length;
-      metaEl.textContent = `전체 ${filled}개 등록됨 (500칸 중) — 위 3줄에서 주제별로 모아보기`;
+      metaEl.textContent = `전체 ${filled}개 등록됨 (100칸 중) — 위 3줄에서 주제별로 모아보기`;
     }
 
     if (items.length === 0) {
@@ -353,11 +345,7 @@
       return;
     }
 
-    const showEmpty = !!q || showAllSlots;
-    items.forEach(it => {
-      if (!it.hasContent && !showEmpty) return;
-      listEl.appendChild(createItemBtn(it, !activeCat));
-    });
+    items.forEach(it => listEl.appendChild(createItemBtn(it, !activeCat)));
   }
 
   function renderCatList() {
@@ -366,6 +354,7 @@
     const q = catQuery.trim();
     let items = ALL.filter(it => it.cat === activeCat && matchesQuery(it, q));
     items.sort((a, b) => a.n - b.n);
+    if (!showAllSlots) items = items.filter(it => it.hasContent);
 
     const totalInCat = ALL.filter(it => it.cat === activeCat).length;
     const filledInCat = items.filter(i => i.hasContent).length;
@@ -380,11 +369,7 @@
       return;
     }
 
-    const showEmpty = !!q || showAllSlots;
-    items.forEach(it => {
-      if (!it.hasContent && !showEmpty) return;
-      catListEl.appendChild(createItemBtn(it, false));
-    });
+    items.forEach(it => catListEl.appendChild(createItemBtn(it, false)));
   }
 
   function switchToCatView(cat) {
@@ -483,7 +468,7 @@
   // ── 라우터 ────────────────────────────────
   function render() {
     const n = parseInt(location.hash.replace('#', ''));
-    const isDetail = n >= 1 && n <= MAX_N && ((typeof PAGES !== 'undefined' && PAGES[n] && PAGES[n].url));
+    const isDetail = n >= 1 && n <= MAX_N;
 
     document.getElementById('view-detail').classList.toggle('active', isDetail);
 
@@ -513,9 +498,17 @@
     document.title = `${label} — Motion Test`;
 
     const content = document.getElementById('detail-content');
-    content.innerHTML =
-      `<iframe class="detail-iframe" src="${page.url}" allowfullscreen
-       allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
+    if (page.url) {
+      content.innerHTML =
+        `<iframe class="detail-iframe" src="${page.url}" allowfullscreen
+         allow="microphone; camera; clipboard-write; fullscreen"></iframe>`;
+    } else {
+      content.innerHTML =
+        `<div class="empty-msg">
+           <span class="icon">🧪</span>
+           <p>아직 내용이 없습니다</p>
+         </div>`;
+    }
   }
 
   window.addEventListener('hashchange', render);
